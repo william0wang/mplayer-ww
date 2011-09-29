@@ -13,6 +13,12 @@
 #include <stdlib.h>
 #include "loader/win32.h" // printf macro
 
+#define S_OK  ((HRESULT)0L)
+
+#if HAVE_PTHREADS
+#include <pthread.h>
+static pthread_mutex_t page_mutex = PTHREAD_MUTEX_INITIALIZER;
+#endif
 typedef long STDCALL (*GETCLASS) (const GUID*, const GUID*, void**);
 
 #ifndef WIN32_LOADER
@@ -26,6 +32,8 @@ const GUID IID_IClassFactory =
     0x00000001, 0x0000, 0x0000,
     {0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46}
 };
+
+int no_discontinuity = 0;
 
 HRESULT STDCALL CoInitialize(LPVOID pvReserved);
 void STDCALL CoUninitialize(void);
@@ -96,16 +104,22 @@ void DS_Filter_Destroy(DS_Filter* This)
 static HRESULT STDCALL DS_Filter_CopySample(void* pUserData,IMediaSample* pSample){
     BYTE* pointer;
     int len;
+    AM_MEDIA_TYPE *mt;
+    REFERENCE_TIME stoptime;
+
     SampleProcUserData* pData=pUserData;
     Debug printf("CopySample called(%p,%p)\n",pSample,pUserData);
+
     if (pSample->vt->GetPointer(pSample, &pointer))
 	return 1;
     len = pSample->vt->GetActualDataLength(pSample);
     if (len == 0)
 	len = pSample->vt->GetSize(pSample);//for iv50
 
+    pSample->vt->GetTime(pSample, &pData->pts_nsec, &stoptime);
     pData->frame_pointer = pointer;
     pData->frame_size = len;
+    pData->state = PD_SET;
 /*
     FILE* file=fopen("./uncompr.bmp", "wb");
     char head[14]={0x42, 0x4D, 0x36, 0x10, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x36, 0x00, 0x00, 0x00};
@@ -116,6 +130,43 @@ static HRESULT STDCALL DS_Filter_CopySample(void* pUserData,IMediaSample* pSampl
     fclose(file);
 */
     return 0;
+}
+
+void GetProductVersion(HMODULE hMod)
+{
+    HANDLE r;
+    char *res;
+    int len, i, mversion;
+    r = FindResourceA(hMod, (LPCSTR)1, (LPCSTR)16); //VS_VERSION_INFO, RT_VERSION
+    res = (char *)LoadResource(hMod, r);
+    len = SizeofResource(hMod, r);
+    for(i = 0; i < len-50; i ++) {
+      if(res[i]=='P'   && res[i+2]=='r' && res[i+4]=='o' && res[i+6]=='d' &&
+        res[i+8]=='u'  && res[i+10]=='c' && res[i+12]=='t' && res[i+14]=='V' &&
+        res[i+16]=='e' && res[i+18]=='r' && res[i+20]=='s' && res[i+22]=='i' &&
+        res[i+24]=='o' && res[i+26]=='n' && res[i+28]==0) {
+		char s[256];
+		WideCharToMultiByte(0,0,(LPCWSTR)(res+i+30),-1,s,256,NULL,NULL);
+		printf("ProductVersion: %s\n", s);
+	    if(!no_discontinuity && s[0] == '1' && s[1] == ',') {
+          mversion = s[3] - '0';
+          if(mversion < 6 && mversion > 0) no_discontinuity = 1;
+        }
+      }
+    }
+}
+
+void DS_ShowPropertyPage(DS_Filter* This)
+{
+	HRESULT result;
+	void *pointer;
+	result = This->m_pFilter->vt->QueryInterface(This, &IID_ISpecifyPropertyPages, (void*)&pointer);
+	if(result || ! pointer)
+	{
+		printf("Filter does not provide ISpecifyPropertyPages\n");
+		return;
+	}
+	printf("Filter does provide ISpecifyPropertyPages\n");
 }
 
 DS_Filter* DS_FilterCreate(const char* dllname, const GUID* id,
@@ -176,6 +227,7 @@ DS_Filter* DS_FilterCreate(const char* dllname, const GUID* id,
 	    em = "could not open DirectShow DLL";
 	    break;
 	}
+    GetProductVersion(This->m_iHandle);
 	func = (GETCLASS)GetProcAddress((unsigned)This->m_iHandle, "DllGetClassObject");
 	if (!func)
 	{
@@ -294,13 +346,19 @@ DS_Filter* DS_FilterCreate(const char* dllname, const GUID* id,
 
 	This->m_pOurOutput = COutputPinCreate(This->m_pDestType,DS_Filter_CopySample,pUserData);
 
-	result = This->m_pOutputPin->vt->ReceiveConnection(This->m_pOutputPin,
-							   (IPin*) This->m_pOurOutput,
+	result = This->m_pOutputPin->vt->QueryAccept(This->m_pOutputPin,
 							   This->m_pDestType);
-	if (result)
-	{
-	    em = "could not connect to output pin";
-            break;
+	// Only connect if we can.  Otherwise delay the connection until
+	// DS_VideoDecoder_SetDestFmt is called
+  	if (! result) {
+		result = This->m_pOutputPin->vt->ReceiveConnection(This->m_pOutputPin,
+								   (IPin*) This->m_pOurOutput,
+								   This->m_pDestType);
+		if (result)
+		{
+		    em = "could not connect to output pin";
+	            break;
+		}
 	}
 
 	init++;

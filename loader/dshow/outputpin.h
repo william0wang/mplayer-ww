@@ -25,6 +25,7 @@ struct COutputPin
     SAMPLEPROC SampleProc;
     void* pUserData;
     void ( *SetNewFormat )(COutputPin*, const AM_MEDIA_TYPE* a);
+    int restrict_media_type;
 };
 
 COutputPin* COutputPinCreate(const AM_MEDIA_TYPE* amt,SAMPLEPROC SampleProc,void* pUserData);

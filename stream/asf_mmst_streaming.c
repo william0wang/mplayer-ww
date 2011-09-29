@@ -60,6 +60,8 @@
 #define HDR_BUF_SIZE 8192
 #define MAX_STREAMS 20
 
+char *url_cp = "UTF-8";
+
 typedef struct
 {
   uint8_t buf[BUF_SIZE];
@@ -565,7 +567,7 @@ int asf_mmst_streaming_start(stream_t *stream)
 
   /* prepare for the url encoding conversion */
 #ifdef CONFIG_ICONV
-  url_conv = iconv_open("UTF-16LE", "UTF-8");
+  url_conv = iconv_open("UTF-16LE", url_cp);
 #endif
 
   snprintf (str, 1023, "\034\003NSPlayer/7.0.0.1956; {33715801-BAB3-9D85-24E9-03B90328270A}; Host: %s", url1->hostname);

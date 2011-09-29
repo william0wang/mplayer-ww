@@ -74,6 +74,7 @@ extern const stream_info_t stream_info_dvdnav;
 extern const stream_info_t stream_info_smb;
 extern const stream_info_t stream_info_sdp;
 extern const stream_info_t stream_info_rtsp_sip;
+extern const stream_info_t stream_info_vod;
 
 extern const stream_info_t stream_info_cue;
 extern const stream_info_t stream_info_null;
@@ -120,6 +121,9 @@ static const stream_info_t* const auto_open_streams[] = {
 #endif
 #ifdef CONFIG_FTP
   &stream_info_ftp,
+#endif
+#ifdef CONFIG_VOD
+  &stream_info_vod,
 #endif
 #ifdef CONFIG_VSTREAM
   &stream_info_vstream,

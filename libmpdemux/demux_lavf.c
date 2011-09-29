@@ -54,6 +54,11 @@ static unsigned int opt_analyzeduration = 0;
 static char *opt_format;
 static char *opt_cryptokey;
 static char *opt_avopt = NULL;
+static int not_correct_pts = 0;
+static int is_matroska_format = 0;
+extern int is_mpegts_format;
+extern int is_rar_stream;
+extern int mkv_realdemux;
 
 const m_option_t lavfdopts_conf[] = {
 	{"probesize", &(opt_probesize), CONF_TYPE_INT, CONF_RANGE, 32, INT_MAX, NULL},
@@ -148,7 +153,7 @@ static int lavf_check_file(demuxer_t *demuxer){
     AVProbeData avpd;
     lavf_priv_t *priv;
     int probe_data_size = 0;
-    int read_size = INITIAL_PROBE_SIZE;
+    int read_size = is_rar_stream?2048:INITIAL_PROBE_SIZE;
     int score;
 
     if(!demuxer->priv)
@@ -201,8 +206,11 @@ static int lavf_check_file(demuxer_t *demuxer){
     if(!priv->avif){
         mp_msg(MSGT_HEADER,MSGL_V,"LAVF_check: no clue about this gibberish!\n");
         return 0;
-    }else
+    }else{
+		if(is_rar_stream && !strcmp("matroska,webm", priv->avif->name))
+			return 0;
         mp_msg(MSGT_HEADER,MSGL_V,"LAVF_check: %s\n", priv->avif->long_name);
+	}
 
     return DEMUXER_TYPE_LAVF;
 }
@@ -362,7 +370,10 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
                     case PIX_FMT_BGR24:
                         codec->codec_tag= MKTAG(24, 'R', 'G', 'B');
                 }
-            }
+            } else if(is_matroska_format && (codec->codec_id == CODEC_ID_RV40 ||
+				codec->codec_id == CODEC_ID_RV30 || codec->codec_id == CODEC_ID_RV20)) {
+					mkv_realdemux = 1;
+			}
             // mp4v is sometimes also used for files containing e.g. mjpeg
             if(codec->codec_tag == MKTAG('m', 'p', '4', 'v'))
                 codec->codec_tag= 0;
@@ -387,7 +398,7 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
             sh_video->fps=av_q2d(st->r_frame_rate);
             sh_video->frametime=1/av_q2d(st->r_frame_rate);
             sh_video->format=bih->biCompression;
-            if(st->sample_aspect_ratio.num)
+            if(st->sample_aspect_ratio.num && st->sample_aspect_ratio.num < 0xfffff)
                 sh_video->aspect = codec->width  * st->sample_aspect_ratio.num
                          / (float)(codec->height * st->sample_aspect_ratio.den);
             else
@@ -545,6 +556,14 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
 
     priv->avfc= avfc;
 
+	not_correct_pts = 0;
+	is_matroska_format = 0;
+    if(!strcmp("mpegts", priv->avif->name)) {
+		is_mpegts_format = 2;
+	} else if(!strcmp("matroska,webm", priv->avif->name)) {
+		is_matroska_format = 1;
+	}
+
     if(avformat_find_stream_info(avfc, NULL) < 0){
         mp_msg(MSGT_HEADER,MSGL_ERR,"LAVF_header: av_find_stream_info() failed\n");
         return NULL;
@@ -553,6 +572,12 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
     /* Add metadata. */
     while((t = av_dict_get(avfc->metadata, "", t, AV_METADATA_IGNORE_SUFFIX)))
         demux_info_add(demuxer, t->key, t->value);
+
+	if(!strcmp("mov,mp4,m4a,3gp,3g2,mj2", priv->avif->name)) {
+        t = av_dict_get(avfc->metadata, "major_brand", NULL, 0);
+		if(t && !strncmp("3gp", t->value, 3)) 
+			not_correct_pts = 1;
+	}
 
     for(i=0; i < avfc->nb_chapters; i++) {
         AVChapter *c = avfc->chapters[i];
@@ -691,6 +716,8 @@ static int demux_lavf_control(demuxer_t *demuxer, int cmd, void *arg)
 
     switch (cmd) {
         case DEMUXER_CTRL_CORRECT_PTS:
+            if (not_correct_pts)
+                return DEMUXER_CTRL_NOTIMPL;
 	    return DEMUXER_CTRL_OK;
         case DEMUXER_CTRL_GET_TIME_LENGTH:
 	    if (priv->avfc->duration == 0 || priv->avfc->duration == AV_NOPTS_VALUE)

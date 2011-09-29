@@ -138,21 +138,22 @@ DMO_Filter* DMO_FilterCreate(const char* dllname, const GUID* id,
                 Debug printf("BYTE %d  %02x  %02x\n", i, ((uint8_t*)dmo.pbFormat)[i], ((uint8_t*)out_fmt->pbFormat)[i]);
 */
 	}
+	if (0!=memcmp(&GUID_NULL, &out_fmt->subtype, sizeof(GUID))) {
+		hr = This->m_pMedia->vt->SetOutputType(This->m_pMedia, 0, out_fmt, 0);
+		if (hr)
+		{
+		    em = "output format no accepted";
+		    break;
+		}
 
-	hr = This->m_pMedia->vt->SetOutputType(This->m_pMedia, 0, out_fmt, 0);
-	if (hr)
-	{
-	    em = "output format no accepted";
-	    break;
+		inputs = outputs = 0;
+		hr = This->m_pMedia->vt->GetOutputSizeInfo(This->m_pMedia, 0, &inputs, &outputs);
+		Debug printf("GetOutput r=0x%lx   size:%ld  align:%ld\n", hr, inputs, outputs);
+
+		// This->m_pMedia->vt->AllocateStreamingResources(This->m_pMedia);
+		hr = This->m_pMedia->vt->GetStreamCount(This->m_pMedia, &inputs, &outputs);
+		Debug printf("StreamCount r=0x%lx  %ld  %ld\n", hr, inputs, outputs);
 	}
-
-	inputs = outputs = 0;
-	hr = This->m_pMedia->vt->GetOutputSizeInfo(This->m_pMedia, 0, &inputs, &outputs);
-	Debug printf("GetOutput r=0x%lx   size:%ld  align:%ld\n", hr, inputs, outputs);
-
-	// This->m_pMedia->vt->AllocateStreamingResources(This->m_pMedia);
-	hr = This->m_pMedia->vt->GetStreamCount(This->m_pMedia, &inputs, &outputs);
-	Debug printf("StreamCount r=0x%lx  %ld  %ld\n", hr, inputs, outputs);
 
         break;
     }

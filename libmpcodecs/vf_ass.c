@@ -65,6 +65,7 @@ static const struct vf_priv_s {
     unsigned char *dirty_rows;
 } vf_priv_dflt;
 
+static double ass_last_pts = -303;
 
 static int config(struct vf_instance *vf,
                   int width, int height, int d_width, int d_height,
@@ -74,6 +75,8 @@ static int config(struct vf_instance *vf,
 
     if (outfmt == IMGFMT_IF09)
         return 0;
+
+	ass_last_pts = -303;
 
     vf->priv->outh = height + ass_top_margin + ass_bottom_margin;
     vf->priv->outw = width;
@@ -352,8 +355,10 @@ static void render_frame(struct vf_instance *vf, mp_image_t *mpi,
 
 static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
 {
+    if (pts > ass_last_pts || pts < ass_last_pts-1.0)
+        ass_last_pts = pts;
     struct mp_eosd_image_list images;
-    eosd_render_frame(pts, &images);
+    eosd_render_frame(ass_last_pts, &images);
     prepare_image(vf, mpi);
     render_frame(vf, mpi, &images);
     return vf_next_put_image(vf, vf->dmpi, pts);

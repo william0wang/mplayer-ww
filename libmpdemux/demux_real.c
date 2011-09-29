@@ -63,8 +63,8 @@ static unsigned char sipr_swaps[38][2]={
     {77,80} };
 
 typedef struct {
-    unsigned int	timestamp;
-    int		offset;
+    int64_t		timestamp;
+    off_t		offset;
 //    int		packetno;
 //    int		len; /* only filled by our index generator */
 //    int		flags; /* only filled by our index generator */
@@ -72,7 +72,7 @@ typedef struct {
 
 typedef struct {
     /* for seeking */
-    int		index_chunk_offset;
+    int64_t		index_chunk_offset;
     real_index_table_t *index_table[MAX_STREAMS];
 
 //    int		*index_table[MAX_STREAMS];
@@ -106,9 +106,9 @@ typedef struct {
      * Used to demux multirate files
      */
     int is_multirate; ///< != 0 for multirate files
-    int str_data_offset[MAX_STREAMS]; ///< Data chunk offset for every audio/video stream
-    int audio_curpos; ///< Current file position for audio demuxing
-    int video_curpos; ///< Current file position for video demuxing
+    off_t str_data_offset[MAX_STREAMS]; ///< Data chunk offset for every audio/video stream
+    off_t audio_curpos; ///< Current file position for audio demuxing
+    off_t video_curpos; ///< Current file position for video demuxing
     int a_num_of_packets; ///< Number of audio packets
     int v_num_of_packets; ///< Number of video packets
     int a_bitrate; ///< Audio bitrate
@@ -168,7 +168,7 @@ static void dump_index(demuxer_t *demuxer, int stream_id)
     for (i = 0; i < entries; i++)
     {
 #if 1
-	mp_msg(MSGT_DEMUX, MSGL_V,"i: %d, pos: %d, timestamp: %u\n", i, index[i].offset, index[i].timestamp);
+	mp_msg(MSGT_DEMUX, MSGL_V,"i: %d, pos: %"PRId64", timestamp: %u\n", i, index[i].offset, index[i].timestamp);
 #else
 	mp_msg(MSGT_DEMUX, MSGL_V,"packetno: %x pos: %x len: %x timestamp: %x flags: %x\n",
 	    index[i].packetno, index[i].offset, index[i].len, index[i].timestamp,
@@ -181,7 +181,7 @@ static int parse_index_chunk(demuxer_t *demuxer)
 {
     real_priv_t *priv = demuxer->priv;
     int origpos = stream_tell(demuxer->stream);
-    int next_header_pos = priv->index_chunk_offset;
+    int64_t next_header_pos = priv->index_chunk_offset;
     int i, entries, stream_id;
 
 read_index:
@@ -190,7 +190,7 @@ read_index:
     i = stream_read_dword_le(demuxer->stream);
     if ((i == -256) || (i != MKTAG('I', 'N', 'D', 'X')))
     {
-	mp_msg(MSGT_DEMUX, MSGL_WARN,"Something went wrong, no index chunk found on given address (%d)\n",
+	mp_msg(MSGT_DEMUX, MSGL_WARN,"Something went wrong, no index chunk found on given address (%"PRId64")\n",
 	    next_header_pos);
 	index_mode = -1;
         if (i == -256)
@@ -200,7 +200,7 @@ read_index:
 	//goto end;
     }
 
-    mp_msg(MSGT_DEMUX, MSGL_V,"Reading index table from index chunk (%d)\n",
+    mp_msg(MSGT_DEMUX, MSGL_V,"Reading index table from index chunk (%"PRId64")\n",
 	next_header_pos);
 
     i = stream_read_dword(demuxer->stream);
@@ -217,7 +217,7 @@ read_index:
     mp_msg(MSGT_DEMUX, MSGL_V,"stream_id: %d\n", stream_id);
 
     next_header_pos = stream_read_dword(demuxer->stream);
-    mp_msg(MSGT_DEMUX, MSGL_V,"next_header_pos: %d\n", next_header_pos);
+    mp_msg(MSGT_DEMUX, MSGL_V,"next_header_pos: %"PRId64"\n", next_header_pos);
     if (entries <= 0 || entries > MAX_INDEX_ENTRIES)
     {
 	if (next_header_pos)
@@ -1603,7 +1603,7 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		            stream_skip(demuxer->stream, 4); // Skip DATA offset for broken stream
 		        } else {
 		            priv->str_data_offset[stream_list[i]] = stream_read_dword(demuxer->stream);
-		            mp_msg(MSGT_DEMUX,MSGL_V,"Stream %d with DATA offset 0x%08x\n", stream_list[i], priv->str_data_offset[stream_list[i]]);
+		            mp_msg(MSGT_DEMUX,MSGL_V,"Stream %d with DATA offset 0x%08x\n", stream_list[i], 0xffffffff & priv->str_data_offset[stream_list[i]]);
 		        }
 		    // Skip the rest of this chunk
 		 } else
@@ -1782,7 +1782,7 @@ static void demux_seek_real(demuxer_t *demuxer, float rel_seek_secs, float audio
     sh_audio_t *sh_audio = d_audio->sh;
     sh_video_t *sh_video = d_video->sh;
     int vid = d_video->id, aid = d_audio->id;
-    int next_offset = 0;
+    off_t next_offset = 0;
     int64_t cur_timestamp = 0;
     int streams = 0;
     int retried = 0;

@@ -37,6 +37,9 @@
 #include "spudec.h"
 #include "mp_msg.h"
 #include "path.h"
+#ifdef __MINGW32__
+#include "unrar.h"
+#endif
 #include "unrar_exec.h"
 #include "libavutil/common.h"
 
@@ -217,6 +220,114 @@ static size_t rar_read(void *ptr, size_t size, size_t nmemb,
     res /= size;
     return res;
 }
+
+#elif defined(__MINGW32__)
+typedef FILE rar_stream_t;
+extern char *tempsub;
+static int is_tempsub = 0;
+
+rar_stream_t *urardll_get(char *filename, char *ArcName)
+{
+  FILE *stream=NULL;
+  int hArcData;
+  struct RARHeaderDataEx HeaderData;
+  struct RAROpenArchiveDataEx OpenArchiveData;
+  char *extmatch_filename=NULL;
+
+  memset(&OpenArchiveData,0,sizeof(OpenArchiveData));
+  OpenArchiveData.ArcName=ArcName;
+  OpenArchiveData.OpenMode=RAR_OM_EXTRACT;
+  hArcData=(*RAROpenArchiveEx)(&OpenArchiveData);
+
+  if (OpenArchiveData.OpenResult) return NULL;
+
+  HeaderData.CmtBuf=NULL;
+  while (!(*RARReadHeaderEx)(hArcData,&HeaderData))
+  {
+    if (stricmp(HeaderData.FileName, filename)) {
+	if (!extmatch_filename && !stricmp(strrchr(HeaderData.FileName,'.'), strrchr(filename,'.')))
+	  extmatch_filename = strdup(HeaderData.FileName);
+	if ((*RARProcessFile)(hArcData,RAR_SKIP,NULL,NULL)) break;
+    } else {
+	if (!(*RARProcessFile)(hArcData,RAR_EXTRACT,NULL,tempsub)) {
+	  stream = fopen(tempsub, "rb");
+	  is_tempsub = 1;
+	}
+	break;
+    }
+  }
+  (*RARCloseArchive)(hArcData);
+
+  if (extmatch_filename) {
+    if (!stream) stream = urardll_get(extmatch_filename, ArcName);
+    free(extmatch_filename);
+  }
+
+  return stream;
+}
+
+/**********************************************************************
+ * RAR stream handling
+ * The RAR file must have the same basename as the file to open
+ * See <URL:http://www.unrarlib.org/>
+ **********************************************************************/
+static rar_stream_t *rar_open(const char *const filename, const char *const mode)
+{
+    FILE *stream;
+    /* unrarlib can only read */
+    if (strcmp("r", mode) && strcmp("rb", mode)) {
+	errno = EINVAL;
+	return NULL;
+    }
+    /* first try normal access */
+    is_tempsub = 0;
+    if (!(stream=fopen(filename, mode)) && unrardll) {
+	char *rar_filename;
+	const char *p;
+
+	/* Guess the RAR archive filename */
+	rar_filename = NULL;
+	p = strrchr(filename, '.');
+	if (p) {
+	    ptrdiff_t l = p - filename;
+	    rar_filename = malloc(l + 5);
+	    if (rar_filename == NULL) return NULL;
+	    strncpy(rar_filename, filename, l);
+	    strcpy(rar_filename + l, ".rar");
+	} else {
+	    rar_filename = malloc(strlen(filename) + 5);
+	    if (rar_filename == NULL) return NULL;
+	    strcpy(rar_filename, filename);
+	    strcat(rar_filename, ".rar");
+	}
+
+	/* get rid of the path if there is any */
+	if (p = strrchr(filename, '\\'))
+	    p++;
+	else
+	    p = filename;
+
+	stream = urardll_get((char*)p, rar_filename);
+	free(rar_filename);
+    }
+    return stream;
+}
+
+static int rar_close(rar_stream_t *stream)
+{
+    int result=0;
+    if (stream) {
+	result = fclose(stream);
+	if (is_tempsub) unlink(tempsub);
+    }
+    return result;
+}
+
+#define rar_eof		feof
+#define rar_tell	ftell
+#define rar_seek	fseek
+#define rar_getc	getc
+#define rar_read	fread
 
 #else
 typedef FILE rar_stream_t;

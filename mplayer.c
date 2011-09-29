@@ -167,6 +167,12 @@ static MPContext mpctx_s = {
 static MPContext *mpctx = &mpctx_s;
 
 int fixed_vo;
+extern int channel_state;
+#ifdef CONFIG_ICONV
+extern char *url_cp;
+extern char *sub_cps;
+int cp_index_min;
+#endif
 
 // benchmark:
 double video_time_usage;
@@ -188,6 +194,10 @@ int use_gui;
 
 #ifdef CONFIG_GUI
 int enqueue;
+#endif
+
+#ifdef CONFIG_ICONV
+extern char *sub_cps;
 #endif
 
 static int list_properties;
@@ -284,6 +294,14 @@ int sub_auto = 1;
 char *vobsub_name;
 int subcc_enabled;
 int suboverlap_enabled = 1;
+int coreavc_codec = 0;
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+extern int special_codec;
+#else
+int special_codec = 0;
+#endif
+
+char* current_module=NULL; // for debugging
 
 char *current_module; // for debugging
 
@@ -490,6 +508,15 @@ char *get_metadata(metadata_t type)
     return NULL;
 }
 
+static off_t get_media_bitrate()
+{
+	off_t mediasize = mpctx->demuxer->movi_end - mpctx->demuxer->movi_start;
+	off_t len = demuxer_get_time_length(mpctx->demuxer);
+	if(mediasize <= 0 || len <= 0)
+		return 0;
+	return (mediasize*8 / len);
+}
+
 static void print_file_properties(const MPContext *mpctx, const char *filename)
 {
     double video_start_pts = MP_NOPTS_VALUE;
@@ -507,6 +534,7 @@ static void print_file_properties(const MPContext *mpctx, const char *filename)
         mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VIDEO_HEIGHT=%d\n",    mpctx->sh_video->disp_h);
         mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VIDEO_FPS=%5.3f\n",    mpctx->sh_video->fps);
         mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VIDEO_ASPECT=%1.4f\n", mpctx->sh_video->aspect);
+        mp_msg(MSGT_IDENTIFY,MSGL_INFO,"ID_MEDIA_BITRATE=%d\n", get_media_bitrate());
         video_start_pts = ds_get_next_pts(mpctx->d_video);
     }
     if (mpctx->sh_audio) {
@@ -733,6 +761,10 @@ void exit_player_with_rc(enum exit_reason how, int rc)
     if (mpctx->playtree)
         play_tree_free(mpctx->playtree, 1);
     mpctx->playtree = NULL;
+
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+    unrar_uninit();
+#endif
 
     free(edl_records); // free mem allocated for EDL
     edl_records = NULL;
@@ -1057,10 +1089,18 @@ void add_subtitles(char *filename, float fps, int noerr)
 #ifdef CONFIG_ASS
     ASS_Track *asst = 0;
 #endif
+	char *p = NULL;
+	int cp_index = -1;
 
     if (filename == NULL || mpctx->set_of_sub_size >= MAX_SUBTITLE_FILES)
         return;
 
+	// try to load plain text subtilte
+	sub_cp = sub_cps;
+	do {
+		cp_index++;
+		p = strchr(sub_cp, ',');
+		if (p) *p = 0;			// temp change
     subd = sub_read_file(filename, fps);
 #ifdef CONFIG_ASS
     if (ass_enabled)
@@ -1069,6 +1109,15 @@ void add_subtitles(char *filename, float fps, int noerr)
 #else
         asst = ass_read_stream(ass_library, filename, 0);
 #endif
+		if (p)
+		{
+			*p = ',';			// restore
+			if (!subd)
+				sub_cp = p + 1;	// to next codepage token
+		}
+		else break;				// no more codepage token
+	} while (!subd && sub_cp && *sub_cp);
+	
     if (ass_enabled && subd && !asst)
         asst = ass_read_subdata(ass_library, subd, fps);
 
@@ -1516,6 +1565,116 @@ void set_osd_bar(int type, const char *name, double min, double max, double val)
                 name, ROUND(100 * (val - min) / (max - min)));
 }
 
+int is_mpegts_format=0;
+int stream_offset_ex=0;
+int stream_need_adjust=0;
+static int is_vob_format=0;
+static int is_asf_format=0;
+static int adjust_ts_offset=1;
+static int mpegts_not_mpeg=0;
+static int save_frame_dropping=0;
+static float save_subdelay=0;
+static double save_endpos=0;
+static int demuxer_get_current_time_ex(demuxer_t *demuxer, int len)
+{
+    int get_time_ans, offset, pts;
+    get_time_ans = pts = demuxer_get_current_time(mpctx->demuxer);
+    if(stream_need_adjust) {
+        if(is_mpegts_format && !mpegts_not_mpeg) {
+            sh_video_t *sh_video = demuxer->video->sh;
+            sh_audio_t *sh_audio = demuxer->audio->sh;
+            if (sh_video && sh_video->i_bps && sh_audio && sh_audio->i_bps)
+                get_time_ans = (demuxer->filepos - demuxer->movi_start)
+                                        / (sh_video->i_bps + sh_audio->i_bps);
+            else if (sh_video && sh_video->i_bps)
+                get_time_ans = (demuxer->filepos - demuxer->movi_start) / sh_video->i_bps;
+            else if (sh_audio && sh_audio->i_bps)
+                get_time_ans = (demuxer->filepos - demuxer->movi_start) / sh_audio->i_bps;
+            else
+                get_time_ans = 0;
+            offset = get_time_ans-pts;
+            if(offset > 0) offset = 0;
+            if(adjust_ts_offset == 1 && offset < 0) {
+                stream_offset_ex = offset;
+                save_subdelay = sub_delay;
+                sub_delay = save_subdelay+stream_offset_ex;
+                end_at.pos = save_endpos-stream_offset_ex;
+                adjust_ts_offset = -1;
+            } else if(adjust_ts_offset == -1 && offset < 0
+                 && (stream_offset_ex < offset-1 || stream_offset_ex > offset+1)) {
+                sub_delay += offset-stream_offset_ex;
+                end_at.pos += stream_offset_ex-offset;
+                stream_offset_ex = offset;
+            }
+        } else if(adjust_ts_offset) {
+            get_time_ans += stream_offset_ex;
+        }
+    }
+    return get_time_ans;
+}
+
+static void update_ts_offset_ex(demuxer_t *demuxer)
+{
+    int get_time_ans, offset, pts, len;
+
+    if(!stream_need_adjust || (mpegts_not_mpeg && !save_frame_dropping))
+        return;
+
+    pts = demuxer_get_current_time(demuxer);
+
+	if (is_mpegts_format == 2 && save_frame_dropping && pts > 1) {
+        frame_dropping = save_frame_dropping;
+        save_frame_dropping = 0;
+    } else if(stream_need_adjust && is_mpegts_format) {
+        sh_video_t *sh_video = demuxer->video->sh;
+        sh_audio_t *sh_audio = demuxer->audio->sh;
+        if (sh_video && sh_video->i_bps && sh_audio && sh_audio->i_bps)
+            get_time_ans = (demuxer->filepos - demuxer->movi_start)
+                                    / (sh_video->i_bps + sh_audio->i_bps);
+        else if (sh_video && sh_video->i_bps)
+            get_time_ans = (demuxer->filepos - demuxer->movi_start) / sh_video->i_bps;
+        else if (sh_audio && sh_audio->i_bps)
+            get_time_ans = (demuxer->filepos - demuxer->movi_start) / sh_audio->i_bps;
+        else
+            get_time_ans = 0;
+        if(is_mpegts_format == 2 && save_frame_dropping && get_time_ans > 1) {
+            frame_dropping = save_frame_dropping;
+            save_frame_dropping = 0;
+        }
+        if(!mpegts_not_mpeg) {
+            offset = get_time_ans-pts;
+            if(offset > 0) offset = 0;
+            if(adjust_ts_offset == 1 && offset < 0) {
+                stream_offset_ex = offset;
+                save_subdelay = sub_delay;
+                sub_delay = save_subdelay+stream_offset_ex;
+                end_at.pos = save_endpos-stream_offset_ex;
+                adjust_ts_offset = -1;
+            } else if(adjust_ts_offset == -1 && offset < 0
+                 && (stream_offset_ex < offset-1 || stream_offset_ex > offset+1)) {
+                sub_delay += offset-stream_offset_ex;
+                end_at.pos += stream_offset_ex-offset;
+                stream_offset_ex = offset;
+            }
+        }
+    }
+}
+
+static void adjust_stream_offset_ex(float offset)
+{
+    save_subdelay = sub_delay;
+    save_endpos = end_at.pos;
+	stream_offset_ex = 0;
+    if(offset > 0) {
+        stream_offset_ex = -offset;
+        end_at.pos += offset;
+        sub_delay -= offset;
+        adjust_ts_offset = -1;
+    } else {
+        adjust_ts_offset = 1;
+    }
+}
+
 /**
  * @brief Display text subtitles on the OSD.
  */
@@ -1573,7 +1732,7 @@ static void update_osd_msg(void)
             int percentage = -1;
             char percentage_text[10];
             char fractions_text[4];
-            int pts = demuxer_get_current_time(mpctx->demuxer);
+            int pts = demuxer_get_current_time_ex(mpctx->demuxer, len);
 
             if (mpctx->osd_show_percentage)
                 percentage = demuxer_get_percent_pos(mpctx->demuxer);
@@ -1615,8 +1774,10 @@ static void update_osd_msg(void)
                 snprintf(osd_text_timer, 63, "%c %02d:%02d:%02d%s%s",
                          mpctx->osd_function, pts / 3600, (pts / 60) % 60,
                          pts % 60, fractions_text, percentage_text);
-        } else
+        } else {
+            update_ts_offset_ex(mpctx->demuxer);
             osd_text_timer[0] = 0;
+        }
 
         // always decrement the percentage timer
         if (mpctx->osd_show_percentage)
@@ -2353,8 +2514,24 @@ int reinit_video_chain(void)
 
     initialized_flags |= INITIALIZED_VCODEC;
 
-    if (sh_video->codec)
-        mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VIDEO_CODEC=%s\n", sh_video->codec->name);
+    coreavc_codec = 0;
+    special_codec = 0;
+	if (sh_video->codec) {
+		if(!strcasecmp(sh_video->codec->name, "wmv11dmo") || !strcasecmp(sh_video->codec->name, "wmvvc1dmo") ||
+				!strcasecmp(sh_video->codec->name, "wmvdmo") || !strcasecmp(sh_video->codec->name, "wmv9dmo") ||
+				!strcasecmp(sh_video->codec->name, "divxh264win")) {
+			special_codec = 1;
+		} else if(!strcasecmp(sh_video->codec->name, "coreavc") ||
+				!strcasecmp(sh_video->codec->name, "coreavcwindows")) {
+			special_codec = 1;
+			coreavc_codec = 1;
+			if(!strcasecmp(mpctx->demuxer->desc->name, "lavf"))
+				user_correct_pts = 0;
+			if(user_correct_pts)
+				correct_pts = 1;
+		}
+		mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VIDEO_CODEC=%s\n", sh_video->codec->name);
+	}
 
     sh_video->last_pts = MP_NOPTS_VALUE;
     sh_video->num_buffered_pts = 0;
@@ -2388,7 +2565,7 @@ static double update_video(int *blit_frame)
     //--------------------  Decode a frame: -----------------------
     double frame_time;
     *blit_frame = 0; // Don't blit if we hit EOF
-    if (!correct_pts) {
+    if (!correct_pts || (special_codec && !coreavc_codec)) {
         unsigned char *start = NULL;
         void *decoded_frame  = NULL;
         int drop_frame       = 0;
@@ -2713,6 +2890,27 @@ static int seek(MPContext *mpctx, double amount, int style)
     return 0;
 }
 
+static float get_stream_offset_ex()
+{
+    int offset = 0;
+
+    if(!is_mpegts_format && !is_asf_format && !is_vob_format)
+        return 0;
+
+    offset = mpctx->d_audio->pts;
+    if(is_mpegts_format && offset < 10) offset = 0;
+    if(offset > 0) {
+		stream_need_adjust = 1;
+        mp_msg(MSGT_CPLAYER,MSGL_V,"Stream time offset: %f\n", offset);
+	}
+
+    if(is_mpegts_format == 2 && frame_dropping) {
+        save_frame_dropping = frame_dropping;
+        frame_dropping = 0;
+    }
+    return offset;
+}
+
 /* This preprocessor directive is a hack to generate a mplayer-nomain.o object
  * file for some tools to link against. */
 #ifndef DISABLE_MAIN
@@ -2722,6 +2920,10 @@ int main(int argc, char *argv[])
     int i;
 
     common_preinit();
+
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+    unrar_init();
+#endif
 
     // Create the config context and register the options
     mconfig = m_config_new();
@@ -3184,6 +3386,8 @@ play_next_file:
     }
     mpctx->sh_audio = NULL;
     mpctx->sh_video = NULL;
+    is_mpegts_format=0;
+    mpegts_not_mpeg=0;
 
     current_module = "open_stream";
     mpctx->stream  = open_stream(filename, 0, &mpctx->file_format);
@@ -3531,6 +3735,17 @@ goto_enable_cache:
         }
     }
 
+	if (mpctx->sh_video) {
+		char *ext = strrchr(filename, '.');
+		if(!is_mpegts_format && !strcasecmp(mpctx->demuxer->desc->name, "mpegts"))
+			is_mpegts_format = 1;
+		if(!is_mpegts_format && ext && (!strcasecmp(mpctx->demuxer->desc->name, "mpegps") && !strcasecmp(ext, ".vob")) )
+			is_mpegts_format = 1;
+		if(is_mpegts_format == 2 && mpctx->sh_video->format >= 0x20202020 && strcasecmp((char *)&mpctx->sh_video->format, "mpg2"))
+			mpegts_not_mpeg = 1;
+		if(!is_asf_format && !strcasecmp(mpctx->demuxer->desc->name, "asf"))
+			is_asf_format = 1;
+	}
     print_file_properties(mpctx, filename);
 
     // Adjust EDL positions with start_pts
@@ -3662,6 +3877,8 @@ goto_enable_cache:
             mpctx->eof = PT_NEXT_ENTRY;
             goto goto_next_file;
         }
+
+        adjust_stream_offset_ex(get_stream_offset_ex());
 
         if (seek_to_sec) {
             seek(mpctx, seek_to_sec, SEEK_ABSOLUTE);

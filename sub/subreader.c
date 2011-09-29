@@ -51,6 +51,11 @@
 #ifdef CONFIG_ICONV
 #include <iconv.h>
 char *sub_cp=NULL;
+char *sub_cps=NULL;
+int sub_ignore_errors=5;
+static int cp_utf16=0;
+static int _ignore_errors=5;
+static int recode_errors = 0;
 #endif
 #ifdef CONFIG_FRIBIDI
 #include <fribidi/fribidi.h>
@@ -60,7 +65,7 @@ int fribidi_flip_commas = 0;    ///flip comma when fribidi is used
 #endif
 
 /* Maximal length of line of a subtitle */
-#define LINE_LEN 1000
+#define LINE_LEN 4000
 static float mpsub_position=0;
 static float mpsub_multiplier=1.;
 static int sub_slacktime = 20000; //20 sec
@@ -85,6 +90,78 @@ int sub_format=SUB_INVALID;
    modified by sub_read_aqt_line or sub_read_subrip09_line.
  */
 unsigned long previous_sub_end;
+#endif
+
+#ifdef CONFIG_ICONV
+static iconv_t icdsc = (iconv_t)(-1);
+static const char cr[] = { 0x0D, 0x00 };
+static const char lf[] = { 0x0A, 0x00 };
+
+static inline char *_stream_read_line(stream_t *s,unsigned char* mem, int max, int utf16)
+{
+  int len;
+  unsigned char* end,*ptr = mem;
+  int e0 = 0, e1 = 1;
+  max >>= 2; // divede 4
+  do {
+    len = s->buf_len-s->buf_pos;
+    // try to fill the buffer
+    if(len <= 0 &&
+       (!cache_stream_fill_buffer(s) ||
+        (len = s->buf_len-s->buf_pos) <= 0)) break;
+	if (!utf16)
+    	end = (unsigned char*) memchr((void*)(s->buffer+s->buf_pos),'\n',len);
+	else {
+		int i = len-1;
+		if(utf16 == 2) { e0 = 1; e1 = 0; }
+		char *p = (char *)(s->buffer+s->buf_pos);
+		end = NULL;
+		while (i--) {
+			if ((*(p+1) == cr[e0] && *(p+2) == cr[e1]) || (*(p+1) == lf[e0] && *(p+2) == lf[e1])) {
+				int endl_len = 2;
+				if((i > 3) && *(p+1) == cr[0] && *(p+2) == cr[1] && *(p+3) == lf[0] && *(p+4) == lf[1])
+					endl_len = 4;
+				end = (char *)p;
+				end += endl_len;
+				break;
+			}
+			p++;
+		}
+    }
+    if(end) len = end - (s->buffer+s->buf_pos) + 1;
+    if(len > 0 && max > 1) {
+      int l = len > max-1 ? max-1 : len;
+      memcpy(ptr,s->buffer+s->buf_pos,l);
+      max -= l;
+      ptr += l;
+    }
+    s->buf_pos += len;
+  } while(!end);
+  if(s->eof && ptr == mem) return NULL;
+  if(max > 0) ptr[0] = 0;
+
+  if (icdsc != (iconv_t)-1) {
+	// need convert to utf8
+	static char obuf[LINE_LEN+2];
+	char *ip, *op;
+	size_t i,o;
+
+	i = ptr - mem;
+	o = LINE_LEN;
+	ip = mem;
+	op = obuf;
+	if (iconv(icdsc, &ip, &i, &op, &o) == (size_t)(-1)) {
+		mp_msg(MSGT_SUBREADER,MSGL_V,"SUB: error recoding line: %s\n", mem);
+		recode_errors++;
+	    return NULL;
+	}
+	*op = 0;
+	strcpy(mem, obuf);
+  }
+
+  return mem;
+}
+#define stream_read_line _stream_read_line
 #endif
 
 static int eol(char p) {
@@ -430,10 +507,10 @@ static subtitle *sub_ass_read_line_subviewer(stream_t *st, subtitle *current, in
 #endif
 
 static subtitle *sub_read_line_subviewer(stream_t *st,subtitle *current, int utf16) {
-    char line[LINE_LEN+1];
+    char line[LINE_LEN+1],test[LINE_LEN+1];
     int a1,a2,a3,a4,b1,b2,b3,b4;
     char *p=NULL;
-    int i,len;
+    int i,len,k,pos;
 
 #ifdef CONFIG_ASS
     if (ass_enabled)
@@ -477,6 +554,18 @@ static subtitle *sub_read_line_subviewer(stream_t *st,subtitle *current, int utf
 
 		i++;
 	    } else {
+	    	if(!len) {
+		    	pos = stream_tell(st);
+	    		if (stream_read_line (st, test, LINE_LEN, utf16)) {
+					if(stream_read_line (st, test, LINE_LEN, utf16)) {
+						if (sscanf (test, "%d:%d:%d%[,.:]%d --> %d:%d:%d%[,.:]%d",&a1,&a2,&a3,(char *)&k,&a4,&b1,&b2,&b3,(char *)&k,&b4) < 10) {
+							stream_seek(st, pos);
+						    continue;
+						}
+	    			}
+	    		}
+				stream_seek(st, pos);
+			}
 		break;
 	    }
 	}
@@ -710,12 +799,18 @@ static void sub_pp_ssa(subtitle *sub) {
 	while (l){
             	/* eliminate any text enclosed with {}, they are font and color settings */
             	so=de=sub->text[--l];
+            	if(so && *so != '{') {
+            		start = strstr(so, ")}");
+            		if(start && (start - so < 6)) {
+            			*so = '{';
+            			so[1] = '\\';
+            		}
+            	}
             	while (*so) {
             		if(*so == '{' && so[1]=='\\') {
             			for (start=so; *so && *so!='}'; so++);
-            			if(*so) so++; else so=start;
-            		}
-            		if(*so) {
+            			if(*so) so++; else so=start+1;
+            		} else if(*so) {
             			*de=*so;
             			so++; de++;
             		}
@@ -1102,12 +1197,17 @@ static subtitle *sub_read_line_jacosub(stream_t* st, subtitle * current, int utf
 
 static int sub_autodetect (stream_t* st, int *uses_time, int utf16) {
     char line[LINE_LEN+1];
-    int i,j=0;
+    int i,j=0,k=0;
 
     while (j < 100) {
 	j++;
-	if (!stream_read_line (st, line, LINE_LEN, utf16))
-	    return SUB_INVALID;
+	if (!stream_read_line (st, line, LINE_LEN, utf16)) {
+		k++;
+		if(k > _ignore_errors)
+			return SUB_INVALID;
+		else
+			continue;
+	}
 
 	if (sscanf (line, "{%d}{%d}", &i, &i)==2)
 		{*uses_time=0;return SUB_MICRODVD;}
@@ -1157,11 +1257,11 @@ static int sub_autodetect (stream_t* st, int *uses_time, int utf16) {
 int sub_utf8_prev=0;
 
 #ifdef CONFIG_ICONV
-static iconv_t icdsc = (iconv_t)(-1);
 
 void	subcp_open (stream_t *st)
 {
 	char *tocp = "UTF-8";
+	cp_utf16 = 0;
 
 	if (sub_cp){
 		const char *cp_tmp = sub_cp;
@@ -1171,6 +1271,8 @@ void	subcp_open (stream_t *st)
 		     || sscanf(sub_cp, "ENCA:%2s:%99s", enca_lang, enca_fallback) == 2) {
 		  if (st && st->flags & MP_STREAM_SEEK ) {
 		    cp_tmp = guess_cp(st, enca_lang, enca_fallback);
+		    if(!strcasecmp(cp_tmp, "UCS-2"))
+		      cp_utf16 = 1;
 		  } else {
 		    cp_tmp = enca_fallback;
 		    if (st)
@@ -1178,8 +1280,10 @@ void	subcp_open (stream_t *st)
 		  }
 		}
 #endif
+		if(!strcasecmp(cp_tmp, "UTF-16"))
+		    cp_utf16 = 1;
 		if ((icdsc = iconv_open (tocp, cp_tmp)) != (iconv_t)(-1)){
-			mp_msg(MSGT_SUBREADER,MSGL_V,"SUB: opened iconv descriptor.\n");
+			mp_msg(MSGT_SUBREADER,MSGL_V,"SUB: opened iconv descriptor:%s.\n", cp_tmp);
 			sub_utf8 = 2;
 		} else
 			mp_msg(MSGT_SUBREADER,MSGL_ERR,"SUB: error opening iconv descriptor.\n");
@@ -1433,7 +1537,7 @@ sub_data* sub_read_file (const char *filename, float fps) {
     int utf16;
     stream_t* fd;
     int n_max, n_first, i, j, sub_first, sub_orig;
-    subtitle *first, *second, *sub, *return_sub, *alloced_sub = NULL;
+    subtitle *first, *second, *sub, *return_sub, *save_sub, *alloced_sub = NULL;
     sub_data *subt_data;
     int uses_time = 0, sub_num = 0, sub_errs = 0;
     static const struct subreader sr[]=
@@ -1459,6 +1563,7 @@ sub_data* sub_read_file (const char *filename, float fps) {
     if(filename==NULL) return NULL; //qnx segfault
     fd=open_stream (filename, NULL, NULL); if (!fd) return NULL;
 
+	subcp_open(fd);
     sub_format = SUB_INVALID;
     for (utf16 = 0; sub_format == SUB_INVALID && utf16 < 3; utf16++) {
         sub_format=sub_autodetect (fd, &uses_time, utf16);
@@ -1471,23 +1576,6 @@ sub_data* sub_read_file (const char *filename, float fps) {
     if (sub_format==SUB_INVALID) {mp_msg(MSGT_SUBREADER,MSGL_WARN,"SUB: Could not determine file format\n");return NULL;}
     srp=sr+sub_format;
     mp_msg(MSGT_SUBREADER, MSGL_V, "SUB: Detected subtitle file format: %s\n", srp->name);
-
-#ifdef CONFIG_ICONV
-    sub_utf8_prev=sub_utf8;
-    {
-	    int l,k;
-	    k = -1;
-	    if ((l=strlen(filename))>4){
-		    char *exts[] = {".utf", ".utf8", ".utf-8" };
-		    for (k=3;--k>=0;)
-			if (l >= strlen(exts[k]) && !strcasecmp(filename+(l - strlen(exts[k])), exts[k])){
-			    sub_utf8 = 1;
-			    break;
-			}
-	    }
-	    if (k<0) subcp_open(fd);
-    }
-#endif
 
     sub_num=0;n_max=32;
     first=malloc(n_max*sizeof(subtitle));
@@ -1515,11 +1603,18 @@ sub_data* sub_read_file (const char *filename, float fps) {
 	sub = &first[sub_num];
 #endif
 	memset(sub, '\0', sizeof(subtitle));
+		save_sub = sub;
+    	recode_errors = 0;
         sub=srp->read(fd,sub,utf16);
-        if(!sub) break;   // EOF
-#ifdef CONFIG_ICONV
-	if ((sub!=ERR) && sub_utf8 == 2) sub=subcp_recode(sub);
-#endif
+        if(!sub) {
+        	if(!recode_errors) break;   // EOF
+			sub_errs += recode_errors;
+			 if(sub_errs <= sub_ignore_errors) {
+				sub = save_sub;
+				continue;
+			}
+			sub = ERR;
+        }
 #ifdef CONFIG_FRIBIDI
 	if (sub!=ERR) sub=sub_fribidi(sub,sub_utf8,0);
 #endif

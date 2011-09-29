@@ -59,7 +59,7 @@ ASS_Track* ass_default_track(ASS_Library* library) {
 
 	track->track_type = TRACK_TYPE_ASS;
 	track->Timer = 100.;
-	track->PlayResY = 288;
+	track->PlayResY = 360;
 	track->WrapStyle = 0;
 
 	if (ass_styles_file)
@@ -77,7 +77,7 @@ ASS_Track* ass_default_track(ASS_Library* library) {
 		style->FontName = (font_fontconfig >= 0 && sub_font_name) ? strdup(sub_font_name) : (font_fontconfig >= 0 && font_name) ? strdup(font_name) : strdup("Sans");
 		style->treat_fontname_as_pattern = 1;
 
-		fs = track->PlayResY * text_font_scale_factor / 100.;
+		fs = track->PlayResY * text_font_scale_factor * 1.3333 / 100.;
 		// approximate autoscale coefficients
 		if (subtitle_autoscale == 2)
 			fs *= 1.3;
@@ -86,7 +86,7 @@ ASS_Track* ass_default_track(ASS_Library* library) {
 		style->FontSize = fs;
 
 		if (ass_color) c1 = strtoll(ass_color, NULL, 16);
-		else c1 = 0xFFFF0000;
+		else c1 = 0xFFFFFF00;
 		if (ass_border_color) c2 = strtoll(ass_border_color, NULL, 16);
 		else c2 = 0x00000000;
 
@@ -96,7 +96,7 @@ ASS_Track* ass_default_track(ASS_Library* library) {
 		style->BackColour = 0x00000000;
 		style->BorderStyle = 1;
 		style->Alignment = 2;
-		style->Outline = 2;
+		style->Outline = 1;
 		style->MarginL = 10;
 		style->MarginR = 10;
 		style->MarginV = 5;

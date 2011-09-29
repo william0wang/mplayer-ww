@@ -58,6 +58,7 @@ typedef struct h264_module_t {
 
 static x264_param_t param;
 static int parse_error = 0;
+static int psp480p = 0;
 
 static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts);
 static int encode_frame(struct vf_instance *vf, x264_picture_t *pic_in);
@@ -115,6 +116,8 @@ void x264enc_set_param(const m_option_t* opt, char* arg)
                 slow_firstpass = 1;
         } else if (!strcasecmp(name, "slow_firstpass"))
             slow_firstpass = 1;
+		else if(!strcasecmp(name, "psp480p"))
+			psp480p = 1;
         else if (strcasecmp(name, "preset") && strcasecmp(name, "tune")) {
             ret = x264_param_parse(&param, name, value);
             if (ret == X264_PARAM_BAD_NAME)
@@ -159,6 +162,10 @@ static int config(struct vf_instance *vf, int width, int height, int d_width, in
     param.b_vfr_input = 0;
     param.vui.i_sar_width = d_width*height;
     param.vui.i_sar_height = d_height*width;
+    if(psp480p) {
+      param.vui.i_sar_width = 400;
+      param.vui.i_sar_height = 330;
+    }
 
     x264_param_parse(&param, "stats", passtmpfile);
 

@@ -31,7 +31,40 @@
 #include "stream/stream.h"
 #include "libmpdemux/muxer.h"
 #include "ae_pcm.h"
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+#include <io.h>
+#endif
 
+static int ao_pipe = 0;
+static int pipe_only = 0;
+
+#define WAV_ID_RIFF 0x46464952 /* "RIFF" */
+#define WAV_ID_WAVE 0x45564157 /* "WAVE" */
+#define WAV_ID_FMT  0x20746d66 /* "fmt " */
+#define WAV_ID_DATA 0x61746164 /* "data" */
+#define WAV_ID_PCM  0x0001
+
+struct WaveHeader
+{
+	uint32_t riff;
+	uint32_t file_length;
+	uint32_t wave;
+	uint32_t fmt;
+	uint32_t fmt_length;
+	uint16_t fmt_tag;
+	uint16_t channels;
+	uint32_t sample_rate;
+	uint32_t bytes_per_second;
+	uint16_t block_align;
+	uint16_t bits;
+	uint32_t data;
+	uint32_t data_length;
+};
+
+m_option_t pcmopts_conf[] = {
+	{"pipe", &ao_pipe, CONF_TYPE_INT, 0, 0, 0, NULL},
+	{NULL, NULL, 0, 0, 0, 0, NULL}
+};
 
 static int bind_pcm(audio_encoder_t *encoder, muxer_stream_t *mux_a)
 {
@@ -67,6 +100,10 @@ static int encode_pcm(audio_encoder_t *encoder, uint8_t *dest, void *src, int ns
 	}
 	else
 	memcpy(dest, src, max_size);
+
+	if (ao_pipe) {
+		max_size = write(ao_pipe, dest, max_size);
+	}
 	return max_size;
 }
 
@@ -77,6 +114,13 @@ static int set_decoded_len(audio_encoder_t *encoder, int len)
 
 static int close_pcm(audio_encoder_t *encoder)
 {
+	if (ao_pipe) {
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+		_commit(ao_pipe);
+#endif
+		close(ao_pipe);
+		ao_pipe = 0;
+	}
 	return 1;
 }
 
@@ -97,5 +141,25 @@ int mpae_init_pcm(audio_encoder_t *encoder)
 	encoder->encode = encode_pcm;
 	encoder->close = close_pcm;
 
+	if (ao_pipe) {
+		struct WaveHeader wavhdr;
+		wavhdr.riff = le2me_32(WAV_ID_RIFF);
+		wavhdr.wave = le2me_32(WAV_ID_WAVE);
+		wavhdr.fmt = le2me_32(WAV_ID_FMT);
+		wavhdr.fmt_length = le2me_32(16);
+		wavhdr.fmt_tag = le2me_16(WAV_ID_PCM);
+		wavhdr.channels = le2me_16(encoder->params.channels);
+		wavhdr.sample_rate = le2me_32(encoder->params.sample_rate);
+		wavhdr.bits = le2me_16(16);
+		wavhdr.block_align = le2me_16(wavhdr.channels * (16 / 8));
+		wavhdr.bytes_per_second = le2me_32(encoder->params.sample_rate * wavhdr.block_align);
+		
+		wavhdr.data = le2me_32(WAV_ID_DATA);
+		wavhdr.data_length=le2me_32(0x7ffff000);
+		wavhdr.file_length = wavhdr.data_length + sizeof(wavhdr) - 8;
+
+		write(ao_pipe, &wavhdr, sizeof(wavhdr));
+		mp_msg(MSGT_MENCODER, MSGL_INFO, "Audio data will be piped out through fd %d\n", ao_pipe); 
+	}
 	return 1;
 }

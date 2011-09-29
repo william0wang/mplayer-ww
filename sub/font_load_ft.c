@@ -72,10 +72,12 @@ int force_load_font;
 
 int using_freetype = 0;
 #ifdef CONFIG_FONTCONFIG
-int font_fontconfig = 1;
+int font_fontconfig = 0;
 #else
 int font_fontconfig = -1;
 #endif
+
+int use_font_name = 0;
 
 //// constants
 static unsigned int const colors = 256;
@@ -1140,6 +1142,16 @@ void load_font_ft(int width, int height, font_desc_t** fontp, const char *font_n
     if (vo_font && !vo_font->dynamic) return;
 
     if (vo_font) free_font_desc(vo_font);
+
+	if(use_font_name) {
+		char name[1024];
+		if (font_name)
+			strcpy(name, font_name);
+		else
+			name[0] = 0;
+		*fontp=read_font_desc_ft(name, 0, width, height, font_scale_factor);
+		return;
+	}
 
 #ifdef CONFIG_FONTCONFIG
     if (font_fontconfig > 0)

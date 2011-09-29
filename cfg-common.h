@@ -52,6 +52,17 @@
 #include "mpcommon.h"
 
 
+extern int network_timeout;
+
+extern int use_font_name;
+#ifdef CONFIG_ICONV
+extern int sub_ignore_errors;
+#endif
+#ifdef CONFIG_WIN32DLL
+extern int force_dshow_demux;
+#endif
+extern int auto_threads;
+
 
 #ifdef CONFIG_RADIO
 const m_option_t radioopts_conf[]={
@@ -352,6 +363,7 @@ const m_option_t common_opts[] = {
     {"csslib", "libcss is obsolete. Try libdvdread instead.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
 
 #ifdef CONFIG_NETWORKING
+    {"timeout", &network_timeout, CONF_TYPE_INT, 0, 0, 9999, NULL},
     {"user", &network_username, CONF_TYPE_STRING, 0, 0, 0, NULL},
     {"passwd", &network_password, CONF_TYPE_STRING, 0, 0, 0, NULL},
     {"bandwidth", &network_bandwidth, CONF_TYPE_INT, CONF_MIN, 0, 0, NULL},
@@ -372,6 +384,7 @@ const m_option_t common_opts[] = {
 #endif /* HAVE_AF_INET6 */
 
 #else
+    {"timeout", "MPlayer was compiled without streaming (network) support.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
     {"user", "MPlayer was compiled without streaming (network) support.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
     {"passwd", "MPlayer was compiled without streaming (network) support.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
     {"bandwidth", "MPlayer was compiled without streaming (network) support.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
@@ -444,6 +457,10 @@ const m_option_t common_opts[] = {
 
 #ifdef CONFIG_CDDA
     { "cdda", &cdda_opts, CONF_TYPE_SUBCONFIG, 0, 0, 0, NULL},
+#endif
+
+#ifdef CONFIG_WIN32DLL
+    { "dshow-demux", &force_dshow_demux, CONF_TYPE_FLAG, 0, 0, 1, NULL},
 #endif
 
     // demuxer.c - select audio/sub file/demuxer
@@ -523,6 +540,8 @@ const m_option_t common_opts[] = {
     {"vfm", &video_fm_list, CONF_TYPE_STRING_LIST, 0, 0, 0, NULL},
     {"ac", &audio_codec_list, CONF_TYPE_STRING_LIST, 0, 0, 0, NULL},
     {"vc", &video_codec_list, CONF_TYPE_STRING_LIST, 0, 0, 0, NULL},
+    { "auto-threads", &auto_threads, CONF_TYPE_FLAG, 0, 0, 1, NULL},
+    { "noauto-threads", &auto_threads, CONF_TYPE_FLAG, 0, 1, 0, NULL},
 
     // postprocessing:
 #ifdef CONFIG_FFMPEG
@@ -579,7 +598,9 @@ const m_option_t common_opts[] = {
     {"noflip-hebrew-commas", "MPlayer was compiled without FriBiDi support.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
 #endif /* CONFIG_FRIBIDI */
 #ifdef CONFIG_ICONV
-    {"subcp", &sub_cp, CONF_TYPE_STRING, 0, 0, 0, NULL},
+    {"sub-ignore-errors", &sub_ignore_errors, CONF_TYPE_INT, 0, 0, 9999, NULL},
+    {"subcp", &sub_cps, CONF_TYPE_STRING, 0, 0, 0, NULL},
+    {"urlcp", &url_cp, CONF_TYPE_STRING, 0, 0, 0, NULL},
 #endif
     {"subdelay", &sub_delay, CONF_TYPE_FLOAT, 0, 0.0, 10.0, NULL},
     {"subfps", &sub_fps, CONF_TYPE_FLOAT, 0, 0.0, 10.0, NULL},
@@ -595,6 +616,7 @@ const m_option_t common_opts[] = {
 #ifdef CONFIG_UNRAR_EXEC
     {"unrarexec", &unrar_executable, CONF_TYPE_STRING, 0, 0, 0, NULL},
 #endif
+    {"use-font-name", &use_font_name, CONF_TYPE_FLAG, 0, 0, 1, NULL},
     // specify IFO file for VOBSUB subtitle
     {"ifo", &spudec_ifo, CONF_TYPE_STRING, 0, 0, 0, NULL},
     // enable Closed Captioning display

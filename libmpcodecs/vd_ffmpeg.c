@@ -20,6 +20,18 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <time.h>
+#include <pthread.h>
+
+#if defined (__NetBSD__) || defined(__OpenBSD__)
+#include <sys/param.h>
+#include <sys/sysctl.h>
+#include <machine/cpu.h>
+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__DragonFly__) || defined(__APPLE__)
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#elif defined(__linux__)
+#include <sched.h>
+#endif
 
 #include "config.h"
 #include "mp_msg.h"
@@ -53,6 +65,8 @@ LIBVD_EXTERN(ffmpeg)
 #if CONFIG_XVMC
 #include "libavcodec/xvmc.h"
 #endif
+
+int auto_threads = 1;
 
 typedef struct {
     AVCodecContext *avctx;
@@ -230,6 +244,47 @@ static int init(sh_video_t *sh){
         mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_MissingLAVCcodec, sh->codec->dll);
         uninit(sh);
         return 0;
+    }
+
+    if (auto_threads) {
+#if (defined(__MINGW32__) && HAVE_PTHREADS)
+        lavc_param_threads = pthread_num_processors_np();
+#elif defined(__linux__)
+        /* Code stolen from x264 :) */
+        unsigned int bit;
+        int np;
+        cpu_set_t p_aff;
+        memset( &p_aff, 0, sizeof(p_aff) );
+        sched_getaffinity( 0, sizeof(p_aff), &p_aff );
+        for( np = 0, bit = 0; bit < sizeof(p_aff); bit++ )
+            np += (((uint8_t *)&p_aff)[bit / 8] >> (bit % 8)) & 1;
+
+        lavc_param_threads = np;
+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__DragonFly__) || defined(__APPLE__) || defined (__NetBSD__) || defined(__OpenBSD__)
+        /* Code stolen from x264 :) */
+        int numberOfCPUs;
+        size_t length = sizeof( numberOfCPUs );
+#if defined (__NetBSD__) || defined(__OpenBSD__)
+        int mib[2] = { CTL_HW, HW_NCPU };
+        if( sysctl(mib, 2, &numberOfCPUs, &length, NULL, 0) )
+#else
+        if( sysctlbyname("hw.ncpu", &numberOfCPUs, &length, NULL, 0) )
+#endif
+        {
+            numberOfCPUs = 1;
+        }
+        lavc_param_threads = numberOfCPUs;
+#endif
+        if(lavc_codec->id == CODEC_ID_H264 || lavc_codec->id == CODEC_ID_FFH264 
+		 || lavc_codec->id == CODEC_ID_MPEG2TS || lavc_codec->id == CODEC_ID_MPEG2VIDEO_XVMC) {
+            if (lavc_param_threads > 16) lavc_param_threads = 16;
+            if (lavc_param_threads > 1 && (lavc_codec->id == CODEC_ID_MPEG2VIDEO ||
+              lavc_codec->id == CODEC_ID_MPEG2TS || lavc_codec->id == CODEC_ID_MPEG2VIDEO_XVMC))
+                vd_use_slices = 0;
+            mp_msg(MSGT_DECVIDEO, MSGL_INFO, "Spawning %d decoding thread%s...\n", lavc_param_threads, lavc_param_threads == 1 ? "" : "s");
+        } else {
+            lavc_param_threads = 1;
+        }
     }
 
     if(use_slices && (lavc_codec->capabilities&CODEC_CAP_DRAW_HORIZ_BAND) && !do_vis_debug)

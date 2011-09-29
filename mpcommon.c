@@ -251,8 +251,10 @@ void update_subtitles(sh_video_t *sh_video, double refpts, demux_stream_t *d_dvd
         }
         if (d_dvdsub->non_interleaved)
             ds_get_next_pts(d_dvdsub);
-        while (1) {
-            double subpts = curpts;
+        while (d_dvdsub->first) {
+            double subpts = ds_get_next_pts(d_dvdsub);
+            if (subpts > curpts)
+                break;
             type = orig_type;
             len = ds_get_packet_sub(d_dvdsub, &packet, &subpts, &endpts);
             if (len < 0)

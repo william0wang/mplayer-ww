@@ -29,4 +29,6 @@ CMediaSample* CMediaSampleCreate(IMemAllocator* allocator, int size);
 // called from allocator
 void CMediaSample_Destroy(CMediaSample* This);
 
+extern int get_memstruct_pagenum(void * __ptr);
+extern void memstruct_setlock(void * __ptr, unsigned char value);
 #endif /* MPLAYER_CMEDIASAMPLE_H */

@@ -167,8 +167,14 @@ static HRESULT STDCALL CMediaSample_GetTime(IMediaSample * This,
 					    /* [out] */ REFERENCE_TIME *pTimeStart,
 					    /* [out] */ REFERENCE_TIME *pTimeEnd)
 {
-    Debug printf("CMediaSample_GetTime(%p) called (UNIMPLEMENTED)\n", This);
-    return E_NOTIMPL;
+    //return E_NOTIMPL;
+    if (pTimeStart)
+      *pTimeStart = ((CMediaSample*) This)->time_start;
+    if (pTimeEnd)
+       *pTimeEnd = ((CMediaSample*) This)->time_end;
+    Debug printf("CMediaSample_GetTime(%p) called => (%lld, %lld)\n", This,
+                 (pTimeStart ? *pTimeStart : -1), (pTimeEnd ? *pTimeEnd : -1));
+    return 0;
 }
 
 /**
@@ -191,8 +197,14 @@ static HRESULT STDCALL CMediaSample_SetTime(IMediaSample * This,
 					    /* [in] */ REFERENCE_TIME *pTimeStart,
 					    /* [in] */ REFERENCE_TIME *pTimeEnd)
 {
-    Debug printf("CMediaSample_SetTime(%p) called (UNIMPLEMENTED)\n", This);
-    return E_NOTIMPL;
+    Debug printf("CMediaSample_SetTime(%p, %lld, %lld) called\n", This,
+                 (pTimeStart ? *pTimeStart : -1), (pTimeEnd ? *pTimeEnd : -1));
+    //return E_NOTIMPL;
+    if (pTimeStart)
+      ((CMediaSample*) This)->time_start = *pTimeStart;
+    if (pTimeEnd)
+      ((CMediaSample*) This)->time_end = *pTimeEnd;
+    return 0;
 }
 
 /**
@@ -351,7 +363,7 @@ static HRESULT STDCALL CMediaSample_GetMediaType(IMediaSample* This,
     }
 
     t = &((CMediaSample*)This)->media_type;
-    //    free(t.pbFormat);
+    //    if(t.pbFormat)free(t.pbFormat);
     *ppMediaType=CreateMediaType(t);
     //    *ppMediaType=0; //media type was not changed
     return 0;
@@ -400,7 +412,7 @@ static HRESULT STDCALL CMediaSample_SetMediaType(IMediaSample * This,
 static HRESULT STDCALL CMediaSample_IsDiscontinuity(IMediaSample * This)
 {
     Debug printf("CMediaSample_IsDiscontinuity(%p) called\n", This);
-    return ((CMediaSample*) This)->isDiscontinuity;
+    return ((CMediaSample*) This)->isDiscontinuity ? S_OK : S_FALSE;
 }
 
 /**

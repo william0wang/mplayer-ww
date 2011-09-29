@@ -132,6 +132,7 @@ static int check_routes(af_channels_t* s, int nin, int nout)
   return AF_OK;
 }
 
+extern int channel_state;
 // Initialization and runtime control
 static int control(struct af_instance_s* af, int cmd, void* arg)
 {
@@ -147,10 +148,10 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
 	return AF_DETACH;
 
       // If mono: fake stereo
-      if(((af_data_t*)arg)->nch == 1){
+      if(((af_data_t*)arg)->nch == 1 || channel_state){
 	s->nr = min(af->data->nch,2);
 	for(i=0;i<s->nr;i++){
-	  s->route[i][FR] = 0;
+	  s->route[i][FR] = channel_state&1;
 	  s->route[i][TO] = i;
 	}
       }

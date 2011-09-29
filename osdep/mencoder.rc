@@ -1,0 +1,71 @@
+/*
+ * Windows resource file for MPlayer
+ *
+ * This file is part of MPlayer.
+ *
+ * MPlayer is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * MPlayer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with MPlayer; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <winver.h>
+#include <winuser.h>
+#include <dlgs.h>
+#include <commctrl.h>
+#include "resource.h"
+#include "version.h"
+
+1 VERSIONINFO
+FILEVERSION 0,0,9,0
+PRODUCTVERSION 0,0,9,0
+FILEOS VOS__WINDOWS32
+FILETYPE VFT_APP
+{
+    BLOCK "StringFileInfo"
+    {
+        BLOCK "000004b0" // LANG_NEUTRAL,UNICODE_CP
+        {
+            VALUE "Comments","MEncoder is distributed under the terms of the GNU General Public License Version 2. Source code is available at http://www.mplayerhq.hu\000"
+            VALUE "CompanyName", "\000"
+            VALUE "FileDescription", "MEncoder - Media Encoder\000"
+            VALUE "FileVersion",VERSION
+            VALUE "InternalName", "Counter Counter\000"
+            VALUE "LegalCopyright", " (C) 2000-2011 MPlayer Team\000"
+            //VALUE "LegalTrademarks"," \000";
+            VALUE "OriginalFilename", "mencoder.exe\000"
+            VALUE "ProductName", "MEncoder - The Media Encoder\000"
+            VALUE "ProductVersion",VERSION
+            VALUE "SpecialBuild","WW\000"
+        }
+    }
+    BLOCK "VarFileInfo"
+    {
+        VALUE "Translation",0,0x04b0
+    }
+}
+
+IDI_ICON1 ICON DISCARDABLE  "etc/mencoder.ico"
+
+// for some reason RT_MANIFEST does not work
+1 24 "mplayer.exe.manifest"
+
+IDD_PASSWORD DIALOG DISCARDABLE 38, 46, 121, 45
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUPWINDOW | WS_VISIBLE | WS_DLGFRAME
+CAPTION "Input RAR Password"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    EDITTEXT        IDC_PASSWORD, 6, 6, 109, 12, ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK", IDOK, 6, 25, 50, 14
+    PUSHBUTTON      "Cancel", IDCANCEL, 66, 25, 50, 14
+END
+

@@ -64,7 +64,10 @@ char *get_path(const char *filename){
 
 	if ((homedir = getenv("MPLAYER_HOME")) != NULL)
 		config_dir = "";
-	else if ((homedir = getenv("HOME")) == NULL)
+	else
+#if !defined(__MINGW32__) && !defined(__CYGWIN__)
+	     if ((homedir = getenv("HOME")) == NULL)
+#endif
 #if defined(__MINGW32__) || defined(__CYGWIN__)
 	/* Hack to get fonts etc. loaded outside of Cygwin environment. */
 	{

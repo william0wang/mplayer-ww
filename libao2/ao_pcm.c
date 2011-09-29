@@ -54,6 +54,7 @@ LIBAO_EXTERN(pcm)
 static char *ao_outputfilename = NULL;
 static int ao_pcm_waveheader = 1;
 static int fast = 0;
+static int ao_pipe = 0;
 
 #define WAV_ID_RIFF 0x46464952 /* "RIFF" */
 #define WAV_ID_WAVE 0x45564157 /* "WAVE" */
@@ -62,6 +63,23 @@ static int fast = 0;
 #define WAV_ID_PCM  0x0001
 #define WAV_ID_FLOAT_PCM  0x0003
 #define WAV_ID_FORMAT_EXTENSIBLE 0xfffe
+
+struct WaveHeader
+{
+    uint32_t riff;
+    uint32_t file_length;
+    uint32_t wave;
+    uint32_t fmt;
+    uint32_t fmt_length;
+    uint16_t fmt_tag;
+    uint16_t channels;
+    uint32_t sample_rate;
+    uint32_t bytes_per_second;
+    uint16_t block_align;
+    uint16_t bits;
+    uint32_t data;
+    uint32_t data_length;
+};
 
 /* init with default values */
 static uint64_t data_length;
@@ -142,6 +160,7 @@ static int init(int rate,int channels,int format,int flags){
         {"waveheader", OPT_ARG_BOOL, &ao_pcm_waveheader, NULL},
         {"file",       OPT_ARG_MSTRZ, &ao_outputfilename, NULL},
         {"fast",       OPT_ARG_BOOL, &fast, NULL},
+        {"pipe",       OPT_ARG_INT, &ao_pipe, NULL},
         {NULL}
     };
     // set defaults
@@ -150,7 +169,7 @@ static int init(int rate,int channels,int format,int flags){
     if (subopt_parse(ao_subdevice, subopts) != 0) {
         return 0;
     }
-    if (!ao_outputfilename){
+    if (!ao_outputfilename && !ao_pipe){
         ao_outputfilename =
             strdup(ao_pcm_waveheader?"audiodump.wav":"audiodump.pcm");
     }
@@ -186,14 +205,43 @@ static int init(int rate,int channels,int format,int flags){
            (channels > 1) ? "Stereo" : "Mono", af_fmt2str_short(format));
     mp_msg(MSGT_AO, MSGL_INFO, MSGTR_AO_PCM_HintInfo);
 
-    fp = fopen(ao_outputfilename, "wb");
-    if(fp) {
-        if(ao_pcm_waveheader){ /* Reserve space for wave header */
+	if (ao_pipe) {
+		//fp = fdopen(ao_pipe, "wb");
+		mp_msg(MSGT_AO, MSGL_INFO, "[AO PCM] Info: Audio data will be piped out through fd %d\n", ao_pipe); 
+	} else
+	if (!fp) {
+		fp = fopen(ao_outputfilename, "wb");
+	}
+
+	if(ao_pcm_waveheader){ /* Reserve space for wave header */
+		if (ao_pipe) {
+			struct WaveHeader wavhdr;
+    		int bits = af_fmt2bits(format);
+		    wavhdr.riff = le2me_32(WAV_ID_RIFF);
+		    wavhdr.wave = le2me_32(WAV_ID_WAVE);
+		    wavhdr.fmt = le2me_32(WAV_ID_FMT);
+		    wavhdr.fmt_length = le2me_32(16);
+		    wavhdr.fmt_tag = le2me_16(format == AF_FORMAT_FLOAT_LE ? WAV_ID_FLOAT_PCM : WAV_ID_PCM);
+		    wavhdr.channels = le2me_16(ao_data.channels);
+		    wavhdr.sample_rate = le2me_32(ao_data.samplerate);
+		    wavhdr.bytes_per_second = le2me_32(ao_data.bps);
+		    wavhdr.bits = le2me_16(bits);
+		    wavhdr.block_align = le2me_16(ao_data.channels * (bits / 8));
+		
+		    wavhdr.data = le2me_32(WAV_ID_DATA);
+		    wavhdr.data_length=le2me_32(0x7ffff000);
+		    wavhdr.file_length = wavhdr.data_length + sizeof(wavhdr) - 8;
+			wavhdr.file_length=wavhdr.data_length=0;
+
+			write(ao_pipe, &wavhdr,sizeof(wavhdr));
+		}
+		if(fp)
             write_wave_header(fp, 0x7ffff000);
-        }
-        return 1;
-    }
-    mp_msg(MSGT_AO, MSGL_ERR, MSGTR_AO_PCM_CantOpenOutputFile,
+	}
+	if (fp || ao_pipe)
+		return 1;
+
+    mp_msg(MSGT_AO, MSGL_ERR, MSGTR_AO_PCM_CantOpenOutputFile, 
                ao_outputfilename);
     return 0;
 }
@@ -201,7 +249,7 @@ static int init(int rate,int channels,int format,int flags){
 // close audio device
 static void uninit(int immed){
 
-    if(ao_pcm_waveheader){ /* Rewrite wave header */
+    if(ao_pcm_waveheader && fp){ /* Rewrite wave header */
         int broken_seek = 0;
 #ifdef __MINGW32__
         // Windows, in its usual idiocy "emulates" seeks on pipes so it always looks
@@ -218,9 +266,13 @@ static void uninit(int immed){
             write_wave_header(fp, data_length);
         }
     }
-    fclose(fp);
+    if(fp) fclose(fp);
     free(ao_outputfilename);
     ao_outputfilename = NULL;
+
+	if (ao_pipe)
+		close(ao_pipe);
+	ao_pipe = 0;
 }
 
 // stop playing and empty buffers (for seeking/pause)
@@ -262,8 +314,8 @@ static int play(void* data,int len,int flags){
                             len / frame_size, frame_size);
     }
 
-    //printf("PCM: Writing chunk!\n");
-    fwrite(data,len,1,fp);
+    if (fp) fwrite(data, len, 1, fp);
+    if (ao_pipe) write(ao_pipe, data, len);
 
     if(ao_pcm_waveheader)
         data_length += len;

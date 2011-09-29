@@ -381,6 +381,8 @@ Optional features:
   --disable-inet6        disable IPv6 support [autodetect]
   --disable-gethostbyname2  gethostbyname2 part of the C library [autodetect]
   --disable-ftp          disable FTP support [enabled]
+  --disable-ftp-p2p      disable P2P FTP support [enabled]
+  --disable-vod          Disable Truran VOD support [enable]
   --disable-vstream      disable TiVo vstream client support [autodetect]
   --disable-pthreads     disable Posix threads support [autodetect]
   --disable-w32threads   disable Win32 threads support [autodetect]
@@ -422,6 +424,7 @@ Codecs:
   --enable-faad             enable FAAD2 (AAC) [autodetect]
   --disable-faac            disable support for FAAC (AAC encoder) [autodetect]
   --disable-faac-lavc       disable support for FAAC in libavcodec [autodetect]
+  --disable-aacplus         disable support for aacplus in libavcodec [autodetect]
   --disable-ladspa          disable LADSPA plugin support [autodetect]
   --disable-libbs2b         disable libbs2b audio filter support [autodetect]
   --disable-libdv           disable libdv 0.9.5 en/decoding support [autodetect]
@@ -735,6 +738,7 @@ _libmpeg2_internal=auto
 _faad=auto
 _faac=auto
 _faac_lavc=auto
+_aacplus_lavc=auto
 _ladspa=auto
 _libbs2b=auto
 _xmms=no
@@ -844,6 +848,8 @@ _enca=auto
 _inet6=auto
 _gethostbyname2=auto
 _ftp=auto
+_ftp_p2p=auto
+_vod=yes
 _musepack=no
 _vstream=auto
 _pthreads=auto
@@ -1142,6 +1148,8 @@ for ac_option do
   --disable-faac)       _faac=no        ;;
   --enable-faac-lavc)   _faac_lavc=yes  ;;
   --disable-faac-lavc)  _faac_lavc=no   ;;
+  --enable-aacplus)		_aacplus_lavc=yes	;;
+  --disable-aacplus)	_aacplus_lavc=no	;;
   --enable-ladspa)      _ladspa=yes     ;;
   --disable-ladspa)     _ladspa=no      ;;
   --enable-libbs2b)     _libbs2b=yes    ;;
@@ -1331,6 +1339,10 @@ for ac_option do
   --disable-unrarexec)  _unrar_exec=no  ;;
   --enable-ftp)         _ftp=yes        ;;
   --disable-ftp)        _ftp=no         ;;
+  --enable-ftp-p2p)     _ftp_p2p=yes    ;;
+  --disable-ftp-p2p)    _ftp_p2p=no     ;;
+  --enable-vod)         _vod=yes        ;;
+  --disable-vod)        _vod=no         ;;
   --enable-vstream)     _vstream=yes    ;;
   --disable-vstream)    _vstream=no     ;;
   --enable-pthreads)    _pthreads=yes   ;;
@@ -2564,7 +2576,6 @@ elif test -z "$CFLAGS" ; then
   else
     CFLAGS="-O4 $_march $_mcpu $_pipe -ffast-math -fomit-frame-pointer"
     WARNFLAGS="-Wall -Wno-switch -Wno-parentheses -Wpointer-arith -Wredundant-decls"
-    WARN_CFLAGS="-Werror-implicit-function-declaration"
     extra_ldflags="$extra_ldflags -ffast-math"
   fi
 else
@@ -6486,6 +6497,29 @@ fi
 echores "$_faad"
 
 
+echocheck "aacplus support"
+if test "$_aacplus_lavc" = auto && test "$_mencoder" = yes; then
+  cat > $TMPC <<EOF
+#include <libaacplus/aacenc.h>
+int main(void) { AACENC_CONFIG config; AacInitDefaultConfig(&config); return 0; }
+EOF
+  _aacplus_lavc=no
+  for _ld_aacplus in "-laacplus" "-laacplus -lstdc++" ; do
+    cc_check -O4 $_ld_aacplus && libs_mencoder="$libs_mencoder $_ld_aacplus" && _aacplus_lavc=yes && break
+  done
+fi
+if test "$_aacplus_lavc" = yes ; then
+    def_aacplus_lavc="#define CONFIG_LIBAACPLUS 1"
+    libs_mplayer="$libs_mplayer $_ld_aacplus"
+    libavencoders="$libavencoders LIBAACPLUS_ENCODER"
+else
+  _aacplus_lavc=no
+  def_aacplus_lavc="#define CONFIG_LIBAACPLUS 0"
+fi
+res_comment="in libavcodec: $_aacplus_lavc"
+echores "$_aacplus_lavc"
+
+
 echocheck "LADSPA plugin support"
 if test "$_ladspa" = auto ; then
   _ladspa=no
@@ -6737,12 +6771,7 @@ if test "$ffmpeg_a" = auto ; then
   test -d ffmpeg/libavutil && ffmpeg_a=yes && ffmpeg=yes
 elif test "$ffmpeg_so" = auto ; then
   ffmpeg_so=no
-  if $_pkg_config --exists libavutil ; then
-    inc_ffmpeg=$($_pkg_config --cflags libpostproc libswscale libavformat libavcodec libavutil)
-    ld_tmp=$($_pkg_config --libs libpostproc libswscale libavformat libavcodec libavutil)
-    header_check libavutil/avutil.h $inc_ffmpeg $ld_tmp &&
-      extra_ldflags="$extra_ldflags $ld_tmp" && ffmpeg_so=yes && ffmpeg=yes
-  elif header_check libavutil/avutil.h -lpostproc -lswscale -lavformat -lavcodec -lavutil ; then
+  if header_check libavutil/avutil.h -lpostproc -lswscale -lavformat -lavcodec -lavutil ; then
     extra_ldflags="$extra_ldflags -lpostproc -lswscale -lavformat -lavcodec -lavutil"
     ffmpeg_so=yes
     ffmpeg=yes
@@ -7369,6 +7398,27 @@ else
 fi
 echores "$_ftp"
 
+echocheck "ftp-p2p"
+if test "$_ftp_p2p" = "auto" ; then
+test "$_ftp" = "yes" && _ftp_p2p=yes
+fi
+if test "$_ftp_p2p" = yes ; then
+  def_ftp_p2p='#define CONFIG_FTP_P2P 1'
+else
+  def_ftp_p2p='#undef CONFIG_FTP_P2P'
+fi
+echores "$_ftp_p2p"
+
+echocheck "vod"
+if test "$_vod" = yes ; then
+  def_vod='#define CONFIG_VOD 1'
+  inputmodules="vod $inputmodules"
+else
+  noinputmodules="vod $noinputmodules"
+  def_vod='#undef CONFIG_VOD'
+fi
+echores "$_vod"
+
 echocheck "vstream client"
 if test "$_vstream" = auto ; then
   _vstream=no
@@ -7872,6 +7922,8 @@ FASTMEMCPY = $_fastmemcpy
 FBDEV = $_fbdev
 FREETYPE = $_freetype
 FTP = $_ftp
+FTP_P2P = $_ftp_p2p
+VOD = $_vod
 GIF = $_gif
 GGI = $_ggi
 GL = $_gl
@@ -8375,6 +8427,8 @@ $def_fribidi
 /* networking */
 $def_closesocket
 $def_ftp
+$def_ftp_p2p
+$def_vod
 $def_inet6
 $def_inet_aton
 $def_inet_pton
@@ -8569,6 +8623,7 @@ $def_ffmpeg_license
 #define LIBAV_LICENSE FFMPEG_LICENSE
 
 /* External libraries used through FFmpeg. */
+$def_aacplus_lavc
 $def_crystalhd
 $def_faac_lavc
 $def_libdirac_lavc

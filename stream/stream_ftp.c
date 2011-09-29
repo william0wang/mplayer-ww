@@ -87,6 +87,75 @@ static const struct m_struct_st stream_opts = {
 #define TELNET_IP       244             /* interrupt process--permanently */
 #define TELNET_SYNCH    242             /* for telfunc calls */
 
+#ifdef CONFIG_FTP_P2P
+/*
+ * To get filename from the full ftp url
+ * if failed , will return NULL
+ */
+static const char * FtpGetPrueFilename(const char * sfull)
+{
+	const char * p;
+	const char * plast=NULL;
+	if(sfull==NULL) return NULL;
+	if(sfull[0]=='\0') return NULL;
+	p=sfull;
+ 	while(*p!='\0')
+    {
+		if(*p=='/') plast=p;
+		p++;
+    }
+ 	if(plast!=NULL) {
+		plast++;
+		if(*plast!='\0') return plast;
+		return NULL;
+	}
+    return sfull; //maybe there is no path at all
+}
+
+/*
+ * To get path from the full ftp url
+ * if failed , will return false
+ * otherwise , will copy path to buffer
+ */
+static const int FptGetPurePath(const char * sfull, char * buffer , const int ibuffsize)
+{
+ 	int i=0;
+ 	const char * p;
+ 	const char * plast=NULL;
+ 	p=sfull;
+	if(sfull==NULL) return 0;
+ 	if(sfull[0]=='\0') return 0;
+ 	while(*p!='\0')
+    {
+        if(*p=='/') plast=p;
+        p++;
+    }
+ 	if(plast!=NULL) {
+         //now to check buffsize
+         i=(int)(plast-sfull);
+         if(i>=ibuffsize) return 0;
+         //pay attention , not include last /
+         if(plast==sfull) //just root dir
+         {
+			buffer[0]='/';
+			buffer[1]='\0';
+          return 1;
+         }
+	     memcpy(buffer,sfull,i);
+         buffer[i]='\0';
+         return 1;
+
+	}
+	//may be there is  no path , just return root dir
+	if(ibuffsize>=2) {
+		buffer[0]='/';
+		buffer[1]='\0';
+          return 1;
+	}
+    return 0;
+}
+#endif //CONFIG_FTP_P2P
+
 // Check if there is something to read on a fd. This avoid hanging
 // forever if the network stop responding.
 static int fd_can_read(int fd,int timeout) {
@@ -237,6 +306,27 @@ static int FtpOpenPort(struct stream_priv_s* p) {
   char* par,str[128];
   int num[6];
 
+#ifdef CONFIG_FTP_P2P
+  char buffpath[512], buffcmd[512];
+
+/*
+ * send cwd workpath, before pasv and retr command
+ * to make grid ftp lock ip and port
+ * then, we should send rest xxxxx with retr filename
+ */
+  if(!FptGetPurePath(p->filename, buffpath, 512)) {
+	   mp_msg(MSGT_OPEN,MSGL_WARN, "[ftp] command 'CWD' failed: Failed to get pure path\n");
+	   return 0;
+  }
+  snprintf(buffcmd, 511, "CWD%s%s", buffpath[0]!='/'?" /":" ", buffpath);
+
+  resp = FtpSendCmd(buffcmd, p ,rsp_txt);
+  if(resp != 2) {
+    mp_msg(MSGT_OPEN,MSGL_WARN, "[ftp] command 'CWD' failed: %s\n",rsp_txt);
+    return 0;
+  }
+#endif //CONFIG_FTP_P2P
+
   resp = FtpSendCmd("PASV",p,rsp_txt);
   if(resp != 2) {
     mp_msg(MSGT_OPEN,MSGL_WARN, "[ftp] command 'PASV' failed: %s\n",rsp_txt);
@@ -264,7 +354,13 @@ static int FtpOpenPort(struct stream_priv_s* p) {
 static int FtpOpenData(stream_t* s,off_t newpos) {
   struct stream_priv_s* p = s->priv;
   int resp;
+
+#ifdef CONFIG_FTP_P2P
+  char str[512],rsp_txt[256];
+  const char * purefile;
+#else
   char str[256],rsp_txt[256];
+#endif //CONFIG_FTP_P2P
 
   // Open a new connection
   s->fd = FtpOpenPort(p);
@@ -282,7 +378,18 @@ static int FtpOpenData(stream_t* s,off_t newpos) {
   }
 
   // Get the file
+#ifdef CONFIG_FTP_P2P
+  //change from pathfile to filename only
+  purefile = FtpGetPrueFilename(p->filename);
+  if(!purefile) {
+	  mp_msg(MSGT_OPEN,MSGL_ERR, "[ftp] command 'RETR' failed: Get pure filename failed\n");
+      return 0;
+  }
+  snprintf(str,511,"RETR %s",purefile);
+#else
   snprintf(str,255,"RETR %s",p->filename);
+#endif //CONFIG_FTP_P2P
+
   resp = FtpSendCmd(str,p,rsp_txt);
 
   if(resp != 1) {
@@ -391,6 +498,11 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
   struct stream_priv_s* p = (struct stream_priv_s*)opts;
   char str[256],rsp_txt[256];
 
+#ifdef CONFIG_FTP_P2P
+  char buffpath[512], buffcmd[512];
+  const char * purefile;
+#endif
+
   if(mode != STREAM_READ) {
     mp_msg(MSGT_OPEN,MSGL_ERR, "[ftp] Unknown open mode %d\n",mode);
     m_struct_free(&stream_opts,opts);
@@ -449,9 +561,40 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
     return STREAM_ERROR;
   }
 
+#ifdef CONFIG_FTP_P2P
+/*
+ * send cwd workpath, before pasv and retr command
+ * to make grid ftp lock ip and port before get pasv or retr or size command
+ * then, we should send rest xxxxx with retr filename
+ */
+  if(!FptGetPurePath(p->filename, buffpath, 512)) {
+	   mp_msg(MSGT_OPEN,MSGL_WARN, "[ftp] command 'CWD' failed: Failed to get pure path\n");
+	   return 0;
+  }
+  snprintf(buffcmd, 511, "CWD%s%s", buffpath[0]!='/'?" /":" ", buffpath);
+
+  resp = FtpSendCmd(buffcmd, p ,rsp_txt);
+  if(resp != 2) {
+    mp_msg(MSGT_OPEN,MSGL_WARN, "[ftp] command 'CWD' failed: %s\n",rsp_txt);
+    return 0;
+  }
+
+  //because we have already change the work dir
+  //so just send command size filename
+  //not command size path/file
+  purefile = FtpGetPrueFilename(p->filename);
+  if(!purefile) {
+	  mp_msg(MSGT_OPEN,MSGL_ERR, "[ftp] command 'SIZE' failed: Get pure filename failed\n");
+      return 0;
+  }
+  snprintf(buffcmd,511,"SIZE %s",purefile);
+  resp = FtpSendCmd(buffcmd,p,rsp_txt);
+#else
   // Get the filesize
   snprintf(str,255,"SIZE %s",p->filename);
   resp = FtpSendCmd(str,p,rsp_txt);
+#endif
+
   if(resp != 2) {
     mp_msg(MSGT_OPEN,MSGL_WARN, "[ftp] command '%s' failed: %s\n",str,rsp_txt);
   } else {

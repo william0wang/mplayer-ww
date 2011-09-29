@@ -109,29 +109,22 @@ static int load_syms_linux(char *path) {
 			return 0;
 		}
 
-		rvyuv_custom_message = dlsym(handle, "RV20toYUV420CustomMessage");
-		rvyuv_free = dlsym(handle, "RV20toYUV420Free");
-		rvyuv_init = dlsym(handle, "RV20toYUV420Init");
-		rvyuv_transform = dlsym(handle, "RV20toYUV420Transform");
-
-    if(rvyuv_custom_message &&
-       rvyuv_free &&
-       rvyuv_init &&
-       rvyuv_transform)
-    {
-	rv_handle = handle;
-	return 1;
-    }
-
 		rvyuv_custom_message = dlsym(handle, "RV40toYUV420CustomMessage");
 		rvyuv_free = dlsym(handle, "RV40toYUV420Free");
 		rvyuv_init = dlsym(handle, "RV40toYUV420Init");
 		rvyuv_transform = dlsym(handle, "RV40toYUV420Transform");
 
-    if(rvyuv_custom_message &&
-       rvyuv_free &&
-       rvyuv_init &&
-       rvyuv_transform)
+    if(rvyuv_custom_message && rvyuv_free && rvyuv_init && rvyuv_transform)
+    {
+    	rv_handle = handle;
+    	return 1;
+    }
+		rvyuv_custom_message = dlsym(handle, "RV20toYUV420CustomMessage");
+		rvyuv_free = dlsym(handle, "RV20toYUV420Free");
+		rvyuv_init = dlsym(handle, "RV20toYUV420Init");
+		rvyuv_transform = dlsym(handle, "RV20toYUV420Transform");
+
+    if(rvyuv_custom_message && rvyuv_free && rvyuv_init && rvyuv_transform)
     {
 	rv_handle = handle;
 	return 1;
@@ -190,6 +183,19 @@ static int load_syms_windows(char *path) {
 	return 0;
     }
 
+    wrvyuv_custom_message = GetProcAddress(handle, "RV40toYUV420CustomMessage");
+    wrvyuv_free = GetProcAddress(handle, "RV40toYUV420Free");
+    wrvyuv_init = GetProcAddress(handle, "RV40toYUV420Init");
+    wrvyuv_transform = GetProcAddress(handle, "RV40toYUV420Transform");
+    if(wrvyuv_custom_message &&
+       wrvyuv_free &&
+       wrvyuv_init &&
+       wrvyuv_transform) {
+	dll_type = 1;
+	rv_handle = handle;
+	return 1;
+    }
+
     wrvyuv_custom_message = GetProcAddress(handle, "RV20toYUV420CustomMessage");
     wrvyuv_free = GetProcAddress(handle, "RV20toYUV420Free");
     wrvyuv_init = GetProcAddress(handle, "RV20toYUV420Init");
@@ -222,19 +228,6 @@ static int load_syms_windows(char *path) {
 	    }
 	}
 #endif
-	return 1;
-    }
-
-    wrvyuv_custom_message = GetProcAddress(handle, "RV40toYUV420CustomMessage");
-    wrvyuv_free = GetProcAddress(handle, "RV40toYUV420Free");
-    wrvyuv_init = GetProcAddress(handle, "RV40toYUV420Init");
-    wrvyuv_transform = GetProcAddress(handle, "RV40toYUV420Transform");
-    if(wrvyuv_custom_message &&
-       wrvyuv_free &&
-       wrvyuv_init &&
-       wrvyuv_transform) {
-	dll_type = 1;
-	rv_handle = handle;
 	return 1;
     }
 
@@ -361,6 +354,8 @@ static void uninit(sh_video_t *sh){
 	bufsz = 0;
 }
 
+extern int mkv_realdemux;
+
 // decode a frame
 static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
 	mp_image_t* mpi;
@@ -405,6 +400,7 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
 		transform_out, sh->context);
 
 	if(!initialized){  // rv30 width/height now known
+	  if(!mkv_realdemux)
 	    sh->aspect=(float)sh->disp_w/(float)sh->disp_h;
 	    sh->disp_w=transform_out[3];
 	    sh->disp_h=transform_out[4];

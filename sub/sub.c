@@ -670,6 +670,7 @@ subtitle* vo_sub=NULL;
 inline static void vo_update_text_sub(mp_osd_obj_t* obj,int dxs,int dys){
    unsigned char *t;
    int c,i,j,l,x,y,font,prevc,counter;
+   int len;
    int k;
    int xsize;
    int xmin=dxs,xmax=0;
@@ -701,6 +702,7 @@ inline static void vo_update_text_sub(mp_osd_obj_t* obj,int dxs,int dys){
 	    xsize = -sub_font->charspace;
 	  l--;
 	  t=vo_sub->text[i++];
+	  len=strlen(t)-1;
 	    char_position = 0;
 	    char_seq = calloc(strlen(t), sizeof(int));
 
@@ -723,6 +725,7 @@ inline static void vo_update_text_sub(mp_osd_obj_t* obj,int dxs,int dys){
 	      if (!c) c++; // avoid UCS 0
 	      render_one_glyph(sub_font, c);
 
+Breakline:
 		if (c == ' ') {
 		    struct osd_text_t *tmp_ott = calloc(1, sizeof(struct osd_text_t));
 
@@ -745,9 +748,7 @@ inline static void vo_update_text_sub(mp_osd_obj_t* obj,int dxs,int dys){
 		    prevc = c;
 		} else {
 		    int delta_xsize = sub_font->width[c] + sub_font->charspace + kerning(sub_font, prevc, c);
-
-		    if (xsize + delta_xsize <= dxs) {
-			if (!x) x = 1;
+		
 			prevc = c;
 			char_seq[char_position++] = c;
 			xsize += delta_xsize;
@@ -756,10 +757,13 @@ inline static void vo_update_text_sub(mp_osd_obj_t* obj,int dxs,int dys){
 				h = sub_font->pic_a[font]->h;
 			    }
 			}
+
+		    if (xsize + delta_xsize + (j<len?delta_xsize:0) <= dxs) {
+			x = 1;
 		    } else {
 			if (x) {
-			    mp_msg(MSGT_OSD, MSGL_WARN, "\nSubtitle word '%s' too long!\n", t);
-			    x = 0;
+			    c = ' ';
+			    goto Breakline;
 			}
 		    }
 		}

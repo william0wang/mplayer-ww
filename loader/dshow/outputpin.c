@@ -300,7 +300,13 @@ static HRESULT STDCALL COutputPin_ReceiveConnection(IPin * This,
 						    /* [in] */ IPin *pConnector,
 						    /* [in] */ const AM_MEDIA_TYPE *pmt)
 {
+    COutputPin *op = (COutputPin*)This;
     Debug printf("COutputPin_ReceiveConnection(%p) called\n", This);
+    if(op->restrict_media_type && (memcmp(&pmt->majortype, &op->type.majortype, sizeof(GUID)) ||
+                                   memcmp(&pmt->subtype, &op->type.subtype, sizeof(GUID)))) {
+      Debug printf("Refusing type 0x%08x\n", pmt->subtype.f1);
+      return 0x8004022A; //VFW_E_TYPE_NOT_ACCEPT
+    }
     ((COutputPin*)This)->remote = pConnector;
     return 0;
 }
@@ -439,7 +445,20 @@ static HRESULT STDCALL COutputPin_QueryId(IPin * This,
 static HRESULT STDCALL COutputPin_QueryAccept(IPin * This,
 					      /* [in] */ const AM_MEDIA_TYPE *pmt)
 {
-    return output_unimplemented("COutputPin_QueryAccept", This);
+    COutputPin *op = (COutputPin*)This;
+    output_unimplemented("COutputPin_QueryAccept", This);
+    if(op->restrict_media_type && (memcmp(&pmt->majortype, &op->type.majortype, sizeof(GUID)) ||
+                                   memcmp(&pmt->subtype, &op->type.subtype, sizeof(GUID)))) {
+      Debug printf("Refusing type 0x%08x\n", pmt->subtype.f1);
+      return S_FALSE;
+    }
+    if(memcmp(&pmt->formattype, &FORMAT_VideoInfo, sizeof(GUID))) {
+      return S_OK;
+    }
+    if(memcmp(&pmt->formattype, &FORMAT_VideoInfo2, sizeof(GUID))) {
+      return S_OK;
+    }
+    return S_FALSE;
 }
 
 /**
@@ -517,7 +536,8 @@ static HRESULT STDCALL COutputPin_EndOfStream(IPin * This)
  */
 static HRESULT STDCALL COutputPin_BeginFlush(IPin * This)
 {
-    return output_unimplemented("COutputPin_BeginFlush", This);
+    return S_OK;
+    //return output_unimplemented("COutputPin_BeginFlush", This);
 }
 
 /**
@@ -531,7 +551,8 @@ static HRESULT STDCALL COutputPin_BeginFlush(IPin * This)
  */
 static HRESULT STDCALL COutputPin_EndFlush(IPin * This)
 {
-    return output_unimplemented("COutputPin_EndFlush", This);
+    return S_OK;
+    //return output_unimplemented("COutputPin_EndFlush", This);
 }
 
 /**
@@ -749,7 +770,7 @@ static HRESULT STDCALL COutputMemPin_ReceiveMultiple(IMemInputPin * This,
 					    /* [in] */ long nSamples,
 					    /* [out] */ long *nSamplesProcessed)
 {
-    HRESULT hr;
+    HRESULT hr = S_OK;
     Debug printf("COutputMemPin_ReceiveMultiple(%p) %ld\n", This,nSamples);
     for(*nSamplesProcessed=0; *nSamplesProcessed < nSamples; *nSamplesProcessed++) {
          hr = This->vt->Receive(This,pSamples[*nSamplesProcessed]);
@@ -782,6 +803,7 @@ static HRESULT STDCALL COutputMemPin_ReceiveCanBlock(IMemInputPin * This)
 static void COutputPin_SetNewFormat(COutputPin* This, const AM_MEDIA_TYPE* amt)
 {
     CopyMediaType(&(This->type),amt);
+    This->restrict_media_type = 1;
 }
 
 /**
@@ -914,6 +936,7 @@ COutputPin* COutputPinCreate(const AM_MEDIA_TYPE* amt,SAMPLEPROC SampleProc,void
 
     This->refcount = 1;
     This->remote = 0;
+    This->restrict_media_type = 0;
     CopyMediaType(&(This->type),amt);
 
     This->vt->QueryInterface = COutputPin_QueryInterface;

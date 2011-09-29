@@ -85,8 +85,7 @@ static const struct tag_conv {
     {"<b>", "{\\b1}"}, {"</b>", "{\\b0}"},
     {"<u>", "{\\u1}"}, {"</u>", "{\\u0}"},
     {"<s>", "{\\s1}"}, {"</s>", "{\\s0}"},
-    {"{", "\\{"}, {"}", "\\}"},
-    {"\n", "\\N"}
+    {"{", "\\{"}, {"\n", "\\N"}
 };
 
 static const struct {
@@ -132,8 +131,10 @@ void subassconvert_subrip(const char *orig, char *dest, size_t dest_buffer_size)
             const struct tag_conv *tag = &subrip_basic_tags[i];
             int from_len = strlen(tag->from);
             if (strncmp(line, tag->from, from_len) == 0) {
-                append_text(&new_line, "%s", tag->to);
-                line += from_len;
+				if(line[0] != '{' || strlen(line) < 2 || line[1] != '\\') {
+					append_text(&new_line, "%s", tag->to);
+					line += from_len;
+				}
             }
         }
 
@@ -227,6 +228,47 @@ void subassconvert_subrip(const char *orig, char *dest, size_t dest_buffer_size)
                         line += len;
                     }
                     append_text(&new_line, "{\\c&H%06X&}", tag->color & 0xffffff);
+                    has_valid_attr = 1;
+                } else if (strncmp(line, "color=", 6) == 0) {
+                    line += 6;
+                    if (*line == '#') {
+                        // #RRGGBB format
+                        line++;
+                        tag->color = strtol(line, &line, 16) & 0x00ffffff;
+                        if (*line != '>')
+                            break;
+                        tag->color = ((tag->color & 0xff) << 16) |
+                                      (tag->color & 0xff00) |
+                                     ((tag->color & 0xff0000) >> 16) |
+                                     SUBRIP_FLAG_COLOR;
+                    } else {
+                        // Standard web colors
+                        int i, len = indexof(line, '>');
+                        if (len <= 0)
+                            break;
+                        for (i = 0; i < FF_ARRAY_ELEMS(subrip_web_colors); i++) {
+                            const char *color = subrip_web_colors[i].s;
+                            if (strlen(color) == len
+                                && strncasecmp(line, color, len) == 0) {
+                                tag->color = SUBRIP_FLAG_COLOR | subrip_web_colors[i].v;
+                                break;
+                            }
+                        }
+
+                        if (i == FF_ARRAY_ELEMS(subrip_web_colors)) {
+                            /* We didn't find any matching color */
+                            line = strchr(line, '"'); // can't be NULL, see above
+                            mp_msg(MSGT_SUBREADER, MSGL_WARN,
+                                   MSGTR_SUBTITLES_SubRip_UnknownFontColor, orig);
+                            append_text(&new_line, "{\\c}");
+                            line += 2;
+                            continue;
+                        }
+
+                        line += len;
+                    }
+                    append_text(&new_line, "{\\c&H%06X&}", tag->color & 0xffffff);
+					line--;
                     has_valid_attr = 1;
                 } else if (strncmp(line, "face=\"", 6) == 0) {
                     /* Font face attribute */

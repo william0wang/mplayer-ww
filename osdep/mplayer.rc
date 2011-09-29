@@ -19,6 +19,10 @@
  */
 
 #include <winver.h>
+#include <winuser.h>
+#include <dlgs.h>
+#include <commctrl.h>
+#include "resource.h"
 #include "version.h"
 
 1 VERSIONINFO
@@ -36,12 +40,12 @@ FILETYPE VFT_APP
             VALUE "FileDescription", "MPlayer - Movie Player\000"
             VALUE "FileVersion",VERSION
             VALUE "InternalName", "Counter Counter\000"
-            VALUE "LegalCopyright", " (C) 2000-2010 MPlayer Team\000"
+            VALUE "LegalCopyright", " (C) 2000-2011 MPlayer Team\000"
             //VALUE "LegalTrademarks"," \000";
             VALUE "OriginalFilename", "mplayer.exe\000"
             VALUE "ProductName", "MPlayer - The Movie Player\000"
             VALUE "ProductVersion",VERSION
-            //VALUE "SpecialBuild","\000"
+            VALUE "SpecialBuild","WW\000"
         }
     }
     BLOCK "VarFileInfo"
@@ -54,3 +58,14 @@ IDI_ICON1 ICON DISCARDABLE  "etc/mplayer.ico"
 
 // for some reason RT_MANIFEST does not work
 1 24 "mplayer.exe.manifest"
+
+IDD_PASSWORD DIALOG DISCARDABLE 38, 46, 121, 45
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUPWINDOW | WS_VISIBLE | WS_DLGFRAME
+CAPTION "Input RAR Password"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    EDITTEXT        IDC_PASSWORD, 6, 6, 109, 12, ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK", IDOK, 6, 25, 50, 14
+    PUSHBUTTON      "Cancel", IDCANCEL, 66, 25, 50, 14
+END
+

@@ -93,6 +93,7 @@ SRCS_COMMON-$(FFMPEG_A)              += libaf/af_lavcac3enc.c    \
 
 SRCS_COMMON-$(FREETYPE)              += sub/font_load_ft.c
 SRCS_COMMON-$(FTP)                   += stream/stream_ftp.c
+SRCS_COMMON-$(VOD)                   += stream/stream_vod.c
 SRCS_COMMON-$(GIF)                   += libmpdemux/demux_gif.c
 SRCS_COMMON-$(HAVE_POSIX_SELECT)     += libmpcodecs/vf_bmovl.c
 SRCS_COMMON-$(HAVE_SYS_MMAN_H)       += libaf/af_export.c osdep/mmap_anon.c
@@ -267,9 +268,11 @@ SRCS_COMMON-$(WIN32DLL)              += libmpcodecs/ad_acm.c \
                                         libmpcodecs/ad_twin.c \
                                         libmpcodecs/vd_dmo.c \
                                         libmpcodecs/vd_dshow.c \
+                                        libmpcodecs/vd_dshownative.c \
                                         libmpcodecs/vd_vfw.c \
                                         libmpcodecs/vd_vfwex.c \
                                         libmpdemux/demux_avs.c \
+                                        libmpdemux/demux_dshow.c \
                                         loader/afl.c \
                                         loader/drv.c \
                                         loader/vfl.c \
@@ -311,6 +314,7 @@ SRCS_COMMON = asxparser.c \
               playtree.c \
               playtreeparser.c \
               subopt-helper.c \
+              unrar.c \
               libaf/af.c \
               libaf/af_center.c \
               libaf/af_channels.c \
@@ -334,6 +338,7 @@ SRCS_COMMON = asxparser.c \
               libaf/af_tools.c \
               libaf/af_volnorm.c \
               libaf/af_volume.c \
+              libaf/af_wadsp.c \
               libaf/filter.c \
               libaf/format.c \
               libaf/reorder_ch.c \
@@ -444,6 +449,7 @@ SRCS_COMMON = asxparser.c \
               libmpdemux/demux_mov.c \
               libmpdemux/demux_mpg.c \
               libmpdemux/demux_nsv.c \
+              libmpdemux/demux_pmp.c \
               libmpdemux/demux_pva.c \
               libmpdemux/demux_rawaudio.c \
               libmpdemux/demux_rawvideo.c \
@@ -513,6 +519,7 @@ SRCS_MPLAYER-$(DXR3)         += libvo/vo_dxr3.c
 SRCS_MPLAYER-$(ESD)          += libao2/ao_esd.c
 SRCS_MPLAYER-$(FBDEV)        += libvo/vo_fbdev.c libvo/vo_fbdev2.c
 SRCS_MPLAYER-$(FFMPEG)       += libvo/vo_png.c
+SRCS_MPLAYER-$(FFMPEG_A)     += libvo/vo_pipe.c
 SRCS_MPLAYER-$(GGI)          += libvo/vo_ggi.c
 SRCS_MPLAYER-$(GIF)          += libvo/vo_gif89a.c
 SRCS_MPLAYER-$(GL)           += libvo/gl_common.c libvo/vo_gl.c \
@@ -700,6 +707,8 @@ OBJS_MENCODER  += $(addsuffix .o, $(basename $(SRCS_MENCODER)))
 OBJS_MPLAYER   += $(addsuffix .o, $(basename $(SRCS_MPLAYER)))
 OBJS_MPLAYER-$(PE_EXECUTABLE) += osdep/mplayer-rc.o
 OBJS_MPLAYER   += $(OBJS_MPLAYER-yes)
+OBJS_MENCODER-$(PE_EXECUTABLE) += osdep/mencoder-rc.o
+OBJS_MENCODER   += $(OBJS_MENCODER-yes)
 
 MENCODER_DEPS = $(OBJS_MENCODER) $(OBJS_COMMON) $(COMMON_LIBS)
 MPLAYER_DEPS  = $(OBJS_MPLAYER)  $(OBJS_COMMON) $(COMMON_LIBS)
@@ -710,8 +719,8 @@ ALL_PRG-$(MPLAYER)  += mplayer$(EXESUF)
 ALL_PRG-$(MENCODER) += mencoder$(EXESUF)
 
 INSTALL_TARGETS-$(GUI)      += install-gui
-INSTALL_TARGETS-$(MENCODER) += install-mencoder install-mencoder-man
-INSTALL_TARGETS-$(MPLAYER)  += install-mplayer  install-mplayer-man
+INSTALL_TARGETS-$(MENCODER) += install-mencoder
+INSTALL_TARGETS-$(MPLAYER)  += install-mplayer
 
 DIRS =  . \
         gui \
@@ -810,7 +819,7 @@ help_mp.h: help/help_mp-en.h $(HELP_FILE)
 	help/help_create.sh $(HELP_FILE) $(CHARSET)
 
 # rebuild version.h each time the working copy is updated
-version.h: version.sh $(wildcard .svn/entries .git/logs/HEAD)
+version.h: version.sh $(wildcard _svn_mplayer/entries .git/logs/HEAD)
 	./$< `$(CC) -dumpversion`
 
 %$(EXESUF): %.c
@@ -828,9 +837,10 @@ checkheaders: $(ALLHEADERS:.h=.ho)
 # Make sure all generated header files are created.
 codec-cfg.o: codecs.conf.h
 $(DEP_FILES) $(MENCODER_DEPS) $(MPLAYER_DEPS): help_mp.h
-mpcommon.o osdep/mplayer-rc.o gui/ui/gtk/about.o gui/win32/gui.o: version.h
+mpcommon.o osdep/mplayer-rc.o gui/ui/gtk/about.o gui/win32/gui.o osdep/mencoder-rc.o: version.h
 
 osdep/mplayer-rc.o: osdep/mplayer.exe.manifest
+osdep/mencoder-rc.o: osdep/mplayer.exe.manifest
 
 gui/%: CFLAGS += -Wno-strict-prototypes
 
