@@ -40,6 +40,34 @@
 
 #include "libavutil/fifo.h"
 
+#ifdef _WIN32
+#include <windows.h>
+
+static HANDLE hSDL = NULL;
+
+typedef int    (__cdecl *imp_SDL_Init)(uint32_t);
+typedef int    (__cdecl *imp_SDL_OpenAudio)(SDL_AudioSpec *, SDL_AudioSpec*);
+typedef void   (__cdecl *imp_SDL_CloseAudio)(void);
+typedef void   (__cdecl *imp_SDL_PauseAudio)(int);
+typedef char * (__cdecl *imp_SDL_GetError)(void);
+typedef void   (__cdecl *imp_SDL_QuitSubSystem)(uint32_t);
+
+static imp_SDL_Init            pSDL_Init;
+static imp_SDL_OpenAudio       pSDL_OpenAudio;
+static imp_SDL_CloseAudio      pSDL_CloseAudio;
+static imp_SDL_PauseAudio      pSDL_PauseAudio;
+static imp_SDL_GetError        pSDL_GetError;
+static imp_SDL_QuitSubSystem   pSDL_QuitSubSystem;
+
+#define SDL_Init            pSDL_Init
+#define SDL_OpenAudio       pSDL_OpenAudio
+#define SDL_CloseAudio      pSDL_CloseAudio
+#define SDL_PauseAudio      pSDL_PauseAudio
+#define SDL_GetError        pSDL_GetError
+#define SDL_QuitSubSystem   pSDL_QuitSubSystem
+
+#endif
+
 static const ao_info_t info =
 {
 	"SDLlib audio output",
@@ -135,6 +163,26 @@ static int init(int rate,int channels,int format,int flags){
 
 	/* SDL Audio Specifications */
 	SDL_AudioSpec aspec, obtained;
+
+#ifdef _WIN32
+    if (!(hSDL = LoadLibraryA("SDL.dll")))
+    {
+        mp_msg(MSGT_AO, MSGL_ERR, "SDL LoadLibrary failed\n");
+        return -1;
+    }
+#define DLSYM(x) if (!(p##x = (imp_##x) GetProcAddress(hSDL, #x))) \
+    { \
+        mp_msg(MSGT_AO, MSGL_ERR, "Error loading %s\n", #x); \
+        return -1; \
+    };
+
+    DLSYM(SDL_Init);
+    DLSYM(SDL_OpenAudio);
+    DLSYM(SDL_CloseAudio);
+    DLSYM(SDL_PauseAudio);
+    DLSYM(SDL_GetError);
+    DLSYM(SDL_QuitSubSystem);
+#endif
 
 	/* Allocate ring-buffer memory */
 	buffer = av_fifo_alloc(BUFFSIZE);
@@ -251,9 +299,15 @@ static void uninit(int immed){
 	mp_msg(MSGT_AO,MSGL_V,"SDL: Audio Subsystem shutting down!\n");
 	if (!immed)
 	  usec_sleep(get_delay() * 1000 * 1000);
+#ifdef _WIN32
+    if (!hSDL) return;
+#endif
 	SDL_CloseAudio();
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 	av_fifo_free(buffer);
+#ifdef _WIN32
+	FreeLibrary(hSDL);
+#endif
 }
 
 // stop playing and empty buffers (for seeking/pause)

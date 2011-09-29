@@ -16,6 +16,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -45,6 +46,8 @@ static char *old_charset = NULL;
 static iconv_t msgiconv;
 #endif
 
+extern HANDLE hStdOut;
+extern int showlog;
 const char* filename_recode(const char* filename)
 {
 #if !defined(CONFIG_ICONV) || !defined(MSG_CHARSET)
@@ -83,7 +86,7 @@ void mp_msg_init(void){
         verbose = atoi(env);
     for(i=0;i<MSGT_MAX;i++) mp_msg_levels[i] = -2;
     mp_msg_levels[MSGT_IDENTIFY] = -1; // no -identify output by default
-#ifdef CONFIG_ICONV
+#if 0//def CONFIG_ICONV
     mp_msg_charset = getenv("MPLAYER_CHARSET");
     if (!mp_msg_charset)
       mp_msg_charset = get_term_charset();
@@ -177,10 +180,12 @@ static void print_msg_module(FILE* stream, int mod)
 }
 
 void mp_msg(int mod, int lev, const char *format, ... ){
+  if(showlog) {
     va_list va;
     va_start(va, format);
     mp_msg_va(mod, lev, format, va);
     va_end(va);
+  }
 }
 
 void mp_msg_va(int mod, int lev, const char *format, va_list va){
@@ -196,7 +201,7 @@ void mp_msg_va(int mod, int lev, const char *format, va_list va){
     tmp[MSGSIZE_MAX-2] = '\n';
     tmp[MSGSIZE_MAX-1] = 0;
 
-#if defined(CONFIG_ICONV) && defined(MSG_CHARSET)
+#if 0//defined(CONFIG_ICONV) && defined(MSG_CHARSET)
     if (mp_msg_charset && strcasecmp(mp_msg_charset, "noconv")) {
       char tmp2[MSGSIZE_MAX];
       size_t inlen = strlen(tmp), outlen = MSGSIZE_MAX;
@@ -238,8 +243,9 @@ void mp_msg_va(int mod, int lev, const char *format, va_list va){
     len = strlen(tmp);
     header = len && (tmp[len-1] == '\n' || tmp[len-1] == '\r');
 
+  if (showlog==1) {
     fprintf(stream, "%s", tmp);
-    if (mp_msg_color)
-        fprintf(stream, "\033[0m");
     fflush(stream);
+  } else
+    WriteFile(hStdOut, tmp, strlen(tmp), NULL, NULL);
 }

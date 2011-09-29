@@ -40,6 +40,7 @@ extern const vd_functions_t mpcodecs_vd_null;
 extern const vd_functions_t mpcodecs_vd_ffmpeg;
 extern const vd_functions_t mpcodecs_vd_theora;
 extern const vd_functions_t mpcodecs_vd_dshow;
+extern const vd_functions_t mpcodecs_vd_dshownative;
 extern const vd_functions_t mpcodecs_vd_dmo;
 extern const vd_functions_t mpcodecs_vd_vfw;
 extern const vd_functions_t mpcodecs_vd_vfwex;
@@ -73,6 +74,7 @@ const vd_functions_t * const mpcodecs_vd_drivers[] = {
 #endif
 #ifdef CONFIG_WIN32DLL
     &mpcodecs_vd_dshow,
+    &mpcodecs_vd_dshownative,
     &mpcodecs_vd_dmo,
     &mpcodecs_vd_vfw,
     &mpcodecs_vd_vfwex,
@@ -129,6 +131,7 @@ float screen_size_xy = 0;
 float movie_aspect = -1.0;
 int vo_flags = 0;
 int vd_use_slices = -1;
+float movie_scale=1.0;
 
 /** global variables for gamma, brightness, contrast, saturation and hue
     modified by mplayer.c and gui/mplayer/gtk/eq.c:
@@ -288,6 +291,7 @@ int mpcodecs_config_vo(sh_video_t *sh, int w, int h,
     }
     // time to do aspect ratio corrections...
 
+    movie_scale = 1.0;
     if (movie_aspect > -1.0)
         sh->aspect = movie_aspect;      // cmdline overrides autodetect
     else if (sh->stream_aspect != 0.0)
@@ -337,6 +341,7 @@ int mpcodecs_config_vo(sh_video_t *sh, int w, int h,
                 screen_size_y += screen_size_y % 2;     // round
             } else
                 screen_size_x = w;      // keep new width
+            movie_scale = sh->aspect*sh->disp_h/sh->disp_w;			
         } else {
             mp_msg(MSGT_CPLAYER, MSGL_INFO, MSGTR_MovieAspectUndefined);
         }

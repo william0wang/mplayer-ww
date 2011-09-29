@@ -19,6 +19,10 @@
  */
 
 #include <winver.h>
+#include <winuser.h>
+#include <dlgs.h>
+#include <commctrl.h>
+#include "resource.h"
 #include "version.h"
 
 1 VERSIONINFO
@@ -36,12 +40,12 @@ FILETYPE VFT_APP
             VALUE "FileDescription", "MPlayer - Movie Player\000"
             VALUE "FileVersion",VERSION
             VALUE "InternalName", "Counter Counter\000"
-            VALUE "LegalCopyright", " (C) 2000-2010 MPlayer Team\000"
+            VALUE "LegalCopyright", " (C) 2000-2011 MPlayer Team\000"
             //VALUE "LegalTrademarks"," \000";
             VALUE "OriginalFilename", "mplayer.exe\000"
             VALUE "ProductName", "MPlayer - The Movie Player\000"
             VALUE "ProductVersion",VERSION
-            //VALUE "SpecialBuild","\000"
+            VALUE "SpecialBuild","WW\000"
         }
     }
     BLOCK "VarFileInfo"
@@ -50,7 +54,682 @@ FILETYPE VFT_APP
     }
 }
 
-IDI_ICON1 ICON DISCARDABLE  "etc/mplayer.ico"
+IDI_APPICON ICON DISCARDABLE  "../etc/mplayer.ico"
+IDI_MPLAYER_LOGO     BITMAP DISCARDABLE  "../etc/logo.bmp"
+IDB_TASK_THUMBNAIL   BITMAP DISCARDABLE  "../etc/thumbnail.bmp"
+IDB_SKIN_BACKGROUND  BITMAP DISCARDABLE  "../etc/skin/background.bmp"
+IDB_SKIN_BKGL        BITMAP DISCARDABLE  "../etc/skin/background_left.bmp"
+IDB_SKIN_BKGR        BITMAP DISCARDABLE  "../etc/skin/background_right.bmp"
+IDB_SKIN_SEEKBAR     BITMAP DISCARDABLE  "../etc/skin/seekbar.bmp"
+IDB_SKIN_SEEKBARF    BITMAP DISCARDABLE  "../etc/skin/seekbar_foregnd.bmp"
+IDB_SKIN_SEEKBART    BITMAP DISCARDABLE  "../etc/skin/seekbar_thumb.bmp"
+IDB_SKIN_VOLUMEBAR   BITMAP DISCARDABLE  "../etc/skin/volumebar.bmp"
+IDB_SKIN_VOLUMEBARF  BITMAP DISCARDABLE  "../etc/skin/volumebar_foregnd.bmp"
+IDB_SKIN_VOLUMEBART  BITMAP DISCARDABLE  "../etc/skin/volumebar_thumb.bmp"
 
-// for some reason RT_MANIFEST does not work
-1 24 "mplayer.exe.manifest"
+IDR_MAINMENU MENU DISCARDABLE
+BEGIN
+    POPUP "文件(&F)"
+    BEGIN
+        MENUITEM "打开(&O)\tCtrl+O",                IDM_OPEN
+        MENUITEM "打开 Direct&Show\tCtrl+V",        IDM_OPENAVS
+        MENUITEM "添加(&A)\tCtrl+A",                IDM_ADD
+        MENUITEM SEPARATOR
+        MENUITEM "打开文件(&F)",                    IDM_OPENFILE
+        MENUITEM "打开 URL(&U)",                    IDM_OPENURL
+        MENUITEM "打开 DVD(&D)",                    IDM_OPENDVD
+        MENUITEM "打开 Bluray(&B)",                 IDM_OPENBR
+        MENUITEM "播放 CD(&C)",                     IDM_OPENCD
+        MENUITEM SEPARATOR
+        MENUITEM "播放列表(&P)\tCtrl+P",            IDM_PLAYLIST
+        MENUITEM SEPARATOR
+        MENUITEM "加载字幕(&L)",                    IDM_LOAD_SUB
+        MENUITEM SEPARATOR
+        MENUITEM "保存缩略图(&T)",                  IDM_PREVIEW
+        MENUITEM SEPARATOR
+        MENUITEM "退出\tCtrl+X(&X)",                IDM_EXIT
+    END
+    POPUP "选项(&O)"
+    BEGIN
+        MENUITEM "首选项(&M)",                      IDM_CONFIG
+        MENUITEM "快捷键(&I)",                      IDM_INPUT_CONF
+        MENUITEM "文件关联(&A)",                    IDM_CONFIG_ASSOC
+        MENUITEM SEPARATOR
+        MENUITEM "查看媒体信息(&M)\tCtrl+D",        IDM_MEDIA_INFO
+        MENUITEM "查看日志(&L)\tCtrl+L",            IDM_LOG
+        MENUITEM SEPARATOR
+        MENUITEM "视频均衡器(&E)\tCtrl+E",          IDM_OPENEQ
+        MENUITEM "音频DSP插件(&P)",                 IDM_AUIDO_DSP
+        MENUITEM SEPARATOR
+        POPUP "字幕选项"
+		BEGIN
+            MENUITEM "切换字体(&S)",                  IDM_SWITCH_FONT
+            MENUITEM "设置字幕字体(&F)",              IDM_SUB_FONT
+        END
+        POPUP "重载横纵比"
+		BEGIN
+            MENUITEM "默认\tCtrl+R",                   IDM_ASPECT_FILE
+            MENUITEM "4:3\tCtrl+H",                    IDM_ASPECT_43
+            MENUITEM "5:4\tCtrl+J",                    IDM_ASPECT_54
+            MENUITEM "16:9\tCtrl+K",                   IDM_ASPECT_169
+            MENUITEM "2.35:1\tCtrl+T",                 IDM_ASPECT_235
+        END
+        MENUITEM "保持横纵比(&A)",              IDM_KEEP_ASPECT
+        MENUITEM "锁定窗口尺寸(&F)",            IDM_FIXED_SIZE
+        MENUITEM SEPARATOR
+        MENUITEM "禁用屏幕保护(&D)",            IDM_SCREENSAVER
+        MENUITEM "播放结束后关机",              IDM_SHUTDOWN
+    END
+    POPUP "播放"
+    BEGIN
+        MENUITEM "播放/暂停",                 IDM_PLAY_PAUSE
+        MENUITEM "停止",                      IDM_STOP
+        MENUITEM "上一段",                    IDM_PRE
+        MENUITEM "下一段",                    IDM_NEXT
+        MENUITEM SEPARATOR
+        POPUP "&DVD"
+        BEGIN
+			MENUITEM "根菜单",              IDM_DVD_ROOT
+			MENUITEM "标题菜单",            IDM_DVD_TITLE
+			MENUITEM "上一标题",            IDM_DVDT_PRE
+			MENUITEM "下一标题",            IDM_DVDT_NEXT
+            MENUITEM "上一章节",            IDM_DVDC_PRE
+            MENUITEM "下一章节",            IDM_DVDC_NEXT
+            MENUITEM "切换视角",            IDM_DVD_ANGLE
+			POPUP "菜单(&M)"
+			BEGIN
+				MENUITEM "上",            IDM_DVD_UP
+				MENUITEM "下",            IDM_DVD_DOWN
+				MENUITEM "左",            IDM_DVD_LEFT
+				MENUITEM "右",            IDM_DVD_RIGHT
+				MENUITEM SEPARATOR
+				MENUITEM "选择",          IDM_DVD_SEL
+			END
+        	MENUITEM "鼠标控制DVD菜单\tCtrl+N",   IDM_MOUSE_DVDNAV
+        END
+        POPUP "&CD"
+        BEGIN
+            MENUITEM "上一音轨",                IDM_DVDC_PRE
+            MENUITEM "下一音轨",                IDM_DVDC_NEXT
+        END
+        MENUITEM SEPARATOR
+        POPUP "音量(&V)"
+        BEGIN
+            MENUITEM "增大",                IDM_VOLUME_UP
+            MENUITEM "减小",                IDM_VOLUME_DOWN
+            MENUITEM "静音",                IDM_VOLUME_MUTE
+        END
+        POPUP "声道(&C)"
+        BEGIN
+            MENUITEM "立体声",                IDM_AUDIO_STEREO
+            MENUITEM "左声道",                IDM_AUDIO_LEFT
+            MENUITEM "右声道",                IDM_AUDIO_RIGHT
+        END
+        MENUITEM "切换音轨(&S)",              IDM_SWITCH_AUDIO
+        MENUITEM SEPARATOR
+        POPUP "播放速度"
+        BEGIN
+            MENUITEM "加速",            IDM_SPEED_UP
+            MENUITEM "减速",            IDM_SPEED_DOWN
+            MENUITEM "正常速度",        IDM_SPEED_NORMAL
+        END
+    END
+    POPUP "帮助"
+    BEGIN
+         MENUITEM "检查更新(&U)...",             IDM_CHECKUPDATE
+         MENUITEM SEPARATOR
+         MENUITEM "主页(&H)",                    IDM_HOMEPAGE
+         MENUITEM "帮助主题(&M)",                IDM_MANPAGE
+         MENUITEM "命令行(&C)",                  IDM_CMDLINE
+         MENUITEM SEPARATOR
+         MENUITEM "关于 MPlayer(&A)",            IDM_ABOUT
+    END
+END
+
+IDR_MAINMENU_TC MENU DISCARDABLE
+BEGIN
+    POPUP "檔案(&F)"
+    BEGIN
+        MENUITEM "開啟(&O)\tCtrl+O",                IDM_OPEN
+        MENUITEM "開啟 Direct&Show\tCtrl+V",        IDM_OPENAVS
+        MENUITEM "添加(&A)\tCtrl+A",                IDM_ADD
+        MENUITEM SEPARATOR
+        MENUITEM "開啟檔(&F)",                      IDM_OPENFILE
+        MENUITEM "開啟 URL(&U)",                    IDM_OPENURL
+        MENUITEM "開啟 DVD(&D)",                    IDM_OPENDVD
+        MENUITEM "開啟 Bluray(&B)",                 IDM_OPENBR
+        MENUITEM "播放 CD(&C)",                     IDM_OPENCD
+        MENUITEM SEPARATOR
+        MENUITEM "播放列表(&P)\tCtrl+P",            IDM_PLAYLIST
+        MENUITEM SEPARATOR
+        MENUITEM "讀取字幕(&L)",                    IDM_LOAD_SUB
+        MENUITEM SEPARATOR
+        MENUITEM "存儲縮圖(&T)",                    IDM_PREVIEW
+        MENUITEM SEPARATOR
+        MENUITEM "離開(&X)\tCtrl+X",                IDM_EXIT
+    END
+    POPUP "選項(&O)"
+    BEGIN
+        MENUITEM "偏好設定(&M)",                  IDM_CONFIG
+        MENUITEM "快捷鍵(&I)",                    IDM_INPUT_CONF
+        MENUITEM "檔關聯(&A)",                    IDM_CONFIG_ASSOC
+        MENUITEM SEPARATOR
+        MENUITEM "查看媒體信息(&M)\tCtrl+D",      IDM_MEDIA_INFO
+        MENUITEM "查看日志(&L)\tCtrl+L",          IDM_LOG
+        MENUITEM SEPARATOR
+        MENUITEM "視頻均衡器(&E)\tCtrl+E",        IDM_OPENEQ
+        MENUITEM "音頻DSP插件(&P)",               IDM_AUIDO_DSP
+        MENUITEM SEPARATOR
+        POPUP "字幕選項"
+		BEGIN
+            MENUITEM "更換字體(&S)",                 IDM_SWITCH_FONT
+            MENUITEM "設置字幕字體(&F)",             IDM_SUB_FONT
+        END
+        POPUP "復寫長寬比例"
+		BEGIN
+            MENUITEM "預設值\tCtrl+R",                 IDM_ASPECT_FILE
+            MENUITEM "4:3\tCtrl+H",                    IDM_ASPECT_43
+            MENUITEM "5:4\tCtrl+J",                    IDM_ASPECT_54
+            MENUITEM "16:9\tCtrl+K",                   IDM_ASPECT_169
+            MENUITEM "2.35:1\tCtrl+T",                 IDM_ASPECT_235
+        END
+        MENUITEM "保持橫縱比(&A)",              IDM_KEEP_ASPECT
+        MENUITEM "鎖定窗口尺寸(&F)",            IDM_FIXED_SIZE
+        MENUITEM SEPARATOR
+        MENUITEM "禁用螢幕保護(&D)",            IDM_SCREENSAVER
+        MENUITEM "播放結束后關機",              IDM_SHUTDOWN
+    END
+    POPUP "播放"
+    BEGIN
+        MENUITEM "播放/暫停",              IDM_PLAY_PAUSE
+        MENUITEM "停止",                   IDM_STOP
+        MENUITEM "上一段",                 IDM_PRE
+        MENUITEM "下一段",                 IDM_NEXT
+        MENUITEM SEPARATOR
+        POPUP "&DVD"
+        BEGIN
+			MENUITEM "根菜單",              IDM_DVD_ROOT
+			MENUITEM "標題菜單",            IDM_DVD_TITLE
+			MENUITEM "上一標題",            IDM_DVDT_PRE
+			MENUITEM "下一標題",            IDM_DVDT_NEXT
+            MENUITEM "上一章节",            IDM_DVDC_PRE
+            MENUITEM "下一章节",            IDM_DVDC_NEXT
+            MENUITEM "切換視角",            IDM_DVD_ANGLE
+			POPUP "菜單(&M)"
+			BEGIN
+				MENUITEM "上",            IDM_DVD_UP
+				MENUITEM "下",            IDM_DVD_DOWN
+				MENUITEM "左",            IDM_DVD_LEFT
+				MENUITEM "右",            IDM_DVD_RIGHT
+				MENUITEM SEPARATOR
+				MENUITEM "選擇",          IDM_DVD_SEL
+			END
+        	MENUITEM "滑鼠控制DVD菜單\tCtrl+N",   IDM_MOUSE_DVDNAV
+        END
+        POPUP "&CD"
+        BEGIN
+            MENUITEM "上一音軌",              IDM_DVDC_PRE
+            MENUITEM "下一音軌",              IDM_DVDC_NEXT
+        END
+        MENUITEM SEPARATOR
+        POPUP "音量(&V)"
+        BEGIN
+            MENUITEM "增大",                IDM_VOLUME_UP
+            MENUITEM "減小",                IDM_VOLUME_DOWN
+            MENUITEM "靜音",                IDM_VOLUME_MUTE
+        END
+        POPUP "聲道(&C)"
+        BEGIN
+            MENUITEM "立體聲",                IDM_AUDIO_STEREO
+            MENUITEM "左聲道",                IDM_AUDIO_LEFT
+            MENUITEM "右聲道",                IDM_AUDIO_RIGHT
+        END
+        MENUITEM "切換音軌(&S)",              IDM_SWITCH_AUDIO
+        MENUITEM SEPARATOR
+        POPUP "播放速度"
+        BEGIN
+            MENUITEM "加速",           IDM_SPEED_UP
+            MENUITEM "減速",           IDM_SPEED_DOWN
+            MENUITEM "正常速度",       IDM_SPEED_NORMAL
+        END
+    END
+    POPUP "說明"
+    BEGIN
+         MENUITEM "檢查更新(&U)...",         IDM_CHECKUPDATE
+         MENUITEM SEPARATOR
+         MENUITEM "網址(&H)",                IDM_HOMEPAGE
+         MENUITEM "說明(&M)",                IDM_MANPAGE
+         MENUITEM "命令行(&C)",              IDM_CMDLINE
+         MENUITEM SEPARATOR
+         MENUITEM "關于 MPlayer(&A)",        IDM_ABOUT
+    END
+END
+
+IDR_MAINMENU_EN MENU DISCARDABLE
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Open...\tCtrl+O",                IDM_OPEN
+        MENUITEM "Open With Direct&Show\tCtrl+V",   IDM_OPENAVS
+        MENUITEM "&Add...\tCtrl+A",                 IDM_ADD
+        MENUITEM SEPARATOR
+        MENUITEM "Open &File",                      IDM_OPENFILE
+        MENUITEM "Open &URL",                       IDM_OPENURL
+        MENUITEM "Open &Bluray",                    IDM_OPENBR
+        MENUITEM "Open &DVD",                       IDM_OPENDVD
+        MENUITEM "Play &CD",                        IDM_OPENCD
+        MENUITEM SEPARATOR
+        MENUITEM "Open PlayList\tCtrl+P",           IDM_PLAYLIST
+        MENUITEM SEPARATOR
+        MENUITEM "&Load Subtitle...",               IDM_LOAD_SUB
+        MENUITEM SEPARATOR
+        MENUITEM "Save &Thumbnails...",             IDM_PREVIEW
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit\tCtrl+X",                   IDM_EXIT
+    END
+    POPUP "&Option"
+    BEGIN
+        MENUITEM "&Preferences",                       IDM_CONFIG
+        MENUITEM "&Input",                             IDM_INPUT_CONF
+        MENUITEM "File &Association",                  IDM_CONFIG_ASSOC
+        MENUITEM SEPARATOR
+        MENUITEM "Show &Media Information\tCtrl+D",    IDM_MEDIA_INFO
+        MENUITEM "View &Log\tCtrl+L",                  IDM_LOG
+        MENUITEM SEPARATOR
+        MENUITEM "Video &Equalizer\tCtrl+E",           IDM_OPENEQ
+        MENUITEM "Audio &DSP Plugin",                  IDM_AUIDO_DSP
+        MENUITEM SEPARATOR
+        POPUP "SubTitle Option"
+		BEGIN
+            MENUITEM "&Switch Font",                   IDM_SWITCH_FONT
+            MENUITEM "Subtitle &Font...",              IDM_SUB_FONT
+        END
+        POPUP "Override Aspect Ratio"
+		BEGIN
+            MENUITEM "Default\tCtrl+R",                IDM_ASPECT_FILE
+            MENUITEM "4:3\tCtrl+H",                    IDM_ASPECT_43
+            MENUITEM "5:4\tCtrl+J",                    IDM_ASPECT_54
+            MENUITEM "16:9\tCtrl+K",                   IDM_ASPECT_169
+            MENUITEM "2.35:1\tCtrl+T",                 IDM_ASPECT_235
+        END
+        MENUITEM "Keep &Aspect Ratio",                 IDM_KEEP_ASPECT
+        MENUITEM "&Fixed Window Size",                 IDM_FIXED_SIZE
+        MENUITEM SEPARATOR
+        MENUITEM "&Disable ScreenSaver",               IDM_SCREENSAVER
+        MENUITEM "Shutdown After Playback",            IDM_SHUTDOWN
+    END
+    POPUP "&Play"
+    BEGIN
+        MENUITEM "Play/Pause",                  IDM_PLAY_PAUSE
+        MENUITEM "Stop",                        IDM_STOP
+        MENUITEM "Previous",                    IDM_PRE
+        MENUITEM "Next",                        IDM_NEXT
+        MENUITEM SEPARATOR
+        POPUP "&DVD"
+        BEGIN
+			MENUITEM "Root Menu",             IDM_DVD_ROOT
+			MENUITEM "Title Menu",            IDM_DVD_TITLE
+			MENUITEM "Previous Title",        IDM_DVDT_PRE
+			MENUITEM "Next Title",            IDM_DVDT_NEXT
+            MENUITEM "Previous Chapter",      IDM_DVDC_PRE
+            MENUITEM "Next Chapter",          IDM_DVDC_NEXT
+            MENUITEM "Switch Angle",          IDM_DVD_ANGLE
+			POPUP "&Menu"
+			BEGIN
+				MENUITEM "Up",               IDM_DVD_UP
+				MENUITEM "Down",             IDM_DVD_DOWN
+				MENUITEM "Left",             IDM_DVD_LEFT
+				MENUITEM "Right",            IDM_DVD_RIGHT
+				MENUITEM SEPARATOR
+				MENUITEM "Select",           IDM_DVD_SEL
+			END
+			MENUITEM "Mouse Control DVD Menu\tCtrl+N", IDM_MOUSE_DVDNAV
+        END
+        POPUP "&CD"
+        BEGIN
+            MENUITEM "Previous Track",          IDM_DVDC_PRE
+            MENUITEM "Next Track",              IDM_DVDC_NEXT
+        END
+        MENUITEM SEPARATOR
+        POPUP "&Volume"
+        BEGIN
+            MENUITEM "Up",                  IDM_VOLUME_UP
+            MENUITEM "Dowm",                IDM_VOLUME_DOWN
+            MENUITEM "Mute",                IDM_VOLUME_MUTE
+        END
+        POPUP "&Channel"
+        BEGIN
+            MENUITEM "Stereo",              IDM_AUDIO_STEREO
+            MENUITEM "Left",                IDM_AUDIO_LEFT
+            MENUITEM "Right",               IDM_AUDIO_RIGHT
+        END
+        MENUITEM "&Switch Audio",           IDM_SWITCH_AUDIO
+        MENUITEM SEPARATOR
+        POPUP "Play Rate"
+        BEGIN
+            MENUITEM "Increase Rate",           IDM_SPEED_UP
+            MENUITEM "Decrease Rate",           IDM_SPEED_DOWN
+            MENUITEM "Reset Rate",              IDM_SPEED_NORMAL
+        END
+    END
+    POPUP "&Help"
+    BEGIN
+         MENUITEM "Check for &update...",              IDM_CHECKUPDATE
+         MENUITEM SEPARATOR
+         MENUITEM "&Home Page",                        IDM_HOMEPAGE
+         MENUITEM "&Man Page",                         IDM_MANPAGE
+         MENUITEM "&Command Line Switches",            IDM_CMDLINE
+         MENUITEM SEPARATOR
+         MENUITEM "&About MPlayer...",                 IDM_ABOUT
+    END
+END
+
+IDD_TEMPLATE DIALOG DISCARDABLE  0, 0, 250, 25
+STYLE DS_3DLOOK | DS_CONTROL | WS_CHILD |WS_VISIBLE | WS_CLIPSIBLINGS
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "Extra Param:",IDC_STATIC,6,11,58,10, ES_AUTOHSCROLL
+    EDITTEXT        IDC_CMDLINE,60,9,100,12, ES_AUTOHSCROLL
+    LTEXT           "",stc32,0,0,250,8
+END
+
+IDD_TEMPLATE_SC DIALOG DISCARDABLE  0, 0, 250, 25
+STYLE DS_3DLOOK | DS_CONTROL | WS_CHILD |WS_VISIBLE | WS_CLIPSIBLINGS
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "额外参数:",IDC_STATIC,6,11,58,10, ES_AUTOHSCROLL
+    EDITTEXT        IDC_CMDLINE,60,9,100,12, ES_AUTOHSCROLL
+    LTEXT           "",stc32,0,0,250,8
+END
+
+IDD_TEMPLATE_TC DIALOG DISCARDABLE  0, 0, 250, 25
+STYLE DS_3DLOOK | DS_CONTROL | WS_CHILD |WS_VISIBLE | WS_CLIPSIBLINGS
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "額外參數:",IDC_STATIC,6,11,58,10, ES_AUTOHSCROLL
+    EDITTEXT        IDC_CMDLINE,60,9,100,12, ES_AUTOHSCROLL
+    LTEXT           "",stc32,0,0,250,8
+END
+
+IDD_PASSWORD DIALOG DISCARDABLE 38, 46, 121, 45
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUPWINDOW | WS_VISIBLE | WS_DLGFRAME
+CAPTION "Input RAR Password"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    EDITTEXT        IDC_PASSWORD, 6, 6, 109, 12, ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK", IDOK, 6, 25, 50, 14
+    PUSHBUTTON      "Cancel", IDCANCEL, 66, 25, 50, 14
+END
+
+IDD_CONTROL_SKIN DIALOG DISCARDABLE  0, 0, 200, 12
+STYLE DS_3DLOOK | DS_CONTROL | WS_CHILD | WS_CLIPSIBLINGS
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_CTL_SEEK,"msctls_trackbar32",0x0100|TBS_NOTICKS|TBS_BOTH|NOT WS_VISIBLE,0,0,0,0
+    CONTROL         "",IDC_CTL_VOLUME,"msctls_trackbar32",0x0100|TBS_NOTICKS|TBS_BOTH|NOT WS_VISIBLE,0,0,0,0
+END
+
+IDD_CONTROL_SKIN_POP DIALOG DISCARDABLE  0, 0, 200, 12
+STYLE DS_3DLOOK | DS_CONTROL | WS_POPUP | WS_CLIPSIBLINGS
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_CTL_SEEK,"msctls_trackbar32",0x0100|TBS_NOTICKS|TBS_BOTH|NOT WS_VISIBLE,0,0,0,0
+    CONTROL         "",IDC_CTL_VOLUME,"msctls_trackbar32",0x0100|TBS_NOTICKS|TBS_BOTH|NOT WS_VISIBLE,0,0,0,0
+END
+
+IDD_DIALOG_FAVORITES DIALOG DISCARDABLE  0, 0, 220, 120
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Manage Favorites"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,180,99,32,14
+    LISTBOX         IDC_LIST_FAVORITES,8,7,168,106, LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Delete",IDC_BUTTON_DELETE,180,7,32,14
+    PUSHBUTTON      "Clean",IDC_BUTTON_CLEAN,180,40,32,14
+END
+
+IDD_DIALOG_MEDIAINFO DIALOG DISCARDABLE  0, 0, 280, 230
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Media Info"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LISTBOX         IDC_LIST_MEDIAINFO,8,7,264,216, LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+END
+
+IDD_DIALOG_CDROM DIALOG DISCARDABLE  0, 0, 120, 56
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "CD-ROM"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,7,40,45,14
+    PUSHBUTTON      "Cancel",IDCANCEL,68,40,45,14
+    LISTBOX         IDC_LIST_CDROM,7,7,106,32, LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+END
+
+IDD_DIALOG_URL DIALOG DISCARDABLE  0, 0, 260, 42
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "URL"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "URL:",IDC_STATIC,6,11,30,10, ES_AUTOHSCROLL
+    EDITTEXT        IDC_CMDLINE,30,9,224,12, ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,156,25,45,14
+    PUSHBUTTON      "Cancel",IDCANCEL,210,25,45,14
+END
+
+IDD_DIALOG_OPEN DIALOG DISCARDABLE  0, 0, 284, 75
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Open"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,171,54,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,227,54,50,14
+    PUSHBUTTON      "Browse",IDC_BUTTON_DELETE,222,10,50,14
+    PUSHBUTTON      "Browse",IDC_BUTTON_CLEAN,222,30,50,14
+    EDITTEXT        IDC_CMDLINE,40,11,175,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWORD,41,30,173,14,ES_AUTOHSCROLL
+    LTEXT           "File:",IDC_STATIC,7,13,25,8
+    LTEXT           "Audio:",IDC_STATIC,7,32,25,8
+END
+
+IDD_DIALOG_OPEN_SC DIALOG DISCARDABLE  0, 0, 284, 75
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "打开"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "确定",IDOK,171,54,50,14
+    PUSHBUTTON      "取消",IDCANCEL,227,54,50,14
+    PUSHBUTTON      "浏览",IDC_BUTTON_DELETE,222,10,50,14
+    PUSHBUTTON      "浏览",IDC_BUTTON_CLEAN,222,30,50,14
+    EDITTEXT        IDC_CMDLINE,40,11,175,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWORD,41,30,173,14,ES_AUTOHSCROLL
+    LTEXT           "文件:",IDC_STATIC,7,13,25,8
+    LTEXT           "音轨:",IDC_STATIC,7,32,25,8
+END
+
+IDD_DIALOG_OPEN_TC DIALOG DISCARDABLE  0, 0, 284, 75
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "打開"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "確定",IDOK,171,54,50,14
+    PUSHBUTTON      "取消",IDCANCEL,227,54,50,14
+    PUSHBUTTON      "流覽",IDC_BUTTON_DELETE,222,10,50,14
+    PUSHBUTTON      "流覽",IDC_BUTTON_CLEAN,222,30,50,14
+    EDITTEXT        IDC_CMDLINE,40,11,175,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWORD,41,30,173,14,ES_AUTOHSCROLL
+    LTEXT           "檔:",IDC_STATIC,7,13,25,8
+    LTEXT           "音軌:",IDC_STATIC,7,32,25,8
+END
+
+IDD_CONTROL_MESSAGE DIALOG DISCARDABLE  0, 0, 180, 50
+STYLE DS_3DLOOK | DS_CONTROL | WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "",IDC_TEXT_MESSAGE,10,10,160,30
+END
+
+IDD_DIALOG_SHUTDOWN DIALOG DISCARDABLE  0, 0, 130, 30
+STYLE DS_SETFONT  | WS_VISIBLE | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
+FONT 8, "MS Shell Dlg"
+BEGIN
+    PUSHBUTTON      "Cancel", IDCANCEL, 82, 7, 40, 14
+    RTEXT           "",IDC_TEXT_SHUTDOWN,10,10,68,20
+END
+
+IDD_DIALOG_EQ DIALOG DISCARDABLE 0, 0, 263, 130
+STYLE DS_3DLOOK | DS_CONTROL | WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS
+CAPTION "Equalizer"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_SLIDERB,"msctls_trackbar32",0x0100|TBS_NOTICKS|TBS_BOTH,5,20,251,16
+    CONTROL         "",IDC_SLIDERC,"msctls_trackbar32", 0x0100|TBS_NOTICKS|TBS_BOTH ,5,49,251,16
+    CONTROL         "",IDC_SLIDERS,"msctls_trackbar32", 0x0100|TBS_NOTICKS|TBS_BOTH ,5,78,251,16
+    CONTROL         "",IDC_SLIDERG,"msctls_trackbar32", 0x0100|TBS_NOTICKS|TBS_BOTH ,5,107,251,16
+    LTEXT           "Brightness",IDC_STATIC_B,5,9,41,8
+    LTEXT           "Contrast",IDC_STATIC_C,5,38,41,8
+    LTEXT           "Saturation",IDC_STATIC_S,5,67,41,8
+    LTEXT           "Gamma",IDC_STATIC_G,5,96,41,8
+    PUSHBUTTON      "Reset", IDOK,220,5,40, 12
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_MENU_SC           "字幕(&S)"
+    IDS_MENUITEM_SC       "关闭(&O)"
+    IDS_MENU_TC           "字幕(&S)"
+    IDS_MENUITEM_TC       "關閉(&O)"
+    IDS_FILE_SC           "文件(&F)"
+    IDS_OPTION_SC         "选项(&O)"
+    IDS_PLAY_SC           "播放(&P)"
+    IDS_HELP_SC           "帮助(&H)"
+    IDS_EXIT_SC           "退出(&X)"
+    IDS_FILE_TC           "檔案(&F)"
+    IDS_OPTION_TC         "選項(&O)"
+    IDS_PLAY_TC           "播放(&P)"
+    IDS_HELP_TC           "說明(&H)"
+    IDS_EXIT_TC           "離開(&X)"
+    IDS_MENU_EN           "&Subtitle"
+    IDS_MENUITEM_EN       "&off"
+    IDS_FAVMENU_SC        "收藏夹"
+    IDS_FAVMENU_TC        "我的最愛"
+    IDS_FAVMENU_EN        "Fa&vorites"
+    IDS_FAVMENUITEM_SC    "收藏播放的影片\tCtrl+S"
+    IDS_FAVMENUITEM_TC    "新增到我的最愛\tCtrl+S"
+    IDS_FAVMENUITEM_EN    "&Add to Favorites\tCtrl+S"
+    IDS_FAVMENUMANAGE_SC  "管理收藏夹\tCtrl+M"
+    IDS_FAVMENUMANAGE_TC  "組織我的最愛\tCtrl+M"
+    IDS_FAVMENUMANAGE_EN  "&Manage Favorites\tCtrl+M"
+    IDS_OK_SC             "确定"
+    IDS_OK_TC             "確定"
+    IDS_DELETE_TC         "移除"
+    IDS_CLEAN_TC          "清空"
+    IDS_LOADSUB_SC        "加载字幕"
+    IDS_LOADSUB_TC        "載入字幕"
+    IDS_LISTPLAY_SC       "播放打开的文件"
+    IDS_LISTADD_SC        "添加文件到播放列表"
+    IDS_LISTPLAY_TC       "播放開啟的文檔"
+    IDS_LISTADD_TC        "添加文檔到播放列表"
+    IDS_MSGTITLE_TC       "MPlayer 提示"
+    IDS_MSGTEXTFONT_SC    "正在更新字体缓存，请稍等..."
+    IDS_MSGTEXTFONT_TC    "正在更新字體緩存，請稍等..."
+    IDS_MSGTEXTSTREAM_TC  "正在連接網絡并緩沖，請稍等..."
+    IDS_SHUTDOWN_TITLE_SC "自动关机"
+    IDS_SHUTDOWN_TEXT_SC  "秒后自动关机！"
+    IDS_SHUTDOWN_TITLE_TC "自動關機"
+    IDS_SHUTDOWN_TEXT_TC  "秒后自動關機！"
+    IDS_ONEPlAYER_TEXT_TC "您設置了只啟動一個播放器，生成縮圖時必須先關閉播放器，是否繼續？"
+    IDS_FAVMENU_TEXT_TC   "發現已收藏檔案，是否繼續播放此檔？ 時間"
+    IDS_FAVMENU_TEXT_SC   "发现已收藏文件，是否继续播放此文件？ 时间"
+    IDS_AERO_DX_SC        "DirectX视频输出与正在使用Aero特效不兼容！\n请在首选项中更改视频输出为Direct3D或OpenGL。\n是否自动切换到Direct3D视频输出？\n\n[是] 切换，[否] 不切换, [取消] 不再询问"
+    IDS_AUTO_CACHE_SC     "您正在使用的MPlayer拥有新的文件读取缓冲机制。\n播放本地文件时不再需要设置缓存，是否关闭缓存?\n\n[是] 关闭，[否] 不关闭"
+	IDS_D3DX9_DLL_SC      "强制黑位修正需要 d3dx9_24.dll \n请安装最新版DirectX 9.0 c"
+    IDS_AERO_DX_TC        "DirectX視頻輸出與正在使用Aero特效不兼容！\n請在首選項中更改視頻輸出為Direct3D或OpenGL。\n是否自動切換到Direct3D視頻輸出？\n\n[是] 切換，[否] 不切換, [取消] 不再詢問"
+    IDS_AUTO_CACHE_TC     "您正在使用的MPlayer擁有新的文件讀取緩沖機制。\n播放本地文件時不再需要設置緩存，是否關閉緩存?\n\n[是] 關閉，[否] 不關閉"
+	IDS_D3DX9_DLL_TC      "強制黑位修正需要 d3dx9_24.dll \n請安裝最新版DirectX 9.0 c"
+
+    IDS_PLAYLIST_SC     "MPlayer 播放列表"
+    IDS_BT_PLAY_SC      "播放"
+    IDS_BT_UP_SC        "上移"
+    IDS_BT_DOWN_SC      "下移"
+    IDS_BT_ADD_SC       "添加"
+    IDS_BT_REMOVE_SC    "删除"
+    IDS_BT_SAVE_SC      "保存"
+    IDS_BT_CLOSE_SC     "透明"
+    IDS_MU_ADD_SC       "添加文件..."
+    IDS_MU_REMOVE_SC    "删除选中项"
+    IDS_MU_CLEAR_SC     "清空列表"
+    IDS_MU_CLOSE_SC     "关闭"
+	IDS_SUB_DOWNLOAD_SC "下载(&W)\tCtrl+W"
+	IDS_SUB_DOWNLOAD_TC "下載(&W)\tCtrl+W"
+
+    IDS_PLAYLIST_EN     "MPlayer Playlist"
+    IDS_BT_PLAY_EN      "Play All"
+    IDS_BT_UP_EN        "Up"
+    IDS_BT_DOWN_EN      "Down"
+    IDS_BT_ADD_EN       "Add File"
+    IDS_BT_REMOVE_EN    "Remove"
+    IDS_BT_SAVE_EN      "Save"
+    IDS_BT_CLOSE_EN     "Transparent"
+    IDS_MU_ADD_EN       "Add File..."
+    IDS_MU_REMOVE_EN    "Remove Selected"
+    IDS_MU_CLEAR_EN     "Clear Playlist"
+    IDS_MU_CLOSE_EN     "Close"
+
+    IDS_PLAYLIST_TC     "MPlayer 播放列表"
+    IDS_BT_PLAY_TC      "播放"
+    IDS_BT_UP_TC        "上移"
+    IDS_BT_DOWN_TC      "下移"
+    IDS_BT_ADD_TC       "添加"
+    IDS_BT_REMOVE_TC    "刪除"
+    IDS_BT_SAVE_TC      "保存"
+    IDS_BT_CLOSE_TC     "透明"
+    IDS_MU_ADD_TC       "添加文件..."
+    IDS_MU_REMOVE_TC    "刪除選中項"
+    IDS_MU_CLEAR_TC     "清空列表"
+    IDS_MU_CLOSE_TC     "關閉"
+    IDS_MU_SKINS_SC     "皮肤"
+    IDS_MU_SKINSB_SC    "边框皮肤"
+    IDS_MU_SKINSC_SC    "控制栏皮肤"
+    IDS_MU_SKINS_TC     "外皮"
+    IDS_MU_SKINSB_TC    "邊框外皮"
+    IDS_MU_SKINSC_TC    "控制欄外皮"
+
+    IDS_ST_PLAY_SC      "播放中"
+    IDS_ST_PLAY_TC      "播放中"
+    IDS_ST_PLAY_EN      "Playing"
+    IDS_ST_PAUSE_SC     "已暂停"
+    IDS_ST_PAUSE_TC     "已暫停"
+    IDS_ST_PAUSE_EN     "Paused"
+    IDS_ST_SEEK_SC      "检索中"
+    IDS_ST_SEEK_TC      "檢索中"
+    IDS_ST_SEEK_EN      "Seeking"
+    IDS_ST_STOP_SC      "已停止"
+    IDS_ST_STOP_TC      "已停止"
+    IDS_ST_STOP_EN      "Stopped"
+
+END
+
+IDR_ACCELERATOR ACCELERATORS DISCARDABLE
+BEGIN
+    "A",            IDM_ADD,                VIRTKEY, CONTROL, NOINVERT
+    "D",            IDM_MEDIA_INFO,         VIRTKEY, CONTROL, NOINVERT
+    "E",            IDM_OPENEQ,             VIRTKEY, CONTROL, NOINVERT
+    "R",            IDM_ASPECT_FILE,        VIRTKEY, CONTROL, NOINVERT
+    "H",            IDM_ASPECT_43,          VIRTKEY, CONTROL, NOINVERT
+    "J",            IDM_ASPECT_54,          VIRTKEY, CONTROL, NOINVERT
+    "K",            IDM_ASPECT_169,         VIRTKEY, CONTROL, NOINVERT
+    "L",            IDM_LOG,                VIRTKEY, CONTROL, NOINVERT
+    "M",            IDM_FAVORITES_MANAGE,   VIRTKEY, CONTROL, NOINVERT
+    "N",            IDM_MOUSE_DVDNAV,       VIRTKEY, CONTROL, NOINVERT
+    "O",            IDM_OPEN,               VIRTKEY, CONTROL, NOINVERT
+    "P",            IDM_PLAYLIST,           VIRTKEY, CONTROL, NOINVERT
+    "Q",            IDM_OPEN,               VIRTKEY, CONTROL, NOINVERT
+    "S",            IDM_FAVORITES,          VIRTKEY, CONTROL, NOINVERT
+    "T",            IDM_ASPECT_235,         VIRTKEY, CONTROL, NOINVERT
+    "V",            IDM_OPENAVS,            VIRTKEY, CONTROL, NOINVERT
+    "W",            IDM_SUB_DOWNLOAD,       VIRTKEY, CONTROL, NOINVERT
+    "X",            IDM_EXIT,               VIRTKEY, CONTROL, NOINVERT
+END
+IDR_MANIFEST            RT_MANIFEST             "mplayer.exe.manifest"
+

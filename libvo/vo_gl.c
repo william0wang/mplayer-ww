@@ -40,6 +40,7 @@
 #include "aspect.h"
 #include "fastmemcpy.h"
 #include "sub/eosd.h"
+#include "winstuff.h"
 
 #ifdef CONFIG_GL_SDL
 #ifdef CONFIG_SDL_SDL_H
@@ -171,15 +172,41 @@ static unsigned int slice_height = 1;
 
 static void redraw(void);
 
+static int using_gl = 0;
+extern float expand;
+extern int controlbar_height_gl;
+extern DWORD dwMajor,dwMinor;
+extern int show_controlbar;
+extern int show_playbar;
+extern int full_view;
+extern int max_height;
+extern int max_width;
+extern int w32_inited;
+extern int gl_new_window;
+extern int codec_swap_uv;
+
 static void resize(int x,int y){
+  int y_height = 0;
+  int x_offset = 0;
+  int y_offset = 0;
+  if(!using_gl || !w32_inited)
+    return;
   mp_msg(MSGT_VO, MSGL_V, "[gl] Resize: %dx%d\n",x,y);
+  if(!vo_fs) {
+	if(show_controlbar && full_view && !gl_new_window)
+		y_offset = y_height = controlbar_height_gl;
+	if(max_height > y)
+		y_offset = (max_height - y) / 2 + y_offset;
+	if(max_width > x)
+		x_offset = (max_width - x) / 2;
+  }
   if (WinID >= 0) {
     int left = 0, top = 0, w = x, h = y;
     geometry(&left, &top, &w, &h, vo_dwidth, vo_dheight);
     top = y - h - top;
-    mpglViewport(left, top, w, h);
+    mpglViewport(left + x_offset, top + y_offset, w, h - y_height);
   } else
-    mpglViewport( 0, 0, x, y );
+  mpglViewport( 0 + x_offset,0 + y_offset, x, y - y_height);
 
   mpglMatrixMode(GL_PROJECTION);
   mpglLoadIdentity();
@@ -211,6 +238,52 @@ static void resize(int x,int y){
   }
   mpglClear(GL_COLOR_BUFFER_BIT);
   redraw();
+}
+
+extern float w32_factor_x,w32_factor_y;
+extern int w32_delta_x,w32_delta_y;
+void resize_fs_gl()
+{
+	int x,y,top,left;
+	if(!vo_fs || !using_gl || !w32_inited)
+		return;
+	if ( (w32_factor_x == 0) && (w32_factor_y == 0)) {
+		x = vo_screenwidth;
+		y = vo_screenheight;
+		aspect(&x, &y, A_ZOOM);
+	} else {
+		aspect(&vo_dwidth, &vo_dheight, A_ZOOM);
+		x = (int)(vo_dwidth*(1+w32_factor_x))>>1<<1;
+		y = (int)(vo_dheight*(1+w32_factor_y))>>1<<1;
+	}
+	left = (vo_screenwidth-x)/2 + w32_delta_x;
+	top=(vo_screenheight-y)/2 - w32_delta_y;
+
+  	mp_msg(MSGT_VO, MSGL_V, "[gl] Resize_FS: %d , %d %dx%d\n",left,top,x,y);
+	  if (WinID >= 0) {
+		int  w = x, h = y;
+		geometry(&top, &left, &w, &h, x, y);
+		mpglViewport(top, left, w, h);
+	  } else
+	  mpglViewport( left , top,x, y );
+
+	  mpglMatrixMode(GL_PROJECTION);
+	  mpglLoadIdentity();
+	  ass_border_x = 0;
+	  ass_border_y = 0;
+	  mpglOrtho(0, image_width, image_height, 0, -1,1);
+	  mpglMatrixMode(GL_MODELVIEW);
+	  mpglLoadIdentity();
+
+	  if (!scaled_osd) {
+		#ifdef HAVE_FREETYPE
+		  // adjust font size to display size
+		  force_load_font = 1;
+		#endif
+		  vo_osd_changed(OSDTYPE_OSD);
+	  }
+	  mpglClear(GL_COLOR_BUFFER_BIT);
+	  redraw();
 }
 
 static void texSize(int w, int h, int *texw, int *texh) {
@@ -656,6 +729,7 @@ static int
 config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uint32_t flags, char *title, uint32_t format)
 {
   int xs, ys;
+  using_gl = 1;
   image_height = height;
   image_width = width;
   image_format = format;
@@ -775,12 +849,15 @@ static void do_render_osd(int type) {
     return;
   // set special rendering parameters
   if (!scaled_osd) {
+    int vo_osdheight = vo_dheight;
     mpglMatrixMode(GL_PROJECTION);
     mpglPushMatrix();
     mpglLoadIdentity();
-    mpglOrtho(0, vo_dwidth, vo_dheight, 0, -1, 1);
-  }
-  mpglEnable(GL_BLEND);
+    if(!vo_fs && show_controlbar && full_view && !gl_new_window && vo_osdheight > controlbar_height_gl)
+   	  vo_osdheight -= controlbar_height_gl;
+      mpglOrtho(0, vo_dwidth, vo_osdheight, 0, -1, 1);
+    }
+    mpglEnable(GL_BLEND);
   if (draw_eosd) {
     mpglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     mpglCallList(eosdDispList);
@@ -810,6 +887,8 @@ static void draw_osd(void)
     clearOSD();
     osd_w = scaled_osd ? image_width : vo_dwidth;
     osd_h = scaled_osd ? image_height : vo_dheight;
+    if(!vo_fs && show_controlbar && full_view && !gl_new_window && osd_h > controlbar_height_gl)
+      osd_h -= controlbar_height_gl;
     vo_draw_text_ext(osd_w, osd_h, ass_border_x, ass_border_y, ass_border_x, ass_border_y,
                      image_width, image_height, create_osd_texture);
   }
@@ -944,10 +1023,17 @@ static uint32_t get_image(mp_image_t *mpi) {
     mp_get_chroma_shift(image_format, &xs, &ys, NULL);
     mpi->flags |= MP_IMGFLAG_COMMON_STRIDE | MP_IMGFLAG_COMMON_PLANE;
     mpi->stride[0] = mpi->width;
-    mpi->planes[1] = mpi->planes[0] + mpi->stride[0] * mpi->height;
-    mpi->stride[1] = mpi->width >> xs;
-    mpi->planes[2] = mpi->planes[1] + mpi->stride[1] * (mpi->height >> ys);
-    mpi->stride[2] = mpi->width >> xs;
+    if(codec_swap_uv) {
+        mpi->planes[2] = mpi->planes[0] + mpi->stride[0] * mpi->height;
+        mpi->stride[2] = mpi->width >> xs;
+        mpi->planes[1] = mpi->planes[2] + mpi->stride[2] * (mpi->height >> ys);
+	    mpi->stride[1] = mpi->width >> xs;
+    } else {
+        mpi->planes[1] = mpi->planes[0] + mpi->stride[0] * mpi->height;
+        mpi->stride[1] = mpi->width >> xs;
+        mpi->planes[2] = mpi->planes[1] + mpi->stride[1] * (mpi->height >> ys);
+        mpi->stride[2] = mpi->width >> xs;
+    }
     if (ati_hack && !mesa_buffer) {
       mpi->flags &= ~MP_IMGFLAG_COMMON_PLANE;
       if (!gl_buffer_uv[0]) mpglGenBuffers(2, gl_buffer_uv);
@@ -1319,13 +1405,22 @@ static const struct {
   {NULL,          NULL,       0                 }
 };
 
+extern int w32Cmd(GUI_CMD cmd, int v);
+extern int vo_paused;
+
 static int control(uint32_t request, void *data)
 {
   switch (request) {
   case VOCTRL_PAUSE:
-  case VOCTRL_RESUME:
+    vo_paused = 1;
     int_pause = (request == VOCTRL_PAUSE);
-    return VO_TRUE;
+    if(!vo_fs && vo_ontop == 2) w32Cmd(CMD_PAUSE_CONTINUE,0);
+ 	return VO_TRUE;
+  case VOCTRL_RESUME:
+    vo_paused = 0;
+    int_pause = (request == VOCTRL_PAUSE);
+    w32Cmd(CMD_PAUSE_CONTINUE,0);
+  	return VO_TRUE;
   case VOCTRL_QUERY_FORMAT:
     return query_format(*(uint32_t*)data);
   case VOCTRL_GET_IMAGE:
@@ -1340,6 +1435,8 @@ static int control(uint32_t request, void *data)
     return VO_TRUE;
   case VOCTRL_GET_EOSD_RES:
     {
+      if(vo_dheight <= 0 || vo_dwidth <= 0)
+        break;
       struct mp_eosd_settings *r = data;
       r->w = vo_dwidth; r->h = vo_dheight;
       r->srcw = image_width; r->srch = image_height;
@@ -1348,7 +1445,8 @@ static int control(uint32_t request, void *data)
       else if (aspect_scaling()) {
         r->ml = r->mr = ass_border_x;
         r->mt = r->mb = ass_border_y;
-      }
+      } else if(!vo_fs && show_controlbar && full_view && !gl_new_window)
+      	r->h -= controlbar_height_gl;
     }
     return VO_TRUE;
   case VOCTRL_GUISUPPORT:
@@ -1401,6 +1499,12 @@ static int control(uint32_t request, void *data)
   case VOCTRL_UPDATE_SCREENINFO:
     glctx.update_xinerama_info();
     return VO_TRUE;
+  case VOCTRL_GUI_RESIZE:
+    {
+      if(vo_fs) resize_fs_gl();
+      else resize(vo_dwidth, vo_dheight);
+      return VO_TRUE;
+    }
   }
   return VO_NOTIMPL;
 }

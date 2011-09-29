@@ -251,7 +251,7 @@ static void make_text(void)
 
 static void ourBuildTextures(void)
 {
-    mpglTexImage2D(GL_TEXTURE_2D, 0, 1, 128, 64, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE,
+    mpglTexImage2D(GL_TEXTURE_2D, 0, 1, FONT_TEXTURE_W, FONT_TEXTURE_H, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE,
                    font_texture);
     mpglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     mpglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

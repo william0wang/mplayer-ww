@@ -24,10 +24,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <mbstring.h>
 #include <ctype.h>
 
 #include <sys/types.h>
 #include <dirent.h>
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+#include <windows.h>
+#endif
 
 #include "ass_mp.h"
 #include "config.h"
@@ -51,6 +55,15 @@
 #ifdef CONFIG_ICONV
 #include <iconv.h>
 char *sub_cp=NULL;
+char *sub_cps=NULL;
+int sub_ignore_errors=5;
+static int cp_utf16=0;
+static int _ignore_errors=5;
+static int recode_errors = 0;
+static int lyrics_offset = 0;
+extern int fake_sub;
+extern int always_use_ass;
+extern char *sub_path;
 #endif
 #ifdef CONFIG_FRIBIDI
 #include <fribidi/fribidi.h>
@@ -60,7 +73,7 @@ int fribidi_flip_commas = 0;    ///flip comma when fribidi is used
 #endif
 
 /* Maximal length of line of a subtitle */
-#define LINE_LEN 1000
+#define LINE_LEN 4000
 static float mpsub_position=0;
 static float mpsub_multiplier=1.;
 static int sub_slacktime = 20000; //20 sec
@@ -85,6 +98,78 @@ int sub_format=SUB_INVALID;
    modified by sub_read_aqt_line or sub_read_subrip09_line.
  */
 unsigned long previous_sub_end;
+#endif
+
+#ifdef CONFIG_ICONV
+static iconv_t icdsc = (iconv_t)(-1);
+static const char cr[] = { 0x0D, 0x00 };
+static const char lf[] = { 0x0A, 0x00 };
+
+static inline char *_stream_read_line(stream_t *s,unsigned char* mem, int max, int utf16)
+{
+  int len;
+  unsigned char* end,*ptr = mem;
+  int e0 = 0, e1 = 1;
+  max >>= 2; // divede 4
+  do {
+    len = s->buf_len-s->buf_pos;
+    // try to fill the buffer
+    if(len <= 0 &&
+       (!cache_stream_fill_buffer(s) ||
+        (len = s->buf_len-s->buf_pos) <= 0)) break;
+	if (!utf16)
+    	end = (unsigned char*) memchr((void*)(s->buffer+s->buf_pos),'\n',len);
+	else {
+		int i = len-1;
+		if(utf16 == 2) { e0 = 1; e1 = 0; }
+		char *p = (char *)(s->buffer+s->buf_pos);
+		end = NULL;
+		while (i--) {
+			if ((*(p+1) == cr[e0] && *(p+2) == cr[e1]) || (*(p+1) == lf[e0] && *(p+2) == lf[e1])) {
+				int endl_len = 2;
+				if((i > 3) && *(p+1) == cr[0] && *(p+2) == cr[1] && *(p+3) == lf[0] && *(p+4) == lf[1])
+					endl_len = 4;
+				end = (char *)p;
+				end += endl_len;
+				break;
+			}
+			p++;
+		}
+    }
+    if(end) len = end - (s->buffer+s->buf_pos) + 1;
+    if(len > 0 && max > 1) {
+      int l = len > max-1 ? max-1 : len;
+      memcpy(ptr,s->buffer+s->buf_pos,l);
+      max -= l;
+      ptr += l;
+    }
+    s->buf_pos += len;
+  } while(!end);
+  if(s->eof && ptr == mem) return NULL;
+  if(max > 0) ptr[0] = 0;
+
+  if (icdsc != (iconv_t)-1) {
+	// need convert to utf8
+	static char obuf[LINE_LEN+2];
+	char *ip, *op;
+	size_t i,o;
+
+	i = ptr - mem;
+	o = LINE_LEN;
+	ip = mem;
+	op = obuf;
+	if (iconv(icdsc, &ip, &i, &op, &o) == (size_t)(-1)) {
+		mp_msg(MSGT_SUBREADER,MSGL_V,"SUB: error recoding line: %s\n", mem);
+		recode_errors++;
+	    return NULL;
+	}
+	*op = 0;
+	strcpy(mem, obuf);
+  }
+
+  return mem;
+}
+#define stream_read_line _stream_read_line
 #endif
 
 static int eol(char p) {
@@ -430,13 +515,13 @@ static subtitle *sub_ass_read_line_subviewer(stream_t *st, subtitle *current, in
 #endif
 
 static subtitle *sub_read_line_subviewer(stream_t *st,subtitle *current, int utf16) {
-    char line[LINE_LEN+1];
+    char line[LINE_LEN+1],test[LINE_LEN+1];
     int a1,a2,a3,a4,b1,b2,b3,b4;
     char *p=NULL;
-    int i,len;
+    int i,len,k,pos;
 
 #ifdef CONFIG_ASS
-    if (ass_enabled)
+    if (ass_enabled && always_use_ass)
         return sub_ass_read_line_subviewer(st, current, utf16);
 #endif
     while (!current->text[0]) {
@@ -477,6 +562,18 @@ static subtitle *sub_read_line_subviewer(stream_t *st,subtitle *current, int utf
 
 		i++;
 	    } else {
+	    	if(!len) {
+		    	pos = stream_tell(st);
+	    		if (stream_read_line (st, test, LINE_LEN, utf16)) {
+					if(stream_read_line (st, test, LINE_LEN, utf16)) {
+						if (sscanf (test, "%d:%d:%d%[,.:]%d --> %d:%d:%d%[,.:]%d",&a1,&a2,&a3,(char *)&k,&a4,&b1,&b2,&b3,(char *)&k,&b4) < 10) {
+							stream_seek(st, pos);
+						    continue;
+						}
+	    			}
+	    		}
+				stream_seek(st, pos);
+			}
 		break;
 	    }
 	}
@@ -521,8 +618,8 @@ static subtitle *sub_read_line_subviewer2(stream_t *st,subtitle *current, int ut
 static subtitle *sub_read_line_vplayer(stream_t *st,subtitle *current, int utf16) {
 	char line[LINE_LEN+1];
 	int a1,a2,a3;
-	char *p=NULL, separator;
-	int len,plen;
+	char *p=NULL, *next,separator;
+	int i,len,plen;
 
 	while (!current->text[0]) {
 		if (!stream_read_line (st, line, LINE_LEN, utf16)) return NULL;
@@ -583,6 +680,51 @@ static subtitle *sub_read_line_google(stream_t *st, subtitle *current, int utf16
     // discard rest of closing tag
     if (!stream_read_until(st, part, LINE_LEN, '>', utf16)) return NULL;
     return current;
+}
+
+static subtitle *sub_read_line_lyrics(stream_t *st,subtitle *current, int utf16) {
+	char line[LINE_LEN+1];
+	int a1,a2,a3;
+	char *p=NULL, *next;
+	int i,len,plen;
+	off_t pos;
+
+	while (!current->text[0]) {
+		pos = stream_tell(st);
+		if (!stream_read_line (st, line, LINE_LEN, utf16)) return NULL;
+
+		if (!lyrics_offset && (sscanf(line, "[offset:%d]",&a1) == 1)) {
+			lyrics_offset = a1/10;
+			continue;
+		}
+
+		if ((len=sscanf (line, "[%d:%d.%d]%n",&a1,&a2,&a3,&plen)) < 3)
+			continue;
+
+		current->start = a1*6000+a2*100+a3+lyrics_offset;
+
+        p = &line[ plen ];
+
+		if((len=sscanf (p, "[%d:%d.%d]%n",&a1,&a2,&a3,&plen)) >= 3) {
+			stream_seek(st, pos+plen);
+			p += plen;
+			while((len=sscanf (p, "[%d:%d.%d]%n",&a1,&a2,&a3,&plen)) >= 3)
+	            p += plen;
+		}
+
+ 		i=0;
+		if (*p!='|') {
+			//
+			next = p,i=0;
+			while ((next =sub_readtext (next, &(current->text[i])))) {
+				if (current->text[i]==ERR) {return ERR;}
+				i++;
+				if (i>=SUB_MAX_TEXT) { mp_msg(MSGT_SUBREADER,MSGL_WARN,"Too many lines in a subtitle\n");current->lines=i;return current;}
+			}
+			current->lines=i+1;
+		}
+	}
+	return current;
 }
 
 static subtitle *sub_read_line_rt(stream_t *st,subtitle *current, int utf16) {
@@ -710,12 +852,18 @@ static void sub_pp_ssa(subtitle *sub) {
 	while (l){
             	/* eliminate any text enclosed with {}, they are font and color settings */
             	so=de=sub->text[--l];
+            	if(so && *so != '{') {
+            		start = strstr(so, ")}");
+            		if(start && (start - so < 6)) {
+            			*so = '{';
+            			so[1] = '\\';
+            		}
+            	}
             	while (*so) {
             		if(*so == '{' && so[1]=='\\') {
             			for (start=so; *so && *so!='}'; so++);
-            			if(*so) so++; else so=start;
-            		}
-            		if(*so) {
+            			if(*so) so++; else so=start+1;
+            		} else if(*so) {
             			*de=*so;
             			so++; de++;
             		}
@@ -882,7 +1030,6 @@ retry:
     current->start = a1*360000+a2*6000+a3*100;
 
 #ifdef CONFIG_SORTSUB
-    if (!previous_sub_end)
     previous_sub_end = (current->start) ? current->start - 1 : 0;
 #else
     if (previous_subrip09_sub != NULL)
@@ -1102,12 +1249,17 @@ static subtitle *sub_read_line_jacosub(stream_t* st, subtitle * current, int utf
 
 static int sub_autodetect (stream_t* st, int *uses_time, int utf16) {
     char line[LINE_LEN+1];
-    int i,j=0;
+    int i,j=0,k=0;
 
     while (j < 100) {
 	j++;
-	if (!stream_read_line (st, line, LINE_LEN, utf16))
-	    return SUB_INVALID;
+	if (!stream_read_line (st, line, LINE_LEN, utf16)) {
+		k++;
+		if(k > _ignore_errors)
+			return SUB_INVALID;
+		else
+			continue;
+	}
 
 	if (sscanf (line, "{%d}{%d}", &i, &i)==2)
 		{*uses_time=0;return SUB_MICRODVD;}
@@ -1131,6 +1283,8 @@ static int sub_autodetect (stream_t* st, int *uses_time, int utf16) {
 		{*uses_time=1;return SUB_VPLAYER;}
 	if (sscanf (line, "%d:%d:%d ",     &i, &i, &i )==3)
 		{*uses_time=1;return SUB_VPLAYER;}
+	if (sscanf (line, "[%d:%d.%d]",     &i, &i, &i )==3)
+		{*uses_time=1;return SUB_LYRICS;}
 	if (!strncasecmp(line, "<window", 7))
 		{*uses_time=1;return SUB_RT;}
 	if (!memcmp(line, "Dialogue: Marked", 16))
@@ -1157,11 +1311,11 @@ static int sub_autodetect (stream_t* st, int *uses_time, int utf16) {
 int sub_utf8_prev=0;
 
 #ifdef CONFIG_ICONV
-static iconv_t icdsc = (iconv_t)(-1);
 
 void	subcp_open (stream_t *st)
 {
 	char *tocp = "UTF-8";
+	cp_utf16 = 0;
 
 	if (sub_cp){
 		const char *cp_tmp = sub_cp;
@@ -1171,6 +1325,8 @@ void	subcp_open (stream_t *st)
 		     || sscanf(sub_cp, "ENCA:%2s:%99s", enca_lang, enca_fallback) == 2) {
 		  if (st && st->flags & MP_STREAM_SEEK ) {
 		    cp_tmp = guess_cp(st, enca_lang, enca_fallback);
+		    if(!strcasecmp(cp_tmp, "UCS-2"))
+		      cp_utf16 = 1;
 		  } else {
 		    cp_tmp = enca_fallback;
 		    if (st)
@@ -1178,8 +1334,10 @@ void	subcp_open (stream_t *st)
 		  }
 		}
 #endif
+		if(!strcasecmp(cp_tmp, "UTF-16"))
+		    cp_utf16 = 1;
 		if ((icdsc = iconv_open (tocp, cp_tmp)) != (iconv_t)(-1)){
-			mp_msg(MSGT_SUBREADER,MSGL_V,"SUB: opened iconv descriptor.\n");
+			mp_msg(MSGT_SUBREADER,MSGL_V,"SUB: opened iconv descriptor:%s.\n", cp_tmp);
 			sub_utf8 = 2;
 		} else
 			mp_msg(MSGT_SUBREADER,MSGL_ERR,"SUB: error opening iconv descriptor.\n");
@@ -1433,7 +1591,7 @@ sub_data* sub_read_file (const char *filename, float fps) {
     int utf16;
     stream_t* fd;
     int n_max, n_first, i, j, sub_first, sub_orig;
-    subtitle *first, *second, *sub, *return_sub, *alloced_sub = NULL;
+    subtitle *first, *second, *sub, *return_sub, *save_sub, *alloced_sub = NULL;
     sub_data *subt_data;
     int uses_time = 0, sub_num = 0, sub_errs = 0;
     static const struct subreader sr[]=
@@ -1453,12 +1611,15 @@ sub_data* sub_read_file (const char *filename, float fps) {
 	    { sub_read_line_jacosub, NULL, "jacosub" },
 	    { sub_read_line_mpl2, NULL, "mpl2" },
 	    { sub_read_line_google, NULL, "google" },
+	    { sub_read_line_lyrics, NULL, "lyrics" },
     };
     const struct subreader *srp;
 
     if(filename==NULL) return NULL; //qnx segfault
     fd=open_stream (filename, NULL, NULL); if (!fd) return NULL;
+    lyrics_offset = 0;
 
+	subcp_open(fd);
     sub_format = SUB_INVALID;
     for (utf16 = 0; sub_format == SUB_INVALID && utf16 < 3; utf16++) {
         sub_format=sub_autodetect (fd, &uses_time, utf16);
@@ -1471,23 +1632,6 @@ sub_data* sub_read_file (const char *filename, float fps) {
     if (sub_format==SUB_INVALID) {mp_msg(MSGT_SUBREADER,MSGL_WARN,"SUB: Could not determine file format\n");return NULL;}
     srp=sr+sub_format;
     mp_msg(MSGT_SUBREADER, MSGL_V, "SUB: Detected subtitle file format: %s\n", srp->name);
-
-#ifdef CONFIG_ICONV
-    sub_utf8_prev=sub_utf8;
-    {
-	    int l,k;
-	    k = -1;
-	    if ((l=strlen(filename))>4){
-		    char *exts[] = {".utf", ".utf8", ".utf-8" };
-		    for (k=3;--k>=0;)
-			if (l >= strlen(exts[k]) && !strcasecmp(filename+(l - strlen(exts[k])), exts[k])){
-			    sub_utf8 = 1;
-			    break;
-			}
-	    }
-	    if (k<0) subcp_open(fd);
-    }
-#endif
 
     sub_num=0;n_max=32;
     first=malloc(n_max*sizeof(subtitle));
@@ -1515,11 +1659,18 @@ sub_data* sub_read_file (const char *filename, float fps) {
 	sub = &first[sub_num];
 #endif
 	memset(sub, '\0', sizeof(subtitle));
+		save_sub = sub;
+    	recode_errors = 0;
         sub=srp->read(fd,sub,utf16);
-        if(!sub) break;   // EOF
-#ifdef CONFIG_ICONV
-	if ((sub!=ERR) && sub_utf8 == 2) sub=subcp_recode(sub);
-#endif
+        if(!sub) {
+        	if(!recode_errors) break;   // EOF
+			sub_errs += recode_errors;
+			 if(sub_errs <= sub_ignore_errors) {
+				sub = save_sub;
+				continue;
+			}
+			sub = ERR;
+        }
 #ifdef CONFIG_FRIBIDI
 	if (sub!=ERR) sub=sub_fribidi(sub,sub_utf8,0);
 #endif
@@ -1740,7 +1891,7 @@ if ((suboverlap_enabled == 2) ||
 	    if (higher_line >= SUB_MAX_TEXT) {
 		// the 'block' has too much lines, so we don't overlap the
 		// subtitles
-		second = realloc(second, (sub_num + sub_to_add + 1) * sizeof(subtitle));
+		second = (subtitle *) realloc(second, (sub_num + sub_to_add + 1) * sizeof(subtitle));
 		for (j = 0; j <= sub_to_add; ++j) {
 		    int ls;
 		    memset(&second[sub_num + j], '\0', sizeof(subtitle));
@@ -1760,7 +1911,7 @@ if ((suboverlap_enabled == 2) ||
 
 	    // we read the placeholder structure and create the new
 	    // subs.
-	    second = realloc(second, (sub_num + 1) * sizeof(subtitle));
+	    second = (subtitle *) realloc(second, (sub_num + 1) * sizeof(subtitle));
 	    memset(&second[sub_num], '\0', sizeof(subtitle));
 	    second[sub_num].start = local_start;
 	    second[sub_num].end   = local_end;
@@ -1806,7 +1957,7 @@ if ((suboverlap_enabled == 2) ||
 }
     if (return_sub == NULL) return NULL;
     subt_data = malloc(sizeof(sub_data));
-    subt_data->filename = strdup(filename);
+    subt_data->filename = fake_sub? strdup("Audio Tags") : strdup(filename);
     subt_data->sub_uses_time = uses_time;
     subt_data->sub_num = sub_num;
     subt_data->sub_errs = sub_errs;
@@ -1827,6 +1978,13 @@ char * strreplace( char * in,char * what,char * whereof )
 }
 #endif
 
+static int isuchar(int c)
+{
+	if(c > 255 || c < 0)
+		return 1;
+
+	return 0;
+}
 
 static void strcpy_trim(char *d, const char *s)
 {
@@ -1922,18 +2080,21 @@ struct sub_list {
  * @param limit_fuzziness Ignore flag when sub_fuziness == 2
  */
 static void append_dir_subtitles(struct sub_list *slist, const char *path,
-                                 const char *fname, int limit_fuzziness)
+                                 const char **fnames, int limit_fuzziness)
 {
-    char *f_fname, *f_fname_noext, *f_fname_trim, *tmp, *tmp_sub_id;
+    char *fname, *f_fname, *f_fname_noext, *f_fname_trim, *tmp, *tmp_sub_id;
     char *tmp_fname_noext, *tmp_fname_trim, *tmp_fname_ext, *tmpresult;
 
     int len, found, i;
-    char *sub_exts[] = {"utf", "utf8", "utf-8", "sub", "srt", "smi", "rt", "txt", "ssa", "aqt", "jss", "js", "ass", NULL};
+    char *sub_exts[] = {"utf", "utf8", "utf-8", "sub", "srt", "smi", "rt", "txt", "ssa", "aqt", "jss", "js", "ass", "lrc", NULL};
 
     FILE *f;
 
     DIR *d;
     struct dirent *de;
+
+	while (fname= *(fnames++)) {
+	if(!fname) break;
 
     len = (strlen(fname) > 256 ? strlen(fname) : 256)
          + (strlen(path) > 256 ? strlen(path) : 256) + 2;
@@ -2068,6 +2229,7 @@ static void append_dir_subtitles(struct sub_list *slist, const char *path,
     }
 
     free(tmp_sub_id);
+	}
 
     free(f_fname);
     free(f_fname_noext);
@@ -2089,9 +2251,10 @@ static void append_dir_subtitles(struct sub_list *slist, const char *path,
  * @note Subtitles are tracked and scored in various places according to the
  *       user options, sorted, and then added by calling the add_f function.
  */
-void load_subtitles(const char *fname, float fps, open_sub_func add_f)
+void load_subtitles(const char *fname, float fps, struct stream *st, open_sub_func add_f)
 {
     int i;
+    char *fnames[4];
     char *mp_subdir, *path = NULL;
     struct sub_list slist;
 
@@ -2114,26 +2277,34 @@ void load_subtitles(const char *fname, float fps, open_sub_func add_f)
         free(slist.subs);
         return;
     }
-    append_dir_subtitles(&slist, path, fname, 0);
+
+    memset(fnames, 0, 16);
+    if (strstr(fname,"dvd://")) {
+        if (strlen(dvd_device) < 4)
+            fnames[0] = "c:\\dvd.img";    // a fake name, you must name your subtitle "dvd.srt..." & put in your sub_path
+        else /* is image file */
+            fnames[0] = dvd_device;
+    } else {
+        fnames[0] = fname;
+        fnames[1] = get_rar_stream_filename(st);
+        fnames[2] = get_rar_stream_basename(st);
+    }
+	mp_subdir = malloc(strlen(path) + 8);
+	sprintf(mp_subdir, "%s\\subs\\", path);
+
+    append_dir_subtitles(&slist, path, fnames, 0);
     free(path);
 
     // Load subtitles in dirs specified by sub-paths option
     if (sub_paths) {
         for (i = 0; sub_paths[i]; i++) {
-            path = mp_path_join(fname, sub_paths[i]);
-            if (!path) {
-                free(slist.subs);
-                return;
-            }
-            append_dir_subtitles(&slist, path, fname, 0);
-            free(path);
+            append_dir_subtitles(&slist, sub_paths[i], fnames, 1);
         }
     }
 
     // Load subtitles in ~/.mplayer/sub limiting sub fuzziness
-    mp_subdir = get_path("sub/");
     if (mp_subdir)
-        append_dir_subtitles(&slist, mp_subdir, fname, 1);
+        append_dir_subtitles(&slist, mp_subdir, fnames, 1);
     free(mp_subdir);
 
     // Sort subs by priority and append them
@@ -2146,6 +2317,56 @@ void load_subtitles(const char *fname, float fps, open_sub_func add_f)
     free(slist.subs);
 }
 
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+int guess_vobsub(char *file, const char * const ifo, void **spu, open_vob_func add_f){
+    WIN32_FIND_DATA ff;
+    HANDLE f;
+    char buf[MAX_PATH], path[MAX_PATH], name[MAX_PATH], *p, *pdot, *pslash;
+    char *vob_exts[] = {"*.idx", "*.sub", "*.rar", NULL};
+    strcpy(path, file);
+    pslash = strrchr(path, '/');
+    if (!pslash) pslash = _mbsrchr(path, '\\');
+    if(pslash) {
+        strcpy(name, pslash + 1);
+    	pslash[1] = 0;
+    	SetCurrentDirectory(path);
+    } else {
+    	path[0] = 0;
+        strcpy(name, file);
+    }
+    int i = 0, j = strlen(name), x;
+    while (name[i] && i<j) {
+        name[i] = (char)tolower((int)name[i]);
+        i++ ;
+    }
+    for (x = 0; vob_exts[x]; x++) {
+        f = FindFirstFile(vob_exts[x], &ff);
+        do {
+            strcpy(buf, ff.cFileName);
+            i = 0, j = strlen(buf);
+            while (buf[i] && i<j) {
+                buf[i] = (char)tolower((int)buf[i]);
+                i++ ;
+            }
+            if(!strstr(buf,name))
+                continue;
+            strcpy(buf, ff.cFileName);
+            pdot = strrchr(buf, '.');
+            if (pdot) *pdot = '\0';
+    		char *psub = mp_path_join(path, buf);
+            if(add_f(psub, ifo, 0, spu)) {
+                FindClose(f);
+                free(psub);
+                return 1;
+            }
+            free(psub);
+        } while ( FindNextFile(f, &ff) );
+        FindClose(f);
+    }
+    return 0;
+}
+#endif
+
 /**
  * @brief Load VOB subtitle matching the subtitle filename.
  *
@@ -2157,7 +2378,7 @@ void load_subtitles(const char *fname, float fps, open_sub_func add_f)
 void load_vob_subtitle(const char *fname, const char * const ifo, void **spu,
                        open_vob_func add_f)
 {
-    char *name = NULL, *mp_subdir = NULL;
+    char *name = NULL, *mp_subdir = NULL, *psub = NULL;
 
     // Load subtitles specified by vobsub option
     if (vobsub_name) {
@@ -2177,6 +2398,10 @@ void load_vob_subtitle(const char *fname, const char * const ifo, void **spu,
     if (add_f(name, ifo, 0, spu))
         goto out;
 
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+    if(guess_vobsub(name, ifo, spu, add_f))
+        goto out;
+
     // Try looking at the dirs specified by sub-paths option
     if (sub_paths) {
         int i;
@@ -2194,12 +2419,26 @@ void load_vob_subtitle(const char *fname, const char * const ifo, void **spu,
             if (!psub)
                 goto out;
 
-            sub_found = add_f(psub, ifo, 0, spu);
+            sub_found = guess_vobsub(psub, ifo, spu, add_f);
             free(psub);
             if (sub_found)
                 goto out;
         }
-    }
+    } else {
+        int sub_found;
+		char *filedir = mp_dirname(name);
+	    mp_subdir = malloc(strlen(filedir) + 8);
+	    sprintf(mp_subdir, "%ssubs\\", filedir);
+		psub = mp_path_join(mp_subdir, mp_basename(name));
+		free(filedir);
+		free(mp_subdir);
+	    sub_found = guess_vobsub(psub, ifo, spu, add_f);
+        free(psub);
+        if (sub_found)
+            goto out;
+	}
+
+#endif
 
     // If still no VOB found, try loading it from ~/.mplayer/sub
     mp_subdir = get_path("sub/");

@@ -46,6 +46,7 @@
 #define VOCTRL_GUI_NOWINDOW 19
 /* used to switch to fullscreen */
 #define VOCTRL_FULLSCREEN 5
+#define VOCTRL_SCREENSHOT 6
 /* signal a device pause */
 #define VOCTRL_PAUSE 7
 /* start/resume playback */
@@ -94,6 +95,8 @@ typedef struct {
   int x,y;
   int w,h;
 } mp_win_t;
+
+#define VOCTRL_GUI_RESIZE 121
 
 #define VO_TRUE      1
 #define VO_FALSE     0

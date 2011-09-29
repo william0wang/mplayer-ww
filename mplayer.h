@@ -46,5 +46,6 @@ extern int stream_dump_type;
 extern char *stream_dump_name;
 
 void update_set_of_subtitles(void);
+char* string_encode(const char* str);
 
 #endif /* MPLAYER_MPLAYER_H */

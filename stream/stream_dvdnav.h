@@ -38,6 +38,7 @@ void mp_dvdnav_handle_input(stream_t *stream, int cmd, int *button);
 void mp_dvdnav_update_mouse_pos(stream_t *stream, int32_t x, int32_t y, int* button);
 void mp_dvdnav_get_highlight (stream_t *stream, nav_highlight_t *hl);
 unsigned int *mp_dvdnav_get_spu_clut(stream_t *stream);
+int mp_dvdnav_get_current_title(stream_t *stream);
 void mp_dvdnav_switch_title(stream_t *stream, int title);
 int mp_dvdnav_is_eof (stream_t *stream);
 int mp_dvdnav_skip_still (stream_t *stream);

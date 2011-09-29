@@ -39,6 +39,8 @@
 #include <fontconfig/fcfreetype.h>
 #endif
 
+#include "message.h"
+
 struct fc_instance {
 #ifdef CONFIG_FONTCONFIG
     FcConfig *config;
@@ -47,6 +49,8 @@ struct fc_instance {
     char *path_default;
     int index_default;
 };
+
+extern char *sub_font_names;
 
 #ifdef CONFIG_FONTCONFIG
 
@@ -135,9 +139,10 @@ static char *select_font(ASS_Library *library, FCInstance *priv,
 
     *index = 0;
 
-    if (treat_family_as_pattern)
+    if (treat_family_as_pattern) {
+        if (strrchr(family, '.')) goto error;
         pat = FcNameParse((const FcChar8 *) family);
-    else
+    } else
         pat = FcPatternCreate();
 
     if (!pat)
@@ -249,11 +254,16 @@ static char *select_font(ASS_Library *library, FCInstance *priv,
 
     if (!treat_family_as_pattern &&
         !(r_family && strcasecmp((const char *) r_family, family) == 0) &&
-        !(r_fullname && strcasecmp((const char *) r_fullname, family) == 0))
+        !(r_fullname && strcasecmp((const char *) r_fullname, family) == 0)) {
         ass_msg(library, MSGL_WARN,
                "fontconfig: Selected font is not the requested one: "
                "'%s' != '%s'",
                (const char *) (r_fullname ? r_fullname : r_family), family);
+        if(retval)
+            free(retval);
+        retval = NULL;
+        goto error;
+    }
 
     result = FcPatternGetString(rpat, FC_STYLE, 0, &r_style);
     if (result != FcResultMatch)
@@ -307,7 +317,7 @@ char *fontconfig_select(ASS_Library *library, FCInstance *priv,
                         unsigned bold, unsigned italic, int *index,
                         uint32_t code)
 {
-    char *res = 0;
+    char *name, *res = 0;
     if (!priv->config) {
         *index = priv->index_default;
         res = priv->path_default ? strdup(priv->path_default) : 0;
@@ -317,6 +327,16 @@ char *fontconfig_select(ASS_Library *library, FCInstance *priv,
         res =
             select_font(library, priv, family, treat_family_as_pattern,
                          bold, italic, index, code);
+    if (!res && sub_font_names) {
+        name = calloc(1, MAX_PATH);
+        strcpy(name, sub_font_names);
+        if (strchr(name, ',')) *strchr(name, ',') = 0;
+        res = name;
+        *index = 0;
+		ass_msg(library, MSGL_WARN, "fontconfig_select: Using default "
+				"font family: (%s, %d, %d) -> %s, %d",
+				"subfont", bold, italic, res, *index);
+    }
     if (!res && priv->family_default) {
         res =
             select_font(library, priv, priv->family_default, 0, bold,
@@ -429,12 +449,13 @@ FCInstance *fontconfig_init(ASS_Library *library,
     const char *dir = library->fonts_dir;
     int i;
 
-    if (!fc) {
+    if (fc < 0) {
         ass_msg(library, MSGL_WARN,
                "Fontconfig disabled, only default font will be used.");
         goto exit;
     }
 
+    show_message(MESSAGE_TYPE_FONTCONFIG);
     priv->config = FcConfigCreate();
     rc = FcConfigParseAndLoad(priv->config, (unsigned char *) config, FcTrue);
     if (!rc) {
@@ -469,6 +490,7 @@ FCInstance *fontconfig_init(ASS_Library *library,
 
     priv->family_default = family ? strdup(family) : NULL;
 exit:
+    end_message();
     priv->path_default = path ? strdup(path) : NULL;
     priv->index_default = 0;
 

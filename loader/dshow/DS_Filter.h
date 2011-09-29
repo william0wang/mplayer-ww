@@ -4,9 +4,15 @@
 #include "inputpin.h"
 #include "outputpin.h"
 
+#define PD_SET 0x01
+#define PD_SENT 0x02
+
 typedef struct {
     char* frame_pointer;
     long frame_size;
+    int  state;
+    unsigned long interlace;
+    uint64_t pts_nsec;
 } SampleProcUserData;
 
 /**

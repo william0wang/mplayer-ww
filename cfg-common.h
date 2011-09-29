@@ -51,6 +51,15 @@
 #include "mp_msg.h"
 #include "mpcommon.h"
 
+extern int network_timeout;
+
+#ifdef CONFIG_ICONV
+extern int sub_ignore_errors;
+#endif
+#ifdef CONFIG_WIN32DLL
+extern int force_dshow_demux;
+#endif
+extern int auto_threads;
 
 
 #ifdef CONFIG_RADIO
@@ -317,6 +326,7 @@ const m_option_t common_opts[] = {
 #ifdef CONFIG_STREAM_CACHE
     {"cache", &stream_cache_size, CONF_TYPE_INT, CONF_RANGE, 32, 1048576, NULL},
     {"nocache", &stream_cache_size, CONF_TYPE_FLAG, 0, 1, 0, NULL},
+    {"auto-cache", &stream_cache_auto, CONF_TYPE_FLAG, 0, 0, 1, NULL},
     {"cache-min", &stream_cache_min_percent, CONF_TYPE_FLOAT, CONF_RANGE, 0, 99, NULL},
     {"cache-seek-min", &stream_cache_seek_min_percent, CONF_TYPE_FLOAT, CONF_RANGE, 0, 99, NULL},
 #else
@@ -352,6 +362,7 @@ const m_option_t common_opts[] = {
     {"csslib", "libcss is obsolete. Try libdvdread instead.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
 
 #ifdef CONFIG_NETWORKING
+    {"timeout", &network_timeout, CONF_TYPE_INT, 0, 0, 9999, NULL},
     {"user", &network_username, CONF_TYPE_STRING, 0, 0, 0, NULL},
     {"passwd", &network_password, CONF_TYPE_STRING, 0, 0, 0, NULL},
     {"bandwidth", &network_bandwidth, CONF_TYPE_INT, CONF_MIN, 0, 0, NULL},
@@ -372,6 +383,7 @@ const m_option_t common_opts[] = {
 #endif /* HAVE_AF_INET6 */
 
 #else
+    {"timeout", "MPlayer was compiled without streaming (network) support.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
     {"user", "MPlayer was compiled without streaming (network) support.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
     {"passwd", "MPlayer was compiled without streaming (network) support.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
     {"bandwidth", "MPlayer was compiled without streaming (network) support.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
@@ -444,6 +456,10 @@ const m_option_t common_opts[] = {
 
 #ifdef CONFIG_CDDA
     { "cdda", &cdda_opts, CONF_TYPE_SUBCONFIG, 0, 0, 0, NULL},
+#endif
+
+#ifdef CONFIG_WIN32DLL
+    { "dshow-demux", &force_dshow_demux, CONF_TYPE_FLAG, 0, 0, 1, NULL},
 #endif
 
     // demuxer.c - select audio/sub file/demuxer
@@ -523,6 +539,8 @@ const m_option_t common_opts[] = {
     {"vfm", &video_fm_list, CONF_TYPE_STRING_LIST, 0, 0, 0, NULL},
     {"ac", &audio_codec_list, CONF_TYPE_STRING_LIST, 0, 0, 0, NULL},
     {"vc", &video_codec_list, CONF_TYPE_STRING_LIST, 0, 0, 0, NULL},
+    { "auto-threads", &auto_threads, CONF_TYPE_FLAG, 0, 0, 1, NULL},
+    { "noauto-threads", &auto_threads, CONF_TYPE_FLAG, 0, 1, 0, NULL},
 
     // postprocessing:
 #ifdef CONFIG_FFMPEG
@@ -535,7 +553,7 @@ const m_option_t common_opts[] = {
     {"ssf", scaler_filter_conf, CONF_TYPE_SUBCONFIG, 0, 0, 0, NULL},
     {"zoom", &softzoom, CONF_TYPE_FLAG, 0, 0, 1, NULL},
     {"nozoom", &softzoom, CONF_TYPE_FLAG, 0, 1, 0, NULL},
-    {"aspect", &movie_aspect, CONF_TYPE_FLOAT, CONF_RANGE, 0.1, 10.0, NULL},
+    {"aspect", &movie_aspect, CONF_TYPE_FLOAT, CONF_RANGE, -1, 10.0, NULL},
     {"noaspect", &movie_aspect, CONF_TYPE_FLAG, 0, 0, 0, NULL},
     {"xy", &screen_size_xy, CONF_TYPE_FLOAT, CONF_RANGE, 0.001, 4096, NULL},
 
@@ -579,7 +597,9 @@ const m_option_t common_opts[] = {
     {"noflip-hebrew-commas", "MPlayer was compiled without FriBiDi support.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
 #endif /* CONFIG_FRIBIDI */
 #ifdef CONFIG_ICONV
-    {"subcp", &sub_cp, CONF_TYPE_STRING, 0, 0, 0, NULL},
+    {"sub-ignore-errors", &sub_ignore_errors, CONF_TYPE_INT, 0, 0, 9999, NULL},
+    {"subcp", &sub_cps, CONF_TYPE_STRING, 0, 0, 0, NULL},
+    {"urlcp", &url_cp, CONF_TYPE_STRING, 0, 0, 0, NULL},
 #endif
     {"subdelay", &sub_delay, CONF_TYPE_FLOAT, 0, 0.0, 10.0, NULL},
     {"subfps", &sub_fps, CONF_TYPE_FLOAT, 0, 0.0, 10.0, NULL},
@@ -607,9 +627,9 @@ const m_option_t common_opts[] = {
     {"sub-no-text-pp", &sub_no_text_pp, CONF_TYPE_FLAG, 0, 0, 1, NULL},
     {"sub-fuzziness", &sub_match_fuzziness, CONF_TYPE_INT, CONF_RANGE, 0, 2, NULL},
     {"font", &font_name, CONF_TYPE_STRING, 0, 0, 0, NULL},
-    {"subfont", &sub_font_name, CONF_TYPE_STRING, 0, 0, 0, NULL},
+    {"subfont", &sub_font_names, CONF_TYPE_STRING, 0, 0, 0, NULL},
     {"ffactor", &font_factor, CONF_TYPE_FLOAT, CONF_RANGE, 0.0, 10.0, NULL},
-    {"subpos", &sub_pos, CONF_TYPE_INT, CONF_RANGE, 0, 100, NULL},
+    {"subpos", &sub_pos, CONF_TYPE_INT, CONF_RANGE| CONF_GLOBAL, -1, 100, NULL},
     {"subalign", &sub_alignment, CONF_TYPE_INT, CONF_RANGE, 0, 2, NULL},
     {"subwidth", &sub_width_p, CONF_TYPE_INT, CONF_RANGE, 10, 100, NULL},
     {"spualign", &spu_alignment, CONF_TYPE_INT, CONF_RANGE, -1, 2, NULL},

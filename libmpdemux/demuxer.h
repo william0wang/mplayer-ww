@@ -84,6 +84,9 @@
 #define DEMUXER_TYPE_LAVF_PREFERRED 44
 #define DEMUXER_TYPE_RTP_NEMESI 45
 #define DEMUXER_TYPE_MNG 46
+#define DEMUXER_TYPE_PMP 47
+#define DEMUXER_TYPE_DSHOW 48
+#define DEMUXER_TYPE_DSHOW_PREFERRED 49
 
 // This should always match the highest demuxer type number.
 // Unless you want to disallow users to force the demuxer to some types

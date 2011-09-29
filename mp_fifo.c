@@ -27,8 +27,9 @@ static int *key_fifo_data;
 static unsigned key_fifo_read;
 static unsigned key_fifo_write;
 static int previous_down_key;
+unsigned doubleclick_time = 300;
 
-static void mplayer_put_key_internal(int code){
+void mplayer_put_key(int code){
   int fifo_free = key_fifo_read + key_fifo_size - key_fifo_write;
   if (key_fifo_data == NULL)
     key_fifo_data = malloc(key_fifo_size * sizeof(int));
@@ -68,36 +69,3 @@ int mplayer_get_key(int fd){
   return key;
 }
 
-
-unsigned doubleclick_time = 300;
-
-static void put_double(int code) {
-  if (code >= MOUSE_BTN0 && code <= MOUSE_BTN_LAST)
-    mplayer_put_key_internal(code - MOUSE_BTN0 + MOUSE_BTN0_DBL);
-}
-
-void mplayer_put_key(int code) {
-  static unsigned last_key_time[2];
-  static int last_key[2];
-  unsigned now = GetTimerMS();
-  // ignore system-doubleclick if we generate these events ourselves
-  if (doubleclick_time &&
-      (code & ~MP_KEY_DOWN) >= MOUSE_BTN0_DBL &&
-      (code & ~MP_KEY_DOWN) <= MOUSE_BTN_LAST_DBL)
-    return;
-  mplayer_put_key_internal(code);
-  if (code & MP_KEY_DOWN) {
-    code &= ~MP_KEY_DOWN;
-    last_key[1] = last_key[0];
-    last_key[0] = code;
-    last_key_time[1] = last_key_time[0];
-    last_key_time[0] = now;
-    if (last_key[1] == code &&
-        now - last_key_time[1] < doubleclick_time)
-      put_double(code);
-    return;
-  }
-  if (last_key[0] == code && last_key[1] == code &&
-      now - last_key_time[1] < doubleclick_time)
-    put_double(code);
-}

@@ -51,8 +51,10 @@
 #include "tcp.h"
 #include "libavutil/avstring.h"
 
+int network_timeout = 30;
+
 /* IPv6 options */
-int   network_prefer_ipv4 = 0;
+int   network_prefer_ipv4 = 1;
 
 // Converts an address family constant to a string
 
@@ -218,8 +220,10 @@ connect2Server_with_af(char *host, int port, int af,int verb) {
 	FD_SET( socket_server_fd, &set );
 	// When the connection will be made, we will have a writeable fd
 	while((ret = select(socket_server_fd+1, NULL, &set, NULL, &tv)) == 0) {
-	      if(count > 30 || stream_check_interrupt(500)) {
-		if(count > 30)
+	      if( ret<0 ) mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_NW_SelectFailed);
+	      else if(ret > 0) break;
+	      else if(count > network_timeout || stream_check_interrupt(500)) {
+		if(count > network_timeout)
 		  mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_NW_ConnTimeout);
 		else
 		  mp_msg(MSGT_NETWORK,MSGL_V,"Connection interrupted by user\n");
@@ -231,7 +235,6 @@ connect2Server_with_af(char *host, int port, int af,int verb) {
 	      tv.tv_sec = 0;
 	      tv.tv_usec = 500000;
 	}
-	if (ret < 0) mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_NW_SelectFailed);
 
 	// Turn back the socket as blocking
 #if !HAVE_WINSOCK2_H

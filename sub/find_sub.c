@@ -38,13 +38,13 @@ static int nosub_range_end=-1;
 static const sub_data *last_sub_data = NULL;
 
 
-void step_sub(sub_data *subd, float pts, int movement) {
+long long step_sub(sub_data *subd, float now, int movement) {
     subtitle *subs;
     int key;
 
-    if (subd == NULL) return;
+    if (subd == NULL) return 0;
     subs = subd->subtitles;
-    key = (pts-sub_delay) * (subd->sub_uses_time ? 100 : sub_fps);
+    key = now * (subd->sub_uses_time ? 100 : sub_fps);
 
     /* Tell the OSD subsystem that the OSD contents will change soon */
     vo_osd_changed(OSDTYPE_SUBTITLE);
@@ -64,7 +64,7 @@ void step_sub(sub_data *subd, float pts, int movement) {
     	movement = subd->sub_num - current_sub - 1;
 
     current_sub += movement;
-    sub_delay = pts - subs[current_sub].start / (subd->sub_uses_time ? 100 : sub_fps);
+	return (long long)(now - (subs[current_sub].start / (subd->sub_uses_time ? 100 : sub_fps)) * 1000);
 }
 
 void find_sub(sub_data* subd,int key){

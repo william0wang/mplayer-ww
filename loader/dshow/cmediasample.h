@@ -19,6 +19,8 @@ struct CMediaSample
     int isDiscontinuity;
     LONGLONG time_start;
     LONGLONG time_end;
+    LONGLONG m_time_start;
+    LONGLONG m_time_end;
     AM_MEDIA_TYPE media_type;
     int type_valid;
     void ( *SetPointer) (CMediaSample* This, char* pointer);

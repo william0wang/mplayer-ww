@@ -59,6 +59,9 @@
 #define PT_UP_NEXT 3
 #define PT_UP_PREV -3
 #define PT_STOP 4
+#define PT_CURRENT_ENTRY 9
+#define MAX_OSD_LEVEL 4
+#define MAX_TERM_OSD_LEVEL 1
 
 enum exit_reason {
   EXIT_NONE,
@@ -148,6 +151,12 @@ extern float playback_speed;
 extern int fixed_vo;
 
 
+extern int save_volume;
+extern char *sub_font_name;
+extern char *sub_font_names;
+
+void show_benchmark();
+void update_sub_list(int);
 void uninit_player(unsigned int mask);
 void reinit_audio_chain(void);
 double playing_audio_pts(sh_audio_t *sh_audio, demux_stream_t *d_audio,

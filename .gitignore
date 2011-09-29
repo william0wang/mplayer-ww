@@ -1,4 +1,7 @@
 *.[od]
+.svn
+*.a
+*.pc
 *.exe
 *.ho
 codec-cfg
@@ -13,7 +16,8 @@ mencoder
 mplayer
 tags
 TAGS
-version.h
+/version.h
+cat.exe.stackdump
 debian/changelog
 debian/*.debhelper.log
 DOCS/codecs-status.html
@@ -27,8 +31,7 @@ DOCS/xml/*/main.xml
 drivers/mga_vid_test
 drivers/tdfx_vid_test
 ffmpeg/
-libdvdnav/
-libdvdread4/
+
 libvo/aspecttest
 loader/qtx/list
 loader/qtx/qtxload
@@ -52,3 +55,13 @@ TOOLS/subrip
 TOOLS/vivodump
 vidix/pci_*.[ch]
 vidix/dhahelperwin/dhahelper.sys
+cld
+cmk
+cla
+cf
+cf3
+cmk3
+mk
+release
+
+

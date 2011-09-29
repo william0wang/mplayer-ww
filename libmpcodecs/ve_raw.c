@@ -36,6 +36,8 @@
 #include "mp_image.h"
 #include "vf.h"
 
+#include "m_option.h"
+#include "libavutil/rational.h"
 
 //===========================================================================//
 
@@ -43,6 +45,28 @@ struct vf_priv_s {
     muxer_stream_t* mux;
 };
 #define mux_v (vf->priv->mux)
+
+typedef struct {
+	int format;
+	int width;
+	int height;
+	int interlace;
+	int fps_num;
+	int fps_den;
+	int pixelaspect_num;
+	int pixelaspect_den;
+	int frame_count;
+} YUV_INFO;
+
+static int pipefd;
+static int framesize = 0;
+
+m_option_t rawvidopts_conf[] =
+{
+	/* Standard things mencoder should be able to treat directly */
+	{"pipe", &pipefd, CONF_TYPE_INT, 0, 0, 0, NULL},
+	{NULL, 0, 0, 0, 0, 0, NULL}
+};
 
 static int set_format(struct vf_instance *vf, unsigned int fmt) {
     if (!force_fourcc)
@@ -111,6 +135,7 @@ static int config(struct vf_instance *vf,
 	unsigned int flags, unsigned int outfmt)
 {
     int ret;
+    AVRational pixelaspect = av_div_q((AVRational){d_width, d_height}, (AVRational){width, height});
     mux_v->bih->biWidth = width;
     mux_v->bih->biHeight = height;
     mux_v->aspect = (float)d_width/d_height;
@@ -118,6 +143,24 @@ static int config(struct vf_instance *vf,
     if (!ret) return 0;
 
     mux_v->bih->biSizeImage = mux_v->bih->biWidth*mux_v->bih->biHeight*mux_v->bih->biBitCount/8;
+
+	if (pipefd && !framesize)	 {
+		YUV_INFO yuv_info = {
+			0,
+			mux_v->bih->biWidth,
+			mux_v->bih->biHeight,
+			'p',
+			mux_v->h.dwRate,
+			mux_v->h.dwScale,
+			pixelaspect.num, pixelaspect.den,
+			0
+		};
+		int len = sizeof(yuv_info);
+		write(pipefd, &len, sizeof(len));
+		write(pipefd, &yuv_info, len);
+		framesize = mux_v->bih->biSizeImage;
+	}
+
     return 1;
 }
 
@@ -150,12 +193,31 @@ static int query_format(struct vf_instance *vf, unsigned int fmt) {
 }
 
 static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts) {
+    if (pipefd) {
+	char nulldata = 0;
+	mux_v->buffer = &nulldata;
+	muxer_write_chunk(mux_v, 1, 0x10, MP_NOPTS_VALUE, MP_NOPTS_VALUE);
+	//framesize = mpi->width*mpi->height*mux_v->bih->biBitCount/8;
+	write(pipefd, mpi->planes[0], framesize);
+    } else {
     mux_v->buffer = mpi->planes[0];
     muxer_write_chunk(mux_v, mpi->width*mpi->height*mux_v->bih->biBitCount/8, 0x10, pts, pts);
+    }
     return 1;
 }
 
 //===========================================================================//
+
+static void uninit(struct vf_instance *vf)
+{
+    if (pipefd) {
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+		_commit(pipefd);
+#endif
+		close(pipefd);
+		pipefd = 0;
+    }
+}
 
 static int vf_open(vf_instance_t *vf, char* args){
     vf->config = config;
@@ -167,6 +229,7 @@ static int vf_open(vf_instance_t *vf, char* args){
     vf->priv = malloc(sizeof(struct vf_priv_s));
     memset(vf->priv, 0, sizeof(struct vf_priv_s));
     vf->priv->mux = (muxer_stream_t*)args;
+    vf->uninit = uninit;
 
     mux_v->bih = calloc(1, sizeof(*mux_v->bih));
     mux_v->bih->biSize = sizeof(*mux_v->bih);

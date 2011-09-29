@@ -42,6 +42,8 @@
 #include "libvo/fastmemcpy.h"
 #include "libavutil/mem.h"
 
+vf_instance_t *last_vf=NULL;
+
 extern const vf_info_t vf_info_1bpp;
 extern const vf_info_t vf_info_2xsai;
 extern const vf_info_t vf_info_ass;
@@ -634,6 +636,7 @@ int vf_next_config(struct vf_instance *vf,
         unsigned int voflags, unsigned int outfmt){
     int miss;
     int flags=vf->next->query_format(vf->next,outfmt);
+    last_vf = vf;
     if(!flags){
         // hmm. colorspace mismatch!!!
         // let's insert the 'scale' filter, it does the job for us:
@@ -741,4 +744,5 @@ void vf_uninit_filter_chain(vf_instance_t* vf){
         vf_uninit_filter(vf);
         vf=next;
     }
+    last_vf = NULL;
 }

@@ -31,6 +31,7 @@
 #include "video_out_internal.h"
 #include "libmpcodecs/vf.h"
 #include "sub/sub.h"
+#include "winstuff.h"
 
 #include "gl_common.h"
 #include "aspect.h"
@@ -88,6 +89,8 @@ static int      gl_antialias=0;
 static int      use_yuv;
 static int      is_yuv;
 static int      use_glFinish;
+static int      using_gl2 = 0;
+extern int      gui_thread;
 
 static void (*draw_alpha_fnc)
                  (int x0,int y0, int w,int h, unsigned char* src, unsigned char *srca, int stride);
@@ -421,9 +424,30 @@ static void drawTextureDisplay (void)
   texdirty = 0;
 }
 
+extern int controlbar_height_gl;
+extern DWORD dwMajor,dwMinor;
+extern int show_controlbar;
+extern int full_view;
+extern int max_height;
+extern int max_width;
+extern int w32_inited;
+extern int gl_new_window;
 
 static void resize(int x,int y){
+  if(!using_gl2 || !w32_inited)
+    return;
   mp_msg(MSGT_VO,MSGL_V,"[gl2] Resize: %dx%d\n",x,y);
+  int y_height = 0;
+  int x_offset = 0;
+  int y_offset = 0;
+  if(!vo_fs ) {
+  	 if(show_controlbar && full_view && !gl_new_window)
+  	 	y_offset = y_height = controlbar_height_gl;
+  	 if(max_height > y)
+  	 	 y_offset = (max_height - y) / 2 + y_offset;
+  	 if(max_width > x)
+  	 	 x_offset = (max_width - x) / 2;
+  }
   if(aspect_scaling()) {
     glClear(GL_COLOR_BUFFER_BIT);
     aspect(&x, &y, A_WINZOOM);
@@ -437,10 +461,44 @@ static void resize(int x,int y){
       int left = 0, top = 0, w = x, h = y;
       geometry(&left, &top, &w, &h, vo_dwidth, vo_dheight);
       top = y - h - top;
-      glViewport(left, top, w, h);
+      glViewport(left + x_offset, top + y_offset, w, h- y_height );
     } else
-      glViewport( 0, 0, x, y );
+      glViewport( 0 + x_offset, 0 + y_offset, x, y - y_height );
   }
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho (0, 1, 1, 0, -1.0, 1.0);
+
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+}
+extern float w32_factor_x,w32_factor_y;
+extern int w32_delta_x,w32_delta_y;
+void resize_fs_gl2()
+{
+	if(!vo_fs || !using_gl2 || !w32_inited)
+		return;
+	int x,y;
+	  if ( (w32_factor_x == 0) && (w32_factor_y == 0))
+	  {
+		x = vo_screenwidth;
+		y = vo_screenheight;
+   	 aspect(&x, &y, A_ZOOM);
+	  }
+	  else
+	  {
+   	 aspect(&vo_dwidth, &vo_dheight, A_ZOOM);
+		x = (int)(vo_dwidth*(1+w32_factor_x))>>1<<1;
+		y = (int)(vo_dheight*(1+w32_factor_y))>>1<<1;
+	  }
+	
+	int top,left;
+	left = (vo_screenwidth-x)/2 + w32_delta_x;
+	top=(vo_screenheight-y)/2 - w32_delta_y;
+  	mp_msg(MSGT_VO, MSGL_V, "[gl] Resize_FS: %d , %d %dx%d\n",left,top,x,y);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glViewport( left , top,x, y );
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -554,6 +612,7 @@ static int config_glx(uint32_t width, uint32_t height, uint32_t d_width, uint32_
 
 static int initGl(uint32_t d_width, uint32_t d_height)
 {
+  using_gl2 = 1;
   fragprog = lookupTex = 0;
   if (initTextures() < 0)
     return -1;
@@ -618,6 +677,8 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
 {
   int xs, ys;
   const unsigned char * glVersion;
+
+  using_gl2 = 1;
 
   image_height = height;
   image_width = width;
@@ -892,12 +953,21 @@ err_out:
     return -1;
 }
 
+extern int w32Cmd(GUI_CMD cmd, int v);
+extern int vo_paused;
 static int control(uint32_t request, void *data)
 {
   switch (request) {
     case VOCTRL_PAUSE:
-    case VOCTRL_RESUME:
+      vo_paused = 1;
       int_pause = (request == VOCTRL_PAUSE);
+      if(!vo_fs && vo_ontop == 2)
+        w32Cmd(CMD_PAUSE_CONTINUE,0);
+ 	  return VO_TRUE;
+    case VOCTRL_RESUME:
+      vo_paused = 0;
+      int_pause = (request == VOCTRL_PAUSE);
+      w32Cmd(CMD_PAUSE_CONTINUE,0);
       return VO_TRUE;
     case VOCTRL_QUERY_FORMAT:
       return query_format(*((uint32_t*)data));
@@ -934,6 +1004,12 @@ static int control(uint32_t request, void *data)
 #endif
     case VOCTRL_UPDATE_SCREENINFO:
       glctx.update_xinerama_info();
+      return VO_TRUE;
+    case VOCTRL_GUI_RESIZE:
+      if(vo_fs)
+        resize_fs_gl2();
+      else
+        resize(vo_dwidth, vo_dheight);
       return VO_TRUE;
   }
   return VO_NOTIMPL;

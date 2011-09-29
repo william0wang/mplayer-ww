@@ -109,6 +109,13 @@ static const mp_cmd_t mp_cmds[] = {
   { MP_CMD_SUB_POS, "sub_pos", 1, { {MP_CMD_ARG_INT,{0}}, {MP_CMD_ARG_INT,{0}}, {-1,{0}} } },
   { MP_CMD_SUB_ALIGNMENT, "sub_alignment",0, { {MP_CMD_ARG_INT,{-1}}, {-1,{0}} } },
   { MP_CMD_SUB_VISIBILITY, "sub_visibility", 0, { {MP_CMD_ARG_INT,{-1}}, {-1,{0}} } },
+  { MP_CMD_RELOAD, "reload", 0, { {-1,{0}} } },
+  { MP_CMD_KEEP_ASPECT, "keep_aspect", 0, { {-1,{0}} } },
+  { MP_CMD_SWITCH_VIEW, "switch_view", 0, { {-1,{0}} } },
+  { MP_CMD_SWITCH_FONT, "switch_font", 0, { {-1,{0}} } },
+  { MP_CMD_ADDFILE, "addfile", 1, { {MP_CMD_ARG_STRING, {0}}, {-1,{0}} } },
+  { MP_CMD_ADDLIST, "addlist", 1, { {MP_CMD_ARG_STRING, {0}}, {-1,{0}} } },
+
   { MP_CMD_SUB_LOAD, "sub_load", 1, { {MP_CMD_ARG_STRING,{0}}, {-1,{0}} } },
   { MP_CMD_SUB_REMOVE, "sub_remove", 0, { {MP_CMD_ARG_INT,{-1}}, {-1,{0}} } },
   { MP_CMD_SUB_SELECT, "vobsub_lang", 0, { { MP_CMD_ARG_INT,{-2} }, {-1,{0}} } }, // for compatibility
@@ -179,6 +186,8 @@ static const mp_cmd_t mp_cmds[] = {
   { MP_CMD_TV_TELETEXT_GO_LINK, "teletext_go_link", 1, { {MP_CMD_ARG_INT,{0}}, {-1,{0}} } },
   { MP_CMD_OVERLAY_ADD, "overlay_add", 5, { {MP_CMD_ARG_STRING,{0}}, {MP_CMD_ARG_INT,{0}}, {MP_CMD_ARG_INT,{0}}, {MP_CMD_ARG_INT,{0}}, {MP_CMD_ARG_INT,{0}}, {-1,{0}} } },
   { MP_CMD_OVERLAY_REMOVE, "overlay_remove", 1, { {MP_CMD_ARG_INT,{0}}, {-1,{0}} } },
+  { MP_CMD_GUI_RESIZE, "vo_gui_resize", 0, { {MP_CMD_ARG_INT,{-1}}, {-1,{0}} } },
+  { MP_CMD_AUDIO_DSP, "audio_dsp", 1, { {MP_CMD_ARG_STRING, {0}}, {-1,{0}} } },
 
 #ifdef CONFIG_DVDNAV
   { MP_CMD_DVDNAV, "dvdnav", 1, { {MP_CMD_ARG_STRING, {0}}, {-1,{0}} } },
@@ -377,10 +386,10 @@ static const mp_key_name_t key_names[] = {
 
 static const mp_cmd_bind_t def_cmd_binds[] = {
 
-  { {  MOUSE_BTN3, 0 }, "seek 10" },
-  { {  MOUSE_BTN4, 0 }, "seek -10" },
-  { {  MOUSE_BTN5, 0 }, "volume 1" },
-  { {  MOUSE_BTN6, 0 }, "volume -1" },
+  { {  MOUSE_BTN3, 0 }, "volume 1" },
+  { {  MOUSE_BTN4, 0 }, "volume -1" },
+  { {  MOUSE_BTN5, 0 }, "seek 10" },
+  { {  MOUSE_BTN6, 0 }, "seek -10" },
 
 #ifdef CONFIG_DVDNAV
   { { KEY_KP8, 0 }, "dvdnav up" },   // up
@@ -389,7 +398,7 @@ static const mp_cmd_bind_t def_cmd_binds[] = {
   { { KEY_KP6, 0 }, "dvdnav right" },   // right
   { { KEY_KP5, 0 }, "dvdnav menu" },   // menu
   { { KEY_KPENTER, 0 }, "dvdnav select" },   // select
-  { { MOUSE_BTN0, 0 }, "dvdnav mouse" },   //select
+  //{ { MOUSE_BTN0, 0 }, "dvdnav mouse" },   //select
   { { KEY_KP7, 0 }, "dvdnav prev" },   // previous menu
 #endif
 
@@ -414,12 +423,12 @@ static const mp_cmd_bind_t def_cmd_binds[] = {
   { { KEY_HOME, 0 }, "pt_up_step 1" },
   { { KEY_END, 0 }, "pt_up_step -1" },
   { { '>', 0 }, "pt_step 1" },
-  { { KEY_ENTER, 0 }, "pt_step 1 1" },
+  { { KEY_ENTER, 0 }, "vo_fullscreen" },//pt_step 1 1
   { { '<', 0 }, "pt_step -1" },
   { { KEY_INS, 0 }, "alt_src_step 1" },
   { { KEY_DEL, 0 }, "alt_src_step -1" },
   { { 'o', 0 }, "osd" },
-  { { 'I', 0 }, "osd_show_property_text \"${filename}\"" },
+ // { { 'B', 0 }, "osd_show_property_text \"${filename}\"" },
   { { 'P', 0 }, "osd_show_progression" },
   { { 'z', 0 }, "sub_delay -0.1" },
   { { 'x', 0 }, "sub_delay +0.1" },
@@ -444,8 +453,13 @@ static const mp_cmd_bind_t def_cmd_binds[] = {
   { { 'D', 0 }, "step_property deinterlace" },
   { { 'r', 0 }, "sub_pos -1" },
   { { 't', 0 }, "sub_pos +1" },
+  { { 'c', 0 }, "sub_scale 0.1" },
+  { { 'C', 0 }, "sub_scale 0.1" },
+  { { 'v', 0 }, "sub_scale -0.1" },
+  { { 'V', 0 }, "sub_scale -0.1" },
+ // { { 'b', 0 }, "sub_source" },
   { { 'a', 0 }, "sub_alignment" },
-  { { 'v', 0 }, "sub_visibility" },
+  //{ { 'v', 0 }, "sub_visibility" },
   { { 'j', 0 }, "sub_select" },
   { { 'J', 0 }, "sub_select -3" },
   { { 'F', 0 }, "forced_subs_only" },
@@ -453,6 +467,8 @@ static const mp_cmd_bind_t def_cmd_binds[] = {
   { { '_', 0 }, "step_property switch_video" },
   { { KEY_TAB, 0 }, "step_property switch_program" },
   { { 'i', 0 }, "edl_mark" },
+  { { 'b', 0 }, "loop 1" },
+  { { 'B', 0 }, "loop 1" },
 #ifdef CONFIG_TV
   { { 'h', 0 }, "tv_step_channel 1" },
   { { 'k', 0 }, "tv_step_channel -1" },
@@ -486,7 +502,7 @@ static const mp_cmd_bind_t def_cmd_binds[] = {
 #endif
   { { 'T', 0 }, "vo_ontop" },
   { { 'f', 0 }, "vo_fullscreen" },
-  { { 'c', 0 }, "capturing" },
+//  { { 'c', 0 }, "capturing" },
   { { 's', 0 }, "screenshot 0" },
   { { 'S', 0 }, "screenshot 1" },
   { { 'w', 0 }, "panscan -0.1" },
@@ -510,7 +526,7 @@ static const mp_cmd_bind_t def_cmd_binds[] = {
 
   { { '!', 0 }, "seek_chapter -1" },
   { { '@', 0 }, "seek_chapter 1" },
-  { { 'A', 0 }, "switch_angle 1" },
+//  { { 'A', 0 }, "switch_angle 1" },
   { { 'U', 0 }, "stop" },
 
   { { 0 }, NULL }
@@ -588,7 +604,7 @@ static unsigned int ar_delay = 100, ar_rate = 8, last_ar = 0;
 
 static int use_joystick = 1, use_lirc = 1, use_lircc = 1;
 static int default_bindings = 1;
-static char* config_file = "input.conf";
+static char* config_file = "input.ini";
 
 /* Apple Remote */
 #ifdef CONFIG_APPLE_REMOTE
@@ -882,12 +898,14 @@ mp_input_parse_cmd(char* str) {
 	break;
       } else if(!e) e = ptr+strlen(ptr);
       l = e-start;
+/*
       ptr2 = start;
       for(e = strchr(ptr2,'\\') ; e && e<start+l ; e = strchr(ptr2,'\\')) {
 	memmove(e,e+1,strlen(e));
 	ptr2 = e + 1;
         l--;
       }
+*/
       cmd->args[i].v.s = malloc(l+1);
       strncpy(cmd->args[i].v.s,start,l);
       cmd->args[i].v.s[l] = '\0';
@@ -1090,6 +1108,7 @@ mp_input_get_cmd_from_keys(int n,int* keys, int paused) {
     cmd = mp_input_find_bind_for_key(def_cmd_binds,n,keys);
 
   if(cmd == NULL) {
+  	if (!keys[0]) return NULL;
     char key_name[100];
     int i;
     av_strlcpy(key_name, mp_input_get_key_name(keys[0]), sizeof(key_name));
@@ -1751,24 +1770,11 @@ mp_input_init(void) {
   if(!file)
     return;
 
-  if( !mp_input_parse_config(file)) {
-    // free file if it was allocated by get_path(),
-    // before it gets overwritten
-    if( file != config_file)
-    {
-      free(file);
-    }
-    // Try global conf dir
-    file = MPLAYER_CONFDIR "/input.conf";
-    if(! mp_input_parse_config(file))
-      mp_msg(MSGT_INPUT,MSGL_V,"Falling back on default (hardcoded) input config\n");
-  }
-  else
-  {
-    // free file if it was allocated by get_path()
-    if( file != config_file)
-      free(file);
-  }
+  if(!mp_input_parse_config(file))
+    mp_msg(MSGT_INPUT,MSGL_V,"Falling back on default (hardcoded) input config\n");
+  // free file if it was allocated by get_path()
+  if( file != config_file)
+    free(file);
 
 #ifdef CONFIG_JOYSTICK
   if(use_joystick) {

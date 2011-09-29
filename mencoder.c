@@ -120,6 +120,20 @@ int vobsub_id=-1;
 char* audio_lang=NULL;
 char* dvdsub_lang=NULL;
 
+char* filename=NULL;
+int channel_state = 0;
+int coreavc_codec=0;
+int is_mpegts_format=0;
+
+#ifdef CONFIG_ICONV
+extern char *url_cp;
+extern char *sub_cps;
+#endif
+
+#ifdef CONFIG_ASS
+int keep_pts=0;
+#endif
+
 static char** audio_codec_list=NULL;  // override audio codec
 static char** video_codec_list=NULL;  // override video codec
 static char** audio_fm_list=NULL;     // override audio codec family
@@ -247,6 +261,13 @@ static short edl_seek_type; ///< When non-zero, frames are discarded instead of 
 /* FIXME */
 static void mencoder_exit(int level, const char *how)
 {
+	if(vo_vobsub) vobsub_close(vo_vobsub);
+	vo_vobsub=NULL;
+
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+  	unrar_uninit();
+#endif
+
     if (how)
 	mp_msg(MSGT_MENCODER, MSGL_INFO, MSGTR_ExitingHow, how);
     else
@@ -311,10 +332,16 @@ static void add_subtitles(char *filename, float fps, int silent)
 #ifdef CONFIG_ASS
     ASS_Track *asst = 0;
 #endif
-
-    if (!filename) return;
-
-    subd = sub_read_file(filename, fps);
+    if (filename == NULL) return;
+    // try to load plain text subtilte
+    char *p = NULL;
+    int cp_index = -1;
+    sub_cp = sub_cps;
+    do {
+		cp_index++;
+		p = strchr(sub_cp, ',');
+		if (p) *p = 0;			// temp change
+		subd = sub_read_file(filename, fps);
 #ifdef CONFIG_ASS
     if (ass_enabled)
 #ifdef CONFIG_ICONV
@@ -322,6 +349,15 @@ static void add_subtitles(char *filename, float fps, int silent)
 #else
         asst = ass_read_file(ass_library, filename, 0);
 #endif
+		if (p)
+		{
+			*p = ',';			// restore
+			if (!subd)
+				sub_cp = p + 1;	// to next codepage token
+		}
+		else break;				// no more codepage token
+	} while (!subd && sub_cp && *sub_cp);
+
     if (ass_enabled && subd && !asst)
         asst = ass_read_subdata(ass_library, subd, fps);
 
@@ -555,7 +591,6 @@ double sub_offset=0;
 int did_seek=0;
 
 m_entry_t* filelist = NULL;
-char* filename=NULL;
 
 int decoded_frameno=0;
 int next_frameno=-1;
@@ -571,6 +606,10 @@ audio_encoder_t *aencoder = NULL;
 user_correct_pts = 0;
 
   common_preinit();
+
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+  unrar_init();
+#endif
 
   // Create the config context and register the options
   mconfig = m_config_new();
@@ -992,9 +1031,21 @@ default: {
 // we know fps so now we can adjust subtitles time to ~6 seconds AST
 // check .sub
     load_subtitles(filename, sh_video->fps, add_subtitles);
+#ifdef CONFIG_ASS
+  if (ass_enabled && ass_library && ass_track)
+    keep_pts = 1;
+  else
+    keep_pts = 0;
+#endif
 
     mp_msg(MSGT_CPLAYER,MSGL_INFO,"==========================================================================\n");
     init_best_video_codec(sh_video,video_codec_list,video_fm_list);
+	char *ext = strrchr(filename, '.');
+	if(sh_video && sh_video->initialized && (!strcasecmp(demuxer->desc->name, "asf") || 
+		(ext && !strcasecmp(demuxer->desc->name, "mpegps") && !strcasecmp(ext, ".vob")) ||
+		!strcasecmp(demuxer->desc->name, "mpegts") || is_mpegts_format)) {
+			sub_delay -= d_audio->pts;
+	}
     mp_msg(MSGT_CPLAYER,MSGL_INFO,"==========================================================================\n");
     if(!sh_video->initialized) mencoder_exit(1,NULL);
  }
@@ -1466,6 +1517,11 @@ default:
         did_seek = 0;
         sub_offset = sh_video->pts;
     }
+#ifdef CONFIG_ASS
+  if (keep_pts)
+    blit_frame = decoded_frame && filter_video(sh_video, decoded_frame, sh_video->pts);
+  else
+#endif
     // NOTE: this is not really correct, but it allows -ass to work mostly
     // v_muxer_time was tried before, but it is completely off when -ss is used
     // (see bug #1960).

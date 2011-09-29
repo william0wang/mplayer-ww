@@ -52,6 +52,9 @@ extern const af_info_t af_info_karaoke;
 extern const af_info_t af_info_scaletempo;
 extern const af_info_t af_info_stats;
 extern const af_info_t af_info_bs2b;
+#ifdef _WIN32
+extern const af_info_t af_info_wadsp;
+#endif
 
 static const af_info_t * const filter_list[] = {
    &af_info_dummy,
@@ -89,6 +92,9 @@ static const af_info_t * const filter_list[] = {
    &af_info_stats,
 #ifdef CONFIG_LIBBS2B
    &af_info_bs2b,
+#endif
+#ifdef _WIN32
+   &af_info_wadsp,
 #endif
    NULL
 };

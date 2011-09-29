@@ -53,13 +53,14 @@ char* ass_color = NULL;
 char* ass_border_color = NULL;
 char* ass_styles_file = NULL;
 int ass_hinting = ASS_HINTING_NATIVE + 4; // native hinting for unscaled osd
+extern int fake_video;
 
 ASS_Track* ass_default_track(ASS_Library* library) {
 	ASS_Track* track = ass_new_track(library);
 
 	track->track_type = TRACK_TYPE_ASS;
 	track->Timer = 100.;
-	track->PlayResY = 288;
+	track->PlayResY = 360;
 	track->WrapStyle = 0;
 
 	if (ass_styles_file)
@@ -74,10 +75,10 @@ ASS_Track* ass_default_track(ASS_Library* library) {
 		sid = ass_alloc_style(track);
 		style = track->styles + sid;
 		style->Name = strdup("Default");
-		style->FontName = (font_fontconfig >= 0 && sub_font_name) ? strdup(sub_font_name) : (font_fontconfig >= 0 && font_name) ? strdup(font_name) : strdup("Sans");
+		style->FontName = (font_fontconfig >= 0 && sub_font_name) ? strdup(sub_font_name) : (font_fontconfig >= 0 && font_name) ? strdup(font_name) : strdup("Microsoft YaHei");
 		style->treat_fontname_as_pattern = 1;
 
-		fs = track->PlayResY * text_font_scale_factor / 100.;
+		fs = track->PlayResY * text_font_scale_factor * 1.3333 / 100.;
 		// approximate autoscale coefficients
 		if (subtitle_autoscale == 2)
 			fs *= 1.3;
@@ -86,9 +87,9 @@ ASS_Track* ass_default_track(ASS_Library* library) {
 		style->FontSize = fs;
 
 		if (ass_color) c1 = strtoll(ass_color, NULL, 16);
-		else c1 = 0xFFFF0000;
+		else c1 = 0xFFFFFF00;
 		if (ass_border_color) c2 = strtoll(ass_border_color, NULL, 16);
-		else c2 = 0x00000000;
+		else c2 = 0x0000003C;
 
 		style->PrimaryColour = c1;
 		style->SecondaryColour = c1;
@@ -102,6 +103,18 @@ ASS_Track* ass_default_track(ASS_Library* library) {
 		style->MarginV = 5;
 		style->ScaleX = 1.;
 		style->ScaleY = 1.;
+
+		if(fake_video) {
+			track->PlayResX = 480;
+			track->PlayResY = 270;
+			style->PrimaryColour = 0xFFFFFF00;
+			style->OutlineColour = 0x3366FF3F;
+			style->Outline = 1;
+			style->MarginL = 5;
+			style->MarginR = 5;
+			style->MarginV = 90;
+			style->FontSize = 30;
+		}
 	}
 
 	ass_process_force_style(track);

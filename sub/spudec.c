@@ -56,6 +56,7 @@
 int spu_aamode = 3;
 int spu_alignment = -1;
 float spu_gaussvar = 1.0;
+extern float movie_scale;
 
 typedef struct packet_t packet_t;
 struct packet_t {
@@ -88,6 +89,7 @@ typedef struct {
   packet_t *queue_tail;
   unsigned int global_palette[16];
   unsigned int orig_frame_width, orig_frame_height;
+  unsigned int scale_x, scale_y;
   unsigned char* packet;
   size_t packet_reserve;	/* size of the memory pointed to by packet */
   unsigned int packet_offset;	/* end of the currently assembled fragment */
@@ -898,8 +900,9 @@ void spudec_draw_scaled(void *me, unsigned int dxs, unsigned int dys, void (*dra
 	/* scaled_x = scalex * x / 0x100
 	   scaled_y = scaley * y / 0x100
 	   order of operations is important because of rounding. */
-	unsigned int scalex = 0x100 * dxs / spu->orig_frame_width;
-	unsigned int scaley = 0x100 * dys / spu->orig_frame_height;
+	unsigned int scalex = spu->scale_x * dxs / spu->orig_frame_width;
+	//unsigned int scaley = spu->scale_y * dys / spu->orig_frame_height;
+	unsigned int scaley = spu->scale_y * dxs * 23 * movie_scale / (spu->orig_frame_height << 5);
 	spu->scaled_start_col = spu->start_col * scalex / 0x100;
 	spu->scaled_start_row = spu->start_row * scaley / 0x100;
 	spu->scaled_width = spu->width * scalex / 0x100;
@@ -1193,7 +1196,7 @@ nothing_to_do:
           spu->scaled_start_row = dys*sub_pos/100 - spu->scaled_height;
 	  break;
 	}
-	draw_alpha(spu->scaled_start_col, spu->scaled_start_row, spu->scaled_width, spu->scaled_height,
+	draw_alpha(spu->scaled_start_col + (dxs>>1) - (spu->scale_x*dxs>>9), spu->scaled_start_row, spu->scaled_width, spu->scaled_height,
 		   spu->scaled_image, spu->scaled_aimage, spu->scaled_stride);
 	spu->spu_changed = 0;
       }
@@ -1299,6 +1302,8 @@ void *spudec_new_scaled(unsigned int *palette, unsigned int frame_width, unsigne
       else
         this->orig_frame_height = 576;
     }
+    this->scale_x = 256;
+    this->scale_y = 256;
   }
   else
     mp_msg(MSGT_SPUDEC,MSGL_FATAL, "FATAL: spudec_init: calloc");

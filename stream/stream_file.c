@@ -18,6 +18,17 @@
 
 #include "config.h"
 
+#ifdef __MINGW32__
+#define _WIN32_WINNT 0x0500
+#include <windows.h>
+#include <string.h>
+#include <process.h>
+#include "unrar.h"
+#include "resource.h"
+#include "libvo/fastmemcpy.h"
+#include "libavutil/common.h"
+#endif
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -32,6 +43,9 @@
 #include "help_mp.h"
 #include "m_option.h"
 #include "m_struct.h"
+
+int is_rar_stream = 0;
+int enable_file_mapping = 1;
 
 static struct stream_priv_s {
   char* filename;
@@ -54,8 +68,566 @@ static const struct m_struct_st stream_opts = {
   stream_opts_fields
 };
 
+#ifdef __MINGW32__
+
+#define _BASE_MAP_BUFFER_SIZE 8 * 1024 * 1024
+int _map_buffer_size = _BASE_MAP_BUFFER_SIZE;
+int _map_buffer_factor = 2;
+extern int is_vista;
+extern int stream_cache_size;
+
+typedef struct {
+	char *filename;
+	int hArcData;
+	HANDLE hPipeWrite;
+} stream_rar_priv_t;
+
+typedef struct {
+	char *filename;
+	WORD headSize;
+	DWORD packSize;
+	WORD idx;
+	BYTE naming;
+	char *basename;
+	off_t fileSize;
+} stream_0day_priv_t;
+
+typedef struct {
+	HANDLE hFileMapping;
+	void *pbFile;
+	void *pbFileNext;
+	int   allocation;
+	int   is_file_end;
+	int   buffer_size;
+	int   buffer_size_next;
+	off_t readpos;
+	off_t offset;
+	off_t offset_next;
+	off_t fileSize;
+} stream_map_priv_t;
+
+static char pw[256];
+
+static void unrar_close(stream_rar_priv_t *p)
+{
+	if (p->hArcData != 0) {
+		(*RARCloseArchive)(p->hArcData);
+		p->hArcData = 0;
+	}
+	if (p->hPipeWrite != INVALID_HANDLE_VALUE) {
+		CloseHandle(p->hPipeWrite);
+		p->hPipeWrite = INVALID_HANDLE_VALUE;
+	}
+}
+
+int CALLBACK unrar_pw_dlgproc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
+{
+	switch (msg)
+	{
+		case WM_COMMAND:
+			if (LOWORD(wp) == IDOK) {
+				pw[GetDlgItemText(hDlg, IDC_PASSWORD, pw, 255)] = 0;
+				EndDialog(hDlg, IDOK);
+			} else if (LOWORD(wp) == IDCANCEL) {
+				EndDialog(hDlg, IDCANCEL);
+			}
+			break;
+	}
+	return FALSE;
+}
+
+int __stdcall unrar_callback(unsigned int msg,int p,int P1,int P2)
+{
+	switch (msg) {
+	case UCM_CHANGEVOLUME:
+		if (P2 == RAR_VOL_ASK) {
+			Sleep(5000);
+		}
+		break;
+	case UCM_PROCESSDATA:
+		if (!WriteFile((HANDLE)p, (LPCVOID)P1, P2, (LPDWORD)&P2, NULL)) return -1;
+		break;
+	}
+	return 0;
+}
+
+void unrar_thread(stream_rar_priv_t *p)
+{
+	(*RARProcessFile)(p->hArcData, RAR_TEST, NULL, NULL);
+	unrar_close(p);
+	_endthread();
+}
+
+static void close_rar(stream_t *s)
+{
+	stream_rar_priv_t *p = (stream_rar_priv_t *)s->priv;
+	CloseHandle((HANDLE)s->fd);
+	s->fd = -1;
+	unrar_close(p);
+	free(p->filename);
+	free(p);
+}
+
+static int open_0day_volume(stream_0day_priv_t *p, int i)
+{
+    int h;
+    char *name = (char*)malloc(260);
+
+    if (!p->naming) {
+        char c = 'r';
+        if (i) {
+            c += (i-1) / 100;
+            sprintf(name, "%s%c%02d", p->basename, c, (i-1)%100);
+        }
+        else
+            sprintf(name, "%srar", p->basename);
+    }
+    else
+        sprintf(name, "%s%0*d.rar", p->basename, p->naming, i + 1);
+
+    h = open(name, O_RDONLY|O_BINARY);
+    if (h >= 0) {
+        p->idx = i;
+    }
+
+    free(name);
+
+    return h;
+}
+
+static void close_0day(stream_t *s)
+{
+	stream_0day_priv_t *p = (stream_0day_priv_t *)s->priv;
+
+	free(p->filename);
+	free(p->basename);
+	free(p);
+}
+
+static int seek_0day(stream_t *s,off_t newpos)
+{
+	stream_0day_priv_t *p = (stream_0day_priv_t *)s->priv;
+	int i, fd;
+
+	s->pos = newpos;
+	if (newpos < 0 || newpos > p->fileSize) {
+		s->eof = 1;
+		return 0;
+	}
+
+	i = newpos / p->packSize;
+	if (i != p->idx) {
+		fd = open_0day_volume(p, i);
+		if (fd < 0) {
+			s->eof = 1;
+			return 0;
+		}
+		close(s->fd);
+		s->fd = fd;
+	}
+
+	lseek(s->fd, newpos-i*((off_t)p->packSize)+p->headSize, SEEK_SET);
+	return 1;
+}
+
+static int fill_buffer_0day(stream_t *s, char* buffer, int max_len)
+{
+	int r, fd;
+	off_t i, j;
+	stream_0day_priv_t *p = (stream_0day_priv_t *)s->priv;
+
+	if ((s->pos >= p->fileSize) && (max_len > 0)) {
+		close(s->fd);
+		s->fd = -1;
+		return -1;
+	}
+
+	i = s->pos + max_len;
+	if (i > p->fileSize) {
+		i = p->fileSize;
+		max_len = i - s->pos;
+	}
+	j = (p->idx+1)*((off_t)p->packSize);
+	if (i > j) {
+		j = max_len-(i-j);
+		r = read(s->fd, buffer, j);
+		if (r < j) goto exit_fill_buffer_0day;
+
+		fd = open_0day_volume(p, p->idx+1);
+		if (fd < 0) {
+			s->eof = 1;
+			goto exit_fill_buffer_0day;
+		}
+		close(s->fd);
+		s->fd = fd;
+		lseek(s->fd, p->headSize, SEEK_SET);
+		r += read(s->fd, buffer + r, max_len - r);
+	} else
+		r = read(s->fd, buffer, max_len);
+
+exit_fill_buffer_0day:
+	return (r <= 0) ? -1 : r;
+}
+
+static int rar_open(char *rarname, mode_t m, stream_t *stream)
+{
+	stream_0day_priv_t *p;
+	char RarTag[7], method, *pp, type = 0;
+	WORD w, n, flag;
+
+	int h = open(rarname, m);
+	if (h < 0) return h;
+
+	read(h, RarTag, 7);						/* Read Rar!... Tag */
+	if (strncmp(RarTag, "Rar!", 4)) {
+		lseek(h, 0, SEEK_SET);				/* Not a RAR */
+		return h;
+	}
+
+	p = (stream_0day_priv_t*)malloc(sizeof(stream_0day_priv_t));
+	memset(p, 0, sizeof(stream_0day_priv_t));
+	p->headSize = 7;
+	while (type != 0x74) {
+		lseek(h, 2, SEEK_CUR);				/* CRC */
+		read(h, &type, 1);					/* Type */
+		read(h, (char*)&flag, 2);			/* Flag */
+		read(h, (char*)&w, 2);				/* Size */
+		p->headSize += w;
+		if (type == 0x73) { /* main header */
+			p->naming = flag & 0x10;
+		} else
+		if (type == 0x74) {	/* file header */
+			read(h, (char*)&(p->packSize), 4);
+			read(h, (char*)&(p->fileSize), 4);
+			lseek(h, 10, SEEK_CUR);			/* Skip OS/CRC/Time/Ver */
+			read(h, &method, 1);			/* Compression Method */
+			read(h, (char*)&n, 2);			/* Size of rarname */
+			if (w == n + 0x2D) {
+				/* fileSize is 64bit */
+				lseek(h, 8, SEEK_CUR);
+				read(h, ((char*)&(p->fileSize))+4, 4);
+			} else {
+				lseek(h, 4, SEEK_CUR);		/* Attr */
+			}
+			p->filename = (char *)malloc(n + 1);
+			read(h, p->filename, n);		/* filename */
+			p->filename[n] = 0;
+		} else
+		if (type == 0x7A) {	/* comment header */
+			read(h, (char*)&w, 2);			/* Size of comment */
+			p->headSize += w;
+		}
+		lseek(h, p->headSize, SEEK_SET);	/* Seek to next header */
+	}
+	mp_msg(MSGT_STREAM,MSGL_INFO, "File Flags=%04x\tCompression Method=%x\n", flag, method);
+
+	if (!(flag & 0x04) && (method == 0x30)) {	/* 0day stream */
+		n = strlen(rarname);
+		p->basename = strdup(rarname);
+		if (p->naming) {
+			p->naming = rarname + n - strrchr(rarname, 't') - 5;
+			n -= (p->naming + 4);
+		} else {
+			n -= 3;
+		}
+		p->basename[n] = 0;
+
+		close(h);
+		h = open_0day_volume(p, 0);
+		if (h < 0) {
+			free(p->filename);
+			free(p->basename);
+			free(p);
+		} else {
+			/* reget packSize, avoid got the last volume's packSize */
+			type = 0;
+			n = 7;
+			lseek(h, 7, SEEK_SET);
+			while (type != 0x74) {
+				lseek(h, 2, SEEK_CUR);				/* CRC */
+				read(h, &type, 1);					/* Type */
+				read(h, (char*)&flag, 2);			/* Flag */
+				read(h, (char*)&w, 2);				/* Size */
+				n += w;
+				if (type == 0x74) {	/* file header */
+					read(h, (char*)&(p->packSize), 4);
+				} else
+				if (type == 0x7A) {	/* comment header */
+					read(h, (char*)&w, 2);			/* Size of comment */
+					n += w;
+				}
+				lseek(h, n, SEEK_SET);	/* Seek to next header */
+			}
+
+			stream->priv = (void*)p;
+			stream->close = close_0day;
+			stream->seek = seek_0day;
+			stream->fill_buffer = fill_buffer_0day;
+			stream->end_pos = p->fileSize;
+			stream->type = STREAMTYPE_FILE;
+		}
+		return h;
+	}
+
+	free(p);
+
+	if (unrardll) {								/* rar stream */
+		struct RAROpenArchiveDataEx OpenArchiveData;
+		struct RARHeaderDataEx HeaderData;
+		HANDLE hPipeRead, hPipeWrite;
+		int hArcData;
+
+		memset(&OpenArchiveData,0,sizeof(OpenArchiveData));
+		OpenArchiveData.ArcName=rarname;
+		OpenArchiveData.OpenMode=RAR_OM_EXTRACT;
+
+		hArcData=(*RAROpenArchiveEx)(&OpenArchiveData);
+		if (!OpenArchiveData.OpenResult) {
+			HeaderData.CmtBuf=NULL;
+			if (!(*RARReadHeaderEx)(hArcData,&HeaderData)) {
+				if (HeaderData.Flags & 0x04) {
+					/* Request password */
+					if (DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_PASSWORD),
+						GetForegroundWindow(), unrar_pw_dlgproc) == IDOK) {
+						(*RARSetPassword)(hArcData, pw);
+					} else {
+						close(h);
+						h = -2;
+						goto rar_open_break;
+					}
+				}
+				if (CreatePipe(&hPipeRead, &hPipeWrite, 0, 0x10000)) {
+					stream_rar_priv_t *p;
+
+					(*RARSetCallback)(hArcData, unrar_callback, (int)hPipeWrite);
+					p = (stream_rar_priv_t*)malloc(sizeof(stream_rar_priv_t));
+					p->filename = strdup(HeaderData.FileName);
+					p->hArcData = hArcData;
+					p->hPipeWrite = hPipeWrite;
+					if (_beginthread((void (*)())unrar_thread, 0, (void*)p) != -1) {
+						stream->priv = (void*)p;
+						stream->close = close_rar;
+						close(h);
+						return (int)hPipeRead;
+					}
+					else {
+						free(p->filename);
+						free(p);
+						CloseHandle(hPipeRead);
+						CloseHandle(hPipeWrite);
+					}
+				}
+			}
+
+rar_open_break:
+			(*RARCloseArchive)(hArcData);
+		}
+	}
+
+	return h;
+}
+
+static void close_map_file(stream_t *s)
+{
+    stream_map_priv_t *p = (stream_map_priv_t*)s->priv;
+	if(s->fd > 0)
+		CloseHandle(s->fd);
+	if(p) {
+		if(p->pbFile)
+			UnmapViewOfFile(p->pbFile);
+		p->pbFile = NULL;
+		if(p->pbFileNext)
+			UnmapViewOfFile(p->pbFileNext);
+		p->pbFileNext = NULL;
+		if(p->hFileMapping)
+			CloseHandle(p->hFileMapping);
+		p->hFileMapping = NULL;
+	}
+	s->fd = -1;
+	s->priv = 0;
+}
+
+int get_extension_cache_size(const char *filename, const char *ext)
+{
+	int file_size, cache_size, fp;
+	if(ext && filename && (!strcasecmp(ext, ".mkv") || !strcasecmp(ext, ".mov"))) {
+		cache_size = (_BASE_MAP_BUFFER_SIZE * _map_buffer_factor) / 1024 / 1024 * 1024;
+		fp=open(filename, O_RDONLY);
+		if (fp >= 0) {
+			file_size = lseek(fp, 0, SEEK_END) / 1024;
+			close(fp);
+			if(file_size > cache_size)
+				return cache_size;
+			else if(file_size > cache_size/2)
+				return cache_size/2;
+		}
+	}
+	return -1;
+}
+
+int set_map_buffer_size(stream_t *s, double bps, int use_cache)
+{
+	int m_size, cache_size = 0;
+	MEMORYSTATUSEX memstatus;
+    stream_map_priv_t *p = (stream_map_priv_t*)s->priv;
+	if(!use_cache && (!p || is_rar_stream || _map_buffer_factor < 3 || s->type != STREAMTYPE_FILE ||
+		p->buffer_size + (p->pbFileNext ? p->buffer_size_next : 0) >= p->fileSize))
+		return cache_size;
+
+	bps = bps * 8 / 1024 / 1024;
+	if(bps < 4 || bps > 256)
+		return cache_size;
+
+	if(use_cache)
+		cache_size = (_BASE_MAP_BUFFER_SIZE * _map_buffer_factor) / 1024 / 1024 * 1024;
+
+	if(8*_map_buffer_factor/bps > 30)
+		return cache_size;
+
+	switch(_map_buffer_factor)
+	{
+	case 12: // >= 4.0 GB
+		m_size = 512;
+		break;
+	case 10: // >= 3.5 GB
+		m_size = 384;
+		break;
+	case 8:	// >= 2.5 GB
+		m_size = 320;
+		break;
+	case 6:	// >= 2.0 GB
+		m_size = 256;
+		break;
+	case 4:	// >= 1.5 GB
+		m_size = 192;
+		break;
+	case 3:	// >= 1.0 GB
+		m_size = 80;
+		break;
+	default:
+		m_size = 0;
+		break;
+	}
+
+	if(m_size > 0) {
+		memstatus.dwLength =sizeof(MEMORYSTATUSEX);
+		GlobalMemoryStatusEx(&memstatus);
+
+		bps = FFMIN3(bps*30, (double)(memstatus.ullAvailPhys/1024/1024.0)/3, m_size) * 1024 * 1024;
+		if(bps < _BASE_MAP_BUFFER_SIZE)
+			return cache_size;
+
+		if(use_cache) {
+			int fsize = s->end_pos - s->start_pos;
+			cache_size = _BASE_MAP_BUFFER_SIZE * _map_buffer_factor + (int)bps/2;
+			if(cache_size > fsize && fsize > 0)
+				cache_size = fsize - 1024 * 2;
+			cache_size = cache_size / 1024 / 1024 * 1024;
+			return cache_size;
+		} else if(p && p->allocation > 0)
+			_map_buffer_size =((_BASE_MAP_BUFFER_SIZE * _map_buffer_factor + (int)bps) / 2) / p->allocation * p->allocation;
+		else
+			return cache_size;
+
+		if(p->fileSize - p->offset >= _map_buffer_size) {
+			p->buffer_size =  _map_buffer_size;
+			p->is_file_end = 0;
+		} else {
+			p->buffer_size = p->fileSize - p->offset;
+			p->is_file_end = 1;
+		}
+		UnmapViewOfFile(p->pbFile);
+		if(p->pbFileNext)
+			UnmapViewOfFile(p->pbFileNext);
+		p->pbFile = MapViewOfFile(p->hFileMapping, FILE_MAP_READ, (p->offset>>32), p->offset&0xffffffff, p->buffer_size);
+		if(p->fileSize > p->offset + p->buffer_size) {
+			p->offset_next = p->offset + p->buffer_size;
+			p->buffer_size_next = (p->fileSize - p->offset_next) > _map_buffer_size ? _map_buffer_size : (p->fileSize - p->offset_next);
+			p->pbFileNext = MapViewOfFile(p->hFileMapping, FILE_MAP_READ, (p->offset_next>>32), p->offset_next&0xffffffff, p->buffer_size_next);
+		} else {
+			p->pbFileNext = NULL;
+		}
+		mp_msg(MSGT_STREAM,MSGL_V,"[stream] resize file read buffer to: %0.2f MB\n", (float)((p->buffer_size+p->buffer_size_next)/1024)/1024);
+	}
+
+	return cache_size;
+}
+
+#endif
+
 static int fill_buffer(stream_t *s, char* buffer, int max_len){
-  int r = read(s->fd,buffer,max_len);
+  int r = 0;
+#ifdef __MINGW32__
+  stream_map_priv_t *p;
+  if (s->priv) {
+	if(is_rar_stream)
+  		ReadFile((HANDLE)s->fd,buffer,max_len,(LPDWORD)&r,NULL);
+	else {
+		p = (stream_map_priv_t*)s->priv;
+		if(p->readpos >= p->fileSize)
+			return -1;
+		if(p->readpos + max_len <= p->offset + p->buffer_size) {
+			r = max_len;
+		} else if(p->is_file_end) {
+			r = p->fileSize - p->readpos;
+		} else if(p->pbFileNext && p->readpos + max_len <= p->offset_next + p->buffer_size_next) {
+			if(p->readpos < p->offset + p->buffer_size) {
+				r = p->buffer_size+p->offset - p->readpos;
+				fast_memcpy(buffer, p->pbFile+(int)(p->readpos-p->offset), r);
+				p->readpos += r;
+			}
+			UnmapViewOfFile(p->pbFile);
+			p->pbFile = p->pbFileNext;
+			p->offset = p->offset_next;
+			p->buffer_size = p->buffer_size_next;
+			if(p->fileSize > p->offset + p->buffer_size) {
+				p->offset_next = p->offset + p->buffer_size;
+				p->buffer_size_next = (p->fileSize - p->offset_next) > _map_buffer_size ? _map_buffer_size : (p->fileSize - p->offset_next);
+				p->pbFileNext = MapViewOfFile(p->hFileMapping, FILE_MAP_READ, (p->offset_next>>32), p->offset_next&0xffffffff, p->buffer_size_next);
+			} else {
+				p->pbFileNext = NULL;
+			}
+			fast_memcpy(buffer+r, p->pbFile+(int)(p->readpos-p->offset), max_len-r);
+			p->readpos += (max_len-r);
+			return max_len;
+		} else if(p->readpos < p->fileSize) {
+			p->offset = p->readpos;
+			p->offset = p->offset/p->allocation*p->allocation;
+			if(p->fileSize - p->offset >= _map_buffer_size) {
+				p->buffer_size =  _map_buffer_size;
+				p->is_file_end = 0;
+			} else {
+				p->buffer_size = p->fileSize - p->offset;
+				p->is_file_end = 1;
+			}
+			UnmapViewOfFile(p->pbFile);
+			p->pbFile = MapViewOfFile(p->hFileMapping, FILE_MAP_READ, (p->offset>>32), p->offset&0xffffffff, p->buffer_size);
+			if(!p->pbFile)
+				return -1;
+			if(p->pbFileNext)
+				UnmapViewOfFile(p->pbFileNext);
+			if(p->fileSize > p->offset + p->buffer_size) {
+				p->offset_next = p->offset + p->buffer_size;
+				p->buffer_size_next = (p->fileSize - p->offset_next) > _map_buffer_size ? _map_buffer_size : (p->fileSize - p->offset_next);
+				p->pbFileNext = MapViewOfFile(p->hFileMapping, FILE_MAP_READ, (p->offset_next>>32), p->offset_next&0xffffffff, p->buffer_size_next);
+			} else {
+				p->pbFileNext = NULL;
+			}
+			if(p->readpos + max_len <= p->offset + p->buffer_size) {
+				r = max_len;
+			} else if(p->is_file_end) {
+				r = p->fileSize - p->readpos;
+			}
+		}
+		if(r > 0 && r <= max_len) {
+			fast_memcpy(buffer, p->pbFile+(int)(p->readpos-p->offset), r);
+			p->readpos += r;
+		} else
+			r = 0;
+	}
+  } else
+#endif
+    r = read(s->fd,buffer,max_len);
   return (r <= 0) ? -1 : r;
 }
 
@@ -74,7 +646,73 @@ static int write_buffer(stream_t *s, char* buffer, int len) {
 
 static int seek(stream_t *s,off_t newpos) {
   s->pos = newpos;
-  if(lseek(s->fd,s->pos,SEEK_SET)<0) {
+#ifdef __MINGW32__
+  LARGE_INTEGER pos, npos;
+  stream_map_priv_t *p;
+  newpos = -1;
+  if(s->priv && !is_rar_stream) {
+	 p = (stream_map_priv_t*)s->priv;
+	 if(p->fileSize < s->pos) {
+		s->eof=1;
+		return 0;
+	 }
+	 if((p->pbFileNext && s->pos + STREAM_BUFFER_SIZE > p->offset_next + p->buffer_size_next) || s->pos < p->offset) {
+		p->offset =  s->pos/p->allocation*p->allocation;
+		if(p->fileSize - p->offset >= _map_buffer_size) {
+			p->buffer_size =  _map_buffer_size;
+			p->is_file_end = 0;
+		} else {
+			p->buffer_size = p->fileSize - p->offset;
+			p->is_file_end = 1;
+		}
+		UnmapViewOfFile(p->pbFile);
+		p->pbFile = MapViewOfFile(p->hFileMapping, FILE_MAP_READ, (p->offset>>32), p->offset&0xffffffff, p->buffer_size);
+		if(!p->pbFile) {
+			s->eof=1;
+			return 0;
+		}
+		if(p->fileSize > p->offset + p->buffer_size) {
+			p->offset_next = p->offset + p->buffer_size;
+			p->buffer_size_next = (p->fileSize - p->offset_next) > _map_buffer_size ? _map_buffer_size : (p->fileSize - p->offset_next);
+			p->pbFileNext = MapViewOfFile(p->hFileMapping, FILE_MAP_READ, (p->offset_next>>32), p->offset_next&0xffffffff, p->buffer_size_next);
+		} else {
+			p->pbFileNext = NULL;
+		}
+	} else if(s->pos + STREAM_BUFFER_SIZE > p->offset + p->buffer_size) {
+		if(p->pbFileNext) {
+			UnmapViewOfFile(p->pbFile);
+			p->pbFile = p->pbFileNext;
+			p->offset = p->offset_next;
+			p->buffer_size = p->buffer_size_next;
+			if(p->fileSize > p->offset + p->buffer_size) {
+				p->offset_next = p->offset + p->buffer_size;
+				p->buffer_size_next = (p->fileSize - p->offset_next) > _map_buffer_size ? _map_buffer_size : (p->fileSize - p->offset_next);
+				p->pbFileNext = MapViewOfFile(p->hFileMapping, FILE_MAP_READ, (p->offset_next>>32), p->offset_next&0xffffffff, p->buffer_size_next);
+			} else {
+				p->pbFileNext = NULL;
+			}
+		} else {
+			p->offset =  s->pos/p->allocation*p->allocation;
+			if(p->fileSize - p->offset >= _map_buffer_size) {
+				p->buffer_size =  _map_buffer_size;
+				p->is_file_end = 0;
+			} else {
+				p->buffer_size = p->fileSize - p->offset;
+				p->is_file_end = 1;
+			}
+			UnmapViewOfFile(p->pbFile);
+			p->pbFile = MapViewOfFile(p->hFileMapping, FILE_MAP_READ, (p->offset>>32), p->offset&0xffffffff, p->buffer_size);
+			if(!p->pbFile) {
+				s->eof=1;
+				return 0;
+			}
+		}
+	}
+	newpos = p->readpos = s->pos;
+  } else
+#endif
+	  newpos = lseek(s->fd,s->pos,SEEK_SET);
+  if(newpos<0) {
     s->eof=1;
     return 0;
   }
@@ -100,9 +738,16 @@ static int control(stream_t *s, int cmd, void *arg) {
   switch(cmd) {
     case STREAM_CTRL_GET_SIZE: {
       off_t size;
-
-      size = lseek(s->fd, 0, SEEK_END);
-      lseek(s->fd, s->pos, SEEK_SET);
+#ifdef __MINGW32__
+      if (s->priv) {
+	  	if (is_rar_stream && s->type == STREAMTYPE_STREAM) return STREAM_UNSUPPORTED;
+	  	size = ((stream_0day_priv_t*)s->priv)->fileSize;
+      } else
+#endif
+	  {
+        size = lseek(s->fd, 0, SEEK_END);
+        lseek(s->fd, s->pos, SEEK_SET);
+	  }
       if(size != (off_t)-1) {
         *((off_t*)arg) = size;
         return 1;
@@ -112,12 +757,34 @@ static int control(stream_t *s, int cmd, void *arg) {
   return STREAM_UNSUPPORTED;
 }
 
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+char *get_rar_stream_filename(stream_t *s)
+{
+	if (!s || !is_rar_stream || (s->control != control) || !s->priv)
+		return NULL;
+	else
+		return *(char**)(s->priv);
+}
+
+char *get_rar_stream_basename(stream_t *s)
+{
+	if (!s || !is_rar_stream || (s->seek != seek_0day))
+		return NULL;
+	else if (((stream_0day_priv_t*)s->priv)->naming)
+		return ((stream_0day_priv_t*)s->priv)->basename;
+	else
+		return NULL;
+}
+#endif
+
 static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
   int f;
   mode_t m = 0;
   off_t len;
   unsigned char *filename;
   struct stream_priv_s* p = (struct stream_priv_s*)opts;
+  int is_pipe = 0;
+  is_rar_stream = 0;
 
   if(mode == STREAM_READ)
     m = O_RDONLY;
@@ -157,6 +824,12 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
 #if HAVE_SETMODE
       setmode(fileno(stdin),O_BINARY);
 #endif
+    } else if (!strncmp(filename,"fd=",3) || !strncmp(filename,"fd:",3)) {
+      f = atoi(filename + 3);
+      is_pipe = 1;
+    } else if (!strncmp(filename,"pipe:",5)) {
+      f = atoi(filename + 5);
+      is_pipe = 1;
     } else {
       mp_msg(MSGT_OPEN,MSGL_INFO,"Writing to stdout\n");
       f=1;
@@ -169,6 +842,33 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
 #ifndef __MINGW32__
       openmode |= S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH;
 #endif
+#ifdef __MINGW32__
+    char *s = strrchr(filename,'.');
+    if (mode == STREAM_READ) {
+		if(s && (!stricmp(s,".rar") || (strlen(s)>2 && s[1]>'q' && isdigit(s[2]) && isdigit(s[3]) && s[4]==0))) {
+		  f=rar_open(filename,m,stream);
+		  is_rar_stream = 1;
+		} else if(enable_file_mapping){
+      	  stream_map_priv_t *pr = (stream_map_priv_t*)malloc(sizeof(stream_map_priv_t));
+		  f=CreateFile(filename, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_RANDOM_ACCESS, NULL);
+		  pr->fileSize = 0;
+		  pr->pbFile = 0;
+		  pr->pbFileNext = 0;
+		  pr->hFileMapping = 0;
+		  pr->offset_next = 0;
+		  pr->buffer_size_next = 0;
+		  stream->priv = (void *)pr;
+		  stream->close = close_map_file;
+		} else {
+		    f=open(filename,m, openmode);
+		    if(f<0) {
+		      mp_msg(MSGT_OPEN,MSGL_ERR,MSGTR_FileNotFound,filename);
+		      m_struct_free(&stream_opts,opts);
+		      return STREAM_ERROR;
+		    }
+		}
+	} else
+#endif
       f=open(filename,m, openmode);
     if(f<0) {
       mp_msg(MSGT_OPEN,MSGL_ERR,MSGTR_FileNotFound,filename);
@@ -177,13 +877,49 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
     }
   }
 
-  len=lseek(f,0,SEEK_END); lseek(f,0,SEEK_SET);
+if(!stream->end_pos) {
+#ifdef __MINGW32__
+	if(stream->priv && !is_rar_stream) {
+		stream_map_priv_t *pr = (stream_map_priv_t*)stream->priv;
+		SYSTEM_INFO info;
+		LARGE_INTEGER pos, npos;
+		GetSystemInfo(&info);
+		pos.QuadPart = 0;
+		if(SetFilePointerEx((HANDLE)f, pos, &npos, FILE_END))
+			len = npos.QuadPart;
+		SetFilePointerEx((HANDLE)f, pos, &npos, FILE_BEGIN);
+		pr->fileSize = len;
+		pr->offset = pr->readpos = 0;
+		pr->allocation = info.dwAllocationGranularity;
+		if(pr->allocation < 1) pr->allocation = 256 * 1024;
+		_map_buffer_size = (_BASE_MAP_BUFFER_SIZE * _map_buffer_factor / 2) / pr->allocation * pr->allocation;
+		pr->buffer_size = pr->fileSize > _map_buffer_size ? _map_buffer_size : pr->fileSize;
+		pr->hFileMapping = CreateFileMapping((HANDLE)f, NULL, PAGE_READONLY, 0, 0, NULL);
+		pr->pbFile = MapViewOfFile(pr->hFileMapping, FILE_MAP_READ, 0, 0, pr->buffer_size);
+		if(pr->pbFile) {
+			if(pr->fileSize > pr->buffer_size) {
+				pr->offset_next = pr->buffer_size;
+				pr->buffer_size_next = (pr->fileSize - pr->buffer_size) > _map_buffer_size ? _map_buffer_size : (pr->fileSize - pr->buffer_size);
+				pr->pbFileNext = MapViewOfFile(pr->hFileMapping, FILE_MAP_READ, (pr->offset_next>>32), pr->offset_next&0xffffffff, pr->buffer_size_next);
+			}
+			mp_msg(MSGT_STREAM,MSGL_V,"[stream] init file read buffer: %0.2f MB\n", (float)((pr->buffer_size+pr->buffer_size_next)/1024)/1024);
+			CloseHandle((HANDLE)f);
+			f = -1;
+		} else {
+			stream->priv = NULL;
+		}
+	} else
+#endif
+	{
+  	  len=lseek(f,0,SEEK_END);
+	  lseek(f,0,SEEK_SET);
+	}
 #ifdef __MINGW32__
   // seeks on stdin incorrectly succeed on MinGW
   if(f==0)
     len = -1;
 #endif
-  if(len == -1) {
+  if(len == -1 || is_pipe) {
     if(mode == STREAM_READ) stream->seek = seek_forward;
     stream->type = STREAMTYPE_STREAM; // Must be move to STREAMTYPE_FILE
     stream->flags |= MP_STREAM_SEEK_FW;
@@ -192,11 +928,12 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
     stream->end_pos = len;
     stream->type = STREAMTYPE_FILE;
   }
+  stream->fill_buffer = fill_buffer;
+} else len = stream->end_pos;
 
   mp_msg(MSGT_OPEN,MSGL_V,"[file] File size is %"PRId64" bytes\n", (int64_t)len);
 
   stream->fd = f;
-  stream->fill_buffer = fill_buffer;
   stream->write_buffer = write_buffer;
   stream->control = control;
   stream->read_chunk = 64*1024;

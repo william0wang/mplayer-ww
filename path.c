@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <mbstring.h>
 #include "config.h"
 #include "mp_msg.h"
 #include "path.h"
@@ -44,6 +45,7 @@
 
 #include "osdep/osdep.h"
 
+#if 0
 char *get_path(const char *filename){
 	char *homedir;
 	char *buff;
@@ -154,6 +156,7 @@ char *get_path(const char *filename){
 	mp_msg(MSGT_GLOBAL,MSGL_V,"get_path('%s') -> '%s'\n",filename,buff);
 	return buff;
 }
+#endif
 
 #if (defined(__MINGW32__) || defined(__CYGWIN__)) && defined(CONFIG_WIN32DLL)
 void set_path_env(void)
@@ -202,7 +205,11 @@ const char *mp_basename(const char *path)
     char *s;
 
 #if HAVE_DOS_PATHS
+#if defined(__MINGW32__) || defined(__CYGWIN__)
+    s = _mbsrchr(path, '\\');
+#else
     s = strrchr(path, '\\');
+#endif
     if (s)
         path = s + 1;
     s = strrchr(path, ':');

@@ -37,6 +37,8 @@
 
 #define VERTICAL_LOWER_BOUND 0x02f1
 
+extern char *font_path;
+
 /**
  * Select a good charmap, prefer Microsoft Unicode charmaps.
  * Otherwise, let FreeType decide.
@@ -123,6 +125,7 @@ static int add_face(void *fc_priv, ASS_Font *font, uint32_t ch)
     FT_Face face;
     int error;
     int mem_idx;
+    char name[MAX_PATH];
 
     if (font->n_faces == ASS_FONT_MAX_FACES)
         return -1;
@@ -131,8 +134,6 @@ static int add_face(void *fc_priv, ASS_Font *font, uint32_t ch)
         fontconfig_select(font->library, fc_priv, font->desc.family,
                           font->desc.treat_family_as_pattern,
                           font->desc.bold, font->desc.italic, &index, ch);
-    if (!path)
-        return -1;
 
     mem_idx = find_font(font->library, path);
     if (mem_idx >= 0) {
@@ -149,10 +150,16 @@ static int add_face(void *fc_priv, ASS_Font *font, uint32_t ch)
             return -1;
         }
     } else {
-        error = FT_New_Face(font->ftlibrary, path, index, &face);
+        strcpy(name, path);
+        if (strchr(name, ',')) *strchr(name, ',') = 0;
+        if (!strchr(name,'\\') && !strchr(name,'/')) {
+            memcpy(name+strlen(font_path), name, strlen(name)+1);
+            memcpy(name, font_path, strlen(font_path));
+        }
+		error = FT_New_Face(font->ftlibrary, name, index, &face);
         if (error) {
             ass_msg(font->library, MSGL_WARN,
-                    "Error opening font: '%s', %d", path, index);
+                    "Error opening font: '%s', %d", name, index);
             free(path);
             return -1;
         }

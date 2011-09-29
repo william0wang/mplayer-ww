@@ -878,6 +878,13 @@ void mp_dvdnav_get_highlight (stream_t *stream, nav_highlight_t *hl) {
   hl->palette = hlev.palette;
 }
 
+int mp_dvdnav_get_current_title(stream_t *stream) {
+  dvdnav_priv_t *priv = stream->priv;
+  int title=0, part=0;
+  dvdnav_current_title_info(priv->dvdnav, &title, &part);
+  return title;
+}
+
 void mp_dvdnav_switch_title (stream_t *stream, int title) {
   dvdnav_priv_t *priv = stream->priv;
   uint32_t titles;

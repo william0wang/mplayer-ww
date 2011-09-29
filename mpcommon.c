@@ -61,6 +61,9 @@ sub_data* subdata = NULL;
 subtitle* vo_sub_last = NULL;
 char *spudec_ifo;
 int forced_subs_only;
+extern int always_use_ass;
+extern int gui_thread;
+extern int high_accuracy_timer;
 
 const char *mencoder_version = "MEncoder " VERSION;
 const char *mplayer_version  = "MPlayer "  VERSION;
@@ -241,6 +244,7 @@ void update_subtitles(sh_video_t *sh_video, double refpts, demux_stream_t *d_dvd
                 spudec_assemble(vo_spudec, packet, len, timestamp);
         }
     } else if (is_text_sub(type) || is_av_sub(type) || type == 'd') {
+		int is_ass_format = (always_use_ass | (type == 'a'));
         int orig_type = type;
         double endpts;
         if (type == 'd' && !d_dvdsub->demuxer->teletext) {
@@ -251,8 +255,10 @@ void update_subtitles(sh_video_t *sh_video, double refpts, demux_stream_t *d_dvd
         }
         if (d_dvdsub->non_interleaved)
             ds_get_next_pts(d_dvdsub);
-        while (1) {
-            double subpts = curpts;
+        while (d_dvdsub->first) {
+            double subpts = ds_get_next_pts(d_dvdsub);
+            if (subpts > curpts)
+                break;
             type = orig_type;
             len = ds_get_packet_sub(d_dvdsub, &packet, &subpts, &endpts);
             if (len < 0)
@@ -288,7 +294,7 @@ void update_subtitles(sh_video_t *sh_video, double refpts, demux_stream_t *d_dvd
                 continue;
             }
 #ifdef CONFIG_ASS
-            if (ass_enabled) {
+            if (ass_enabled && is_ass_format) {
                 sh_sub_t* sh = d_dvdsub->sh;
                 ass_track = sh ? sh->ass_track : NULL;
                 if (!ass_track) continue;
@@ -462,7 +468,8 @@ static void sanitize_os(void)
     // stop Windows from showing all kinds of annoying error dialogs
     SetErrorMode(0x8003);
     // request 1ms timer resolution
-    timeBeginPeriod(1);
+    if(high_accuracy_timer)
+      timeBeginPeriod(1);
 #endif
 }
 
@@ -477,6 +484,7 @@ int common_init(void)
     sanitize_os();
 
 #ifdef CONFIG_PRIORITY
+  if(!gui_thread)
     set_priority();
 #endif
 
@@ -485,15 +493,13 @@ int common_init(void)
 
     /* Check codecs.conf. */
     if (!codecs_file || !parse_codec_cfg(codecs_file)) {
-        char *conf_path = get_path("codecs.conf");
+        char *conf_path = get_path("codecs.ini");
         if (!parse_codec_cfg(conf_path)) {
-            if (!parse_codec_cfg(MPLAYER_CONFDIR "/codecs.conf")) {
-                if (!parse_codec_cfg(NULL)) {
-                    free(conf_path);
-                    return 0;
-                }
-                mp_msg(MSGT_CPLAYER, MSGL_V, "Using built-in default codecs.conf.\n");
+            if (!parse_codec_cfg(NULL)) {
+                free(conf_path);
+                return 0;
             }
+                mp_msg(MSGT_CPLAYER, MSGL_V, "Using built-in default codecs.conf.\n");
         }
         free(conf_path);
     }
@@ -510,7 +516,7 @@ int common_init(void)
         if (font_name) {
             vo_font = read_font_desc(font_name, font_factor, verbose>1);
             if (!vo_font)
-                mp_msg(MSGT_CPLAYER,MSGL_ERR,MSGTR_CantLoadFont,
+                mp_msg(MSGT_CPLAYER,MSGL_V,MSGTR_CantLoadFont,
                        filename_recode(font_name));
         } else {
             // try default:

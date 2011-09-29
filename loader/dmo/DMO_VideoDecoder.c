@@ -81,11 +81,37 @@ static ct check[] = {
     {0,0,NULL,0},
 };
 
+#define is_wvc1(cc) (cc == mmioFOURCC('W', 'V', 'C', '1') || \
+                    cc == mmioFOURCC('w', 'v', 'c', '1'))
+
+extern int is_mpegts_format;
+
+static char *ConvertToWVC1(VIDEOINFOHEADER *vih, int *size)
+{
+    VIDEOINFOHEADER *vih2;
+    BYTE extra[] = {0x00, 0x00, 0x00, 0x01, 0x0f, 0xdb, 0xfe, 0x3b,
+                    0xf2, 0x1b, 0xca, 0x3b, 0xf8, 0x86, 0xf1, 0x80,
+                    0xca, 0x02, 0x02, 0x03, 0x09, 0xa5, 0x01, 0xb7,
+                    0x07, 0xfc, 0x00, 0x00, 0x01, 0x0e, 0x1a, 0xdf,
+                    0xfc, 0xef, 0xc8, 0x6c, 0x40 };//What does these mean?
+    int extra_size = sizeof(extra);
+
+    vih2 = (VIDEOINFOHEADER *)malloc(sizeof(VIDEOINFOHEADER)+extra_size);
+    memset(vih2, 0, sizeof(VIDEOINFOHEADER));
+    memcpy(vih2, vih, sizeof(VIDEOINFOHEADER));
+    memcpy((BYTE *)vih2 + sizeof(VIDEOINFOHEADER), extra, extra_size);
+    *size = sizeof(VIDEOINFOHEADER) + extra_size;
+
+    return (char *)vih2;
+}
+
 DMO_VideoDecoder * DMO_VideoDecoder_Open(char* dllname, GUID* guid, BITMAPINFOHEADER * format, int flip, int maxauto)
 {
     DMO_VideoDecoder *this;
     HRESULT result;
     ct* c;
+    int size;
+    int is_wvc1_video;
 
     this = malloc(sizeof(DMO_VideoDecoder));
     memset( this, 0, sizeof(DMO_VideoDecoder));
@@ -140,6 +166,13 @@ DMO_VideoDecoder * DMO_VideoDecoder_Open(char* dllname, GUID* guid, BITMAPINFOHE
         this->m_sOurType.cbFormat = bihs;
         this->m_sOurType.pbFormat = (char*)this->m_sVhdr;
 
+	if(is_mpegts_format) {
+		if(is_wvc1_video = is_wvc1(this->m_sVhdr->bmiHeader.biCompression)) {
+			this->m_sOurType.pbFormat = (char*)ConvertToWVC1(this->m_sVhdr, &size);
+			this->m_sOurType.cbFormat = size;
+		}
+	}
+
 	this->m_sVhdr2 = (VIDEOINFOHEADER*)(malloc(sizeof(VIDEOINFOHEADER)+12));
 	memcpy(this->m_sVhdr2, this->m_sVhdr, sizeof(VIDEOINFOHEADER));
 	memset((char*)this->m_sVhdr2 + sizeof(VIDEOINFOHEADER), 0, 12);
@@ -152,7 +185,14 @@ DMO_VideoDecoder * DMO_VideoDecoder_Open(char* dllname, GUID* guid, BITMAPINFOHE
 
 	memset(&this->m_sDestType, 0, sizeof(this->m_sDestType));
 	this->m_sDestType.majortype = MEDIATYPE_Video;
-	this->m_sDestType.subtype = MEDIASUBTYPE_RGB24;
+
+	if(!strcasecmp(dllname, "wmvdecod.dll")) {
+		if(is_mpegts_format && is_wvc1_video)
+			this->m_sDestType.subtype = FORMAT_WVC1Video;
+		else
+			this->m_sDestType.subtype = GUID_NULL;
+	} else
+		this->m_sDestType.subtype = MEDIASUBTYPE_RGB24;
 	this->m_sDestType.formattype = FORMAT_VideoInfo;
 	this->m_sDestType.bFixedSizeSamples = true;
 	this->m_sDestType.bTemporalCompression = false;

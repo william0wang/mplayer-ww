@@ -213,12 +213,31 @@ static double x2scr_pos_scaled(ASS_Renderer *render_priv, double x)
  */
 static double y2scr(ASS_Renderer *render_priv, double y)
 {
+    double yscr = 0;
+    if (render_priv->settings.use_margins) {
+        yscr = y * render_priv->orig_height_nocrop / render_priv->track->PlayResY;
+        if(yscr*2 > render_priv->orig_height_nocrop)
+            return yscr + FFMAX(render_priv->settings.top_margin, 0) +
+                FFMAX(render_priv->settings.bottom_margin, 0);
+        else
+            return yscr;
+    }
+
     return y * render_priv->orig_height_nocrop /
         render_priv->track->PlayResY +
         FFMAX(render_priv->settings.top_margin, 0);
 }
 static double y2scr_pos(ASS_Renderer *render_priv, double y)
 {
+    double yscr = 0;
+    if (render_priv->settings.use_margins) {
+        yscr = y * render_priv->orig_height / render_priv->track->PlayResY;
+        if(yscr*2 > render_priv->orig_height)
+    	    return yscr + render_priv->settings.top_margin + render_priv->settings.bottom_margin;
+        else
+            return yscr;
+    }
+
     return y * render_priv->orig_height / render_priv->track->PlayResY +
         render_priv->settings.top_margin;
 }

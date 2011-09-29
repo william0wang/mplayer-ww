@@ -113,9 +113,9 @@ void mixer_decvolume(mixer_t *mixer)
  float mixer_l, mixer_r;
  mixer_getvolume(mixer, &mixer_l, &mixer_r);
  mixer_l -= mixer->volstep;
- if ( mixer_l < 0 ) mixer_l = 0;
+ if ( mixer_l < 1 ) mixer_l = 0;
  mixer_r -= mixer->volstep;
- if ( mixer_r < 0 ) mixer_r = 0;
+ if ( mixer_r < 1 ) mixer_r = 0;
  mixer_setvolume(mixer, mixer_l, mixer_r);
 }
 
@@ -124,6 +124,8 @@ void mixer_getbothvolume(mixer_t *mixer, float *b)
  float mixer_l, mixer_r;
  mixer_getvolume(mixer, &mixer_l, &mixer_r);
  *b = ( mixer_l + mixer_r ) / 2;
+ if( *b < 1.1)
+ 	 *b = 0;
 }
 
 void mixer_mute(mixer_t *mixer)

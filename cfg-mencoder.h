@@ -33,6 +33,9 @@
 #include "libmpdemux/muxer_avi.h"
 #include "cfg-common.h"
 
+extern const m_option_t pcmopts_conf[];
+extern const m_option_t rawvidopts_conf[];
+
 const m_option_t ovc_conf[]={
     {"copy", &out_video_codec, CONF_TYPE_FLAG, 0, 0, VCODEC_COPY, NULL},
     {"frameno", &out_video_codec, CONF_TYPE_FLAG, 0, 0, VCODEC_FRAMENO, NULL},
@@ -217,6 +220,11 @@ const m_option_t mencoder_opts[]={
     {"odml", &write_odml, CONF_TYPE_FLAG, CONF_GLOBAL, 0, 1, NULL},
     {"noodml", &write_odml, CONF_TYPE_FLAG, CONF_GLOBAL, 1, 0, NULL},
 
+#ifdef CONFIG_ASS
+    {"keep-pts", &keep_pts, CONF_TYPE_FLAG, 0, 0, 1, NULL},
+    {"nokeep-pts", &keep_pts, CONF_TYPE_FLAG, 0, 1, 0, NULL},
+#endif
+
     // info header strings
     {"info", info_conf, CONF_TYPE_SUBCONFIG, CONF_GLOBAL, 0, 0, NULL},
 
@@ -262,6 +270,10 @@ const m_option_t mencoder_opts[]={
 #ifdef CONFIG_FFMPEG
     {"lavfopts",  lavfopts_conf, CONF_TYPE_SUBCONFIG, CONF_GLOBAL, 0, 0, NULL},
 #endif
+
+    {"pcmopts", pcmopts_conf, CONF_TYPE_SUBCONFIG, CONF_GLOBAL, 0, 0, NULL},
+    {"rawvidopts", rawvidopts_conf, CONF_TYPE_SUBCONFIG, CONF_GLOBAL, 0, 0, NULL},
+    {"vobsub", &vobsub_name, CONF_TYPE_STRING, 0, 0, 0, NULL},
 
     {NULL, NULL, 0, 0, 0, 0, NULL}
 };

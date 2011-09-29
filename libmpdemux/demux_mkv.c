@@ -194,6 +194,9 @@ typedef struct mkv_demuxer {
 #define RAPROPERTIES4_SIZE 56
 #define RAPROPERTIES5_SIZE 70
 
+extern int coreavc_codec;
+int mkv_realdemux = 0;
+
 /**
  * \brief ensures there is space for at least one additional element
  * \param arrayp array to grow
@@ -380,6 +383,15 @@ lzo_fail:
             }
             *size = dstlen - out_avail;
         }
+        if (track->encodings[i].comp_algo == 3)
+        {
+          *dest = malloc (*size + track->encodings[i].comp_settings_len);
+          memcpy(*dest, track->encodings[i].comp_settings,
+                 track->encodings[i].comp_settings_len);
+          memcpy(*dest + track->encodings[i].comp_settings_len, src, *size);
+          *size += track->encodings[i].comp_settings_len;
+          modified = 1;
+        }
     }
 
     return modified;
@@ -542,7 +554,7 @@ static int demux_mkv_read_trackencodings(demuxer_t *demuxer,
                                track->tnum);
                     }
 
-                    if (e.comp_algo != 0 && e.comp_algo != 2) {
+                    if (e.comp_algo != 0 && e.comp_algo != 2 && e.comp_algo != 3) {
                         mp_msg(MSGT_DEMUX, MSGL_WARN,
                                MSGTR_MPDEMUX_MKV_UnknownCompression,
                                track->tnum, e.comp_algo);
@@ -1591,7 +1603,8 @@ static int demux_mkv_open_video(demuxer_t *demuxer, mkv_track_t *track,
                 bih = realloc(bih, bih->biSize);
                 memcpy(bih + 1, track->private_data, track->private_size);
             }
-            track->reorder_timecodes = user_correct_pts == 0;
+            //track->reorder_timecodes = user_correct_pts == 0;
+            track->reorder_timecodes = 1;
             if (!vi->id) {
                 mp_msg(MSGT_DEMUX, MSGL_WARN, MSGTR_MPDEMUX_MKV_UnknownCodecID,
                        track->codec_id, track->tnum);
@@ -1620,8 +1633,13 @@ static int demux_mkv_open_video(demuxer_t *demuxer, mkv_track_t *track,
         // by the Real DLLs. If DisplayWidth/DisplayHeight was not set in
         // the Matroska file then it has already been set to PixelWidth/Height
         // by check_track_information.
+        mkv_realdemux = 0;
         sh_v->disp_w = track->v_dwidth;
         sh_v->disp_h = track->v_dheight;
+        if (track->v_dheight) {
+          mkv_realdemux = 1;
+          sh_v->aspect = (float)track->v_dwidth / (float)track->v_dheight;
+        }
     }
     sh_v->ImageDesc = ImageDesc;
     mp_msg(MSGT_DEMUX, MSGL_V, "[mkv] Aspect: %f\n", sh_v->aspect);
@@ -1636,7 +1654,6 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
     mkv_demuxer_t *mkv_d = (mkv_demuxer_t *) demuxer->priv;
     sh_audio_t *sh_a = new_sh_audio_aid(demuxer, track->tnum, aid,
                                         track->language);
-    demux_packet_t *dp;
     if (!sh_a)
         return 1;
     mkv_d->audio_tracks[mkv_d->last_aid] = track->tnum;
@@ -1705,6 +1722,8 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
             track->a_formattag = mmioFOURCC('W', 'V', 'P', 'K');
         else if (!strcmp(track->codec_id, MKV_A_TRUEHD))
             track->a_formattag = mmioFOURCC('T', 'R', 'H', 'D');
+        else if (!strcmp(track->codec_id, "A_TTA1"))
+            track->a_formattag = mmioFOURCC('T', 'T', 'A', '1');
         else if (!strcmp(track->codec_id, MKV_A_FLAC)) {
             if (track->private_data == NULL || track->private_size == 0) {
                 mp_msg(MSGT_DEMUX, MSGL_WARN,
@@ -1917,18 +1936,45 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
         }
         if (size < 4 || ptr[0] != 'f' || ptr[1] != 'L' || ptr[2] != 'a'
             || ptr[3] != 'C') {
-            dp = new_demux_packet(4);
-            memcpy(dp->buffer, "fLaC", 4);
+            sh_a->codecdata = malloc(4);
+            sh_a->codecdata_len = 4;
+            memcpy(sh_a->codecdata, "fLaC", 4);
         } else {
-            dp = new_demux_packet(size);
-            memcpy(dp->buffer, ptr, size);
+            sh_a->codecdata = malloc(size);
+            sh_a->codecdata_len = size;
+            memcpy(sh_a->codecdata, ptr, size);
         }
-        dp->pts = 0;
-        dp->flags = 0;
-        ds_add_packet(demuxer->audio, dp);
     } else if (track->a_formattag == mmioFOURCC('W', 'V', 'P', 'K') ||
                track->a_formattag == mmioFOURCC('T', 'R', 'H', 'D')) {
         /* do nothing, still works */
+    } else if (track->a_formattag == mmioFOURCC('T', 'T', 'A', '1')) {
+        /* Create TTA Header. not sure */
+        struct __attribute__((__packed__)) {
+          char format[4];
+          uint16_t aformat;
+          uint16_t channels;
+          uint16_t bps;
+          uint32_t sfreq;
+          uint32_t slen;
+          uint32_t crc; /*dummy*/
+          uint32_t seektable[2]; /*dummy*/
+        } tta_head; /* need sizeof >= 30 */
+        sh_a->wf->nAvgBytesPerSec = sh_a->channels * sh_a->samplerate*2;
+        sh_a->wf->nBlockAlign = sh_a->wf->nAvgBytesPerSec;
+        sh_a->format = mmioFOURCC('T', 'T', 'A', '1');
+        sh_a->wf->cbSize = sizeof(tta_head);
+        sh_a->wf = realloc (sh_a->wf, sizeof (*sh_a->wf) + sh_a->wf->cbSize);
+        memcpy(&tta_head.format[0],(char *)&(sh_a->format),4);
+        const tta_format_int = 1;
+        tta_head.aformat = le2me_16(tta_format_int);
+        tta_head.channels = le2me_16(track->a_channels);
+        tta_head.bps = le2me_16(track->a_bps);
+        tta_head.sfreq = le2me_32((uint32_t)(track->a_sfreq));
+        tta_head.slen = le2me_32((uint32_t)(mkv_d->duration * track->a_sfreq));
+        tta_head.crc = le2me_32(0);
+        tta_head.seektable[0] = le2me_32(0);
+        tta_head.seektable[1] = le2me_32(0);
+        memcpy((char *)(sh_a->wf + 1),(char *)&tta_head,sh_a->wf->cbSize);
     } else if (!track->ms_compat
                || (track->private_size < sizeof(*sh_a->wf))) {
         free_sh_audio(demuxer, track->tnum);
@@ -2624,10 +2670,15 @@ static int handle_block(demuxer_t *demuxer, uint8_t *block, uint64_t length,
             else if (ds == demuxer->audio && track->realmedia)
                 handle_realaudio(demuxer, track, block, lace_size[i],
                                  block_bref);
-            else if (ds == demuxer->video && track->reorder_timecodes)
-                handle_video_bframes(demuxer, track, block, lace_size[i],
+            else if (ds == demuxer->video && track->reorder_timecodes && !coreavc_codec) {
+				uint8_t *buffer;
+                int size = lace_size[i];
+                demux_mkv_decode(track, block, &buffer, &size, 1);
+                handle_video_bframes(demuxer, track, buffer, size,
                                      block_bref, block_fref);
-            else {
+                if (buffer != block)
+                    free(buffer);
+			} else {
                 int modified;
                 size_t size = lace_size[i];
                 demux_packet_t *dp;
@@ -2966,8 +3017,8 @@ static int demux_mkv_control(demuxer_t *demuxer, int cmd, void *arg)
     mkv_demuxer_t *mkv_d = (mkv_demuxer_t *) demuxer->priv;
 
     switch (cmd) {
-    case DEMUXER_CTRL_CORRECT_PTS:
-        return DEMUXER_CTRL_OK;
+    //case DEMUXER_CTRL_CORRECT_PTS:
+    //    return DEMUXER_CTRL_OK;
     case DEMUXER_CTRL_GET_TIME_LENGTH:
         if (mkv_d->duration == 0)
             return DEMUXER_CTRL_DONTKNOW;
@@ -2984,7 +3035,7 @@ static int demux_mkv_control(demuxer_t *demuxer, int cmd, void *arg)
         return DEMUXER_CTRL_OK;
 
     case DEMUXER_CTRL_SWITCH_AUDIO:
-        if (demuxer->audio && demuxer->audio->sh) {
+        if (demuxer->audio/* && demuxer->audio->sh*/) {
             sh_audio_t *sh = demuxer->a_streams[demuxer->audio->id];
             int aid = *(int *) arg;
             if (aid < 0)

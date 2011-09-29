@@ -51,6 +51,7 @@ extern char *sub_cp;
 #define SUB_JACOSUB  12
 #define SUB_MPL2     13
 #define SUB_GOOGLE   14
+#define SUB_LYRICS   15
 
 #define MAX_SUBTITLE_FILES 128
 
@@ -83,6 +84,7 @@ typedef struct {
     int sub_uses_time;
     int sub_num;          // number of subtitle structs
     int sub_errs;
+    char *fontname;
 } sub_data;
 
 extern char *fribidi_charset;
@@ -101,7 +103,7 @@ void subcp_open (struct stream *st); /* for demux_ogg.c */
 void subcp_close (void); /* for demux_ogg.c */
 const char* guess_buffer_cp(unsigned char* buffer, int buflen, const char *preferred_language, const char *fallback);
 const char* guess_cp(struct stream *st, const char *preferred_language, const char *fallback);
-void load_subtitles(const char *fname, float fps, open_sub_func add_f);
+void load_subtitles(const char *fname, float fps, struct stream *st, open_sub_func add_f);
 void load_vob_subtitle(const char *fname, const char * const spudec_ifo, void **spu, open_vob_func add_f);
 void list_sub_file(sub_data* subd);
 void dump_srt(sub_data* subd, float fps);
@@ -111,7 +113,7 @@ void dump_jacosub(sub_data* subd, float fps);
 void dump_sami(sub_data* subd, float fps);
 void sub_free( sub_data * subd );
 void find_sub(sub_data* subd,int key);
-void step_sub(sub_data *subd, float pts, int movement);
+long long step_sub(sub_data *subd, float pts, int movement);
 void sub_add_text(subtitle *sub, const char *txt, int len, double endpts, int strip_markup);
 int sub_clear_text(subtitle *sub, double pts);
 

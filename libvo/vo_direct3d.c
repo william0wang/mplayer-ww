@@ -32,6 +32,10 @@
 #include "libavutil/common.h"
 #include "sub/font_load.h"
 #include "sub/sub.h"
+#include "subopt-helper.h"
+#include "d3dx9api.h"
+#include "winstuff.h"
+#include "message.h"
 
 static const vo_info_t info =
 {
@@ -40,6 +44,8 @@ static const vo_info_t info =
     "Georgi Petrov (gogothebee) <gogothebee@gmail.com>",
     ""
 };
+
+static int levelconv;
 
 /*
  * Link essential libvo functions: preinit, config, control, draw_frame,
@@ -73,6 +79,7 @@ static struct global_priv {
 
     HANDLE d3d9_dll;                /**< d3d9 Library HANDLE */
     IDirect3D9 * (WINAPI *pDirect3DCreate9)(UINT); /**< pointer to Direct3DCreate9 function */
+    IDirect3DPixelShader9* d3dx_pixel_shader;
 
     LPDIRECT3D9        d3d_handle;  /**< Direct3D Handle */
     LPDIRECT3DDEVICE9  d3d_device;  /**< The Direct3D Adapter */
@@ -82,6 +89,8 @@ static struct global_priv {
     IDirect3DTexture9 *d3d_texture_osd; /**< Direct3D Texture. Uses RGBA */
     IDirect3DTexture9 *d3d_texture_system; /**< Direct3D Texture. System memory
                                     cannot lock a normal texture. Uses RGBA */
+    IDirect3DTexture9 *d3d_texture_video; /**< Direct3D Texture. Uses RGBA */
+    IDirect3DSurface9 *d3d_surface_video; /**< Video Texture surface */
     IDirect3DSurface9 *d3d_backbuf; /**< Video card's back buffer (used to
                                     display next frame) */
     int cur_backbuf_width;          /**< Current backbuffer width */
@@ -134,6 +143,11 @@ typedef struct {
     float tu, tv;       /* Texture coordinates */
 } struct_vertex;
 
+typedef struct {
+    float x, y, z, rhw; /* Position of vertex in 3D space */
+    float tu, tv;       /* Texture coordinates */
+} struct_vertex2;
+
 typedef enum back_buffer_action {
     BACKBUFFER_CREATE,
     BACKBUFFER_RESET
@@ -181,6 +195,170 @@ static void calc_fs_rect(void)
     priv->is_clear_needed = 1;
 }
 
+
+/** @brief prepare YUV to RGB converting TV to PC levels.
+ *  @return 0 on success, -1 on failure
+ */
+static int d3dx9_prepare_levelconv()
+{
+    int i;
+    HRESULT hr;
+    HANDLE d3dx9_dll;
+    char dll_str[32];
+    char src_data[2048];
+    ID3DXBuffer *d3dx_shader = NULL;
+    ID3DXBuffer *d3dx_error = NULL;
+    D3DXCompileShaderPtr m_pD3DXCompileShader;
+
+    if(!levelconv)
+        return -1;
+
+    // load latest compatible version of the DLL that is available
+    for (i=37; i>=24; i--) {
+        snprintf(dll_str, 32, "d3dx9_%d.dll", i);
+        d3dx9_dll = LoadLibraryA(dll_str);
+        if (d3dx9_dll) break;
+    }
+
+    if (!d3dx9_dll) {
+        mp_msg(MSGT_VO, MSGL_INFO, "<vo_direct3d>Unable to dynamically load d3dx9_xx.dll\n");
+		pop_message(MESSAGE_TYPE_D3DX9, 15000);
+        return -1;
+    }
+
+    m_pD3DXCompileShader = (D3DXCompileShaderPtr)GetProcAddress(d3dx9_dll, "D3DXCompileShader");
+
+    if (!m_pD3DXCompileShader) {
+        mp_msg(MSGT_VO, MSGL_INFO, "<vo_direct3d>Unable to get D3DXCompileShader address\n");
+        return -1;
+    }
+
+    snprintf(src_data, 2048, "sampler s0 : register(s0);\n\
+#define const_1 (16.0/255.0)\n\
+#define const_2 (255.0/219.0)\n\
+float4 main(float2 tex : TEXCOORD0) : COLOR\n{\n\
+return((tex2D(s0,tex) - const_1) * const_2);\n}\n");
+
+    hr = m_pD3DXCompileShader(src_data, strlen(src_data), NULL, NULL, "main", "ps_2_0",
+           /* D3DXSHADER_DEBUG */ D3DXSHADER_SKIPVALIDATION , &d3dx_shader, &d3dx_error, NULL);
+
+    if(FAILED(hr)) {
+        if(d3dx_error) {
+            snprintf(src_data, 2048, "%s", (char *)ID3DXBuffer_GetBufferPointer(d3dx_error));
+            ID3DXBuffer_Release(d3dx_error);
+        } else
+            src_data[0] = 0;
+        mp_msg(MSGT_VO, MSGL_V, "<vo_direct3d>D3DXCompileShader failed: %s\n", src_data);
+        return -1;
+    }
+
+    hr = IDirect3DDevice9_CreatePixelShader(priv->d3d_device,
+            ID3DXBuffer_GetBufferPointer(d3dx_shader), &priv->d3dx_pixel_shader);
+
+    ID3DXBuffer_Release(d3dx_shader);
+
+    if(FAILED(hr)) {
+		priv->d3dx_pixel_shader = NULL;
+        mp_msg(MSGT_VO, MSGL_V, "<vo_direct3d>IDirect3DDevice9_CreatePixelShader failed\n");
+        return -1;
+    }
+
+    mp_msg(MSGT_VO, MSGL_V, "<vo_direct3d> YUV to RGB converting TV to PC levels.\n");
+    return 0;
+}
+
+/** @brief YUV to RGB converting TV to PC levels.
+ *  @return 0 on success, -1 on failure
+ */
+static int d3dx9_level_conver()
+{
+    int i;
+    float l, t, w, h;
+    IDirect3DSurface9 *old_surface;
+
+    if(!levelconv || !priv->d3dx_pixel_shader ||
+       !priv->d3d_texture_video || !priv->d3d_surface_video)
+        return -1;
+
+    /*
+    D3DSURFACE_DESC desc;
+    if(FAILED(IDirect3DCubeTexture9_GetLevelDesc(priv->d3d_texture_video, 0, &desc)))
+        return -1;
+
+    l = t = 0;
+    w = (float)desc.Width;
+    h = (float)desc.Height;
+    */
+
+    l = (float)priv->fs_movie_rect.left;
+    t = (float)priv->fs_movie_rect.top;
+    w = (float)priv->fs_movie_rect.right;
+    h = (float)priv->fs_movie_rect.bottom;
+
+    struct_vertex2 v2[] = {
+        {l, t, 0.5f, 2.0f, 0, 0},
+        {w, t, 0.5f, 2.0f, 1, 0},
+        {l, h, 0.5f, 2.0f, 0, 1},
+        {w, h, 0.5f, 2.0f, 1, 1},
+    };
+
+    for(i=0; i < 4; i++) {
+        v2[i].x -= 0.5;
+        v2[i].y -= 0.5;
+    }
+
+    /*
+    if (FAILED(IDirect3DDevice9_GetRenderTarget(priv->d3d_device, 0, &old_surface)))
+        return -1;
+
+    IDirect3DDevice9_SetRenderTarget(priv->d3d_device, 0, priv->d3d_surface_video);
+    */
+
+    if (FAILED(IDirect3DDevice9_StretchRect(priv->d3d_device,
+                                            priv->d3d_surface,
+                                            NULL,
+                                            priv->d3d_surface_video,
+                                            NULL,
+                                            D3DTEXF_NONE))) {
+        /*IDirect3DDevice9_SetRenderTarget(priv->d3d_device, 0, old_surface);*/
+        mp_msg(MSGT_VO, MSGL_V, "<vo_direct3d>Copying frame to the d3d_surface_video failed.\n");
+        return -1;
+    }
+
+    IDirect3DDevice9_SetTexture(priv->d3d_device, 0, priv->d3d_texture_video);
+
+    if(FAILED(IDirect3DDevice9_SetPixelShader(priv->d3d_device, priv->d3dx_pixel_shader))) {
+        IDirect3DDevice9_SetTexture(priv->d3d_device, 0, NULL);
+        /*IDirect3DDevice9_SetRenderTarget(priv->d3d_device, 0, old_surface);*/
+        mp_msg(MSGT_VO, MSGL_V, "<vo_direct3d>set pixel shader failed.\n");
+        return -1;
+    };
+
+    IDirect3DDevice9_SetFVF(priv->d3d_device, D3DFVF_XYZRHW | D3DFVF_TEX1);
+    struct_vertex2 tmp = v2[2]; v2[2] = v2[3]; v2[3] = tmp;
+    IDirect3DDevice9_DrawPrimitiveUP(priv->d3d_device, D3DPT_TRIANGLEFAN, 2, v2, sizeof(struct_vertex2));
+
+    IDirect3DDevice9_SetTexture(priv->d3d_device, 0, NULL);
+    IDirect3DDevice9_SetPixelShader(priv->d3d_device, NULL);
+
+    /*
+    if (FAILED(IDirect3DDevice9_StretchRect(priv->d3d_device,
+                                            priv->d3d_surface,
+                                            &priv->fs_panscan_rect,
+                                            priv->d3d_backbuf,
+                                            &priv->fs_movie_rect,
+                                            D3DTEXF_LINEAR))) {
+        mp_msg(MSGT_VO, MSGL_INFO,
+               "<vo_direct3d>Copying frame to the backbuffer failed.\n");
+        return -1;
+    }
+
+    IDirect3DDevice9_SetRenderTarget(priv->d3d_device, 0, old_surface);
+    */
+
+    return 0;
+}
+
 /** @brief Destroy D3D Offscreen and Backbuffer surfaces.
  */
 static void destroy_d3d_surfaces(void)
@@ -204,6 +382,11 @@ static void destroy_d3d_surfaces(void)
     if (priv->d3d_texture_system)
         IDirect3DTexture9_Release(priv->d3d_texture_system);
     priv->d3d_texture_system = NULL;
+
+    if (priv->d3d_texture_video)
+        IDirect3DTexture9_Release(priv->d3d_texture_video);
+    priv->d3d_texture_video = NULL;
+    priv->d3d_surface_video = NULL;
 
     if (priv->d3d_backbuf)
         IDirect3DSurface9_Release(priv->d3d_backbuf);
@@ -264,8 +447,34 @@ static int create_d3d_surfaces(void)
     priv->osd_texture_width  = tex_width;
     priv->osd_texture_height = tex_height;
 
+    if(osd_width <= 0 || osd_height <= 0 || tex_width <= 0 || tex_height <= 0) {
+        mp_msg(MSGT_VO,MSGL_V, "<vo_direct3d>OSD texture requested size error (%dx%d) (%dx%d).\n",
+            priv->osd_width, priv->osd_height, priv->osd_texture_width, priv->osd_texture_height);
+        return 0;
+    }
+
     mp_msg(MSGT_VO, MSGL_V, "<vo_direct3d>OSD texture size (%dx%d), requested (%dx%d).\n",
            vo_dwidth, vo_dheight, priv->osd_texture_width, priv->osd_texture_height);
+
+    if(levelconv) {
+	    /* create video texture */
+	    if (!priv->d3d_texture_video &&
+	        FAILED(IDirect3DDevice9_CreateTexture(priv->d3d_device,
+	                                              priv->src_width,
+	                                              priv->src_height,
+	                                              1,
+	                                              D3DUSAGE_RENDERTARGET,
+	                                              D3DFMT_A8R8G8B8,
+	                                              D3DPOOL_DEFAULT,
+	                                              &priv->d3d_texture_video,
+	                                              NULL))) {
+	        mp_msg(MSGT_VO,MSGL_ERR,
+	               "<vo_direct3d>Allocating Fixer texture in video RAM failed.\n");
+	        return 0;
+	    }
+	
+	    IDirect3DTexture9_GetSurfaceLevel(priv->d3d_texture_video, 0, &priv->d3d_surface_video);
+    }
 
     /* create OSD */
     if (!priv->d3d_texture_system &&
@@ -379,6 +588,8 @@ static int change_d3d_backbuffer(back_buffer_action_e action)
            present_params.BackBufferWidth, present_params.BackBufferHeight,
            vo_dwidth, vo_dheight);
 
+    d3dx9_prepare_levelconv();
+
     return 1;
 }
 
@@ -441,6 +652,11 @@ static int reconfigure_d3d(void)
         IDirect3DDevice9_Release(priv->d3d_device);
     priv->d3d_device = NULL;
 
+    /* Destroy the D3DX Pixer Shader */
+    if (priv->d3dx_pixel_shader)
+        IDirect3DPixelShader9_Release(priv->d3dx_pixel_shader);
+    priv->d3dx_pixel_shader = NULL;
+
     /* Stop the whole Direct3D */
     IDirect3D9_Release(priv->d3d_handle);
 
@@ -488,6 +704,11 @@ static int resize_d3d(void)
         IDirect3DTexture9_Release(priv->d3d_texture_system);
     priv->d3d_texture_system = NULL;
 
+    if (priv->d3d_texture_video)
+        IDirect3DTexture9_Release(priv->d3d_texture_video);
+    priv->d3d_texture_video = NULL;
+    priv->d3d_surface_video = NULL;
+
 
     /* Recreate the OSD. The function will observe that the offscreen plain
      * surface and the backbuffer are not destroyed and will skip their creation,
@@ -527,6 +748,11 @@ static void uninit_d3d(void)
     if (priv->d3d_device)
         IDirect3DDevice9_Release(priv->d3d_device);
     priv->d3d_device = NULL;
+
+    /* Destroy the D3DX Pixer Shader */
+    if (priv->d3dx_pixel_shader)
+        IDirect3DPixelShader9_Release(priv->d3dx_pixel_shader);
+    priv->d3dx_pixel_shader = NULL;
 
     /* Stop the whole D3D. */
     if (priv->d3d_handle) {
@@ -590,6 +816,14 @@ skip_upload:
         priv->is_clear_needed = 0;
     }
 
+    if(levelconv && !d3dx9_level_conver()) {
+        if (FAILED(IDirect3DDevice9_EndScene(priv->d3d_device))) {
+            mp_msg(MSGT_VO, MSGL_ERR, "<vo_direct3d>EndScene failed.\n");
+            return VO_ERROR;
+        }
+        return VO_TRUE;
+    }
+
     if (FAILED(IDirect3DDevice9_StretchRect(priv->d3d_device,
                                             priv->d3d_surface,
                                             &priv->fs_panscan_rect,
@@ -643,6 +877,13 @@ static int query_format(uint32_t movie_fmt)
     return 0;
 }
 
+static const opt_t subopts[] =
+{
+    { "levelconv", OPT_ARG_BOOL, &levelconv, NULL},
+    { NULL }
+};
+
+
 /****************************************************************************
  *                                                                          *
  *                                                                          *
@@ -677,10 +918,22 @@ static int preinit(const char *arg)
         goto err_out;
     }
 
-    /* FIXME
-       > Please use subopt-helper.h for this, see vo_gl.c:preinit for
-       > an example of how to use it.
-    */
+    levelconv = 0;
+    priv->d3d_texture_video = NULL;
+    priv->d3d_surface_video = NULL;
+    priv->d3dx_pixel_shader = NULL;
+
+    if (subopt_parse(arg, subopts) != 0) {
+        mp_msg(MSGT_VO, MSGL_FATAL,
+                "\n-vo direct3d command line help:\n"
+                "Example: mplayer -vo direct3d:levelconv\n"
+                "\n"
+                "\nOptions:\n"
+                "  levelconv\n"
+                "    Force YUV to RGB converting TV (16-235) to PC (0-255) levels\n"
+                "\n");
+        return -1;
+    }
 
     priv->d3d9_dll = LoadLibraryA("d3d9.dll");
     if (!priv->d3d9_dll) {
@@ -755,7 +1008,8 @@ err_out:
     return -1;
 }
 
-
+extern int w32Cmd(GUI_CMD cmd, int v);
+extern int vo_paused;
 
 /** @brief libvo Callback: Handle control requests.
  *  @return VO_TRUE on success, VO_NOTIMPL when not implemented
@@ -778,10 +1032,14 @@ static int control(uint32_t request, void *data)
     case VOCTRL_RESET:
         return VO_NOTIMPL;
     case VOCTRL_PAUSE:
+        vo_paused = 1;
         priv->is_paused = 1;
+        w32Cmd(CMD_PAUSE_CONTINUE,0);
         return VO_TRUE;
     case VOCTRL_RESUME:
+        vo_paused = 0;
         priv->is_paused = 0;
+        w32Cmd(CMD_PAUSE_CONTINUE,0);
         return VO_TRUE;
     case VOCTRL_GUISUPPORT:
         return VO_NOTIMPL;
@@ -803,6 +1061,9 @@ static int control(uint32_t request, void *data)
         calc_fs_rect();
         return VO_TRUE;
     case VOCTRL_GET_PANSCAN:
+        return VO_TRUE;
+    case VOCTRL_GUI_RESIZE:
+        resize_d3d();
         return VO_TRUE;
     }
     return VO_FALSE;
@@ -847,8 +1108,15 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
         IDirect3DDevice9_Release(priv->d3d_device);
     priv->d3d_device = NULL;
 
+    /* Destroy the D3DX Pixer Shader */
+    if (priv->d3dx_pixel_shader)
+        IDirect3DPixelShader9_Release(priv->d3dx_pixel_shader);
+    priv->d3dx_pixel_shader = NULL;
+
     if (!configure_d3d())
         return VO_ERROR;
+
+    w32Cmd(CMD_CONFIGURE_FINISHED, 0);
 
     return 0; /* Success */
 }
@@ -1030,6 +1298,10 @@ static void draw_osd(void)
 {
     // we can not render OSD if we lost the device e.g. because it was uncooperative
     if (!priv->d3d_device)
+        return;
+
+    if(priv->osd_texture_width <= 0 || priv->osd_texture_height <= 0 ||
+        priv->osd_width <= 0 || priv->osd_height <= 0)
         return;
 
     if (vo_osd_changed(0)) {

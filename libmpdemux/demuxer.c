@@ -84,6 +84,9 @@ extern const demuxer_desc_t demuxer_desc_roq;
 extern const demuxer_desc_t demuxer_desc_gif;
 extern const demuxer_desc_t demuxer_desc_ogg;
 extern const demuxer_desc_t demuxer_desc_avs;
+extern const demuxer_desc_t demuxer_desc_dshow;
+extern const demuxer_desc_t demuxer_desc_dshow_preferred;
+extern const demuxer_desc_t demuxer_desc_pmp;
 extern const demuxer_desc_t demuxer_desc_pva;
 extern const demuxer_desc_t demuxer_desc_nsv;
 extern const demuxer_desc_t demuxer_desc_mpeg_ts;
@@ -118,6 +121,10 @@ const demuxer_desc_t *const demuxer_list[] = {
     &demuxer_desc_tv,
 #endif
     &demuxer_desc_mf,
+#ifdef CONFIG_WIN32DLL
+    &demuxer_desc_dshow_preferred,
+#endif
+    &demuxer_desc_pmp,
 #ifdef CONFIG_FFMPEG
     &demuxer_desc_lavf_preferred,
 #endif
@@ -179,6 +186,9 @@ const demuxer_desc_t *const demuxer_list[] = {
 #endif
 #ifdef CONFIG_MNG
     &demuxer_desc_mng,
+#endif
+#ifdef CONFIG_WIN32DLL
+    &demuxer_desc_dshow,
 #endif
     /* Please do not add any new demuxers here. If you want to implement a new
      * demuxer, add it to libavformat, except for wrappers around external

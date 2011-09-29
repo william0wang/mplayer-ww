@@ -26,6 +26,10 @@
 #include <inttypes.h>
 #include <assert.h>
 
+#ifdef WIN32
+#include<windows.h>
+#endif
+
 #include "config.h"
 #include "mp_msg.h"
 #include "help_mp.h"
@@ -65,6 +69,12 @@ static const struct vf_priv_s {
     unsigned char *dirty_rows;
 } vf_priv_dflt;
 
+static double ass_last_pts = -303;
+
+extern int ass_auto_expand;
+extern int ass_expand_aspect;
+extern float force_monitor_aspect;
+extern int get_sub_size(void);
 
 static int config(struct vf_instance *vf,
                   int width, int height, int d_width, int d_height,
@@ -74,6 +84,26 @@ static int config(struct vf_instance *vf,
 
     if (outfmt == IMGFMT_IF09)
         return 0;
+	ass_last_pts = -303;
+    if(ass_auto_expand && get_sub_size())
+    {
+        float ass_aspect = 0.0;
+        if(ass_expand_aspect > 0)
+            ass_aspect = (float)ass_expand_aspect / 100000.0;
+        int  ass_borth_margin = 0;
+        if(ass_aspect > 0.2)
+            ass_borth_margin = (((double)d_width / ass_aspect) - d_height) / 2;
+        else if(force_monitor_aspect > 0.2)
+            ass_borth_margin = (((double)d_width / force_monitor_aspect) - d_height) / 2;
+#ifdef WIN32
+        else {
+            double scr_aspect = (double)GetSystemMetrics(SM_CXSCREEN) / (double)GetSystemMetrics(SM_CYSCREEN);
+            ass_borth_margin = (((double)d_width / scr_aspect ) - d_height) / 2;
+        }
+#endif
+        if(ass_borth_margin > 0)
+            ass_bottom_margin = ass_top_margin = ass_borth_margin;
+    }
 
     vf->priv->outh = height + ass_top_margin + ass_bottom_margin;
     vf->priv->outw = width;
@@ -352,8 +382,10 @@ static void render_frame(struct vf_instance *vf, mp_image_t *mpi,
 
 static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
 {
+    if (pts > ass_last_pts || pts < ass_last_pts-1.0)
+        ass_last_pts = pts;
     struct mp_eosd_image_list images;
-    eosd_render_frame(pts, &images);
+    eosd_render_frame(ass_last_pts, &images);
     prepare_image(vf, mpi);
     render_frame(vf, mpi, &images);
     return vf_next_put_image(vf, vf->dmpi, pts);

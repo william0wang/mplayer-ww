@@ -16,6 +16,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <windows.h>
 #include <stdlib.h>
 #include <inttypes.h>
 #include <unistd.h>
@@ -70,6 +71,26 @@
 #include "mp_fifo.h"
 #include "libavutil/avstring.h"
 #include "edl.h"
+#include "m_config.h"
+#include "winstuff.h"
+#include "help/help_mp_lang-utf.h"
+
+extern int sys_Language;
+extern m_config_t *mconfig;
+extern int force_load_font;
+extern int need_update_playtree;
+extern int vo_dirver;
+extern int have_audio;
+extern int loop_break;
+extern int not_save_status;
+//extern int screenshot_pts;
+
+int channel_state = 0; // 0: Both 1: Right 2: Left
+int bChannel = 0;
+
+extern int import_playtree_into_playlist(play_tree_t *tree, m_config_t *config);
+
+static char *channel_state_text[] = {"both", "right", "left"};
 
 static void rescale_input_coordinates(int ix, int iy, double *dx, double *dy)
 {
@@ -125,7 +146,7 @@ static int sub_source_and_index_by_pos(MPContext *mpctx, int *pos)
     return -1;
 }
 
-static int sub_source_by_pos(MPContext *mpctx, int pos)
+int sub_source_by_pos(MPContext *mpctx, int pos)
 {
     return sub_source_and_index_by_pos(mpctx, &pos);
 }
@@ -235,10 +256,29 @@ static int mp_property_loop(m_option_t *prop, int action, void *arg,
     switch (action) {
     case M_PROPERTY_PRINT:
         if (!arg) return M_PROPERTY_ERROR;
-        if (mpctx->loop_times < 0)
+        if (mpctx->loop_times < 0) {
+            if(sys_Language == 1)
+                    *(char **) arg = strdup(GB_MSGTR_LoopStatus1);
+            else if(sys_Language == 3 || sys_Language == 4)
+                    *(char **) arg = strdup(BIG5_MSGTR_LoopStatus1);
+            else
             *(char**)arg = strdup("off");
-        else if (mpctx->loop_times == 0)
+        } else if (mpctx->loop_times == 0) {
+            if(sys_Language == 1)
+                    *(char **) arg = strdup(GB_MSGTR_LoopStatus2);
+            else if(sys_Language == 3 || sys_Language == 4)
+                    *(char **) arg = strdup(BIG5_MSGTR_LoopStatus2);
+            else
             *(char**)arg = strdup("inf");
+        } else if(mpctx->loop_times > 10) {
+            mpctx->loop_times = -1;
+            if(sys_Language == 1)
+                    *(char **) arg = strdup(GB_MSGTR_LoopStatus1);
+            else if(sys_Language == 3 || sys_Language == 4)
+                    *(char **) arg = strdup(BIG5_MSGTR_LoopStatus1);
+            else
+            *(char**)arg = strdup("off");
+        }
         else
             break;
         return M_PROPERTY_OK;
@@ -447,7 +487,7 @@ static int mp_property_time_pos(m_option_t *prop, int action,
 static int mp_property_chapter(m_option_t *prop, int action, void *arg,
                                MPContext *mpctx)
 {
-    int chapter = -1;
+    int chapter;
     float next_pts = 0;
     int chapter_num;
     int step_all;
@@ -674,21 +714,27 @@ static int mp_property_volume(m_option_t *prop, int action, void *arg,
             return M_PROPERTY_ERROR;
         M_PROPERTY_CLAMP(prop, *(float *) arg);
         mixer_setvolume(&mpctx->mixer, *(float *) arg, *(float *) arg);
-        return M_PROPERTY_OK;
+        break;
     case M_PROPERTY_STEP_UP:
         if (arg && *(float *) arg <= 0)
             mixer_decvolume(&mpctx->mixer);
         else
             mixer_incvolume(&mpctx->mixer);
-        return M_PROPERTY_OK;
+        break;
     case M_PROPERTY_STEP_DOWN:
         if (arg && *(float *) arg <= 0)
             mixer_incvolume(&mpctx->mixer);
         else
             mixer_decvolume(&mpctx->mixer);
-        return M_PROPERTY_OK;
+        break;
+    default:
+        return M_PROPERTY_NOT_IMPLEMENTED;
     }
-    return M_PROPERTY_NOT_IMPLEMENTED;
+    float vol;
+    mixer_getbothvolume(&mpctx->mixer, &vol);
+    save_volume = vol;
+    guiCommand(CMD_UPDATE_VOLUME, save_volume);
+    return M_PROPERTY_OK;
 }
 
 /// Mute (RW)
@@ -720,6 +766,11 @@ static int mp_property_mute(m_option_t *prop, int action, void *arg,
         if (!arg)
             return M_PROPERTY_ERROR;
         if (mpctx->edl_muted) {
+            if(sys_Language == 1)
+                    *(char **) arg = strdup(GB_MSGTR_EnabledEdl);
+            else if(sys_Language == 3 || sys_Language == 4)
+                    *(char **) arg = strdup(BIG5_MSGTR_EnabledEdl);
+            else
             *(char **) arg = strdup(MSGTR_EnabledEdl);
             return M_PROPERTY_OK;
         }
@@ -896,6 +947,8 @@ static int mp_property_audio(m_option_t *prop, int action, void *arg,
 
         if (current_id < 0)
             *(char **) arg = strdup(MSGTR_Disabled);
+        else if (channel_state)
+            *(char **) arg = strdup(channel_state_text[channel_state]);
         else {
             char lang[40] = MSGTR_Unknown;
             sh_audio_t* sh = mpctx->sh_audio;
@@ -949,6 +1002,14 @@ static int mp_property_audio(m_option_t *prop, int action, void *arg,
                 mpctx->sh_audio = sh2;
                 reinit_audio_chain();
             }
+        }
+        else if (audio_id > -1 && mpctx->sh_audio->channels == 2) {
+            sh_audio_t *sh = mpctx->sh_audio;
+            channel_state = (channel_state + 2) % 3;
+            uninit_player(INITIALIZED_AO);
+            mpctx->sh_audio = sh;
+            reinit_audio_chain();
+            mixer_setvolume(&mpctx->mixer, (float)save_volume, (float)save_volume);
         }
         mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_AUDIO_TRACK=%d\n", audio_id);
         return M_PROPERTY_OK;
@@ -1225,8 +1286,29 @@ static int mp_property_vo_flag(m_option_t *prop, int action, void *arg,
 static int mp_property_ontop(m_option_t *prop, int action, void *arg,
                              MPContext *mpctx)
 {
-    return mp_property_vo_flag(prop, action, arg, VOCTRL_ONTOP, &vo_ontop,
-                               mpctx);
+    if(!mpctx->sh_video)
+        return M_PROPERTY_UNAVAILABLE;
+
+    switch(action) {
+    case M_PROPERTY_PRINT:
+        if(!arg) return 0;
+            if(sys_Language == 1)
+                *(char**)arg = strdup(vo_ontop == 1 ? GB_MSGTR_Enabled :
+                                      (vo_ontop == 2 ? GB_MSGTR_WhilePlaying  : GB_MSGTR_Disabled));
+            else if(sys_Language == 3 || sys_Language == 4)
+                *(char**)arg = strdup(vo_ontop == 1 ? BIG5_MSGTR_Enabled :
+                                      (vo_ontop == 2 ? BIG5_MSGTR_WhilePlaying  : BIG5_MSGTR_Disabled));
+            else
+                *(char**)arg = strdup(vo_ontop == 1 ? MSGTR_Enabled :
+                                      (vo_ontop == 2 ? MSGTR_WhilePlaying  : MSGTR_Disabled));
+        return 1;
+    case M_PROPERTY_STEP_UP:
+    case M_PROPERTY_STEP_DOWN:
+        if(vo_config_count) mpctx->video_out->control(VOCTRL_ONTOP, 0);
+        return 1;
+    default:
+        return m_property_flag(prop, action, arg, &vo_ontop);
+    }
 }
 
 /// Display in the root window (RW)
@@ -1257,6 +1339,15 @@ static int mp_property_framedropping(m_option_t *prop, int action,
     case M_PROPERTY_PRINT:
         if (!arg)
             return M_PROPERTY_ERROR;
+        if(sys_Language == 1)
+            *(char **) arg = strdup(frame_dropping == 1 ? GB_MSGTR_Enabled :
+                                    (frame_dropping == 2 ? GB_MSGTR_HardFrameDrop :
+                                    GB_MSGTR_Disabled));
+        else if(sys_Language == 3 || sys_Language == 4)
+            *(char **) arg = strdup(frame_dropping == 1 ? BIG5_MSGTR_Enabled :
+                                    (frame_dropping == 2 ? BIG5_MSGTR_HardFrameDrop :
+                                    BIG5_MSGTR_Disabled));
+        else
         *(char **) arg = strdup(frame_dropping == 1 ? MSGTR_Enabled :
                                 (frame_dropping == 2 ? MSGTR_HardFrameDrop :
                                  MSGTR_Disabled));
@@ -1481,8 +1572,8 @@ static int mp_property_sub(m_option_t *prop, int action, void *arg,
 
             snprintf(*(char **) arg, 63, "(%d) %s%s",
                      mpctx->set_of_sub_pos + 1,
-                     strlen(tmp) < 20 ? "" : "...",
-                     strlen(tmp) < 20 ? tmp : tmp + strlen(tmp) - 19);
+                     strlen(tmp) < 36 ? "" : "...",
+                     strlen(tmp) < 36 ? tmp : tmp + strlen(tmp) - 35);
             return M_PROPERTY_OK;
         }
 #ifdef CONFIG_DVDNAV
@@ -1539,6 +1630,11 @@ static int mp_property_sub(m_option_t *prop, int action, void *arg,
             snprintf(*(char **) arg, 63, "(%d) %s", dvdsub_id, MSGTR_Unknown);
             return M_PROPERTY_OK;
         }
+        if(sys_Language == 1)
+            snprintf(*(char **) arg, 63, GB_MSGTR_Disabled);
+        else if(sys_Language == 3 || sys_Language == 4)
+            snprintf(*(char **) arg, 63, BIG5_MSGTR_Disabled);
+        else
         snprintf(*(char **) arg, 63, MSGTR_Disabled);
         return M_PROPERTY_OK;
 
@@ -1564,6 +1660,8 @@ static int mp_property_sub(m_option_t *prop, int action, void *arg,
     default:
         return M_PROPERTY_NOT_IMPLEMENTED;
     }
+
+    guiCommand(CMD_UPDATE_SUBMENU, mpctx->global_sub_pos);
 
     if (mpctx->global_sub_pos >= 0) {
         source = sub_source(mpctx);
@@ -1603,7 +1701,14 @@ static int mp_property_sub(m_option_t *prop, int action, void *arg,
 #endif
         {
             subdata = mpctx->set_of_subtitles[mpctx->set_of_sub_pos];
+#ifdef CONFIG_ICONV
+        if ( subdata->fontname && sub_font_name != subdata->fontname ) {
+            sub_font_name = subdata->fontname;
+            force_load_font = 1;
+        }
+#else
             vo_osd_changed(OSDTYPE_SUBTITLE);
+#endif
         }
     } else if (source == SUB_SOURCE_DEMUX) {
         dvdsub_id = source_pos;
@@ -1635,6 +1740,7 @@ static int mp_property_sub(m_option_t *prop, int action, void *arg,
             }
         }
     }
+    if(vo_spudec) vo_osd_changed(OSDTYPE_SPU);
 #ifdef CONFIG_DVDREAD
     if (vo_spudec
         && (mpctx->stream->type == STREAMTYPE_DVD
@@ -1846,7 +1952,23 @@ static int mp_property_sub_delay(m_option_t *prop, int action, void *arg,
 static int mp_property_sub_alignment(m_option_t *prop, int action,
                                      void *arg, MPContext *mpctx)
 {
-    char *name[] = { MSGTR_Top, MSGTR_Center, MSGTR_Bottom };
+    char *name[3];
+    name[0] = malloc(64);
+    name[1] = malloc(64);
+    name[2] = malloc(64);
+    if(sys_Language == 1) {
+        strcpy(name[0],GB_MSGTR_Top);
+        strcpy(name[1],GB_MSGTR_Center);
+        strcpy(name[2],GB_MSGTR_Bottom);
+    } else if(sys_Language == 3 || sys_Language == 4) {
+        strcpy(name[0],BIG5_MSGTR_Top);
+        strcpy(name[1],BIG5_MSGTR_Center);
+        strcpy(name[2],BIG5_MSGTR_Bottom);
+    } else {
+        strcpy(name[0],MSGTR_Top);
+        strcpy(name[1],MSGTR_Center);
+        strcpy(name[2],MSGTR_Bottom);
+    }
 
     if (!mpctx->sh_video || mpctx->global_sub_pos < 0
         || sub_source(mpctx) != SUB_SOURCE_SUBS)
@@ -1936,6 +2058,14 @@ static int mp_property_sub_forced_only(m_option_t *prop, int action,
 
 #ifdef CONFIG_FREETYPE
 /// Subtitle scale (RW)
+typedef struct {
+  void *queue_head;
+  void *queue_tail;
+  unsigned int global_palette[16];
+  unsigned int orig_frame_width, orig_frame_height;
+  unsigned int scale_x, scale_y;
+} spudec_tmp_t;
+
 static int mp_property_sub_scale(m_option_t *prop, int action, void *arg,
                               MPContext *mpctx)
 {
@@ -1965,6 +2095,12 @@ static int mp_property_sub_scale(m_option_t *prop, int action, void *arg,
                 ass_force_reload = 1;
             }
 #endif
+            if (vo_spudec) {
+                if(*(float *)arg != 0) {
+                    ((spudec_tmp_t *)vo_spudec)->scale_x *= (*(float *)arg > 0)?1.02:0.98;
+                    ((spudec_tmp_t *)vo_spudec)->scale_y *= (*(float *)arg > 0)?1.02:0.98;
+                }
+            }
             text_font_scale_factor += (arg ? *(float *) arg : 0.1)*
               (action == M_PROPERTY_STEP_UP ? 1.0 : -1.0);
             M_PROPERTY_CLAMP(prop, text_font_scale_factor);
@@ -2112,7 +2248,7 @@ static int mp_property_teletext_page(m_option_t *prop, int action, void *arg,
 static const m_option_t mp_properties[] = {
     // General
     { "osdlevel", mp_property_osdlevel, CONF_TYPE_INT,
-     M_OPT_RANGE, 0, 3, NULL },
+     M_OPT_RANGE, 0, 4, NULL },
     { "loop", mp_property_loop, CONF_TYPE_INT,
      M_OPT_MIN, -1, 0, NULL },
     { "speed", mp_property_playback_speed, CONF_TYPE_FLOAT,
@@ -2384,6 +2520,104 @@ static struct {
     { "tv_contrast", MP_CMD_TV_SET_CONTRAST, 0, OSD_CONTRAST, -1, MSGTR_Contrast },
 #endif
     { NULL, 0, 0, 0, -1, NULL }
+},set_prop_cmd_cn[] = {
+    // general
+    { "loop", MP_CMD_LOOP, 0, 0, -1, GB_MSGTR_LoopStatus },
+    { "chapter", MP_CMD_SEEK_CHAPTER, 0, 0, -1, NULL },
+    { "angle", MP_CMD_SWITCH_ANGLE, 0, 0, -1, NULL },
+    { "capturing", MP_CMD_CAPTURING, 1, 0, -1, NULL },
+    // audio
+    { "volume", MP_CMD_VOLUME, 0, OSD_VOLUME, -1, GB_MSGTR_Volume },
+    { "mute", MP_CMD_MUTE, 1, 0, -1, GB_MSGTR_MuteStatus },
+    { "audio_delay", MP_CMD_AUDIO_DELAY, 0, 0, -1, GB_MSGTR_AVDelayStatus },
+    { "switch_audio", MP_CMD_SWITCH_AUDIO, 1, 0, -1, GB_MSGTR_OSDAudio },
+    { "balance", MP_CMD_BALANCE, 0, OSD_BALANCE, -1, GB_MSGTR_Balance },
+    // video
+    { "fullscreen", MP_CMD_VO_FULLSCREEN, 1, 0, -1, NULL },
+    { "panscan", MP_CMD_PANSCAN, 0, OSD_PANSCAN, -1, GB_MSGTR_Panscan },
+    { "ontop", MP_CMD_VO_ONTOP, 1, 0, -1, GB_MSGTR_OnTopStatus },
+    { "rootwin", MP_CMD_VO_ROOTWIN, 1, 0, -1, GB_MSGTR_RootwinStatus },
+    { "border", MP_CMD_VO_BORDER, 1, 0, -1, GB_MSGTR_BorderStatus },
+    { "framedropping", MP_CMD_FRAMEDROPPING, 1, 0, -1, GB_MSGTR_FramedroppingStatus },
+    { "gamma", MP_CMD_GAMMA, 0, OSD_BRIGHTNESS, -1, GB_MSGTR_Gamma },
+    { "brightness", MP_CMD_BRIGHTNESS, 0, OSD_BRIGHTNESS, -1, GB_MSGTR_Brightness },
+    { "contrast", MP_CMD_CONTRAST, 0, OSD_CONTRAST, -1, GB_MSGTR_Contrast },
+    { "saturation", MP_CMD_SATURATION, 0, OSD_SATURATION, -1, GB_MSGTR_Saturation },
+    { "hue", MP_CMD_HUE, 0, OSD_HUE, -1, GB_MSGTR_Hue },
+    { "vsync", MP_CMD_SWITCH_VSYNC, 1, 0, -1, GB_MSGTR_VSyncStatus },
+        // subs
+    { "sub", MP_CMD_SUB_SELECT, 1, 0, -1, GB_MSGTR_SubSelectStatus },
+    { "sub_source", MP_CMD_SUB_SOURCE, 1, 0, -1, GB_MSGTR_SubSourceStatus },
+    { "sub_vob", MP_CMD_SUB_VOB, 1, 0, -1, GB_MSGTR_SubSelectStatus },
+    { "sub_demux", MP_CMD_SUB_DEMUX, 1, 0, -1, GB_MSGTR_SubSelectStatus },
+    { "sub_file", MP_CMD_SUB_FILE, 1, 0, -1, GB_MSGTR_SubSelectStatus },
+    { "sub_pos", MP_CMD_SUB_POS, 0, 0, -1, GB_MSGTR_SubPosStatus },
+    { "sub_alignment", MP_CMD_SUB_ALIGNMENT, 1, 0, -1, GB_MSGTR_SubAlignStatus },
+    { "sub_delay", MP_CMD_SUB_DELAY, 0, 0, OSD_MSG_SUB_DELAY, GB_MSGTR_SubDelayStatus },
+    { "sub_visibility", MP_CMD_SUB_VISIBILITY, 1, 0, -1, GB_MSGTR_SubVisibleStatus },
+    { "sub_forced_only", MP_CMD_SUB_FORCED_ONLY, 1, 0, -1, GB_MSGTR_SubForcedOnlyStatus },
+#ifdef CONFIG_FREETYPE
+    { "sub_scale", MP_CMD_SUB_SCALE, 0, 0, -1, GB_MSGTR_SubScale},
+#endif
+#ifdef CONFIG_ASS
+    { "ass_use_margins", MP_CMD_ASS_USE_MARGINS, 1, 0, -1, NULL },
+#endif
+#ifdef CONFIG_TV
+    { "tv_brightness", MP_CMD_TV_SET_BRIGHTNESS, 0, OSD_BRIGHTNESS, -1, GB_MSGTR_Brightness },
+    { "tv_hue", MP_CMD_TV_SET_HUE, 0, OSD_HUE, -1, GB_MSGTR_Hue },
+    { "tv_saturation", MP_CMD_TV_SET_SATURATION, 0, OSD_SATURATION, -1, GB_MSGTR_Saturation },
+    { "tv_contrast", MP_CMD_TV_SET_CONTRAST, 0, OSD_CONTRAST, -1, GB_MSGTR_Contrast },
+#endif
+    { NULL, 0, 0, 0, -1, NULL }
+},set_prop_cmd_tc[] = {
+    // general
+    { "loop", MP_CMD_LOOP, 0, 0, -1, BIG5_MSGTR_LoopStatus },
+    { "chapter", MP_CMD_SEEK_CHAPTER, 0, 0, -1, NULL },
+    { "angle", MP_CMD_SWITCH_ANGLE, 0, 0, -1, NULL },
+    { "capturing", MP_CMD_CAPTURING, 1, 0, -1, NULL },
+    // audio
+    { "volume", MP_CMD_VOLUME, 0, OSD_VOLUME, -1, BIG5_MSGTR_Volume },
+    { "mute", MP_CMD_MUTE, 1, 0, -1, BIG5_MSGTR_MuteStatus },
+    { "audio_delay", MP_CMD_AUDIO_DELAY, 0, 0, -1, BIG5_MSGTR_AVDelayStatus },
+    { "switch_audio", MP_CMD_SWITCH_AUDIO, 1, 0, -1, BIG5_MSGTR_OSDAudio },
+    { "balance", MP_CMD_BALANCE, 0, OSD_BALANCE, -1, BIG5_MSGTR_Balance },
+    // video
+    { "fullscreen", MP_CMD_VO_FULLSCREEN, 1, 0, -1, NULL },
+    { "panscan", MP_CMD_PANSCAN, 0, OSD_PANSCAN, -1, BIG5_MSGTR_Panscan },
+    { "ontop", MP_CMD_VO_ONTOP, 1, 0, -1, BIG5_MSGTR_OnTopStatus },
+    { "rootwin", MP_CMD_VO_ROOTWIN, 1, 0, -1, BIG5_MSGTR_RootwinStatus },
+    { "border", MP_CMD_VO_BORDER, 1, 0, -1, BIG5_MSGTR_BorderStatus },
+    { "framedropping", MP_CMD_FRAMEDROPPING, 1, 0, -1, BIG5_MSGTR_FramedroppingStatus },
+    { "gamma", MP_CMD_GAMMA, 0, OSD_BRIGHTNESS, -1, BIG5_MSGTR_Gamma },
+    { "brightness", MP_CMD_BRIGHTNESS, 0, OSD_BRIGHTNESS, -1, BIG5_MSGTR_Brightness },
+    { "contrast", MP_CMD_CONTRAST, 0, OSD_CONTRAST, -1, BIG5_MSGTR_Contrast },
+    { "saturation", MP_CMD_SATURATION, 0, OSD_SATURATION, -1, BIG5_MSGTR_Saturation },
+    { "hue", MP_CMD_HUE, 0, OSD_HUE, -1, BIG5_MSGTR_Hue },
+    { "vsync", MP_CMD_SWITCH_VSYNC, 1, 0, -1, BIG5_MSGTR_VSyncStatus },
+        // subs
+    { "sub", MP_CMD_SUB_SELECT, 1, 0, -1, BIG5_MSGTR_SubSelectStatus },
+    { "sub_source", MP_CMD_SUB_SOURCE, 1, 0, -1, BIG5_MSGTR_SubSourceStatus },
+    { "sub_vob", MP_CMD_SUB_VOB, 1, 0, -1, BIG5_MSGTR_SubSelectStatus },
+    { "sub_demux", MP_CMD_SUB_DEMUX, 1, 0, -1, BIG5_MSGTR_SubSelectStatus },
+    { "sub_file", MP_CMD_SUB_FILE, 1, 0, -1, BIG5_MSGTR_SubSelectStatus },
+    { "sub_pos", MP_CMD_SUB_POS, 0, 0, -1, BIG5_MSGTR_SubPosStatus },
+    { "sub_alignment", MP_CMD_SUB_ALIGNMENT, 1, 0, -1, BIG5_MSGTR_SubAlignStatus },
+    { "sub_delay", MP_CMD_SUB_DELAY, 0, 0, OSD_MSG_SUB_DELAY, BIG5_MSGTR_SubDelayStatus },
+    { "sub_visibility", MP_CMD_SUB_VISIBILITY, 1, 0, -1, BIG5_MSGTR_SubVisibleStatus },
+    { "sub_forced_only", MP_CMD_SUB_FORCED_ONLY, 1, 0, -1, BIG5_MSGTR_SubForcedOnlyStatus },
+#ifdef CONFIG_FREETYPE
+    { "sub_scale", MP_CMD_SUB_SCALE, 0, 0, -1, BIG5_MSGTR_SubScale},
+#endif
+#ifdef CONFIG_ASS
+    { "ass_use_margins", MP_CMD_ASS_USE_MARGINS, 1, 0, -1, NULL },
+#endif
+#ifdef CONFIG_TV
+    { "tv_brightness", MP_CMD_TV_SET_BRIGHTNESS, 0, OSD_BRIGHTNESS, -1, BIG5_MSGTR_Brightness },
+    { "tv_hue", MP_CMD_TV_SET_HUE, 0, OSD_HUE, -1, BIG5_MSGTR_Hue },
+    { "tv_saturation", MP_CMD_TV_SET_SATURATION, 0, OSD_SATURATION, -1, BIG5_MSGTR_Saturation },
+    { "tv_contrast", MP_CMD_TV_SET_CONTRAST, 0, OSD_CONTRAST, -1, BIG5_MSGTR_Contrast },
+#endif
+    { NULL, 0, 0, 0, -1, NULL }
 };
 
 
@@ -2423,14 +2657,30 @@ static int set_property_command(MPContext *mpctx, mp_cmd_t *cmd)
 
     if (set_prop_cmd[i].osd_progbar) {
         if (prop->type == CONF_TYPE_INT) {
-            if (mp_property_do(pname, M_PROPERTY_GET, &r, mpctx) > 0)
-                set_osd_bar(set_prop_cmd[i].osd_progbar,
-                            set_prop_cmd[i].osd_msg, prop->min, prop->max, r);
+            if (mp_property_do(pname, M_PROPERTY_GET, &r, mpctx) > 0) {
+                if(sys_Language == 1)
+                    set_osd_bar(set_prop_cmd[i].osd_progbar,
+                                set_prop_cmd_cn[i].osd_msg, prop->min, prop->max, r);
+                else if(sys_Language == 3 || sys_Language == 4)
+                    set_osd_bar(set_prop_cmd[i].osd_progbar,
+                                set_prop_cmd_tc[i].osd_msg, prop->min, prop->max, r);
+                else
+                    set_osd_bar(set_prop_cmd[i].osd_progbar,
+                                set_prop_cmd[i].osd_msg, prop->min, prop->max, r);
+            }
         } else if (prop->type == CONF_TYPE_FLOAT) {
             float f;
-            if (mp_property_do(pname, M_PROPERTY_GET, &f, mpctx) > 0)
-                set_osd_bar(set_prop_cmd[i].osd_progbar,
-                            set_prop_cmd[i].osd_msg, prop->min, prop->max, f);
+            if (mp_property_do(pname, M_PROPERTY_GET, &f, mpctx) > 0)  {
+                if(sys_Language == 1)
+                    set_osd_bar(set_prop_cmd[i].osd_progbar,
+                                set_prop_cmd_cn[i].osd_msg, prop->min, prop->max, f);
+                else if(sys_Language == 3 || sys_Language == 4)
+                    set_osd_bar(set_prop_cmd[i].osd_progbar,
+                                set_prop_cmd_tc[i].osd_msg, prop->min, prop->max, f);
+                else
+                    set_osd_bar(set_prop_cmd[i].osd_progbar,
+                                set_prop_cmd[i].osd_msg, prop->min, prop->max, f);
+            }
         } else
             mp_msg(MSGT_CPLAYER, MSGL_ERR,
                    "Property use an unsupported type.\n");
@@ -2440,8 +2690,18 @@ static int set_property_command(MPContext *mpctx, mp_cmd_t *cmd)
     if (set_prop_cmd[i].osd_msg) {
         char *val = mp_property_print(pname, mpctx);
         if (val) {
-            set_osd_msg(set_prop_cmd[i].osd_id >=
-                        0 ? set_prop_cmd[i].osd_id : OSD_MSG_PROPERTY + i,
+                if(sys_Language == 1)
+                        set_osd_msg(set_prop_cmd[i].osd_id >=
+                                0 ? set_prop_cmd[i].osd_id : OSD_MSG_PROPERTY + i,
+                                1, osd_duration, set_prop_cmd_cn[i].osd_msg, val);
+                else if(sys_Language == 3 || sys_Language == 4)
+                        set_osd_msg(set_prop_cmd[i].osd_id >=
+                                0 ? set_prop_cmd[i].osd_id : OSD_MSG_PROPERTY + i,
+                                1, osd_duration, set_prop_cmd_tc[i].osd_msg, val);
+                else
+                        set_osd_msg(set_prop_cmd[i].osd_id >=
+                                0 ? set_prop_cmd[i].osd_id : OSD_MSG_PROPERTY + i,
+
                         1, osd_duration, set_prop_cmd[i].osd_msg, val);
             free(val);
         }
@@ -2789,6 +3049,14 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
             break;
 
         case MP_CMD_QUIT:
+            if (mpctx->stream)
+                SaveStatus();
+            char s[10];
+            char *tmp = get_path("kk.ini");
+            sprintf(s, "%d", save_volume);
+            WritePrivateProfileString("Status", "Volume", s, tmp);
+            free(tmp);
+            show_benchmark();
             exit_player_with_rc(EXIT_QUIT,
                                 (cmd->nargs > 0) ? cmd->args[0].v.i : 0);
 
@@ -2821,6 +3089,7 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
                     if (mpctx->eof)
                         mpctx->play_tree_step = n;
                     brk_cmd = 1;
+                    loop_break = 1;
                 }
             }
             break;
@@ -2857,21 +3126,28 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
         case MP_CMD_SUB_STEP:
             if (sh_video) {
                 int movement = cmd->args[0].v.i;
-                step_sub(subdata, sh_video->pts, movement);
+                long long ms = step_sub(subdata, sh_video->pts-sub_delay, movement);
 #ifdef CONFIG_ASS
-                if (ass_track)
-                    sub_delay +=
-                        ass_step_sub(ass_track,
+                if (ass_track && !ms)
+                    ms = ass_step_sub(ass_track,
                                      (sh_video->pts +
-                                      sub_delay) * 1000 + .5, movement) / 1000.;
+                                      sub_delay) * 1000 + .5, movement);
 #endif
-                set_osd_msg(OSD_MSG_SUB_DELAY, 1, osd_duration,
-                            MSGTR_OSDSubDelay, ROUND(sub_delay * 1000));
+                if (ms) {
+                   char s[40];
+                   sprintf(s, "seek %f", ms / 1000.0);
+                   mp_input_queue_cmd(mp_input_parse_cmd(s));
+                }
             }
             break;
 
         case MP_CMD_SUB_LOG:
             log_sub();
+            break;
+
+        case MP_CMD_AUDIO_DSP:
+            if (mpctx->sh_audio  && mpctx->sh_audio->afilter)
+                af_control_any_rev(mpctx->sh_audio->afilter, AF_CONTROL_WADSP, cmd->args[0].v.s);
             break;
 
         case MP_CMD_OSD:{
@@ -2886,11 +3162,23 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
                     osd_level = v > max ? max : v;
                 /* Show OSD state when disabled, but not when an explicit
                    argument is given to the OSD command, i.e. in slave mode. */
-                if (v == -1 && osd_level <= 1)
-                    set_osd_msg(OSD_MSG_OSD_STATUS, 0, osd_duration,
+                if (v == -1 && osd_level <= 1) {
+                    if(sys_Language == 1)
+                        set_osd_msg(OSD_MSG_OSD_STATUS, 0, osd_duration,
+                                        GB_MSGTR_OSDosd,
+                                        osd_level ? GB_MSGTR_OSDenabled :
+                                        GB_MSGTR_OSDdisabled);
+                    else if(sys_Language == 3 || sys_Language == 4)
+                        set_osd_msg(OSD_MSG_OSD_STATUS, 0, osd_duration,
+                                        BIG5_MSGTR_OSDosd,
+                                        osd_level ? BIG5_MSGTR_OSDenabled :
+                                        BIG5_MSGTR_OSDdisabled);
+                    else
+                        set_osd_msg(OSD_MSG_OSD_STATUS, 0, osd_duration,
                                 MSGTR_OSDosd,
                                 osd_level ? MSGTR_OSDenabled :
                                 MSGTR_OSDdisabled);
+                }
                 else
                     rm_osd_msg(OSD_MSG_OSD_STATUS);
             }
@@ -2909,6 +3197,7 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
                                                        mpctx);
                 /* if no argument supplied take default osd_duration, else <arg> ms. */
                 if (txt) {
+                        txt = string_encode(txt);
                     set_osd_msg(OSD_MSG_TEXT, cmd->args[2].v.i,
                                 (cmd->args[1].v.i <
                                  0 ? osd_duration : cmd->args[1].v.i),
@@ -2922,8 +3211,12 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
                 play_tree_t *e = play_tree_new();
                 play_tree_add_file(e, cmd->args[0].v.s);
 
-                if (cmd->args[1].v.i)   // append
-                    play_tree_append_entry(mpctx->playtree->child, e);
+                if (cmd->args[1].v.i) {   // append
+                    if(need_update_playtree)
+                        import_playtree_into_playlist(e, mconfig);
+                    else
+                        play_tree_append_entry(mpctx->playtree->child, e);
+                }
                 else {
                     // Go back to the starting point.
                     while (play_tree_iter_up_step
@@ -2933,6 +3226,8 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
                     play_tree_set_child(mpctx->playtree, e);
                     pt_iter_goto_head(mpctx->playtree_iter);
                     mpctx->eof = PT_NEXT_SRC;
+                    need_update_playtree = 0;
+                    not_save_status = 1;
                 }
                 brk_cmd = 1;
             }
@@ -2944,8 +3239,12 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
                     mp_msg(MSGT_CPLAYER, MSGL_ERR,
                            MSGTR_PlaylistLoadUnable, cmd->args[0].v.s);
                 else {
-                    if (cmd->args[1].v.i)       // append
-                        play_tree_append_entry(mpctx->playtree->child, e);
+                    if (cmd->args[1].v.i) {        // append
+                            if(need_update_playtree)
+                                import_playtree_into_playlist(e, mconfig);
+                            else
+                                play_tree_append_entry(mpctx->playtree->child, e);
+                        }
                     else {
                         // Go back to the starting point.
                         while (play_tree_iter_up_step
@@ -2956,6 +3255,8 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
                         play_tree_set_child(mpctx->playtree, e);
                         pt_iter_goto_head(mpctx->playtree_iter);
                         mpctx->eof = PT_NEXT_SRC;
+                        need_update_playtree = 0;
+                        not_save_status = 1;
                     }
                 }
                 brk_cmd = 1;
@@ -2963,6 +3264,9 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
             break;
 
         case MP_CMD_STOP:
+            if(!mpctx->playtree_iter)
+                break;
+
 #ifdef CONFIG_GUI
             // playtree_iter isn't used by the GUI
             if (use_gui)
@@ -2977,6 +3281,37 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
             brk_cmd = 1;
             break;
 
+        case MP_CMD_ADDLIST: {
+                 play_tree_t* e = parse_playlist_file(cmd->args[0].v.s);
+                 if(need_update_playtree)
+                     import_playtree_into_playlist(e, mconfig);
+                 else
+                     play_tree_append_entry(mpctx->playtree, e);
+             }
+             break;
+        case MP_CMD_RELOAD:
+             mpctx->eof = PT_CURRENT_ENTRY;
+             brk_cmd = 1;
+             break;
+         case MP_CMD_KEEP_ASPECT:
+             guiCommand(CMD_SWITCH_ASPECT, 0);
+             break;
+         case MP_CMD_SWITCH_VIEW:
+             guiCommand(CMD_SWITCH_VIEW, 0);
+             break;
+         case MP_CMD_SWITCH_FONT:
+             if (sh_video) {
+                 if (strchr(sub_font_name, ','))
+                     sub_font_name = strchr(sub_font_name, ',')+1;
+                 else
+                     sub_font_name = sub_font_names;
+                 force_load_font = 1;
+                 vo_osd_changed(OSDTYPE_SUBTITLE);
+             }
+             break;
+        case MP_CMD_GUI_RESIZE:
+             mpctx->video_out->control(VOCTRL_GUI_RESIZE, 0);
+             break;
         case MP_CMD_OSD_SHOW_PROGRESSION:{
                 int len = demuxer_get_time_length(mpctx->demuxer);
                 int pts = demuxer_get_current_time(mpctx->demuxer);
@@ -3199,7 +3534,10 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
                 add_subtitles(cmd->args[0].v.s, sh_video->fps, 0);
                 if (n != mpctx->set_of_sub_size) {
                     mpctx->sub_counts[SUB_SOURCE_SUBS]++;
-                    ++mpctx->global_sub_size;
+                    update_sub_list(mpctx->global_sub_size++);
+                    char tmps[60];
+                    sprintf(tmps, "sub_select %d", mpctx->global_sub_size);
+                    mp_input_queue_cmd(mp_input_parse_cmd(tmps));
                 }
             }
             break;
@@ -3448,12 +3786,18 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
                 if (osd_level > 1 && button > 0)
                     set_osd_msg(OSD_MSG_TEXT, 1, osd_duration,
                                 "Selected button number %d", button);
+                if (mpctx->sh_audio)
+                    have_audio = 1;
+                else
+                    have_audio = 1;
             }
             break;
 
         case MP_CMD_SWITCH_TITLE:
-            if (mpctx->stream->type == STREAMTYPE_DVDNAV)
-                mp_dvdnav_switch_title(mpctx->stream, cmd->args[0].v.i);
+            if (mpctx->stream->type == STREAMTYPE_DVDNAV) {
+                int title = mp_dvdnav_get_current_title(mpctx->stream) + cmd->args[0].v.i;
+                mp_dvdnav_switch_title(mpctx->stream,title);
+            }
             break;
 
 #endif

@@ -36,6 +36,18 @@
 #include "libvo/vo_zr.h"
 #include "mp_fifo.h"
 
+extern int fixedsize;
+extern int auto_hide;
+extern int auto_play;
+extern int systray;
+extern int switch_view;
+extern int generate_preview;
+extern int auto_directrendering;
+extern int auto_expand;
+
+extern int enable_mouse_movements;
+extern int use_filedir_conf;
+
 
 const m_option_t vd_conf[]={
     {"help", "Use MPlayer with an appropriate video file instead of live partners to avoid vd.\n", CONF_TYPE_PRINT, CONF_NOCFG|CONF_GLOBAL, 0, 0, NULL},
@@ -73,8 +85,7 @@ const m_option_t mplayer_opts[]={
     {"ao", &audio_driver_list, CONF_TYPE_STRING_LIST, 0, 0, 0, NULL},
     {"fixed-vo", &fixed_vo, CONF_TYPE_FLAG,CONF_GLOBAL , 0, 1, NULL},
     {"nofixed-vo", &fixed_vo, CONF_TYPE_FLAG,CONF_GLOBAL, 1, 0, NULL},
-    {"ontop", &vo_ontop, CONF_TYPE_FLAG, 0, 0, 1, NULL},
-    {"noontop", &vo_ontop, CONF_TYPE_FLAG, 0, 1, 0, NULL},
+    {"ontop", &vo_ontop, CONF_TYPE_INT, CONF_RANGE|CONF_GLOBAL, 0, 2, NULL},
     {"rootwin", &vo_rootwin, CONF_TYPE_FLAG, 0, 0, 1, NULL},
     {"border", &vo_border, CONF_TYPE_FLAG, 0, 0, 1, NULL},
     {"noborder", &vo_border, CONF_TYPE_FLAG, 0, 1, 0, NULL},
@@ -201,6 +212,15 @@ const m_option_t mplayer_opts[]={
     {"gamma",&vo_gamma_gamma, CONF_TYPE_INT, CONF_RANGE, -100, 100, NULL},
     {"keepaspect", &vo_keepaspect, CONF_TYPE_FLAG, 0, 0, 1, NULL},
     {"nokeepaspect", &vo_keepaspect, CONF_TYPE_FLAG, 0, 1, 0, NULL},
+    {"systray", &systray, CONF_TYPE_INT, CONF_RANGE, 0, 2, NULL},
+    {"autoplay", &auto_play, CONF_TYPE_INT, CONF_RANGE, 0, 10000, NULL},
+    {"switchview", &switch_view, CONF_TYPE_INT, CONF_RANGE, 0, 2, NULL},
+    {"generate-preview", &generate_preview, CONF_TYPE_FLAG, CONF_RANGE, 0, 1, NULL},
+    {"fixedsize", &fixedsize, CONF_TYPE_FLAG, CONF_GLOBAL, 0, 1, NULL},
+    {"autohide", &auto_hide, CONF_TYPE_INT, CONF_RANGE, 0, 10000, NULL},
+    {"autoexpand", &auto_expand, CONF_TYPE_INT, CONF_RANGE, 0, 1, NULL},
+    {"autodr", &auto_directrendering, CONF_TYPE_INT, CONF_RANGE, 0, 1, NULL},
+
 
     // direct rendering (decoding to video out buffer)
     {"dr", &vo_directrendering, CONF_TYPE_FLAG, 0, 0, 1, NULL},
@@ -233,7 +253,7 @@ const m_option_t mplayer_opts[]={
     {"crash-debug", &crash_debug, CONF_TYPE_FLAG, CONF_GLOBAL, 0, 1, NULL},
     {"nocrash-debug", &crash_debug, CONF_TYPE_FLAG, CONF_GLOBAL, 1, 0, NULL},
 #endif
-    {"osdlevel", &osd_level, CONF_TYPE_INT, CONF_RANGE, 0, 3, NULL},
+    {"osdlevel", &osd_level, CONF_TYPE_INT, CONF_RANGE | CONF_GLOBAL, 0, 4, NULL},
     {"osd-duration", &osd_duration, CONF_TYPE_INT, CONF_MIN, 0, 0, NULL},
     {"osd-fractions", &osd_fractions, CONF_TYPE_INT, CONF_RANGE, 0, 2, NULL},
 #ifdef CONFIG_MENU

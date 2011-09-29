@@ -106,7 +106,9 @@ static const int channel_mask[] = {
   SPEAKER_FRONT_LEFT   | SPEAKER_FRONT_RIGHT  | SPEAKER_LOW_FREQUENCY,
   SPEAKER_FRONT_LEFT   | SPEAKER_FRONT_RIGHT  | SPEAKER_BACK_LEFT    | SPEAKER_BACK_RIGHT,
   SPEAKER_FRONT_LEFT   | SPEAKER_FRONT_RIGHT  | SPEAKER_BACK_LEFT    | SPEAKER_BACK_RIGHT   | SPEAKER_LOW_FREQUENCY,
-  SPEAKER_FRONT_LEFT   | SPEAKER_FRONT_CENTER | SPEAKER_FRONT_RIGHT  | SPEAKER_BACK_LEFT    | SPEAKER_BACK_RIGHT     | SPEAKER_LOW_FREQUENCY
+  SPEAKER_FRONT_LEFT   | SPEAKER_FRONT_CENTER | SPEAKER_FRONT_RIGHT  | SPEAKER_BACK_LEFT    | SPEAKER_BACK_RIGHT     | SPEAKER_LOW_FREQUENCY,
+  SPEAKER_FRONT_LEFT   | SPEAKER_FRONT_CENTER | SPEAKER_BACK_CENTER  | SPEAKER_FRONT_RIGHT  | SPEAKER_BACK_LEFT      | SPEAKER_BACK_RIGHT     | SPEAKER_LOW_FREQUENCY,
+  SPEAKER_FRONT_LEFT   | SPEAKER_FRONT_CENTER | SPEAKER_FRONT_RIGHT  | SPEAKER_BACK_RIGHT   | SPEAKER_BACK_LEFT      | SPEAKER_SIDE_RIGHT     | SPEAKER_SIDE_LEFT      | SPEAKER_LOW_FREQUENCY
 };
 
 static HINSTANCE hdsound_dll = NULL;      ///handle to the dll
@@ -424,7 +426,7 @@ static int init(int rate, int channels, int format, int flags)
 	DSBUFFERDESC dsbdesc;
 
 	//check if the channel count and format is supported in general
-	if (channels > 6) {
+	if (channels > 8) {
 		UninitDirectSound();
 		mp_msg(MSGT_AO, MSGL_ERR, "ao_dsound: 8 channel audio not yet supported\n");
 		return 0;
@@ -567,9 +569,8 @@ static void uninit(int immed)
 	if(immed)reset();
 	else{
 		DWORD status;
+		usec_sleep(get_delay() * 1000 * 1000);
 		IDirectSoundBuffer_Play(hdsbuf, 0, 0, 0);
-		while(!IDirectSoundBuffer_GetStatus(hdsbuf,&status) && (status&DSBSTATUS_PLAYING))
-			usec_sleep(20000);
 	}
 	DestroyBuffer();
 	UninitDirectSound();

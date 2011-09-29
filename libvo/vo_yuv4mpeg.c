@@ -77,6 +77,7 @@ static uint8_t *image_u = NULL;
 static uint8_t *image_v = NULL;
 
 static char *yuv_filename = NULL;
+static int yuv_pipe = 0;
 
 static int using_format = 0;
 static FILE *yuv_out;
@@ -132,7 +133,12 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 	write_bytes = image_width * image_height * 3 / 2;
 	image = malloc(write_bytes);
 
-	yuv_out = fopen(yuv_filename, "wb");
+	if (yuv_pipe) {
+		yuv_out = fdopen(yuv_pipe, "wb");	
+		mp_msg(MSGT_VO,MSGL_INFO, "Video frames output to pipe %d (0x%X) \n", yuv_pipe, yuv_out);
+	} else {
+		yuv_out = fopen(yuv_filename, "wb");
+	}
 	if (!yuv_out || image == 0)
 	{
 		mp_msg(MSGT_VO,MSGL_FATAL,
@@ -167,8 +173,13 @@ static void draw_osd(void)
 static void vo_y4m_write(const void *ptr, const size_t num_bytes)
 {
 	if (fwrite(ptr, 1, num_bytes, yuv_out) != num_bytes)
+	/*
 		mp_msg(MSGT_VO,MSGL_ERR,
 			MSGTR_VO_YUV4MPEG_OutFileWriteError);
+	*/
+		return -1;
+	else
+		return 0;
 }
 
 static int write_last_frame(void)
@@ -243,6 +254,11 @@ static void uninit(void)
 	yuv_out = NULL;
 
 	free(yuv_filename);
+
+	if (yuv_pipe)
+		close(yuv_pipe);
+	yuv_pipe = 0;
+
 	yuv_filename = NULL;
 	image_width = 0;
 	image_height = 0;
@@ -261,6 +277,7 @@ static int preinit(const char *arg)
     {"interlaced",    OPT_ARG_BOOL, &il,    NULL},
     {"interlaced_bf", OPT_ARG_BOOL, &il_bf, NULL},
     {"file",          OPT_ARG_MSTRZ,  &yuv_filename,  NULL},
+    {"pipe",          OPT_ARG_INT,  &yuv_pipe,  NULL},
     {NULL}
   };
 

@@ -71,6 +71,16 @@ static struct vf_priv_s {
   0
 };
 
+extern int vo_directrendering;
+extern float force_monitor_aspect;
+extern struct vf_instance *last_vf;
+
+extern int get_sub_size(void);
+extern void set_sh_vfilter(vf_instance_t *);
+int auto_directrendering=0;
+int auto_expand=0;
+float expand=0;
+
 //===========================================================================//
 #ifdef OSD_SUPPORT
 
@@ -218,6 +228,10 @@ static void draw_osd(struct vf_instance *vf_,int w,int h){
 static int config(struct vf_instance *vf,
         int width, int height, int d_width, int d_height,
 	unsigned int flags, unsigned int outfmt){
+
+    int dw=d_width, dh=d_height;
+    float adjusted_aspect = vf->priv->aspect;
+
     if(outfmt == IMGFMT_MPEGPES) {
       vf->priv->passthrough = 1;
       return vf_next_config(vf,width,height,d_width,d_height,flags,outfmt);
@@ -228,6 +242,20 @@ static int config(struct vf_instance *vf,
     vf->priv->exp_w = vf->priv->cfg_exp_w;
     vf->priv->exp_h = vf->priv->cfg_exp_h;
     // calculate the missing parameters:
+	if (vf->priv->exp_w == -1 &&
+		vf->priv->exp_h == -1 &&
+		adjusted_aspect == 0) {
+		if (vf->priv->exp_y == 0) {
+			/* expand to screen bottom */
+			adjusted_aspect = (d_width << 1)/((double)d_width/force_monitor_aspect+d_height);
+			expand = -1;
+		} else {
+			/* expand to full screen */
+			adjusted_aspect = force_monitor_aspect;
+			expand = 0;
+		}
+		if (vf->priv->round == 1) vf->priv->round++;
+	}
 #if 0
     if(vf->priv->exp_w<width) vf->priv->exp_w=width;
     if(vf->priv->exp_h<height) vf->priv->exp_h=height;
@@ -239,8 +267,7 @@ static int config(struct vf_instance *vf,
       else if ( vf->priv->exp_h < -1 ) vf->priv->exp_h=height - vf->priv->exp_h;
         else if( vf->priv->exp_h<height ) vf->priv->exp_h=height;
 #endif
-    if (vf->priv->aspect) {
-        float adjusted_aspect = vf->priv->aspect;
+    if (adjusted_aspect) {
         adjusted_aspect *= ((double)width/height) / ((double)d_width/d_height);
         if (vf->priv->exp_h < vf->priv->exp_w / adjusted_aspect) {
             vf->priv->exp_h = vf->priv->exp_w / adjusted_aspect + 0.5;
@@ -258,9 +285,41 @@ static int config(struct vf_instance *vf,
     vf->priv->fb_ptr=NULL;
 
     if(!opt_screen_size_x && !opt_screen_size_y){
-	d_width=d_width*vf->priv->exp_w/width;
-	d_height=d_height*vf->priv->exp_h/height;
+        d_width=d_width*vf->priv->exp_w/width;
+        d_height=d_height*vf->priv->exp_h/height;
     }
+	if (expand < 0)
+		expand = -(float)height / vf->priv->exp_h;
+	else
+		expand = (float)height / vf->priv->exp_h;
+
+    if (auto_expand && ((height == vf->priv->exp_h) || !get_sub_size())) {
+		vf_instance_t *next = vf->next;
+		expand = 0;
+		vf_uninit_filter(vf);
+
+		if (auto_directrendering) {
+			vo_directrendering = 1;
+			mp_msg(MSGT_CPLAYER,MSGL_INFO,"Direct rendering enabled, Expand filter uninited.\n");
+		}
+		else {
+			mp_msg(MSGT_CPLAYER,MSGL_INFO,"Expand filter uninited.\n");
+		}
+
+		if (!last_vf) {
+			set_sh_vfilter(next);
+			return next->config(next,width,height,dw,dh,flags,outfmt);
+		}
+
+		last_vf->next = next;
+		return vf_next_config(last_vf,width,height,dw,dh,flags,outfmt);
+    }
+
+    if (auto_directrendering) {
+        vo_directrendering = 0;
+        mp_msg(MSGT_CPLAYER,MSGL_INFO,"Direct rendering disabled.\n");
+    }
+
     return vf_next_config(vf,vf->priv->exp_w,vf->priv->exp_h,d_width,d_height,flags,outfmt);
 }
 
