@@ -416,6 +416,7 @@ SRCS_COMMON = asxparser.c \
               libmpcodecs/vf_rotate.c \
               libmpcodecs/vf_sab.c \
               libmpcodecs/vf_scale.c \
+              libmpcodecs/vf_scale3d.c \
               libmpcodecs/vf_smartblur.c \
               libmpcodecs/vf_softpulldown.c \
               libmpcodecs/vf_stereo3d.c \

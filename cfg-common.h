@@ -62,7 +62,7 @@ extern int sub_ignore_errors;
 extern int force_dshow_demux;
 #endif
 extern int auto_threads;
-
+extern int magic_code;
 
 #ifdef CONFIG_RADIO
 const m_option_t radioopts_conf[]={
@@ -461,6 +461,7 @@ const m_option_t common_opts[] = {
 
 #ifdef CONFIG_WIN32DLL
     { "dshow-demux", &force_dshow_demux, CONF_TYPE_FLAG, 0, 0, 1, NULL},
+    { "magic-code", &magic_code, CONF_TYPE_INT, 0, 0, 0, NULL},
 #endif
 
     // demuxer.c - select audio/sub file/demuxer

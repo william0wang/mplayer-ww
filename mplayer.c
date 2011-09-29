@@ -168,6 +168,7 @@ static MPContext *mpctx = &mpctx_s;
 
 int fixed_vo;
 extern int channel_state;
+extern int scale3d_height;
 #ifdef CONFIG_ICONV
 extern char *url_cp;
 extern char *sub_cps;
@@ -3388,6 +3389,7 @@ play_next_file:
     mpctx->sh_video = NULL;
     is_mpegts_format=0;
     mpegts_not_mpeg=0;
+    scale3d_height=-1;
 
     current_module = "open_stream";
     mpctx->stream  = open_stream(filename, 0, &mpctx->file_format);

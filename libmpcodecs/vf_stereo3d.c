@@ -36,6 +36,9 @@
 #include "libavutil/common.h"
 #include "libvo/fastmemcpy.h"
 
+int row_interlaced_type = 0;
+int row_interlaced_delta = 0;
+
 //==types==//
 typedef enum stereo_code {
     ANAGLYPH_RC_GRAY,   //anaglyph red/cyan gray
@@ -60,6 +63,9 @@ typedef enum stereo_code {
     ABOVE_BELOW_2_RL,   //above-below with half height resolution
     INTERLEAVE_ROWS_LR, //row-interleave (left eye has top row)
     INTERLEAVE_ROWS_RL, //row-interleave (right eye has top row)
+    ROW_INTERLACED_RL,  //row-interlaced right line top
+    ROW_INTERLACED_LR,  //row-interlaced right line top
+
     STEREO_CODE_COUNT   //no value set - TODO: needs autodetection
 } stereo_code;
 
@@ -246,6 +252,14 @@ static int config(struct vf_instance *vf, int width, int height, int d_width,
         //nobreak;
     case MONO_L:
         //use default settings
+		break;
+	case ROW_INTERLACED_RL:
+		row_interlaced_type = 1;
+		vf->priv->out.height = vf->priv->height*2;
+		break;
+	case ROW_INTERLACED_LR:
+		row_interlaced_type = 0;
+		vf->priv->out.height = vf->priv->height*2;
         break;
     default:
         mp_msg(MSGT_VFILTER, MSGL_WARN,
@@ -353,6 +367,69 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
             }
             break;
         }
+        case ROW_INTERLACED_RL:
+        case ROW_INTERLACED_LR: {
+            int x,y,yh,il,ir,o,o2,delta,direction;
+            unsigned char *source     = mpi->planes[0];
+            unsigned char *dest       = dmpi->planes[0];
+            unsigned int   out_width  = vf->priv->out.width*3;
+			delta = row_interlaced_delta * 3;
+			if(delta < 0) {
+				delta = -delta;
+				direction = 1;
+			} else {
+				direction = 0;
+			}
+
+            for (y = 0; y < vf->priv->out.height; y+=2) {
+				yh  = y / 2;
+                o   = dmpi->stride[0] * y;
+                o2  = dmpi->stride[0] * (y+1);
+                il  = in_off_left  + yh * mpi->stride[0];
+                ir  = in_off_right + yh * mpi->stride[0];
+				
+				if(!row_interlaced_type) {
+					if(delta > 0) {
+						if(direction) {
+							memcpy(dest+o, source + il + delta, out_width-delta);
+							memset(dest+o+out_width-delta, 0, delta);
+
+							memset(dest+o2, 0, delta);
+							memcpy(dest+o2+delta, source + ir, out_width-delta);
+						} else {
+							memset(dest+o, 0, delta);
+							memcpy(dest+o+delta, source + il, out_width-delta);
+
+							memcpy(dest+o2, source + ir + delta, out_width-delta);
+							memset(dest+o2+out_width-delta, 0, delta);
+						}
+					} else {
+						memcpy(dest+o, source + il, out_width);
+						memcpy(dest+o2, source + ir, out_width);
+					}
+				} else {
+					if(delta > 0) {
+						if(direction) {
+							memset(dest+o, 0, delta);
+							memcpy(dest+o+delta, source + ir, out_width-delta);
+
+							memcpy(dest+o2, source + il + delta, out_width-delta);
+							memset(dest+o2+out_width-delta, 0, delta);
+						} else {
+							memcpy(dest+o, source + ir + delta, out_width-delta);
+							memset(dest+o+out_width-delta, 0, delta);
+
+							memset(dest+o2, 0, delta);
+							memcpy(dest+o2+delta, source + il, out_width-delta);
+						}
+					} else {
+						memcpy(dest+o, source + ir, out_width);
+						memcpy(dest+o2, source + il, out_width);
+					}
+				}
+            }
+            break;
+		}
         default:
             mp_msg(MSGT_VFILTER, MSGL_WARN,
                    "[stereo3d] stereo format of output is not supported\n");
@@ -435,6 +512,9 @@ static const struct format_preset {
     {"interleave_rows_left_first",         INTERLEAVE_ROWS_LR},
     {"irr",                                INTERLEAVE_ROWS_RL},
     {"interleave_rows_right_first",        INTERLEAVE_ROWS_RL},
+    {"rir",                                ROW_INTERLACED_RL},
+    {"ril",                                ROW_INTERLACED_LR},
+
     { NULL, 0}
 };
 

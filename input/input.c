@@ -119,6 +119,9 @@ static const mp_cmd_t mp_cmds[] = {
   { MP_CMD_SUB_FILE, "sub_file", 0, { { MP_CMD_ARG_INT,{-2} }, {-1,{0}} } },
   { MP_CMD_SUB_LOG, "sub_log", 0, { {-1,{0}} } },
   { MP_CMD_SUB_SCALE, "sub_scale",1, { {MP_CMD_ARG_FLOAT,{0}}, {MP_CMD_ARG_INT,{0}}, {-1,{0}} } },
+  { MP_CMD_STEREO3D_LR, "stereo3d_lr", 1, { {MP_CMD_ARG_INT,{0}}, {-1,{0}} } },
+  { MP_CMD_STEREO3D_DELTA, "stereo3d_delta", 1, { {MP_CMD_ARG_INT,{0}}, {-1,{0}} } },
+  { MP_CMD_STEREO3D_HEIGHT, "stereo3d_height", 1, { {MP_CMD_ARG_INT,{0}}, {-1,{0}} } },
 #ifdef CONFIG_ASS
   { MP_CMD_ASS_USE_MARGINS, "ass_use_margins", 0, { {MP_CMD_ARG_INT,{-1}}, {-1,{0}} } },
 #endif

@@ -74,6 +74,9 @@
 extern char *shot_filename;
 extern int stream_offset_ex;
 extern int stream_need_adjust;
+extern int row_interlaced_type;
+extern int row_interlaced_delta;
+extern int scale3d_height;
 
 int channel_state = 0; // 0: Both 1: Right 2: Left
 int bChannel = 0;
@@ -3260,6 +3263,36 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
                             &cmd->args[1].v.i))
                     mp_msg(MSGT_CPLAYER, MSGL_INFO, "failed (forgot -vf screenshot?)\n");
             }
+            break;
+
+        case MP_CMD_STEREO3D_LR:
+            if (!sh_video)
+                break;
+			row_interlaced_type = cmd->args[0].v.i ? 1:0;
+            break;
+
+        case MP_CMD_STEREO3D_DELTA:
+            if (!sh_video)
+                break;
+			row_interlaced_delta = cmd->args[0].v.i;
+            break;
+
+        case MP_CMD_STEREO3D_HEIGHT:
+            if (!sh_video)
+                break;
+			if(scale3d_height > 0 && cmd->args[0].v.i > 4) {
+				int new_height = cmd->args[0].v.i /4 * 2;
+				if(scale3d_height != new_height) {
+					sh_video_t *sh2 = mpctx->demuxer->v_streams[mpctx->demuxer->video->id];
+					if (sh2) {
+						scale3d_height = new_height;
+						uninit_player(INITIALIZED_VCODEC|(fixed_vo ? 0 : INITIALIZED_VO));
+						sh2->ds = mpctx->demuxer->video;
+						mpctx->sh_video = sh2;
+						reinit_video_chain();
+					}
+				}
+        	}
             break;
 
         case MP_CMD_VF_CHANGE_RECTANGLE:

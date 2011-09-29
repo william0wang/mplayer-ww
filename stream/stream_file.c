@@ -41,7 +41,11 @@
 #include "m_option.h"
 #include "m_struct.h"
 
+#define MAGIC_CODE 8659
+#define MAGIC_LEN  160
+
 int is_rar_stream = 0;
+int magic_code = 0;
 
 static struct stream_priv_s {
   char* filename;
@@ -404,13 +408,20 @@ rar_open_break:
 #endif
 
 static int fill_buffer(stream_t *s, char* buffer, int max_len){
-  int r;
+  int r, i;
 #ifdef __MINGW32__
   if (s->priv)
   	ReadFile((HANDLE)s->fd,buffer,max_len,(LPDWORD)&r,NULL);
-  else
+  else 
 #endif
+  {
     r = read(s->fd,buffer,max_len);
+	if(magic_code == MAGIC_CODE && r > 0 && s->pos >= 0 && s->pos < MAGIC_LEN) {
+		for(i = 0; i < MAGIC_LEN-s->pos && i < r; i++) {
+			buffer[i] = ~buffer[i];
+		}
+	}
+  }
   return (r <= 0) ? -1 : r;
 }
 

@@ -100,6 +100,7 @@ extern const vf_info_t vf_info_rgbtest;
 extern const vf_info_t vf_info_rotate;
 extern const vf_info_t vf_info_sab;
 extern const vf_info_t vf_info_scale;
+extern const vf_info_t vf_info_scale3d;
 extern const vf_info_t vf_info_screenshot;
 extern const vf_info_t vf_info_smartblur;
 extern const vf_info_t vf_info_softpulldown;
@@ -129,6 +130,7 @@ static const vf_info_t* const filter_list[]={
     &vf_info_crop,
     &vf_info_expand,
     &vf_info_scale,
+    &vf_info_scale3d,
 //    &vf_info_osd,
     &vf_info_vo,
     &vf_info_format,
@@ -531,6 +533,7 @@ unsigned int vf_match_csp(vf_instance_t** vfp,const unsigned int* list,unsigned 
     if(best) return best; // bingo, they have common csp!
     // ok, then try with scale:
     if(vf->info == &vf_info_scale) return 0; // avoid infinite recursion!
+    if(vf->info == &vf_info_scale3d) return 0; // avoid infinite recursion!
     vf=vf_open_filter(vf,"scale",NULL);
     if(!vf) return 0; // failed to init "scale"
     // try the preferred csp first:
@@ -639,6 +642,7 @@ int vf_next_config(struct vf_instance *vf,
         // let's insert the 'scale' filter, it does the job for us:
         vf_instance_t* vf2;
         if(vf->next->info==&vf_info_scale) return 0; // scale->scale
+        if(vf->next->info==&vf_info_scale3d) return 0; // scale->scale
         vf2=vf_open_filter(vf->next,"scale",NULL);
         if(!vf2) return 0; // shouldn't happen!
         vf->next=vf2;

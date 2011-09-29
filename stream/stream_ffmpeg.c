@@ -26,9 +26,20 @@
 #include "m_struct.h"
 #include "av_helpers.h"
 
+#define MAGIC_CODE 8659
+#define MAGIC_LEN  160
+
+extern int magic_code;
+
 static int fill_buffer(stream_t *s, char *buffer, int max_len)
 {
+	int i;
     int r = url_read_complete(s->priv, buffer, max_len);
+	if(magic_code == MAGIC_CODE && r > 0 && s->pos >= 0 && s->pos < MAGIC_LEN) {
+		for(i = 0; i < MAGIC_LEN-s->pos && i < r; i++) {
+			buffer[i] = ~buffer[i];
+		}
+	}
     return (r <= 0) ? -1 : r;
 }
 
