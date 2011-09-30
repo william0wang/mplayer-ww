@@ -340,7 +340,9 @@ void uiSetFileName(char *dir, char *name, int type)
     else
         setddup(&guiInfo.Filename, dir, name);
 
+    filename = guiInfo.Filename;
     guiInfo.StreamType = type;
+
     nfree(guiInfo.AudioFilename);
     nfree(guiInfo.SubtitleFilename);
 }
@@ -455,7 +457,7 @@ int gui(int what, void *data)
             dvd_title = 0;
             force_fps = 0;
             if(!mygui->playlist->tracks) return 0;
-            setdup(&guiInfo.Filename, mygui->playlist->tracks[mygui->playlist->current]->filename);
+            uiSetFileName(NULL, mygui->playlist->tracks[mygui->playlist->current]->filename, STREAMTYPE_FILE);
             guiInfo.Track = mygui->playlist->current + 1;
             if(gtkAONorm) greplace(&af_cfg.list, "volnorm", "volnorm");
             if(gtkAOExtraStereo)
@@ -481,12 +483,11 @@ int gui(int what, void *data)
                     dvd_chapter = guiInfo.Chapter;
                     dvd_angle = guiInfo.Angle;
                     sprintf(tmp,"dvd://%d", guiInfo.Track);
-                    setdup(&guiInfo.Filename, tmp);
+                    uiSetFileName(NULL, tmp, STREAMTYPE_DVD);
                     break;
                 }
 #endif
             }
-            filename = guiInfo.Filename;
             break;
         }
         case GUI_SET_AUDIO:
@@ -737,8 +738,7 @@ int guiPlaylistInitialize(play_tree_t *my_playtree, m_config_t *config, int enqu
     if (result)
     {
         mygui->playlist->current = 0;
-        filename = mygui->playlist->tracks[0]->filename;
-        uiSetFileName(NULL, filename, STREAMTYPE_FILE);
+        uiSetFileName(NULL, mygui->playlist->tracks[0]->filename, STREAMTYPE_FILE);
     }
     return result;
 }

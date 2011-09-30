@@ -233,8 +233,10 @@ void guiInit(void)
 
     uiSubRender = 1;
 
-    if (plCurrent && !filename)
+    if (plCurrent && !filename) {
         uiSetFileName(plCurrent->path, plCurrent->name, STREAMTYPE_FILE);
+        filename = NULL; // don't start playing
+    }
 
     if (subdata)
         setdup(&guiInfo.SubtitleFilename, subdata->filename);
@@ -404,7 +406,7 @@ int gui(int what, void *data)
             char tmp[512];
 
             sprintf(tmp, "vcd://%d", guiInfo.Track);
-            setdup(&guiInfo.Filename, tmp);
+            uiSetFileName(NULL, tmp, STREAMTYPE_VCD);
         }
         break;
 #endif
@@ -415,7 +417,7 @@ int gui(int what, void *data)
             char tmp[512];
 
             sprintf(tmp, "dvd://%d", guiInfo.Track);
-            setdup(&guiInfo.Filename, tmp);
+            uiSetFileName(NULL, tmp, STREAMTYPE_DVD);
         }
 
             dvd_chapter = guiInfo.Chapter;
@@ -423,14 +425,6 @@ int gui(int what, void *data)
 
             break;
 #endif
-        }
-
-// if ( guiInfo.StreamType != STREAMTYPE_PLAYLIST ) // Does not make problems anymore!
-        {
-            if (guiInfo.Filename)
-                filename = gstrdup(guiInfo.Filename);
-            else if (filename)
-                setdup(&guiInfo.Filename, filename);
         }
 
         // video opts
@@ -766,11 +760,8 @@ int gui(int what, void *data)
 
         if (guiInfo.Playing && (next = listSet(gtkGetNextPlItem, NULL)) && (plLastPlayed != next)) {
             plLastPlayed = next;
-            setddup(&guiInfo.Filename, next->path, next->name);
-            guiInfo.StreamType = STREAMTYPE_FILE;
-            guiInfo.NewPlay    = GUI_FILE_NEW;
-            nfree(guiInfo.AudioFilename);
-            nfree(guiInfo.SubtitleFilename);
+            uiSetFileName(next->path, next->name, STREAMTYPE_FILE);
+            guiInfo.NewPlay = GUI_FILE_NEW;
             guiInfo.Track++;
         } else {
             if (guiInfo.NewPlay == GUI_FILE_NEW)
@@ -877,18 +868,16 @@ int guiPlaylistInitialize(play_tree_t *my_playtree, m_config_t *config, int enqu
     uiCurr();   // update filename
     uiGotoTheNext = 1;
 
-    if (!enqueue)
-        filename = guiInfo.Filename;             // Backward compatibility; if file is specified on commandline,
-                                                 // gmplayer does directly start in Play-Mode.
-    else
-        filename = NULL;
+    if (enqueue)
+        filename = NULL;            // don't start playing
 
     return result;
 }
 
 // This function imports and inserts an playtree, that is created "on the fly",
 // for example by parsing some MOV-Reference-File; or by loading an playlist
-// with "File Open".
+// with "File Open". (The latter, actually, isn't allowed in MPlayer and thus
+// not working which is why this function won't get called for that reason.)
 // The file which contained the playlist is thereby replaced with it's contents.
 int guiPlaylistAdd(play_tree_t *my_playtree, m_config_t *config)
 {
