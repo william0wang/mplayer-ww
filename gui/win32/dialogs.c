@@ -127,10 +127,13 @@ int display_openfilewindow(gui_t *gui, int add)
         do
         {
             filespec = &fileopen.lpstrFile[fileopen.nFileOffset];
-            filename[0] = 0;
-            strcat(filename, directory);
-            strcat(filename, "\\");
-            strcat(filename, filespec);
+            strcpy(filename, directory);
+
+            if (*filespec)
+            {
+                strcat(filename, "/");
+                strcat(filename, filespec);
+            }
 
             if (GetFileAttributes(filename) & FILE_ATTRIBUTE_DIRECTORY)
                 mp_msg(MSGT_GPLAYER, MSGL_V, "[GUI] %s is a directory, skipping...\n", filename);
@@ -523,7 +526,7 @@ static LRESULT CALLBACK PlayListWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPA
                     {
                 case ID_PLAY:
                         if(selected) pl->current = selected - 1;
-                        uiSetFileName(NULL, pl->tracks[pl->current]->filename, STREAMTYPE_STREAM);
+                        uiSetFileName(NULL, pl->tracks[pl->current]->filename, STREAMTYPE_FILE);
                         gui->startplay(gui);
                     }
                     return 0;
@@ -712,7 +715,7 @@ static LRESULT CALLBACK SkinBrowserWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
                         SendMessage(listbox, LB_GETTEXT, (WPARAM) index, (LPARAM) skinName);
                         /* fill out the full pathname to the skin */
                         strcpy(skinspath, get_path("skins"));
-                        strcat(skinspath, "\\");
+                        strcat(skinspath, "/");
                         strcat(skinspath, skinName);
                         ShowWindow(hwnd, SW_HIDE);
                         Shell_NotifyIcon(NIM_DELETE, &nid);

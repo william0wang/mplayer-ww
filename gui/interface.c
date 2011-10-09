@@ -323,6 +323,7 @@ int gui(int what, void *data)
     dvd_priv_t *dvd;
 #endif
     plItem *next;
+    int state;
 
     if (guiInfo.mpcontext)
         mixer = mpctx_get_mixer(guiInfo.mpcontext);
@@ -349,6 +350,7 @@ int gui(int what, void *data)
     case GUI_HANDLE_EVENTS:
         if (!guiInfo.Playing || !guiInfo.VideoWindow)
             wsHandleEvents();
+        wsAutohideCursor();
         gtkEventHandling();
         break;
 
@@ -397,7 +399,8 @@ int gui(int what, void *data)
         }
 
         switch (guiInfo.StreamType) {
-        case STREAMTYPE_PLAYLIST:
+        case STREAMTYPE_FILE:
+        case STREAMTYPE_STREAM:
             break;
 
 #ifdef CONFIG_VCD
@@ -601,6 +604,13 @@ int gui(int what, void *data)
         guiInfo.StreamType = stream->type;
 
         switch (guiInfo.StreamType) {
+#ifdef CONFIG_VCD
+        case STREAMTYPE_VCD:
+            guiInfo.Tracks = 0;
+            stream_control(stream, STREAM_CTRL_GET_NUM_CHAPTERS, &guiInfo.Tracks);
+            break;
+#endif
+
 #ifdef CONFIG_DVDREAD
         case STREAMTYPE_DVD:
             dvd = stream->priv;
@@ -614,13 +624,6 @@ int gui(int what, void *data)
             guiInfo.Track   = dvd_title + 1;
             guiInfo.Chapter = dvd_chapter + 1;
             guiInfo.Angle   = dvd_angle + 1;
-            break;
-#endif
-
-#ifdef CONFIG_VCD
-        case STREAMTYPE_VCD:
-            guiInfo.Tracks = 0;
-            stream_control(stream, STREAM_CTRL_GET_NUM_CHAPTERS, &guiInfo.Tracks);
             break;
 #endif
 
@@ -640,10 +643,14 @@ int gui(int what, void *data)
 
         guiInfo.sh_video = data;
 
-        if (guiInfo.StreamType == STREAMTYPE_STREAM)
-            btnSet(evSetMoviePosition, btnDisabled);
-        else
-            btnSet(evSetMoviePosition, btnReleased);
+        state = (guiInfo.StreamType == STREAMTYPE_STREAM ? btnDisabled : btnReleased);
+        btnSet(evForward10sec, state);
+        btnSet(evBackward10sec, state);
+        btnSet(evForward1min, state);
+        btnSet(evBackward1min, state);
+        btnSet(evForward10min, state);
+        btnSet(evBackward10min, state);
+        btnSet(evSetMoviePosition, state);
 
 #ifdef CONFIG_DXR3
         if (video_driver_list && !gstrcmp(video_driver_list[0], "dxr3") && (((demuxer_t *)mpctx_get_demuxer(guiInfo.mpcontext))->file_format != DEMUXER_TYPE_MPEG_PS) && !gtkVfLAVC) {

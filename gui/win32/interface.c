@@ -304,7 +304,7 @@ void uiNext(void)
             if(mygui->playlist->current == (mygui->playlist->trackcount - 1))
                 return;
             uiSetFileName(NULL, mygui->playlist->tracks[(mygui->playlist->current)++]->filename,
-                           STREAMTYPE_STREAM);
+                           STREAMTYPE_FILE);
             break;
     }
     mygui->startplay(mygui);
@@ -326,7 +326,7 @@ void uiPrev(void)
             if(mygui->playlist->current == 0)
                 return;
             uiSetFileName(NULL, mygui->playlist->tracks[(mygui->playlist->current)--]->filename,
-                           STREAMTYPE_STREAM);
+                           STREAMTYPE_FILE);
             break;
     }
     mygui->startplay(mygui);
@@ -473,7 +473,8 @@ int gui(int what, void *data)
             guiInfo.NewPlay = 0;
             switch(guiInfo.StreamType)
             {
-                case STREAMTYPE_PLAYLIST:
+                case STREAMTYPE_FILE:
+                case STREAMTYPE_STREAM:
                     break;
 #ifdef CONFIG_DVDREAD
                 case STREAMTYPE_DVD:
@@ -650,7 +651,7 @@ int gui(int what, void *data)
 
               uiGotoTheNext = 1;
               guiInfo.NewPlay = GUI_FILE_NEW;
-              uiSetFileName(NULL, mygui->playlist->tracks[(mygui->playlist->current)++]->filename, STREAMTYPE_STREAM);
+              uiSetFileName(NULL, mygui->playlist->tracks[(mygui->playlist->current)++]->filename, STREAMTYPE_FILE);
               //sprintf(guiInfo.Filename, mygui->playlist->tracks[(mygui->playlist->current)++]->filename);
           }
 
@@ -740,6 +741,9 @@ int guiPlaylistInitialize(play_tree_t *my_playtree, m_config_t *config, int enqu
         mygui->playlist->current = 0;
         uiSetFileName(NULL, mygui->playlist->tracks[0]->filename, STREAMTYPE_FILE);
     }
+
+    if (enqueue) filename = NULL;
+
     return result;
 }
 
