@@ -62,6 +62,9 @@ cf
 cf3
 cmk3
 mk
-release
+mkp
+/release
+/release_console
+/release_player
 
 
