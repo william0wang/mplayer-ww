@@ -180,8 +180,8 @@ static const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_RAWVIDEO,     MKTAG('U', 'Y', 'V', 'Y') },
     { CODEC_ID_RAWVIDEO,     MKTAG('V', 'Y', 'U', 'Y') },
     { CODEC_ID_RAWVIDEO,     MKTAG('I', 'Y', 'U', 'V') },
-    { CODEC_ID_RAWVIDEO,     MKTAG('Y', '8', ' ', ' ') },
     { CODEC_ID_RAWVIDEO,     MKTAG('Y', '8', '0', '0') },
+    { CODEC_ID_RAWVIDEO,     MKTAG('Y', '8', ' ', ' ') },
     { CODEC_ID_RAWVIDEO,     MKTAG('H', 'D', 'Y', 'C') },
     { CODEC_ID_RAWVIDEO,     MKTAG('Y', 'V', 'U', '9') },
     { CODEC_ID_RAWVIDEO,     MKTAG('V', 'D', 'T', 'Z') }, /* SoftLab-NSK VideoTizer */
@@ -259,6 +259,8 @@ static const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_CAVS,         MKTAG('C', 'A', 'V', 'S') },
     { CODEC_ID_JPEG2000,     MKTAG('m', 'j', 'p', '2') },
     { CODEC_ID_JPEG2000,     MKTAG('M', 'J', '2', 'C') },
+    { CODEC_ID_JPEG2000,     MKTAG('L', 'J', '2', 'C') },
+    { CODEC_ID_JPEG2000,     MKTAG('L', 'J', '2', 'K') },
     { CODEC_ID_VMNC,         MKTAG('V', 'M', 'n', 'c') },
     { CODEC_ID_TARGA,        MKTAG('t', 'g', 'a', ' ') },
     { CODEC_ID_PNG,          MKTAG('M', 'P', 'N', 'G') },
@@ -277,6 +279,7 @@ static const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_G2M,          MKTAG('G', '2', 'M', '2') },
     { CODEC_ID_G2M,          MKTAG('G', '2', 'M', '3') },
     { CODEC_ID_G2M,          MKTAG('G', '2', 'M', '4') },
+    { CODEC_ID_AMV,          MKTAG('A', 'M', 'V', 'F') },
     { CODEC_ID_NONE,         0 }
 };
 
@@ -296,6 +299,7 @@ static const AVCodecTag ff_codec_wav_tags[] = {
     { CODEC_ID_ADPCM_YAMAHA,    0x0020 },
     { CODEC_ID_TRUESPEECH,      0x0022 },
     { CODEC_ID_GSM_MS,          0x0031 },
+    { CODEC_ID_AMR_NB,          0x0038 },  /* rogue format number */
     { CODEC_ID_ADPCM_G726,      0x0045 },
     { CODEC_ID_MP2,             0x0050 },
     { CODEC_ID_MP3,             0x0055 },
@@ -354,6 +358,7 @@ static const AVCodecTag mp_wav_tags[] = {
     { CODEC_ID_COOK,              MKTAG('c', 'o', 'o', 'k')},
     { CODEC_ID_DSICINAUDIO,       MKTAG('D', 'C', 'I', 'A')},
     { CODEC_ID_EAC3,              MKTAG('E', 'A', 'C', '3')},
+    { CODEC_ID_G723_1,            MKTAG('7', '2', '3', '1')},
     { CODEC_ID_INTERPLAY_DPCM,    MKTAG('I', 'N', 'P', 'A')},
     { CODEC_ID_MLP,               MKTAG('M', 'L', 'P', ' ')},
     { CODEC_ID_MP1,               0x50},
@@ -380,6 +385,9 @@ static const AVCodecTag mp_wav_tags[] = {
 const struct AVCodecTag * const mp_wav_taglists[] = {ff_codec_wav_tags, mp_wav_tags, 0};
 
 static const AVCodecTag mp_codecid_override_tags[] = {
+    { CODEC_ID_8SVX_EXP,          MKTAG('8', 'e', 'x', 'p')},
+    { CODEC_ID_8SVX_FIB,          MKTAG('8', 'f', 'i', 'b')},
+    { CODEC_ID_8SVX_RAW,          MKTAG('8', 'r', 'a', 'w')},
     { CODEC_ID_AAC,               MKTAG('M', 'P', '4', 'A')},
     { CODEC_ID_AAC_LATM,          MKTAG('M', 'P', '4', 'L')},
     { CODEC_ID_AC3,               0x2000},
@@ -391,6 +399,7 @@ static const AVCodecTag mp_codecid_override_tags[] = {
     { CODEC_ID_FLV1,              MKTAG('F', 'L', 'V', '1')},
     { CODEC_ID_G729,              MKTAG('G', '7', '2', '9')},
     { CODEC_ID_H264,              MKTAG('H', '2', '6', '4')},
+    { CODEC_ID_MP3,               0x55},
     { CODEC_ID_MPEG4,             MKTAG('M', 'P', '4', 'V')},
     { CODEC_ID_PCM_BLURAY,        MKTAG('B', 'P', 'C', 'M')},
     { CODEC_ID_PCM_S8,            MKTAG('t', 'w', 'o', 's')},
