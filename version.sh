@@ -3,16 +3,16 @@
 test "$1" && extra="-gcc$1"
 build=$(date +%Y%m%d)
 
-# releases extract the version number from the VERSION file
-version=$(cat VERSION 2> /dev/null)
+# get the version number from git log
+version=$(git log --grep='git-svn-id:' -1 | grep  'git-svn-id:' | cut -d "@" -f2 | cut -d " " -f1)
 
 if test -z $version ; then
 # Extract revision number from file used by daily tarball snapshots
 # or from the places different Subversion versions have it.
 svn_revision=$(cat snapshot_version 2> /dev/null)
 test $svn_revision || svn_revision=$(LC_ALL=C svn info 2> /dev/null | grep Revision | cut -d' ' -f2)
-test $svn_revision || svn_revision=$(grep revision _svn_mplayer/entries 2>/dev/null | cut -d '"' -f2)
-test $svn_revision || svn_revision=$(sed -n -e '/^dir$/{n;p;q;}' _svn_mplayer/entries 2>/dev/null)
+test $svn_revision || svn_revision=$(grep revision .svn/entries 2>/dev/null | cut -d '"' -f2)
+test $svn_revision || svn_revision=$(sed -n -e '/^dir$/{n;p;q;}' .svn/entries 2>/dev/null)
 test $svn_revision && svn_revision=SVN-r$svn_revision
 test $svn_revision || svn_revision=UNKNOWN
 version=$svn_revision
