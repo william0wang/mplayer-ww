@@ -73,6 +73,7 @@ SRCS_COMMON-$(FFMPEG)                += av_helpers.c                \
                                         av_opts.c                   \
                                         libaf/af_lavcresample.c     \
                                         libmpcodecs/ad_ffmpeg.c     \
+                                        libmpcodecs/ad_spdif.c      \
                                         libmpcodecs/vd_ffmpeg.c     \
                                         libmpcodecs/vf_geq.c        \
                                         libmpcodecs/vf_lavc.c       \
@@ -82,6 +83,8 @@ SRCS_COMMON-$(FFMPEG)                += av_helpers.c                \
                                         libmpdemux/demux_lavf.c     \
                                         stream/stream_ffmpeg.c      \
                                         sub/av_sub.c                \
+
+SRCS_COMMON-$(CONFIG_VF_LAVFI)      +=  libmpcodecs/vf_lavfi.c
 
 # These filters use private headers and do not work with shared FFmpeg.
 SRCS_COMMON-$(FFMPEG_A)              += libaf/af_lavcac3enc.c    \
@@ -701,7 +704,7 @@ SRCS_MENCODER = mencoder.c \
                 $(SRCS_MENCODER-yes)
 
 # (linking) order matters for these libraries
-FFMPEGPARTS = libpostproc libswscale libavformat libavcodec libavutil
+FFMPEGPARTS = libpostproc libswscale libavfilter libavformat libavcodec libavutil
 FFMPEGLIBS  = $(foreach part, $(FFMPEGPARTS), ffmpeg/$(part)/$(part).a)
 FFMPEGFILES = $(foreach part, $(FFMPEGPARTS), $(wildcard $(addprefix ffmpeg/$(part)/,*.[chS] /*/*.[chS] /*/*.asm)))
 

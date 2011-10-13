@@ -416,6 +416,7 @@ Codecs:
   --disable-libnut          disable libnut [autodetect]
   --disable-ffmpeg_a        disable static FFmpeg [autodetect]
   --disable-ffmpeg_so       disable shared FFmpeg [autodetect]
+  --enable-vf-lavfi         enable libavfilter wrapper [disabled]
   --disable-libavcodec_mpegaudio_hp disable high precision audio decoding
                                     in libavcodec [enabled]
   --disable-tremor-internal disable internal Tremor [enabled]
@@ -650,12 +651,13 @@ _cross_compile=auto
 _prefix="/usr/local"
 ffmpeg_a=auto
 ffmpeg_so=auto
+_vf_lavfi=no
 _libavcodec_mpegaudio_hp=yes
 _libopencore_amrnb=auto
 _libopencore_amrwb=auto
 libopenjpeg=auto
 libavdecoders_all=$(sed -n 's/^[^#]*DEC.*(.*, *\(.*\)).*/\1_decoder/p' ffmpeg/libavcodec/allcodecs.c | tr '[a-z]' '[A-Z]')
-libavdecoders=$(echo $libavdecoders_all | sed -e 's/ LIB[A-Z0-9_]*_DECODER//g' -e s/PRORES_GPL_DECODER//)
+libavdecoders=$(echo $libavdecoders_all | sed -e 's/ LIB[A-Z0-9_]*_DECODER//g')
 libavencoders_all=$(sed -n 's/^[^#]*ENC.*(.*, *\(.*\)).*/\1_encoder/p' ffmpeg/libavcodec/allcodecs.c | tr '[a-z]' '[A-Z]')
 libavencoders=$(echo $libavencoders_all | sed -e 's/ LIB[A-Z0-9_]*_ENCODER//g')
 libavparsers_all=$(sed -n 's/^[^#]*PARSER.*(.*, *\(.*\)).*/\1_parser/p' ffmpeg/libavcodec/allcodecs.c | tr '[a-z]' '[A-Z]')
@@ -671,6 +673,8 @@ libavmuxers_all=$(sed -n 's/^[^#]*_MUX.*(.*, *\(.*\)).*/\1_muxer/p' ffmpeg/libav
 libavmuxers=$(echo $libavmuxers_all | sed -e 's/ LIB[A-Z0-9_]*_MUXER//g' -e s/RTP_MUXER// -e s/RTSP_MUXER// -e s/SAP_MUXER//)
 libavprotocols_all=$(sed -n 's/^[^#]*PROTOCOL.*(.*, *\(.*\)).*/\1_protocol/p' ffmpeg/libavformat/allformats.c | tr '[a-z]' '[A-Z]')
 libavprotocols=$libavprotocols_all
+libavfilters_all=$(sed -n 's/^[^#]*FILTER.*(.*, *\(.*\),.*).*/\1_filter/p' ffmpeg/libavfilter/allfilters.c | tr '[a-z]' '[A-Z]')
+libavfilters=$(echo $libavfilters_all | sed -e 's/ LIB[A-Z0-9_]*_FILTER//g' -e 's/ FREI0R[A-Z0-9_]*_FILTER//g' -e 's/ OCV_FILTER//g' -e 's/ MP_FILTER//g')
 _mencoder=yes
 _mplayer=yes
 _x11=auto
@@ -1278,10 +1282,14 @@ for ac_option do
   --disable-demuxer=*) libavdemuxers=$(echo $libavdemuxers | sed "s/$(echo $ac_option | cut -d '=' -f 2 | tr '[a-z]' '[A-Z]')//g") ;;
   --enable-muxer=*)    libavmuxers="$libavmuxers $(echo $ac_option | cut -d '=' -f 2 | tr '[a-z]' '[A-Z]')" ;;
   --disable-muxer=*)    libavmuxers=$(echo $libavmuxers | sed "s/$(echo $ac_option | cut -d '=' -f 2 | tr '[a-z]' '[A-Z]')//g") ;;
+  --enable-filter=*)    libavfilters="$libavfilters $(echo $ac_option | cut -d '=' -f 2 | tr '[a-z]' '[A-Z]')" ;;
+  --disable-filter=*)    libavfilters=$(echo $libavfilters | sed "s/$(echo $ac_option | cut -d '=' -f 2 | tr '[a-z]' '[A-Z]')//g") ;;
   --enable-ffmpeg_a)    ffmpeg_a=yes    ;;
   --disable-ffmpeg_a)   ffmpeg_a=no     ;;
   --enable-ffmpeg_so)   ffmpeg_so=yes   ;;
   --disable-ffmpeg_so)  ffmpeg_so=no    ;;
+  --enable-vf-lavfi)    _vf_lavfi=yes   ;;
+  --disable-vf-lavfi)   _vf_lavfi=no    ;;
   --enable-libavcodec_mpegaudio_hp)     _libavcodec_mpegaudio_hp=yes    ;;
   --disable-libavcodec_mpegaudio_hp)    _libavcodec_mpegaudio_hp=no     ;;
 
@@ -6799,6 +6807,7 @@ else
   def_ffmpeg_so='#undef CONFIG_FFMPEG_SO'
   nocodecmodules="ffmpeg $nocodecmodules"
 fi
+test "$_vf_lavfi" = yes && def_vf_lavfi='#define CONFIG_VF_LAVFI 1'
 test "$_libavcodec_mpegaudio_hp" = yes &&
   def_libavcodec_mpegaudio_hp='#define CONFIG_MPEGAUDIO_HP 1' &&
   mak_libavcodec_mpegaudio_hp='CONFIG_MPEGAUDIO_HP = yes'
@@ -6849,14 +6858,6 @@ else
   nocodecmodules="libopencore_amrwb $nocodecmodules"
 fi
 echores "$_libopencore_amrwb"
-
-
-if test "$_libopencore_amrnb" = no && test "$_libopencore_amrwb" = no ; then
-  libavdecoders="$libavdecoders PRORES_GPL_DECODER"
-  def_ffmpeg_license='#define FFMPEG_LICENSE "GPL version 2"'
-else
-  def_ffmpeg_license='#define FFMPEG_LICENSE "GPL version 2 or later"'
-fi
 
 
 echocheck "libdv-0.9.5+"
@@ -8059,6 +8060,7 @@ FFMPEG     = $ffmpeg
 FFMPEG_A   = $ffmpeg_a
 
 CONFIG_AVCODEC  = $ffmpeg_a
+CONFIG_AVFILTER = $ffmpeg_a
 CONFIG_AVFORMAT = $ffmpeg_a
 CONFIG_AVUTIL   = $ffmpeg_a
 CONFIG_POSTPROC = $ffmpeg_a
@@ -8118,6 +8120,7 @@ CONFIG_GPL      = yes
 CONFIG_MLIB     = $_mlib
 CONFIG_MUXERS   = $_mencoder
 CONFIG_RTPDEC   = $networking
+CONFIG_VF_LAVFI = $_vf_lavfi
 CONFIG_VDPAU    = $_vdpau
 CONFIG_XVMC     = $_xvmc
 CONFIG_ZLIB     = $_zlib
@@ -8136,6 +8139,7 @@ $(echo $libavmuxers    | tr '[a-z] ' '[A-Z]\n' | sed 's/^/CONFIG_/;s/$/=yes/')
 $(echo $libavprotocols | tr '[a-z] ' '[A-Z]\n' | sed 's/^/CONFIG_/;s/$/=yes/')
 $(echo $libavbsfs      | tr '[a-z] ' '[A-Z]\n' | sed 's/^/CONFIG_/;s/$/=yes/')
 $(echo $libavhwaccels  | tr '[a-z] ' '[A-Z]\n' | sed 's/^/CONFIG_/;s/$/=yes/')
+$(echo $libavfilters   | tr '[a-z] ' '[A-Z]\n' | sed 's/^/CONFIG_/;s/$/=yes/')
 EOF
 
 #############################################################################
@@ -8174,8 +8178,10 @@ cat > $TMPH << EOF
    */
 #define CONFIG_FAKE_MONO 1
 
-/* set up max. outburst. use 65536 for ALSA 0.5, for others 16384 is enough */
-#define MAX_OUTBURST 65536
+/* set up max. outburst. use 131072 for TrueHD SPDIF pass-through,
+ * use 65536 for ALSA 0.5, for others 16384 is enough
+ */
+#define MAX_OUTBURST 131072
 
 /* set up audio OUTBURST. Do not change this! */
 #define OUTBURST 512
@@ -8571,6 +8577,7 @@ $def_roundf
 $def_threads
 $def_trunc
 $def_truncf
+$def_vf_lavfi
 $def_xform_asm
 $def_xmm_clobbers
 $def_yasm
@@ -8593,6 +8600,7 @@ $def_yasm
 #define HAVE_INLINE_ASM 1
 #define HAVE_ISATTY 0
 #define HAVE_LDBRX 0
+#define HAVE_LOCALTIME_R 0
 #define HAVE_MAPVIEWOFFILE 0
 #define HAVE_PPC4XX 0
 #define HAVE_STRERROR_R 0
@@ -8622,7 +8630,7 @@ $def_yasm
 #endif
 
 #define FFMPEG_CONFIGURATION "--enable-gpl --enable-postproc"
-$def_ffmpeg_license
+#define FFMPEG_LICENSE "GPL version 2 or later"
 
 #define LIBAV_CONFIGURATION FFMPEG_CONFIGURATION
 #define LIBAV_LICENSE FFMPEG_LICENSE
@@ -8650,6 +8658,7 @@ $(ff_config_enable "$libavmuxers_all"    "$libavmuxers" "#")
 $(ff_config_enable "$libavprotocols_all" "$libavprotocols" "#")
 $(ff_config_enable "$libavbsfs_all"      "$libavbsfs" "#")
 $(ff_config_enable "$libavhwaccels_all"  "$libavhwaccels" "#")
+$(ff_config_enable "$libavfilters_all"   "$libavfilters" "#")
 
 #endif /* MPLAYER_CONFIG_H */
 EOF
