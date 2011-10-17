@@ -29,6 +29,9 @@ typedef struct
 } GUID;
 #endif
 
+// use copies of the IIDs to avoid symbol collisions
+#define IID_IUnknown MP_IID_IUnknown
+#define IID_IClassFactory MP_IID_IClassFactory
 extern const GUID IID_IUnknown;
 extern const GUID IID_IClassFactory;
 
