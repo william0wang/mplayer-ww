@@ -268,19 +268,21 @@ void bpFree(guiImage *img)
  * @param out bitmap mask
  *
  * @return 1 (ok) or 0 (error)
+ *
+ * @note As a side effect, transparent pixels of @a in will be rendered black.
  */
 int bpRenderMask(const guiImage *in, guiImage *out)
 {
     uint32_t *buf;
-    unsigned long i;
-    int b = 0, c = 0;
-    unsigned char tmp = 0;
+    unsigned long x, y;
+    unsigned long i = 0, c = 0;
+    unsigned char tmp = 0, b = 1;
     int shaped = 0;
 
     out->Width     = in->Width;
     out->Height    = in->Height;
     out->Bpp       = 1;
-    out->ImageSize = (out->Width * out->Height + 7) / 8;
+    out->ImageSize = ((out->Width + 7) / 8) * out->Height;
     out->Image     = calloc(1, out->ImageSize);
 
     if (!out->Image) {
@@ -290,24 +292,31 @@ int bpRenderMask(const guiImage *in, guiImage *out)
 
     buf = (uint32_t *)in->Image;
 
-    for (i = 0; i < out->Width * out->Height; i++) {
-        tmp >>= 1;
+    for (y = 0; y < in->Height; y++) {
+        for (x = 0; x < in->Width; x++) {
+            if (!IS_TRANSPARENT(buf[i]))
+                tmp |= b;
+            else {
+                buf[i] = 0; // pixel should be black (if transparency isn't supported)
+                shaped = 1;
+            }
 
-        if (!IS_TRANSPARENT(buf[i]))
-            tmp |= 0x80;
-        else {
-            buf[i] = 0;
-            shaped = 1;
+            i++;
+            b <<= 1;
+
+            if (b == 0) {
+                out->Image[c++] = tmp;
+                tmp = 0;
+                b   = 1;
+            }
         }
 
-        if (++b == 8) {
+        if (b != 1) {
             out->Image[c++] = tmp;
-            tmp = b = 0;
+            tmp = 0;
+            b   = 1;
         }
     }
-
-    if (b)
-        out->Image[c] = tmp;
 
     if (!shaped)
         bpFree(out);
