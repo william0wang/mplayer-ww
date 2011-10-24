@@ -35,28 +35,28 @@
 #
 #############################################################################
 
-  if test -e ffmpeg/.svn ; then
+if test -e ffmpeg/.svn ; then
     echo "You have an outdated FFmpeg SVN checkout in ffmpeg/, please (re)move or replace it"
     exit 1
-  fi
+fi
 
-  if test -e ffmpeg/mp_auto_pull ; then
+if test -e ffmpeg/mp_auto_pull ; then
     if ! (cd ffmpeg && git pull --rebase --ff-only) ; then
-      echo "git pull failed, (re)move ffmpeg/mp_auto_pull to disable pulling"
-      exit 1
+        echo "git pull failed, (re)move ffmpeg/mp_auto_pull to disable pulling"
+        exit 1
     fi
-  fi
+fi
 
-  if ! test -e ffmpeg ; then
+if ! test -e ffmpeg ; then
     echo "No FFmpeg checkout, press enter to download one with git or CTRL+C to abort"
     read tmp
     if ! git clone --depth 1 git://git.videolan.org/ffmpeg.git ffmpeg ; then
-      rm -rf ffmpeg
-      echo "Failed to get a FFmpeg checkout"
-      exit 1
+        rm -rf ffmpeg
+        echo "Failed to get a FFmpeg checkout"
+        exit 1
     fi
     touch ffmpeg/mp_auto_pull
-  fi
+fi
 
 # Prevent locale nonsense from breaking basic text processing utilities
 export LC_ALL=C
@@ -3114,7 +3114,7 @@ fi
 echores "$_kstat"
 
 
-for func in exp2 exp2f llrint llrintf log2 log2f lrint lrintf round roundf trunc truncf; do
+for func in cbrtf exp2 exp2f llrint llrintf log2 log2f lrint lrintf round roundf trunc truncf; do
 echocheck $func
 eval _$func=no
 statement_check math.h "${func}(2.0)" -D_ISOC99_SOURCE && eval _$func=yes
@@ -3565,6 +3565,8 @@ echores "$_dynamic_plugins"
 
 
 def_threads='#define HAVE_THREADS 0'
+def_pthreads='#define HAVE_PTHREADS 0'
+def_w32threads='#define HAVE_W32THREADS 0'
 
 echocheck "pthread"
 if linux ; then
@@ -3617,7 +3619,7 @@ if test "$_w32threads" = auto ; then
   _w32threads=no
   mingw32 && _w32threads=yes
 fi
-test "$_w32threads" = yes && def_threads='#define HAVE_THREADS 1'
+test "$_w32threads" = yes && def_threads='#define HAVE_THREADS 1' && def_w32threads='#define HAVE_W32THREADS 1'
 echores "$_w32threads"
 
 echocheck "rpath"
@@ -5985,7 +5987,7 @@ EOF
     if test "$_ass" = no ; then
         res_comment="FreeType >= 2.2.1 needed"
     elif test "$ass_internal" != yes ; then
-    cat > $TMPC << EOF
+        cat > $TMPC << EOF
 #include <ass/ass.h>
 int main(void) {
 #if !defined(LIBASS_VERSION) || LIBASS_VERSION < 0x00910000
@@ -6935,7 +6937,7 @@ if test "$_x264" = auto && test "$_mencoder" = yes ; then
   cat > $TMPC << EOF
 #include <inttypes.h>
 #include <x264.h>
-#if !(X264_BUILD >= 115)
+#if !(X264_BUILD >= 118)
 #error We do not support old versions of x264. Get the latest from git.
 #endif
 int main(void) { x264_encoder_open((void*)0); return 0; }
@@ -7140,7 +7142,8 @@ if test "$_mencoder" = yes ; then
 else
   # mpeg1video for vf_lavc, snow for vf_uspp / vf_mcdeint,
   libavencoders="$mplayer_encoders MPEG1VIDEO_ENCODER SNOW_ENCODER"
-  libavmuxers=""
+  # needed for codec id -> tag conversion
+  libavmuxers="AVI_MUXER"
   def_muxers='#define CONFIG_MUXERS 0'
 fi
 echores "$_mencoder"
@@ -7771,7 +7774,7 @@ libs_mplayer=$ld_tmp
 
 CFLAGS="$CFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE"
 
-CXXFLAGS=" $CFLAGS -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS"
+CXXFLAGS=" $CFLAGS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS"
 
 # This must be the last test to be performed. Any other tests following it
 # could fail due to linker errors. libdvdnavmini is intentionally not linked
@@ -8554,6 +8557,7 @@ $def_arpa_inet_h
 $def_bswap
 $def_bzlib
 $def_dcbzl
+$def_cbrtf
 $def_exp2
 $def_exp2f
 $def_fast_64bit
@@ -8584,11 +8588,13 @@ $def_threads
 $def_trunc
 $def_truncf
 $def_vf_lavfi
+$def_w32threads
 $def_xform_asm
 $def_xmm_clobbers
 $def_yasm
 
 #define CONFIG_AUDIO_FLOAT 0
+#define CONFIG_AVSERVER 0
 #define CONFIG_FASTDIV 0
 #define CONFIG_FFSERVER 0
 #define CONFIG_GPL 1
@@ -8610,6 +8616,7 @@ $def_yasm
 #define HAVE_MAPVIEWOFFILE 0
 #define HAVE_PPC4XX 0
 #define HAVE_STRERROR_R 0
+#define HAVE_STRPTIME 0
 #define HAVE_SYMVER_ASM_LABEL 0
 #define HAVE_SYMVER_GNU_ASM 0
 #define HAVE_SYS_SELECT_H 0
