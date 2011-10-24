@@ -18,11 +18,13 @@
 
 #include "config.h"
 
+#include <stdint.h>
+#include "mp_msg.h"
 #include "mp_taglists.h"
 #include "libavformat/avformat.h"
 
 #ifdef CONFIG_FFMPEG_A
-#include "libavformat/riff.h"
+#include "libavformat/internal.h"
 #else
 typedef struct AVCodecTag {
     enum CodecID id;
@@ -37,6 +39,7 @@ static const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_H264,         MKTAG('a', 'v', 'c', '1') },
     { CODEC_ID_H264,         MKTAG('D', 'A', 'V', 'C') },
     { CODEC_ID_H264,         MKTAG('V', 'S', 'S', 'H') },
+    { CODEC_ID_H264,         MKTAG('Q', '2', '6', '4') }, /* QNAP surveillance system */
     { CODEC_ID_H263,         MKTAG('H', '2', '6', '3') },
     { CODEC_ID_H263,         MKTAG('X', '2', '6', '3') },
     { CODEC_ID_H263,         MKTAG('T', '2', '6', '3') },
@@ -89,6 +92,7 @@ static const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_MPEG4,        MKTAG('S', 'I', 'P', 'P') }, /* Samsung SHR-6040 */
     { CODEC_ID_MPEG4,        MKTAG('X', 'V', 'I', 'X') },
     { CODEC_ID_MPEG4,        MKTAG('D', 'r', 'e', 'X') },
+    { CODEC_ID_MPEG4,        MKTAG('Q', 'M', 'P', '4') }, /* QNAP Systems */
     { CODEC_ID_MSMPEG4V3,    MKTAG('M', 'P', '4', '3') },
     { CODEC_ID_MSMPEG4V3,    MKTAG('D', 'I', 'V', '3') },
     { CODEC_ID_MSMPEG4V3,    MKTAG('M', 'P', 'G', '3') },
@@ -280,6 +284,10 @@ static const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_G2M,          MKTAG('G', '2', 'M', '3') },
     { CODEC_ID_G2M,          MKTAG('G', '2', 'M', '4') },
     { CODEC_ID_AMV,          MKTAG('A', 'M', 'V', 'F') },
+    { CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'R', 'A') },
+    { CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'R', 'G') },
+    { CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'Y', '0') },
+    { CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'Y', '2') },
     { CODEC_ID_NONE,         0 }
 };
 
@@ -344,7 +352,7 @@ static const AVCodecTag ff_codec_wav_tags[] = {
 };
 #endif
 
-static const AVCodecTag mp_wav_tags[] = {
+static const struct AVCodecTag mp_wav_tags[] = {
     { CODEC_ID_ADPCM_4XM,         MKTAG('4', 'X', 'M', 'A')},
     { CODEC_ID_ADPCM_ADX,         MKTAG('S', 'a', 'd', 'x')},
     { CODEC_ID_ADPCM_EA,          MKTAG('A', 'D', 'E', 'A')},
@@ -382,9 +390,9 @@ static const AVCodecTag mp_wav_tags[] = {
     { 0, 0 },
 };
 
-const struct AVCodecTag * const mp_wav_taglists[] = {ff_codec_wav_tags, mp_wav_tags, 0};
+static const struct AVCodecTag * const mp_wav_taglists[] = {mp_wav_tags, 0};
 
-static const AVCodecTag mp_codecid_override_tags[] = {
+static const struct AVCodecTag mp_codecid_override_tags[] = {
     { CODEC_ID_8SVX_EXP,          MKTAG('8', 'e', 'x', 'p')},
     { CODEC_ID_8SVX_FIB,          MKTAG('8', 'f', 'i', 'b')},
     { CODEC_ID_8SVX_RAW,          MKTAG('8', 'r', 'a', 'w')},
@@ -417,10 +425,10 @@ static const AVCodecTag mp_codecid_override_tags[] = {
     { 0, 0 },
 };
 
-const struct AVCodecTag * const mp_codecid_override_taglists[] =
+static const struct AVCodecTag * const mp_codecid_override_taglists[] =
                         {mp_codecid_override_tags, 0};
 
-static const AVCodecTag mp_bmp_tags[] = {
+static const struct AVCodecTag mp_bmp_tags[] = {
     { CODEC_ID_AMV,               MKTAG('A', 'M', 'V', 'V')},
     { CODEC_ID_ANM,               MKTAG('A', 'N', 'M', ' ')},
     { CODEC_ID_ANSI,              MKTAG('T', 'X', 'T', '4')},
@@ -457,4 +465,37 @@ static const AVCodecTag mp_bmp_tags[] = {
     { 0, 0 },
 };
 
-const struct AVCodecTag * const mp_bmp_taglists[] = {ff_codec_bmp_tags, mp_bmp_tags, 0};
+static const struct AVCodecTag * const mp_bmp_taglists[] = {mp_bmp_tags, 0};
+
+enum CodecID mp_tag2codec_id(uint32_t tag, int audio)
+{
+    return av_codec_get_id(audio ? mp_wav_taglists : mp_bmp_taglists, tag);
+}
+
+uint32_t mp_codec_id2tag(enum CodecID codec_id, uint32_t old_tag, int audio)
+{
+    AVOutputFormat *avi_format;
+    // For some formats (like PCM) always trust CODEC_ID_* more than codec_tag
+    uint32_t tag = av_codec_get_tag(mp_codecid_override_taglists, codec_id);
+    if (tag)
+        return tag;
+
+    // mp4a tag is used for all mp4 files no matter what they actually contain
+    // mp4v is sometimes also used for files containing e.g. mjpeg
+    if (audio  && old_tag != MKTAG('m', 'p', '4', 'a') ||
+        !audio && old_tag != MKTAG('m', 'p', '4', 'v'))
+        tag = old_tag;
+    if (tag)
+        return tag;
+
+    tag = av_codec_get_tag(audio ? mp_wav_taglists : mp_bmp_taglists, codec_id);
+    if (tag)
+        return tag;
+
+    avi_format = av_guess_format("avi", NULL, NULL);
+    if (!avi_format) {
+        mp_msg(MSGT_DEMUXER, MSGL_FATAL, "MPlayer cannot work properly without AVI muxer in libavformat!\n");
+        return 0;
+    }
+    return av_codec_get_tag(avi_format->codec_tag, codec_id);
+}

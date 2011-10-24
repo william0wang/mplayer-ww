@@ -888,6 +888,8 @@ static int parse_print(const m_option_t* opt,const char *name, const char *param
 
   if(opt->priv == NULL)
     return M_OPT_EXIT;
+  if(opt->priv == PRIV_NO_EXIT)
+    return 0;
   return 1;
 }
 
@@ -1114,6 +1116,7 @@ static struct {
   {"argb", IMGFMT_ARGB},
   {"bgra", IMGFMT_BGRA},
   {"abgr", IMGFMT_ABGR},
+  {"gbr24p", IMGFMT_GBR24P},
   {"mjpeg", IMGFMT_MJPEG},
   {"mjpg", IMGFMT_MJPEG},
   { NULL, 0 }
