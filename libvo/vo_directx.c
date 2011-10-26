@@ -153,7 +153,7 @@ extern int disable_screensaver;
 extern BOOL bScrActiveSave;
 
 #define CONTROLBAR_H 20
-static int min_video_width=320;
+static int min_video_width=360;
 static int controlbar_offset = 0;
 static int auto_hide_control_save = 0;
 static int controlbar_height_fixed = 0;
@@ -1687,10 +1687,10 @@ static int reloadskin(HWND hWnd, HWND hWndctrl, const char *skname, int appskin)
 		InvalidateRect(hWndctrl, NULL, FALSE);
 	}
 
-	if(gui_skin.background_width > 320)
+	if(gui_skin.background_width > 360)
 		min_video_width = gui_skin.background_width;
 	else
-		min_video_width = 320;
+		min_video_width = 360;
 
 	if(gui_skin.enable_appskin && gui_skin.border_ok) {
 		xborder0 = xborder = gui_skin.border_left.img->width + gui_skin.border_right.img->width;

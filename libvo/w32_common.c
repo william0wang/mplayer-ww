@@ -98,7 +98,7 @@ extern int open_with_dshow_demux;
 static int seekbar_width = 0;
 static const int volumebar_width = 60;
 static const int volumebar_height = 20;
-static int min_video_width=320;
+static int min_video_width=360;
 int controlbar_height_gl = 0;
 static int controlbar_alpha_save = 0;
 static int auto_hide_control_save = 0;
@@ -647,10 +647,10 @@ static int reloadskin(HWND hWnd, HWND hWndctrl, const char *skname, int appskin)
 		InvalidateRect(hWndctrl, NULL, FALSE);
 	}
 
-	if(gui_skin.background_width > 320)
+	if(gui_skin.background_width > 360)
 		min_video_width = gui_skin.background_width;
 	else
-		min_video_width = 320;
+		min_video_width = 360;
 
 	if(gui_skin.enable_appskin && gui_skin.border_ok) {
 		controlbar_height_gl = 0;
