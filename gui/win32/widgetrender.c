@@ -26,10 +26,9 @@
 #include <windows.h>
 
 #include "gui/util/bitmap.h"
+#include "gui/util/string.h"
 #include "gui/interface.h"
 #include "gui.h"
-
-#include "libavutil/avstring.h"
 
 #define MAX_LABELSIZE 250
 
@@ -116,66 +115,6 @@ static void stringreplace(char *dest, const char *what, const char *format, ... 
     }
 }
 
-static char *TranslateFilename (int c, char *tmp, size_t tmplen)
-{
-    int i;
-    char *p;
-    size_t len;
-
-    switch (guiInfo.StreamType)
-    {
-        case STREAMTYPE_FILE:
-            if (guiInfo.Filename && guiInfo.Filename[0])
-            {
-                p = strrchr(guiInfo.Filename, '\\');
-
-                if (p) av_strlcpy(tmp, p + 1, tmplen);
-                else av_strlcpy(tmp, guiInfo.Filename, tmplen);
-
-                len = strlen(tmp);
-
-                if (len > 3 && tmp[len - 3] == '.') tmp[len - 3] = 0;
-                else if (len > 4 && tmp[len - 4] == '.') tmp[len - 4] = 0;
-                else if (len > 5 && tmp[len - 5] == '.') tmp[len - 5] = 0;
-            }
-            else av_strlcpy(tmp, "No file loaded.", tmplen);
-            break;
-
-        case STREAMTYPE_STREAM:
-            av_strlcpy(tmp, guiInfo.Filename, tmplen);
-            break;
-
-#ifdef CONFIG_DVDREAD
-        case STREAMTYPE_DVD:
-            if (guiInfo.Chapter) snprintf(tmp, tmplen, "Chapter %d", guiInfo.Chapter);
-            else av_strlcat(tmp, "No chapter", tmplen);
-            break;
-#endif
-
-        default:
-            av_strlcpy(tmp, "No media opened.", tmplen);
-            break;
-    }
-
-    if (c)
-    {
-        for (i = 0; tmp[i]; i++)
-        {
-            int t = 0;
-
-            if (c == 1)
-                if (tmp[i] >= 'A' && tmp[i] <= 'Z') t = 32;
-
-            if (c == 2)
-                if (tmp[i] >= 'a' && tmp[i] <= 'z') t = -32;
-
-            tmp[i] = (char) (tmp[i] + t);
-        }
-    }
-
-    return tmp;
-}
-
 /* replaces the chars with special meaning with the associated data from the player info struct */
 static char *generatetextfromlabel(widget *item)
 {
@@ -205,7 +144,7 @@ static char *generatetextfromlabel(widget *item)
     stringreplace(text, "$b", "%3.2f", guiInfo.Balance);
     stringreplace(text, "$B", "%3.1f", guiInfo.Balance);
     stringreplace(text, "$t", "%.2i", guiInfo.Track);
-    stringreplace(text, "$o", "%s", TranslateFilename(0, tmp, sizeof(tmp)));
+    stringreplace(text, "$o", "%s", acp(TranslateFilename(0, tmp, sizeof(tmp))));
     stringreplace(text, "$x", "%i", guiInfo.VideoWidth);
     stringreplace(text, "$y", "%i", guiInfo.VideoHeight);
     stringreplace(text, "$C", "%s", guiInfo.sh_video ? codecname : "");
@@ -230,8 +169,8 @@ static char *generatetextfromlabel(widget *item)
 #endif
     else stringreplace(text, "$T", "u");
 
-    stringreplace(text, "$f", TranslateFilename(1, tmp, sizeof(tmp)));
-    stringreplace(text, "$F", TranslateFilename(2, tmp, sizeof(tmp)));
+    stringreplace(text, "$f", acp(TranslateFilename(1, tmp, sizeof(tmp))));
+    stringreplace(text, "$F", acp(TranslateFilename(2, tmp, sizeof(tmp))));
 
     return text;
 }

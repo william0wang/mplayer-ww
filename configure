@@ -1504,7 +1504,7 @@ if test -z "$_target" ; then
 
   # host's CPU/instruction set
   case "$(uname -m 2>&1)" in
-      x86_64|amd64|i[3-9]86*|x86|x86pc|k5|k6|k6_2|k6_3|k6-2|k6-3|pentium*|athlon*|i586_i686|i586-i686) host_arch=i386 ;;
+      x86_64|amd64|i[3-9]86*|i86pc|x86|x86pc|k5|k6|k6_2|k6_3|k6-2|k6-3|pentium*|athlon*|i586_i686|i586-i686) host_arch=i386 ;;
       ia64) host_arch=ia64 ;;
       macppc|ppc*|Power*) host_arch=ppc ;;
       alpha) host_arch=alpha ;;
@@ -2695,7 +2695,7 @@ def_ebx_available='#define HAVE_EBX_AVAILABLE 0'
 def_xmm_clobbers='#define HAVE_XMM_CLOBBERS 0'
 
 if x86_64 ; then
-inline_asm_check '"mov (%eax), %eax"' || die "Your binutils version is too old and not supported"
+inline_asm_check '"mov (%eax), %eax"' || die "Your binutils version is too old to compile for 64-bit"
 fi
 
 if x86 ; then
@@ -3896,10 +3896,13 @@ echores "$gettimeofday"
 
 
 echocheck "glob()"
+# glob_win enables a Windows-specific glob() replacement
 glob=yes
+glob_win=yes
 def_glob='#define HAVE_GLOB 1'
 statement_check glob.h 'glob("filename", 0, 0, 0)' ||
-    { glob=no ; def_glob='#undef HAVE_GLOB' ; }
+    { glob=no ; def_glob='#undef HAVE_GLOB' ;
+      mingw32 && glob_win=no ; }
 echores "$glob"
 
 
@@ -4844,7 +4847,7 @@ fi
 echocheck "OpenJPEG (JPEG 2000) support"
 if test "$libopenjpeg" = auto ; then
   libopenjpeg=no
-  define_statement_check OPJ_STATIC openjpeg.h 'opj_dparameters_t dec_params; opj_set_default_decoder_parameters(&dec_params)' -lopenjpeg && libopenjpeg=yes
+  define_statement_check OPJ_STATIC openjpeg.h 'opj_dparameters_t dec_params; opj_set_default_decoder_parameters(&dec_params);opj_decode_with_info(0,0,0)' -lopenjpeg && libopenjpeg=yes
 fi
 echores "$libopenjpeg"
 if test "$libopenjpeg" = yes ; then
@@ -7895,6 +7898,7 @@ MPLAYER  = $_mplayer
 # operating system features which have local fallbacks
 GETTIMEOFDAY = $gettimeofday
 GLOB         = $glob
+GLOB_WIN     = $glob_win
 MMAP         = $mmap
 SETENV       = $setenv
 SHMEM        = $shmem
