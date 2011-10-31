@@ -819,7 +819,7 @@ static const char help_text[]=
 #define MSGTR_MENU_PlayList MSGTR_PlayList
 #define MSGTR_MENU_SkinBrowser "Skinbrowser"
 #define MSGTR_MENU_Preferences MSGTR_Preferences
-#define MSGTR_MENU_Exit "Beenden..."
+#define MSGTR_MENU_Exit "Beenden"
 #define MSGTR_MENU_Mute "Stummschaltung"
 #define MSGTR_MENU_Original "Original"
 #define MSGTR_MENU_AspectRatio "Seitenverhältnis"
@@ -1005,6 +1005,33 @@ static const char help_text[]=
 #define MSGTR_WS_NotAFile "Dies scheint keine Datei zu sein...\n"
 #define MSGTR_WS_DDNothing "D&D: Nichts zurückgegeben!\n"
 
+// Win32 GUI
+#define MSGTR_Close "Schließen"
+#define MSGTR_Default "Standard"
+#define MSGTR_Down "Runter"
+#define MSGTR_Load "Laden"
+#define MSGTR_Save "Speichern"
+#define MSGTR_Up "Hoch"
+#define MSGTR_DirectorySelect "Wähle ein Verzeichnis ..."
+#define MSGTR_PlaylistSave "Speichere Wiedergabeliste ..."
+#define MSGTR_PlaylistSelect "Wähle Wiedergabeliste ..."
+#define MSGTR_SelectChapter "Wähle Kapitel ..."
+#define MSGTR_MENU_DebugConsole "Debugging-Konsole"
+#define MSGTR_MENU_OnlineHelp "Online-Hilfe"
+#define MSGTR_MENU_PlayDirectory "Spiele ein Verzeichnis..."
+#define MSGTR_MENU_SeekBack "Springe zurück"
+#define MSGTR_MENU_SeekForw "Springe vor"
+#define MSGTR_MENU_ShowHide "Zeigen/Verbergen"
+#define MSGTR_MENU_SubtitlesOnOff "Untertitel-Anzeige ein/aus"
+#define MSGTR_PLAYLIST_AddFile "Datei hinzufügen..."
+#define MSGTR_PLAYLIST_AddURL "URL hinzufügen..."
+#define MSGTR_PREFERENCES_Priority "Priorität:"
+#define MSGTR_PREFERENCES_PriorityHigh "hoch"
+#define MSGTR_PREFERENCES_PriorityLow "niedrig"
+#define MSGTR_PREFERENCES_PriorityNormal "normal"
+#define MSGTR_PREFERENCES_PriorityNormalAbove "höher als normal"
+#define MSGTR_PREFERENCES_PriorityNormalBelow "niedriger als normal"
+#define MSGTR_PREFERENCES_VideoInSubwin "Video in Unterfenster anzeigen (nur DirectX)"
 
 
 // ======================= Videoausgabetreiber ========================

@@ -28,9 +28,9 @@
 
 #include "libmpcodecs/img_format.h"
 #include "libmpcodecs/mp_image.h"
-
 #include "libvo/fastmemcpy.h"
 #include "libavutil/mem.h"
+#include "mp_msg.h"
 
 void mp_image_alloc_planes(mp_image_t *mpi) {
   // IF09 - allocate space for 4. plane delta info - unused
@@ -152,6 +152,8 @@ void mp_image_setfmt(mp_image_t* mpi,unsigned int out_fmt){
     case IMGFMT_444P16_BE:
     case IMGFMT_444P10_LE:
     case IMGFMT_444P10_BE:
+    case IMGFMT_444P9_LE:
+    case IMGFMT_444P9_BE:
     case IMGFMT_422P16_LE:
     case IMGFMT_422P16_BE:
     case IMGFMT_422P10_LE:

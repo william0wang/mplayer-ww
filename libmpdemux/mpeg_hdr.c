@@ -70,7 +70,7 @@ int mp_header_process_sequence_header (mp_mpeg_header_t * picture, const unsigne
 }
 
 static int header_process_sequence_extension (mp_mpeg_header_t * picture,
-					      unsigned char * buffer)
+					      const unsigned char * buffer)
 {
     /* check chroma format, size extensions, marker bit */
 
@@ -87,7 +87,7 @@ static int header_process_sequence_extension (mp_mpeg_header_t * picture,
     return 0;
 }
 
-static int header_process_picture_coding_extension (mp_mpeg_header_t * picture, unsigned char * buffer)
+static int header_process_picture_coding_extension (mp_mpeg_header_t * picture, const unsigned char * buffer)
 {
     picture->picture_structure = buffer[2] & 3;
     picture->top_field_first = buffer[3] >> 7;
@@ -113,7 +113,7 @@ static int header_process_picture_coding_extension (mp_mpeg_header_t * picture, 
     return 0;
 }
 
-int mp_header_process_extension (mp_mpeg_header_t * picture, unsigned char * buffer)
+int mp_header_process_extension (mp_mpeg_header_t * picture, const unsigned char * buffer)
 {
     switch (buffer[0] & 0xf0) {
     case 0x10:	/* sequence extension */
@@ -157,7 +157,7 @@ float mpeg12_aspect_info(mp_mpeg_header_t *picture)
 }
 
 //MPEG4 HEADERS
-unsigned char mp_getbits(unsigned char *buffer, unsigned int from, unsigned char len)
+unsigned char mp_getbits(const unsigned char *buffer, unsigned int from, unsigned char len)
 {
     unsigned int n;
     unsigned char m, u, l, y;
@@ -178,7 +178,7 @@ unsigned char mp_getbits(unsigned char *buffer, unsigned int from, unsigned char
     return  y;
 }
 
-static inline unsigned int mp_getbits16(unsigned char *buffer, unsigned int from, unsigned char len)
+static inline unsigned int mp_getbits16(const unsigned char *buffer, unsigned int from, unsigned char len)
 {
     if(len > 8)
         return (mp_getbits(buffer, from, len - 8) << 8) | mp_getbits(buffer, from + len - 8, 8);
@@ -189,7 +189,7 @@ static inline unsigned int mp_getbits16(unsigned char *buffer, unsigned int from
 #define getbits mp_getbits
 #define getbits16 mp_getbits16
 
-static int read_timeinc(mp_mpeg_header_t * picture, unsigned char * buffer, int n)
+static int read_timeinc(mp_mpeg_header_t * picture, const unsigned char * buffer, int n)
 {
     if(picture->timeinc_bits > 8) {
       picture->timeinc_unit = getbits(buffer, n, picture->timeinc_bits - 8) << 8;
@@ -204,9 +204,9 @@ static int read_timeinc(mp_mpeg_header_t * picture, unsigned char * buffer, int 
     return n;
 }
 
-int mp4_header_process_vol(mp_mpeg_header_t * picture, unsigned char * buffer)
+int mp4_header_process_vol(mp_mpeg_header_t * picture, const unsigned char * buffer)
 {
-    unsigned int n, aspect=0, aspectw=0, aspecth=0,  x=1, v;
+    unsigned int n, aspect,  x=1, v;
 
     //begins with 0x0000012x
     picture->fps = 0;
@@ -218,10 +218,8 @@ int mp4_header_process_vol(mp_mpeg_header_t * picture, unsigned char * buffer)
     aspect=getbits(buffer, n, 4);
     n += 4;
     if(aspect == 0x0f) {
-      aspectw = getbits(buffer, n, 8);
-      n += 8;
-      aspecth = getbits(buffer, n, 8);
-      n += 8;
+      // custom aspect w and h, 8 bit each
+      n += 16;
     }
 
     if(getbits(buffer, n, 1)) {
@@ -268,7 +266,7 @@ int mp4_header_process_vol(mp_mpeg_header_t * picture, unsigned char * buffer)
     return 0;
 }
 
-void mp4_header_process_vop(mp_mpeg_header_t * picture, unsigned char * buffer)
+void mp4_header_process_vop(mp_mpeg_header_t * picture, const unsigned char * buffer)
 {
   int n;
   n = 0;
@@ -370,12 +368,10 @@ static int h264_parse_vui(mp_mpeg_header_t * picture, unsigned char * buf, unsig
   return n;
 }
 
-static int mp_unescape03(unsigned char *buf, int len)
+static int mp_unescape03(uint8_t *dest, const uint8_t *buf, int len)
 {
-  unsigned char *dest;
   int i, j, skip;
 
-  dest = malloc(len);
   if(! dest)
     return 0;
 
@@ -399,18 +395,17 @@ static int mp_unescape03(unsigned char *buf, int len)
   dest[j] = buf[len-2];
   dest[j+1] = buf[len-1];
   len -= skip;
-  memcpy(buf, dest, len);
-  free(dest);
 
   return len;
 }
 
-int h264_parse_sps(mp_mpeg_header_t * picture, unsigned char * buf, int len)
+int h264_parse_sps(mp_mpeg_header_t * picture, const unsigned char * inbuf, int len)
 {
   unsigned int n = 0, v, i, k, mbh;
   int frame_mbs_only;
+  uint8_t *buf = malloc(len);
 
-  len = mp_unescape03(buf, len);
+  len = mp_unescape03(buf, inbuf, len);
 
   picture->fps = picture->timeinc_unit = picture->timeinc_resolution = 0;
   n = 24;
@@ -465,14 +460,17 @@ int h264_parse_sps(mp_mpeg_header_t * picture, unsigned char * buf, int len)
   if(getbits(buf, n++, 1))
     n = h264_parse_vui(picture, buf, n);
 
+  free(buf);
+
   return n;
 }
 
-int mp_vc1_decode_sequence_header(mp_mpeg_header_t * picture, unsigned char * buf, int len)
+int mp_vc1_decode_sequence_header(mp_mpeg_header_t * picture, const unsigned char * inbuf, int len)
 {
   int n, x;
+  uint8_t *buf = malloc(len);
 
-  len = mp_unescape03(buf, len);
+  len = mp_unescape03(buf, inbuf, len);
 
   picture->display_picture_width = picture->display_picture_height = 0;
   picture->fps = 0;
@@ -480,7 +478,7 @@ int mp_vc1_decode_sequence_header(mp_mpeg_header_t * picture, unsigned char * bu
   x = getbits(buf, n, 2);
   n += 2;
   if(x != 3) //not advanced profile
-    return 0;
+    goto err_out;
 
   getbits16(buf, n, 14);
   n += 14;
@@ -534,6 +532,10 @@ int mp_vc1_decode_sequence_header(mp_mpeg_header_t * picture, unsigned char * bu
     }
   }
 
-  //free(dest);
+  free(buf);
   return 1;
+
+err_out:
+  free(buf);
+  return 0;
 }
