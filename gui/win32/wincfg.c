@@ -92,7 +92,7 @@ int cfg_gui_include(m_option_t *conf, const char *filename)
 {
     (void)conf;
 
-    return m_config_parse_config_file(gui_conf, filename);
+    return m_config_parse_config_file(gui_conf, filename, 0);
 }
 
 int cfg_read(void)
@@ -105,7 +105,7 @@ int cfg_read(void)
     mp_msg(MSGT_GPLAYER, MSGL_V, "[GUI] [cfg] reading config file: %s\n", cfg);
     gui_conf = m_config_new();
     m_config_register_options(gui_conf, gui_opts);
-    if (m_config_parse_config_file(gui_conf, cfg) < 0)
+    if (m_config_parse_config_file(gui_conf, cfg, 1) < 0)
         mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_ConfigFileError);
     free(cfg);
     return 0;
