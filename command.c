@@ -223,7 +223,7 @@ static void log_sub(void)
 }
 
 
-/// \defgroup Properties
+/// \defgroup properties Properties
 ///@{
 
 /// \defgroup GeneralProperties General properties
@@ -2513,6 +2513,7 @@ static const char *property_error_string(int error_value)
     }
     return "UNKNOWN";
 }
+///@}
 
 static void remove_subtitle_range(MPContext *mpctx, int start, int count)
 {

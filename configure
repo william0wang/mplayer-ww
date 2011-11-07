@@ -674,6 +674,7 @@ libavmuxers_all=$(sed -n 's/^[^#]*_MUX.*(.*, *\(.*\)).*/\1_muxer/p' ffmpeg/libav
 libavmuxers=$(echo $libavmuxers_all | sed -e 's/ LIB[A-Z0-9_]*_MUXER//g' -e s/RTP_MUXER// -e s/RTSP_MUXER// -e s/SAP_MUXER//)
 libavprotocols_all=$(sed -n 's/^[^#]*PROTOCOL.*(.*, *\(.*\)).*/\1_protocol/p' ffmpeg/libavformat/allformats.c | tr '[a-z]' '[A-Z]')
 libavprotocols=$libavprotocols_all
+libavprotocols=$(echo $libavprotocols | sed -e s/HTTPS_PROTOCOL// -e s/TLS_PROTOCOL//)
 libavfilters_all=$(sed -n 's/^[^#]*FILTER.*(.*, *\(.*\),.*).*/\1_filter/p' ffmpeg/libavfilter/allfilters.c | tr '[a-z]' '[A-Z]')
 libavfilters=$(echo $libavfilters_all | sed -e 's/ LIB[A-Z0-9_]*_FILTER//g' -e 's/ FREI0R[A-Z0-9_]*_FILTER//g' -e 's/ OCV_FILTER//g' -e 's/ MP_FILTER//g')
 _mencoder=yes
@@ -2794,8 +2795,11 @@ inline_asm_check '"":::"%xmm0"' &&
   xmm_clobbers=yes || xmm_clobbers=no
 echores "$xmm_clobbers"
 
+else
+  _yasm=''
+  def_yasm='#define HAVE_YASM 0'
+  have_yasm="no"
 fi #if x86
-
 
 #FIXME: This should happen before the check for CFLAGS..
 def_altivec_h='#define HAVE_ALTIVEC_H 0'
@@ -3854,7 +3858,7 @@ cat > $TMPC << EOF
 #define _ISOC99_SOURCE
 #include <stdarg.h>
 #include <stdio.h>
-int main(void) { va_list ap = { 0 }; vsscanf("foo", "bar", ap); return 0; }
+int main(void) { va_list ap; vsscanf("foo", "bar", ap); return 0; }
 EOF
 cc_check || { vsscanf=no ; def_vsscanf='#undef HAVE_VSSCANF' ; }
 echores "$vsscanf"
@@ -5509,8 +5513,6 @@ if test "$_alsa" != no ; then
 fi
 def_alsa='#undef CONFIG_ALSA'
 def_alsa5='#undef CONFIG_ALSA5'
-def_alsa9='#undef CONFIG_ALSA9'
-def_alsa1x='#undef CONFIG_ALSA1X'
 def_sys_asoundlib_h='#undef HAVE_SYS_ASOUNDLIB_H'
 def_alsa_asoundlib_h='#undef HAVE_ALSA_ASOUNDLIB_H'
 if test "$_alsaver" ; then
@@ -5525,28 +5527,24 @@ if test "$_alsaver" ; then
     _alsa9=yes
     aomodules="alsa $aomodules"
     def_alsa='#define CONFIG_ALSA 1'
-    def_alsa9='#define CONFIG_ALSA9 1'
     def_sys_asoundlib_h='#define HAVE_SYS_ASOUNDLIB_H 1'
     res_comment="using alsa 0.9.x and sys/asoundlib.h"
   elif test "$_alsaver" = '0.9.x-alsa' ; then
     _alsa9=yes
     aomodules="alsa $aomodules"
     def_alsa='#define CONFIG_ALSA 1'
-    def_alsa9='#define CONFIG_ALSA9 1'
     def_alsa_asoundlib_h='#define HAVE_ALSA_ASOUNDLIB_H 1'
     res_comment="using alsa 0.9.x and alsa/asoundlib.h"
   elif test "$_alsaver" = '1.0.x-sys' ; then
     _alsa1x=yes
     aomodules="alsa $aomodules"
     def_alsa='#define CONFIG_ALSA 1'
-    def_alsa1x="#define CONFIG_ALSA1X 1"
     def_alsa_asoundlib_h='#define HAVE_SYS_ASOUNDLIB_H 1'
     res_comment="using alsa 1.0.x and sys/asoundlib.h"
   elif test "$_alsaver" = '1.0.x-alsa' ; then
     _alsa1x=yes
     aomodules="alsa $aomodules"
     def_alsa='#define CONFIG_ALSA 1'
-    def_alsa1x="#define CONFIG_ALSA1X 1"
     def_alsa_asoundlib_h='#define HAVE_ALSA_ASOUNDLIB_H 1'
     res_comment="using alsa 1.0.x and alsa/asoundlib.h"
   else
@@ -7139,14 +7137,11 @@ echores "$_mp3lame"
 
 
 echocheck "mencoder"
-if test "$_mencoder" = yes ; then
-  def_muxers='#define CONFIG_MUXERS 1'
-else
+if test "$_mencoder" = no ; then
   # mpeg1video for vf_lavc, snow for vf_uspp / vf_mcdeint,
   libavencoders="$mplayer_encoders MPEG1VIDEO_ENCODER SNOW_ENCODER"
   # needed for codec id -> tag conversion
   libavmuxers="AVI_MUXER"
-  def_muxers='#define CONFIG_MUXERS 0'
 fi
 echores "$_mencoder"
 
@@ -7819,6 +7814,187 @@ echores "$_dvdnav"
 # DO NOT ADD ANY TESTS THAT USE LINKER FLAGS HERE (like cc_check).
 # Read dvdnav comment above.
 
+
+# XML documentation tests
+echocheck "XML catalogs"
+for try_catalog in \
+  /etc/sgml/catalog \
+  /usr/share/xml/docbook/*/catalog.xml \
+  /opt/local/share/xml/docbook-xml/*/catalog.xml \
+  /opt/local/share/xml/docbook/*/catalog.xml \
+  /usr/share/sgml/docbook/*/*catalog \
+  /usr/share/apps/ksgmltools2/customization/en/catalog \
+  /usr/share/sgml/catalog \
+  /usr/local/share/sgml/catalog \
+  /usr/lib/sgml/catalog \
+  /usr/local/lib/sgml/catalog \
+  /usr/share/docbook-xml42/catalog.xml \
+  /usr/share/sgml/docbook/xmlcatalog; do
+  if test -f "$try_catalog"; then
+    catalog=$try_catalog
+    break
+  fi
+done
+
+if test -n "$catalog"; then
+  echores "SGML catalog"
+  catalog_opts=--catalogs
+else
+  echores "No SGML catalog found."
+fi
+
+echocheck "XML chunked stylesheet"
+for try_chunk_xsl in \
+  /usr/share/xml/docbook/*/html/chunk.xsl \
+  /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/html/chunk.xsl \
+  /usr/share/sgml/docbook/yelp/docbook/html/chunk.xsl \
+  /usr/local/share/sgml/docbook/stylesheet/xsl/nwalsh/html/chunk.xsl \
+  /usr/local/share/sgml/docbook/yelp/docbook/html/chunk.xsl \
+  /usr/share/docbook-xsl/html/chunk.xsl \
+  /usr/share/sgml/docbook/xsl-stylesheets*/html/chunk.xsl \
+  /usr/share/xml/docbook/stylesheet/nwalsh/current/html/chunk.xsl \
+  /opt/local/share/xsl/docbook-xsl/html/chunk.xsl; do
+  if test -f "$try_chunk_xsl"; then
+    chunk_xsl=$try_chunk_xsl
+    break
+  fi
+done
+
+if test -z "$chunk_xsl"; then
+  chunk_xsl=/usr/share/sgml/docbook/stylesheet/xsl/nwalsh/html/chunk.xsl
+  echores "not found, using default"
+  fake_chunk_xsl=yes
+else
+  echores "chunk.xsl"
+fi
+
+echocheck "XML monolithic stylesheet"
+for try_docbook_xsl in \
+  /usr/share/xml/docbook/*/html/docbook.xsl \
+  /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/html/docbook.xsl \
+  /usr/share/sgml/docbook/yelp/docbook/html/docbook.xsl \
+  /usr/local/share/sgml/docbook/stylesheet/xsl/nwalsh/html/docbook.xsl \
+  /usr/local/share/sgml/docbook/yelp/docbook/html/docbook.xsl \
+  /usr/share/docbook-xsl/html/docbook.xsl \
+  /usr/share/sgml/docbook/xsl-stylesheets*/html/docbook.xsl \
+  /usr/share/xml/docbook/stylesheet/nwalsh/current/html/docbook.xsl \
+  /opt/local/share/xsl/docbook-xsl/html/docbook.xsl; do
+  if test -f "$try_docbook_xsl"; then
+    docbook_xsl=$try_docbook_xsl
+    break
+  fi
+done
+
+if test -z "$docbook_xsl"; then
+  docbook_xsl=/usr/share/sgml/docbook/stylesheet/xsl/nwalsh/html/docbook.xsl
+  echores "not found, using default"
+else
+  echores "docbook.xsl"
+fi
+
+cat > DOCS/xml/html-chunk.xsl << EOF
+<?xml version="1.0" encoding="utf-8"?>
+<!-- **************************************************
+     This file is generated automatically. DO NOT EDIT.
+     ************************************************** -->
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                version="1.0">
+
+  <xsl:import href="$chunk_xsl"/>
+  <xsl:include href="html-common.xsl"/>
+
+</xsl:stylesheet>
+EOF
+
+cat > DOCS/xml/html-single.xsl << EOF
+<?xml version="1.0" encoding="utf-8"?>
+<!-- **************************************************
+     This file is generated automatically. DO NOT EDIT.
+     ************************************************** -->
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                version="1.0">
+
+  <xsl:import href="$docbook_xsl"/>
+  <xsl:include href="html-common.xsl"/>
+
+</xsl:stylesheet>
+EOF
+
+echocheck "XML DTD"
+#FIXME: This should prefer higher version numbers, not the other way around ..
+for try_dtd in \
+  /usr/share/xml/docbook/*/dtd/4*/docbookx.dtd \
+  /usr/share/xml/docbook/*/docbookx.dtd \
+  /usr/share/sgml/docbook/*/docbookx.dtd \
+  /usr/share/sgml/docbook/dtd/*/docbookx.dtd \
+  /usr/share/sgml/docbook/dtd/xml/*/docbookx.dtd \
+  /usr/share/docbook-xml*/docbookx.dtd \
+  /opt/local/share/xml/docbook*/*/docbookx.dtd \
+  /usr/share/apps/ksgmltools2/docbook/*/docbookx.dtd; do
+  if test -f "$try_dtd"; then
+    dtd=$try_dtd
+    break
+  fi
+done
+
+if test -z "$dtd"; then
+  dtd=/usr/share/sgml/docbook/dtd/xml/4.1.2/docbookx.dtd
+  echores "not found, using default"
+else
+  echores "docbookx.dtd"
+fi
+
+for lang in $language_doc; do
+  cat > DOCS/xml/$lang/main.xml << EOF
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!-- **************************************************
+     This file is generated automatically. DO NOT EDIT.
+     ************************************************** -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+    "$dtd"
+[
+<!ENTITY bugreports.xml SYSTEM "bugreports.xml">
+<!ENTITY documentation.xml SYSTEM "documentation.xml">
+<!ENTITY encoding-guide.xml SYSTEM "encoding-guide.xml">
+<!ENTITY faq.xml SYSTEM "faq.xml">
+<!ENTITY install.xml SYSTEM "install.xml">
+<!ENTITY mencoder.xml SYSTEM "mencoder.xml">
+<!ENTITY ports.xml SYSTEM "ports.xml">
+<!ENTITY skin.xml SYSTEM "skin.xml">
+<!ENTITY usage.xml SYSTEM "usage.xml">
+<!ENTITY video.xml SYSTEM "video.xml">
+]>
+<book id="index" lang="$lang">
+&documentation.xml;
+&install.xml;
+&usage.xml;
+&video.xml;
+&ports.xml;
+&mencoder.xml;
+&encoding-guide.xml;
+&faq.xml;
+&bugreports.xml;
+&skin.xml;
+</book>
+EOF
+
+done
+
+echocheck "valid XSLT processor"
+if xsltproc --version > /dev/null 2>&1; then
+  if test -z "$fake_chunk_xsl"; then
+    echores "xsltproc"
+    xsltcommand="xsltproc $catalog_opts -o \$\$1 \$\$2 \$\$3"
+  else
+    echores "Found xsltproc but no stylesheets on your system."
+    echores "xsltproc is unusable without stylesheets."
+  fi
+else
+  echores "xsltproc not found"
+fi
+
+#############################################################################
+
 mak_enable () {
 list=$(echo $1 | tr '[a-z]' '[A-Z]')
 item=$(echo $2 | tr '[a-z]' '[A-Z]')
@@ -7845,6 +8021,10 @@ DOC_LANGS = $language_doc
 DOC_LANG_ALL = $doc_lang_all
 MAN_LANGS = $language_man
 MAN_LANG_ALL = $man_lang_all
+
+CATALOG = $catalog
+XMLLINT_COMMAND = xmllint --noout --noent --postvalid $catalog_opts \$*
+XSLT_COMMAND = $xsltcommand
 
 prefix  = \$(DESTDIR)$_prefix
 BINDIR  = \$(DESTDIR)$_bindir
@@ -8130,7 +8310,8 @@ CONFIG_CRYSTALHD= $crystalhd
 CONFIG_ENCODERS = yes
 CONFIG_GPL      = yes
 CONFIG_MLIB     = $_mlib
-CONFIG_MUXERS   = $_mencoder
+CONFIG_MUXERS   = yes
+CONFIG_NETWORK  = $networking
 CONFIG_RTPDEC   = $networking
 CONFIG_VF_LAVFI = $_vf_lavfi
 CONFIG_VDPAU    = $_vdpau
@@ -8390,9 +8571,7 @@ $def_xshape
 
 /* Audio output drivers */
 $def_alsa
-$def_alsa1x
 $def_alsa5
-$def_alsa9
 $def_arts
 $def_coreaudio
 $def_dart
@@ -8553,7 +8732,7 @@ $def_ffmpeg_so
 #define CONFIG_DECODERS 1
 #define CONFIG_ENCODERS 1
 #define CONFIG_DEMUXERS 1
-$def_muxers
+#define CONFIG_MUXERS 1
 $def_rtpdec
 
 $def_arpa_inet_h
@@ -8602,6 +8781,7 @@ $def_yasm
 #define CONFIG_FFSERVER 0
 #define CONFIG_GPL 1
 #define CONFIG_GRAY 0
+#define CONFIG_LIBMODPLUG 0
 #define CONFIG_LIBVORBIS 0
 #define CONFIG_POWERPC_PERF 0
 #define CONFIG_SHARED 0
