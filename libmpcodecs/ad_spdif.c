@@ -21,6 +21,7 @@
 #include "config.h"
 #include "mp_msg.h"
 #include "ad_internal.h"
+#include "av_helpers.h"
 #include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
 #include "libavutil/opt.h"
@@ -106,6 +107,7 @@ static int init(sh_audio_t *sh)
     sh->context = spdif_ctx;
     lavf_ctx    = spdif_ctx->lavf_ctx;
 
+    init_avformat();
     lavf_ctx->oformat = av_guess_format(FILENAME_SPDIFENC, NULL, NULL);
     if (!lavf_ctx->oformat)
         goto fail;
@@ -116,7 +118,7 @@ static int init(sh_audio_t *sh)
                             read_packet, write_packet, seek);
     if (!lavf_ctx->pb)
         goto fail;
-    stream = av_new_stream(lavf_ctx, 0);
+    stream = avformat_new_stream(lavf_ctx, 0);
     if (!stream)
         goto fail;
     lavf_ctx->duration   = AV_NOPTS_VALUE;
@@ -156,8 +158,6 @@ static int init(sh_audio_t *sh)
         } else
             srate = sh->avctx->sample_rate;
         bps = sh->avctx->bit_rate/8;
-    } else {
-        ;
     }
     sh->ds->buffer_pos -= in_size;
 

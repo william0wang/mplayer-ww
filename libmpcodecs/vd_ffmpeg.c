@@ -294,7 +294,7 @@ static int init(sh_video_t *sh){
     if(use_slices && (lavc_codec->capabilities&CODEC_CAP_DRAW_HORIZ_BAND) && !do_vis_debug)
         ctx->do_slices=1;
 
-    if(lavc_codec->capabilities&CODEC_CAP_DR1 && !do_vis_debug && lavc_codec->id != CODEC_ID_H264 && lavc_codec->id != CODEC_ID_INTERPLAY_VIDEO && lavc_codec->id != CODEC_ID_ROQ && lavc_codec->id != CODEC_ID_VP8 && lavc_codec->id != CODEC_ID_LAGARITH)
+    if(lavc_codec->capabilities&CODEC_CAP_DR1 && !do_vis_debug && lavc_codec->id != CODEC_ID_H264 && lavc_codec->id != CODEC_ID_INTERPLAY_VIDEO && lavc_codec->id != CODEC_ID_VP8 && lavc_codec->id != CODEC_ID_LAGARITH)
         ctx->do_dr1=1;
     ctx->b_age= ctx->ip_age[0]= ctx->ip_age[1]= 256*256*256*64;
     ctx->ip_count= ctx->b_count= 0;
@@ -584,8 +584,8 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
     int type= MP_IMGTYPE_IPB;
     int width= avctx->width;
     int height= avctx->height;
-    // special case to handle reget_buffer without buffer hints
-    if (pic->opaque && pic->data[0] && !pic->buffer_hints)
+    // special case to handle reget_buffer
+    if (pic->opaque && pic->data[0] && (!pic->buffer_hints || pic->buffer_hints & FF_BUFFER_HINTS_REUSABLE))
         return 0;
     avcodec_align_dimensions(avctx, &width, &height);
 //printf("get_buffer %d %d %d\n", pic->reference, ctx->ip_count, ctx->b_count);
@@ -596,16 +596,16 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
         if (pic->buffer_hints & FF_BUFFER_HINTS_READABLE)
             flags |= MP_IMGFLAG_READABLE;
         if (pic->buffer_hints & FF_BUFFER_HINTS_PRESERVE) {
-            type = MP_IMGTYPE_STATIC;
+            type = MP_IMGTYPE_IP;
             flags |= MP_IMGFLAG_PRESERVE;
         }
         if (pic->buffer_hints & FF_BUFFER_HINTS_REUSABLE) {
-            type = MP_IMGTYPE_STATIC;
+            type = MP_IMGTYPE_IP;
             flags |= MP_IMGFLAG_PRESERVE;
         }
         flags|=(avctx->skip_idct<=AVDISCARD_DEFAULT && avctx->skip_frame<=AVDISCARD_DEFAULT && ctx->do_slices) ?
                  MP_IMGFLAG_DRAW_CALLBACK:0;
-        mp_msg(MSGT_DECVIDEO, MSGL_DBG2, type == MP_IMGTYPE_STATIC ? "using STATIC\n" : "using TEMP\n");
+        mp_msg(MSGT_DECVIDEO, MSGL_DBG2, type == MP_IMGTYPE_IP ? "using IP\n" : "using TEMP\n");
     } else {
         if(!pic->reference){
             ctx->b_count++;
@@ -764,9 +764,6 @@ static void release_buffer(struct AVCodecContext *avctx, AVFrame *pic){
     }
 
     if (mpi) {
-        // Palette support: free palette buffer allocated in get_buffer
-        if (mpi->bpp == 8)
-            av_freep(&mpi->planes[1]);
         // release mpi (in case MPI_IMGTYPE_NUMBERED is used, e.g. for VDPAU)
         mpi->usage_count--;
     }
@@ -843,13 +840,16 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
     pkt.flags = AV_PKT_FLAG_KEY;
     if (!ctx->palette_sent && sh->bih && sh->bih->biBitCount <= 8) {
         /* Pass palette to codec */
-        uint8_t *pal = av_packet_new_side_data(&pkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
         unsigned palsize = sh->bih->biSize - sizeof(*sh->bih);
         if (palsize == 0) {
             /* Palette size in biClrUsed */
             palsize = sh->bih->biClrUsed * 4;
         }
-        memcpy(pal, sh->bih+1, FFMIN(palsize, AVPALETTE_SIZE));
+        // if still 0, we simply have no palette in extradata.
+        if (palsize) {
+            uint8_t *pal = av_packet_new_side_data(&pkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
+            memcpy(pal, sh->bih+1, FFMIN(palsize, AVPALETTE_SIZE));
+        }
         ctx->palette_sent = 1;
     }
     ret = avcodec_decode_video2(avctx, pic, &got_picture, &pkt);
