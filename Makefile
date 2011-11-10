@@ -33,8 +33,7 @@ OS_FEATURE-$(STRSEP)                 += osdep/strsep.c
 OS_FEATURE-$(VSSCANF)                += osdep/vsscanf.c
 
 # conditional source declarations
-SRCS_AUDIO_INPUT-$(ALSA1X)           += stream/ai_alsa1x.c
-SRCS_AUDIO_INPUT-$(ALSA9)            += stream/ai_alsa.c
+SRCS_AUDIO_INPUT-$(ALSA)             += stream/ai_alsa.c
 SRCS_AUDIO_INPUT-$(OSS)              += stream/ai_oss.c
 SRCS_COMMON-$(AUDIO_INPUT)           += $(SRCS_AUDIO_INPUT-yes)
 SRCS_COMMON-$(BITMAP_FONT)           += sub/font_load.c
@@ -502,9 +501,7 @@ SRCS_COMMON = asxparser.c \
 
 SRCS_MPLAYER-$(3DFX)         += libvo/vo_3dfx.c
 SRCS_MPLAYER-$(AA)           += libvo/vo_aa.c
-SRCS_MPLAYER-$(ALSA1X)       += libao2/ao_alsa.c
-SRCS_MPLAYER-$(ALSA5)        += libao2/ao_alsa5.c
-SRCS_MPLAYER-$(ALSA9)        += libao2/ao_alsa.c
+SRCS_MPLAYER-$(ALSA)         += libao2/ao_alsa.c
 SRCS_MPLAYER-$(APPLE_IR)     += input/appleir.c
 SRCS_MPLAYER-$(APPLE_REMOTE) += input/ar.c
 SRCS_MPLAYER-$(ARTS)         += libao2/ao_arts.c
@@ -835,6 +832,38 @@ checkheaders: $(ALLHEADERS:.h=.ho)
 
 
 
+###### XML documentation ######
+
+doc: html-chunked html-single
+
+html-chunked: $(addprefix html-chunked-,$(DOC_LANGS))
+html-single:  $(addprefix html-single-,$(DOC_LANGS))
+
+xmllint: $(addprefix xmllint-,$(DOC_LANGS))
+
+define lang-def
+html-chunked-$(lang): DOCS/HTML/$(lang)/dummy.html
+html-single-$(lang):  DOCS/HTML/$(lang)/MPlayer.html
+DOCS/HTML/$(lang)/dummy.html DOCS/HTML/$(lang)/MPlayer.html: DOCS/xml/$(lang)/main.xml $(wildcard DOCS/xml/$(lang)/*.xml) DOCS/xml/html-common.xsl DOCS/HTML/$(lang)/default.css
+
+DOCS/HTML/$(lang)/default.css:
+	mkdir -p $$(@D)
+	cp -f DOCS/xml/default.css $$(@D)
+
+DOCS/HTML/$(lang)/dummy.html:
+	SGML_CATALOG_FILES=$(CATALOG) $(XSLT_COMMAND) $$@ DOCS/xml/html-chunk.xsl $$<
+
+DOCS/HTML/$(lang)/MPlayer.html:
+	SGML_CATALOG_FILES=$(CATALOG) $(XSLT_COMMAND) $$@ DOCS/xml/html-single.xsl $$<
+
+xmllint-$(lang):
+	SGML_CATALOG_FILES=$(CATALOG) $(XMLLINT_COMMAND) DOCS/xml/$(lang)/main.xml
+endef
+
+$(foreach lang, $(DOC_LANG_ALL),$(eval $(lang-def)))
+
+
+
 ###### dependency declarations / specific CFLAGS ######
 
 # Make sure all generated header files are created.
@@ -936,12 +965,14 @@ uninstall:
 
 clean:
 	-$(MAKE) -C ffmpeg $@
+	-$(MAKE) -C tests clean
 	-rm -f $(call ADD_ALL_DIRS,/*.o /*.a /*.ho /*~)
 	-rm -f $(call ADD_ALL_EXESUFS,mplayer mencoder)
 
 distclean: clean testsclean toolsclean driversclean dhahelperclean
 	-$(MAKE) -C ffmpeg $@
-	-rm -rf DOCS/tech/doxygen
+	-rm -rf DOCS/tech/doxygen DOCS/HTML
+	-rm -f DOCS/xml/html-chunk.xsl DOCS/xml/html-single.xsl
 	-rm -f $(call ADD_ALL_DIRS,/*.d)
 	-rm -f config.* codecs.conf.h help_mp.h version.h TAGS tags
 	-rm -f $(VIDIX_PCI_FILES)
@@ -1097,12 +1128,15 @@ dhahelperclean:
 	-rm -f vidix/dhahelper/*.o vidix/dhahelper/*~ vidix/dhahelper/test
 	-rm -f $(addprefix vidix/dhahelperwin/,*.o *~ dhahelper.sys dhasetup.exe base.tmp temp.exp)
 
+fatetest: mplayer$(EXESUF)
+	$(MAKE) -C tests fatetest
 
 
 -include $(DEP_FILES) $(DRIVER_DEP_FILES) $(TESTS_DEP_FILES) $(TOOLS_DEP_FILES) $(DHAHELPER_DEP_FILES)
 
 .PHONY: all doxygen *install* *tools drivers dhahelper*
-.PHONY: checkheaders *clean tests check_checksums
+.PHONY: checkheaders *clean tests check_checksums fatetest
+.PHONY: doc html-chunked* html-single* xmllint*
 
 # Disable suffix rules.  Most of the builtin rules are suffix rules,
 # so this saves some time on slow systems.
