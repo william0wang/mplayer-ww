@@ -105,7 +105,9 @@ static int lavc_param_vstats=0;
 static int lavc_param_idct_algo=0;
 static int lavc_param_debug=0;
 static int lavc_param_vismv=0;
+#ifdef CODEC_FLAG2_SHOW_ALL
 static int lavc_param_wait_keyframe=0;
+#endif
 static int lavc_param_skip_top=0;
 static int lavc_param_skip_bottom=0;
 static int lavc_param_fast=0;
@@ -595,11 +597,9 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
         type = MP_IMGTYPE_TEMP;
         if (pic->buffer_hints & FF_BUFFER_HINTS_READABLE)
             flags |= MP_IMGFLAG_READABLE;
-        if (pic->buffer_hints & FF_BUFFER_HINTS_PRESERVE) {
-            type = MP_IMGTYPE_IP;
-            flags |= MP_IMGFLAG_PRESERVE;
-        }
-        if (pic->buffer_hints & FF_BUFFER_HINTS_REUSABLE) {
+        if (pic->buffer_hints & FF_BUFFER_HINTS_PRESERVE ||
+            pic->buffer_hints & FF_BUFFER_HINTS_REUSABLE) {
+            ctx->ip_count++;
             type = MP_IMGTYPE_IP;
             flags |= MP_IMGFLAG_PRESERVE;
         }
@@ -616,6 +616,11 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
             flags|= MP_IMGFLAG_PRESERVE|MP_IMGFLAG_READABLE
                       | (ctx->do_slices ? MP_IMGFLAG_DRAW_CALLBACK : 0);
         }
+        if(avctx->has_b_frames || ctx->b_count){
+            type= MP_IMGTYPE_IPB;
+        }else{
+            type= MP_IMGTYPE_IP;
+        }
     }
 
     if(init_vo(sh, avctx->pix_fmt) < 0){
@@ -630,7 +635,7 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
     if (IMGFMT_IS_HWACCEL(ctx->best_csp)) {
         type =  MP_IMGTYPE_NUMBERED | (0xffff << 16);
     } else
-    if (!pic->buffer_hints) {
+    if (type == MP_IMGTYPE_IP || type == MP_IMGTYPE_IPB) {
         if(ctx->b_count>1 || ctx->ip_count>2){
             mp_msg(MSGT_DECVIDEO, MSGL_WARN, MSGTR_MPCODECS_DRIFailure);
 
@@ -646,11 +651,6 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
             return avctx->get_buffer(avctx, pic);
         }
 
-        if(avctx->has_b_frames || ctx->b_count){
-            type= MP_IMGTYPE_IPB;
-        }else{
-            type= MP_IMGTYPE_IP;
-        }
         mp_msg(MSGT_DECVIDEO, MSGL_DBG2, type== MP_IMGTYPE_IPB ? "using IPB\n" : "using IP\n");
     }
 
