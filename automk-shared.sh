@@ -16,7 +16,7 @@ if [ -f "config.mak" ]; then
   echo
   echo Beginning Make...
   echo
-  make
+  make -j4
 fi
 
 if [ -f "mplayer.exe" ]; then
