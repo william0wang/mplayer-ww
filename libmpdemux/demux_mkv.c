@@ -1603,8 +1603,7 @@ static int demux_mkv_open_video(demuxer_t *demuxer, mkv_track_t *track,
                 bih = realloc(bih, bih->biSize);
                 memcpy(bih + 1, track->private_data, track->private_size);
             }
-            //track->reorder_timecodes = user_correct_pts == 0;
-            track->reorder_timecodes = 1;
+            track->reorder_timecodes = user_correct_pts == 0;
             if (!vi->id) {
                 mp_msg(MSGT_DEMUX, MSGL_WARN, MSGTR_MPDEMUX_MKV_UnknownCodecID,
                        track->codec_id, track->tnum);
@@ -2671,7 +2670,7 @@ static int handle_block(demuxer_t *demuxer, uint8_t *block, uint64_t length,
                 handle_realaudio(demuxer, track, block, lace_size[i],
                                  block_bref);
             else if (ds == demuxer->video && track->reorder_timecodes && !coreavc_codec) {
-				uint8_t *buffer;
+                uint8_t *buffer;
                 int size = lace_size[i];
                 demux_mkv_decode(track, block, &buffer, &size, 1);
                 handle_video_bframes(demuxer, track, buffer, size,
@@ -3017,8 +3016,8 @@ static int demux_mkv_control(demuxer_t *demuxer, int cmd, void *arg)
     mkv_demuxer_t *mkv_d = (mkv_demuxer_t *) demuxer->priv;
 
     switch (cmd) {
-    //case DEMUXER_CTRL_CORRECT_PTS:
-    //    return DEMUXER_CTRL_OK;
+    case DEMUXER_CTRL_CORRECT_PTS:
+        return DEMUXER_CTRL_OK;
     case DEMUXER_CTRL_GET_TIME_LENGTH:
         if (mkv_d->duration == 0)
             return DEMUXER_CTRL_DONTKNOW;
