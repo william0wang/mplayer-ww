@@ -221,7 +221,6 @@ static const char * const preferred_list[] = {
     "gxf",
     "nut",
     "nuv",
-    "matroska,webm",
     "mov,mp4,m4a,3gp,3g2,mj2",
     "mpc",
     "mpc8",
