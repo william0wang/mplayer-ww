@@ -33,7 +33,6 @@ fi
     --disable-vidix \
     --disable-vidix-pcidb \
 	--disable-ffmpeg_a \
-    --enable-faac \
     --enable-freetype \
     --enable-matrixview \
     --enable-runtime-cpudetection \
