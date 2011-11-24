@@ -18,6 +18,7 @@
 #include <windows.h>
 #include "af.h"
 #include "af_wadsp.h"
+#include "mp_msg.h"
 
 #define MAX_PLUGINS  8
 
