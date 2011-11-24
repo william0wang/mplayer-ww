@@ -7,7 +7,7 @@ fi
 . autocfg-shared.sh $1
 
 if [ -f "config.mak" ]; then
-  make
+  make -j4
 fi
 
 if [ ! -d "release_console" ]; then
@@ -21,11 +21,13 @@ if [ -f "mencoder.exe" ]; then
 fi
 
 if [ -d "/usr/local/ffmpeg-ww-full/bin" ] ; then
+	cp -f -p /usr/local/ffmpeg-ww-full/bin/avconv.exe ./release_console/
 	cp -f -p /usr/local/ffmpeg-ww-full/bin/ffmpeg.exe ./release_console/
-	cp -f -p /usr/local/ffmpeg-ww-full/bin/swscale-2.dll ./release_console/
-	cp -f -p /usr/local/ffmpeg-ww-full/bin/avutil-51.dll ./release_console/
 	cp -f -p /usr/local/ffmpeg-ww-full/bin/avcodec-53.dll ./release_console/
 	cp -f -p /usr/local/ffmpeg-ww-full/bin/avfilter-2.dll ./release_console/
+	cp -f -p /usr/local/ffmpeg-ww-full/bin/avutil-51.dll ./release_console/
 	cp -f -p /usr/local/ffmpeg-ww-full/bin/avformat-53.dll ./release_console/
 	cp -f -p /usr/local/ffmpeg-ww-full/bin/postproc-51.dll ./release_console/
+	cp -f -p /usr/local/ffmpeg-ww-full/bin/swresample-0.dll ./release_console/
+	cp -f -p /usr/local/ffmpeg-ww-full/bin/swscale-2.dll ./release_console/
 fi

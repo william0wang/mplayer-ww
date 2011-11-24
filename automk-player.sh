@@ -33,7 +33,7 @@ fi
 	--extra-libs="-Wl,--enable-auto-import" 
 
 if [ -f "config.mak" ]; then
-  make
+  make -j4
 fi
 
 if [ ! -d "release_player" ]; then
