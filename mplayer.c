@@ -3390,7 +3390,7 @@ static double update_video(int *blit_frame)
                 sh_video->last_pts = sh_video->pts;
             else
                 sh_video->pts = sh_video->last_pts + sh_video->frametime;
-            mp_msg(MSGT_CPLAYER, MSGL_V, "pts value < previous\n");
+            mp_msg(MSGT_CPLAYER, MSGL_DBG2, "pts value < previous\n");
         }
         frame_time = sh_video->pts - sh_video->last_pts;
         if (!frame_time)
