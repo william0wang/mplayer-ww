@@ -199,14 +199,12 @@ static char *help_texts = NULL;
 static int demuxer_get_current_time_ex(demuxer_t *demuxer);
 
 play_tree_t* playtree;
-int coreavc_codec = 0;
 int codec_swap_uv = 0;
 #if (defined(__MINGW32__) || defined(__CYGWIN__)) && defined(CONFIG_WIN32DLL)
 extern int force_dshow_demux;
 extern int open_with_dshow_demux;
 #endif
 extern int enable_file_mapping;
-extern int special_codec;
 extern int osd_percent;
 extern int osd_systime;
 extern int is_vista;
@@ -3264,17 +3262,10 @@ int reinit_video_chain(void)
     initialized_flags |= INITIALIZED_VCODEC;
 
     if (sh_video->codec) {
-        if(!strcasecmp(sh_video->codec->name, "divxh264win")) {
-            special_codec = 1;
-	    } else if(!strcasecmp(sh_video->codec->name, "wmv11dmo") || !strcasecmp(sh_video->codec->name, "wmvvc1dmo") ||
-                !strcasecmp(sh_video->codec->name, "wmvdmo") || !strcasecmp(sh_video->codec->name, "wmv9dmo")) {
+	    if(!strcasecmp(sh_video->codec->name, "wmv11dmo") || !strcasecmp(sh_video->codec->name, "wmvvc1dmo") ||
+                !strcasecmp(sh_video->codec->name, "wmvdmo") || !strcasecmp(sh_video->codec->name, "wmv9dmo") ||
+				!strcasecmp(sh_video->codec->name, "coreavcwindows")) {
     	    codec_swap_uv = 1;
-        } else if(!strcasecmp(sh_video->codec->name, "coreavcwindows")) {
-        	codec_swap_uv = 1;
-        	coreavc_codec = 1;
-	    	if(!strcasecmp(mpctx->demuxer->desc->name, "lavf"))
-	    		user_correct_pts = 0;
-        	if(user_correct_pts) correct_pts = 1;
         }
         mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VIDEO_CODEC=%s\n", sh_video->codec->name);
     }
@@ -3313,7 +3304,7 @@ static double update_video(int *blit_frame)
     //--------------------  Decode a frame: -----------------------
     double frame_time;
     *blit_frame = 0; // Don't blit if we hit EOF
-    if (!correct_pts || fake_video || special_codec) {
+    if (!correct_pts || fake_video) {
         unsigned char *start = NULL;
         void *decoded_frame  = NULL;
         int drop_frame       = 0;
@@ -4140,9 +4131,7 @@ play_next_file:
     cp_index_min = 9999;
 #endif
     fake_video = 0;
-    coreavc_codec = 0;
     codec_swap_uv = 0;
-	special_codec = 0;
     sub_font_name = sub_font_names;
     if (!reload) {
         channel_state = 0;

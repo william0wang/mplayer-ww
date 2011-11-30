@@ -14,14 +14,13 @@
 #endif
 
 #define DSN_OK 0
-#define DSN_API_VERSION 7
+#define DSN_API_VERSION 8
 
 typedef struct _DSVideoCodec DSVideoCodec;
 typedef DSVideoCodec * (WINAPI *funcDSOpenVideoCodec)(const char *dll, const GUID guid, BITMAPINFOHEADER* bih,
-                                                        unsigned int outfmt, float fps, const char *filename, int mpegts, int *err);
+                                                        unsigned int outfmt, double fps, const char *filename, int mpegts, int *err);
 typedef void (WINAPI *funcDSCloseVideoCodec)(DSVideoCodec *codec);
-typedef int (WINAPI *funcDSVideoDecode)(DSVideoCodec *vcodec, const BYTE *src, int size, double pts,
-                                          double *newpts, BYTE *pImage, int keyframe);
+typedef int (WINAPI *funcDSVideoDecode)(DSVideoCodec *vcodec, const BYTE *src, int size, double pts, BYTE *pImage, int keyframe);
 typedef int (WINAPI *funcDSVideoResync)(DSVideoCodec *codec, double pts);
 typedef const char * (WINAPI *funcDSStrError)(int error);
 typedef unsigned int (WINAPI *funcDSGetApiVersion)(void);
@@ -51,7 +50,6 @@ static struct
 
 LIBVD_EXTERN(dshownative)
 
-int special_codec = 0;
 extern int is_mpegts_format;
 
 static int control(sh_video_t *sh, int cmd, void *arg, ...)
@@ -116,7 +114,6 @@ static int init(sh_video_t *sh)
         return 0;
     }
 
-	special_codec = 1;
     mp_msg(MSGT_DECVIDEO, MSGL_V, "INFO: [dshownative] video codec init OK.\n");
     return 1;
 }
@@ -131,18 +128,17 @@ static void uninit(sh_video_t *sh)
 }
 
 // decode a frame
-static mp_image_t* decode(sh_video_t *sh, void* data,int len, int flags)
+static mp_image_t* decode(sh_video_t *sh, void* data, int len, int flags)
 {
     mp_image_t* mpi;
     unsigned char *planes;
     int err;
-    double newpts;
     int keyframe;
 
     if (len <= 0)
         return NULL; // skipped frame
 
-    mpi = mpcodecs_get_image(sh, MP_IMGTYPE_TEMP, MP_IMGFLAG_COMMON_PLANE /*MP_IMGFLAG_PRESERVE*/, sh->disp_w, sh->disp_h);
+    mpi = mpcodecs_get_image(sh, MP_IMGTYPE_TEMP, MP_IMGFLAG_PRESERVE, sh->disp_w, sh->disp_h);
     if (!mpi) return NULL;
 
     keyframe = sh->ds->flags & 1;
@@ -152,15 +148,9 @@ static mp_image_t* decode(sh_video_t *sh, void* data,int len, int flags)
     else
         planes = mpi->planes[0];
 
-    if ((err = dsn.DSVideoDecode(dsn.codec, data, len, sh->pts, &newpts, planes, keyframe) == DSN_OK))
-    {
-        sh->pts = newpts;
+    if ((err = dsn.DSVideoDecode(dsn.codec, data, len, sh->pts, planes, keyframe) == DSN_OK))
         return mpi;
-    }
-    else
-    {
-        //mp_msg(MSGT_DECVIDEO, MSGL_ERR, "[dshownative] Decoding failed: %s\n", dsn.DSStrError(err)); 
-        return NULL;
-    }
+
+    return NULL;
 }
 

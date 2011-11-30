@@ -194,7 +194,6 @@ typedef struct mkv_demuxer {
 #define RAPROPERTIES4_SIZE 56
 #define RAPROPERTIES5_SIZE 70
 
-extern int coreavc_codec;
 int mkv_realdemux = 0;
 
 /**
@@ -2669,7 +2668,7 @@ static int handle_block(demuxer_t *demuxer, uint8_t *block, uint64_t length,
             else if (ds == demuxer->audio && track->realmedia)
                 handle_realaudio(demuxer, track, block, lace_size[i],
                                  block_bref);
-            else if (ds == demuxer->video && track->reorder_timecodes && !coreavc_codec) {
+            else if (ds == demuxer->video && track->reorder_timecodes) {
                 uint8_t *buffer;
                 int size = lace_size[i];
                 demux_mkv_decode(track, block, &buffer, &size, 1);
