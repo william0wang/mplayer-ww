@@ -289,6 +289,7 @@ static const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'R', 'G') },
     { CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'Y', '0') },
     { CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'Y', '2') },
+    { CODEC_ID_VBLE,         MKTAG('V', 'B', 'L', 'E') },
     { CODEC_ID_NONE,         0 }
 };
 
@@ -392,7 +393,7 @@ static const struct AVCodecTag mp_wav_tags[] = {
     { 0, 0 },
 };
 
-static const struct AVCodecTag * const mp_wav_taglists[] = {mp_wav_tags, 0};
+static const struct AVCodecTag * const mp_wav_taglists[] = {ff_codec_wav_tags, mp_wav_tags, 0};
 
 static const struct AVCodecTag mp_codecid_override_tags[] = {
     { CODEC_ID_8SVX_EXP,          MKTAG('8', 'e', 'x', 'p')},
@@ -471,7 +472,7 @@ static const struct AVCodecTag mp_bmp_tags[] = {
     { 0, 0 },
 };
 
-static const struct AVCodecTag * const mp_bmp_taglists[] = {mp_bmp_tags, 0};
+static const struct AVCodecTag * const mp_bmp_taglists[] = {ff_codec_bmp_tags, mp_bmp_tags, 0};
 
 enum CodecID mp_tag2codec_id(uint32_t tag, int audio)
 {
