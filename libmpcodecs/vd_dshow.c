@@ -40,18 +40,21 @@ static const vd_info_t info = {
 
 LIBVD_EXTERN(dshow)
 
+static int buffered_frames = 0;
+
 extern void DS_VideoDecoder_SeekInternal(DS_VideoDecoder *this);
 
 // to set/get/query special features/parameters
 static int control(sh_video_t *sh,int cmd,void* arg,...){
     switch(cmd){
     case VDCTRL_RESYNC_STREAM:
+      buffered_frames = 0;
       DS_VideoDecoder_SeekInternal(sh->context);
     return CONTROL_TRUE;
     case VDCTRL_QUERY_MAX_PP_LEVEL:
 	return 4;
     case VDCTRL_QUERY_UNSEEN_FRAMES:
-	return 10;
+	return buffered_frames+10;
     case VDCTRL_SET_PP_LEVEL:
 	if(!sh->context) return CONTROL_ERROR;
 	DS_VideoDecoder_SetValue(sh->context,"Quality",*((int*)arg));
@@ -131,10 +134,12 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
 		return NULL;
     }
 
-    pts = sh->pts*1E9;
+    if(buffered_frames == 0)
+        sh->buffered_pts[0] = sh->pts;
 
-    mpi=mpcodecs_get_image(sh, MP_IMGTYPE_TEMP, MP_IMGFLAG_PRESERVE /*MP_IMGFLAG_COMMON_PLANE*/,
-	sh->disp_w, sh->disp_h);
+    pts = sh->buffered_pts[0]*1E9;
+
+    mpi=mpcodecs_get_image(sh, MP_IMGTYPE_TEMP, MP_IMGFLAG_PRESERVE, sh->disp_w, sh->disp_h);
 
     if(!mpi){	// temporary!
 		mp_msg(MSGT_DECVIDEO,MSGL_WARN,MSGTR_MPCODECS_CouldntAllocateImageForCinepakCodec);
@@ -144,7 +149,13 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
     DS_VideoDecoder_FreeFrame(sh->context);
     DS_VideoDecoder_SetPTS(sh->context, pts);
     ret = DS_VideoDecoder_DecodeInternal(sh->context, data, len, 0, mpi->planes[0]);
-    if(!ret) return 0;
+    pts = DS_VideoDecoder_GetPTS(sh->context);
+
+    if(!ret) {
+      ++buffered_frames;   return 0;
+    } else if(pts && !(ret & (1<<31))) {
+      sh->buffered_pts[0] = (double)pts/1E9;
+    }
 
     return mpi;
 }
