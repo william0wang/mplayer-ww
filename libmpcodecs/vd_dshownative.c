@@ -20,7 +20,8 @@ typedef struct _DSVideoCodec DSVideoCodec;
 typedef DSVideoCodec * (WINAPI *funcDSOpenVideoCodec)(const char *dll, const GUID guid, BITMAPINFOHEADER* bih,
                                                         unsigned int outfmt, double fps, const char *filename, int mpegts, int *err);
 typedef void (WINAPI *funcDSCloseVideoCodec)(DSVideoCodec *codec);
-typedef int (WINAPI *funcDSVideoDecode)(DSVideoCodec *vcodec, const BYTE *src, int size, double pts, BYTE *pImage, int keyframe);
+typedef int (WINAPI *funcDSVideoDecode)(DSVideoCodec *vcodec, const BYTE *src, int size, double pts,
+                                          double *newpts, BYTE *pImage, int keyframe);
 typedef int (WINAPI *funcDSVideoResync)(DSVideoCodec *codec, double pts);
 typedef const char * (WINAPI *funcDSStrError)(int error);
 typedef unsigned int (WINAPI *funcDSGetApiVersion)(void);
@@ -132,7 +133,7 @@ static mp_image_t* decode(sh_video_t *sh, void* data, int len, int flags)
 {
     mp_image_t* mpi;
     unsigned char *planes;
-    int err;
+    double newpts;
     int keyframe;
 
     if (len <= 0)
@@ -148,9 +149,10 @@ static mp_image_t* decode(sh_video_t *sh, void* data, int len, int flags)
     else
         planes = mpi->planes[0];
 
-    if ((err = dsn.DSVideoDecode(dsn.codec, data, len, sh->pts, planes, keyframe) == DSN_OK))
+    if (dsn.DSVideoDecode(dsn.codec, data, len, sh->pts, &newpts, planes, keyframe) == DSN_OK) {
+        sh->pts = newpts;
         return mpi;
+	}
 
     return NULL;
 }
-
