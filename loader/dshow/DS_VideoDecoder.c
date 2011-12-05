@@ -29,6 +29,7 @@ struct DS_VideoDecoder
 static SampleProcUserData sampleProcData;
 static int discontinuity = 1;
 static long max_frame_size = 0;
+static REFERENCE_TIME frame_time = 1;
 #include "DS_VideoDecoder.h"
 
 #include "loader/wine/winerror.h"
@@ -218,7 +219,7 @@ void DS_VideoDecoder_SetInputType(DS_VideoDecoder *this, BITMAPINFOHEADER * form
 	max_frame_size = 0;
 }
 
-DS_VideoDecoder * DS_VideoDecoder_Open(char* dllname, GUID* guid, BITMAPINFOHEADER * format, int flip, int maxauto)
+DS_VideoDecoder * DS_VideoDecoder_Open(char* dllname, GUID* guid, BITMAPINFOHEADER * format, double fps, int flip, int maxauto)
 {
     DS_VideoDecoder *this;
     HRESULT result;
@@ -227,6 +228,7 @@ DS_VideoDecoder * DS_VideoDecoder_Open(char* dllname, GUID* guid, BITMAPINFOHEAD
     this = malloc(sizeof(DS_VideoDecoder));
     memset( this, 0, sizeof(DS_VideoDecoder));
 
+	frame_time = 1;
     this->m_sVhdr2 = 0;
     this->m_iLastQuality = -1;
     this->m_iMaxAuto = maxauto;
@@ -234,6 +236,9 @@ DS_VideoDecoder * DS_VideoDecoder_Open(char* dllname, GUID* guid, BITMAPINFOHEAD
 #ifdef WIN32_LOADER
     Setup_LDT_Keeper();
 #endif
+
+	if(fps > 0)
+		frame_time = 1E9/fps;
 
 	if(!stricmp(dllname, "DivXDecH264.ax")) {
 		HKEY hKey;
@@ -450,7 +455,7 @@ int DS_VideoDecoder_DecodeInternal(DS_VideoDecoder *this, const void* src, int s
     int result;
     int ret = 0;
 	REFERENCE_TIME starttime = pts;
-	REFERENCE_TIME stoptime = starttime + 1;
+	REFERENCE_TIME stoptime = starttime + frame_time;
 
     Debug printf("DS_VideoDecoder_DecodeInternal(%p,%p,%d,%d,%p)\n",this,src,size,is_keyframe,pImage);
 
