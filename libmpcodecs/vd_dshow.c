@@ -130,7 +130,7 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
     if(flags&3){
 		// framedrop:
         DS_VideoDecoder_FreeFrame(sh->context);
-        DS_VideoDecoder_DecodeInternal(sh->context, data, len, 0, 0);
+        DS_VideoDecoder_DecodeInternal(sh->context, data, len, 0, 0, 0);
 		return NULL;
     }
 
@@ -147,8 +147,7 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
     }
 
     DS_VideoDecoder_FreeFrame(sh->context);
-    DS_VideoDecoder_SetPTS(sh->context, pts);
-    ret = DS_VideoDecoder_DecodeInternal(sh->context, data, len, 0, mpi->planes[0]);
+    ret = DS_VideoDecoder_DecodeInternal(sh->context, data, len, 0, mpi->planes[0], pts);
     pts = DS_VideoDecoder_GetPTS(sh->context);
 
     if(!ret) {

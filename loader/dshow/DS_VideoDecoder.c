@@ -428,17 +428,6 @@ void DS_VideoDecoder_SeekInternal(DS_VideoDecoder *this)
     discontinuity = 1;
 }
 
-void DS_VideoDecoder_SetPTS(DS_VideoDecoder *this, uint64_t pts_nsec)
-{
-    IMediaSample* sample = 0;
-    REFERENCE_TIME stoptime;
-    stoptime = pts_nsec + 1;
-    this->m_pDS_Filter->m_pAll->vt->GetBuffer(this->m_pDS_Filter->m_pAll, &sample, 0, 0, 0);
-    if(sample)
-      sample->vt->SetTime(sample, &pts_nsec, &stoptime);
-    sample->vt->Release((IUnknown*)sample);
-}
-
 uint64_t DS_VideoDecoder_GetPTS(DS_VideoDecoder *this)
 {
     return sampleProcData.pts_nsec;
@@ -450,12 +439,14 @@ void DS_VideoDecoder_FreeFrame(DS_VideoDecoder *this)
       sampleProcData.state = 0;
 }
 
-int DS_VideoDecoder_DecodeInternal(DS_VideoDecoder *this, const void* src, int size, int is_keyframe, char* pImage)
+int DS_VideoDecoder_DecodeInternal(DS_VideoDecoder *this, const void* src, int size, int is_keyframe, char* pImage, uint64_t pts)
 {
     IMediaSample* sample = 0;
     char* ptr;
     int result;
     int ret = 0;
+	REFERENCE_TIME starttime = pts;
+	REFERENCE_TIME stoptime = starttime + 1;
 
     Debug printf("DS_VideoDecoder_DecodeInternal(%p,%p,%d,%d,%p)\n",this,src,size,is_keyframe,pImage);
 
@@ -469,7 +460,7 @@ int DS_VideoDecoder_DecodeInternal(DS_VideoDecoder *this, const void* src, int s
 
     //cout << "DECODE " << (void*) pImage << "   d: " << (void*) pImage->Data() << endl;
 
-
+    sample->vt->SetTime(sample, &starttime, &stoptime);
     sample->vt->SetActualDataLength(sample, size);
     sample->vt->GetPointer(sample, (BYTE **)&ptr);
     memcpy(ptr, src, size);

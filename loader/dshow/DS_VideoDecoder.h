@@ -16,9 +16,7 @@ void DS_VideoDecoder_StartInternal(DS_VideoDecoder *this);
 
 void DS_VideoDecoder_StopInternal(DS_VideoDecoder *this);
 
-int DS_VideoDecoder_DecodeInternal(DS_VideoDecoder *this, const void* src, int size, int is_keyframe, char* pImage);
-
-void DS_VideoDecoder_SetPTS(DS_VideoDecoder *this, uint64_t pts_nsec);
+int DS_VideoDecoder_DecodeInternal(DS_VideoDecoder *this, const void* src, int size, int is_keyframe, char* pImage, uint64_t pts);
 
 uint64_t DS_VideoDecoder_GetPTS(DS_VideoDecoder *this);
 
