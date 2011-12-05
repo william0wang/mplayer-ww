@@ -18,7 +18,7 @@ struct DS_VideoDecoder
     DS_Filter* m_pDS_Filter;
     AM_MEDIA_TYPE m_sOurType, m_sDestType;
     VIDEOINFOHEADER* m_sVhdr;
-    VIDEOINFOHEADER* m_sVhdr2;
+    VIDEOINFOHEADER2* m_sVhdr2;
     int m_Caps;//CAPS m_Caps;                // capabilities of DirectShow decoder
     int m_iLastQuality;         // remember last quality as integer
     int m_iMinBuffers;
@@ -264,23 +264,27 @@ DS_VideoDecoder * DS_VideoDecoder_Open(char* dllname, GUID* guid, BITMAPINFOHEAD
 
         DS_VideoDecoder_SetInputType(this, format);
 
-	this->m_sVhdr2 = malloc(sizeof(VIDEOINFOHEADER)+12);
-	memcpy(this->m_sVhdr2, this->m_sVhdr, sizeof(VIDEOINFOHEADER));
-        memset((char*)this->m_sVhdr2 + sizeof(VIDEOINFOHEADER), 0, 12);
+	this->m_sVhdr2 = malloc(sizeof(VIDEOINFOHEADER2)+12);
+	memset((char*)this->m_sVhdr2, 0, sizeof(VIDEOINFOHEADER2)+12);
+	this->m_sVhdr2->rcSource = this->m_sVhdr->rcSource;
+	this->m_sVhdr2->rcTarget = this->m_sVhdr->rcTarget;
+	this->m_sVhdr2->dwBitRate = this->m_sVhdr->dwBitRate;
+	this->m_sVhdr2->dwBitErrorRate = this->m_sVhdr->dwBitErrorRate;
+	this->m_sVhdr2->bmiHeader = this->m_sVhdr->bmiHeader;
 	this->m_sVhdr2->bmiHeader.biCompression = 0;
 	this->m_sVhdr2->bmiHeader.biBitCount = 24;
 
 	memset(&this->m_sDestType, 0, sizeof(this->m_sDestType));
 	this->m_sDestType.majortype = MEDIATYPE_Video;
 	this->m_sDestType.subtype = MEDIASUBTYPE_RGB24;
-	this->m_sDestType.formattype = FORMAT_VideoInfo;
+	this->m_sDestType.formattype = FORMAT_VideoInfo2;
 	this->m_sDestType.bFixedSizeSamples = true;
 	this->m_sDestType.bTemporalCompression = false;
 	this->m_sDestType.lSampleSize = labs(this->m_sVhdr2->bmiHeader.biWidth*this->m_sVhdr2->bmiHeader.biHeight
 				       * ((this->m_sVhdr2->bmiHeader.biBitCount + 7) / 8));
 	this->m_sVhdr2->bmiHeader.biSizeImage = this->m_sDestType.lSampleSize;
 	this->m_sDestType.pUnk = 0;
-	this->m_sDestType.cbFormat = sizeof(VIDEOINFOHEADER);
+	this->m_sDestType.cbFormat = sizeof(VIDEOINFOHEADER2);
 	this->m_sDestType.pbFormat = (char*)this->m_sVhdr2;
 
         memset(&this->iv.m_obh, 0, sizeof(this->iv.m_obh));
@@ -686,9 +690,9 @@ int DS_VideoDecoder_SetDestFmt(DS_VideoDecoder *this, int bits, unsigned int csp
     memcpy(&(this->m_sVhdr2->bmiHeader), &this->iv.m_obh, sizeof(this->iv.m_obh));
     this->m_sVhdr2->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     if (this->m_sVhdr2->bmiHeader.biCompression == 3)
-        this->m_sDestType.cbFormat = sizeof(VIDEOINFOHEADER) + 12;
+        this->m_sDestType.cbFormat = sizeof(VIDEOINFOHEADER2) + 12;
     else
-        this->m_sDestType.cbFormat = sizeof(VIDEOINFOHEADER);
+        this->m_sDestType.cbFormat = sizeof(VIDEOINFOHEADER2);
 
 
     switch(csp)
@@ -738,9 +742,9 @@ int DS_VideoDecoder_SetDestFmt(DS_VideoDecoder *this, int bits, unsigned int csp
 	memcpy(&(this->m_sVhdr2->bmiHeader), &this->iv.m_decoder, sizeof(this->iv.m_decoder));
 	this->m_sVhdr2->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 	if (this->m_sVhdr2->bmiHeader.biCompression == 3)
-    	    this->m_sDestType.cbFormat = sizeof(VIDEOINFOHEADER) + 12;
+    	    this->m_sDestType.cbFormat = sizeof(VIDEOINFOHEADER2) + 12;
 	else
-    	    this->m_sDestType.cbFormat = sizeof(VIDEOINFOHEADER);
+    	    this->m_sDestType.cbFormat = sizeof(VIDEOINFOHEADER2);
 
 	return -1;
     }
