@@ -20,6 +20,7 @@ _config="--disable-mencoder \
     --disable-vidix-pcidb \
     --disable-libdirac-lavc \
 	--disable-ffmpeg_a \
+	--enable-debug=3 \
     --enable-freetype \
     --enable-runtime-cpudetection \
 	--extra-cflags="-I/usr/local/ffmpeg-ww/include" \
