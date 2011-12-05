@@ -398,7 +398,6 @@ static const mp_cmd_bind_t def_cmd_binds[] = {
   { { KEY_KP6, 0 }, "dvdnav right" },   // right
   { { KEY_KP5, 0 }, "dvdnav menu" },   // menu
   { { KEY_KPENTER, 0 }, "dvdnav select" },   // select
-  //{ { MOUSE_BTN0, 0 }, "dvdnav mouse" },   //select
   { { KEY_KP7, 0 }, "dvdnav prev" },   // previous menu
 #endif
 
@@ -416,19 +415,18 @@ static const mp_cmd_bind_t def_cmd_binds[] = {
   { { '}', 0 }, "speed_mult 2.0" },
   { { KEY_BACKSPACE, 0 }, "speed_set 1.0" },
   { { 'q', 0 }, "quit" },
-  { { KEY_ESC, 0 }, "quit" },
   { { 'p', 0 }, "pause" },
   { { ' ', 0 }, "pause" },
   { { '.', 0 }, "frame_step" },
   { { KEY_HOME, 0 }, "pt_up_step 1" },
   { { KEY_END, 0 }, "pt_up_step -1" },
   { { '>', 0 }, "pt_step 1" },
-  { { KEY_ENTER, 0 }, "vo_fullscreen" },//pt_step 1 1
+  { { KEY_ENTER, 0 }, "vo_fullscreen" },
   { { '<', 0 }, "pt_step -1" },
   { { KEY_INS, 0 }, "alt_src_step 1" },
   { { KEY_DEL, 0 }, "alt_src_step -1" },
   { { 'o', 0 }, "osd" },
- // { { 'B', 0 }, "osd_show_property_text \"${filename}\"" },
+  { { 'I', 0 }, "osd_show_property_text \"${filename}\"" },
   { { 'P', 0 }, "osd_show_progression" },
   { { 'z', 0 }, "sub_delay -0.1" },
   { { 'x', 0 }, "sub_delay +0.1" },
@@ -457,9 +455,9 @@ static const mp_cmd_bind_t def_cmd_binds[] = {
   { { 'C', 0 }, "sub_scale 0.1" },
   { { 'v', 0 }, "sub_scale -0.1" },
   { { 'V', 0 }, "sub_scale -0.1" },
- // { { 'b', 0 }, "sub_source" },
+  { { 'b', 0 }, "sub_source" },
   { { 'a', 0 }, "sub_alignment" },
-  //{ { 'v', 0 }, "sub_visibility" },
+  { { 'v', 0 }, "sub_visibility" },
   { { 'j', 0 }, "sub_select" },
   { { 'J', 0 }, "sub_select -3" },
   { { 'F', 0 }, "forced_subs_only" },
@@ -502,7 +500,7 @@ static const mp_cmd_bind_t def_cmd_binds[] = {
 #endif
   { { 'T', 0 }, "vo_ontop" },
   { { 'f', 0 }, "vo_fullscreen" },
-//  { { 'c', 0 }, "capturing" },
+  { { 'c', 0 }, "capturing" },
   { { 's', 0 }, "screenshot 0" },
   { { 'S', 0 }, "screenshot 1" },
   { { 'w', 0 }, "panscan -0.1" },
@@ -526,7 +524,7 @@ static const mp_cmd_bind_t def_cmd_binds[] = {
 
   { { '!', 0 }, "seek_chapter -1" },
   { { '@', 0 }, "seek_chapter 1" },
-//  { { 'A', 0 }, "switch_angle 1" },
+  { { 'A', 0 }, "switch_angle 1" },
   { { 'U', 0 }, "stop" },
 
   { { 0 }, NULL }
