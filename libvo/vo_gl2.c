@@ -434,6 +434,14 @@ extern int w32_inited;
 extern int gl_new_window;
 
 static void resize(int x,int y){
+  // simple orthogonal projection for 0-1;0-1
+  static const float matrix[16] = {
+     2,  0, 0, 0,
+     0, -2, 0, 0,
+     0,  0, 0, 0,
+    -1,  1, 0, 1,
+  };
+
   if(!using_gl2 || !w32_inited)
     return;
   mp_msg(MSGT_VO,MSGL_V,"[gl2] Resize: %dx%d\n",x,y);
@@ -467,8 +475,7 @@ static void resize(int x,int y){
   }
 
   glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glOrtho (0, 1, 1, 0, -1.0, 1.0);
+  glLoadMatrixf(matrix);
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();

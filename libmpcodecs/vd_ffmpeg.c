@@ -842,15 +842,21 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
     pkt.flags = AV_PKT_FLAG_KEY;
     if (!ctx->palette_sent && sh->bih && sh->bih->biBitCount <= 8) {
         /* Pass palette to codec */
+        uint8_t *pal_data = (uint8_t *)(sh->bih+1);
         unsigned palsize = sh->bih->biSize - sizeof(*sh->bih);
-        if (palsize == 0) {
-            /* Palette size in biClrUsed */
-            palsize = sh->bih->biClrUsed * 4;
+        unsigned needed_size = 4 << sh->bih->biBitCount;
+        // Assume palette outside bih in rest of chunk.
+        // Fixes samples/V-codecs/QPEG/MITSUMI.AVI
+        if (palsize < needed_size &&
+            sh->bih_size > sh->bih->biSize &&
+            sh->bih_size - sh->bih->biSize > palsize) {
+            pal_data = (uint8_t *)sh->bih + sh->bih->biSize;
+            palsize = sh->bih_size - sh->bih->biSize;
         }
         // if still 0, we simply have no palette in extradata.
         if (palsize) {
             uint8_t *pal = av_packet_new_side_data(&pkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
-            memcpy(pal, sh->bih+1, FFMIN(palsize, AVPALETTE_SIZE));
+            memcpy(pal, pal_data, FFMIN(palsize, AVPALETTE_SIZE));
         }
         ctx->palette_sent = 1;
     }
@@ -952,9 +958,15 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
 
     if(!mpi)
     mpi=mpcodecs_get_image(sh, MP_IMGTYPE_EXPORT, MP_IMGFLAG_PRESERVE,
-        avctx->width, avctx->height);
+        pic->width, pic->height);
     if(!mpi){        // temporary!
         mp_msg(MSGT_DECVIDEO, MSGL_WARN, MSGTR_MPCODECS_CouldntAllocateImageForCodec);
+        return NULL;
+    }
+
+    if (mpi->w != pic->width || mpi->h != pic->height ||
+        pic->width != avctx->width || pic->height != avctx->height) {
+        mp_msg(MSGT_DECVIDEO, MSGL_ERR, "Dropping frame with size not matching configured size\n");
         return NULL;
     }
 

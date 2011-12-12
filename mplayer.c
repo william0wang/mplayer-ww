@@ -196,7 +196,7 @@ extern int loop_all;
 extern int vo_dirver;
 extern int generate_preview;
 static char *help_texts = NULL;
-static int demuxer_get_current_time_ex(demuxer_t *demuxer);
+static double demuxer_get_current_time_ex(demuxer_t *demuxer);
 
 play_tree_t* playtree;
 int codec_swap_uv = 0;
@@ -994,9 +994,9 @@ void fake_subtitle()
 	free(subfile);
 }
 
-static int demuxer_get_current_time_ex(demuxer_t *demuxer)
+static double demuxer_get_current_time_ex(demuxer_t *demuxer)
 {
-    int get_time_ans, offset, pts;
+    double get_time_ans, offset, pts;
     get_time_ans = pts = demuxer_get_current_time(demuxer);
     if(stream_need_adjust) {
         if(is_mpegts_format && !mpegts_not_mpeg) {
@@ -2395,13 +2395,15 @@ static void update_osd_msg(void)
 
     if (mpctx->sh_video) {
         // fallback on the timer
-        int len, pts;
+        int len, pts_seconds;
+		double pts;
         if(show_status || osd_level>=2) {
 			double new_pts = fake_video?mpctx->d_audio->pts:demuxer_get_current_time_ex(mpctx->demuxer);
             len = demuxer_get_time_length(mpctx->demuxer);
 			if (new_pts > last_pts || new_pts < last_pts-1.0)
 				last_pts = new_pts;
 			pts = last_pts;
+            pts_seconds = pts;
             if(is_mpegts_format == 2 && save_frame_dropping && pts > 1) {
                 frame_dropping = save_frame_dropping;
                 save_frame_dropping = 0;
@@ -2457,7 +2459,7 @@ static void update_osd_msg(void)
             if (osd_fractions == 1) {
                 // print fractions as sub-second timestamp
                 snprintf(fractions_text, sizeof(fractions_text), ".%02d",
-                         (int)((mpctx->sh_video->pts - pts) * 100) % 100);
+                         (int)((pts - pts_seconds) * 100) % 100);
             } else if (osd_fractions == 2) {
                 // print fractions by estimating the frame count within the
                 // second
@@ -2468,7 +2470,7 @@ static void update_osd_msg(void)
                 // we add 0.2 and cut off at the decimal point, which proved
                 // as good heuristic
                 snprintf(fractions_text, sizeof(fractions_text), ".%02d",
-                         (int)((mpctx->sh_video->pts - pts) *
+                         (int)((pts - pts_seconds) *
                                mpctx->sh_video->fps + 0.2));
             } else {
                 // do not print fractions
@@ -2477,17 +2479,17 @@ static void update_osd_msg(void)
 
             if (osd_level == 4)
                 snprintf(osd_text_timer, 63, "%c -%02d:%02d:%02d%s%s%s",
-                mpctx->osd_function,(len-pts)/3600,((len-pts)/60)%60,
-                (len-pts)%60,fractions_text,percentage_text,systime_text);
+                mpctx->osd_function,(len-pts_seconds)/3600,((len-pts_seconds)/60)%60,
+                (len-pts_seconds)%60,fractions_text,percentage_text,systime_text);
             else if (osd_level == 3)
                 snprintf(osd_text_timer, 63, "%c %02d:%02d:%02d%s / %02d:%02d:%02d%s%s",
-                    mpctx->osd_function,pts/3600,(pts/60)%60,pts%60,fractions_text,
+                    mpctx->osd_function,pts_seconds/3600,(pts_seconds/60)%60,pts_seconds%60,fractions_text,
                     len/3600,(len/60)%60,len%60,percentage_text,systime_text);
             else if(osd_systime == 9)
                 snprintf(osd_text_timer, 63, "%s",systime_text_only);
             else
                 snprintf(osd_text_timer, 63, "%c %02d:%02d:%02d%s%s%s",mpctx->osd_function
-                    ,pts/3600,(pts/60)%60,pts%60,fractions_text,percentage_text,systime_text);
+                    ,pts_seconds/3600,(pts_seconds/60)%60,pts_seconds%60,fractions_text,percentage_text,systime_text);
         }
         if(show_status) {
 			if(show_status2) {
@@ -2497,22 +2499,22 @@ static void update_osd_msg(void)
 						len/3600,(len/60)%60,len%60);
 				} else if(show_status2 == 6) {
 					snprintf(status_text_timer2, 63, "-%02d:%02d:%02d",
-						(len-pts)/3600,((len-pts)/60)%60,(len-pts)%60);
+						(len-pts_seconds)/3600,((len-pts_seconds)/60)%60,(len-pts_seconds)%60);
 				}
 			}
             if(show_status > 3) {
                 snprintf(status_text_timer, 63, "%c %02d:%02d:%02d%s%s",
-                    mpctx->osd_function,pts/3600,(pts/60)%60,pts%60,percentage_text,systime_text);
+                    mpctx->osd_function,pts_seconds/3600,(pts_seconds/60)%60,pts_seconds%60,percentage_text,systime_text);
             } else if(show_status == 3) {
                 snprintf(status_text_timer, 63, "%c %02d:%02d:%02d / %02d:%02d:%02d%s%s",
-                    mpctx->osd_function,pts/3600,(pts/60)%60,pts%60,
+                    mpctx->osd_function,pts_seconds/3600,(pts_seconds/60)%60,pts_seconds%60,
                     len/3600,(len/60)%60,len%60,percentage_text,systime_text);
             } else if(show_status == 2) {
                 snprintf(status_text_timer, 63, "%c %02d:%02d:%02d"
-                    , mpctx->osd_function, pts/3600, (pts/60)%60, pts%60);
+                    , mpctx->osd_function, pts_seconds/3600, (pts_seconds/60)%60, pts_seconds%60);
             } else {
                 snprintf(status_text_timer, 63, "%c %02d:%02d:%02d / %02d:%02d:%02d"
-                    , mpctx->osd_function, pts/3600, (pts/60)%60, pts%60, len/3600, (len/60)%60, len%60);
+                    , mpctx->osd_function, pts_seconds/3600, (pts_seconds/60)%60, pts_seconds%60, len/3600, (len/60)%60, len%60);
             }
             if(strcasecmp(status_text_saved, status_text_timer)) {
                 guiCommand(CMD_UPDATE_STATUS, status_text_timer);
@@ -4061,7 +4063,10 @@ play_next_file:
             gui(GUI_HANDLE_EVENTS, 0);
             gui(GUI_REDRAW, 0);
             if ((cmd = mp_input_get_cmd(0, 0, 0)) != NULL) {
-                gui(GUI_RUN_COMMAND, (void *)cmd->id);
+                if (cmd->id == MP_CMD_GUI)
+                    gui(GUI_RUN_MESSAGE, cmd->args[0].v.s);
+                else
+                    gui(GUI_RUN_COMMAND, (void *)cmd->id);
                 mp_cmd_free(cmd);
             }
         }

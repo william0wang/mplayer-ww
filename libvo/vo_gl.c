@@ -152,6 +152,7 @@ static int custom_tlin;
 static int custom_trect;
 static int mipmap_gen;
 static int stereo_mode;
+static enum MPGLType backend;
 
 static int int_pause;
 static int eq_bri = 0;
@@ -186,6 +187,14 @@ extern int gl_new_window;
 extern int codec_swap_uv;
 
 static void resize(int x,int y){
+  // simple orthogonal projection for 0-image_width;0-image_height
+  float matrix[16] = {
+    2.0/image_width,   0, 0, 0,
+    0, -2.0/image_height, 0, 0,
+    0, 0, 0, 0,
+    -1, 1, 0, 1
+  };
+
   int y_height = 0;
   int x_offset = 0;
   int y_offset = 0;
@@ -209,7 +218,6 @@ static void resize(int x,int y){
   mpglViewport( 0 + x_offset,0 + y_offset, x, y - y_height);
 
   mpglMatrixMode(GL_PROJECTION);
-  mpglLoadIdentity();
   ass_border_x = ass_border_y = 0;
   if (aspect_scaling() && use_aspect) {
     int new_w, new_h;
@@ -220,11 +228,14 @@ static void resize(int x,int y){
     new_h += vo_panscan_y;
     scale_x = (GLdouble)new_w / (GLdouble)x;
     scale_y = (GLdouble)new_h / (GLdouble)y;
-    mpglScaled(scale_x, scale_y, 1);
+    matrix[0]  *= scale_x;
+    matrix[12] *= scale_x;
+    matrix[5]  *= scale_y;
+    matrix[13] *= scale_y;
     ass_border_x = (vo_dwidth - new_w) / 2;
     ass_border_y = (vo_dheight - new_h) / 2;
   }
-  mpglOrtho(0, image_width, image_height, 0, -1,1);
+  mpglLoadMatrixf(matrix);
 
   mpglMatrixMode(GL_MODELVIEW);
   mpglLoadIdentity();
@@ -244,6 +255,14 @@ extern float w32_factor_x,w32_factor_y;
 extern int w32_delta_x,w32_delta_y;
 void resize_fs_gl()
 {
+  // simple orthogonal projection for 0-image_width;0-image_height
+  float matrix[16] = {
+    2.0/image_width,   0, 0, 0,
+    0, -2.0/image_height, 0, 0,
+    0, 0, 0, 0,
+    -1, 1, 0, 1
+  };
+
 	int x,y,top,left;
 	if(!vo_fs || !using_gl || !w32_inited)
 		return;
@@ -268,10 +287,9 @@ void resize_fs_gl()
 	  mpglViewport( left , top,x, y );
 
 	  mpglMatrixMode(GL_PROJECTION);
-	  mpglLoadIdentity();
 	  ass_border_x = 0;
 	  ass_border_y = 0;
-	  mpglOrtho(0, image_width, image_height, 0, -1,1);
+	  mpglLoadMatrixf(matrix);
 	  mpglMatrixMode(GL_MODELVIEW);
 	  mpglLoadIdentity();
 
@@ -611,7 +629,8 @@ static int initGl(uint32_t d_width, uint32_t d_height) {
   mpglDepthMask(GL_FALSE);
   mpglDisable(GL_CULL_FACE);
   mpglEnable(gl_target);
-  mpglDrawBuffer(vo_doublebuffering?GL_BACK:GL_FRONT);
+  if (mpglDrawBuffer)
+    mpglDrawBuffer(vo_doublebuffering?GL_BACK:GL_FRONT);
   mpglTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
   mp_msg(MSGT_VO, MSGL_V, "[gl] Creating %dx%d texture...\n",
@@ -681,6 +700,13 @@ static int create_window(uint32_t d_width, uint32_t d_height, uint32_t flags, co
 #ifdef CONFIG_GL_WIN32
   if (glctx.type == GLTYPE_W32 && !vo_w32_config(d_width, d_height, flags))
     return -1;
+#endif
+#ifdef CONFIG_GL_EGL_X11
+  if (glctx.type == GLTYPE_EGL_X11) {
+    XVisualInfo vinfo = { .visual = CopyFromParent, .depth = CopyFromParent };
+    vo_x11_create_vo_window(&vinfo, vo_dx, vo_dy, d_width, d_height, flags,
+            CopyFromParent, "gl", title);
+  }
 #endif
 #ifdef CONFIG_GL_X11
   if (glctx.type == GLTYPE_X11) {
@@ -850,14 +876,21 @@ static void do_render_osd(int type) {
   // set special rendering parameters
   if (!scaled_osd) {
     int vo_osdheight = vo_dheight;
-    mpglMatrixMode(GL_PROJECTION);
-    mpglPushMatrix();
-    mpglLoadIdentity();
     if(!vo_fs && show_controlbar && full_view && !gl_new_window && vo_osdheight > controlbar_height_gl)
    	  vo_osdheight -= controlbar_height_gl;
-      mpglOrtho(0, vo_dwidth, vo_osdheight, 0, -1, 1);
-    }
-    mpglEnable(GL_BLEND);
+
+    // simple orthogonal projection for 0-vo_dwidth;0-vo_dheight
+    float matrix[16] = {
+      2.0/vo_dwidth,   0, 0, 0,
+      0, -2.0/vo_osdheight, 0, 0,
+      0,  0, 0, 0,
+      -1, 1, 0, 1
+    };
+    mpglMatrixMode(GL_PROJECTION);
+    mpglPushMatrix();
+    mpglLoadMatrixf(matrix);
+  }
+  mpglEnable(GL_BLEND);
   if (draw_eosd) {
     mpglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     mpglCallList(eosdDispList);
@@ -1200,6 +1233,12 @@ uninit(void)
   uninit_mpglcontext(&glctx);
 }
 
+static int valid_backend(void *p)
+{
+  int *backend = p;
+  return *backend >= GLTYPE_AUTO && *backend < GLTYPE_COUNT;
+}
+
 static int valid_csp(void *p)
 {
   int *csp = p;
@@ -1239,13 +1278,14 @@ static const opt_t subopts[] = {
   {"mipmapgen",    OPT_ARG_BOOL, &mipmap_gen,   NULL},
   {"osdcolor",     OPT_ARG_INT,  &osd_color,    NULL},
   {"stereo",       OPT_ARG_INT,  &stereo_mode,  NULL},
+  {"backend",      OPT_ARG_INT,  &backend,      valid_backend},
   {NULL}
 };
 
 static int preinit_internal(const char *arg, int allow_sw)
 {
     // set defaults
-    enum MPGLType gltype = GLTYPE_AUTO;
+    backend = GLTYPE_AUTO;
     many_fmts = 1;
     use_osd = -1;
     scaled_osd = 0;
@@ -1352,10 +1392,16 @@ static int preinit_internal(const char *arg, int allow_sw)
               "    1: side-by-side to red-cyan stereo\n"
               "    2: side-by-side to green-magenta stereo\n"
               "    3: side-by-side to quadbuffer stereo\n"
+              "  backend=<n>\n"
+              "   -1: auto-select\n"
+              "    0: Win32/WGL\n"
+              "    1: X11/GLX\n"
+              "    2: SDL\n"
+              "    3: X11/EGL (experimental)\n"
               "\n" );
       return -1;
     }
-    if (!init_mpglcontext(&glctx, gltype))
+    if (!init_mpglcontext(&glctx, backend))
       goto err_out;
     if (use_yuv == -1 || !allow_sw) {
       if (create_window(320, 200, VOFLAG_HIDDEN, NULL) < 0)

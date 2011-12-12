@@ -358,6 +358,8 @@ void ShowFileSelect( int type,int modal )
  fsTopList_items=g_list_append( fsTopList_items,"/" );
  gtk_combo_set_popdown_strings( GTK_COMBO( fsCombo4 ),fsTopList_items );
 
+ gtk_widget_grab_focus( fsFNameList );
+
  gtk_window_set_modal( GTK_WINDOW( fsFileSelect ),modal );
 
  gtk_widget_show( fsFileSelect );
@@ -543,18 +545,27 @@ static gboolean on_FileSelect_key_release_event( GtkWidget * widget,
                                                  GdkEventKey * event,
                                                  gpointer user_data )
 {
- switch ( event->keyval )
-  {
-   case GDK_Escape:
-        gtk_button_released( GTK_BUTTON( fsCancel ) );
-        break;
-   case GDK_Return:
-        gtk_button_released( GTK_BUTTON( fsOk ) );
-        break;
-   case GDK_BackSpace:
-        gtk_button_released( GTK_BUTTON( fsUp ) );
-        break;
-  }
+ if ( GTK_WIDGET_TYPE( widget ) == GTK_TYPE_BUTTON )
+ {
+  if (event->keyval == GDK_Return) gtk_button_released( GTK_BUTTON( widget ) );
+ }
+ else
+ {
+  switch ( event->keyval )
+   {
+    case GDK_Escape:
+         gtk_button_released( GTK_BUTTON( fsCancel ) );
+         break;
+    case GDK_Return:
+         gtk_button_released( GTK_BUTTON( fsOk ) );
+         gtk_widget_grab_focus( fsFNameList );
+         break;
+    case GDK_BackSpace:
+         gtk_button_released( GTK_BUTTON( fsUp ) );
+         gtk_widget_grab_focus( fsFNameList );
+         break;
+   }
+ }
  return FALSE;
 }
 
@@ -711,12 +722,13 @@ GtkWidget * create_FileSelect( void )
  gtk_signal_connect( GTK_OBJECT( fsPathCombo ),"changed",GTK_SIGNAL_FUNC( fs_fsPathCombo_changed ),fsPathCombo );
  gtk_signal_connect( GTK_OBJECT( fsPathCombo ),"activate",GTK_SIGNAL_FUNC( fs_fsPathCombo_activate ),fsPathCombo );
  gtk_signal_connect( GTK_OBJECT( fsUp ),"released",GTK_SIGNAL_FUNC( fs_Up_released ),fsFNameList );
+ gtk_signal_connect( GTK_OBJECT( fsUp ),"key_release_event",GTK_SIGNAL_FUNC( on_FileSelect_key_release_event ),NULL );
  gtk_signal_connect( GTK_OBJECT( fsOk ),"released",GTK_SIGNAL_FUNC( fs_Ok_released ),fsCombo4 );
+ gtk_signal_connect( GTK_OBJECT( fsOk ),"key_release_event",GTK_SIGNAL_FUNC( on_FileSelect_key_release_event ),NULL );
  gtk_signal_connect( GTK_OBJECT( fsCancel ),"released",GTK_SIGNAL_FUNC( fs_Cancel_released ),NULL );
+ gtk_signal_connect( GTK_OBJECT( fsCancel ),"key_release_event",GTK_SIGNAL_FUNC( on_FileSelect_key_release_event ),NULL );
  gtk_signal_connect( GTK_OBJECT( fsFNameList ),"select_row",(GtkSignalFunc)fs_fsFNameList_select_row,NULL );
  gtk_signal_connect( GTK_OBJECT( fsFNameList ),"event", (GtkSignalFunc)fs_fsFNameList_event,NULL );
-
- gtk_widget_grab_focus( fsFNameList );
 
  return fsFileSelect;
 }
