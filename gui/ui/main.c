@@ -144,26 +144,26 @@ void uiEventHandling( int msg,float param )
         mplayer( MPLAYER_EXIT_GUI, EXIT_QUIT, 0 );
         break;
 
-   case evSetURL:
-        gtkShow( evPlayNetwork,NULL );
+   case evLoadURL:
+        gtkShow( evLoadURL,NULL );
 	break;
 
-   case evSetAudio:
+   case ivSetAudio:
         if ( !mpctx_get_demuxer(guiInfo.mpcontext) || audio_id == iparam ) break;
 	audio_id=iparam;
 	goto play;
 
-   case evSetVideo:
+   case ivSetVideo:
         if ( !mpctx_get_demuxer(guiInfo.mpcontext) || video_id == iparam ) break;
 	video_id=iparam;
 	goto play;
 
-   case evSetSubtitle:
+   case ivSetSubtitle:
         mp_property_do("sub",M_PROPERTY_SET,&iparam,guiInfo.mpcontext);
 	break;
 
 #ifdef CONFIG_VCD
-   case evSetVCDTrack:
+   case ivSetVCDTrack:
         guiInfo.Track=iparam;
    case evPlayVCD:
  	guiInfoMediumClear ( CLEAR_ALL );
@@ -230,19 +230,19 @@ play:
         uiPlay();
         break;
 #ifdef CONFIG_DVDREAD
-   case evSetDVDSubtitle:
+   case ivSetDVDSubtitle:
         dvdsub_id=iparam;
         goto play_dvd_2;
         break;
-   case evSetDVDAudio:
+   case ivSetDVDAudio:
         audio_id=iparam;
         goto play_dvd_2;
         break;
-   case evSetDVDChapter:
+   case ivSetDVDChapter:
         guiInfo.Chapter=iparam;
         goto play_dvd_2;
         break;
-   case evSetDVDTitle:
+   case ivSetDVDTitle:
         guiInfo.Track=iparam;
 	guiInfo.Chapter=1;
 	guiInfo.Angle=1;
@@ -277,7 +277,7 @@ NoPause:
    case evPrev: uiPrev(); break;
    case evNext: uiNext(); break;
 
-   case evPlayList:    gtkShow( evPlayList,NULL );        break;
+   case evPlaylist:    gtkShow( evPlaylist,NULL );        break;
    case evSkinBrowser: gtkShow( evSkinBrowser,skinName ); break;
    case evAbout:       gtkShow( evAbout,NULL );           break;
    case evPreferences: gtkShow( evPreferences,NULL );     break;
@@ -394,7 +394,7 @@ set_volume:
 	break;
 
 // --- timer events
-   case evRedraw:
+   case ivRedraw:
         {
           unsigned now = GetTimerMS();
           if ((now > last_redraw_time) &&
@@ -437,7 +437,7 @@ void uiMainMouseHandle( int Button,int X,int Y,int RX,int RY )
  switch ( Button )
   {
    case wsPMMouseButton:
-	  gtkShow( evHidePopUpMenu,NULL );
+	  gtkShow( ivHidePopUpMenu,NULL );
           uiShowMenu( RX,RY );
           itemtype=itPRMButton;
           break;
@@ -446,7 +446,7 @@ void uiMainMouseHandle( int Button,int X,int Y,int RX,int RY )
           break;
 
    case wsPLMouseButton:
-	  gtkShow( evHidePopUpMenu,NULL );
+	  gtkShow( ivHidePopUpMenu,NULL );
           sx=X; sy=Y; boxMoved=1; itemtype=itPLMButton;
           SelectedItem=currentselected;
           if ( SelectedItem == -1 ) break;
@@ -493,7 +493,7 @@ void uiMainMouseHandle( int Button,int X,int Y,int RX,int RY )
           break;
 
    case wsRRMouseButton:
-        gtkShow( evShowPopUpMenu,NULL );
+        gtkShow( ivShowPopUpMenu,NULL );
         break;
 
 // --- rolled mouse ... de szar :)))
