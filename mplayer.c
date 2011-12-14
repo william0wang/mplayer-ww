@@ -1743,7 +1743,7 @@ static void update_osd_msg(void)
             int percentage = -1;
             char percentage_text[10];
             char fractions_text[4];
-            double pts = demuxer_get_current_time(mpctx->demuxer, len);
+            double pts = demuxer_get_current_time_ex(mpctx->demuxer, len);
             int pts_seconds = pts;
 
             if (mpctx->osd_show_percentage)
