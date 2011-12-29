@@ -59,6 +59,8 @@ const gchar   * fsFilter = "*";
 
 int             fsType    = 0;
 
+static gint     fsCurrFNameListSelected, fsLastFNameListSelected;
+
 char * fsVideoFilterNames[][2] =
          {
 	   { "ASF files (*.asf)",					"*.asf" },
@@ -243,7 +245,6 @@ static void CheckDir( GtkWidget * list )
  globfree( &gg );
 
  gtk_clist_set_column_width( GTK_CLIST( list ),0,17 );
- gtk_clist_select_row( GTK_CLIST( list ),0,1 );
  gtk_widget_show( list );
 }
 
@@ -251,6 +252,7 @@ void ShowFileSelect( int type,int modal )
 {
  int i, k, fsMedium;
  char * tmp = NULL, * dir = NULL;
+ struct stat f;
 
  if ( fsFileSelect ) gtkActive( fsFileSelect );
   else fsFileSelect=create_FileSelect();
@@ -320,7 +322,6 @@ void ShowFileSelect( int type,int modal )
 
  if ( tmp && tmp[0] )
   {
-   struct stat f;
    dir = strdup( tmp );
 
    do
@@ -353,12 +354,16 @@ void ShowFileSelect( int type,int modal )
  }
  free( dir );
  if ( getenv( "HOME" ) ) fsTopList_items=g_list_append( fsTopList_items,getenv( "HOME" ) );
- fsTopList_items=g_list_append( fsTopList_items,"/home" );
- fsTopList_items=g_list_append( fsTopList_items,"/mnt" );
+ else fsTopList_items=g_list_append( fsTopList_items,"/home" );
+ if (stat( "/media",&f ) == 0) fsTopList_items=g_list_append( fsTopList_items,"/media" );
+ if (stat( "/mnt",&f ) == 0) fsTopList_items=g_list_append( fsTopList_items,"/mnt" );
  fsTopList_items=g_list_append( fsTopList_items,"/" );
  gtk_combo_set_popdown_strings( GTK_COMBO( fsCombo4 ),fsTopList_items );
 
  gtk_widget_grab_focus( fsFNameList );
+ ((GtkCList *)fsFNameList)->focus_row = fsLastFNameListSelected;
+ gtk_clist_select_row( GTK_CLIST( fsFNameList ),fsLastFNameListSelected,1 );
+ fsLastFNameListSelected = 0;
 
  gtk_window_set_modal( GTK_WINDOW( fsFileSelect ),modal );
 
@@ -371,6 +376,7 @@ void HideFileSelect( void )
  gtk_widget_hide( fsFileSelect );
  gtk_widget_destroy( fsFileSelect );
  fsFileSelect=NULL;
+ fsLastFNameListSelected = fsCurrFNameListSelected;
 }
 
 static void fs_PersistantHistory( char * subject )
@@ -484,6 +490,7 @@ static void fs_Ok_released( GtkButton * button, gpointer user_data )
    fsSelectedFile=fsThatDir;
    CheckDir( fsFNameList );
    gtk_entry_set_text( GTK_ENTRY( fsPathCombo ),(unsigned char *)get_current_dir_name_utf8() );
+   gtk_widget_grab_focus( fsFNameList );
    return;
   }
 
@@ -534,6 +541,7 @@ static void fs_Cancel_released( GtkButton * button,gpointer user_data )
 static void fs_fsFNameList_select_row( GtkWidget * widget, gint row, gint column,
                                        GdkEventButton *bevent, gpointer user_data)
 {
+ fsCurrFNameListSelected = row;
  gtk_clist_get_text( GTK_CLIST(widget ),row,1,&fsSelectedFile );
  g_free( fsSelectedFileUtf8 );
  fsSelectedFileUtf8 = g_filename_from_utf8( fsSelectedFile, -1, NULL, NULL, NULL );
@@ -558,7 +566,6 @@ static gboolean on_FileSelect_key_release_event( GtkWidget * widget,
          break;
     case GDK_Return:
          gtk_button_released( GTK_BUTTON( fsOk ) );
-         gtk_widget_grab_focus( fsFNameList );
          break;
     case GDK_BackSpace:
          gtk_button_released( GTK_BUTTON( fsUp ) );
