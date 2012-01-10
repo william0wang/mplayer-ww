@@ -382,7 +382,7 @@ lzo_fail:
             }
             *size = dstlen - out_avail;
         }
-        if (track->encodings[i].comp_algo == 3)
+      else if (track->encodings[i].comp_algo == 3)
         {
           *dest = malloc (*size + track->encodings[i].comp_settings_len);
           memcpy(*dest, track->encodings[i].comp_settings,

@@ -971,7 +971,7 @@ uninstall:
 
 clean:
 	-$(MAKE) -C ffmpeg $@
-	-$(MAKE) -C tests clean
+	-rm -rf tests/res
 	-rm -f $(call ADD_ALL_DIRS,/*.o /*.a /*.ho /*~)
 	-rm -f $(call ADD_ALL_EXESUFS,mplayer mencoder)
 
@@ -992,6 +992,43 @@ TAGS:
 
 tags:
 	rm -f $@; find . -name '*.[chS]' -o -name '*.asm' | xargs ctags -a
+
+
+
+###### regression tests #######
+
+BROKEN_SAMPLES =                         \
+    h264-conformance/FM1_BT_B.h264       \
+    h264-conformance/FM1_FT_E.264        \
+    h264-conformance/FM2_SVA_B.264       \
+    pva/PVA_test-partial.pva             \
+    wmv8/wmv_drm.wmv                     \
+    wtv/law-and-order-partial.wtv        \
+
+AUDIO_ONLY_SAMPLES =                                               \
+    aac/% ac3/% amrnb/% amrwb/% atrac1/% atrac3/% bink/binkaudio%  \
+    creative/% dts/% duck/%-audio-only.avi eac3/% gsm/% imc/%      \
+    lossless-audio/% mp3-conformance/% musepack/% nellymoser/%     \
+    qcp/%                                                          \
+    qt-surge-suite/% real/ra% sipr/% truespeech/% vorbis/%         \
+    vqf/% w64/% wmapro/% wmavoice/%                                \
+
+# running wildcard with empty FATE_SAMPLES seems to cause a lot of issues
+ifdef FATE_SAMPLES
+ALLSAMPLES_FULLPATH = $(wildcard $(FATE_SAMPLES)/*/*.*)
+ALLSAMPLES          = $(patsubst $(FATE_SAMPLES)/%,%,$(ALLSAMPLES_FULLPATH))
+SAMPLES := $(filter-out $(BROKEN_SAMPLES),$(ALLSAMPLES))
+SAMPLES := $(filter-out $(AUDIO_ONLY_SAMPLES),$(SAMPLES))
+RESULTS  = $(patsubst %,tests/res/%.md5,$(SAMPLES))
+
+fatetest: $(RESULTS)
+
+tests/res/%.md5: mplayer$(EXESUF) $(FATE_SAMPLES)/%
+	@tests/faterun.sh $*
+else
+fatetest:
+	@echo "You need to set FATE_SAMPLES for fatetest to work"
+endif
 
 
 
@@ -1133,9 +1170,6 @@ install-dhahelperwin:
 dhahelperclean:
 	-rm -f vidix/dhahelper/*.o vidix/dhahelper/*~ vidix/dhahelper/test
 	-rm -f $(addprefix vidix/dhahelperwin/,*.o *~ dhahelper.sys dhasetup.exe base.tmp temp.exp)
-
-fatetest: mplayer$(EXESUF)
-	$(MAKE) -C tests fatetest
 
 
 -include $(DEP_FILES) $(DRIVER_DEP_FILES) $(TESTS_DEP_FILES) $(TOOLS_DEP_FILES) $(DHAHELPER_DEP_FILES)
