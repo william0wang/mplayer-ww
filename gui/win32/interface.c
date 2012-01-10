@@ -21,10 +21,23 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config.h"
+
+#if defined(CONFIG_LIBCDIO)
+#include <cdio/cdda.h>
+#elif defined(CONFIG_CDDA)
+#include <cdda_interface.h>
+#endif
+
 #include <windows.h>
 
 #if defined(__CYGWIN__) || defined(__WINE__)
 #define _beginthreadex CreateThread
+#ifdef __WINE__
+#include <winioctl.h>
+#define WINE_MOUNTMGR_EXTENSIONS
+#include <ddk/mountmgr.h>
+#endif
 #else
 #include <process.h>
 #endif
@@ -57,9 +70,8 @@
 #include "mpcommon.h"
 #include "gui.h"
 #include "dialogs.h"
-#ifdef CONFIG_LIBCDIO
-#include <cdio/cdio.h>
-#endif
+
+#define SAME_STREAMTYPE (STREAMTYPE_DUMMY - 1)
 
 int guiWinID = 0;
 
@@ -75,6 +87,89 @@ static unsigned threadId;
 const ao_functions_t *audio_out = NULL;
 const vo_functions_t *video_out = NULL;
 mixer_t *mixer = NULL;
+
+#ifdef __WINE__
+/**
+ * @brief Convert a Windows style path to a file name into an Unix style one.
+ *
+ * @param filename pointer to the file path to be converted
+ *
+ * @return pointer to the converted file path
+ */
+static char *unix_name (char *filename)
+{
+    static char *unix_filename;
+    LPSTR (*CDECL wine_get_unix_file_name_ptr)(LPCWSTR);
+    int wchar_conv;
+
+    if (*filename && (filename[1] == ':'))
+    {
+        wine_get_unix_file_name_ptr = (void *) GetProcAddress(GetModuleHandleA("KERNEL32"), "wine_get_unix_file_name");
+        wchar_conv = MultiByteToWideChar(CP_UNIXCP, 0, filename, -1, NULL, 0);
+
+        if (wine_get_unix_file_name_ptr && wchar_conv)
+        {
+            WCHAR *ntpath;
+            char *unix_name;
+
+            ntpath = HeapAlloc(GetProcessHeap(), 0, sizeof(*ntpath) * (wchar_conv + 1));
+            MultiByteToWideChar(CP_UNIXCP, 0, filename, -1, ntpath, wchar_conv);
+            unix_name = wine_get_unix_file_name_ptr(ntpath);
+            setdup(&unix_filename, unix_name);
+            filename = unix_filename;
+            HeapFree(GetProcessHeap(), 0, unix_name);
+            HeapFree(GetProcessHeap(), 0, ntpath);
+        }
+    }
+
+    return filename;
+}
+
+/**
+ * @brief Convert a Windows style device name into an Unix style one.
+ *
+ * @param device pointer to the device name to be converted
+ *
+ * @return pointer to the converted device name
+ */
+static char *unix_device (char *device)
+{
+    static char *unix_devname;
+    HANDLE mgr;
+    DWORD size = 1024;
+
+    mgr = CreateFileW(MOUNTMGR_DOS_DEVICE_NAME, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, 0);
+
+    if (mgr != INVALID_HANDLE_VALUE)
+    {
+        struct mountmgr_unix_drive input;
+        struct mountmgr_unix_drive *data;
+
+        data = HeapAlloc(GetProcessHeap(), 0, size);
+
+        if (data)
+        {
+            memset(&input, 0, sizeof(input));
+            input.letter = *device;
+
+            if (DeviceIoControl(mgr, IOCTL_MOUNTMGR_QUERY_UNIX_DRIVE, &input, sizeof(input), data, size, NULL, NULL))
+            {
+                if (data->device_offset)
+                {
+                    setdup(&unix_devname, (char *) data + data->device_offset);
+                    device = unix_devname;
+                }
+            }
+
+            HeapFree(GetProcessHeap(), 0, data);
+        }
+
+        CloseHandle(mgr);
+    }
+
+    return device;
+}
+#endif
 
 /* test for playlist files, no need to specify -playlist on the commandline.
  * add any conceivable playlist extensions here.
@@ -114,35 +209,63 @@ static void guiSetEvent(int event)
         case evPlayDVD:
         {
             static char dvdname[MAX_PATH];
-            guiInfo.Track = dvd_title;
-            guiInfo.Chapter = dvd_chapter;
-            guiInfo.Angle = dvd_angle;
+            guiInfo.Track = 1;
+            guiInfo.Chapter = 1;
+            guiInfo.Angle = 1;
             guiInfo.NewPlay = GUI_FILE_SAME;
 
+#ifdef __WINE__
+            // dvd_device is in the Windows style (D:\), which needs to be
+            // converted for MPlayer, so that it will find the device in the
+            // Linux filesystem.
+            dvd_device = unix_device(dvd_device);
+#endif
             uiSetFileName(NULL, dvd_device, STREAMTYPE_DVD);
             dvdname[0] = 0;
             strcat(dvdname, "DVD Movie");
             GetVolumeInformation(dvd_device, dvdname, MAX_PATH, NULL, NULL, NULL, NULL, 0);
             capitalize(dvdname);
             mp_msg(MSGT_GPLAYER, MSGL_V, "Opening DVD %s -> %s\n", dvd_device, dvdname);
-            gui(GUI_PREPARE, (void *) STREAMTYPE_DVD);
             mygui->playlist->clear_playlist(mygui->playlist);
             mygui->playlist->add_track(mygui->playlist, filename, NULL, dvdname, 0);
-            mygui->startplay(mygui);
+            uiPlay();
             break;
         }
 #endif
-#ifdef CONFIG_LIBCDIO
+#ifdef CONFIG_CDDA
         case evPlayCD:
         {
             int i;
             char track[10];
             char trackname[10];
-            CdIo_t *p_cdio = cdio_open(NULL, DRIVER_UNKNOWN);
-            track_t i_tracks;
+#ifdef CONFIG_LIBCDIO
+            cdrom_drive_t *cd;
+#else
+            cdrom_drive *cd;
+#endif
+            int i_tracks;
 
-            if(p_cdio == NULL) printf("Couldn't find a driver.\n");
-            i_tracks = cdio_get_num_tracks(p_cdio);
+#ifdef __WINE__
+            // cdrom_device is in the Windows style (D:\), which needs to be
+            // converted for MPlayer, so that it will find the device in the
+            // Linux filesystem.
+            cdrom_device = unix_device(cdrom_device);
+#endif
+            cd = cdda_identify(cdrom_device, 0, NULL);
+            if (cd)
+            {
+                if (cdda_open(cd) != 0)
+                {
+                    cdda_close(cd);
+                    cd = NULL;
+                }
+            }
+            if(!cd)
+            {
+                printf("Couldn't find a driver.\n");
+                break;
+            }
+            i_tracks = cdda_tracks(cd);
 
             mygui->playlist->clear_playlist(mygui->playlist);
             for(i=0;i<i_tracks;i++)
@@ -151,7 +274,7 @@ static void guiSetEvent(int event)
                 sprintf(trackname, "Track %d", i+1);
                 mygui->playlist->add_track(mygui->playlist, track, NULL, trackname, 0);
             }
-            cdio_destroy(p_cdio);
+            cdda_close(cd);
             mygui->startplay(mygui);
             break;
         }
@@ -331,44 +454,6 @@ void uiPrev(void)
     mygui->startplay(mygui);
 }
 
-#ifdef __WINE__
-/**
- * @brief Convert a Windows style path to a file name into an Unix style one.
- *
- * @param filename pointer to the file path to be converted
- *
- * @return pointer to the converted file path
- */
-static char *unix_name (char *filename)
-{
-    static char *unix_filename;
-    LPSTR (*CDECL wine_get_unix_file_name_ptr)(LPCWSTR);
-    int wchar_conv;
-
-    if (*filename && (filename[1] == ':'))
-    {
-        wine_get_unix_file_name_ptr = (void *) GetProcAddress(GetModuleHandleA("KERNEL32"), "wine_get_unix_file_name");
-        wchar_conv = MultiByteToWideChar(CP_UNIXCP, 0, filename, -1, NULL, 0);
-
-        if (wine_get_unix_file_name_ptr && wchar_conv)
-        {
-            WCHAR *ntpath;
-            char *unix_name;
-
-            ntpath = HeapAlloc(GetProcessHeap(), 0, sizeof(*ntpath) * (wchar_conv + 1));
-            MultiByteToWideChar(CP_UNIXCP, 0, filename, -1, ntpath, wchar_conv);
-            unix_name = wine_get_unix_file_name_ptr(ntpath);
-            setdup(&unix_filename, unix_name);
-            filename = unix_filename;
-            HeapFree(GetProcessHeap(), 0, unix_name);
-            HeapFree(GetProcessHeap(), 0, ntpath);
-        }
-    }
-
-    return filename;
-}
-#endif
-
 void uiSetFileName(char *dir, char *name, int type)
 {
     if(!name) return;
@@ -386,7 +471,9 @@ void uiSetFileName(char *dir, char *name, int type)
     // it will find the filename in the Linux filesystem.
     filename = unix_name(filename);
 #endif
-    guiInfo.StreamType = type;
+
+    if (type != SAME_STREAMTYPE)
+        guiInfo.StreamType = type;
 
     nfree(guiInfo.AudioFilename);
     nfree(guiInfo.SubtitleFilename);
@@ -502,8 +589,25 @@ int gui(int what, void *data)
             dvd_title = 0;
             force_fps = 0;
             if(!mygui->playlist->tracks) return 0;
-            uiSetFileName(NULL, mygui->playlist->tracks[mygui->playlist->current]->filename, STREAMTYPE_FILE);
-            guiInfo.Track = mygui->playlist->current + 1;
+            switch(guiInfo.StreamType)
+            {
+                case STREAMTYPE_FILE:
+                case STREAMTYPE_STREAM:
+                    uiSetFileName(NULL, mygui->playlist->tracks[mygui->playlist->current]->filename, SAME_STREAMTYPE);
+                    guiInfo.Track = mygui->playlist->current + 1;
+                    break;
+#ifdef CONFIG_DVDREAD
+                case STREAMTYPE_DVD:
+                {
+                    char tmp[512];
+                    dvd_chapter = guiInfo.Chapter;
+                    dvd_angle = guiInfo.Angle;
+                    sprintf(tmp,"dvd://%d", guiInfo.Track);
+                    uiSetFileName(NULL, tmp, SAME_STREAMTYPE);
+                    break;
+                }
+#endif
+            }
             guiInfo.VideoWindow = 1;
             if(gtkAONorm) greplace(&af_cfg.list, "volnorm", "volnorm");
             if(gtkAOExtraStereo)
@@ -517,24 +621,6 @@ int gui(int what, void *data)
             if(gtkCacheOn) stream_cache_size = gtkCacheSize;
             if(gtkAutoSyncOn) autosync = gtkAutoSync;
             guiInfo.NewPlay = 0;
-            switch(guiInfo.StreamType)
-            {
-                case STREAMTYPE_FILE:
-                case STREAMTYPE_STREAM:
-                    break;
-#ifdef CONFIG_DVDREAD
-                case STREAMTYPE_DVD:
-                {
-                    char tmp[512];
-                    dvd_title = guiInfo.Track;
-                    dvd_chapter = guiInfo.Chapter;
-                    dvd_angle = guiInfo.Angle;
-                    sprintf(tmp,"dvd://%d", guiInfo.Track);
-                    uiSetFileName(NULL, tmp, STREAMTYPE_DVD);
-                    break;
-                }
-#endif
-            }
             break;
         }
         case GUI_SET_AUDIO:

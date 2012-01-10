@@ -37,7 +37,6 @@
 #include "libmpcodecs/vd.h"
 #include "libvo/video_out.h"
 #include "mp_core.h"
-#include "stream/stream.h"
 
 int uiGotoTheNext = 1;
 
@@ -63,9 +62,13 @@ void uiFullScreen(void)
 
 void uiPlay(void)
 {
-    if (!guiInfo.Filename ||
-        (guiInfo.Filename[0] == 0) ||
-        (guiInfo.Playing == GUI_PLAY))
+    if (guiInfo.Playing == GUI_PLAY)
+        return;
+
+    if (guiInfo.StreamType != STREAMTYPE_CDDA &&
+        guiInfo.StreamType != STREAMTYPE_VCD &&
+        guiInfo.StreamType != STREAMTYPE_DVD &&
+        (!guiInfo.Filename || (guiInfo.Filename[0] == 0)))
         return;
 
     if (guiInfo.Playing == GUI_PAUSE) {
@@ -227,7 +230,9 @@ void uiSetFileName(char *dir, char *name, int type)
         setddup(&guiInfo.Filename, dir, name);
 
     filename = guiInfo.Filename;
-    guiInfo.StreamType = type;
+
+    if (type != SAME_STREAMTYPE)
+        guiInfo.StreamType = type;
 
     nfree(guiInfo.AudioFilename);
     nfree(guiInfo.SubtitleFilename);
@@ -242,6 +247,11 @@ void uiCurr(void)
         return;
 
     switch (guiInfo.StreamType) {
+#ifdef CONFIG_CDDA
+    case STREAMTYPE_CDDA:
+        break;
+#endif
+
 #ifdef CONFIG_VCD
     case STREAMTYPE_VCD:
         break;
@@ -281,6 +291,15 @@ void uiPrev(void)
         return;
 
     switch (guiInfo.StreamType) {
+#ifdef CONFIG_CDDA
+    case STREAMTYPE_CDDA:
+        if (--guiInfo.Track == 0) {
+            guiInfo.Track = 1;
+            stop = 1;
+        }
+        break;
+#endif
+
 #ifdef CONFIG_VCD
     case STREAMTYPE_VCD:
         if (--guiInfo.Track == 1) {
@@ -335,6 +354,17 @@ void uiNext(void)
         return;
 
     switch (guiInfo.StreamType) {
+#ifdef CONFIG_CDDA
+    case STREAMTYPE_CDDA:
+
+        if (++guiInfo.Track > guiInfo.Tracks) {
+            guiInfo.Track = guiInfo.Tracks;
+            stop = 1;
+        }
+
+        break;
+#endif
+
 #ifdef CONFIG_VCD
     case STREAMTYPE_VCD:
 
