@@ -54,7 +54,6 @@
 
 #ifdef CONFIG_ICONV
 #include <iconv.h>
-char *sub_cp=NULL;
 char *sub_cps=NULL;
 int sub_ignore_errors=5;
 static int cp_utf16=0;
@@ -65,6 +64,7 @@ extern int fake_sub;
 extern int always_use_ass;
 extern char *sub_path;
 #endif
+char *sub_cp=NULL;
 #ifdef CONFIG_FRIBIDI
 #include <fribidi/fribidi.h>
 char *fribidi_charset = NULL;   ///character set that will be passed to FriBiDi

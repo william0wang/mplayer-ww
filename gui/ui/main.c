@@ -114,11 +114,8 @@ static void guiInfoMediumClear (int what)
     listSet(gtkDelPl, NULL);
   }
 
-#ifdef CONFIG_VCD
   if (what & CLEAR_VCD) guiInfo.Tracks = 0;
-#endif
 
-#ifdef CONFIG_DVDREAD
   if (what & CLEAR_DVD)
   {
     guiInfo.AudioStreams = 0;
@@ -127,7 +124,6 @@ static void guiInfoMediumClear (int what)
     guiInfo.Chapters = 0;
     guiInfo.Angles = 0;
   }
-#endif
 }
 
 static unsigned last_redraw_time = 0;
@@ -181,27 +177,27 @@ void uiEventHandling( int msg,float param )
 #ifdef CONFIG_DVDREAD
    case ivSetDVDSubtitle:
         dvdsub_id=iparam;
-        goto play_dvd_2;
+        uiEventHandling( ivPlayDVD, 0 );
         break;
    case ivSetDVDAudio:
         audio_id=iparam;
-        goto play_dvd_2;
+        uiEventHandling( ivPlayDVD, 0 );
         break;
    case ivSetDVDChapter:
         guiInfo.Chapter=iparam;
-        goto play_dvd_2;
+        uiEventHandling( ivPlayDVD, 0 );
         break;
    case ivSetDVDTitle:
         guiInfo.Track=iparam;
         guiInfo.Chapter=1;
         guiInfo.Angle=1;
-        goto play_dvd_2;
+        uiEventHandling( ivPlayDVD, 0 );
         break;
    case evPlayDVD:
         guiInfo.Track=1;
         guiInfo.Chapter=1;
         guiInfo.Angle=1;
-play_dvd_2:
+   case ivPlayDVD:
  	guiInfoMediumClear( CLEAR_ALL - CLEAR_DVD );
         guiInfo.StreamType=STREAMTYPE_DVD;
 	goto play;
@@ -228,7 +224,7 @@ play:
 	         guiInfo.Track=1;
 	       guiInfo.NewPlay=GUI_FILE_NEW;
 	       break;
-#ifdef CONFIG_CDDA
+
           case STREAMTYPE_CDDA:
 	       guiInfoMediumClear( CLEAR_ALL - CLEAR_VCD - CLEAR_FILE );
 	       if ( guiInfo.Playing != GUI_PAUSE )
@@ -238,8 +234,7 @@ play:
                  guiInfo.NewPlay=GUI_FILE_SAME;
 		}
 	       break;
-#endif
-#ifdef CONFIG_VCD
+
           case STREAMTYPE_VCD:
 	       guiInfoMediumClear( CLEAR_ALL - CLEAR_VCD - CLEAR_FILE );
 	       if ( guiInfo.Playing != GUI_PAUSE )
@@ -249,8 +244,7 @@ play:
                  guiInfo.NewPlay=GUI_FILE_SAME;
 		}
 	       break;
-#endif
-#ifdef CONFIG_DVDREAD
+
           case STREAMTYPE_DVD:
 	       guiInfoMediumClear( CLEAR_ALL - CLEAR_DVD - CLEAR_FILE );
 	       if ( guiInfo.Playing != GUI_PAUSE )
@@ -258,7 +252,6 @@ play:
                  guiInfo.NewPlay=GUI_FILE_SAME;
 		}
                break;
-#endif
          }
         uiPlay();
         break;
@@ -332,6 +325,15 @@ set_volume:
         break;
 
 
+   case evMenu:
+        /*if (guiApp.menuIsPresent)   NOTE TO MYSELF: Not before mouse over and
+         {                                            cursor keys will work there.
+          gtkShow( ivHidePopUpMenu,NULL );
+          uiShowMenu( 0,0 );
+         }
+        else*/ gtkShow( ivShowPopUpMenu,NULL );
+        break;
+
    case evIconify:
         switch ( iparam )
          {
@@ -399,10 +401,9 @@ set_volume:
 	  default: movie_aspect=-1;
 	 }
 	wsClearWindow( guiApp.subWindow );
-#ifdef CONFIG_DVDREAD
-	if ( guiInfo.StreamType == STREAMTYPE_VCD || guiInfo.StreamType == STREAMTYPE_DVD ) goto play_dvd_2;
+	if ( guiInfo.StreamType == STREAMTYPE_VCD ) uiEventHandling( evPlayVCD, 0 );
+	 else if ( guiInfo.StreamType == STREAMTYPE_DVD ) uiEventHandling( ivPlayDVD, 0 );
 	 else
-#endif
 	 guiInfo.NewPlay=GUI_FILE_NEW;
 	break;
 
