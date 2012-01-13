@@ -54,16 +54,14 @@
 #include <X11/extensions/shape.h>
 #endif
 
-#ifdef CONFIG_XINERAMA
-#include <X11/extensions/Xinerama.h>
-#endif
-
 #ifdef CONFIG_XF86VM
 #include <X11/extensions/xf86vmode.h>
 #endif
 
 #include <sys/ipc.h>
+#ifdef HAVE_SHM
 #include <sys/shm.h>
+#endif
 
 #define MOUSEHIDE_DELAY 1000   // in milliseconds
 
@@ -270,21 +268,21 @@ void wsXInit(Display *mDisplay)
             mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_WS_RemoteDisplay);
     }
 
-    if (!XShmQueryExtension(wsDisplay)) {
+#ifdef HAVE_SHM
+    if (!XShmQueryExtension(wsDisplay))
+#endif
+    wsUseXShm = 0;
+
+    if (!wsUseXShm)
         mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_WS_NoXshm);
-        wsUseXShm = 0;
-    }
 
 #ifdef CONFIG_XSHAPE
-
-    if (!XShapeQueryExtension(wsDisplay, &eventbase, &errorbase)) {
-        mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_WS_NoXshape);
-        wsUseXShape = 0;
-    }
-
-#else
-    wsUseXShape = 0;
+    if (!XShapeQueryExtension(wsDisplay, &eventbase, &errorbase))
 #endif
+    wsUseXShape = 0;
+
+    if (!wsUseXShape)
+        mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_WS_NoXshape);
 
     XSynchronize(wsDisplay, True);
 
@@ -325,13 +323,14 @@ void wsXInit(Display *mDisplay)
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[ws]  green mask: 0x%x\n", wsGreenMask);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[ws]  blue mask: 0x%x\n", wsBlueMask);
 
-#ifdef MP_DEBUG
+#ifdef HAVE_SHM
     if (wsUseXShm) {
         int minor, major, shp;
 
         XShmQueryVersion(wsDisplay, &major, &minor, &shp);
         mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[ws] XShm version is %d.%d\n", major, minor);
     }
+#endif
 
 #ifdef CONFIG_XSHAPE
     if (wsUseXShape) {
@@ -340,7 +339,6 @@ void wsXInit(Display *mDisplay)
         XShapeQueryVersion(wsDisplay, &major, &minor);
         mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[ws] XShape version is %d.%d\n", major, minor);
     }
-#endif
 #endif
 
     wsOutMask = wsGetOutMask();
@@ -1079,12 +1077,15 @@ void wsConvert(wsTWindow *win, unsigned char *Image)
 
 void wsPutImage(wsTWindow *win)
 {
+#ifdef HAVE_SHM
     if (wsUseXShm) {
         XShmPutImage(wsDisplay, win->WindowID, win->wGC, win->xImage,
                      0, 0,
                      (win->Width - win->xImage->width) / 2, (win->Height - win->xImage->height) / 2,
                      win->xImage->width, win->xImage->height, 0);
-    } else {
+    } else
+#endif
+    {
         XPutImage(wsDisplay, win->WindowID, win->wGC, win->xImage,
                   0, 0,
                   (win->Width - win->xImage->width) / 2, (win->Height - win->xImage->height) / 2,
@@ -1408,10 +1409,12 @@ void wsDestroyImage(wsTWindow *win)
     if (win->xImage) {
         XDestroyImage(win->xImage);
 
+#ifdef HAVE_SHM
         if (wsUseXShm) {
             XShmDetach(wsDisplay, &win->Shminfo);
             shmdt(win->Shminfo.shmaddr);
         }
+#endif
     }
 
     win->xImage = NULL;
@@ -1419,6 +1422,7 @@ void wsDestroyImage(wsTWindow *win)
 
 void wsCreateImage(wsTWindow *win, int Width, int Height)
 {
+#ifdef HAVE_SHM
     if (wsUseXShm) {
         win->xImage = XShmCreateImage(wsDisplay, win->VisualInfo.visual,
                                       win->VisualInfo.depth, ZPixmap, NULL, &win->Shminfo, Width, Height);
@@ -1453,7 +1457,9 @@ void wsCreateImage(wsTWindow *win, int Width, int Height)
         XShmAttach(wsDisplay, &win->Shminfo);
         XSync(wsDisplay, False);
         shmctl(win->Shminfo.shmid, IPC_RMID, 0);
-    } else {
+    } else
+#endif
+    {
         win->xImage = XCreateImage(wsDisplay, win->VisualInfo.visual, win->VisualInfo.depth,
                                    ZPixmap, 0, 0, Width, Height,
                                    (wsDepthOnScreen == 3) ? 32 : wsDepthOnScreen,
@@ -1518,7 +1524,6 @@ void wsSetMousePosition(wsTWindow *win, int x, int y)
 void wsSetShape(wsTWindow *win, char *data)
 {
 #ifdef CONFIG_XSHAPE
-
     if (!wsUseXShape)
         return;
 
@@ -1528,7 +1533,6 @@ void wsSetShape(wsTWindow *win, char *data)
         XFreePixmap(wsDisplay, win->Mask);
     } else
         XShapeCombineMask(wsDisplay, win->WindowID, ShapeBounding, 0, 0, None, ShapeSet);
-
 #endif
 }
 

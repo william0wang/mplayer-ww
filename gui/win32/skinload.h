@@ -175,6 +175,7 @@ skin_t *loadskin(char *skindir, int desktopbpp);
 #define evAbout             12
 #define evPreferences       14
 #define evSkinBrowser       15
+#define evMenu              33
 
 #define evIconify           11
 #define evExit              1000
@@ -195,5 +196,6 @@ skin_t *loadskin(char *skindir, int desktopbpp);
 #define ivSetCDTrack      5014
 
 #define ivRedraw          7002
+#define ivPlayDVD         7003
 
 #endif /* MPLAYER_GUI_SKINLOAD_H */
