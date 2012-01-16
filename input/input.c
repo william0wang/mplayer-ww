@@ -419,6 +419,7 @@ static const mp_cmd_bind_t def_cmd_binds[] = {
   { { '}', 0 }, "speed_mult 2.0" },
   { { KEY_BACKSPACE, 0 }, "speed_set 1.0" },
   { { 'q', 0 }, "quit" },
+  { { KEY_ESC, 0 }, "quit" },
   { { 'p', 0 }, "pause" },
   { { ' ', 0 }, "pause" },
   { { '.', 0 }, "frame_step" },
