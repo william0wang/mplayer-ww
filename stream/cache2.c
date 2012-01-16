@@ -269,6 +269,8 @@ static int cache_execute_control(cache_vars_t *s) {
   int needs_flush = 0;
   static unsigned last;
   int quit = s->control == -2;
+  uint64_t old_pos = s->stream->pos;
+  int old_eof = s->stream->eof;
   if (quit || !s->stream->control) {
     s->stream_time_length = 0;
     s->stream_time_pos = MP_NOPTS_VALUE;
@@ -320,11 +322,13 @@ static int cache_execute_control(cache_vars_t *s) {
       s->control_res = STREAM_UNSUPPORTED;
       break;
   }
-  if (needs_flush) {
+  if (s->control_res == STREAM_OK && needs_flush) {
     s->read_filepos = s->stream->pos;
     s->eof = s->stream->eof;
     cache_flush(s);
-  }
+  } else if (needs_flush &&
+             (old_pos != s->stream->pos || old_eof != s->stream->eof))
+    mp_msg(MSGT_STREAM, MSGL_ERR, "STREAM_CTRL changed stream pos but returned error, this is not allowed!\n");
   s->control = -1;
   return 1;
 }
@@ -644,14 +648,19 @@ int cache_do_control(stream_t *stream, int cmd, void *arg) {
       return STREAM_UNSUPPORTED;
     }
   }
-  // to avoid unnecessary differences with non-cache behaviour,
-  // do this also on failure.
+  if (s->control_res != STREAM_OK)
+    return s->control_res;
+  // We cannot do this on failure, since this would cause the
+  // stream position to jump when e.g. STREAM_CTRL_SEEK_TO_TIME
+  // is unsupported - but in that case we need the old value
+  // to do the fallback seek.
+  // This unfortunately can lead to slightly different behaviour
+  // with and without cache if the protocol changes pos even
+  // when an error happened.
   if (pos_change) {
     stream->pos = s->read_filepos;
     stream->eof = s->eof;
   }
-  if (s->control_res != STREAM_OK)
-    return s->control_res;
   switch (cmd) {
     case STREAM_CTRL_GET_TIME_LENGTH:
     case STREAM_CTRL_GET_CURRENT_TIME:

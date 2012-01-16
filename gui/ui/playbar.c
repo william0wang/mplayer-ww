@@ -207,7 +207,7 @@ rollerhandled:
 	switch ( itemtype )
 	 {
 	  case itPRMButton:
-	       uiMenuMouseHandle( X,Y,RX,RY );
+	       uiMenuMouseHandle( RX,RY );
 	       break;
 	  case itPotmeter:
 	       item->value=(float)( X - item->x ) / item->width * 100.0f;
@@ -227,7 +227,7 @@ potihandled:
   }
 }
 
-void uiPlaybarShow( int x, int y )
+void uiPlaybarShow( int y )
 {
  if ( !guiApp.playbarIsPresent || !gtkEnablePlayBar ) return;
  if ( !guiApp.subWindow.isFullScreen ) return;

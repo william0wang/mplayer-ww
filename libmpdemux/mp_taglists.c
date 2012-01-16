@@ -139,6 +139,8 @@ static const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_MPEG2VIDEO,   MKTAG('E', 'M', '2', 'V') },
     { CODEC_ID_MPEG2VIDEO,   MKTAG('M', '7', '0', '1') }, /* Matrox MPEG2 intra-only */
     { CODEC_ID_MPEG2VIDEO,   MKTAG('m', 'p', 'g', 'v') },
+    { CODEC_ID_MPEG1VIDEO,   MKTAG('B', 'W', '1', '0') },
+    { CODEC_ID_MPEG1VIDEO,   MKTAG('X', 'M', 'P', 'G') }, /* Xing MPEG intra only */
     { CODEC_ID_MJPEG,        MKTAG('M', 'J', 'P', 'G') },
     { CODEC_ID_MJPEG,        MKTAG('L', 'J', 'P', 'G') },
     { CODEC_ID_MJPEG,        MKTAG('d', 'm', 'b', '1') },
@@ -178,6 +180,7 @@ static const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_RAWVIDEO,     MKTAG('2', 'V', 'u', '1') },
     { CODEC_ID_RAWVIDEO,     MKTAG('2', 'v', 'u', 'y') },
     { CODEC_ID_RAWVIDEO,     MKTAG('y', 'u', 'v', 's') },
+    { CODEC_ID_RAWVIDEO,     MKTAG('y', 'u', 'v', '2') },
     { CODEC_ID_RAWVIDEO,     MKTAG('P', '4', '2', '2') },
     { CODEC_ID_RAWVIDEO,     MKTAG('Y', 'V', '1', '2') },
     { CODEC_ID_RAWVIDEO,     MKTAG('Y', 'V', '1', '6') },
@@ -202,6 +205,9 @@ static const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_R10K,         MKTAG('R', '1', '0', 'k') },
     { CODEC_ID_R210,         MKTAG('r', '2', '1', '0') },
     { CODEC_ID_V210,         MKTAG('v', '2', '1', '0') },
+    { CODEC_ID_V308,         MKTAG('v', '3', '0', '8') },
+    { CODEC_ID_V410,         MKTAG('v', '4', '1', '0') },
+    { CODEC_ID_YUV4,         MKTAG('y', 'u', 'v', '4') },
     { CODEC_ID_INDEO3,       MKTAG('I', 'V', '3', '1') },
     { CODEC_ID_INDEO3,       MKTAG('I', 'V', '3', '2') },
     { CODEC_ID_INDEO4,       MKTAG('I', 'V', '4', '1') },
@@ -270,7 +276,7 @@ static const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_TARGA,        MKTAG('t', 'g', 'a', ' ') },
     { CODEC_ID_PNG,          MKTAG('M', 'P', 'N', 'G') },
     { CODEC_ID_PNG,          MKTAG('P', 'N', 'G', '1') },
-    { CODEC_ID_CLJR,         MKTAG('c', 'l', 'j', 'r') },
+    { CODEC_ID_CLJR,         MKTAG('C', 'L', 'J', 'R') },
     { CODEC_ID_DIRAC,        MKTAG('d', 'r', 'a', 'c') },
     { CODEC_ID_RPZA,         MKTAG('a', 'z', 'p', 'r') },
     { CODEC_ID_RPZA,         MKTAG('R', 'P', 'Z', 'A') },
@@ -289,6 +295,10 @@ static const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'R', 'G') },
     { CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'Y', '0') },
     { CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'Y', '2') },
+    { CODEC_ID_VBLE,         MKTAG('V', 'B', 'L', 'E') },
+    { CODEC_ID_ESCAPE130,    MKTAG('E', '1', '3', '0') },
+    { CODEC_ID_DXTORY,       MKTAG('x', 't', 'o', 'r') },
+    { CODEC_ID_Y41P,         MKTAG('Y', '4', '1', 'P') },
     { CODEC_ID_NONE,         0 }
 };
 
@@ -399,7 +409,7 @@ static const struct AVCodecTag mp_wav_tags[] = {
     { 0, 0 },
 };
 
-static const struct AVCodecTag * const mp_wav_taglists[] = {mp_wav_tags, 0};
+static const struct AVCodecTag * const mp_wav_taglists[] = {ff_codec_wav_tags, mp_wav_tags, 0};
 
 static const struct AVCodecTag mp_codecid_override_tags[] = {
     { CODEC_ID_8SVX_EXP,          MKTAG('8', 'e', 'x', 'p')},
@@ -486,7 +496,7 @@ static const struct AVCodecTag mp_bmp_tags[] = {
     { 0, 0 },
 };
 
-static const struct AVCodecTag * const mp_bmp_taglists[] = {mp_bmp_tags, 0};
+static const struct AVCodecTag * const mp_bmp_taglists[] = {ff_codec_bmp_tags, mp_bmp_tags, 0};
 
 enum CodecID mp_tag2codec_id(uint32_t tag, int audio)
 {

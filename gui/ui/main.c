@@ -146,13 +146,13 @@ void uiEventHandling( int msg,float param )
 
    case ivSetAudio:
         if ( !mpctx_get_demuxer(guiInfo.mpcontext) || audio_id == iparam ) break;
-	audio_id=iparam;
-	goto play;
+	mp_property_do("switch_audio",M_PROPERTY_SET,&iparam,guiInfo.mpcontext);
+	break;
 
    case ivSetVideo:
         if ( !mpctx_get_demuxer(guiInfo.mpcontext) || video_id == iparam ) break;
-	video_id=iparam;
-	goto play;
+	mp_property_do("switch_video",M_PROPERTY_SET,&iparam,guiInfo.mpcontext);
+	break;
 
    case ivSetSubtitle:
         mp_property_do("sub",M_PROPERTY_SET,&iparam,guiInfo.mpcontext);
@@ -326,10 +326,10 @@ set_volume:
 
 
    case evMenu:
-        /*if (guiApp.menuIsPresent)   NOTE TO MYSELF: Not before mouse over and
-         {                                            cursor keys will work there.
-          gtkShow( ivHidePopUpMenu,NULL );
-          uiShowMenu( 0,0 );
+        /*if (guiApp.menuIsPresent)   NOTE TO MYSELF: Uncomment only after mouse
+         {                                            pointer and cursor keys work
+          gtkShow( ivHidePopUpMenu,NULL );            with this menu from skin as
+          uiShowMenu( 0,0 );                          they do with normal menus.
          }
         else*/ gtkShow( ivShowPopUpMenu,NULL );
         break;
@@ -531,7 +531,7 @@ rollerhandled:
                  uiMainRender=0;
                  break;
             case itPRMButton:
-                 uiMenuMouseHandle( X,Y,RX,RY );
+                 uiMenuMouseHandle( RX,RY );
                  break;
             case itPotmeter:
                  item->value=(float)( X - item->x ) / item->width * 100.0f;
