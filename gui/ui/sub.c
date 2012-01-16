@@ -57,7 +57,7 @@ void uiSubMouseHandle( int Button,int X,int Y,int RX,int RY )
  static int mplSubMoved = 0;
  static int msButton = 0;
 
- uiPlaybarShow( X,Y );
+ uiPlaybarShow( Y );
 
  switch( Button )
   {
@@ -94,9 +94,9 @@ void uiSubMouseHandle( int Button,int X,int Y,int RX,int RY )
                     }
                    break;
             case wsPMMouseButton:
-                   uiMenuMouseHandle( X,Y,RX,RY );
+                   uiMenuMouseHandle( RX,RY );
                    break;
-	    default: uiPlaybarShow( X,Y ); break;
+	    default: uiPlaybarShow( Y ); break;
            }
           break;
    case wsRLMouseButton:

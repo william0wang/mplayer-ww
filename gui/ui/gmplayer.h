@@ -46,9 +46,9 @@ void uiSubMouseHandle( int Button, int X, int Y, int RX, int RY );
 void uiMenuInit( void );
 void uiHideMenu( int mx, int my, int w );
 void uiShowMenu( int mx, int my );
-void uiMenuMouseHandle( int X, int Y, int RX, int RY );
+void uiMenuMouseHandle( int RX, int RY );
 
 void uiPlaybarInit( void );
-void uiPlaybarShow( int x, int y );
+void uiPlaybarShow( int y );
 
 #endif /* MPLAYER_GUI_GMPLAYER_H */

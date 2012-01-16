@@ -794,6 +794,7 @@ static subtitle *sub_read_line_ssa(stream_t *st,subtitle *current, int utf16) {
 	     line3[LINE_LEN+1],
 	     *line2;
 	char *tmp;
+	const char *brace;
 
 	do {
 		if (!stream_read_line (st, line, LINE_LEN, utf16)) return NULL;
@@ -811,11 +812,13 @@ static subtitle *sub_read_line_ssa(stream_t *st,subtitle *current, int utf16) {
 
         line2=strchr(line3, ',');
         if (!line2) return NULL;
+        brace = strchr(line2, '{');
 
         for (comma = 4; comma < max_comma; comma ++)
           {
             tmp = line2;
             if(!(tmp=strchr(++tmp, ','))) break;
+            if(brace && brace < tmp) break; // comma inside command
             if(*(++tmp) == ' ') break;
                   /* a space after a comma means we're already in a sentence */
             line2 = tmp;
@@ -2801,6 +2804,16 @@ void sub_add_text(subtitle *sub, const char *txt, int len, double endpts, int st
   if (sub->lines < SUB_MAX_TEXT &&
       strlen(sub->text[sub->lines]))
     sub->lines++;
+  if (sub->lines > 1 &&
+      strcmp(sub->text[sub->lines-1], sub->text[sub->lines-2]) == 0) {
+    // remove duplicate lines. These can happen with some
+    // "clever" ASS effects.
+    sub->lines--;
+    sub->endpts[sub->lines-1] =
+      FFMAX(sub->endpts[sub->lines-1],
+            sub->endpts[sub->lines]);
+    free(sub->text[sub->lines]);
+  }
 #ifdef CONFIG_FRIBIDI
   sub = sub_fribidi(sub, sub_utf8, orig_lines);
 #endif
