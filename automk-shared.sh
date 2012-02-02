@@ -30,10 +30,10 @@ if [ -f "mplayer.exe" ]; then
 fi
 
 if [ -d "/usr/local/ffmpeg-ww/bin" ] ; then
-	cp -f -p /usr/local/ffmpeg-ww/bin/swscale-2.dll ./release/
-	cp -f -p /usr/local/ffmpeg-ww/bin/avutil-51.dll ./release/
-	cp -f -p /usr/local/ffmpeg-ww/bin/avcodec-53.dll ./release/
-	cp -f -p /usr/local/ffmpeg-ww/bin/avformat-53.dll ./release/
-	cp -f -p /usr/local/ffmpeg-ww/bin/postproc-51.dll ./release/
+	cp -f -p /usr/local/ffmpeg-ww/bin/swscale-*.dll ./release/
+	cp -f -p /usr/local/ffmpeg-ww/bin/avutil-*.dll ./release/
+	cp -f -p /usr/local/ffmpeg-ww/bin/avcodec-*.dll ./release/
+	cp -f -p /usr/local/ffmpeg-ww/bin/avformat-*.dll ./release/
+	cp -f -p /usr/local/ffmpeg-ww/bin/postproc-*.dll ./release/
 fi
 
