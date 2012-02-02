@@ -40,6 +40,7 @@
 #include "av_helpers.h"
 
 #include "libavutil/common.h"
+#include "libavutil/dict.h"
 #include "libavutil/intreadwrite.h"
 #include "mpbswap.h"
 #include "fmt-conversion.h"
@@ -76,8 +77,6 @@ typedef struct {
     int do_dr1;
     int vo_initialized;
     int best_csp;
-    int b_age;
-    int ip_age[2];
     int qp_stat[32];
     double qp_sum;
     double inv_qp_sum;
@@ -130,14 +129,14 @@ static const mp_image_t mpi_no_picture =
 const m_option_t lavc_decode_opts_conf[]={
     {"bug"           , &lavc_param_workaround_bugs      , CONF_TYPE_INT     , CONF_RANGE, -1, 999999, NULL},
     {"er"            , &lavc_param_error_resilience     , CONF_TYPE_INT     , CONF_RANGE, 0, 99, NULL},
-    {"gray"          , &lavc_param_gray                 , CONF_TYPE_FLAG    , 0, 0, CODEC_FLAG_PART, NULL},
+    {"gray"          , &lavc_param_gray                 , CONF_TYPE_FLAG    , 0, 0, CODEC_FLAG_GRAY, NULL},
     {"idct"          , &lavc_param_idct_algo            , CONF_TYPE_INT     , CONF_RANGE, 0, 99, NULL},
     {"ec"            , &lavc_param_error_concealment    , CONF_TYPE_INT     , CONF_RANGE, 0, 99, NULL},
     {"vstats"        , &lavc_param_vstats               , CONF_TYPE_FLAG    , 0, 0, 1, NULL},
     {"debug"         , &lavc_param_debug                , CONF_TYPE_INT     , CONF_RANGE, 0, 9999999, NULL},
     {"vismv"         , &lavc_param_vismv                , CONF_TYPE_INT     , CONF_RANGE, 0, 9999999, NULL},
 #ifdef CODEC_FLAG2_SHOW_ALL
-    {"wait_keyframe" , &lavc_param_wait_keyframe        , CONF_TYPE_FLAG    , 0, 0, CODEC_FLAG_PART, NULL},
+    {"wait_keyframe" , &lavc_param_wait_keyframe        , CONF_TYPE_FLAG    , 0, 0, 1, NULL},
 #endif
     {"st"            , &lavc_param_skip_top             , CONF_TYPE_INT     , CONF_RANGE, 0, 999, NULL},
     {"sb"            , &lavc_param_skip_bottom          , CONF_TYPE_INT     , CONF_RANGE, 0, 999, NULL},
@@ -239,6 +238,7 @@ static int init(sh_video_t *sh){
     // slice is rather broken with threads, so disable that combination unless
     // explicitly requested
     int use_slices = vd_use_slices > 0 || (vd_use_slices <  0 && lavc_param_threads <= 1);
+    AVDictionary *opts = NULL;
 
     init_avcodec();
 
@@ -300,7 +300,6 @@ static int init(sh_video_t *sh){
 
     if(lavc_codec->capabilities&CODEC_CAP_DR1 && !do_vis_debug && lavc_codec->id != CODEC_ID_H264 && lavc_codec->id != CODEC_ID_INTERPLAY_VIDEO && lavc_codec->id != CODEC_ID_VP8 && lavc_codec->id != CODEC_ID_LAGARITH)
         ctx->do_dr1=1;
-    ctx->b_age= ctx->ip_age[0]= ctx->ip_age[1]= 256*256*256*64;
     ctx->ip_count= ctx->b_count= 0;
 
     ctx->pic = avcodec_alloc_frame();
@@ -322,8 +321,21 @@ static int init(sh_video_t *sh){
     avctx->coded_width = sh->disp_w;
     avctx->coded_height= sh->disp_h;
     avctx->workaround_bugs= lavc_param_workaround_bugs;
-    avctx->error_recognition= lavc_param_error_resilience;
-    if(lavc_param_gray) avctx->flags|= CODEC_FLAG_GRAY;
+    switch (lavc_param_error_resilience) {
+    case 5:
+        avctx->err_recognition |= AV_EF_EXPLODE | AV_EF_COMPLIANT | AV_EF_CAREFUL;
+        break;
+    case 4:
+    case 3:
+        avctx->err_recognition |= AV_EF_AGGRESSIVE;
+        // Fallthrough
+    case 2:
+        avctx->err_recognition |= AV_EF_COMPLIANT;
+        // Fallthrough
+    case 1:
+        avctx->err_recognition |= AV_EF_CAREFUL;
+    }
+    lavc_param_gray|= CODEC_FLAG_GRAY;
 #ifdef CODEC_FLAG2_SHOW_ALL
     if(!lavc_param_wait_keyframe) avctx->flags2 |= CODEC_FLAG2_SHOW_ALL;
 #endif
@@ -383,7 +395,7 @@ static int init(sh_video_t *sh){
        MJPG fourcc :( */
         if (!sh->bih || sh->bih->biSize <= sizeof(*sh->bih))
             break;
-        avctx->flags |= CODEC_FLAG_EXTERN_HUFF;
+        av_dict_set(&opts, "extern_huff", "1", 0);
         avctx->extradata_size = sh->bih->biSize-sizeof(*sh->bih);
         avctx->extradata = av_mallocz(avctx->extradata_size + FF_INPUT_BUFFER_PADDING_SIZE);
         memcpy(avctx->extradata, sh->bih+1, avctx->extradata_size);
@@ -442,11 +454,12 @@ static int init(sh_video_t *sh){
         set_format_params(avctx, PIX_FMT_XVMC_MPEG2_IDCT);
 
     /* open it */
-    if (avcodec_open2(avctx, lavc_codec, NULL) < 0) {
+    if (avcodec_open2(avctx, lavc_codec, &opts) < 0) {
         mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_CantOpenCodec);
         uninit(sh);
         return 0;
     }
+    av_dict_free(&opts);
     // this is necessary in case get_format was never called and init_vo is
     // too late e.g. for H.264 VDPAU
     set_format_params(avctx, avctx->pix_fmt);
@@ -475,7 +488,6 @@ static void uninit(sh_video_t *sh){
             mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_CantCloseCodec);
 
         av_freep(&avctx->extradata);
-        av_freep(&avctx->palctrl);
         av_freep(&avctx->slice_offset);
     }
 
@@ -490,28 +502,6 @@ static void draw_slice(struct AVCodecContext *s,
     sh_video_t *sh = s->opaque;
     uint8_t *source[MP_MAX_PLANES]= {src->data[0] + offset[0], src->data[1] + offset[1], src->data[2] + offset[2]};
     int strides[MP_MAX_PLANES] = {src->linesize[0], src->linesize[1], src->linesize[2]};
-#if 0
-    int start=0, i;
-    int width= s->width;
-    int skip_stride= ((width<<lavc_param_lowres)+15)>>4;
-    uint8_t *skip= &s->coded_frame->mbskip_table[(y>>4)*skip_stride];
-    int threshold= s->coded_frame->age;
-    if(s->pict_type!=B_TYPE){
-        for(i=0; i*16<width+16; i++){
-            if(i*16>=width || skip[i]>=threshold){
-                if(start==i) start++;
-                else{
-                    uint8_t *src2[3]= {src[0] + start*16,
-                                     src[1] + start*8,
-                                     src[2] + start*8};
-//printf("%2d-%2d x %d\n", start, i, y);
-                    mpcodecs_draw_slice (sh, src2, stride, (i-start)*16, height, start*16, y);
-                    start= i+1;
-                }
-            }
-        }
-    }else
-#endif
     if (height < 0)
     {
         int i;
@@ -733,19 +723,6 @@ else if(mpi->flags&MP_IMGFLAG_DRAW_CALLBACK)
 else
     printf(".");
 #endif
-    if(pic->reference){
-        pic->age= ctx->ip_age[0];
-
-        ctx->ip_age[0]= ctx->ip_age[1]+1;
-        ctx->ip_age[1]= 1;
-        ctx->b_age++;
-    }else{
-        pic->age= ctx->b_age;
-
-        ctx->ip_age[0]++;
-        ctx->ip_age[1]++;
-        ctx->b_age=1;
-    }
     pic->type= FF_BUFFER_TYPE_USER;
     return 0;
 }
@@ -918,16 +895,16 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
            all_frametime, (double)(len*8)/sh->frametime/1000.0,
            (double)(all_len*8)/all_frametime/1000.0);
         switch(pic->pict_type){
-        case FF_I_TYPE:
+        case AV_PICTURE_TYPE_I:
             fprintf(fvstats, "type= I\n");
             break;
-        case FF_P_TYPE:
+        case AV_PICTURE_TYPE_P:
             fprintf(fvstats, "type= P\n");
             break;
-        case FF_S_TYPE:
+        case AV_PICTURE_TYPE_S:
             fprintf(fvstats, "type= S\n");
             break;
-        case FF_B_TYPE:
+        case AV_PICTURE_TYPE_B:
             fprintf(fvstats, "type= B\n");
             break;
         default:
