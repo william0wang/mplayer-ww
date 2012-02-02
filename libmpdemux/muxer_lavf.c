@@ -147,13 +147,13 @@ static muxer_stream_t* lavf_new_stream(muxer_t *muxer, int type)
 	}
 	stream->priv = spriv;
 
-	spriv->avstream = av_new_stream(priv->oc, 1);
+	spriv->avstream = avformat_new_stream(priv->oc, NULL);
 	if(!spriv->avstream)
 	{
 		mp_msg(MSGT_MUXER, MSGL_ERR, "Could not allocate avstream, EXIT.\n");
 		return NULL;
 	}
-	spriv->avstream->stream_copy = 1;
+	spriv->avstream->id = 1;
 
 	ctx = spriv->avstream->codec;
 	ctx->codec_id = CODEC_ID_NONE;
@@ -248,8 +248,8 @@ static void fix_parameters(muxer_stream_t *stream)
 
 static void write_chunk(muxer_stream_t *stream, size_t len, unsigned int flags, double dts, double pts)
 {
-	muxer_t *muxer = (muxer_t*) stream->muxer;
-	muxer_priv_t *priv = (muxer_priv_t *) muxer->priv;
+	muxer_t *muxer = stream->muxer;
+	muxer_priv_t *priv = muxer->priv;
 	muxer_stream_priv_t *spriv = (muxer_stream_priv_t *) stream->priv;
 	AVPacket pkt;
 
@@ -281,10 +281,21 @@ static void write_chunk(muxer_stream_t *stream, size_t len, unsigned int flags, 
 
 static void write_header(muxer_t *muxer)
 {
-	muxer_priv_t *priv = (muxer_priv_t *) muxer->priv;
+	muxer_priv_t *priv = muxer->priv;
+	AVDictionary *opts = NULL;
+	char tmpstr[50];
 
 	mp_msg(MSGT_MUXER, MSGL_INFO, MSGTR_WritingHeader);
-	avformat_write_header(priv->oc, NULL);
+	if (mux_rate) {
+		snprintf(tmpstr, sizeof(tmpstr), "%i", mux_rate);
+		av_dict_set(&opts, "muxrate", tmpstr, 0);
+	}
+	if (mux_preload) {
+		snprintf(tmpstr, sizeof(tmpstr), "%i", (int)(mux_preload * AV_TIME_BASE));
+		av_dict_set(&opts, "preload", tmpstr, 0);
+	}
+	avformat_write_header(priv->oc, &opts);
+	av_dict_free(&opts);
 	muxer->cont_write_header = NULL;
 }
 
@@ -292,7 +303,7 @@ static void write_header(muxer_t *muxer)
 static void write_trailer(muxer_t *muxer)
 {
 	int i;
-	muxer_priv_t *priv = (muxer_priv_t *) muxer->priv;
+	muxer_priv_t *priv = muxer->priv;
 
 	mp_msg(MSGT_MUXER, MSGL_INFO, MSGTR_WritingTrailer);
 	av_write_trailer(priv->oc);
@@ -356,8 +367,6 @@ int muxer_init_muxer_lavf(muxer_t *muxer)
 
 
 	priv->oc->packet_size= mux_packet_size;
-        priv->oc->mux_rate= mux_rate;
-        priv->oc->preload= (int)(mux_preload*AV_TIME_BASE);
         priv->oc->max_delay= (int)(mux_max_delay*AV_TIME_BASE);
         if (info_name)
             av_dict_set(&priv->oc->metadata, "title",     info_name,      0);
@@ -379,9 +388,9 @@ int muxer_init_muxer_lavf(muxer_t *muxer)
 
 	priv->oc->pb = avio_alloc_context(priv->buffer, BIO_BUFFER_SIZE, 1, muxer, NULL, mp_write, mp_seek);
 	if ((muxer->stream->flags & MP_STREAM_SEEK) != MP_STREAM_SEEK)
-            priv->oc->pb->is_streamed = 1;
+            priv->oc->pb->seekable = 0;
 
-	muxer->priv = (void *) priv;
+	muxer->priv = priv;
 	muxer->cont_new_stream = &lavf_new_stream;
 	muxer->cont_write_chunk = &write_chunk;
 	muxer->cont_write_header = &write_header;
