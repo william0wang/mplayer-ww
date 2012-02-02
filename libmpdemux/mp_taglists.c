@@ -26,6 +26,8 @@
 
 #ifdef CONFIG_FFMPEG_A
 #include "libavformat/internal.h"
+extern const AVCodecTag ff_codec_bmp_tags[];
+extern const AVCodecTag ff_codec_wav_tags[];
 #else
 typedef struct AVCodecTag {
     enum CodecID id;

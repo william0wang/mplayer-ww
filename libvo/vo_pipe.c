@@ -38,7 +38,7 @@
 #include "mp_msg.h"
 #include "help_mp.h"
 
-#include "sub.h"
+#include "sub/sub.h"
 
 #include "fastmemcpy.h"
 #include "libswscale/swscale.h"
@@ -177,7 +177,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 	
 	if(using_format != IMGFMT_YV12)
 	{
-		sws_rgb2rgb_init(get_sws_cpuflags());
+		sws_rgb2rgb_init();
 		rgb_buffer = malloc(image_width * image_height * 3);
 		if (!rgb_buffer)
 		{
@@ -604,7 +604,7 @@ static int preinit(const char *arg)
     return 0;
 }
 
-static int control(uint32_t request, void *data, ...)
+static int control(uint32_t request, void *data)
 {
   switch (request) {
   case VOCTRL_QUERY_FORMAT:
