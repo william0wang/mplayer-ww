@@ -4,6 +4,7 @@
 *.pc
 *.exe
 *.ho
+*.swp
 codec-cfg
 codec-cfg-test
 codecs2html
