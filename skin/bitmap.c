@@ -16,242 +16,317 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+/**
+ * @file
+ * @brief Image loader and bitmap mask rendering
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <windows.h>
 
 #include "bitmap.h"
 
 #include "help_mp.h"
 #include "libavcodec/avcodec.h"
+#include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "libvo/fastmemcpy.h"
 #include "mp_msg.h"
 
-static int pngRead(unsigned char *fname, txSample *bf)
+/**
+ * @brief Read and decode a PNG file into bitmap data.
+ *
+ * @param fname filename (with path)
+ * @param img pointer suitable to store the image data
+ *
+ * @return 0 (ok), 1 (decoding error), 2 (open error), 3 (file too big),
+ *                 4 (out of memory), 5 (avcodec alloc error)
+ */
+static int pngRead(const char *fname, guiImage *img)
 {
-    FILE *fp;
-    int decode_ok;
+    FILE *file;
+    long len;
     void *data;
-    int len;
+    int decode_ok, bpl;
     AVCodecContext *avctx;
     AVFrame *frame;
     AVPacket pkt;
 
-    fp = fopen(fname, "rb");
+    file = fopen(fname, "rb");
 
-    if (!fp) {
-        mp_dbg(MSGT_GPLAYER, MSGL_DBG2, "[png] file read error ( %s )\n", fname);
-        return 1;
-    }
-
-    fseek(fp, 0, SEEK_END);
-    len = ftell(fp);
-    if (len > 50 * 1024 * 1024 || len < 8) {
-        fclose(fp);
+    if (!file)
         return 2;
+
+    fseek(file, 0, SEEK_END);
+    len = ftell(file);
+
+    if (len > 50 * 1024 * 1024 || len < 8) {
+        fclose(file);
+        return 3;
     }
 
     data = av_malloc(len + FF_INPUT_BUFFER_PADDING_SIZE);
 
-    fseek(fp, 0, SEEK_SET);
-    fread(data, len, 1, fp);
-    fclose(fp);
+    if (!data) {
+        fclose(file);
+        return 4;
+    }
 
-    avctx = avcodec_alloc_context();
+    fseek(file, 0, SEEK_SET);
+    fread(data, len, 1, file);
+    fclose(file);
+
+    avctx = avcodec_alloc_context3(NULL);
     frame = avcodec_alloc_frame();
+
+    if (!(avctx && frame)) {
+        av_free(frame);
+        av_free(avctx);
+        av_free(data);
+        return 5;
+    }
+
     avcodec_register_all();
-    avcodec_open(avctx, avcodec_find_decoder(CODEC_ID_PNG));
+    avcodec_open2(avctx, avcodec_find_decoder(CODEC_ID_PNG), NULL);
+
     av_init_packet(&pkt);
     pkt.data = data;
     pkt.size = len;
     // HACK: make PNGs decode normally instead of as CorePNG delta frames
     pkt.flags = AV_PKT_FLAG_KEY;
     avcodec_decode_video2(avctx, frame, &decode_ok, &pkt);
-    memset(bf, 0, sizeof(*bf));
+    memset(img, 0, sizeof(*img));
 
     switch (avctx->pix_fmt) {
     case PIX_FMT_GRAY8:
-        bf->BPP = 8;
+        img->Bpp = 8;
         break;
 
     case PIX_FMT_GRAY16BE:
-        bf->BPP = 16;
+        img->Bpp = 16;
         break;
 
     case PIX_FMT_RGB24:
-        bf->BPP = 24;
+        img->Bpp = 24;
         break;
 
-    case PIX_FMT_BGRA:
-    case PIX_FMT_ARGB:
-        bf->BPP = 32;
+    case PIX_FMT_RGBA:
+        img->Bpp = 32;
         break;
 
     default:
-        bf->BPP = 0;
+        img->Bpp = 0;
         break;
     }
 
-    if (decode_ok && bf->BPP) {
-        int bpl;
+    if (decode_ok && img->Bpp) {
+        img->Width  = avctx->width;
+        img->Height = avctx->height;
+        bpl = img->Width * (img->Bpp / 8);
+        img->ImageSize = bpl * img->Height;
 
-        bf->Width  = avctx->width;
-        bf->Height = avctx->height;
-        bpl = bf->Width * (bf->BPP / 8);
-        bf->ImageSize = bpl * bf->Height;
-        bf->Image     = malloc(bf->ImageSize);
-        memcpy_pic(bf->Image, frame->data[0], bpl, bf->Height, bpl, frame->linesize[0]);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] file: %s\n", fname);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap]  size: %lux%lu, color depth: %u\n", img->Width, img->Height, img->Bpp);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap]  image size: %lu\n", img->ImageSize);
+
+        img->Image = malloc(img->ImageSize);
+
+        if (img->Image)
+            memcpy_pic(img->Image, frame->data[0], bpl, img->Height, bpl, frame->linesize[0]);
+        else
+            decode_ok = 0;
     }
 
     avcodec_close(avctx);
-    av_freep(&frame);
-    av_freep(&avctx);
-    av_freep(&data);
+    av_free(frame);
+    av_free(avctx);
+    av_free(data);
 
-    mp_dbg(MSGT_GPLAYER, MSGL_DBG2, "[png] filename: %s.\n", fname);
-    mp_dbg(MSGT_GPLAYER, MSGL_DBG2, "[png]  size: %lux%lu bits: %u\n", bf->Width, bf->Height, bf->BPP);
-    mp_dbg(MSGT_GPLAYER, MSGL_DBG2, "[png]  imagesize: %lu\n", bf->ImageSize);
-
-    return !(decode_ok && bf->BPP);
+    return !(decode_ok && img->Bpp);
 }
 
-static int conv24to32(txSample *bf)
+/**
+ * @brief Convert a 24-bit RGB or 32-bit RGBA image into a 32-bit ARGB image.
+ *
+ * @param img image to be converted
+ *
+ * @return 1 (ok) or 0 (error)
+ *
+ * @note This is an in-place conversion,
+ *       new memory will be allocated for @a img if necessary.
+ */
+static int convert_ARGB(guiImage *img)
 {
-    unsigned char *tmpImage;
-    unsigned int i, c;
+    char *orgImage;
+    unsigned long i, c;
 
-    if (bf->BPP == 24) {
-        tmpImage      = bf->Image;
-        bf->BPP       = 32;
-        bf->ImageSize = bf->Width * bf->Height * 4;
-        bf->Image     = calloc(1, bf->ImageSize);
+    if (img->Bpp == 24) {
+        orgImage = img->Image;
 
-        if (!bf->Image) {
-            free(tmpImage);
-            mp_dbg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] not enough memory for image\n");
-            return 1;
+        img->Bpp       = 32;
+        img->ImageSize = img->Width * img->Height * 4;
+        img->Image     = calloc(1, img->ImageSize);
+
+        if (!img->Image) {
+            free(orgImage);
+            mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] not enough memory: %lu\n", img->ImageSize);
+            return 0;
         }
 
-        for (c = 0, i = 0; c < bf->ImageSize; c += 4, i += 3)
-            *(uint32_t *)&bf->Image[c] = AV_RB24(&tmpImage[i]);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] 32 bpp conversion size: %lu\n", img->ImageSize);
 
-        free(tmpImage);
-    }
+        for (i = 0, c = 0; i < img->ImageSize; i += 4, c += 3)
+            *(uint32_t *)&img->Image[i] = ALPHA_OPAQUE | AV_RB24(&orgImage[c]);
 
-    return 0;
+        free(orgImage);
+    } else if (img->Bpp == 32) {
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] 32 bpp ARGB conversion\n");
+
+        for (i = 0; i < img->ImageSize; i += 4)
+            *(uint32_t *)&img->Image[i] = (img->Image[i + 3] << 24) | AV_RB24(&img->Image[i]);
+    } else
+        return 0;
+
+    return 1;
 }
 
-static void Normalize(txSample *bf)
+/**
+ * @brief Check whether a (PNG) file exists.
+ *
+ * @param fname filename (with path, but may lack extension)
+ *
+ * @return path including extension (ok) or NULL (not accessible)
+ */
+static const char *fExist(const char *fname)
 {
-    int i;
+    static const char ext[][4] = { "png", "PNG" };
+    static char buf[512];
+    unsigned int i;
 
-    for (i = 0; i < (int)bf->ImageSize; i += 4)
-#if !HAVE_BIGENDIAN
-        bf->Image[i + 3] = 0;
-#else
-        bf->Image[i] = 0;
-#endif
-}
-
-static unsigned char *fExist(unsigned char *fname)
-{
-    static unsigned char tmp[512];
-    FILE *fl;
-    unsigned char ext[][6] = { ".png\0", ".PNG\0" };
-    int i;
-
-    fl = fopen(fname, "rb");
-
-    if (fl != NULL) {
-        fclose(fl);
+    if (access(fname, R_OK) == 0)
         return fname;
-    }
 
-    for (i = 0; i < 2; i++) {
-        snprintf(tmp, sizeof(tmp), "%s%s", fname, ext[i]);
-        fl = fopen(tmp, "rb");
+    for (i = 0; i < FF_ARRAY_ELEMS(ext); i++) {
+        snprintf(buf, sizeof(buf), "%s.%s", fname, ext[i]);
 
-        if (fl != NULL) {
-            fclose(fl);
-            return tmp;
-        }
+        if (access(buf, R_OK) == 0)
+            return buf;
     }
 
     return NULL;
 }
 
-int bpRead(char *fname, txSample *bf)
+/**
+ * @brief Read a PNG file.
+ *
+ * @param fname filename (with path, but may lack extension)
+ * @param img pointer suitable to store the image data
+ *
+ * @return 0 (ok), -1 (color depth too low), -2 (not accessible),
+ *                 -5 (#pngRead() error) or -8 (#convert_ARGB() error)
+ */
+int bpRead(const char *fname, guiImage *img)
 {
+    int r;
+
     fname = fExist(fname);
 
-    if (fname == NULL)
+    if (!fname)
         return -2;
 
-    if (pngRead(fname, bf)) {
-        mp_dbg(MSGT_GPLAYER, MSGL_FATAL, "[bitmap] unknown file type ( %s )\n", fname);
+    r = pngRead(fname, img);
+
+    if (r != 0) {
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] read error #%d: %s\n", r, fname);
         return -5;
     }
 
-    if (bf->BPP < 24) {
-        mp_dbg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] Sorry, only 24 and 32 bpp bitmaps are supported.\n");
+    if (img->Bpp < 24) {
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] bpp too low: %u\n", img->Bpp);
         return -1;
     }
 
-    if (conv24to32(bf))
+    if (!convert_ARGB(img))
         return -8;
 
-    Normalize(bf);
     return 0;
 }
 
-void bpFree(txSample *bf)
+/**
+ * @brief Free all memory allocated to an image and set all its pointers to NULL.
+ *
+ * @param img image to be freed
+ */
+void bpFree(guiImage *img)
 {
-    free(bf->Image);
-    memset(bf, 0, sizeof(*bf));
+    free(img->Image);
+    memset(img, 0, sizeof(*img));
 }
 
-void Convert32to1(txSample *in, txSample *out, int adaptivlimit)
+/**
+ * @brief Render a bitmap mask for an image.
+ *
+ * @param in image to render a bitmap mask from
+ * @param out bitmap mask
+ *
+ * @return 1 (ok) or 0 (error)
+ *
+ * @note As a side effect, transparent pixels of @a in will be rendered black.
+ */
+int bpRenderMask(const guiImage *in, guiImage *out)
 {
+    uint32_t *buf;
+    unsigned long x, y;
+    unsigned long i = 0, c = 0;
+    unsigned char tmp = 0, b = 1;
+    int shaped = 0;
+
     out->Width     = in->Width;
     out->Height    = in->Height;
-    out->BPP       = 1;
-    out->ImageSize = (out->Width * out->Height + 7) / 8;
+    out->Bpp       = 1;
+    out->ImageSize = ((out->Width + 7) / 8) * out->Height;
+    out->Image     = calloc(1, out->ImageSize);
 
-    mp_dbg(MSGT_GPLAYER, MSGL_DBG2, "[c32to1] imagesize: %lu\n", out->ImageSize);
+    if (!out->Image) {
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] not enough memory: %lu\n", out->ImageSize);
+        return 0;
+    }
 
-    out->Image = calloc(1, out->ImageSize);
+    buf = (uint32_t *)in->Image;
 
-    if (out->Image == NULL)
-        mp_msg(MSGT_GPLAYER, MSGL_WARN, "[bitmap] Sorry, only 24 and 32 bpp bitmaps are supported.\n");
-    {
-        int i, b, c = 0;
-        unsigned int *buf = NULL;
-        unsigned char tmp = 0;
-        int nothaveshape  = 1;
-
-        buf = (unsigned int *)in->Image;
-
-        for (b = 0, i = 0; i < (int)(out->Width * out->Height); i++) {
-            if ((int)buf[i] != adaptivlimit)
-                tmp = (tmp >> 1) | 128;
+    for (y = 0; y < in->Height; y++) {
+        for (x = 0; x < in->Width; x++) {
+            if (!IS_TRANSPARENT(buf[i]))
+                tmp |= b;
             else {
-                tmp    = tmp >> 1;
-                buf[i] = nothaveshape = 0;
+                buf[i] = 0; // pixel should be black (if transparency isn't supported)
+                shaped = 1;
             }
 
-            if (b++ == 7) {
+            i++;
+            b <<= 1;
+
+            if (b == 0) {
                 out->Image[c++] = tmp;
-                tmp = b = 0;
+                tmp = 0;
+                b   = 1;
             }
         }
 
-        if (b)
-            out->Image[c] = tmp;
-
-        if (nothaveshape) {
-            free(out->Image);
-            out->Image = NULL;
+        if (b != 1) {
+            out->Image[c++] = tmp;
+            tmp = 0;
+            b   = 1;
         }
     }
+
+    if (!shaped)
+        bpFree(out);
+
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] 1 bpp conversion size: %lu\n", out->ImageSize);
+
+    return 1;
 }

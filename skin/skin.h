@@ -24,10 +24,11 @@
 
 typedef struct
 {
-    char *data;                   /* pointer to image data */
-    int  width;                   /* image width */
-    int  height;                  /* image height */
-    int  size;                    /* image data size in bytes */
+    char *name;                  /* image name */
+    int size;                    /* image data size in bytes */
+    int width;                   /* image width */
+    int height;                  /* image height */
+    char *data;                  /* pointer to image data */
 } image_t;
 
 typedef struct

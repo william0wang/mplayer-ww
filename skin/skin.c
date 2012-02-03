@@ -75,9 +75,9 @@ static int GetDesktopBitsPerPixel(void)
 }
 
 /* reads a complete image as is into image buffer */
-static image_t *pngRead(const char *skindir, unsigned char *fname)
+static image_t *pngRead(const char *skindir, const char *fname)
 {
-    txSample bmp;
+    guiImage bmp;
     image_t *bf;
     FILE *fp;
     char *filename = NULL;
