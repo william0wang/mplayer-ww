@@ -3,6 +3,7 @@
 *.a
 *.pc
 *.exe
+*.dll
 *.ho
 *.swp
 codec-cfg
