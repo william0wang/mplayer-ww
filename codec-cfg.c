@@ -188,6 +188,7 @@ static const struct {
     {"420P9",       IMGFMT_420P9},
     {"420A",        IMGFMT_420A},
     {"444P",        IMGFMT_444P},
+    {"444A",        IMGFMT_444A},
     {"422P",        IMGFMT_422P},
     {"411P",        IMGFMT_411P},
     {"440P",        IMGFMT_440P},
@@ -198,6 +199,8 @@ static const struct {
     {"UYVY",        IMGFMT_UYVY},
     {"YVYU",        IMGFMT_YVYU},
 
+    {"RGB64LE",     IMGFMT_RGB64LE},
+    {"RGB64BE",     IMGFMT_RGB64BE},
     {"RGB48LE",     IMGFMT_RGB48LE},
     {"RGB48BE",     IMGFMT_RGB48BE},
     {"RGB4",        IMGFMT_RGB4},

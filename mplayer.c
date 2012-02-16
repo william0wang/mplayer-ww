@@ -837,7 +837,7 @@ static void exit_sighandler(int x)
 #endif
     }
     mp_msg(MSGT_CPLAYER, MSGL_FATAL, "\n" MSGTR_IntBySignal, x,
-           current_module ? current_module : "unknown"
+           current_module ? current_module : MSGTR_Unknown
            );
     mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_SIGNAL=%d\n", x);
     if (sig_count <= 1)
@@ -863,17 +863,17 @@ static void exit_sighandler(int x)
 #ifdef CONFIG_CRASH_DEBUG
             if (crash_debug) {
                 int gdb_pid;
-                mp_msg(MSGT_CPLAYER, MSGL_INFO, "Forking...\n");
+                mp_msg(MSGT_CPLAYER, MSGL_INFO, MSGTR_Forking);
                 gdb_pid = fork();
-                mp_msg(MSGT_CPLAYER, MSGL_INFO, "Forked...\n");
+                mp_msg(MSGT_CPLAYER, MSGL_INFO, MSGTR_Forked);
                 if (gdb_pid == 0) { // We are the child
                     char spid[20];
                     snprintf(spid, sizeof(spid), "%i", getppid());
                     getch2_disable(); // allow terminal to work properly with gdb
                     if (execlp("gdb", "gdb", prog_path, spid, "-ex", "bt", NULL) == -1)
-                        mp_msg(MSGT_CPLAYER, MSGL_ERR, "Couldn't start gdb\n");
+                        mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_CouldntStartGdb);
                 } else if (gdb_pid < 0)
-                    mp_msg(MSGT_CPLAYER, MSGL_ERR, "Couldn't fork\n");
+                    mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_CouldntFork);
                 else {
                     waitpid(gdb_pid, NULL, 0);
                 }
@@ -999,7 +999,7 @@ static void load_per_file_config(m_config_t *conf, const char *const file)
     const char *name;
 
     if (strlen(file) > PATH_MAX - 14) {
-        mp_msg(MSGT_CPLAYER, MSGL_WARN, "Filename is too long, can not load file or directory specific config files\n");
+        mp_msg(MSGT_CPLAYER, MSGL_WARN, MSGTR_FilenameTooLong);
         return;
     }
     sprintf(cfg, "%s.conf", file);
@@ -2280,6 +2280,7 @@ static int fill_audio_out_buffers(void)
     int audio_eof = 0;
     int bytes_to_write;
     int format_change = 0;
+    int timeout = 0;
     sh_audio_t *const sh_audio = mpctx->sh_audio;
 
     current_module = "play_audio";
@@ -2293,6 +2294,10 @@ static int fill_audio_out_buffers(void)
         bytes_to_write = mpctx->audio_out->get_space();
         if (mpctx->sh_video || bytes_to_write >= ao_data.outburst)
             break;
+        if (timeout++ > 10) {
+            mp_msg(MSGT_CPLAYER, MSGL_WARN, MSGTR_AudioDeviceStuck);
+            break;
+        }
 
         // handle audio-only case:
         // this is where mplayer sleeps during audio-only playback
@@ -2351,7 +2356,7 @@ static int fill_audio_out_buffers(void)
         } else if ((format_change || audio_eof) && mpctx->audio_out->get_delay() < .04) {
             // Sanity check to avoid hanging in case current ao doesn't output
             // partial chunks and doesn't check for AOPLAY_FINAL_CHUNK
-            mp_msg(MSGT_CPLAYER, MSGL_WARN, "Audio output truncated at end.\n");
+            mp_msg(MSGT_CPLAYER, MSGL_WARN, MSGTR_AudioOutputTruncated);
             sh_audio->a_out_buffer_len = 0;
         }
     }
@@ -2498,7 +2503,7 @@ int reinit_video_chain(void)
             if (vf_ass)
                 sh_video->vfilter = vf_ass;
             else
-                mp_msg(MSGT_CPLAYER, MSGL_ERR, "ASS: cannot add video filter\n");
+                mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_ASSCannotAddVideoFilter);
         }
     }
 #endif
@@ -2641,7 +2646,7 @@ static double update_video(int *blit_frame)
         ((vf_instance_t *)sh_video->vfilter)->control(sh_video->vfilter,
                                                       VFCTRL_GET_PTS, &sh_video->pts);
         if (sh_video->pts == MP_NOPTS_VALUE) {
-            mp_msg(MSGT_CPLAYER, MSGL_ERR, "pts after filters MISSING\n");
+            mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_PtsAfterFiltersMissing);
             sh_video->pts = sh_video->last_pts;
         }
         if (sh_video->last_pts == MP_NOPTS_VALUE)
@@ -3101,7 +3106,7 @@ int main(int argc, char *argv[])
 
     // Many users forget to include command line in bugreports...
     if (mp_msg_test(MSGT_CPLAYER, MSGL_V)) {
-        mp_msg(MSGT_CPLAYER, MSGL_INFO, "CommandLine:");
+        mp_msg(MSGT_CPLAYER, MSGL_INFO, MSGTR_CommandLine);
         for (i = 1; i < argc; i++)
             mp_msg(MSGT_CPLAYER, MSGL_INFO, " '%s'", argv[i]);
         mp_msg(MSGT_CPLAYER, MSGL_INFO, "\n");
@@ -3173,7 +3178,7 @@ int main(int argc, char *argv[])
                 if (menu_init(mpctx, MPLAYER_CONFDIR "/menu.conf"))
                     mp_msg(MSGT_CPLAYER, MSGL_V,  "Menu initialized: %s\n", MPLAYER_CONFDIR "/menu.conf");
                 else {
-                    mp_msg(MSGT_CPLAYER, MSGL_ERR, "Menu init failed.\n");
+                    mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_MenuInitFailed);
                     use_menu = 0;
                 }
             }

@@ -16,8 +16,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "cfg.h"
@@ -27,7 +27,9 @@
 
 #include "config.h"
 #include "help_mp.h"
+#include "libavutil/common.h"
 #include "libmpcodecs/vd.h"
+#include "libmpdemux/demuxer.h"
 #include "libvo/video_out.h"
 #include "libvo/x11_common.h"
 #include "mixer.h"
@@ -37,6 +39,8 @@
 #include "mplayer.h"
 #include "parser-cfg.h"
 #include "path.h"
+#include "stream/stream.h"
+#include "sub/ass_mp.h"
 #include "sub/font_load.h"
 #include "sub/sub.h"
 
@@ -93,6 +97,11 @@ int guiWinID = -1;
 char *skinName;
 
 char *fsHistory[5];
+
+static const char gui_configuration[] = "gui.conf";
+static const char gui_history[]       = "gui.history";
+static const char gui_playlist[]      = "gui.pl";
+static const char gui_urllist[]       = "gui.url";
 
 static const m_option_t gui_opts[] = {
     { "cache",                       &gtkCacheOn,              CONF_TYPE_FLAG,        0,           0,     1,       NULL },
@@ -223,27 +232,6 @@ static const m_option_t gui_opts[] = {
     { NULL,                          NULL,                     0,                     0,           0,     0,       NULL }
 };
 
-static char *gfgets(char *str, int size, FILE *f)
-{
-    char *s, c;
-
-    s = fgets(str, size, f);
-
-    if (s) {
-        c = s[strlen(s) - 1];
-
-        if (c == '\n' || c == '\r')
-            s[strlen(s) - 1] = 0;
-
-        c = s[strlen(s) - 1];
-
-        if (c == '\n' || c == '\r')
-            s[strlen(s) - 1] = 0;
-    }
-
-    return s;
-}
-
 int cfg_gui_include(m_option_t *conf, const char *filename)
 {
     (void)conf;
@@ -251,18 +239,18 @@ int cfg_gui_include(m_option_t *conf, const char *filename)
     return m_config_parse_config_file(gui_conf, filename, 0);
 }
 
-int cfg_read(void)
+void cfg_read(void)
 {
-    char *cfg;
-    FILE *f;
+    char *fname, line[512];
+    FILE *file;
 
     player_idle_mode = 1;   // GUI is in idle mode by default
 
     // configuration
 
-    cfg = get_path("gui.conf");
+    fname = get_path(gui_configuration);
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[cfg] file: %s\n", cfg);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[cfg] file: %s\n", fname);
 
     gui_conf = m_config_new();
 
@@ -273,174 +261,189 @@ int cfg_read(void)
 
     m_config_register_options(gui_conf, gui_opts);
 
-    if (!disable_gui_conf && (m_config_parse_config_file(gui_conf, cfg, 1) < 0)) {
-        gmp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_ConfigFileError);
-// mplayer(MPLAYER_EXIT_GUI, 1, 0);
+    if (!disable_gui_conf && (m_config_parse_config_file(gui_conf, fname, 1) < 0)) {
+        gmp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_ConfigFileError "\n");
+        mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
     }
 
-    free(cfg);
+    free(fname);
 
     // playlist
 
-    cfg = get_path("gui.pl");
-    f   = fopen(cfg, "rt");
+    fname = get_path(gui_playlist);
+    file  = fopen(fname, "rt");
 
-    if (f) {
-        while (!feof(f)) {
-            char tmp[512];
+    if (file) {
+        while (fgetstr(line, sizeof(line), file)) {
             plItem *item;
 
-            if (gfgets(tmp, 512, f) == NULL)
+            if (!*line)
                 continue;
 
-            item       = calloc(1, sizeof(plItem));
-            item->path = strdup(tmp);
-            gfgets(tmp, 512, f);
-            item->name = strdup(tmp);
-            listSet(gtkAddPlItem, item);
+            item = calloc(1, sizeof(plItem));
+
+            if (!item) {
+                gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_MemAllocFailed);
+                mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
+            }
+
+            item->path = strdup(line);
+
+            if (fgetstr(line, sizeof(line), file) && *line) {
+                item->name = strdup(line);
+                listMgr(gtkAddPlItem, item);
+            } else {
+                free(item->path);
+                free(item);
+            }
         }
 
-        fclose(f);
+        fclose(file);
     }
 
-    free(cfg);
+    free(fname);
 
     // URL list
 
-    cfg = get_path("gui.url");
-    f   = fopen(cfg, "rt");
+    fname = get_path(gui_urllist);
+    file  = fopen(fname, "rt");
 
-    if (f) {
-        while (!feof(f)) {
-            char tmp[512];
+    if (file) {
+        while (fgetstr(line, sizeof(line), file)) {
             urlItem *item;
 
-            if (gfgets(tmp, 512, f) == NULL)
+            if (!*line)
                 continue;
 
-            item      = calloc(1, sizeof(urlItem));
-            item->url = strdup(tmp);
-            listSet(gtkAddURLItem, item);
+            item = calloc(1, sizeof(urlItem));
+
+            if (!item) {
+                gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_MemAllocFailed);
+                mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
+            }
+
+            item->url = strdup(line);
+            listMgr(gtkAddURLItem, item);
         }
 
-        fclose(f);
+        fclose(file);
     }
 
-    free(cfg);
+    free(fname);
 
     // directory history
 
-    cfg = get_path("gui.history");
-    f   = fopen(cfg, "rt+");
+    fname = get_path(gui_history);
+    file  = fopen(fname, "rt");
 
-    if (f) {
-        int i = 0;
+    if (file) {
+        unsigned int i = 0;
 
-        while (!feof(f)) {
-            char tmp[512];
+        while (fgetstr(line, sizeof(line), file))
+            if (*line && (i < FF_ARRAY_ELEMS(fsHistory)))
+                fsHistory[i++] = strdup(line);
 
-            if (gfgets(tmp, 512, f) == NULL)
-                continue;
-
-            fsHistory[i++] = gstrdup(tmp);
-        }
-
-        fclose(f);
+        fclose(file);
     }
 
-    free(cfg);
-
-    return 0;
+    free(fname);
 }
 
-int cfg_write(void)
+void cfg_write(void)
 {
-    char *cfg;
-    FILE *f;
-    int i;
+    char *fname;
+    FILE *file;
 
     // configuration
 
-    cfg = get_path("gui.conf");
-    f   = fopen(cfg, "wt+");
+    fname = get_path(gui_configuration);
+    file  = fopen(fname, "wt+");
 
-    if (f) {
-        for (i = 0; gui_opts[i].name; i++) {
-            char *v = m_option_print(&gui_opts[i], gui_opts[i].p);
+    if (file) {
+        const m_option_t *opts = gui_opts;
 
-            if (v == (char *)-1) {
-                mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_UnableToSaveOption, gui_opts[i].name);
-                v = NULL;
+        while (opts->name) {
+            char *val = m_option_print(opts, opts->p);
+
+            if (val == (char *)-1) {
+                gmp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_UnableToSaveOption, opts->name);
+                val = NULL;
             }
 
-            if (v) {
-                fprintf(f, "%s = \"%s\"\n", gui_opts[i].name, v);
-                free(v);
+            if (val) {
+                char delim[] = "\"";
+
+                if (!strchr(val, ' '))
+                    *delim = 0;
+
+                fprintf(file, "%s=%s%s%s\n", opts->name, delim, val, delim);
+                free(val);
             }
+
+            opts++;
         }
 
-        fclose(f);
+        fclose(file);
     }
 
-    free(cfg);
+    free(fname);
 
     // playlist
 
-    cfg = get_path("gui.pl");
-    f   = fopen(cfg, "wt+");
+    fname = get_path(gui_playlist);
+    file  = fopen(fname, "wt+");
 
-    if (f) {
-        plCurrent = plList;
+    if (file) {
+        plItem *item = plList;
 
-        while (plCurrent) {
-            if (plCurrent->path && plCurrent->name) {
-                fprintf(f, "%s\n", plCurrent->path);
-                fprintf(f, "%s\n", plCurrent->name);
+        while (item) {
+            if (item->path && item->name) {
+                fprintf(file, "%s\n", item->path);
+                fprintf(file, "%s\n", item->name);
             }
 
-            plCurrent = plCurrent->next;
+            item = item->next;
         }
 
-        fclose(f);
+        fclose(file);
     }
 
-    free(cfg);
+    free(fname);
 
     // URL list
 
-    cfg = get_path("gui.url");
-    f   = fopen(cfg, "wt+");
+    fname = get_path(gui_urllist);
+    file  = fopen(fname, "wt+");
 
-    if (f) {
-        while (urlList) {
-            if (urlList->url)
-                fprintf(f, "%s\n", urlList->url);
+    if (file) {
+        urlItem *item = urlList;
 
-            urlList = urlList->next;
+        while (item) {
+            if (item->url)
+                fprintf(file, "%s\n", item->url);
+
+            item = item->next;
         }
 
-        fclose(f);
+        fclose(file);
     }
 
-    free(cfg);
+    free(fname);
 
     // directory history
 
-    cfg = get_path("gui.history");
-    f   = fopen(cfg, "wt+");
+    fname = get_path(gui_history);
+    file  = fopen(fname, "wt+");
 
-    if (f) {
-        int i = 0;
+    if (file) {
+        unsigned int i;
 
-// while (fsHistory[i] != NULL)
-        for (i = 0; i < 5; i++)
+        for (i = 0; i < FF_ARRAY_ELEMS(fsHistory); i++)
             if (fsHistory[i])
-                fprintf(f, "%s\n", fsHistory[i]);
+                fprintf(file, "%s\n", fsHistory[i]);
 
-        fclose(f);
+        fclose(file);
     }
 
-    free(cfg);
-
-    return 0;
+    free(fname);
 }

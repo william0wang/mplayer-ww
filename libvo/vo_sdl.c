@@ -169,9 +169,6 @@ static struct sdl_priv_s {
 	/* is X running (0/1) */
 	int X;
 
-	/* X11 Resolution */
-	int XWidth, XHeight;
-
         /* original image dimensions */
 	int width, height;
 
@@ -393,8 +390,6 @@ static int sdl_open (void *plugin, void *name)
 
 #if !defined( __AMIGAOS4__ ) && !defined( __APPLE__ )
 	priv->sdlfullflags |= SDL_DOUBLEBUF;
-	if (vo_doublebuffering)
-	    priv->sdlflags |= SDL_DOUBLEBUF;
 #endif
 
 	/* get information about the graphics adapter */
@@ -483,81 +478,6 @@ static int sdl_close (void)
 	return 0;
 }
 
-/**
- * Do aspect ratio calculations
- *
- *   params : srcw == sourcewidth
- *            srch == sourceheight
- *            dstw == destinationwidth
- *            dsth == destinationheight
- *
- *  returns : SDL_Rect structure with new x and y, w and h
- **/
-
-#if 0
-static SDL_Rect aspect(int srcw, int srch, int dstw, int dsth) {
-	SDL_Rect newres;
-	mp_msg(MSGT_VO,MSGL_V, "SDL Aspect-Destinationres: %ix%i (x: %i, y: %i)\n", newres.w, newres.h, newres.x, newres.y);
-	newres.h = ((float)dstw / (float)srcw * (float)srch) * ((float)dsth/((float)dstw/(MONITOR_ASPECT)));
-	if(newres.h > dsth) {
-		newres.w = ((float)dsth / (float)newres.h) * dstw;
-		newres.h = dsth;
-		newres.x = (dstw - newres.w) / 2;
-		newres.y = 0;
-	}
-	else {
-		newres.w = dstw;
-		newres.x = 0;
-		newres.y = (dsth - newres.h) / 2;
-	}
-
-	mp_msg(MSGT_VO,MSGL_V, "SDL Mode: %d:  %d x %d\n", i, priv->fullmodes[i]->w, priv->fullmodes[i]->h);
-
-	return newres;
-}
-#endif
-
-/**
- * Sets the specified fullscreen mode.
- *
- *   params : mode == index of the desired fullscreen mode
- *  returns : doesn't return
- **/
-
-#if 0
-static void set_fullmode (int mode)
-{
-	struct sdl_priv_s *priv = &sdl_priv;
-	SDL_Surface *newsurface = NULL;
-	int haspect, waspect = 0;
-
-	/* if we haven't set a fullmode yet, default to the lowest res fullmode first */
-	if (mode < 0)
-		mode = priv->fullmode = findArrayEnd(priv->fullmodes) - 1;
-
-	/* Calculate proper aspect ratio for fullscreen
-	 * Height smaller than expected: add horizontal black bars (haspect)*/
-	haspect = (priv->width * (float) ((float) priv->fullmodes[mode]->h / (float) priv->fullmodes[mode]->w) - priv->height) * (float) ((float) priv->fullmodes[mode]->w / (float) priv->width);
-	/* Height bigger than expected: add vertical black bars (waspect)*/
-	if (haspect < 0) {
-		haspect = 0; /* set haspect to zero because image will be scaled horizontal instead of vertical */
-		waspect = priv->fullmodes[mode]->w - ((float) ((float) priv->fullmodes[mode]->h / (float) priv->height) * (float) priv->width);
-	}
-//	printf ("W-Aspect: %i  H-Aspect: %i\n", waspect, haspect);
-
-	/* change to given fullscreen mode and hide the mouse cursor */
-	newsurface = SDL_SetVideoMode(priv->fullmodes[mode]->w - waspect, priv->fullmodes[mode]->h - haspect, priv->bpp, priv->sdlfullflags);
-
-	/* if we were successful hide the mouse cursor and save the mode */
-	if (newsurface) {
-		if (priv->surface)
-	    	    SDL_FreeSurface(priv->surface);
-		priv->surface = newsurface;
-		SDL_ShowCursor(0);
-	}
-}
-#endif
-
 /* Set video mode. Not fullscreen */
 static void set_video_mode(int width, int height, int bpp, uint32_t sdlflags)
 {
@@ -572,7 +492,9 @@ static void set_video_mode(int width, int height, int bpp, uint32_t sdlflags)
     priv->rgbsurface = NULL;
     priv->overlay = NULL;
 
-    newsurface = SDL_SetVideoMode(width, height, bpp, sdlflags);
+    vo_dwidth  = width;
+    vo_dheight = height;
+    newsurface = sdl_set_mode(bpp, sdlflags);
 
     if(newsurface) {
 
@@ -583,13 +505,9 @@ static void set_video_mode(int width, int height, int bpp, uint32_t sdlflags)
         priv->surface = newsurface;
         priv->dstwidth = width;
         priv->dstheight = height;
-        vo_dwidth  = width;
-        vo_dheight = height;
 
         setup_surfaces();
     }
-    else
-        mp_msg(MSGT_VO,MSGL_WARN, "set_video_mode: SDL_SetVideoMode failed: %s\n", SDL_GetError());
 }
 
 static void set_fullmode (int mode) {
@@ -608,8 +526,8 @@ static void set_fullmode (int mode) {
 	/* if we haven't set a fullmode yet, default to the lowest res fullmode first */
 	/* But select a mode where the full video enter */
 	if(priv->X && priv->fulltype & VOFLAG_FULLSCREEN) {
-		screen_surface_w = priv->XWidth;
-		screen_surface_h = priv->XHeight;
+		screen_surface_w = vo_screenwidth;
+		screen_surface_h = vo_screenheight;
 	}
 	else if (mode < 0) {
         int i,j,imax;
@@ -631,27 +549,22 @@ static void set_fullmode (int mode) {
 		  }
 		mp_msg(MSGT_VO,MSGL_V, "SET SDL Mode: %d:  %d x %d\n", mode, priv->fullmodes[mode]->w, priv->fullmodes[mode]->h);
 		priv->fullmode = mode;
-        screen_surface_h = priv->fullmodes[mode]->h;
-        screen_surface_w = priv->fullmodes[mode]->w;
 	}
-    else {
        screen_surface_h = priv->fullmodes[mode]->h;
        screen_surface_w = priv->fullmodes[mode]->w;
-	}
 
 	aspect_save_screenres(screen_surface_w, screen_surface_h);
 
 	/* calculate new video size/aspect */
 	if(priv->mode == YUV) {
         if(priv->fulltype&VOFLAG_FULLSCREEN)
-		aspect_save_screenres(priv->XWidth, priv->XHeight);
-
         aspect(&priv->dstwidth, &priv->dstheight, A_ZOOM);
 	}
 
 	/* try to change to given fullscreenmode */
-	newsurface = SDL_SetVideoMode(priv->dstwidth, screen_surface_h, priv->bpp,
-                                  priv->sdlfullflags);
+        vo_dwidth  = priv->dstwidth;
+        vo_dheight = screen_surface_h;
+        newsurface = sdl_set_mode(priv->bpp, priv->sdlfullflags);
 
 	/*
 	 * In Mac OS X (and possibly others?) SDL_SetVideoMode() appears to
@@ -687,8 +600,6 @@ static void set_fullmode (int mode) {
         SDL_SRF_UNLOCK(priv->surface)
         setup_surfaces();
 	}
-    else
-        mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_SDL_SetVideoModeFailedFull, SDL_GetError());
 }
 
 
@@ -751,14 +662,12 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
         d_height = height;
     }
 
-    aspect_save_orig(width,height);
-	aspect_save_prescale(d_width ? d_width : width, d_height ? d_height : height);
-
 	/* Save the original Image size */
     priv->width  = width;
     priv->height = height;
-    priv->dstwidth  = d_width ? d_width : width;
-    priv->dstheight = d_height ? d_height : height;
+    priv->dstwidth  = vo_dwidth;
+    priv->dstheight = vo_dheight;
+printf("w/h: %i %i\n", vo_dwidth, vo_dheight);
 
     priv->format = format;
 
@@ -769,11 +678,6 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
 	/* Set output window title */
 	SDL_WM_SetCaption (".: MPlayer : F = Fullscreen/Windowed : C = Cycle Fullscreen Resolutions :.", title);
 	//SDL_WM_SetCaption (title, title);
-    }
-
-    if(priv->X) {
-	aspect_save_screenres(priv->XWidth,priv->XHeight);
-	aspect(&priv->dstwidth,&priv->dstheight,A_NOZOOM);
     }
 
 	priv->windowsize.w = priv->dstwidth;
@@ -1461,10 +1365,8 @@ static int preinit(const char *arg)
 #ifdef CONFIG_X11
     if(vo_init()) {
 		mp_msg(MSGT_VO,MSGL_V, "SDL: deactivating XScreensaver/DPMS\n");
-		priv->XWidth = vo_screenwidth;
-		priv->XHeight = vo_screenheight;
 		priv->X = 1;
-		mp_msg(MSGT_VO,MSGL_V, "SDL: X11 Resolution %ix%i\n", priv->XWidth, priv->XHeight);
+		mp_msg(MSGT_VO,MSGL_V, "SDL: X11 Resolution %ix%i\n", vo_screenwidth, vo_screenheight);
 	}
 #endif
 
@@ -1534,6 +1436,13 @@ static int control(uint32_t request, void *data)
       set_fullmode(priv->fullmode);
       mp_msg(MSGT_VO,MSGL_DBG2, "SDL: Set fullscreen mode\n");
     }
+    return VO_TRUE;
+  case VOCTRL_UPDATE_SCREENINFO:
+    if (!vo_screenwidth || !vo_screenheight) {
+        vo_screenwidth  = 1024;
+        vo_screenheight = 768;
+    }
+    aspect_save_screenres(vo_screenwidth, vo_screenheight);
     return VO_TRUE;
   }
 

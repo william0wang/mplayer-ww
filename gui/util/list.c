@@ -28,10 +28,10 @@ plItem *plLastPlayed;
 
 urlItem *urlList;
 
-void *listSet(int cmd, void *vparam)
+void *listMgr(int cmd, void *data)
 {
-    plItem *item      = (plItem *)vparam;
-    urlItem *url_item = (urlItem *)vparam;
+    plItem *item      = (plItem *)data;
+    urlItem *url_item = (urlItem *)data;
     int is_added      = 1;
 
     switch (cmd) {
@@ -72,7 +72,7 @@ void *listSet(int cmd, void *vparam)
 
             return plCurrent;
         } else
-            return listSet(gtkAddPlItem, item);
+            return listMgr(gtkAddPlItem, item);
 
     // get next item from playlist
     case gtkGetNextPlItem:
@@ -139,30 +139,16 @@ void *listSet(int cmd, void *vparam)
 
     // delete list
     case gtkDelPl:
-    {
-        plItem *curr = plList;
-        plItem *next;
+        while (plList) {
+            plItem *next = plList->next;
 
-        if (!plList)
-            return NULL;
+            free(plList->path);
+            free(plList->name);
+            free(plList);
 
-        if (!curr->next) {
-            free(curr->path);
-            free(curr->name);
-            free(curr);
-        } else {
-            while (curr->next) {
-                next = curr->next;
-                free(curr->path);
-                free(curr->name);
-                free(curr);
-                curr = next;
-            }
+            plList = next;
         }
-
-        plList    = NULL;
         plCurrent = NULL;
-    }
         return NULL;
 
     // handle url
@@ -187,44 +173,75 @@ void *listSet(int cmd, void *vparam)
             urlList = url_item;
         }
         return NULL;
+
+    case gtkDelURL:
+        while (urlList) {
+            urlItem *next = urlList->next;
+
+            free(urlList->url);
+            free(urlList);
+
+            urlList = next;
+        }
+        return NULL;
     }
 
     return NULL;
 }
 
 /**
- * \brief This actually creates a new list containing only one element...
+ * @brief Set list to @a entry.
+ *
+ * @param list pointer to the char pointer list
+ * @param entry the new (and only) element of the list
+ *
+ * @note Actually, a new list will be created and the old list will be freed.
  */
-void gaddlist(char ***list, const char *entry)
+void listSet(char ***list, const char *entry)
 {
-    int i;
-
     if (*list) {
-        for (i = 0; (*list)[i]; i++)
-            free((*list)[i]);
+        char **l = *list;
+
+        while (*l) {
+            free(*l);
+            l++;
+        }
 
         free(*list);
     }
 
-    *list      = malloc(2 * sizeof(char **));
-    (*list)[0] = gstrdup(entry);
-    (*list)[1] = NULL;
+    *list = malloc(2 * sizeof(char *));
+
+    if (*list) {
+        (*list)[0] = gstrdup(entry);
+        (*list)[1] = NULL;
+    }
 }
 
 /**
- * \brief This replaces a string starting with search by replace.
- * If not found, replace is appended.
+ * @brief Replace the first element in list that starts with @a search.
+ *
+ * @note If no such element is found, @a replace will be appended.
+ *
+ * @param list pointer to the char pointer list
+ * @param search element to search
+ * @param replace replacement element
  */
-void greplace(char ***list, const char *search, const char *replace)
+void listRepl(char ***list, const char *search, const char *replace)
 {
-    int i   = 0;
-    int len = (search ? strlen(search) : 0);
+    int i      = 0;
+    char **org = *list;
+
+    if (!replace)
+        return;
 
     if (*list) {
+        size_t len = (search ? strlen(search) : 0);
+
         for (i = 0; (*list)[i]; i++) {
-            if (search && (strncmp((*list)[i], search, len) == 0)) {
+            if (gstrncmp((*list)[i], search, len) == 0) {
                 free((*list)[i]);
-                (*list)[i] = gstrdup(replace);
+                (*list)[i] = strdup(replace);
                 return;
             }
         }
@@ -233,6 +250,11 @@ void greplace(char ***list, const char *search, const char *replace)
     } else
         *list = malloc(2 * sizeof(char *));
 
-    (*list)[i]     = gstrdup(replace);
+    if (!*list) {
+        *list = org;
+        return;
+    }
+
+    (*list)[i]     = strdup(replace);
     (*list)[i + 1] = NULL;
 }
