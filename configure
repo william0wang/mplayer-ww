@@ -6737,6 +6737,7 @@ else
   _librtmp=no
   def_librtmp='#define CONFIG_LIBRTMP 0'
   noinputmodules="librtmp $noinputmodules"
+  libavprotocols=$(echo $libavprotocols | sed -e s/LIBRTMP_PROTOCOL// -e s/LIBRTMPE_PROTOCOL// -e s/LIBRTMPS_PROTOCOL// -e s/LIBRTMPT_PROTOCOL// -e s/LIBRTMPTE_PROTOCOL// )
 fi
 echores "$_librtmp"
 
@@ -7097,8 +7098,6 @@ echocheck "mencoder"
 if test "$_mencoder" = no ; then
   # mpeg1video for vf_lavc, snow for vf_uspp / vf_mcdeint,
   libavencoders="$mplayer_encoders MPEG1VIDEO_ENCODER SNOW_ENCODER"
-  # needed for codec id -> tag conversion
-  libavmuxers="AVI_MUXER"
 fi
 echores "$_mencoder"
 
@@ -8213,6 +8212,7 @@ CONFIG_AVFORMAT = $ffmpeg_a
 CONFIG_AVUTIL   = $ffmpeg_a
 CONFIG_POSTPROC = $ffmpeg_a
 CONFIG_SWSCALE  = $ffmpeg_a
+CONFIG_SWRESAMPLE = $ffmpeg_a
 
 ASFLAGS    = \$(CFLAGS)
 AS_DEPFLAGS= $DEPFLAGS

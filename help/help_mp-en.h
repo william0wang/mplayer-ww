@@ -177,6 +177,17 @@ static const char help_text[]=
 #define MSGTR_MenuCall "Menu call\n"
 #define MSGTR_MasterQuit "Option -udp-slave: exiting because master exited\n"
 #define MSGTR_InvalidIP "Option -udp-ip: invalid IP address\n"
+#define MSGTR_Forking "Forking...\n"
+#define MSGTR_Forked "Forked...\n"
+#define MSGTR_CouldntStartGdb "Couldn't start gdb\n"
+#define MSGTR_CouldntFork "Couldn't fork\n"
+#define MSGTR_FilenameTooLong "Filename is too long, can not load file or directory specific config files\n"
+#define MSGTR_AudioDeviceStuck "Audio device got stuck!\n"
+#define MSGTR_AudioOutputTruncated "Audio output truncated at end.\n"
+#define MSGTR_ASSCannotAddVideoFilter "ASS: cannot add video filter\n"
+#define MSGTR_PtsAfterFiltersMissing "pts after filters MISSING\n"
+#define MSGTR_CommandLine "CommandLine:"
+#define MSGTR_MenuInitFailed "Menu init failed.\n"
 
 // --- edit decision lists
 #define MSGTR_EdlOutOfMem "Can't allocate enough memory to hold EDL data.\n"
@@ -994,7 +1005,6 @@ static const char help_text[]=
 // vo_sdl.c
 #define MSGTR_LIBVO_SDL_CouldntGetAnyAcceptableSDLModeForOutput "[VO_SDL] Couldn't get any acceptable SDL Mode for output.\n"
 #define MSGTR_LIBVO_SDL_SetVideoModeFailed "[VO_SDL] set_video_mode: SDL_SetVideoMode failed: %s.\n"
-#define MSGTR_LIBVO_SDL_SetVideoModeFailedFull "[VO_SDL] Set_fullmode: SDL_SetVideoMode failed: %s.\n"
 #define MSGTR_LIBVO_SDL_MappingI420ToIYUV "[VO_SDL] Mapping I420 to IYUV.\n"
 #define MSGTR_LIBVO_SDL_UnsupportedImageFormat "[VO_SDL] Unsupported image format (0x%X).\n"
 #define MSGTR_LIBVO_SDL_InfoPleaseUseVmOrZoom "[VO_SDL] Info - please use -vm or -zoom to switch to the best resolution.\n"
@@ -1460,6 +1470,8 @@ static const char help_text[]=
 #define MSGTR_MPDEMUX_AVIHDR_IdxFileSaved "Saved index file: %s\n"
 
 // demux_audio.c
+#define MSGTR_MPDEMUX_AUDIO_BadID3v2TagSize "Audio demuxer: bad ID3v2 tag size: larger than stream (%u).\n"
+#define MSGTR_MPDEMUX_AUDIO_DamagedAppendedID3v2Tag "Audio demuxer: damaged appended ID3v2 tag detected.\n"
 #define MSGTR_MPDEMUX_AUDIO_UnknownFormat "Audio demuxer: unknown format %d.\n"
 
 // demux_demuxers.c

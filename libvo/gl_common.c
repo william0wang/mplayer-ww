@@ -272,6 +272,8 @@ int glFindFormat(uint32_t fmt, int *bpp, GLint *gl_texfmt,
   *bpp = IMGFMT_IS_BGR(fmt)?IMGFMT_BGR_DEPTH(fmt):IMGFMT_RGB_DEPTH(fmt);
   *gl_texfmt = 3;
   switch (fmt) {
+    case IMGFMT_RGB64NE:
+      *gl_texfmt = 4;
     case IMGFMT_RGB48NE:
       *gl_format = GL_RGB;
       *gl_type = GL_UNSIGNED_SHORT;
@@ -2035,7 +2037,7 @@ static void *sdlgpa(const GLubyte *name) {
 }
 
 static int setGlWindow_sdl(MPGLContext *ctx) {
-  if (sdl_set_mode(0, SDL_OPENGL | SDL_RESIZABLE) < 0)
+  if (!sdl_set_mode(0, SDL_OPENGL | SDL_RESIZABLE))
     return SET_WINDOW_FAILED;
   SDL_GL_LoadLibrary(NULL);
   getFunctions(sdlgpa, NULL);

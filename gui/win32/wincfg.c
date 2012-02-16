@@ -38,6 +38,8 @@
 #include "gui/interface.h"
 #include "gui.h"
 
+static const char gui_configuration[] =  "gui.conf";
+
 /* params */
 int   gtkAONorm = 0;
 int   gtkAOExtraStereo = 0;
@@ -93,9 +95,9 @@ int cfg_gui_include(m_option_t *conf, const char *filename)
     return m_config_parse_config_file(gui_conf, filename, 0);
 }
 
-int cfg_read(void)
+void cfg_read(void)
 {
-    char *cfg = get_path("gui.conf");
+    char *cfg = get_path(gui_configuration);
 
     player_idle_mode = 1;   // GUI is in idle mode by default
 
@@ -104,14 +106,13 @@ int cfg_read(void)
     gui_conf = m_config_new();
     m_config_register_options(gui_conf, gui_opts);
     if (m_config_parse_config_file(gui_conf, cfg, 1) < 0)
-        mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_ConfigFileError);
+        mp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_ConfigFileError "\n");
     free(cfg);
-    return 0;
 }
 
-int cfg_write(void)
+void cfg_write(void)
 {
-    char *cfg = get_path("gui.conf");
+    char *cfg = get_path(gui_configuration);
     FILE *f;
     int i;
 
@@ -127,12 +128,15 @@ int cfg_write(void)
             }
             if(v)
             {
-                fprintf(f, "%s = \"%s\"\n", gui_opts[i].name, v);
+                char delim[] = "\"";
+
+                if (!strchr(v, ' ')) *delim = 0;
+
+                fprintf(f, "%s=%s%s%s\n", gui_opts[i].name, delim, v, delim);
                 free(v);
             }
         }
         fclose(f);
     }
     free(cfg);
-    return 0;
 }

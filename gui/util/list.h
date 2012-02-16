@@ -24,20 +24,21 @@
 #define gtkGetPrevPlItem 7
 #define gtkGetCurrPlItem 8
 #define gtkDelPl         9
+#define gtkDelURL        10
 #define gtkDelCurrPlItem 23
 #define gtkInsertPlItem  24
 #define gtkSetCurrPlItem 25
 #define gtkAddURLItem    15
 
 typedef struct plItem {
-    struct plItem *prev, *next;
     char *path;
     char *name;
+    struct plItem *prev, *next;
 } plItem;
 
 typedef struct urlItem {
-    struct urlItem *next;
     char *url;
+    struct urlItem *next;
 } urlItem;
 
 extern plItem *plList;
@@ -46,8 +47,13 @@ extern plItem *plLastPlayed;
 
 extern urlItem *urlList;
 
-void gaddlist(char ***list, const char *entry);
-void greplace(char ***list, const char *search, const char *replace);
-void *listSet(int cmd, void *vparam);
+/// @name list manager (playlist, URL list)
+void *listMgr(int cmd, void *data);
+
+/// @name char pointer list operations
+//@{
+void listRepl(char ***list, const char *search, const char *replace);
+void listSet(char ***list, const char *entry);
+//@}
 
 #endif /* MPLAYER_GUI_LIST_H */
