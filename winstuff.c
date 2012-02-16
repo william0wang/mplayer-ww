@@ -1684,7 +1684,7 @@ void disable_screen_saver(BOOL disable)
 		SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, 0, 0, SPIF_SENDWININICHANGE);
 		SystemParametersInfo(SPI_SETPOWEROFFACTIVE, 0, 0, SPIF_SENDWININICHANGE);
 
-		SetThreadExecutionState(ES_DISPLAY_REQUIRED|ES_SYSTEM_REQUIRED);
+		SetThreadExecutionState(ES_CONTINUOUS|ES_DISPLAY_REQUIRED|ES_SYSTEM_REQUIRED);
 	} else {
 		if(state_saved) {
 			SystemParametersInfo(SPI_SETLOWPOWERTIMEOUT, lowpower, 0, SPIF_SENDWININICHANGE);
@@ -1694,7 +1694,7 @@ void disable_screen_saver(BOOL disable)
 			SystemParametersInfo(SPI_SETPOWEROFFACTIVE, bPowerActiveSave, 0, SPIF_SENDWININICHANGE);
 		}
 
-		SetThreadExecutionState(0);
+		SetThreadExecutionState(ES_CONTINUOUS);
 		state_saved = FALSE;
 	}
 }
@@ -1777,7 +1777,8 @@ void load_config_ex(void) {
 		}
 	}
 
-	disable_screen_saver(disable_screensaver);
+	if(disable_screensaver)
+		disable_screen_saver(TRUE);
 
 	default_dir =  malloc(MAX_PATH);
 	str = iniparser_getstring(kk_ini, "Setting:default_dir", NULL);
