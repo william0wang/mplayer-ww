@@ -336,6 +336,7 @@ static int vf_open(vf_instance_t *vf, char *args)
     vf->priv->outbuffer=0;
     vf->priv->ctx=0;
     vf->priv->avctx = avcodec_alloc_context3(NULL);
+	vf->priv->avctx->pix_fmt = PIX_FMT_RGB24;
 
     if (args) {
         sscanf(args, "%d", &vf->priv->avctx->compression_level);
