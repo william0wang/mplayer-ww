@@ -140,7 +140,6 @@ static const vf_info_t* const filter_list[]={
     &vf_info_palette,
     &vf_info_pp7,
 #ifdef CONFIG_FFMPEG
-    &vf_info_pp,
     &vf_info_lavc,
     &vf_info_lavcdeint,
 #ifdef CONFIG_VF_LAVFI
@@ -148,6 +147,9 @@ static const vf_info_t* const filter_list[]={
 #endif
     &vf_info_screenshot,
     &vf_info_geq,
+#endif
+#ifdef CONFIG_POSTPROC
+    &vf_info_pp,
 #endif
 #ifdef CONFIG_ZR
     &vf_info_zrmjpeg,
@@ -290,7 +292,7 @@ mp_image_t* vf_get_image(vf_instance_t* vf, unsigned int outfmt, int mp_imgtype,
   if (w == -1) w = vf->w;
   if (h == -1) h = vf->h;
 
-  w2=(mp_imgflag&MP_IMGFLAG_ACCEPT_ALIGNED_STRIDE)?((w+15)&(~15)):w;
+  w2=(mp_imgflag&MP_IMGFLAG_ACCEPT_ALIGNED_STRIDE)?FFALIGN(w, 32):w;
 
   if(vf->put_image==vf_next_put_image){
       // passthru mode, if the filter uses the fallback/default put_image() code
@@ -382,8 +384,8 @@ mp_image_t* vf_get_image(vf_instance_t* vf, unsigned int outfmt, int mp_imgtype,
           if(mp_imgflag&MP_IMGFLAG_PREFER_ALIGNED_STRIDE){
               int align=(mpi->flags&MP_IMGFLAG_PLANAR &&
                          mpi->flags&MP_IMGFLAG_YUV) ?
-                         (8<<mpi->chroma_x_shift)-1 : 15; // -- maybe FIXME
-              w2=((w+align)&(~align));
+                         (16<<mpi->chroma_x_shift) : 32; // -- maybe FIXME
+              w2=FFALIGN(w, align);
               if(mpi->width!=w2){
                   // we have to change width... check if we CAN co it:
                   int flags=vf->query_format(vf,outfmt); // should not fail
