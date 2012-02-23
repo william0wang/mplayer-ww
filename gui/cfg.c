@@ -291,7 +291,7 @@ void cfg_read(void)
 
             if (fgetstr(line, sizeof(line), file) && *line) {
                 item->name = strdup(line);
-                listMgr(gtkAddPlItem, item);
+                listMgr(PLAYLIST_ITEM_ADD, item);
             } else {
                 free(item->path);
                 free(item);
@@ -323,7 +323,7 @@ void cfg_read(void)
             }
 
             item->url = strdup(line);
-            listMgr(gtkAddURLItem, item);
+            listMgr(URLLIST_ITEM_ADD, item);
         }
 
         fclose(file);
@@ -394,7 +394,7 @@ void cfg_write(void)
     file  = fopen(fname, "wt+");
 
     if (file) {
-        plItem *item = plList;
+        plItem *item = listMgr(PLAYLIST_GET, 0);
 
         while (item) {
             if (item->path && item->name) {
@@ -416,7 +416,7 @@ void cfg_write(void)
     file  = fopen(fname, "wt+");
 
     if (file) {
-        urlItem *item = urlList;
+        urlItem *item = listMgr(URLLIST_GET, 0);
 
         while (item) {
             if (item->url)

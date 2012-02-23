@@ -758,44 +758,9 @@ void update_sub_list(int i)
                 snprintf(s, 63, "%s%s", namelen <= 32 ? "" : "...", shortname);
 			}
         } else if (sub_type == SUB_SOURCE_DEMUX) {
-#ifdef CONFIG_DVDNAV
-            if (mpctx->stream->type == STREAMTYPE_DVDNAV) {
-				unsigned char lang[3];
-				if (mp_dvdnav_lang_from_sid(mpctx->stream, id, lang))
-					snprintf(s, 63, "DVD(%d) %s", id, lang);
-				else
-					snprintf(s, 63, "DVD(%d) %s", id, MSGTR_Unknown);
-            } else
-#endif
-#ifdef CONFIG_DVDREAD
-            if (mpctx->stream->type == STREAMTYPE_DVD) {
-                char lang[3];
-                int code = dvd_lang_from_sid(mpctx->stream, id);
-                lang[0] = code >> 8;
-                lang[1] = code;
-                lang[2] = 0;
-                snprintf(s, 63, "DVD(%d) %s", id, lang);
-            } else
-#endif
-			if (mpctx->stream->type == STREAMTYPE_BD) {
-				const char *lang = bd_lang_from_id(mpctx->stream, id);
-				if (!lang) lang = MSGTR_Unknown;
-				snprintf(s, 63, "BD(%d) %s", id, lang);
-			} else if (mpctx->demuxer->type == DEMUXER_TYPE_MATROSKA
-                 || mpctx->demuxer->type == DEMUXER_TYPE_LAVF_PREFERRED
-                 || mpctx->demuxer->type == DEMUXER_TYPE_LAVF
-                 || mpctx->demuxer->type == DEMUXER_TYPE_OGG) {
-				const char* lang = NULL;
-				for (j = 0; j < MAX_S_STREAMS; j++) {
-					sh_sub_t *sh = mpctx->demuxer->s_streams[j];
-					if (sh && sh->sid == id) {
-						lang = sh->lang;
-						break;
-					}
-				}
-                if (!lang) lang = MSGTR_Unknown;
-                snprintf(s, 63, "(%d) %s", id, lang);
-            }
+            char lang[40] = MSGTR_Unknown;
+            demuxer_sub_lang(mpctx->demuxer, id, lang, sizeof(lang));
+            snprintf(s, 63, "(%d) %s", id, lang);
         } else {
             snprintf(s, 63, MSGTR_Disabled);
         }

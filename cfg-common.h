@@ -543,7 +543,7 @@ const m_option_t common_opts[] = {
     { "noauto-threads", &auto_threads, CONF_TYPE_FLAG, 0, 1, 0, NULL},
 
     // postprocessing:
-#ifdef CONFIG_FFMPEG
+#ifdef CONFIG_POSTPROC
     {"pp", &divx_quality, CONF_TYPE_INT, 0, 0, 0, NULL},
     {"pphelp", pp_help, CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
 #endif

@@ -70,6 +70,7 @@ static int config(struct vf_instance *vf,
     vf->priv->avctx->width = d_width;
     vf->priv->avctx->height = d_height;
     vf->priv->avctx->pix_fmt = PIX_FMT_RGB24;
+    vf->priv->avctx->compression_level = 0;
     vf->priv->dw = d_width;
     vf->priv->dh = d_height;
     vf->priv->stride = (3*vf->priv->dw+15)&~15;
@@ -336,7 +337,6 @@ static int vf_open(vf_instance_t *vf, char *args)
     vf->priv->outbuffer=0;
     vf->priv->ctx=0;
     vf->priv->avctx = avcodec_alloc_context3(NULL);
-	vf->priv->avctx->pix_fmt = PIX_FMT_RGB24;
 
     if (args) {
         sscanf(args, "%d", &vf->priv->avctx->compression_level);
@@ -346,6 +346,7 @@ static int vf_open(vf_instance_t *vf, char *args)
         vf->priv->avctx->compression_level = 0;
     }
 
+    vf->priv->avctx->pix_fmt = PIX_FMT_RGB24;
     avcodec_register_all();
     if (avcodec_open2(vf->priv->avctx, avcodec_find_encoder(CODEC_ID_PNG), NULL)) {
         mp_msg(MSGT_VFILTER, MSGL_FATAL, "Could not open libavcodec PNG encoder\n");
