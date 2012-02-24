@@ -16,6 +16,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+/**
+ * @file
+ * @brief List management
+ */
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -27,11 +32,21 @@ static plItem *plCurrent;
 
 static urlItem *urlList;
 
+/**
+ * @brief Manage playlists and URL lists.
+ *
+ * @param cmd task to be performed
+ * @param data list item for the task
+ *
+ * @return pointer to top of list (GET command),
+ *         pointer to current list item (ITEM command) or
+ *         NULL (DELETE or unknown command)
+ *
+ */
 void *listMgr(int cmd, void *data)
 {
-    plItem *item      = (plItem *)data;
-    urlItem *url_item = (urlItem *)data;
-    int is_added      = 1;
+    plItem *pdat  = (plItem *)data;
+    urlItem *udat = (urlItem *)data;
 
     switch (cmd) {
     // playlist
@@ -40,105 +55,102 @@ void *listMgr(int cmd, void *data)
 
         return plList;
 
-    case PLAYLIST_ITEM_ADD:
+    case PLAYLIST_ITEM_APPEND:
+
         if (plList) {
-            plItem *next = plList;
+            plItem *item = plList;
 
-            while (next->next)
-                next = next->next;
+            while (item->next)
+                item = item->next;
 
-            next->next = item;
-            item->prev = next;
-            item->next = NULL;
+            item->next = pdat;
+            pdat->prev = item;
+            pdat->next = NULL;
         } else {
-            item->prev = item->next = NULL;
-            plCurrent  = plList = item;
+            pdat->next = pdat->prev = NULL;
+            plCurrent  = plList = pdat;
         }
-        return NULL;
+
+        return plCurrent;
 
     case PLAYLIST_ITEM_INSERT:
+
         if (plCurrent) {
-            plItem *curr = plCurrent;
-            item->next = curr->next;
+            pdat->next = plCurrent->next;
 
-            if (item->next)
-                item->next->prev = item;
+            if (pdat->next)
+                pdat->next->prev = pdat;
 
-            item->prev = curr;
-            curr->next = item;
-            plCurrent  = plCurrent->next;
+            pdat->prev      = plCurrent;
+            plCurrent->next = pdat;
+
+            plCurrent = pdat;
 
             return plCurrent;
         } else
-            return listMgr(PLAYLIST_ITEM_ADD, item);
-
-    case PLAYLIST_ITEM_GET_NEXT:
-        if (plCurrent && plCurrent->next) {
-            plCurrent = plCurrent->next;
-// if (!plCurrent && plList)
-// {
-// plItem *next = plList;
-//
-// while (next->next)
-// {
-// if (!next->next) break;
-// next = next->next;
-// }
-//
-// plCurrent = next;
-// }
-            return plCurrent;
-        }
-        return NULL;
-
-    case PLAYLIST_ITEM_GET_PREV:
-        if (plCurrent && plCurrent->prev) {
-            plCurrent = plCurrent->prev;
-// if ( !plCurrent && plList ) plCurrent=plList;
-            return plCurrent;
-        }
-        return NULL;
+            return listMgr(PLAYLIST_ITEM_APPEND, pdat);
 
     case PLAYLIST_ITEM_SET_CURR:
-        plCurrent = item;
+
+        plCurrent = pdat;
         return plCurrent;
 
     case PLAYLIST_ITEM_GET_CURR:
+
         return plCurrent;
 
+    case PLAYLIST_ITEM_GET_PREV:
+
+        if (plCurrent && plCurrent->prev) {
+            plCurrent = plCurrent->prev;
+            return plCurrent;
+        }
+
+        return NULL;
+
+    case PLAYLIST_ITEM_GET_NEXT:
+
+        if (plCurrent && plCurrent->next) {
+            plCurrent = plCurrent->next;
+            return plCurrent;
+        }
+
+        return NULL;
+
     case PLAYLIST_ITEM_DEL_CURR:
-    {
-        plItem *curr = plCurrent;
 
-        if (!curr)
-            return NULL;
+        if (plCurrent) {
+            plItem *curr = plCurrent;
 
-        if (curr->prev)
-            curr->prev->next = curr->next;
-        if (curr->next)
-            curr->next->prev = curr->prev;
-        if (curr == plList)
-            plList = curr->next;
+            if (curr->prev)
+                curr->prev->next = curr->next;
+            if (curr->next)
+                curr->next->prev = curr->prev;
 
-        plCurrent = curr->next;
+            plCurrent = curr->next;
 
-        free(curr->path);
-        free(curr->name);
-        free(curr);
-    }
-        //uiCurr();     // instead of using uiNext && uiPrev
+            if (curr == plList)
+                plList = plCurrent;
+
+            free(curr->path);
+            free(curr->name);
+            free(curr);
+        }
+
         return plCurrent;
 
     case PLAYLIST_DELETE:
+
         while (plList) {
-            plItem *next = plList->next;
+            plItem *item = plList->next;
 
             free(plList->path);
             free(plList->name);
             free(plList);
 
-            plList = next;
+            plList = item;
         }
+
         plCurrent = NULL;
         return NULL;
 
@@ -149,40 +161,49 @@ void *listMgr(int cmd, void *data)
         return urlList;
 
     case URLLIST_ITEM_ADD:
-        if (urlList) {
-            urlItem *next_url = urlList;
-            is_added = 0;
 
-            while (next_url->next) {
-                if (!gstrcmp(next_url->url, url_item->url)) {
-                    is_added = 1;
-                    break;
+        if (urlList) {
+            urlItem *item = urlList;
+
+            while (item) {
+                if (strcmp(udat->url, item->url) == 0) {
+                    free(udat->url);
+                    free(udat);
+                    return NULL;
                 }
 
-                next_url = next_url->next;
+                if (item->next)
+                    item = item->next;
+                else {
+                    item->next = udat;
+                    udat->next = NULL;
+                    break;
+                }
             }
-
-            if (!is_added && gstrcmp(next_url->url, url_item->url))
-                next_url->next = url_item;
         } else {
-            url_item->next = NULL;
-            urlList = url_item;
+            udat->next = NULL;
+            urlList    = udat;
         }
-        return NULL;
+
+        return udat;
 
     case URLLIST_DELETE:
+
         while (urlList) {
-            urlItem *next = urlList->next;
+            urlItem *item = urlList->next;
 
             free(urlList->url);
             free(urlList);
 
-            urlList = next;
+            urlList = item;
         }
+
+        return NULL;
+
+    default:
+
         return NULL;
     }
-
-    return NULL;
 }
 
 /**
