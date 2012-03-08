@@ -142,6 +142,7 @@
 #define IDM_OPENBD                32832
 #define IDM_SUB_DOWNLOAD          32859
 #define IDM_CONFIG_ASSOC          32860
+#define IDM_DONATE                32861
 #define IDM_SUBTITLE              32880
 
 #define IDD_TEMPLATE              33000

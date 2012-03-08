@@ -176,6 +176,8 @@ BEGIN
     END
     POPUP "帮助"
     BEGIN
+         MENUITEM "捐助",                        IDM_DONATE
+         MENUITEM SEPARATOR
          MENUITEM "检查更新(&U)...",             IDM_CHECKUPDATE
          MENUITEM SEPARATOR
          MENUITEM "主页(&H)",                    IDM_HOMEPAGE
@@ -295,6 +297,8 @@ BEGIN
     END
     POPUP "說明"
     BEGIN
+         MENUITEM "捐助",                    IDM_DONATE
+         MENUITEM SEPARATOR
          MENUITEM "檢查更新(&U)...",         IDM_CHECKUPDATE
          MENUITEM SEPARATOR
          MENUITEM "網址(&H)",                IDM_HOMEPAGE
@@ -414,6 +418,8 @@ BEGIN
     END
     POPUP "&Help"
     BEGIN
+         MENUITEM "Donate",                            IDM_DONATE
+         MENUITEM SEPARATOR
          MENUITEM "Check for &update...",              IDM_CHECKUPDATE
          MENUITEM SEPARATOR
          MENUITEM "&Home Page",                        IDM_HOMEPAGE
