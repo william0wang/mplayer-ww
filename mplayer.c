@@ -1496,6 +1496,10 @@ void exit_player_with_rc(enum exit_reason how, int rc)
         m_config_free(mconfig);
     mconfig = NULL;
 
+#ifdef __MINGW32__
+	win_uninit(rc);
+#endif
+
     exit(rc);
 }
 
