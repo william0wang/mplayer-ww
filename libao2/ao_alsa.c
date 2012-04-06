@@ -65,6 +65,7 @@ static snd_pcm_sw_params_t *alsa_swparams;
 static size_t bytes_per_sample;
 
 static int alsa_can_pause;
+static int prepause_space;
 
 #define ALSA_DEVICE_SIZE 256
 
@@ -77,7 +78,6 @@ static void alsa_error_handler(const char *file, int line, const char *function,
   va_start(va, format);
   vsnprintf(tmp, sizeof tmp, format, va);
   va_end(va);
-  tmp[sizeof tmp - 1] = '\0';
 
   if (err)
     mp_msg(MSGT_AO, MSGL_ERR, "[AO_ALSA] alsa-lib: %s:%i:(%s) %s: %s\n",
@@ -692,6 +692,7 @@ static void audio_pause(void)
         }
           mp_msg(MSGT_AO,MSGL_V,"alsa-pause: pause supported by hardware\n");
     } else {
+        prepause_space = get_space();
         if ((err = snd_pcm_drop(alsa_handler)) < 0)
         {
             mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_ALSA_PcmDropError, snd_strerror(err));
@@ -721,6 +722,7 @@ static void audio_resume(void)
            mp_msg(MSGT_AO,MSGL_ERR,MSGTR_AO_ALSA_PcmPrepareError, snd_strerror(err));
             return;
         }
+        mp_ao_resume_refill(&audio_out_alsa, prepause_space);
     }
 }
 

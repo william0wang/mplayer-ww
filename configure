@@ -6082,7 +6082,7 @@ if test "$_zlib" = yes ; then
   mplayer_encoders="$mplayer_encoders PNG_ENCODER"
 else
   def_zlib='#define CONFIG_ZLIB 0'
-  libavdecoders=$(echo $libavdecoders | sed -e s/FLASHSV_DECODER// -e s/FLASHSV2_DECODER// -e s/PNG_DECODER// -e s/ZMBV_DECODER// -e s/ZLIB_DECODER// -e s/DXA_DECODER// -e s/TSCC_DECODER//)
+  libavdecoders=$(echo $libavdecoders | sed -e s/FLASHSV_DECODER// -e s/FLASHSV2_DECODER// -e s/PNG_DECODER// -e s/ZMBV_DECODER// -e s/ZLIB_DECODER// -e s/DXA_DECODER// -e s/TSCC_DECODER// -e s/ZEROCODEC_DECODER//)
   libavencoders=$(echo $libavencoders | sed -e s/FLASHSV_ENCODER// -e s/FLASHSV2_DECODER// -e s/FLASHSV2_ENCODER// -e s/PNG_ENCODER// -e s/ZMBV_ENCODER// -e s/ZLIB_ENCODER//)
 fi
 echores "$_zlib"
@@ -8279,6 +8279,7 @@ CONFIG_GOLOMB  = yes
 CONFIG_H264CHROMA = yes
 CONFIG_H264DSP = yes
 CONFIG_H264PRED= yes
+CONFIG_H264QPEL= yes
 CONFIG_HUFFMAN = yes
 CONFIG_LPC     = yes
 CONFIG_LSP     = yes
@@ -8806,6 +8807,7 @@ $def_yasm
 #define CONFIG_H264CHROMA 1
 #define CONFIG_H264DSP 1
 #define CONFIG_H264PRED 1
+#define CONFIG_H264QPEL 1
 #define CONFIG_HUFFMAN 1
 #define CONFIG_LPC 1
 #define CONFIG_MDCT 1
