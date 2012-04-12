@@ -11,9 +11,9 @@ SetDatablockOptimize on
 SetCompress auto
 
 VIProductVersion "${PRODUCT_VERSION}"
-VIAddVersionKey "CompanyName" "MPlayer"
-VIAddVersionKey "FileDescription" "MPlayer Installer"
-VIAddVersionKey "LegalCopyright" "Copyright (C) 2007-2010"
+VIAddVersionKey "CompanyName" "MPlayer WW"
+VIAddVersionKey "FileDescription" "MPlayer WW Installer"
+VIAddVersionKey "LegalCopyright" "Copyright (C) william0wang 2007-2012"
 VIAddVersionKey "FileVersion" ${PRODUCT_VERSION}
 
 ReserveFile "install_files\install_mplayer_full.ini"
@@ -103,18 +103,8 @@ SetDetailsPrint listonly
 		File "mplayer\input.ini"
 	nocpoy2:
 
-	File "mplayer\mplayer.exe"
-	File "mplayer\avcodec-53.dll"
-	File "mplayer\avformat-53.dll"
-	File "mplayer\avutil-51.dll"
-	File "mplayer\postproc-51.dll"
-	File "mplayer\dshownative.dll"
-	File "mplayer\pthreadGC2.dll"
-	File "mplayer\meditor2.exe"
-	File "mplayer\meditor.exe"
-	File "mplayer\micons.dll"
-	File "mplayer\unrar.dll"
-	File "mplayer\swscale-2.dll"
+	File "mplayer\*.exe"
+	File "mplayer\*.dll"
 
 SectionEnd
 
