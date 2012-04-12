@@ -52,7 +52,7 @@
 #include "loader/ldt_keeper.h"
 #endif
 
-#define DSN_API_VERSION 7
+#define DSN_API_VERSION 8
 
 typedef struct
 {
