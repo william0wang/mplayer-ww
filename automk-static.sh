@@ -29,11 +29,3 @@ if [ -f "mplayer.exe" ]; then
   install -m 755 -s mplayer.exe ./release/
 fi
 
-if [ -d "/usr/local/ffmpeg-ww/bin" ] ; then
-	cp -f -p /usr/local/ffmpeg-ww/bin/swscale-2.dll ./release/
-	cp -f -p /usr/local/ffmpeg-ww/bin/avutil-51.dll ./release/
-	cp -f -p /usr/local/ffmpeg-ww/bin/avcodec-53.dll ./release/
-	cp -f -p /usr/local/ffmpeg-ww/bin/avformat-53.dll ./release/
-	cp -f -p /usr/local/ffmpeg-ww/bin/postproc-51.dll ./release/
-fi
-
