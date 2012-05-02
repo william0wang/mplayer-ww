@@ -6142,7 +6142,7 @@ echores "$_liblzo"
 echocheck "mad support"
 if test "$_mad" = auto ; then
   _mad=no
-  header_check mad.h -lmad && _mad=yes
+  statement_check mad.h 'mad_synth_init(0)' -lmad && _mad=yes
 fi
 if test "$_mad" = yes ; then
   def_mad='#define CONFIG_LIBMAD 1'
@@ -8978,8 +8978,9 @@ but:
 
     *** ***  DO NOT REPORT BUGS IF IT DOES NOT COMPILE/WORK!  *** ***
 
-It is strongly recommended to let MPlayer choose the correct CFLAGS!
-To do so, execute 'CFLAGS= ./configure <options>'
+It is strongly recommended to let MPlayer choose the correct *FLAGS!
+To do so, remove *FLAGS from the environment an re-run configure.
+You can use --extra-*flags to add custom flags if necessary.
 
 EOF
 fi

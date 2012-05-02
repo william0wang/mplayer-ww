@@ -2660,6 +2660,7 @@ static int generate_video_frame(sh_video_t *sh_video, demux_stream_t *d_video)
         if (in_size < 0) {
             // try to extract last frames in case of decoder lag
             in_size = 0;
+            start   = NULL;
             pts     = MP_NOPTS_VALUE;
             hit_eof = 1;
         }
@@ -2947,6 +2948,19 @@ static void adjust_sync_and_print_status(int between_frames, float timing_error)
             if (AV_delay > 0.5 && drop_frame_cnt > 50 && drop_message == 0) {
                 ++drop_message;
                 mp_msg(MSGT_AVSYNC, MSGL_WARN, MSGTR_SystemTooSlow);
+            }
+            if (AV_delay > 0.5 && correct_pts && mpctx->delay < -audio_delay - 30) {
+                // This case means that we are supposed to stop video for a long
+                // time, even though audio is already ahead.
+                // This happens e.g. when initial audio pts is 10000, video
+                // starts at 0 but suddenly jumps to match audio.
+                // This is common in ogg streams.
+                // Only check for -correct-pts since this case does not cause
+                // issues with -nocorrect-pts.
+                mp_msg(MSGT_AVSYNC, MSGL_WARN, "Timing looks severely broken, resetting\n");
+                AV_delay = 0;
+                timing_error = 0;
+                mpctx->delay = -audio_delay;
             }
             if (autosync)
                 x = AV_delay * 0.1f;
@@ -3288,6 +3302,7 @@ static double update_video(int *blit_frame)
         int full_frame;
 
         do {
+            int flush;
             current_module = "video_read_frame";
             frame_time     = sh_video->next_frame_time;
             if (fake_video) {
@@ -3310,9 +3325,14 @@ static double update_video(int *blit_frame)
                 if (mpctx->d_audio)
                     mpctx->d_audio->eof = 0;
                 mpctx->stream->eof = 0;
-            } else
+            }
 #endif
-            if (in_size < 0)
+            flush = in_size < 0 && mpctx->d_video->eof;
+            if (flush) {
+                start = NULL;
+                in_size = 0;
+            }
+            if (mpctx->stream->type != STREAMTYPE_DVDNAV && in_size < 0)
                 return -1;
             if (in_size > max_framesize)
                 max_framesize = in_size;  // stats
@@ -3321,11 +3341,14 @@ static double update_video(int *blit_frame)
 #ifdef CONFIG_DVDNAV
             full_frame    = 1;
             decoded_frame = mp_dvdnav_restore_smpi(&in_size, &start, decoded_frame);
-            // still frame has been reached, no need to decode
-            if (in_size > 0 && !decoded_frame)
 #endif
+            // still frame has been reached, no need to decode
+            if ((in_size > 0 || flush) && !decoded_frame)
             decoded_frame = decode_video(sh_video, start, in_size, drop_frame,
                                          sh_video->pts, &full_frame);
+
+            if (flush && !decoded_frame)
+                return -1;
 
             if (full_frame) {
                 sh_video->timer += frame_time;
@@ -3503,6 +3526,7 @@ static void edl_loadfile(void)
 // Execute EDL command for the current position if one exists
 static void edl_update(MPContext *mpctx)
 {
+    double pts;
     if (!edl_records)
         return;
 
@@ -3514,6 +3538,7 @@ static void edl_update(MPContext *mpctx)
         return;
     }
 
+    pts = mpctx->sh_video->pts;
     // This indicates that we need to reset next EDL record according
     // to new PTS due to seek or other condition
     if (edl_needs_reset) {
@@ -3524,19 +3549,19 @@ static void edl_update(MPContext *mpctx)
         // Find next record, also skip immediately if we are already
         // inside any record
         while (next_edl_record) {
-            if (next_edl_record->start_sec > mpctx->sh_video->pts)
+            if (next_edl_record->start_sec > pts)
                 break;
-            if (next_edl_record->stop_sec >= mpctx->sh_video->pts) {
+            if (next_edl_record->stop_sec >= pts) {
                 if (edl_backward) {
                     mpctx->osd_function = OSD_REW;
                     edl_decision  = 1;
                     abs_seek_pos  = 0;
-                    rel_seek_secs = -(mpctx->sh_video->pts -
+                    rel_seek_secs = -(pts -
                                       next_edl_record->start_sec +
                                       edl_backward_delay);
                     mp_msg(MSGT_CPLAYER, MSGL_DBG4, "EDL_SKIP: pts [%f], "
                                                     "offset [%f], start [%f], stop [%f], length [%f]\n",
-                           mpctx->sh_video->pts, rel_seek_secs,
+                           pts, rel_seek_secs,
                            next_edl_record->start_sec, next_edl_record->stop_sec,
                            next_edl_record->length_sec);
                     return;
@@ -3554,15 +3579,15 @@ static void edl_update(MPContext *mpctx)
     }
 
     if (next_edl_record &&
-        mpctx->sh_video->pts >= next_edl_record->start_sec) {
+        pts >= next_edl_record->start_sec) {
         if (next_edl_record->action == EDL_SKIP) {
             mpctx->osd_function = OSD_FFW;
             edl_decision  = 1;
             abs_seek_pos  = 0;
-            rel_seek_secs = next_edl_record->stop_sec - mpctx->sh_video->pts;
+            rel_seek_secs = next_edl_record->stop_sec - pts;
             mp_msg(MSGT_CPLAYER, MSGL_DBG4, "EDL_SKIP: pts [%f], offset [%f], "
                                             "start [%f], stop [%f], length [%f]\n",
-                   mpctx->sh_video->pts, rel_seek_secs,
+                   pts, rel_seek_secs,
                    next_edl_record->start_sec, next_edl_record->stop_sec,
                    next_edl_record->length_sec);
         } else if (next_edl_record->action == EDL_MUTE) {
