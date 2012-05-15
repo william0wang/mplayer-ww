@@ -43,11 +43,7 @@
 #include "winstuff.h"
 
 #ifdef CONFIG_GL_SDL
-#ifdef CONFIG_SDL_SDL_H
-#include <SDL/SDL.h>
-#else
-#include <SDL.h>
-#endif
+#include "sdl_common.h"
 #endif
 
 static const vo_info_t info =
@@ -740,9 +736,8 @@ static int create_window(uint32_t d_width, uint32_t d_height, uint32_t flags, co
 #endif
 #ifdef CONFIG_GL_SDL
   if (glctx.type == GLTYPE_SDL) {
-    SDL_WM_SetCaption(title, NULL);
-    vo_dwidth  = d_width;
-    vo_dheight = d_height;
+    if (!vo_sdl_config(d_width, d_height, flags, title))
+        return -1;
   }
 #endif
   return 0;
@@ -1017,7 +1012,7 @@ static uint32_t get_image(mp_image_t *mpi) {
     mpi->height = texture_height;
   }
   mpi->stride[0] = mpi->width * mpi->bpp / 8;
-  needed_size = mpi->stride[0] * mpi->height;
+  needed_size = mpi->stride[0] * mpi->height + 31;
   if (mesa_buffer) {
 #ifdef CONFIG_GL_X11
     if (mesa_bufferptr && needed_size > mesa_buffersize) {
@@ -1040,7 +1035,8 @@ static uint32_t get_image(mp_image_t *mpi) {
     }
     if (!gl_bufferptr)
       gl_bufferptr = mpglMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
-    mpi->planes[0] = gl_bufferptr;
+    mpi->priv = gl_bufferptr;
+    mpi->planes[0] = (uint8_t *)gl_bufferptr + (-(intptr_t)gl_bufferptr & 31);
     mpglBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
   }
   if (!mpi->planes[0]) {
@@ -1147,7 +1143,7 @@ static uint32_t draw_image(mp_image_t *mpi) {
       mpglPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE, 1);
       w = texture_width;
     } else {
-      intptr_t base = (intptr_t)planes[0];
+      intptr_t base = (intptr_t)mpi->priv;
       if (ati_hack) { w = texture_width; h = texture_height; }
       if (mpi_flipped)
         base += (mpi->h - 1) * stride[0];
