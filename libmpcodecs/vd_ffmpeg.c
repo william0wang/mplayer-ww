@@ -618,8 +618,10 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
     }
 
     if (ctx->nonref_dr) {
-        if (flags & MP_IMGFLAG_PRESERVE)
+        if (flags & MP_IMGFLAG_PRESERVE || ctx->b_count > 1) {
+            if (!(flags & MP_IMGFLAG_PRESERVE)) ctx->b_count--;
             return avcodec_default_get_buffer(avctx, pic);
+        }
         type = MP_IMGTYPE_TEMP;
     }
 
@@ -740,8 +742,10 @@ static void release_buffer(struct AVCodecContext *avctx, AVFrame *pic){
     sh_video_t *sh = avctx->opaque;
     vd_ffmpeg_ctx *ctx = sh->context;
     int i;
-    if (pic->type != FF_BUFFER_TYPE_USER)
-        return avcodec_default_release_buffer(avctx, pic);
+    if (pic->type != FF_BUFFER_TYPE_USER) {
+        avcodec_default_release_buffer(avctx, pic);
+        return;
+    }
 
 //printf("release buffer %d %d %d\n", mpi ? mpi->flags&MP_IMGFLAG_PRESERVE : -99, ctx->ip_count, ctx->b_count);
 
@@ -755,11 +759,6 @@ static void release_buffer(struct AVCodecContext *avctx, AVFrame *pic){
     if (mpi) {
         // release mpi (in case MPI_IMGTYPE_NUMBERED is used, e.g. for VDPAU)
         mpi->usage_count--;
-    }
-
-    if(pic->type!=FF_BUFFER_TYPE_USER){
-        avcodec_default_release_buffer(avctx, pic);
-        return;
     }
 
     for(i=0; i<4; i++){
@@ -853,7 +852,10 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
     pkt.size = 0;
     av_destruct_packet(&pkt);
 
-    dr1= ctx->do_dr1;
+    // even when we do dr we might actually get a buffer we had
+    // FFmpeg allocate - this mostly happens with nonref_dr.
+    // Ensure we treat it correctly.
+    dr1= ctx->do_dr1 && pic->type == FF_BUFFER_TYPE_USER;
     if(ret<0) mp_msg(MSGT_DECVIDEO, MSGL_WARN, "Error while decoding frame!\n");
 //printf("repeat: %d\n", pic->repeat_pict);
 //-- vstats generation
