@@ -167,6 +167,9 @@ static int ass_border_x, ass_border_y;
 
 static unsigned int slice_height = 1;
 
+// performance statistics
+static int imgcnt, dr_imgcnt, dr_rejectcnt;
+
 static void redraw(void);
 
 static int using_gl = 0;
@@ -525,6 +528,8 @@ skip_upload:
  */
 static void uninitGl(void) {
   int i = 0;
+  mp_msg(MSGT_VO, MSGL_V, "Drawn %i frames, %i using DR, DR refused %i\n",
+         imgcnt, dr_imgcnt, dr_rejectcnt);
   if (mpglDeletePrograms && fragprog)
     mpglDeletePrograms(1, &fragprog);
   fragprog = 0;
@@ -996,6 +1001,7 @@ static int draw_slice(uint8_t *src[], int stride[], int w,int h,int x,int y)
 
 static uint32_t get_image(mp_image_t *mpi) {
   int needed_size;
+  dr_rejectcnt++;
   if (!mpglGenBuffers || !mpglBindBuffer || !mpglBufferData || !mpglMapBuffer) {
     if (!err_shown)
       mp_msg(MSGT_VO, MSGL_ERR, "[gl] extensions missing for dr\n"
@@ -1089,6 +1095,7 @@ static uint32_t get_image(mp_image_t *mpi) {
     }
   }
   mpi->flags |= MP_IMGFLAG_DIRECT;
+  dr_rejectcnt--;
   return VO_TRUE;
 }
 
@@ -1110,8 +1117,10 @@ static uint32_t draw_image(mp_image_t *mpi) {
   unsigned char *planes[3];
   mp_image_t mpi2 = *mpi;
   int w = mpi->w, h = mpi->h;
+  imgcnt++;
   if (mpi->flags & MP_IMGFLAG_DRAW_CALLBACK)
     goto skip_upload;
+  dr_imgcnt += !!(mpi->flags & MP_IMGFLAG_DIRECT);
   mpi2.flags = 0; mpi2.type = MP_IMGTYPE_TEMP;
   mpi2.width = mpi2.w; mpi2.height = mpi2.h;
   if (force_pbo && !(mpi->flags & MP_IMGFLAG_DIRECT) && !gl_bufferptr && get_image(&mpi2) == VO_TRUE) {
@@ -1420,6 +1429,7 @@ static int preinit_internal(const char *arg, int allow_sw)
                "Use -vo gl:nomanyfmts if playback fails.\n");
     mp_msg(MSGT_VO, MSGL_V, "[gl] Using %d as slice height "
              "(0 means image height).\n", slice_height);
+    imgcnt = dr_imgcnt = dr_rejectcnt = 0;
 
     return 0;
 
