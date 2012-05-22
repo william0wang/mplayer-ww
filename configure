@@ -270,6 +270,13 @@ ppc() {
   esac
 }
 
+sparc() {
+  case "$host_arch" in
+    sparc*) return 0;;
+    *) return 1;;
+  esac
+}
+
 alpha() {
   case "$host_arch" in
     alpha*) return 0;;
@@ -1522,8 +1529,7 @@ if test -z "$_target" ; then
       ia64) host_arch=ia64 ;;
       macppc|ppc*|Power*) host_arch=ppc ;;
       alpha) host_arch=alpha ;;
-      sparc) host_arch=sparc ;;
-      sparc64) host_arch=sparc64 ;;
+      sun4*|sparc*) host_arch=sparc ;;
       parisc*|hppa*|9000*) host_arch=hppa ;;
       arm*|zaurus|cats) host_arch=arm ;;
       sh3|sh4|sh4a) host_arch=sh ;;
@@ -1731,6 +1737,9 @@ if x86 ; then
 fi
 if ppc ; then
   cc_check && host_arch=ppc64 || host_arch=ppc
+fi
+if sparc ; then
+  cc_check && host_arch=sparc64 || host_arch=sparc
 fi
 fi
 
@@ -5149,19 +5158,19 @@ int main(int argc, char *argv[]) {
 EOF
   _gl=no
   for ld_tmp in "" -lGL "-lGL -lXdamage" "-lGL $ld_pthread" ; do
-    if cc_check $ld_tmp ; then
+    if test "$_x11" = yes && cc_check $ld_tmp ; then
       _gl=yes
       _gl_x11=yes
       libs_mplayer="$libs_mplayer $ld_tmp $ld_dl"
       break
     fi
   done
-  if cc_check -DGL_EGL_X11 -lEGL ; then
+  if test "$_x11" = yes && cc_check -DGL_EGL_X11 -lEGL ; then
     _gl=yes
     _gl_egl_x11=yes
     libs_mplayer="$libs_mplayer -lEGL $ld_dl"
   fi
-  if cc_check -DGL_WIN32 -lopengl32 ; then
+  if win32 && cc_check -DGL_WIN32 -lopengl32 ; then
     _gl=yes
     _gl_win32=yes
     libs_mplayer="$libs_mplayer -lopengl32 -lgdi32"
@@ -5279,6 +5288,7 @@ echores "$_direct3d"
 echocheck "Directx"
 if test "$_directx" = auto ; then
   cat > $TMPC << EOF
+#include <windows.h>
 #include <ddraw.h>
 #include <dsound.h>
 int main(void) { return 0; }
@@ -6695,7 +6705,7 @@ if test "$_live" = auto  && test "$networking" = yes ; then
 #error Please upgrade to version 2006.03.03 or later of the "LIVE555 Streaming Media" libraries - available from <www.live555.com/liveMedia/>
 #endif
 #include "BasicUsageEnvironment.hh"
-int main(void) { BasicTaskScheduler::createNew(); return 0; }
+int main(void) { RTSPClient::createNew(*BasicUsageEnvironment::createNew(*BasicTaskScheduler::createNew()), 0, "", 0); return 0; }
 EOF
 
   _live=no

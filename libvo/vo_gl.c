@@ -552,7 +552,7 @@ static int initGl(uint32_t d_width, uint32_t d_height) {
   mpglEnable(gl_target);
   if (mpglDrawBuffer)
     mpglDrawBuffer(vo_doublebuffering?GL_BACK:GL_FRONT);
-  mpglTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  mpglTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
   mp_msg(MSGT_VO, MSGL_V, "[gl] Creating %dx%d texture...\n",
           texture_width, texture_height);
@@ -661,6 +661,10 @@ static int create_window(uint32_t d_width, uint32_t d_height, uint32_t flags, co
 #endif
 #ifdef CONFIG_GL_SDL
   if (glctx.type == GLTYPE_SDL) {
+#if SDL_VERSION_ATLEAST(1, 2, 10)
+    // Ugly to do this here, but SDL ignores it if set later
+    SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, swap_interval);
+#endif
     if (!vo_sdl_config(d_width, d_height, flags, title))
         return -1;
   }
@@ -805,6 +809,8 @@ static void do_render_osd(int type) {
     mpglPushMatrix();
     mpglLoadMatrixf(matrix);
   }
+  if (osd_color != 0xffffff)
+    mpglTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   mpglEnable(GL_BLEND);
   if (draw_eosd) {
     mpglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -822,6 +828,8 @@ static void do_render_osd(int type) {
   }
   // set rendering parameters back to defaults
   mpglDisable(GL_BLEND);
+  if (osd_color != 0xffffff)
+    mpglTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   if (!scaled_osd)
     mpglPopMatrix();
   mpglBindTexture(gl_target, 0);
@@ -842,9 +850,6 @@ static void draw_osd(void)
 }
 
 static void do_render(void) {
-//  Enable(GL_TEXTURE_2D);
-//  BindTexture(GL_TEXTURE_2D, texture_id);
-
   mpglColor4f(1,1,1,1);
   if (is_yuv || custom_prog)
     glEnableYUVConversion(gl_target, yuvconvtype);
@@ -921,9 +926,11 @@ static uint32_t get_image(mp_image_t *mpi) {
     err_shown = 1;
     return VO_FALSE;
   }
+  if (gl_bufferptr) return VO_FALSE;
   if (mpi->flags & MP_IMGFLAG_READABLE) return VO_FALSE;
   if (mpi->type != MP_IMGTYPE_STATIC && mpi->type != MP_IMGTYPE_TEMP &&
-      (mpi->type != MP_IMGTYPE_NUMBERED || mpi->number))
+      mpi->type != MP_IMGTYPE_IPB &&
+      mpi->type != MP_IMGTYPE_NUMBERED)
     return VO_FALSE;
   if (mesa_buffer) mpi->width = texture_width;
   else if (ati_hack) {

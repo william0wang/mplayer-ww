@@ -45,12 +45,13 @@ static int reinit;
 static void get_screensize(void) {
     const SDL_VideoInfo *vi;
     // TODO: better to use a check that gets the runtime version instead?
-    if (!SDL_VERSION_ATLEAST(1, 2, 10)) return;
+#if SDL_VERSION_ATLEAST(1, 2, 10)
     // Keep user-provided settings
     if (vo_screenwidth > 0 || vo_screenheight > 0) return;
     vi = SDL_GetVideoInfo();
     vo_screenwidth  = vi->current_w;
     vo_screenheight = vi->current_h;
+#endif
 }
 
 int vo_sdl_init(void)
@@ -103,6 +104,7 @@ int vo_sdl_config(int w, int h, int flags, const char *title)
         vo_dwidth  = vo_screenwidth;
         vo_dheight = vo_screenheight;
     }
+    SDL_GL_SetAttribute(SDL_GL_STEREO, !!(flags & VOFLAG_STEREO));
     return 1;
 }
 
