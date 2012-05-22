@@ -63,67 +63,62 @@ static gint     fsCurrFNameListSelected, fsLastFNameListSelected;
 
 char * fsVideoFilterNames[][2] =
          {
-	   { "ASF files (*.asf)",					"*.asf" },
-	   { "AVI files (*.avi)",					"*.avi" },
-	   { "Autodesk animations (*.fli,*.flc)",			"*.fli,*.flc" },
-	   { "DGStation Cuberevo recordings (*.trp)",			"*.trp" },
-	   { "DiVX files (*.divx)",					"*.divx" },
-	   { "MP3 files (*.mp3,*.mp2)",					"*.mp3,*.mp2" },
-	   { "MPEG files (*.mpg,*.mpeg,*.m1v)",				"*.mpg,*.mpeg,*.m1v" },
-	   { "Macromedia Flash Video (*.flv)",				"*.flv" },
-	   { "Matroska Audio files (*.mka)",				"*.mka" },
-	   { "Matroska Media files (*.mkv)",				"*.mkv" },
-	   { "NuppelVideo files (*.nuv)",				"*.nuv" },
-	   { "OGG Vorbis files (*.ogg)",				"*.ogg" },
-	   { "OGG Media files (*.ogm)",					"*.ogm" },
-	   { "QuickTime files (*.mov,*.qt,*.mp4)",			"*.mov,*.qt,*.mp4" },
-	   { "RealVideo files (*.rm,*.rmvb)",				"*.rm,*.rmvb"  },
-	   { "Tivo files (*.ty)",					"*.ty"  },
-	   { "VCD/SVCD Images (*.bin)",					"*.bin" },
-	   { "VIVO files (*.viv)",					"*.viv" },
-	   { "VOB files (*.vob)",					"*.vob" },
-	   { "Wave files (*.wav)",					"*.wav" },
-	   { "Windows Media Audio (*.wma)",				"*.wma" },
-	   { "Windows Media Video (*.wmv)",				"*.wmv" },
-	   { "Audio files",						"*.mp2,*.mp3,*.mka,*.ogg,*.wav,*.wma" },
-	   { "Video files",						"*.asf,*.avi,*.fli,*.flc,*.trp,*.divx,*.mpg,*.mpeg,*.m1v,*.flv,*.mkv,*.nuv,*.ogm,*.mov,*.qt,*.mp4,*.rm,*.rmvb,*.ty,*.bin,*.viv,*.vob,*.wmv" },
-	   { "All files",						"*" },
+	   { MSGTR_Filter_AVIFiles,      "*.avi" },
+	   { MSGTR_Filter_DivXFiles,     "*.divx" },
+	   { MSGTR_Filter_FlashVideo,    "*.flv" },
+	   { MSGTR_Filter_MP3Files,      "*.mp3" },
+	   { MSGTR_Filter_MP4Files,      "*.aac,*.f4a,*.f4b,*.f4v,*.m4a,*.m4b,*.m4v,*.mp4" },
+	   { MSGTR_Filter_MPEGFiles,     "*.m1v,*.m2v,*.mp2,*.mpe,*.mpeg,*.mpg,*.mpga,*.vdr,*.vob" },
+	   { MSGTR_Filter_MP2TS,         "*.bdm,*.bdmv,*.clpi,*.cpi,*.m2t,*.m2ts,*.mpl,*.mpls,*.mts,*.rec,*.trp,*.ts,*.ty" },
+	   { MSGTR_Filter_MatroskaMedia, "*.mka,*.mkv" },
+	   { MSGTR_Filter_OGGMedia,      "*.oga,*.ogg,*.ogm,*.ogv,*.ogx,*.spx" },
+	   { MSGTR_Filter_QTMedia,       "*.moov,*.mov,*.qt,*.qtvr" },
+	   { MSGTR_Filter_RNMedia,       "*.ra,*.rm,*.rmvb,*.rv" },
+	   { MSGTR_Filter_VideoCDImages, "*.bin" },
+	   { MSGTR_Filter_WAVFiles,      "*.wav" },
+	   { MSGTR_Filter_WindowsMedia,  "*.asf,*.wma,*.wmv" },
+	   { MSGTR_Filter_Playlists,     "*.asx,*.m3u,*.m3u8,*.nsc,*.pls,*.ram,*.smi,*.smil,*.sml,*.vlc,*.wax,*.wmx,*.wvx" },
+	   { MSGTR_Filter_AllAudioFiles, "*.aac,*.ac3,*.aif,*.aifc,*.aiff,*.amr,*.ape,*.au,*.awb,*.cdg,*.f4a,*.f4b,*.flac,*.m4a,*.m4b,*.mka,*.mp+,*.mp2,*.mp3,*.mpc,*.mpga,*.mpp,*.nsa,*.oga,*.ogg,*.pcm,*.qcp,*.ra,*.snd,*.spx,*.voc,*.vqf,*.w64,*.wav,*.wma,*.wv,*.wvp" },
+	   { MSGTR_Filter_AllVideoFiles, "*.264,*.3g2,*.3ga,*.3gp,*.3gp2,*.3gpp,*.3gpp2,*.asf,*.avi,*.bdm,*.bdmv,*.bin,*.clpi,*.cpi,*.divx,*.dv,*.f4v,*.flc,*.fli,*.flv,*.m1v,*.m2t,*.m2ts,*.m2v,*.m4v,*.mkv,*.moov,*.mov,*.mp2,*.mp4,*.mpe,*.mpeg,*.mpg,*.mpl,*.mpls,*.mts,*.mxf,*.nsv,*.nuv,*.ogg,*.ogm,*.ogv,*.ogx,*.pva,*.qt,*.qtvr,*.rec,*.rm,*.rmvb,*.rv,*.spl,*.str,*.swf,*.trp,*.ts,*.ty,*.vdr,*.viv,*.vivo,*.vob,*.webm,*.wmv" },
+	   { MSGTR_Filter_AllFiles,      "*" },
 	   { NULL,NULL }
 	 };
 int fsLastVideoFilterSelected = -1;
 
 char * fsSubtitleFilterNames[][2] =
          {
-           { "AQT (*.aqt)",						"*.aqt" },
-           { "ASS (*.ass)",						"*.ass" },
-           { "RT  (*.rt) ",						"*.rt"  },
-           { "SMI (*.smi)",						"*.smi" },
-           { "SRT (*.srt)",						"*.srt" },
-           { "SSA (*.ssa)",						"*.ssa" },
-           { "SUB (*.sub)",						"*.sub" },
-           { "TXT (*.txt)",						"*.txt" },
-           { "UTF (*.utf)",						"*.utf" },
-           { "Subtitles",						"*.aqt,*.ass,*.rt,*.smi,*.srt,*.ssa,*.sub,*.txt,*.utf" },
-           { "All files",						"*" },
+           { "AQTitle (*.aqt)",                   "*.aqt" },
+           { "Advanced SubStation Alpha (*.ass)", "*.ass" },
+           { "JACOSub (*.jss) ",                  "*.jss" },
+           { "RealText (*.rt) ",                  "*.rt"  },
+           { "SAMI (*.smi)",                      "*.smi" },
+           { "SubRip (*.srt)",                    "*.srt" },
+           { "SubStation Alpha (*.ssa)",          "*.ssa" },
+           { "MicroDVD (*.sub)",                  "*.sub" },
+           { "Text (*.txt)",                      "*.txt" },
+           { MSGTR_Filter_UTF8Subtitles,          "*.utf,*.utf-8,*.utf8" },
+           { MSGTR_Filter_AllSubtitles,           "*.aqt,*.ass,*.jss,*.rt,*.smi,*.srt,*.ssa,*.sub,*.txt,*.utf" },
+           { MSGTR_Filter_AllFiles,               "*" },
 	   { NULL,NULL }
 	 };
 int fsLastSubtitleFilterSelected = -1;
 
 char * fsOtherFilterNames[][2] =
          {
-	   { "All files",						"*" },
+	   { MSGTR_Filter_AllFiles, "*" },
 	   { NULL,NULL }
 	 };
 
 char * fsAudioFileNames[][2] =
 	 {
-	   { "MP3 files (*.mp2, *.mp3)",				"*.mp2,*.mp3" },
-	   { "Matroska Audio files (*.mka)",				"*.mka" },
-	   { "OGG Vorbis files (*.ogg)",				"*.ogg" },
-	   { "WAV files (*.wav)",					"*.wav" },
-	   { "WMA files (*.wma)",					"*.wma" },
-	   { "Audio files",						"*.mp2,*.mp3,*.mka,*.ogg,*.wav,*.wma" },
-	   { "All files",						"*" },
+	   { MSGTR_Filter_DDRawAudio,    "*.ac3,*.pcm" },
+	   { MSGTR_Filter_MPEGAudio,     "*.aac,*.f4a,*.m4a,*.mp2,*.mp3,*.mpga" },
+	   { MSGTR_Filter_MatroskaAudio, "*.mka" },
+	   { MSGTR_Filter_OGGAudio,      "*.oga,*.ogg,*.spx" },
+	   { MSGTR_Filter_WAVAudio,      "*.wav" },
+	   { MSGTR_Filter_WMAAudio,      "*.wma" },
+	   { MSGTR_Filter_AllAudioFiles, "*.aac,*.ac3,*.f4a,*.m4a,*.mka,*.mp2,*.mp3,*.mpga,*.oga,*.ogg,*.pcm,*.spx,*.wav,*.wma" },
+	   { MSGTR_Filter_AllFiles,      "*" },
 	   { NULL, NULL }
 	 };
 int fsLastAudioFilterSelected = -1;
@@ -131,13 +126,13 @@ int fsLastAudioFilterSelected = -1;
 char * fsFontFileNames[][2] =
          {
 #ifdef CONFIG_FREETYPE
-	   { "True Type fonts (*.ttf)",					"*.ttf" },
-	   { "Type1 fonts (*.pfb)",					"*.pfb" },
-	   { "All fonts",						"*.ttf,*.pfb" },
+	   { MSGTR_Filter_TTF,       "*.ttf" },
+	   { MSGTR_Filter_Type1,     "*.pfb" },
+	   { MSGTR_Filter_AllFonts,  "*.pfb,*.ttf" },
 #else
-	   { "Font files (*.desc)",					"*.desc" },
+	   { MSGTR_Filter_FontFiles, "*.desc" },
 #endif
-	   { "All files",						"*" },
+	   { MSGTR_Filter_AllFiles,  "*" },
 	   { NULL,NULL }
 	 };
 int fsLastFontFilterSelected = -1;
@@ -172,19 +167,6 @@ static char * get_current_dir_name_utf8( void )
  return utf8dir;
 }
 
-static char * Filter( const char * name )
-{
- static char tmp[32];
- unsigned int  i,c;
- for ( i=0,c=0;i < strlen( name );i++ )
-  {
-   if ( ( name[i] >='a' )&&( name[i] <= 'z' ) ) { tmp[c++]='['; tmp[c++]=name[i]; tmp[c++]=name[i] - 32; tmp[c++]=']'; }
-    else tmp[c++]=name[i];
-  }
- tmp[c]=0;
- return tmp;
-}
-
 static void clist_append_fname(GtkWidget * list, char *fname,
                                GdkPixmap *pixmap, GdkPixmap *mask) {
   gint pos;
@@ -200,8 +182,9 @@ static void clist_append_fname(GtkWidget * list, char *fname,
 static void CheckDir( GtkWidget * list )
 {
  struct stat     fs;
- int             i;
+ unsigned int    i, j, fn;
  glob_t          gg;
+ gchar          *filter, **fext;
 
  if ( !fsFilter[0] ) return;
 
@@ -212,36 +195,57 @@ static void CheckDir( GtkWidget * list )
  clist_append_fname(list, "..", dpixmap, dmask);
 
  glob( "*",0,NULL,&gg );
- for(  i=0;(unsigned)i<gg.gl_pathc;i++ )
+ for(  i=0;i<gg.gl_pathc;i++ )
   {
    stat( gg.gl_pathv[i],&fs );
    if( !S_ISDIR( fs.st_mode ) ) continue;
    clist_append_fname(list, gg.gl_pathv[i], dpixmap, dmask);
   }
- globfree( &gg );
 
- if ( strchr( fsFilter,',' ) )
-  {
-   char tmp[8];
-   int  i,c,glob_param = 0;
-   for ( i=0,c=0;i<(int)strlen( fsFilter ) + 1;i++,c++ )
-    {
-     tmp[c]=fsFilter[i];
-     if ( ( tmp[c] == ',' )||( tmp[c] == '\0' ) )
-      {
-       tmp[c]=0; c=-1;
-       glob( Filter( tmp ),glob_param,NULL,&gg );
-       glob_param=GLOB_APPEND;
-      }
-    }
-  } else glob( Filter( fsFilter ),0,NULL,&gg );
+ for (fn = 1, i = 0; fsFilter[i]; i++)
+   if (fsFilter[i] == ',') fn++;
 
- for(  i=0;(unsigned)i<gg.gl_pathc;i++ )
-  {
-   stat( gg.gl_pathv[i],&fs );
-   if(  S_ISDIR( fs.st_mode ) ) continue;
-   clist_append_fname(list, gg.gl_pathv[i], fpixmap, fmask);
-  }
+ filter = g_strdup(fsFilter);
+ fext = calloc(fn, sizeof(gchar *));
+
+ if (filter && fext)
+ {
+   for (j = 0, i = 0; filter[i]; i++)
+   {
+     if (filter[i] == '.') fext[j] = filter + i;
+
+     if (filter[i] == ',')
+     {
+       filter[i] = 0;
+       j++;
+     }
+   }
+
+   for(  i=0;i<gg.gl_pathc;i++ )
+   {
+     char *ext;
+
+     stat( gg.gl_pathv[i],&fs );
+     if(  S_ISDIR( fs.st_mode ) ) continue;
+
+     ext = strrchr(gg.gl_pathv[i], '.');
+
+     if (ext || !fext[0])
+     {
+       for (j = 0; j < fn; j++)
+       {
+         if (fext[j] == NULL || strcasecmp(fext[j], ext) == 0)
+         {
+           clist_append_fname(list, gg.gl_pathv[i], fpixmap, fmask);
+           break;
+         }
+       }
+     }
+   }
+ }
+
+ free(fext);
+ g_free(filter);
  globfree( &gg );
 
  gtk_clist_set_column_width( GTK_CLIST( list ),0,17 );
@@ -481,7 +485,7 @@ static void fs_Up_released( GtkButton * button, gpointer user_data )
 static void fs_Ok_released( GtkButton * button, gpointer user_data )
 {
  GList         * item;
- int             i = 1;
+ int             i = 1, l;
  struct stat     fs;
 
  stat( fsSelectedFile,&fs );
@@ -499,7 +503,9 @@ static void fs_Ok_released( GtkButton * button, gpointer user_data )
  switch ( fsType )
   {
    case fsVideoSelector:
-          uiSetFileName( fsSelectedDirectory,fsSelectedFile,STREAMTYPE_FILE );
+          for (l = 0; fsVideoFilterNames[l][0]; l++)
+            if (strcmp(fsVideoFilterNames[l][0], MSGTR_Filter_Playlists) == 0) break;
+          uiSetFileName( fsSelectedDirectory,fsSelectedFile, fsLastVideoFilterSelected == l ? STREAMTYPE_PLAYLIST : STREAMTYPE_FILE );
           guiInfo.NewPlay=GUI_FILE_NEW; sub_fps=0;
           fs_PersistantHistory( get_current_dir_name_utf8() );      //totem, write into history
           break;
