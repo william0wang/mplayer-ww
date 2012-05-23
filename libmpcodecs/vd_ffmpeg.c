@@ -619,11 +619,11 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
     }
 
     if (ctx->nonref_dr) {
-        if (flags & MP_IMGFLAG_PRESERVE)
+        if (flags & MP_IMGFLAG_PRESERVE || ctx->b_count > 1) {
+            if (!(flags & MP_IMGFLAG_PRESERVE)) ctx->b_count--;
             return avcodec_default_get_buffer(avctx, pic);
-        // Use NUMBERED since for e.g. TEMP vos assume there will
-        // be no other frames between the get_image and matching put_image.
-        type = MP_IMGTYPE_NUMBERED;
+        }
+        type = MP_IMGTYPE_TEMP;
     }
 
     if(init_vo(sh, avctx->pix_fmt) < 0){
@@ -750,10 +750,12 @@ static void release_buffer(struct AVCodecContext *avctx, AVFrame *pic){
 
 //printf("release buffer %d %d %d\n", mpi ? mpi->flags&MP_IMGFLAG_PRESERVE : -99, ctx->ip_count, ctx->b_count);
 
+    if(ctx->ip_count <= 2 && ctx->b_count<=1){
         if(mpi->flags&MP_IMGFLAG_PRESERVE)
             ctx->ip_count--;
         else
             ctx->b_count--;
+    }
 
     if (mpi) {
         // release mpi (in case MPI_IMGTYPE_NUMBERED is used, e.g. for VDPAU)
