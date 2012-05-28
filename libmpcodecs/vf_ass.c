@@ -114,7 +114,8 @@ static void get_image(struct vf_instance *vf, mp_image_t *mpi)
     // width never changes, always try full DR
     mpi->priv = vf->dmpi = vf_get_image(vf->next, mpi->imgfmt, mpi->type,
                                         mpi->flags | MP_IMGFLAG_READABLE,
-                                        vf->priv->outw, vf->priv->outh);
+                                        FFMAX(mpi->width,  vf->priv->outw),
+                                        FFMAX(mpi->height, vf->priv->outh));
 
     if ( (vf->dmpi->flags & MP_IMGFLAG_DRAW_CALLBACK) &&
         !(vf->dmpi->flags & MP_IMGFLAG_DIRECT)) {
@@ -171,8 +172,6 @@ static int prepare_image(struct vf_instance *vf, mp_image_t *mpi)
             mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_MPCODECS_FunWhydowegetNULL);
             return 0;
         }
-        // allow reusing it after this processing
-        vf->dmpi->usage_count--;
         mpi->priv = NULL;
         // we've used DR, so we're ready...
         if (ass_top_margin)
