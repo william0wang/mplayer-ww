@@ -3438,7 +3438,7 @@ play_next_file:
         current_module = "handle_playlist";
         mp_msg(MSGT_CPLAYER, MSGL_V, "Parsing playlist %s...\n",
                filename_recode(filename));
-        entry      = parse_playtree(mpctx->stream, 0);
+        entry      = parse_playtree(mpctx->stream, use_gui);
         mpctx->eof = playtree_add_playlist(entry);
         goto goto_next_file;
     }
@@ -4084,6 +4084,8 @@ goto_enable_cache:
 
 #ifdef CONFIG_DVDNAV
             if (mpctx->stream->type == STREAMTYPE_DVDNAV) {
+                // do not clobber subtitles
+                if (!mp_dvdnav_number_of_subs(mpctx->stream)) {
                 nav_highlight_t hl;
                 mp_dvdnav_get_highlight(mpctx->stream, &hl);
                 if (!vo_spudec || !spudec_apply_palette_crop(vo_spudec, hl.palette, hl.sx, hl.sy, hl.ex, hl.ey)) {
@@ -4094,9 +4096,13 @@ goto_enable_cache:
                     vo_osd_changed(OSDTYPE_DVDNAV);
                     vo_osd_changed(OSDTYPE_SPU);
                 }
+                }
 
                 if (mp_dvdnav_stream_has_changed(mpctx->stream)) {
                     double ar = -1.0;
+                    // clear highlight
+                    if (vo_spudec)
+                        spudec_apply_palette_crop(vo_spudec, 0, 0, 0, 0, 0);
                     if (mpctx->sh_video &&
                         stream_control(mpctx->demuxer->stream,
                                        STREAM_CTRL_GET_ASPECT_RATIO, &ar)
