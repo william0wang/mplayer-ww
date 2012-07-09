@@ -571,15 +571,24 @@ static int change_d3d_backbuffer(back_buffer_action_e action)
     fill_d3d_presentparams(&present_params);
 
     /* vo_w32_window is w32_common variable. It's a handle to the window. */
-    if (action == BACKBUFFER_CREATE &&
-        FAILED(IDirect3D9_CreateDevice(priv->d3d_handle,
+    if (action == BACKBUFFER_CREATE) {
+		if(FAILED(IDirect3D9_CreateDevice(priv->d3d_handle,
                                        D3DADAPTER_DEFAULT,
                                        D3DDEVTYPE_HAL, vo_w32_window,
-                                       D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+                                       D3DCREATE_HARDWARE_VERTEXPROCESSING,
                                        &present_params, &priv->d3d_device))) {
-            mp_msg(MSGT_VO, MSGL_V,
-                   "<vo_direct3d>Creating Direct3D device failed.\n");
-        return 0;
+			mp_msg(MSGT_VO, MSGL_V,
+					   "<vo_direct3d>Creating Direct3D device (software vertex processing).\n");
+			if(FAILED(IDirect3D9_CreateDevice(priv->d3d_handle,
+										   D3DADAPTER_DEFAULT,
+										   D3DDEVTYPE_HAL, vo_w32_window,
+										   D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+										   &present_params, &priv->d3d_device))) {
+				mp_msg(MSGT_VO, MSGL_V,
+					   "<vo_direct3d>Creating Direct3D device failed.\n");
+				return 0;
+			}
+		}
     }
 
     if (action == BACKBUFFER_RESET &&
