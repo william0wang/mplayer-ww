@@ -103,6 +103,7 @@ static struct global_priv {
                                     0 = textures do not have to be square */
     int device_texture_sys;         /**< 1 = device can texture from system memory
                                     0 = device requires shadow */
+    int flag_vertex_processing;
     int max_texture_width;          /**< from the device capabilities */
     int max_texture_height;         /**< from the device capabilities */
     int osd_width;                  /**< current width of the OSD */
@@ -280,16 +281,6 @@ static int d3dx9_level_conver()
        !priv->d3d_texture_video || !priv->d3d_surface_video)
         return -1;
 
-    /*
-    D3DSURFACE_DESC desc;
-    if(FAILED(IDirect3DCubeTexture9_GetLevelDesc(priv->d3d_texture_video, 0, &desc)))
-        return -1;
-
-    l = t = 0;
-    w = (float)desc.Width;
-    h = (float)desc.Height;
-    */
-
     l = (float)priv->fs_movie_rect.left;
     t = (float)priv->fs_movie_rect.top;
     w = (float)priv->fs_movie_rect.right;
@@ -307,20 +298,12 @@ static int d3dx9_level_conver()
         v2[i].y -= 0.5;
     }
 
-    /*
-    if (FAILED(IDirect3DDevice9_GetRenderTarget(priv->d3d_device, 0, &old_surface)))
-        return -1;
-
-    IDirect3DDevice9_SetRenderTarget(priv->d3d_device, 0, priv->d3d_surface_video);
-    */
-
     if (FAILED(IDirect3DDevice9_StretchRect(priv->d3d_device,
                                             priv->d3d_surface,
                                             NULL,
                                             priv->d3d_surface_video,
                                             NULL,
                                             D3DTEXF_NONE))) {
-        /*IDirect3DDevice9_SetRenderTarget(priv->d3d_device, 0, old_surface);*/
         mp_msg(MSGT_VO, MSGL_V, "<vo_direct3d>Copying frame to the d3d_surface_video failed.\n");
         return -1;
     }
@@ -329,7 +312,6 @@ static int d3dx9_level_conver()
 
     if(FAILED(IDirect3DDevice9_SetPixelShader(priv->d3d_device, priv->d3dx_pixel_shader))) {
         IDirect3DDevice9_SetTexture(priv->d3d_device, 0, NULL);
-        /*IDirect3DDevice9_SetRenderTarget(priv->d3d_device, 0, old_surface);*/
         mp_msg(MSGT_VO, MSGL_V, "<vo_direct3d>set pixel shader failed.\n");
         return -1;
     };
@@ -340,21 +322,6 @@ static int d3dx9_level_conver()
 
     IDirect3DDevice9_SetTexture(priv->d3d_device, 0, NULL);
     IDirect3DDevice9_SetPixelShader(priv->d3d_device, NULL);
-
-    /*
-    if (FAILED(IDirect3DDevice9_StretchRect(priv->d3d_device,
-                                            priv->d3d_surface,
-                                            &priv->fs_panscan_rect,
-                                            priv->d3d_backbuf,
-                                            &priv->fs_movie_rect,
-                                            D3DTEXF_LINEAR))) {
-        mp_msg(MSGT_VO, MSGL_INFO,
-               "<vo_direct3d>Copying frame to the backbuffer failed.\n");
-        return -1;
-    }
-
-    IDirect3DDevice9_SetRenderTarget(priv->d3d_device, 0, old_surface);
-    */
 
     return 0;
 }
@@ -571,24 +538,15 @@ static int change_d3d_backbuffer(back_buffer_action_e action)
     fill_d3d_presentparams(&present_params);
 
     /* vo_w32_window is w32_common variable. It's a handle to the window. */
-    if (action == BACKBUFFER_CREATE) {
-		if(FAILED(IDirect3D9_CreateDevice(priv->d3d_handle,
+    if (action == BACKBUFFER_CREATE &&
+        FAILED(IDirect3D9_CreateDevice(priv->d3d_handle,
                                        D3DADAPTER_DEFAULT,
                                        D3DDEVTYPE_HAL, vo_w32_window,
-                                       D3DCREATE_HARDWARE_VERTEXPROCESSING,
+                                       priv->flag_vertex_processing,
                                        &present_params, &priv->d3d_device))) {
-			mp_msg(MSGT_VO, MSGL_V,
-					   "<vo_direct3d>Creating Direct3D device (software vertex processing).\n");
-			if(FAILED(IDirect3D9_CreateDevice(priv->d3d_handle,
-										   D3DADAPTER_DEFAULT,
-										   D3DDEVTYPE_HAL, vo_w32_window,
-										   D3DCREATE_SOFTWARE_VERTEXPROCESSING,
-										   &present_params, &priv->d3d_device))) {
-				mp_msg(MSGT_VO, MSGL_V,
-					   "<vo_direct3d>Creating Direct3D device failed.\n");
-				return 0;
-			}
-		}
+            mp_msg(MSGT_VO, MSGL_V,
+                   "<vo_direct3d>Creating Direct3D device failed.\n");
+        return 0;
     }
 
     if (action == BACKBUFFER_RESET &&
@@ -1000,13 +958,14 @@ static int preinit(const char *arg)
     priv->device_texture_sys      = dev_caps & D3DDEVCAPS_TEXTURESYSTEMMEMORY;
     priv->max_texture_width       = disp_caps.MaxTextureWidth;
     priv->max_texture_height      = disp_caps.MaxTextureHeight;
+    priv->flag_vertex_processing = (disp_caps.VertexProcessingCaps == 0) ? D3DCREATE_SOFTWARE_VERTEXPROCESSING : D3DCREATE_HARDWARE_VERTEXPROCESSING;
 
     mp_msg(MSGT_VO, MSGL_V, "<vo_direct3d>device_caps_power2_only %d, device_caps_square_only %d\n"
-                            "<vo_direct3d>device_texture_sys %d\n"
+                            "<vo_direct3d>device_texture_sys %d, flag_vertex_processing 0x%X\n"
                             "<vo_direct3d>max_texture_width %d, max_texture_height %d\n",
            priv->device_caps_power2_only, priv->device_caps_square_only,
-           priv->device_texture_sys, priv->max_texture_width,
-           priv->max_texture_height);
+           priv->device_texture_sys, priv->flag_vertex_processing,
+           priv->max_texture_width, priv->max_texture_height);
 
     /* w32_common framework call. Configures window on the screen, gets
      * fullscreen dimensions and does other useful stuff.
