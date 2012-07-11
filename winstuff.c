@@ -1972,13 +1972,13 @@ int detect_vo_system(void)
 		}
 	} else if(gl_new_window && is_vista && using_theme && using_aero && vo_dirver == VO_DIRV_OPENGL) {
 		d3d9 = LoadLibraryA("d3d9.dll");
-		if (!d3d9) return;
+		if (!d3d9) return 0;
 
 		pDirect3DCreate9 = (ImpDirect3DCreate9) GetProcAddress(d3d9, "Direct3DCreate9");
-		if (!pDirect3DCreate9) return;
+		if (!pDirect3DCreate9) return 0;
 
 		d3d_handle = pDirect3DCreate9(D3D_SDK_VERSION);
-		if(!d3d_handle) return;
+		if(!d3d_handle) return 0;
 
 		IDirect3D9_GetAdapterIdentifier(d3d_handle, D3DADAPTER_DEFAULT, 0, &AdapterIdentifier);
 		IDirect3D9_Release(d3d_handle);

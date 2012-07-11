@@ -196,6 +196,7 @@ static void calc_fs_rect(void)
     priv->is_clear_needed = 1;
 }
 
+typedef int * (WINAPI *D3DFullColorRangePtr)();
 
 /** @brief prepare YUV to RGB converting TV to PC levels.
  *  @return 0 on success, -1 on failure
@@ -210,12 +211,29 @@ static int d3dx9_prepare_levelconv()
     ID3DXBuffer *d3dx_shader = NULL;
     ID3DXBuffer *d3dx_error = NULL;
     D3DXCompileShaderPtr m_pD3DXCompileShader;
+	D3DFullColorRangePtr pD3DFullColorRange;
+
+    if(!levelconv)
+        return -1;
+
+	d3dx9_dll = LoadLibraryA("dshownative.dll");
+	if (d3dx9_dll) {
+		pD3DFullColorRange = (D3DFullColorRangePtr) GetProcAddress(d3dx9_dll, "D3DFullColorRange");
+		if (pD3DFullColorRange) {
+			if (!pD3DFullColorRange()) {
+				mp_msg(MSGT_VO, MSGL_INFO, "<vo_direct3d>Enable auto color range fix!\n");
+			} else {
+				levelconv = 0;
+			}
+		}
+		FreeLibrary(d3dx9_dll);
+	}
 
     if(!levelconv)
         return -1;
 
     // load latest compatible version of the DLL that is available
-    for (i=37; i>=24; i--) {
+    for (i=43; i>=24; i--) {
         snprintf(dll_str, 32, "d3dx9_%d.dll", i);
         d3dx9_dll = LoadLibraryA(dll_str);
         if (d3dx9_dll) break;
