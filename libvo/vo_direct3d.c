@@ -46,6 +46,7 @@ static const vo_info_t info =
 };
 
 static int levelconv;
+static int autolevel;
 
 /*
  * Link essential libvo functions: preinit, config, control, draw_frame,
@@ -104,6 +105,7 @@ static struct global_priv {
     int device_texture_sys;         /**< 1 = device can texture from system memory
                                     0 = device requires shadow */
     int flag_vertex_processing;
+    int device_ps_major;
     int max_texture_width;          /**< from the device capabilities */
     int max_texture_height;         /**< from the device capabilities */
     int osd_width;                  /**< current width of the OSD */
@@ -213,20 +215,25 @@ static int d3dx9_prepare_levelconv()
     D3DXCompileShaderPtr m_pD3DXCompileShader;
 	D3DFullColorRangePtr pD3DFullColorRange;
 
-    if(!levelconv)
+    if(priv->device_ps_major < 2 || (!levelconv && !autolevel)) {
+		levelconv = 0;
+		autolevel = 0;
         return -1;
+	}
 
-	d3dx9_dll = LoadLibraryA("dshownative.dll");
-	if (d3dx9_dll) {
-		pD3DFullColorRange = (D3DFullColorRangePtr) GetProcAddress(d3dx9_dll, "D3DFullColorRange");
-		if (pD3DFullColorRange) {
-			if (!pD3DFullColorRange()) {
-				mp_msg(MSGT_VO, MSGL_INFO, "<vo_direct3d>Enable auto color range fix!\n");
-			} else {
-				levelconv = 0;
+	if(!levelconv && autolevel && (priv->flag_vertex_processing & D3DCREATE_HARDWARE_VERTEXPROCESSING)) {
+		autolevel = 0;
+		d3dx9_dll = LoadLibraryA("dshownative.dll");
+		if (d3dx9_dll) {
+			pD3DFullColorRange = (D3DFullColorRangePtr) GetProcAddress(d3dx9_dll, "D3DFullColorRange");
+			if (pD3DFullColorRange) {
+				if (!pD3DFullColorRange()) {
+					levelconv = 1;
+					mp_msg(MSGT_VO, MSGL_INFO, "VO: [direct3d] Auto color range converting TV (16-235) to PC (0-255)!\n");
+				} 
 			}
+			FreeLibrary(d3dx9_dll);
 		}
-		FreeLibrary(d3dx9_dll);
 	}
 
     if(!levelconv)
@@ -252,11 +259,11 @@ static int d3dx9_prepare_levelconv()
         return -1;
     }
 
-    snprintf(src_data, 2048, "sampler s0 : register(s0);\n\
-#define const_1 (16.0/255.0)\n\
-#define const_2 (255.0/219.0)\n\
-float4 main(float2 tex : TEXCOORD0) : COLOR\n{\n\
-return((tex2D(s0,tex) - const_1) * const_2);\n}\n");
+    snprintf(src_data, 2048, "sampler s0 : register(s0);\n"
+                             "#define const_1 (16.0/255.0)\n"
+                             "#define const_2 (255.0/219.0)\n"
+                             "float4 main(float2 tex: TEXCOORD0): COLOR {\n"
+                             "return((tex2D(s0,tex) - const_1) * const_2);\n}");
 
     hr = m_pD3DXCompileShader(src_data, strlen(src_data), NULL, NULL, "main", "ps_2_0",
            /* D3DXSHADER_DEBUG */ D3DXSHADER_SKIPVALIDATION , &d3dx_shader, &d3dx_error, NULL);
@@ -871,6 +878,7 @@ static int query_format(uint32_t movie_fmt)
 static const opt_t subopts[] =
 {
     { "levelconv", OPT_ARG_BOOL, &levelconv, NULL},
+    { "autolevel", OPT_ARG_BOOL, &autolevel, NULL},
     { NULL }
 };
 
@@ -910,6 +918,7 @@ static int preinit(const char *arg)
     }
 
     levelconv = 0;
+    autolevel = 1;
     priv->d3d_texture_video = NULL;
     priv->d3d_surface_video = NULL;
     priv->d3dx_pixel_shader = NULL;
@@ -920,8 +929,10 @@ static int preinit(const char *arg)
                 "Example: mplayer -vo direct3d:levelconv\n"
                 "\n"
                 "\nOptions:\n"
-                "  levelconv\n"
-                "    Force YUV to RGB converting TV (16-235) to PC (0-255) levels\n"
+                "  (no)levelconv\n"
+                "    Force color range converting TV (16-235) to PC (0-255)\n"
+                "  (no)autolevel\n"
+                "    Auto detection color range converting TV (16-235) to PC (0-255)\n"
                 "\n");
         return -1;
     }
@@ -976,7 +987,8 @@ static int preinit(const char *arg)
     priv->device_texture_sys      = dev_caps & D3DDEVCAPS_TEXTURESYSTEMMEMORY;
     priv->max_texture_width       = disp_caps.MaxTextureWidth;
     priv->max_texture_height      = disp_caps.MaxTextureHeight;
-    priv->flag_vertex_processing = (disp_caps.VertexProcessingCaps == 0) ? D3DCREATE_SOFTWARE_VERTEXPROCESSING : D3DCREATE_HARDWARE_VERTEXPROCESSING;
+    priv->device_ps_major         = D3DSHADER_VERSION_MAJOR(disp_caps.PixelShaderVersion);
+    priv->flag_vertex_processing  = (disp_caps.VertexProcessingCaps == 0) ? D3DCREATE_SOFTWARE_VERTEXPROCESSING : D3DCREATE_HARDWARE_VERTEXPROCESSING;
 
     mp_msg(MSGT_VO, MSGL_V, "<vo_direct3d>device_caps_power2_only %d, device_caps_square_only %d\n"
                             "<vo_direct3d>device_texture_sys %d, flag_vertex_processing 0x%X\n"
