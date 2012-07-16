@@ -2823,11 +2823,11 @@ EndDrag:
 				if (wParam == 0x32) {
 					scale = 1.0;
 				}
-				else if (wParam == 0x31 && scale > 0.25) {
-					scale -= 0.25;
+				else if (wParam == 0x31 && scale > 0.125) {
+					scale -= 0.125;
 				}
-				else if (wParam == 0x33 && scale < 3.0) {
-					scale += 0.25;
+				else if (wParam == 0x33 && scale < 5.0) {
+					scale += 0.125;
 				}
 				ShowWindow(hWnd, SW_NORMAL);
 				WndState = SW_NORMAL;
