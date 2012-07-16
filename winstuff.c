@@ -1337,36 +1337,6 @@ void updatefavlist(HWND hDlg)
 }
 
 extern int stream_cache_size;
-extern float stream_cache_min_percent;
-
-DWORD WINAPI seekProc(LPVOID lpParam)
-{
-	char *cmd = (char *)lpParam;
-	if(!cmd)
-		return 1;
-	Sleep(500);
-	mp_input_queue_cmd(mp_input_parse_cmd(cmd));
-	free(cmd);
-	return 0;
-}
-
-void StartSeekThread(const char *pos)
-{
-	CreateThread(NULL, 0, seekProc, (LPVOID)pos, 0, NULL);
-}
-
-void seek2time(int time)
-{
-	if( time > 3)
-	{
-		char cmd[MAX_PATH];
-		snprintf(cmd,MAX_PATH,"seek %d",time);
-		if( stream_cache_size > 0 )
-			StartSeekThread(strdup(cmd));
-		else
-			mp_input_queue_cmd(mp_input_parse_cmd(cmd));
-	}
-}
 
 static char win_text[32],ok_text[32],del_text[32],clean_text[32];
 BOOL CALLBACK FavDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)

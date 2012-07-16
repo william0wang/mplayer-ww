@@ -152,7 +152,6 @@
 int is_auto_stream_cache=0;
 int not_save_status = 0;
 
-
 extern int sub_source_by_pos(MPContext * mpctx, int sub_pos);
 extern char *demux_mkv_sub_lang(int);
 extern void StartGuiThread(void);
@@ -234,6 +233,7 @@ static double save_endpos=0;
 extern int adjust_ts_offset;
 extern int seek_realtime;
 extern int auto_threads;
+static int seek_to_time = 0;
 
 char status_text_timer[64];
 char status_text_timer2[64];
@@ -817,6 +817,11 @@ void mp_get_filename(play_tree_t *entry)
         } else
             filename = play_tree_iter_get_file(mpctx->playtree_iter, 1);
     }
+}
+
+void seek2time(int time)
+{
+	seek_to_time = time;
 }
 
 void save_status(void)
@@ -4851,11 +4856,15 @@ goto_enable_cache:
 		
         if (reload && (save_sec>0)) {
             seek(mpctx, save_sec, SEEK_ABSOLUTE);
-            end_at.pos += seek_to_sec;
+            end_at.pos += save_sec;
         } else if (seek_to_sec) {
             seek(mpctx, seek_to_sec, SEEK_ABSOLUTE);
             end_at.pos += seek_to_sec;
-        }
+        } else if(seek_to_time > 3) {
+            seek(mpctx, seek_to_time, SEEK_ABSOLUTE);
+            end_at.pos += seek_to_time;
+			seek_to_time = 0;
+		}
 		
 		if(end_pos > 0) {
 		    end_at.type = END_AT_TIME;
