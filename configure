@@ -72,9 +72,9 @@ compile_check() {
   echo >> "$TMPLOG"
   cat "$source" >> "$TMPLOG"
   echo >> "$TMPLOG"
-  echo "$_cc $WARNFLAGS $WARN_CFLAGS $CFLAGS $source $extra_cflags $ld_static $extra_ldflags $libs_mplayer $libs_mencoder -o $TMPEXE $@" >> "$TMPLOG"
+  echo "$_cc $WARNFLAGS $WARN_CFLAGS $CFLAGS $source $extra_cflags $ld_static $extra_ldflags $libs_mplayer $libs_mencoder -o $TMPEXE $@ -lm" >> "$TMPLOG"
   rm -f "$TMPEXE"
-  $_cc $WARNFLAGS $WARN_CFLAGS $CFLAGS "$source" $extra_cflags $ld_static $extra_ldflags $libs_mplayer $libs_mencoder -o "$TMPEXE" "$@" >> "$TMPLOG" 2>&1
+  $_cc $WARNFLAGS $WARN_CFLAGS $CFLAGS "$source" $extra_cflags $ld_static $extra_ldflags $libs_mplayer $libs_mencoder -o "$TMPEXE" "$@" -lm >> "$TMPLOG" 2>&1
   TMPRES="$?"
   echo >> "$TMPLOG"
   echo >> "$TMPLOG"
@@ -444,6 +444,7 @@ Codecs:
   --disable-ladspa          disable LADSPA plugin support [autodetect]
   --disable-libbs2b         disable libbs2b audio filter support [autodetect]
   --disable-libdv           disable libdv 0.9.5 en/decoding support [autodetect]
+  --disable-libopus         disable libopus decoding support [autodetect]
   --disable-mpg123          disable libmpg123 MP3 decoding support [autodetect]
   --disable-mad             disable libmad (MPEG audio) support [autodetect]
   --disable-mp3lame         disable LAME MP3 encoding support [autodetect]
@@ -685,7 +686,7 @@ libavmuxers_all=$(sed -n 's/^[^#]*_MUX.*(.*, *\(.*\)).*/\1_muxer/p' ffmpeg/libav
 libavmuxers=$(echo $libavmuxers_all | sed -e 's/ LIB[A-Z0-9_]*_MUXER//g' -e s/RTP_MUXER// -e s/RTSP_MUXER// -e s/SAP_MUXER//)
 libavprotocols_all=$(sed -n 's/^[^#]*PROTOCOL.*(.*, *\(.*\)).*/\1_protocol/p' ffmpeg/libavformat/allformats.c | tr '[a-z]' '[A-Z]')
 libavprotocols=$libavprotocols_all
-libavprotocols=$(echo $libavprotocols | sed -e s/HTTPS_PROTOCOL// -e s/TLS_PROTOCOL// -e s/BLURAY_PROTOCOL//)
+libavprotocols=$(echo $libavprotocols | sed -e s/HTTPS_PROTOCOL// -e s/TLS_PROTOCOL// -e s/BLURAY_PROTOCOL// -e s/FFRTMPCRYPT_PROTOCOL//)
 libavfilters_all=$(sed -n 's/^[^#]*FILTER.*(.*, *\(.*\),.*).*/\1_filter/p' ffmpeg/libavfilter/allfilters.c | tr '[a-z]' '[A-Z]')
 libavfilters=$(echo $libavfilters_all | sed -e 's/ LIB[A-Z0-9_]*_FILTER//g' -e 's/ FREI0R[A-Z0-9_]*_FILTER//g' -e 's/ OCV_FILTER//g' -e 's/ MP_FILTER//g')
 _mencoder=yes
@@ -762,6 +763,7 @@ _faac_lavc=auto
 _aacplus_lavc=auto
 _ladspa=auto
 _libbs2b=auto
+_libopus=auto
 _xmms=no
 _vcd=auto
 _bluray=auto
@@ -1177,6 +1179,8 @@ for ac_option do
   --disable-ladspa)     _ladspa=no      ;;
   --enable-libbs2b)     _libbs2b=yes    ;;
   --disable-libbs2b)    _libbs2b=no     ;;
+  --enable-libopus)     _libopus=yes    ;;
+  --disable-libopus)    _libopus=no     ;;
   --enable-xmms)        _xmms=yes       ;;
   --disable-xmms)       _xmms=no        ;;
   --enable-vcd)         _vcd=yes        ;;
@@ -1567,7 +1571,6 @@ else # if test -z "$_target"
 fi
 
 extra_cflags="-I. -Iffmpeg $extra_cflags"
-extra_ldflags="-lm $extra_ldflags"
 _timer=timer-linux.c
 _getch=getch2.c
 
@@ -2968,10 +2971,11 @@ if arm ; then
   echores "$_iwmmxt"
 fi
 
-cpuexts_all='ALTIVEC AVX MMX MMX2 AMD3DNOW AMD3DNOWEXT SSE SSE2 SSSE3 FAST_CMOV CMOV FAST_CLZ ARMV5TE ARMV6 ARMV6T2 ARMVFP VFPV3 NEON IWMMXT MMI VIS MVI'
+cpuexts_all='ALTIVEC AVX MMX MMX2 MMXEXT AMD3DNOW AMD3DNOWEXT SSE SSE2 SSSE3 FAST_CMOV CMOV FAST_CLZ ARMV5TE ARMV6 ARMV6T2 ARMVFP VFPV3 NEON IWMMXT MMI VIS MVI'
 test "$_altivec"   = yes && cpuexts="ALTIVEC $cpuexts"
 test "$_mmx"       = yes && cpuexts="MMX $cpuexts"
 test "$_mmxext"    = yes && cpuexts="MMX2 $cpuexts"
+test "$_mmxext"    = yes && cpuexts="MMXEXT $cpuexts"
 test "$_3dnow"     = yes && cpuexts="AMD3DNOW $cpuexts"
 test "$_3dnowext"  = yes && cpuexts="AMD3DNOWEXT $cpuexts"
 test "$_sse"       = yes && cpuexts="SSE $cpuexts"
@@ -3968,7 +3972,7 @@ echocheck "setenv()"
 setenv=yes
 def_setenv='#define HAVE_SETENV 1'
 statement_check stdlib.h 'setenv("", "", 0)' ||
-    { setenv=no ; def_setenv='#undef HAVE_SETENV' ; }
+    { setenv=no ; def_setenv='#define HAVE_SETENV 0' ; }
 echores "$setenv"
 
 
@@ -6532,6 +6536,28 @@ res_comment="in libavcodec: $_aacplus_lavc"
 echores "$_aacplus_lavc"
 
 
+
+echocheck "libopus decoding support"
+if test "$_libopus" = auto ; then
+  _libopus=no
+  if $_pkg_config --exists 'opus' ; then
+    statement_check opus_multistream.h 'opus_multistream_decoder_create(0,0,0,0,0,0)' $($_pkg_config --libs --cflags opus) &&
+      _libopus=yes
+  fi
+fi
+if test "$_libopus" = yes ; then
+  def_libopus='#define CONFIG_LIBOPUS 1'
+  libavdecoders="$libavdecoders LIBOPUS_DECODER"
+  extra_cflags="$extra_cflags $($_pkg_config --cflags opus)"
+  extra_ldflags="$extra_ldflags $($_pkg_config --libs opus)"
+  codecmodules="libopus $codecmodules"
+else
+  nocodecmodules="libopus $nocodecmodules"
+  def_libopus='#undef CONFIG_LIBOPUS'
+fi
+echores "$_libopus"
+
+
 echocheck "LADSPA plugin support"
 if test "$_ladspa" = auto ; then
   _ladspa=no
@@ -7825,6 +7851,8 @@ else
 fi
 echores "$_dvdnav"
 
+extra_ldflags="$extra_ldflags -lm"
+
 # DO NOT ADD ANY TESTS THAT USE LINKER FLAGS HERE (like cc_check).
 # Read dvdnav comment above.
 
@@ -8280,10 +8308,11 @@ HOSTCFLAGS = -D_ISOC99_SOURCE -D_POSIX_C_SOURCE=200112 -O3
 HOSTLIBS   = -lm
 AS_O       = -o \$@
 CC_O       = -o \$@
+CC_C       = -c
 LD         = gcc
 RANLIB     = $_ranlib
 YASM       = $_yasm
-YASMDEP    = $_yasm
+DEPYASM    = $_yasm
 YASMFLAGS  = $YASMFLAGS
 
 CONFIG_STATIC = yes
@@ -8299,7 +8328,7 @@ SLIBNAME            = \$(SLIBPREF)\$(FULLNAME)\$(SLIBSUF)
 SLIBNAME_WITH_MAJOR = \$(SLIBNAME)-42
 
 # Some FFmpeg codecs depend on these. Enable them unconditionally for now.
-CONFIG_AANDCT  = yes
+CONFIG_AANDCTTABLES  = yes
 CONFIG_DCT     = yes
 CONFIG_DWT     = yes
 CONFIG_FFT     = yes
@@ -8315,6 +8344,7 @@ CONFIG_MDCT    = yes
 CONFIG_MPEGAUDIODSP = yes
 CONFIG_RDFT    = yes
 CONFIG_SINEWIN = yes
+CONFIG_VP3DSP  = yes
 
 $mak_hardcoded_tables
 $mak_libavcodec_mpegaudio_hp
@@ -8545,6 +8575,7 @@ $def_libdv
 $def_liblzo
 $def_libmpeg2
 $def_libmpeg2_internal
+$def_libopus
 $def_mad
 $def_mp3lame
 $def_mp3lame_preset
@@ -8823,16 +8854,20 @@ $def_yasm
 #define HAVE_MAPVIEWOFFILE 0
 #define HAVE_MIPSDSPR1 0
 #define HAVE_MIPSFPU 0
+#define HAVE_MM_EMPTY 0
+#define HAVE_PTHREAD_CANCEL 0
 #define HAVE_PPC4XX 0
+#define HAVE_RDTSC 0
 #define HAVE_STRERROR_R 0
 #define HAVE_STRPTIME 0
+#define HAVE_STRUCT_POLLFD 0
 #define HAVE_SYMVER_ASM_LABEL 0
 #define HAVE_SYMVER_GNU_ASM 0
 #define HAVE_SYS_SELECT_H 0
 #define HAVE_VIRTUALALLOC 0
 
 /* Some FFmpeg codecs depend on these. Enable them unconditionally for now. */
-#define CONFIG_AANDCT 1
+#define CONFIG_AANDCTTABLES 1
 #define CONFIG_DCT 1
 #define CONFIG_DWT 1
 #define CONFIG_FFT 1
