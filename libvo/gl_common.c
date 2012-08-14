@@ -157,6 +157,8 @@ void (GLAPIENTRY *mpglDrawArrays)(GLenum, GLint, GLsizei);
 //! \defgroup glconversion OpenGL conversion helper functions
 
 static GLint hqtexfmt;
+static int use_depth_l16;
+static GLenum l16_format;
 
 /**
  * \brief adjusts the GL_UNPACK_ALIGNMENT to fit the stride.
@@ -540,6 +542,8 @@ static void getFunctions(void *(*getProcAddress)(const GLubyte *),
     hqtexfmt = GL_FLOAT_RGB32_NV;
   else
     hqtexfmt = GL_RGB16;
+  use_depth_l16 = !!strstr(allexts, "GL_EXT_shadow") ||
+                  !!strstr(allexts, "GL_ARB_shadow");
   free(allexts);
 }
 
@@ -570,11 +574,32 @@ void glCreateClearTex(GLenum target, GLenum fmt, GLenum format, GLenum type, GLi
   glAdjustAlignment(stride);
   mpglPixelStorei(GL_UNPACK_ROW_LENGTH, w);
   mpglTexImage2D(target, 0, fmt, w, h, 0, format, type, init);
+  if (format == GL_LUMINANCE && type == GL_UNSIGNED_SHORT) {
+    // ensure we get enough bits
+    GLint bits = 0;
+    glGetTexLevelParameteriv(target, 0, GL_TEXTURE_LUMINANCE_SIZE, &bits);
+    if (bits > 0 && bits < 14 && (use_depth_l16 || HAVE_BIGENDIAN)) {
+      fmt = GL_DEPTH_COMPONENT16;
+      format = GL_DEPTH_COMPONENT;
+      if (!use_depth_l16) {
+        // if we cannot get 16 bit anyway, we can fall back
+        // to L8A8 on big-endian, which is at least faster...
+        fmt = format = GL_LUMINANCE_ALPHA;
+        type = GL_UNSIGNED_BYTE;
+      }
+      mpglTexImage2D(target, 0, fmt, w, h, 0, format, type, init);
+    }
+    l16_format = format;
+  }
   mpglTexParameterf(target, GL_TEXTURE_PRIORITY, 1.0);
   mpglTexParameteri(target, GL_TEXTURE_MIN_FILTER, filter);
   mpglTexParameteri(target, GL_TEXTURE_MAG_FILTER, filter);
   mpglTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   mpglTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  if (format == GL_DEPTH_COMPONENT) {
+      mpglTexParameteri(target, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+      mpglTexParameteri(target, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+  }
   // Border texels should not be used with CLAMP_TO_EDGE
   // We set a sane default anyway.
   mpglTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, border);
@@ -648,7 +673,10 @@ int glFmt2bpp(GLenum format, GLenum type) {
   switch (format) {
     case GL_LUMINANCE:
     case GL_ALPHA:
+    case GL_DEPTH_COMPONENT:
       return component_size;
+    case GL_LUMINANCE_ALPHA:
+      return 2 * component_size;
     case GL_YCBCR_MESA:
       return 2;
     case GL_RGB:
@@ -686,6 +714,10 @@ void glUploadTex(GLenum target, GLenum format, GLenum type,
   if (stride < 0) {
     data += (h - 1) * stride;
     stride = -stride;
+  }
+  if (format == GL_LUMINANCE && type == GL_UNSIGNED_SHORT) {
+    format = l16_format;
+    if (l16_format == GL_LUMINANCE_ALPHA) type = GL_UNSIGNED_BYTE;
   }
   // this is not always correct, but should work for MPlayer
   glAdjustAlignment(stride);
@@ -1362,7 +1394,7 @@ static void glSetupYUVFragprog(gl_conversion_params_t *params) {
     "TEMP coord, coord2, cdelta, parmx, parmy, a, b, yuv;\n";
   int prog_remain;
   char *yuv_prog, *prog_pos;
-  int cur_texu = 3;
+  int cur_texu = 3 + params->has_alpha_tex;
   char lum_scale_texs[1];
   char chrom_scale_texs[1];
   char conv_texs[1];
@@ -1454,6 +1486,11 @@ static void glSetupYUVFragprog(gl_conversion_params_t *params) {
     prog_remain -= strlen(prog_pos);
     prog_pos    += strlen(prog_pos);
   }
+  if (params->has_alpha_tex) {
+    snprintf(prog_pos, prog_remain, "TEX result.color.a, fragment.texcoord[3], texture[3], 2D;\n");
+    prog_remain -= strlen(prog_pos);
+    prog_pos    += strlen(prog_pos);
+  }
   snprintf(prog_pos, prog_remain, "MOV result.color.rgb, res;\nEND");
 
   mp_msg(MSGT_VO, MSGL_DBG2, "[gl] generated fragment program:\n%s\n", yuv_prog);
@@ -1466,11 +1503,14 @@ static void glSetupYUVFragprog(gl_conversion_params_t *params) {
  */
 int glAutodetectYUVConversion(void) {
   const char *extensions = mpglGetString(GL_EXTENSIONS);
+  const char *vendor     = mpglGetString(GL_VENDOR);
+  // Imagination cannot parse floats in exponential representation (%e)
+  int is_img = vendor && strstr(vendor, "Imagination") != NULL;
   if (!extensions || !mpglMultiTexCoord2f)
     return YUV_CONVERSION_NONE;
-  if (strstr(extensions, "GL_ARB_fragment_program"))
+  if (strstr(extensions, "GL_ARB_fragment_program") && !is_img)
     return YUV_CONVERSION_FRAGMENT;
-  if (strstr(extensions, "GL_ATI_text_fragment_shader"))
+  if (strstr(extensions, "GL_ATI_text_fragment_shader") && !is_img)
     return YUV_CONVERSION_TEXT_FRAGMENT;
   if (strstr(extensions, "GL_ATI_fragment_shader"))
     return YUV_CONVERSION_COMBINERS_ATI;
@@ -1599,6 +1639,24 @@ void glDisableYUVConversion(GLenum target, int type) {
   }
 }
 
+void glSetupAlphaStippleTex(unsigned pattern) {
+  int i;
+  uint8_t stipple[16];
+  for (i = 0; i < 16; i++) {
+    stipple[i] = (pattern & 1) * 0xff;
+    pattern >>= 1;
+  }
+  mpglActiveTexture(GL_TEXTURE3);
+  glAdjustAlignment(2);
+  mpglPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+  mpglTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 4, 4, 0, GL_ALPHA, GL_UNSIGNED_BYTE, stipple);
+  mpglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  mpglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  mpglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  mpglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  mpglActiveTexture(GL_TEXTURE0);
+}
+
 void glEnable3DLeft(int type) {
   GLint buffer;
   if (type & GL_3D_SWAP)
@@ -1625,6 +1683,13 @@ void glEnable3DLeft(int type) {
           break;
       }
       mpglDrawBuffer(buffer);
+      break;
+    case GL_3D_STIPPLE:
+      mpglActiveTexture(GL_TEXTURE3);
+      mpglEnable(GL_TEXTURE_2D);
+      mpglActiveTexture(GL_TEXTURE0);
+      mpglEnable(GL_BLEND);
+      mpglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       break;
   }
 }
@@ -1656,6 +1721,13 @@ void glEnable3DRight(int type) {
       }
       mpglDrawBuffer(buffer);
       break;
+    case GL_3D_STIPPLE:
+      mpglActiveTexture(GL_TEXTURE3);
+      mpglEnable(GL_TEXTURE_2D);
+      mpglActiveTexture(GL_TEXTURE0);
+      mpglEnable(GL_BLEND);
+      mpglBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
+      break;
   }
 }
 
@@ -1683,6 +1755,12 @@ void glDisable3D(int type) {
       }
       mpglDrawBuffer(buffer);
       break;
+    case GL_3D_STIPPLE:
+      mpglActiveTexture(GL_TEXTURE3);
+      mpglDisable(GL_TEXTURE_2D);
+      mpglActiveTexture(GL_TEXTURE0);
+      mpglDisable(GL_BLEND);
+      break;
   }
 }
 
@@ -1702,13 +1780,16 @@ void glDisable3D(int type) {
  * \param is_yv12 if != 0, also draw the textures from units 1 and 2,
  *                bits 8 - 15 and 16 - 23 specify the x and y scaling of those textures
  * \param flip flip the texture upside down
+ * \param use_stipple overlay texture 3 as 4x4 alpha stipple
  * \ingroup gltexture
  */
 void glDrawTex(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
                GLfloat tx, GLfloat ty, GLfloat tw, GLfloat th,
-               int sx, int sy, int rect_tex, int is_yv12, int flip) {
+               int sx, int sy, int rect_tex, int is_yv12, int flip,
+               int use_stipple) {
   int chroma_x_shift = (is_yv12 >>  8) & 31;
   int chroma_y_shift = (is_yv12 >> 16) & 31;
+  GLfloat texcoords3[8] = {vo_dx / 4.0, vo_dy / 4.0, vo_dx / 4.0, (vo_dy + vo_dheight) / 4.0, (vo_dx + vo_dwidth) / 4.0, vo_dy / 4.0, (vo_dx + vo_dwidth) / 4.0, (vo_dy + vo_dheight) / 4.0};
   GLfloat xscale = 1 << chroma_x_shift;
   GLfloat yscale = 1 << chroma_y_shift;
   GLfloat tx2 = tx / xscale, ty2 = ty / yscale, tw2 = tw / xscale, th2 = th / yscale;
@@ -1729,6 +1810,11 @@ void glDrawTex(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
     mpglVertexPointer(2, GL_FLOAT, 0, vertices);
     mpglEnableClientState(GL_TEXTURE_COORD_ARRAY);
     mpglTexCoordPointer(2, GL_FLOAT, 0, texcoords);
+    if (use_stipple) {
+      mpglClientActiveTexture(GL_TEXTURE3);
+      mpglEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      mpglTexCoordPointer(2, GL_FLOAT, 0, texcoords3);
+    }
     if (is_yv12) {
       mpglClientActiveTexture(GL_TEXTURE1);
       mpglEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -1739,6 +1825,10 @@ void glDrawTex(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
       mpglClientActiveTexture(GL_TEXTURE0);
     }
     mpglDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    if (use_stipple) {
+      mpglClientActiveTexture(GL_TEXTURE3);
+      mpglDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    }
     if (is_yv12) {
       mpglClientActiveTexture(GL_TEXTURE1);
       mpglDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -1756,24 +1846,32 @@ void glDrawTex(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
     mpglMultiTexCoord2f(GL_TEXTURE1, tx2, ty2);
     mpglMultiTexCoord2f(GL_TEXTURE2, tx2, ty2);
   }
+  if (use_stipple)
+    mpglMultiTexCoord2f(GL_TEXTURE3, texcoords3[0], texcoords3[1]);
   mpglVertex2f(x, y);
   mpglTexCoord2f(tx, ty + th);
   if (is_yv12) {
     mpglMultiTexCoord2f(GL_TEXTURE1, tx2, ty2 + th2);
     mpglMultiTexCoord2f(GL_TEXTURE2, tx2, ty2 + th2);
   }
+  if (use_stipple)
+    mpglMultiTexCoord2f(GL_TEXTURE3, texcoords3[2], texcoords3[3]);
   mpglVertex2f(x, y + h);
   mpglTexCoord2f(tx + tw, ty + th);
   if (is_yv12) {
     mpglMultiTexCoord2f(GL_TEXTURE1, tx2 + tw2, ty2 + th2);
     mpglMultiTexCoord2f(GL_TEXTURE2, tx2 + tw2, ty2 + th2);
   }
+  if (use_stipple)
+    mpglMultiTexCoord2f(GL_TEXTURE3, texcoords3[6], texcoords3[7]);
   mpglVertex2f(x + w, y + h);
   mpglTexCoord2f(tx + tw, ty);
   if (is_yv12) {
     mpglMultiTexCoord2f(GL_TEXTURE1, tx2 + tw2, ty2);
     mpglMultiTexCoord2f(GL_TEXTURE2, tx2 + tw2, ty2);
   }
+  if (use_stipple)
+    mpglMultiTexCoord2f(GL_TEXTURE3, texcoords3[4], texcoords3[5]);
   mpglVertex2f(x + w, y);
   mpglEnd();
 }
