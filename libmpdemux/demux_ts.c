@@ -75,7 +75,6 @@ typedef enum
 	VIDEO_DIRAC	= mmioFOURCC('d', 'r', 'a', 'c'),
 	VIDEO_VC1	= mmioFOURCC('W', 'V', 'C', '1'),
 	AUDIO_MP2   	= 0x50,
-	AUDIO_BPCM  	= mmioFOURCC('B', 'P', 'C', 'M'),
 	AUDIO_A52   	= 0x2000,
 	AUDIO_DTS	= 0x2001,
 	AUDIO_LPCM_BE  	= 0x10001,
@@ -83,6 +82,7 @@ typedef enum
 	AUDIO_AAC_LATM	= mmioFOURCC('M', 'P', '4', 'L'),
 	AUDIO_TRUEHD	= mmioFOURCC('T', 'R', 'H', 'D'),
 	AUDIO_S302M     = mmioFOURCC('B', 'S', 'S', 'D'),
+	AUDIO_PCM_BR    = mmioFOURCC('B', 'P', 'C', 'M'),
 	SPU_DVD		= 0x3000000,
 	SPU_DVB		= 0x3000001,
 	SPU_TELETEXT	= 0x3000002,
@@ -258,8 +258,8 @@ static int IS_AUDIO(es_stream_type_t type)
 	switch (type) {
 	case AUDIO_MP2:
 	case AUDIO_A52:
-	case AUDIO_BPCM:
 	case AUDIO_LPCM_BE:
+	case AUDIO_PCM_BR:
 	case AUDIO_AAC:
 	case AUDIO_AAC_LATM:
 	case AUDIO_DTS:
@@ -893,8 +893,8 @@ static off_t ts_detect_streams(demuxer_t *demuxer, tsdemux_init_t *param)
 		mp_msg(MSGT_DEMUXER, MSGL_INFO, "AUDIO DTS(pid=%d)", param->apid);
 	else if(param->atype == AUDIO_LPCM_BE)
 		mp_msg(MSGT_DEMUXER, MSGL_INFO, "AUDIO LPCM(pid=%d)", param->apid);
-	else if(param->atype == AUDIO_BPCM)
-		mp_msg(MSGT_DEMUXER, MSGL_INFO, "AUDIO BPCM(pid=%d)", param->apid);
+	else if(param->atype == AUDIO_PCM_BR)
+		mp_msg(MSGT_DEMUXER, MSGL_INFO, "AUDIO PCMBR(pid=%d)", param->apid);
 	else if(param->atype == AUDIO_AAC)
 		mp_msg(MSGT_DEMUXER, MSGL_INFO, "AUDIO AAC(pid=%d)", param->apid);
 	else if(param->atype == AUDIO_AAC_LATM)
@@ -2565,7 +2565,7 @@ static int parse_pmt(ts_priv_t * priv, uint16_t progid, uint16_t pid, int is_sta
 				pmt->es[idx].type = SL_SECTION;
 				break;
 			case 0x80:
-				pmt->es[idx].type = AUDIO_BPCM;
+				pmt->es[idx].type = AUDIO_PCM_BR;
 				break;
 			case 0x81:
 				pmt->es[idx].type = AUDIO_A52;
