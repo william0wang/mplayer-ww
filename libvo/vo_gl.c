@@ -82,6 +82,10 @@ static GLuint osdtex[MAX_OSD_PARTS];
 //! Alpha textures for OSD
 static GLuint osdatex[MAX_OSD_PARTS];
 #endif
+//! Coordinates and texture sizes for OSD
+static struct osdcoords {
+  int x, y, w, h, sx, sy;
+} osdcoords[MAX_OSD_PARTS];
 static GLuint *eosdtex;
 #define LARGE_EOSD_TEX_SIZE 512
 #define TINYTEX_SIZE 16
@@ -91,11 +95,7 @@ static GLuint *eosdtex;
 #define SMALLTEX_COLS (LARGE_EOSD_TEX_SIZE/SMALLTEX_SIZE)
 #define SMALLTEX_MAX (SMALLTEX_COLS*SMALLTEX_COLS)
 static GLuint largeeosdtex[2];
-//! Display lists that draw the OSD parts
-static GLuint osdDispList[MAX_OSD_PARTS];
-#ifndef FAST_OSD
-static GLuint osdaDispList[MAX_OSD_PARTS];
-#endif
+//! Display list that draws the EOSD parts
 static GLuint eosdDispList;
 //! How many parts the OSD currently consists of
 static int osdtexCnt;
@@ -117,6 +117,7 @@ static float filter_strength;
 static float noise_strength;
 static int yuvconvtype;
 static int use_rectangle;
+static int using_tex_rect;
 static int err_shown;
 static uint32_t image_width;
 static uint32_t image_height;
@@ -300,17 +301,12 @@ static void update_yuvconv(void) {
  * \brief remove all OSD textures and display-lists, thus clearing it.
  */
 static void clearOSD(void) {
-  int i;
   if (!osdtexCnt)
     return;
   mpglDeleteTextures(osdtexCnt, osdtex);
 #ifndef FAST_OSD
   mpglDeleteTextures(osdtexCnt, osdatex);
-  for (i = 0; i < osdtexCnt; i++)
-    mpglDeleteLists(osdaDispList[i], 1);
 #endif
-  for (i = 0; i < osdtexCnt; i++)
-    mpglDeleteLists(osdDispList[i], 1);
   osdtexCnt = 0;
 }
 
@@ -438,7 +434,7 @@ skip_upload:
       texSize(i->w, i->h, &sx, &sy);
       mpglBindTexture(gl_target, *curtex++);
     }
-    glDrawTex(i->dst_x, i->dst_y, i->w, i->h, x, y, i->w, i->h, sx, sy, use_rectangle == 1, 0, 0, 0);
+    glDrawTex(i->dst_x, i->dst_y, i->w, i->h, x, y, i->w, i->h, sx, sy, using_tex_rect, 0, 0, 0);
   }
   mpglEndList();
   mpglBindTexture(gl_target, 0);
@@ -523,11 +519,13 @@ static void autodetectGlExtensions(void) {
         !glYUVSupportsAlphaTex(use_yuv))
       use_yuv = 0;
   }
+  if (use_ycbcr == -1)
+    use_ycbcr = extensions && strstr(extensions, "ycbcr_422");
   if (is_ati && (lscale == 1 || lscale == 2 || cscale == 1 || cscale == 2))
     mp_msg(MSGT_VO, MSGL_WARN, "[gl] Selected scaling mode may be broken on ATI cards.\n"
              "Tell _them_ to fix GL_REPEAT if you have issues.\n");
-  mp_msg(MSGT_VO, MSGL_V, "[gl] Settings after autodetection: ati-hack = %i, force-pbo = %i, rectangle = %i, yuv = %i\n",
-         ati_hack, force_pbo, use_rectangle, use_yuv);
+  mp_msg(MSGT_VO, MSGL_V, "[gl] Settings after autodetection: ati-hack = %i, force-pbo = %i, rectangle = %i, yuv = %i, ycbcr = %i\n",
+         ati_hack, force_pbo, use_rectangle, use_yuv, use_ycbcr);
 }
 
 static GLint get_scale_type(int chroma) {
@@ -544,7 +542,8 @@ static GLint get_scale_type(int chroma) {
 static int initGl(uint32_t d_width, uint32_t d_height) {
   GLint scale_type = get_scale_type(0);
   autodetectGlExtensions();
-  gl_target = use_rectangle == 1 ? GL_TEXTURE_RECTANGLE : GL_TEXTURE_2D;
+  using_tex_rect = gl_format == GL_YCBCR_422_APPLE || use_rectangle == 1;
+  gl_target = using_tex_rect ? GL_TEXTURE_RECTANGLE : GL_TEXTURE_2D;
   yuvconvtype = SET_YUV_CONVERSION(use_yuv) |
                 SET_YUV_LUM_SCALER(lscale) |
                 SET_YUV_CHROM_SCALER(cscale);
@@ -780,21 +779,7 @@ static void create_osd_texture(int x0, int y0, int w, int h,
 
   mpglBindTexture(gl_target, 0);
 
-  // Create a list for rendering this OSD part
-#ifndef FAST_OSD
-  osdaDispList[osdtexCnt] = mpglGenLists(1);
-  mpglNewList(osdaDispList[osdtexCnt], GL_COMPILE);
-  // render alpha
-  mpglBindTexture(gl_target, osdatex[osdtexCnt]);
-  glDrawTex(x0, y0, w, h, 0, 0, w, h, sx, sy, use_rectangle == 1, 0, 0, 0);
-  mpglEndList();
-#endif
-  osdDispList[osdtexCnt] = mpglGenLists(1);
-  mpglNewList(osdDispList[osdtexCnt], GL_COMPILE);
-  // render OSD
-  mpglBindTexture(gl_target, osdtex[osdtexCnt]);
-  glDrawTex(x0, y0, w, h, 0, 0, w, h, sx, sy, use_rectangle == 1, 0, 0, 0);
-  mpglEndList();
+  osdcoords[osdtexCnt] = (struct osdcoords){x0, y0, w, h, sx, sy};
 
   osdtexCnt++;
 }
@@ -806,6 +791,7 @@ static void create_osd_texture(int x0, int y0, int w, int h,
  * \param type bit 0: render OSD, bit 1: render EOSD
  */
 static void do_render_osd(int type) {
+  int i;
   int draw_osd  = (type & RENDER_OSD)  && osdtexCnt > 0;
   int draw_eosd = (type & RENDER_EOSD) && eosdDispList;
   if (!draw_osd && !draw_eosd)
@@ -834,11 +820,21 @@ static void do_render_osd(int type) {
     mpglColor4ub((osd_color >> 16) & 0xff, (osd_color >> 8) & 0xff, osd_color & 0xff, 0xff - (osd_color >> 24));
     // draw OSD
 #ifndef FAST_OSD
+    // render alpha
     mpglBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
-    mpglCallLists(osdtexCnt, GL_UNSIGNED_INT, osdaDispList);
+    for (i = 0; i < osdtexCnt; i++) {
+      struct osdcoords *c = osdcoords + i;
+      mpglBindTexture(gl_target, osdatex[i]);
+      glDrawTex(c->x, c->y, c->w, c->h, 0, 0, c->w, c->h, c->sx, c->sy, using_tex_rect, 0, 0, 0);
+    }
 #endif
+    // render luminance OSD
     mpglBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    mpglCallLists(osdtexCnt, GL_UNSIGNED_INT, osdDispList);
+    for (i = 0; i < osdtexCnt; i++) {
+      struct osdcoords *c = osdcoords + i;
+      mpglBindTexture(gl_target, osdtex[i]);
+      glDrawTex(c->x, c->y, c->w, c->h, 0, 0, c->w, c->h, c->sx, c->sy, using_tex_rect, 0, 0, 0);
+    }
   }
   // set rendering parameters back to defaults
   mpglDisable(GL_BLEND);
@@ -872,20 +868,20 @@ static void do_render(void) {
     glDrawTex(0, 0, image_width, image_height,
               0, 0, image_width >> 1, image_height,
               texture_width, texture_height,
-              use_rectangle == 1, is_yuv,
+              using_tex_rect, is_yuv,
               mpi_flipped ^ vo_flipped, stereo_mode == GL_3D_STIPPLE);
     glEnable3DRight(stereo_mode);
     glDrawTex(0, 0, image_width, image_height,
               image_width >> 1, 0, image_width >> 1, image_height,
               texture_width, texture_height,
-              use_rectangle == 1, is_yuv,
+              using_tex_rect, is_yuv,
               mpi_flipped ^ vo_flipped, stereo_mode == GL_3D_STIPPLE);
     glDisable3D(stereo_mode);
   } else {
     glDrawTex(0, 0, image_width, image_height,
               0, 0, image_width, image_height,
               texture_width, texture_height,
-              use_rectangle == 1, is_yuv,
+              using_tex_rect, is_yuv,
               mpi_flipped ^ vo_flipped, 0);
   }
   if (is_yuv || custom_prog)
@@ -1038,7 +1034,8 @@ static void clear_border(uint8_t *dst, int start, int stride, int height, int fu
 }
 
 static uint32_t draw_image(mp_image_t *mpi) {
-  int slice = slice_height;
+  // Ask for TexImage instead of TexSubImage for the rectangle + YCBCR + nodr special case.
+  int slice = gl_target == GL_TEXTURE_RECTANGLE && gl_format == GL_YCBCR_422_APPLE ? -1 : slice_height;
   int stride[3];
   unsigned char *planes[3];
   mp_image_t mpi2 = *mpi;
@@ -1151,7 +1148,7 @@ query_format(uint32_t format)
     // ideally MPlayer should be fixed instead not to use Y800 when it has the choice
     if (!use_yuv && (format == IMGFMT_Y8 || format == IMGFMT_Y800))
         return 0;
-    if (!use_ycbcr && (format == IMGFMT_UYVY || format == IMGFMT_YVYU))
+    if (!use_ycbcr && (format == IMGFMT_YUY2 || format == IMGFMT_UYVY))
         return 0;
     if (many_fmts &&
          glFindFormat(format, NULL, NULL, NULL, NULL))
@@ -1229,7 +1226,7 @@ static int preinit_internal(const char *arg, int allow_sw)
     use_osd = -1;
     scaled_osd = 0;
     use_aspect = 1;
-    use_ycbcr = 0;
+    use_ycbcr = -1;
     use_yuv = -1;
     colorspace = -1;
     levelconv = -1;
@@ -1282,7 +1279,7 @@ static int preinit_internal(const char *arg, int allow_sw)
               "    1 is equivalent to enable VSYNC, 0 to disable VSYNC.\n"
               "    Requires GLX_SGI_swap_control support to work.\n"
               "  ycbcr\n"
-              "    also try to use the GL_MESA_ycbcr_texture extension\n"
+              "    also try to use the GL_APPLE_ycbcr_422 extension\n"
               "  yuv=<n>\n"
               "    0: use software YUV to RGB conversion.\n"
               "    1: use register combiners (nVidia only, for older cards).\n"
@@ -1291,7 +1288,7 @@ static int preinit_internal(const char *arg, int allow_sw)
               "    4: use fragment program with gamma correction via lookup.\n"
               "    5: use ATI-specific method (for older cards).\n"
               "    6: use lookup via 3D texture.\n"
-	      "  colorspace=<n>\n"
+              "  colorspace=<n>\n"
               "    0: MPlayer's default YUV to RGB conversion\n"
               "    1: YUV to RGB according to BT.601\n"
               "    2: YUV to RGB according to BT.709\n"
@@ -1354,6 +1351,9 @@ static int preinit_internal(const char *arg, int allow_sw)
       if (!allow_sw && isSoftwareGl())
         goto err_out;
       autodetectGlExtensions();
+    } else if (use_ycbcr == -1) {
+      // rare feature, not worth creating a window to detect
+      use_ycbcr = 0;
     }
     if (many_fmts)
       mp_msg(MSGT_VO, MSGL_INFO, "[gl] using extended formats. "

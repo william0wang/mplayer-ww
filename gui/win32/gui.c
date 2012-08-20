@@ -116,7 +116,7 @@ LPSTR acp (LPCSTR utf8)
     return "?";
 }
 
-static void console_toggle(void)
+static void console_toggle(gui_t *gui)
 {
     if (console_state)
     {
@@ -156,6 +156,12 @@ static void console_toggle(void)
         setvbuf(stderr, NULL, _IONBF, 0);
         print_version("MPlayer");
         console_state = 1;
+    }
+
+    if (gui)
+    {
+        CheckMenuItem(gui->traymenu, ID_CONSOLE, MF_BYCOMMAND | (console_state ? MF_CHECKED : MF_UNCHECKED));
+        CheckMenuItem(gui->menu, ID_CONSOLE, MF_BYCOMMAND | (console_state ? MF_CHECKED : MF_UNCHECKED));
     }
 }
 
@@ -596,7 +602,7 @@ static LRESULT CALLBACK VideoProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
         }
         case WM_WINDOWPOSCHANGED:
         {
-            int tmpheight=0;
+            uint32_t tmpheight=0;
             static uint32_t rect_width;
             static uint32_t rect_height;
             RECT rd;
@@ -652,7 +658,7 @@ static LRESULT CALLBACK VideoProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
             height = rect.bottom - rect.top;
             if(guiInfo.Playing == GUI_STOP)
             {
-                int i;
+                unsigned int i;
                 window *desc = NULL;
 
                 for (i=0; i<gui->skin->windowcount; i++)
@@ -1020,7 +1026,7 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                     handlemsg(hWnd, evPreferences);
                     break;
                 case ID_CONSOLE:
-                    console_toggle();
+                    console_toggle(gui);
                     break;
                 case ID_ONLINEHELP:
                     ShellExecute(NULL, "open", ONLINE_HELP_URL, NULL, NULL, SW_SHOWNORMAL);
@@ -1332,7 +1338,7 @@ static void maketransparent(HWND hwnd, COLORREF crTransparent)
 
 static int window_render(gui_t *gui, HWND hWnd, HDC hdc, window_priv_t *priv, window *desc, BITMAPINFO binfo)
 {
-    int i;
+    unsigned int i;
     SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) gui);
     (gui->window_priv_count)++;
     gui->window_priv = realloc(gui->window_priv, sizeof(window_priv_t *) * gui->window_priv_count);
@@ -1375,13 +1381,13 @@ int create_videowindow(gui_t *gui)
     HINSTANCE instance = GetModuleHandle(NULL);
     WNDCLASS wc;
     RECT rect;
-    HWND hWnd;
     DWORD style = 0;
     HDC hdc = NULL;
     BITMAPINFO binfo;
     window_priv_t *priv = NULL;
     window *desc = NULL;
-    int i, x = -1, y = -1;
+    unsigned int i;
+    int x = -1, y = -1;
     vo_colorkey = 0xff00ff;
 
     for (i=0; i<gui->skin->windowcount; i++)
@@ -1432,17 +1438,16 @@ int create_videowindow(gui_t *gui)
     if (y <= -1 || (y+(rect.bottom-rect.top) > GetSystemMetrics(SM_CYSCREEN)))
         y = x;
 
-    hWnd = CreateWindowEx(0, "MPlayer - Video", "MPlayer - Video", style,
-                          x, y, rect.right-rect.left, rect.bottom-rect.top,
-                          gui->videowindow, NULL, instance, NULL);
+    gui->videowindow = CreateWindowEx(0, "MPlayer - Video", "MPlayer - Video", style,
+                                      x, y, rect.right-rect.left, rect.bottom-rect.top,
+                                      NULL, NULL, instance, NULL);
 
     /* load all the window images */
-    window_render(gui, hWnd, hdc, priv, desc, binfo);
+    window_render(gui, gui->videowindow, hdc, priv, desc, binfo);
 
     /* enable drag and drop support */
-    DragAcceptFiles(hWnd, TRUE);
+    DragAcceptFiles(gui->videowindow, TRUE);
 
-    gui->videowindow = hWnd;
     if(video_window)
         WinID = gui->videowindow;
     ShowWindow(gui->videowindow, SW_SHOW);
@@ -1457,7 +1462,6 @@ int create_window(gui_t *gui, char *skindir)
     WNDCLASS wc;
     RECT rect;
     DWORD style = 0;
-    HWND hwnd;
     HDC hdc = NULL;
     BITMAPINFO binfo;
     window_priv_t *priv = NULL;
@@ -1547,13 +1551,13 @@ int create_window(gui_t *gui, char *skindir)
         gui_main_pos_y = y;
     }
 
-    hwnd = CreateWindowEx(0, gui->classname, "MPlayer", style,
-                          x, y, rect.right-rect.left, rect.bottom-rect.top,
-                          gui->mainwindow, NULL, instance, NULL);
+    gui->mainwindow = CreateWindowEx(0, gui->classname, "MPlayer", style,
+                                     x, y, rect.right-rect.left, rect.bottom-rect.top,
+                                     NULL, NULL, instance, NULL);
 
     /* set the systray icon properties */
     nid.cbSize = sizeof(NOTIFYICONDATA);
-    nid.hWnd = hwnd;
+    nid.hWnd = gui->mainwindow;
     nid.uID = 1;
     nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
     nid.uCallbackMessage = WM_SYSTRAY;
@@ -1564,13 +1568,12 @@ int create_window(gui_t *gui, char *skindir)
     Shell_NotifyIcon(NIM_ADD, &nid);
 
     /* load all the window images */
-    window_render(gui, hwnd, hdc, priv, desc, binfo);
+    window_render(gui, gui->mainwindow, hdc, priv, desc, binfo);
 
     /* enable drag and drop support */
-    DragAcceptFiles(hwnd, TRUE);
+    DragAcceptFiles(gui->mainwindow, TRUE);
 
-    updatedisplay(gui, hwnd);
-    gui->mainwindow = hwnd;
+    updatedisplay(gui, gui->mainwindow);
 
     /* display */
     ShowWindow(gui->mainwindow, SW_SHOW);
@@ -1602,6 +1605,6 @@ gui_t *create_gui(char *skindir, void (*playercontrol)(int event))
     sprintf(temp, "%s/%s", skindir, skinName);
     if(create_window(gui, temp)) return NULL;
     if(create_videowindow(gui)) return NULL;
-    if(console) console_toggle();
+    if(console) console_toggle(gui);
     return gui;
 }
