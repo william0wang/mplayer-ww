@@ -628,6 +628,8 @@ static int fill_buffer(stream_t *s, char* buffer, int max_len){
   } else
 #endif
     r = read(s->fd,buffer,max_len);
+  // We are certain this is EOF, do not retry
+  if (max_len && r == 0) s->eof = 1;
   return (r <= 0) ? -1 : r;
 }
 
