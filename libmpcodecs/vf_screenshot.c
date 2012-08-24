@@ -70,7 +70,6 @@ static int config(struct vf_instance *vf,
     vf->priv->avctx->width = d_width;
     vf->priv->avctx->height = d_height;
     vf->priv->avctx->pix_fmt = PIX_FMT_RGB24;
-    vf->priv->avctx->compression_level = 0;
     vf->priv->dw = d_width;
     vf->priv->dh = d_height;
     vf->priv->stride = (3*vf->priv->dw+15)&~15;
@@ -86,7 +85,8 @@ static void write_png(struct vf_priv_s *priv)
     char *fname = priv->fname;
     FILE * fp;
     AVFrame pic;
-    int size;
+    AVPacket pkt;
+    int got_packet = 0;
 
     fp = fopen (fname, "wb");
     if (fp == NULL) {
@@ -94,11 +94,16 @@ static void write_png(struct vf_priv_s *priv)
         return;
     }
 
+    av_init_packet(&pkt);
+    pkt.data = priv->outbuffer;
+    pkt.size = priv->outbuffer_size;
+    
     pic.data[0] = priv->buffer;
     pic.linesize[0] = priv->stride;
-    size = avcodec_encode_video(priv->avctx, priv->outbuffer, priv->outbuffer_size, &pic);
-    if (size > 0)
-        fwrite(priv->outbuffer, size, 1, fp);
+    if(!avcodec_encode_video2(priv->avctx, &pkt, &pic, &got_packet)) {
+        if (got_packet)
+            fwrite(pkt.data, pkt.size, 1, fp);
+    }
 
     fclose (fp);
 }
@@ -336,6 +341,9 @@ static int vf_open(vf_instance_t *vf, char *args)
     vf->priv->buffer=0;
     vf->priv->outbuffer=0;
     vf->priv->ctx=0;
+
+    avcodec_register_all();
+
     vf->priv->avctx = avcodec_alloc_context3(NULL);
 
     if (args) {
@@ -343,12 +351,11 @@ static int vf_open(vf_instance_t *vf, char *args)
 	    mp_msg(MSGT_VFILTER, MSGL_V, "Screenshot: compression level: %d\n",
 	        vf->priv->avctx->compression_level);
     } else {
-        vf->priv->avctx->compression_level = 0;
+        vf->priv->avctx->compression_level = FF_COMPRESSION_DEFAULT;
     }
 
     vf->priv->avctx->pix_fmt = PIX_FMT_RGB24;
-    avcodec_register_all();
-    if (avcodec_open2(vf->priv->avctx, avcodec_find_encoder(CODEC_ID_PNG), NULL)) {
+    if (avcodec_open2(vf->priv->avctx, avcodec_find_encoder(AV_CODEC_ID_PNG), NULL)) {
         mp_msg(MSGT_VFILTER, MSGL_FATAL, "Could not open libavcodec PNG encoder\n");
         return 0;
     }
