@@ -437,7 +437,8 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
         case AVMEDIA_TYPE_SUBTITLE:{
             sh_sub_t* sh_sub;
             char type;
-            if(codec->codec_id == CODEC_ID_TEXT)
+            if(codec->codec_id == CODEC_ID_TEXT ||
+               codec->codec_id == AV_CODEC_ID_SUBRIP)
                 type = 't';
             else if(codec->codec_id == CODEC_ID_MOV_TEXT)
                 type = 'm';
@@ -838,7 +839,7 @@ redo:
                             prog->aid = program->stream_index[i];
                         break;
                     case AVMEDIA_TYPE_SUBTITLE:
-                        if(prog->sid == -2 && priv->avfc->streams[program->stream_index[i]]->codec->codec_id == CODEC_ID_TEXT)
+                        if(prog->sid == -2)
                             prog->sid = program->stream_index[i];
                         break;
                 }
