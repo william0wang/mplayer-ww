@@ -54,6 +54,7 @@ static subtitle *fb,*bb;
 static unsigned int cursor_pos=0;
 
 static int initialized=0;
+static int wtv_format;
 
 #define CC_ROLLON 1
 #define CC_ROLLUP 2
@@ -124,10 +125,12 @@ void subcc_init(void)
 	channel = -1;
 
 	initialized=1;
+	wtv_format = 0;
 }
 
 void subcc_reset(void)
 {
+    wtv_format = 0;
     if (!initialized)
         return;
     clear_buffer(&buf1);
@@ -317,11 +320,20 @@ static void subcc_decode(const uint8_t *inputbuffer, unsigned int inputlength)
     data2 = current[2];
     current += 3; curbytes += 3;
 
+    // 0xfe/0xff are both used on plain EIA-608 CC and
+    // for extended EIA-708 (where 0xfc/0xfd is used for
+    // compatibility layer).
+    // Allow using channel bit 2 to select between which
+    // ones to look in.
     switch (cc_code) {
+    case 0xfc:
+    case 0xfd:
     case 0xfe:
     case 0xff:
+      if ((cc_code & 2) == (selected_channel() & 4) >> 1)
+          break;
       odd_offset ^= 1;
-      if (odd_offset != selected_channel() >> 1)
+      if (odd_offset != (selected_channel() & 2) >> 1)
           break;
       /* expect EIA-608 CC1/CC2 encoding */
       // FIXME check parity!
@@ -330,6 +342,7 @@ static void subcc_decode(const uint8_t *inputbuffer, unsigned int inputlength)
       cc_decode_EIA608(data1 | (data2 << 8));
       break;
 
+    case 0xfa:
     case 0x00:
       /* This seems to be just padding */
       break;
@@ -385,6 +398,15 @@ void subcc_process_data(const uint8_t *inputdata, unsigned int len)
 		mov_subcc_decode(inputdata, len);
 		return;
 	}
+	if (len & 1) wtv_format = 0;
+	if (len == 2) {
+		// EIA-608 compatibility part.
+		// Full EIA-708 parts have length >= 4 (multiple of 2).
+		cc_decode_EIA608(inputdata[0] | (inputdata[1] << 8));
+		wtv_format = 1;
+	}
+	if (wtv_format)
+		return;
 	subcc_decode(inputdata, len);
 }
 
