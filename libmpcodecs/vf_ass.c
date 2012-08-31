@@ -78,6 +78,7 @@ static int config(struct vf_instance *vf,
 
 	ass_last_pts = -303;
 
+    vf->priv->outfmt = outfmt;
     vf->priv->outh = height + ass_top_margin + ass_bottom_margin;
     vf->priv->outw = width;
 
@@ -371,7 +372,7 @@ static int query_format(struct vf_instance *vf, unsigned int fmt)
     case IMGFMT_YV12:
     case IMGFMT_I420:
     case IMGFMT_IYUV:
-        return vf_next_query_format(vf, vf->priv->outfmt);
+        return vf_next_query_format(vf, fmt) | VFCAP_EOSD;
     }
     return 0;
 }
@@ -404,10 +405,10 @@ static const unsigned int fmt_list[] = {
 static int vf_open(vf_instance_t *vf, char *args)
 {
     int flags;
-    vf->priv->outfmt = vf_match_csp(&vf->next, fmt_list, IMGFMT_YV12);
-    if (vf->priv->outfmt)
-        flags = vf_next_query_format(vf, vf->priv->outfmt);
-    if (!vf->priv->outfmt || (vf->priv->auto_insert && flags & VFCAP_EOSD)) {
+    unsigned outfmt = vf_match_csp(&vf->next, fmt_list, IMGFMT_YV12);
+    if (outfmt)
+        flags = vf_next_query_format(vf, outfmt);
+    if (!outfmt || (vf->priv->auto_insert && flags & VFCAP_EOSD)) {
         uninit(vf);
         return 0;
     }
