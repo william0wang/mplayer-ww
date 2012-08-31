@@ -358,6 +358,9 @@ extern int mkv_realdemux;
 
 // decode a frame
 static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
+
+	if (len <= 0 && !data) return NULL; // delay flush
+
 	mp_image_t* mpi;
 	unsigned long result;
 	uint8_t *buf = data;
