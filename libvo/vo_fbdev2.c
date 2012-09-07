@@ -91,6 +91,7 @@ static void set_bpp(struct fb_var_screeninfo *p, int bpp)
 
 static char *fb_dev_name = NULL; // such as /dev/fb0
 static int fb_dev_fd; // handle for fb_dev_name
+static int fb_omap; // whether this looks like a omapfb device
 static uint8_t *frame_buffer = NULL; // mmap'd access to fbdev
 static uint8_t *center = NULL; // where to begin writing our image (centered?)
 static struct fb_fix_screeninfo fb_finfo; // fixed info
@@ -100,7 +101,6 @@ static unsigned short fb_ored[256], fb_ogreen[256], fb_oblue[256];
 static struct fb_cmap fb_oldcmap = { 0, 256, fb_ored, fb_ogreen, fb_oblue };
 static int fb_cmap_changed = 0; //  to restore map
 static int fb_pixel_size;	// 32:  4  24:  3  16:  2  15:  2
-static int fb_bpp;		// 32: 32  24: 24  16: 16  15: 15
 static size_t fb_size; // size of frame_buffer
 static int fb_line_len; // length of one line in bytes
 static void (*draw_alpha_p)(int w, int h, unsigned char *src,
@@ -181,14 +181,10 @@ static int fb_preinit(int reset)
 		mp_msg(MSGT_VO, MSGL_ERR, "[fbdev2] Can't get VSCREENINFO: %s\n", strerror(errno));
 		goto err_out;
 	}
+	// random ioctl to check if we seem to run on OMAPFB
+#define OMAPFB_SYNC_GFX (('O' << 8) | 37)
+	fb_omap = ioctl(fb_dev_fd, OMAPFB_SYNC_GFX) == 0;
 	fb_orig_vinfo = fb_vinfo;
-
-	fb_bpp = fb_vinfo.bits_per_pixel;
-
-	/* 16 and 15 bpp is reported as 16 bpp */
-	if (fb_bpp == 16)
-		fb_bpp = fb_vinfo.red.length + fb_vinfo.green.length +
-			fb_vinfo.blue.length;
 
 	fb_err = 0;
 	return 0;
@@ -229,14 +225,8 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 		return 1;
 	}
 
-	switch (fb_bpp) {
-		case 32: draw_alpha_p = vo_draw_alpha_rgb32; break;
-		case 24: draw_alpha_p = vo_draw_alpha_rgb24; break;
-		case 16: draw_alpha_p = vo_draw_alpha_rgb16; break;
-		case 15: draw_alpha_p = vo_draw_alpha_rgb15; break;
-		case 12: draw_alpha_p = vo_draw_alpha_rgb12; break;
-		default: return 1;
-	}
+	draw_alpha_p = vo_get_draw_alpha(format);
+	fb_pixel_size = pixel_stride(format);
 
 	if (vo_config_count == 0) {
 		if (ioctl(fb_dev_fd, FBIOGET_FSCREENINFO, &fb_finfo)) {
@@ -272,7 +262,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 				break;
 			default:
 				mp_msg(MSGT_VO, MSGL_ERR, "[fbdev2] visual: %d not yet supported\n", fb_finfo.visual);
-				return 1;
+				break;
 		}
 
 		fb_size = fb_finfo.smem_len;
@@ -293,7 +283,30 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 		return 1;
 	}
 #endif
-	if (fs) memset(frame_buffer, '\0', fb_line_len * fb_vinfo.yres);
+	if (fs) {
+		int len = fb_line_len * fb_vinfo.yres;
+		int i;
+		switch (format) {
+		case IMGFMT_YUY2:
+			for (i = 0; i < len - 3;) {
+				frame_buffer[i++] = 0;
+				frame_buffer[i++] = 0x80;
+				frame_buffer[i++] = 0;
+				frame_buffer[i++] = 0x80;
+			}
+			break;
+		case IMGFMT_UYVY:
+			for (i = 0; i < len - 3;) {
+				frame_buffer[i++] = 0x80;
+				frame_buffer[i++] = 0;
+				frame_buffer[i++] = 0x80;
+				frame_buffer[i++] = 0;
+			}
+			break;
+		default:
+			memset(frame_buffer, 0, len);
+		}
+	}
 
 	return 0;
 }
@@ -302,11 +315,25 @@ static int query_format(uint32_t format)
 {
 	// open the device, etc.
 	if (fb_preinit(0)) return 0;
-	if ((format & IMGFMT_BGR_MASK) == IMGFMT_BGR) {
+	// At least IntelFB silently ignores nonstd value,
+	// so we can run the ioctl check only if already
+	// determined we are running on OMAPFB
+	if (fb_omap && (format == IMGFMT_YUY2 ||
+	                format == IMGFMT_UYVY)) {
+		fb_vinfo.xres_virtual = fb_vinfo.xres;
+		fb_vinfo.yres_virtual = fb_vinfo.yres;
+		fb_vinfo.nonstd = format == IMGFMT_YUY2 ? 8 : 1;
+		if (ioctl(fb_dev_fd, FBIOPUT_VSCREENINFO, &fb_vinfo) == 0)
+			return VFCAP_CSP_SUPPORTED|VFCAP_CSP_SUPPORTED_BY_HW|VFCAP_ACCEPT_STRIDE;
+		return 0;
+	}
+	if (IMGFMT_IS_BGR(format)) {
+		int bpp;
 		int fb_target_bpp = format & 0xff;
 		set_bpp(&fb_vinfo, fb_target_bpp);
 		fb_vinfo.xres_virtual = fb_vinfo.xres;
 		fb_vinfo.yres_virtual = fb_vinfo.yres;
+		fb_vinfo.nonstd = 0;
 		if (ioctl(fb_dev_fd, FBIOPUT_VSCREENINFO, &fb_vinfo))
 			// Needed for Intel framebuffer with 32 bpp
 			fb_vinfo.transp.length = fb_vinfo.transp.offset = 0;
@@ -314,11 +341,10 @@ static int query_format(uint32_t format)
 			mp_msg(MSGT_VO, MSGL_ERR, "[fbdev2] Can't put VSCREENINFO: %s\n", strerror(errno));
 			return 0;
 		}
-		fb_pixel_size = fb_vinfo.bits_per_pixel / 8;
-		fb_bpp = fb_vinfo.bits_per_pixel;
-		if (fb_bpp == 16)
-			fb_bpp = fb_vinfo.red.length + fb_vinfo.green.length + fb_vinfo.blue.length;
-		if (fb_bpp == fb_target_bpp)
+		bpp = fb_vinfo.bits_per_pixel;
+		if (bpp == 16)
+			bpp = fb_vinfo.red.length + fb_vinfo.green.length + fb_vinfo.blue.length;
+		if (bpp == fb_target_bpp)
 			return VFCAP_CSP_SUPPORTED|VFCAP_CSP_SUPPORTED_BY_HW|VFCAP_ACCEPT_STRIDE;
 	}
 	return 0;
