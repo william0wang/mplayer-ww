@@ -44,7 +44,12 @@
 #include <EGL/egl.h>
 #include "x11_common.h"
 #endif
+#ifdef CONFIG_GL_OSX
+#include "osx_common.h"
+#include <OpenGL/OpenGL.h>
+#else
 #include <GL/gl.h>
+#endif
 
 // workaround for some gl.h headers
 #ifndef GLAPIENTRY
@@ -451,6 +456,7 @@ enum MPGLType {
   GLTYPE_X11,
   GLTYPE_SDL,
   GLTYPE_EGL_X11,
+  GLTYPE_OSX,
   GLTYPE_COUNT
 };
 
