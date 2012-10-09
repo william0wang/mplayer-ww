@@ -631,6 +631,10 @@ static int create_window(uint32_t d_width, uint32_t d_height, uint32_t flags, co
   if (glctx.type == GLTYPE_W32 && !vo_w32_config(d_width, d_height, flags))
     return -1;
 #endif
+#ifdef CONFIG_GL_OSX
+  if (glctx.type == GLTYPE_OSX && !vo_osx_config(d_width, d_height, flags))
+    return -1;
+#endif
 #ifdef CONFIG_GL_EGL_X11
   if (glctx.type == GLTYPE_EGL_X11) {
     XVisualInfo vinfo = { .visual = CopyFromParent, .depth = CopyFromParent };
@@ -685,6 +689,14 @@ static int create_window(uint32_t d_width, uint32_t d_height, uint32_t flags, co
   return 0;
 }
 
+#ifdef CONFIG_GL_OSX
+static void osx_redraw(void)
+{
+  // resize will call redraw to refresh the screen
+  resize(vo_dwidth, vo_dheight);
+}
+#endif
+
 /* connect to server, create and map window,
  * allocate colors and (shared) memory
  */
@@ -715,6 +727,9 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
   }
   initGl(vo_dwidth, vo_dheight);
 
+#ifdef CONFIG_GL_OSX
+  vo_osx_redraw_func = osx_redraw;
+#endif
   return 0;
 }
 
@@ -1338,6 +1353,7 @@ static int preinit_internal(const char *arg, int allow_sw)
               "    1: X11/GLX\n"
               "    2: SDL\n"
               "    3: X11/EGL (experimental)\n"
+              "    4: OSX/Cocoa\n"
               "\n" );
       return -1;
     }
@@ -1354,6 +1370,14 @@ static int preinit_internal(const char *arg, int allow_sw)
     } else if (use_ycbcr == -1) {
       // rare feature, not worth creating a window to detect
       use_ycbcr = 0;
+    }
+    if (glctx.type == GLTYPE_OSX && vo_doublebuffering) {
+      // doublebuffering causes issues when e.g. drawing yuy2 textures
+      // (nothing is draw) unless using glfinish which makes things slow.
+      // This is possibly because we do not actually request a double-buffered
+      // context.
+      mp_msg(MSGT_VO, MSGL_INFO, "[gl] -double not supported on OSX, switching to -nodouble\n");
+      vo_doublebuffering = 0;
     }
     if (many_fmts)
       mp_msg(MSGT_VO, MSGL_INFO, "[gl] using extended formats. "

@@ -451,6 +451,15 @@ static uint32_t Directx_InitDirectDraw(void)
     return 0;
 }
 
+static void clear_window(void)
+{
+    HDC dc = vo_w32_get_dc(vo_w32_window);
+    RECT r;
+    GetClientRect(vo_w32_window, &r);
+    FillRect(dc, &r, vo_fs || vidmode ? blackbrush : colorbrush);
+    vo_w32_release_dc(vo_w32_window, dc);
+}
+
 static uint32_t Directx_ManageDisplay(void)
 {
     HRESULT ddrval;
@@ -470,16 +479,23 @@ static uint32_t Directx_ManageDisplay(void)
         width   += vo_panscan_x;
         height  += vo_panscan_y;
     }
-    width    = FFMIN(width, vo_screenwidth);
-    height   = FFMIN(height, vo_screenheight);
     rd.left += (vo_dwidth - width) / 2;
     rd.top  += (vo_dheight - height) / 2;
 
     rd.right  = rd.left + width;
     rd.bottom = rd.top + height;
 
+    if(nooverlay) {
+        g_lpddclipper->lpVtbl->SetHWnd(g_lpddclipper, 0, vo_w32_window);
+        // clear borders. FIXME: this causes flickering
+        if (width < vo_dwidth || height < vo_dheight)
+            clear_window();
+        // For nooverlay we are done, the blitter can handle
+        // a destination RECT larger than the window.
+        return 0;
+    }
     /*ok, let's workaround some overlay limitations*/
-    if (!nooverlay) {
+    {
         uint32_t uStretchFactor1000;                 //minimum stretch
         uint32_t xstretch1000, ystretch1000;
 
@@ -566,8 +582,6 @@ static uint32_t Directx_ManageDisplay(void)
             dwUpdateFlags |= DDOVER_KEYDESTOVERRIDE;
         else if (!tmp_image)
             vo_ontop = 1;
-    } else {
-        g_lpddclipper->lpVtbl->SetHWnd(g_lpddclipper, 0, vo_w32_window);
     }
 
     /*make sure the overlay is inside the screen*/
@@ -576,10 +590,7 @@ static uint32_t Directx_ManageDisplay(void)
     rd.bottom = FFMIN(rd.bottom, vo_screenheight);
     rd.right  = FFMIN(rd.right,  vo_screenwidth);
 
-    /*for nonoverlay mode we are finished, for overlay mode we have to display the overlay first*/
-    if (nooverlay)
-        return 0;
-
+    /* Now reconfigure/show the overlay */
 //    printf("overlay: %i %i %ix%i\n",rd.left,rd.top,rd.right - rd.left,rd.bottom - rd.top);
     ddrval = g_lpddsOverlay->lpVtbl->UpdateOverlay(g_lpddsOverlay, &rs, g_lpddsPrimary, &rd, dwUpdateFlags, &ovfx);
     if (FAILED(ddrval)) {
@@ -610,13 +621,8 @@ static void check_events(void)
     int evt = vo_w32_check_events();
     if (evt & (VO_EVENT_RESIZE | VO_EVENT_MOVE))
         Directx_ManageDisplay();
-    if (evt & (VO_EVENT_RESIZE | VO_EVENT_MOVE | VO_EVENT_EXPOSE)) {
-        HDC dc = vo_w32_get_dc(vo_w32_window);
-        RECT r;
-        GetClientRect(vo_w32_window, &r);
-        FillRect(dc, &r, vo_fs || vidmode ? blackbrush : colorbrush);
-        vo_w32_release_dc(vo_w32_window, dc);
-    }
+    if (evt & (VO_EVENT_RESIZE | VO_EVENT_MOVE | VO_EVENT_EXPOSE))
+        clear_window();
 }
 
 //find out supported overlay pixelformats
@@ -1129,6 +1135,11 @@ static int control(uint32_t request, void *data)
         return VO_TRUE;
     case VOCTRL_FULLSCREEN:
         vo_w32_fullscreen();
+        Directx_ManageDisplay();
+        return VO_TRUE;
+    case VOCTRL_GET_PANSCAN:
+        return VO_TRUE;
+    case VOCTRL_SET_PANSCAN:
         Directx_ManageDisplay();
         return VO_TRUE;
     case VOCTRL_SET_EQUALIZER: {

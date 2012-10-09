@@ -50,8 +50,6 @@ int ass_process_subtitle(ASS_Track* track, subtitle* sub);
 ASS_Track* ass_read_subdata(ASS_Library* library, sub_data* subdata, double fps);
 ASS_Track* ass_read_stream(ASS_Library* library, const char *fname, char *charset);
 
-void ass_configure(ASS_Renderer* priv, int w, int h, int hinting);
-void ass_configure_fonts(ASS_Renderer* priv);
 void ass_mp_reset_config(ASS_Library *l);
 ASS_Library* ass_init(void);
 
@@ -61,7 +59,6 @@ typedef struct {
 } EOSD_ImageList;
 
 extern int ass_force_reload;
-ASS_Image* ass_mp_render_frame(ASS_Renderer *priv, ASS_Track* track, long long now, int* detect_change);
 
 /**
  * Initialize the use of EOSD for ASS subtitles rendering.

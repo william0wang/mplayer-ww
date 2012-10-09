@@ -3572,8 +3572,8 @@ as well as directx, corevideo, quartz, ggi and gl_tiled.
 Enables pan-and-scan functionality (cropping the sides of e.g.\& a 16:9
 movie to make it fit a 4:3 display without black bands).
 The range controls how much of the image is cropped.
-Only works with the xv, xmga, mga, gl, gl_tiled, quartz, corevideo and xvidix
-video output drivers.
+Only works with the directx, xv, xmga, mga, gl, gl_tiled, quartz,
+corevideo and xvidix video output drivers.
 .br
 .I NOTE:
 Values between \-1 and 0 are allowed as well, but highly experimental
@@ -3587,7 +3587,6 @@ Positive values mean multiples of the default range.
 Negative numbers mean you can zoom in up to a factor of \-panscanrange+1.
 E.g.\& \-panscanrange \-3 allows a zoom factor of up to 4.
 This feature is experimental.
-Do not report bugs unless you are using \-vo gl.
 .
 .TP
 .B \-refreshrate <Hz>
@@ -4041,6 +4040,7 @@ Mac OS X CoreVideo video output driver
 .PD 0
 .RSs
 .IPs device_id=<number>
+DEPRECATED, use \-xineramascreen instead.
 Choose the display device to use for fullscreen or set it to \-1 to
 always use the same screen the video window is on (default: \-1 \- auto).
 .IPs shared_buffer
@@ -4150,6 +4150,8 @@ Select the backend/OpenGL implementation to use (default: -1).
 2: SDL
 .br
 3: X11/EGL (highly experimental)
+.br
+4: OSX/Cocoa
 .RE
 .IPs (no)ati\-hack
 ATI drivers may give a corrupted image when PBOs are used (when using \-dr

@@ -311,7 +311,11 @@ int glFindFormat(uint32_t fmt, int *bpp, GLint *gl_texfmt,
       *gl_texfmt = GL_RGB;
       *bpp = 16;
       *gl_format = GL_YCBCR_422_APPLE;
+#if HAVE_BIGENDIAN
       *gl_type = fmt == IMGFMT_YUY2 ? GL_UNSIGNED_SHORT_8_8 : GL_UNSIGNED_SHORT_8_8_REV;
+#else
+      *gl_type = fmt == IMGFMT_UYVY ? GL_UNSIGNED_SHORT_8_8 : GL_UNSIGNED_SHORT_8_8_REV;
+#endif
       break;
 #if 0
     // we do not support palettized formats, although the format the
@@ -2276,6 +2280,9 @@ static int setGlWindow_dummy(MPGLContext *ctx) {
 static void releaseGlContext_dummy(MPGLContext *ctx) {
 }
 
+static void swapGlBuffers_dummy(MPGLContext *ctx) {
+}
+
 static int dummy_check_events(void) {
   return 0;
 }
@@ -2294,6 +2301,8 @@ int init_mpglcontext(MPGLContext *ctx, enum MPGLType type) {
   if (type == GLTYPE_AUTO) {
     int res = init_mpglcontext(ctx, GLTYPE_W32);
     if (res) return res;
+    res = init_mpglcontext(ctx, GLTYPE_OSX);
+    if (res) return res;
     res = init_mpglcontext(ctx, GLTYPE_X11);
     if (res) return res;
     res = init_mpglcontext(ctx, GLTYPE_SDL);
@@ -2304,6 +2313,7 @@ int init_mpglcontext(MPGLContext *ctx, enum MPGLType type) {
   memset(ctx, 0, sizeof(*ctx));
   ctx->setGlWindow = setGlWindow_dummy;
   ctx->releaseGlContext = releaseGlContext_dummy;
+  ctx->swapGlBuffers = swapGlBuffers_dummy;
   ctx->update_xinerama_info = dummy_update_xinerama_info;
   ctx->check_events = dummy_check_events;
   ctx->type = type;
@@ -2353,6 +2363,15 @@ int init_mpglcontext(MPGLContext *ctx, enum MPGLType type) {
     ctx->ontop = vo_x11_ontop;
     return vo_init();
 #endif
+#ifdef CONFIG_GL_OSX
+  case GLTYPE_OSX:
+    ctx->swapGlBuffers = vo_osx_swap_buffers;
+    ctx->update_xinerama_info = vo_osx_update_xinerama_info;
+    ctx->check_events = vo_osx_check_events;
+    ctx->fullscreen = vo_osx_fullscreen;
+    ctx->ontop = vo_osx_ontop;
+    return vo_osx_init();
+#endif
   default:
     return 0;
   }
@@ -2374,6 +2393,11 @@ void uninit_mpglcontext(MPGLContext *ctx) {
 #ifdef CONFIG_GL_SDL
   case GLTYPE_SDL:
     vo_sdl_uninit();
+    break;
+#endif
+#ifdef CONFIG_GL_OSX
+  case GLTYPE_OSX:
+    vo_osx_uninit();
     break;
 #endif
   }

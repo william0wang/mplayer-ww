@@ -41,6 +41,7 @@ if test -e ffmpeg/.svn ; then
 fi
 
 if test -e ffmpeg/mp_auto_pull ; then
+    (cd ffmpeg && git checkout master)
     if ! (cd ffmpeg && git pull --rebase --ff-only) ; then
         echo "git pull failed, (re)move ffmpeg/mp_auto_pull to disable pulling"
         exit 1
@@ -50,7 +51,7 @@ fi
 if ! test -e ffmpeg ; then
     echo "No FFmpeg checkout, press enter to download one with git or CTRL+C to abort"
     read tmp
-    if ! git clone --depth 1 git://git.videolan.org/ffmpeg.git ffmpeg ; then
+    if ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
         rm -rf ffmpeg
         echo "Failed to get a FFmpeg checkout"
         exit 1
@@ -430,9 +431,7 @@ Codecs:
   --enable-vf-lavfi         enable libavfilter wrapper [disabled]
   --disable-libavcodec_mpegaudio_hp disable high precision audio decoding
                                     in libavcodec [enabled]
-  --disable-tremor-internal disable internal Tremor [enabled]
-  --enable-tremor-low       enable lower accuracy internal Tremor [disabled]
-  --enable-tremor           enable external Tremor [autodetect]
+  --enable-tremor           enable integer libvorbis [autodetect]
   --disable-libvorbis       disable libvorbis support [autodetect]
   --disable-speex           disable Speex support [autodetect]
   --disable-libgsm          disable libgsm support [autodetect]
@@ -584,7 +583,11 @@ Advanced options:
   --enable-3dnowext         enable extended 3DNow! [autodetect]
   --enable-sse              enable SSE [autodetect]
   --enable-sse2             enable SSE2 [autodetect]
+  --enable-sse3             enable SSE3 [autodetect]
   --enable-ssse3            enable SSSE3 [autodetect]
+  --enable-sse4             enable SSE4 [autodetect]
+  --enable-sse42            enable SSE4.2 [autodetect]
+  --enable-avx              enable AVX [autodetect]
   --enable-shm              enable shm [autodetect]
   --enable-altivec          enable AltiVec (PowerPC) [autodetect]
   --enable-armv5te          enable DSP extensions (ARM) [autodetect]
@@ -637,7 +640,11 @@ _3dnowext=auto
 _mmxext=auto
 _sse=auto
 _sse2=auto
+_sse3=auto
 _ssse3=auto
+_sse4_1=auto
+_sse4_2=auto
+_avx=auto
 _cmov=auto
 _fast_cmov=auto
 _fast_clz=auto
@@ -748,8 +755,6 @@ _mp3lame_lavc=auto
 _toolame=auto
 _twolame=auto
 _tremor=auto
-_tremor_internal=yes
-_tremor_low=no
 _libvorbis=auto
 _speex=auto
 _libgsm=auto
@@ -1153,10 +1158,6 @@ for ac_option do
   --disable-libgsm)     _libgsm=no      ;;
   --enable-tremor)      _tremor=yes     ;;
   --disable-tremor)     _tremor=no      ;;
-  --enable-tremor-internal)     _tremor_internal=yes    ;;
-  --disable-tremor-internal)    _tremor_internal=no     ;;
-  --enable-tremor-low)  _tremor_low=yes ;;
-  --disable-tremor-low) _tremor_low=no  ;;
   --enable-theora)      _theora=yes     ;;
   --disable-theora)     _theora=no      ;;
   --enable-mpg123)      _mpg123=yes     ;;
@@ -1453,8 +1454,16 @@ for ac_option do
   --disable-sse) _sse=no ;;
   --enable-sse2) _sse2=yes ;;
   --disable-sse2) _sse2=no ;;
+  --enable-sse3) _sse3=yes ;;
+  --disable-sse3) _sse3=no ;;
   --enable-ssse3) _ssse3=yes ;;
   --disable-ssse3) _ssse3=no ;;
+  --enable-sse4) _sse4_1=yes;;
+  --disable-sse4) _sse4_1=no;;
+  --enable-sse42) _sse4_2=yes;;
+  --disable-sse42) _sse4_2=no;;
+  --enable-avx) _avx=yes;;
+  --disable-avx) _avx=no;;
   --enable-mmxext) _mmxext=yes ;;
   --disable-mmxext) _mmxext=no ;;
   --enable-3dnow) _3dnow=yes ;;
@@ -1828,7 +1837,7 @@ if x86 ; then
   exts=$($_cpuinfo | egrep 'features|flags' | cut -d ':' -f 2 | head -n 1)
 
   pparam=$(echo $exts | sed -e s/k6_mtrr/mtrr/ -e s/cyrix_arr/mtrr/ -e s/centaur_mcr/mtrr/ \
-                            -e s/xmm/sse/ -e s/kni/sse/)
+                            -e s/xmm/sse/ -e s/kni/sse/ -e s/pni/sse3/)
   # SSE implies MMX2, but not all SSE processors report the mmxext CPU flag.
   pparam=$(echo $pparam | sed -e 's/sse/sse mmxext/')
 
@@ -1881,7 +1890,11 @@ EOF
   extcheck $_3dnowext "3dnowext" "pswapd %%mm0, %%mm0"
   extcheck $_sse      "sse"      "xorps %%xmm0, %%xmm0" || _gcc3_ext="$_gcc3_ext -mno-sse"
   extcheck $_sse2     "sse2"     "xorpd %%xmm0, %%xmm0" || _gcc3_ext="$_gcc3_ext -mno-sse2"
+  extcheck $_sse3     "sse3"     "addsubps %%xmm0, %%xmm0"
   extcheck $_ssse3    "ssse3"    "pabsd %%xmm0, %%xmm0"
+  extcheck $_sse4_1   "sse4_1"   "pmaxsb %%xmm0, %%xmm0"
+  extcheck $_sse4_2   "sse4_2"   "pcmpgtq %%xmm0, %%xmm0"
+  extcheck $_avx      "avx"      "vpabsw %%xmm0, %%xmm0"
   extcheck $_cmov     "cmov"     "cmovb %%eax,  %%ebx"
 
   echocheck "mtrr support"
@@ -2533,7 +2546,11 @@ if test "$_runtime_cpudetection" = yes ; then
     test "$_mmxext"   != no && _mmxext=yes
     test "$_sse"      != no && _sse=yes
     test "$_sse2"     != no && _sse2=yes
+    test "$_sse3"     != no && _sse3=yes
     test "$_ssse3"    != no && _ssse3=yes
+    test "$_sse4_1"   != no && _sse4_1=yes
+    test "$_sse4_2"   != no && _sse4_2=yes
+    test "$_avx"      != no && _avx=yes
     test "$_mtrr"     != no && _mtrr=yes
   fi
   if ppc; then
@@ -2552,7 +2569,9 @@ short ascii_name[] = {
 int main(void) { return (long)ascii_name; }
 EOF
   if cc_check ; then
-    if strings $TMPEXE | grep -q -l MPlayerBigEndian ; then
+    # stdin is used to make "strings" not try something clever like
+    # parse executable section headers (and possibly fail in the process)
+    if strings < $TMPEXE | grep -q -l MPlayerBigEndian ; then
       _big_endian=yes
     else
       _big_endian=no
@@ -2761,7 +2780,7 @@ def_ebx_available='#define HAVE_EBX_AVAILABLE 0'
 def_xmm_clobbers='#define HAVE_XMM_CLOBBERS 0'
 
 if x86_64 ; then
-inline_asm_check '"mov (%eax), %eax"' || die "Your binutils version is too old to compile for 64-bit"
+inline_asm_check '"mov (%eax), %eax"' || die "Your binutils version is too old to compile for 64-bit (on OSX try --cc=clang)"
 fi
 
 if x86 ; then
@@ -3012,7 +3031,7 @@ if arm ; then
   echores "$_iwmmxt"
 fi
 
-cpuexts_all='ALTIVEC AVX MMX MMX2 MMXEXT AMD3DNOW AMD3DNOWEXT SSE SSE2 SSSE3 SSE4 FAST_CMOV CMOV FAST_CLZ ARMV5TE ARMV6 ARMV6T2 ARMVFP VFPV3 NEON IWMMXT MMI VIS MVI'
+cpuexts_all='ALTIVEC AVX MMX MMX2 MMXEXT AMD3DNOW AMD3DNOWEXT SSE SSE2 SSE3 SSSE3 SSE4 SSE42 FAST_CMOV CMOV FAST_CLZ ARMV5TE ARMV6 ARMV6T2 ARMVFP VFPV3 NEON IWMMXT MMI VIS MVI'
 test "$_altivec"   = yes && cpuexts="ALTIVEC $cpuexts"
 test "$_mmx"       = yes && cpuexts="MMX $cpuexts"
 test "$_mmxext"    = yes && cpuexts="MMX2 $cpuexts"
@@ -3021,7 +3040,11 @@ test "$_3dnow"     = yes && cpuexts="AMD3DNOW $cpuexts"
 test "$_3dnowext"  = yes && cpuexts="AMD3DNOWEXT $cpuexts"
 test "$_sse"       = yes && cpuexts="SSE $cpuexts"
 test "$_sse2"      = yes && cpuexts="SSE2 $cpuexts"
+test "$_sse3"      = yes && cpuexts="SSE3 $cpuexts"
 test "$_ssse3"     = yes && cpuexts="SSSE3 $cpuexts"
+test "$_sse4_1"    = yes && cpuexts="SSE4 $cpuexts"
+test "$_sse4_2"    = yes && cpuexts="SSE42 $cpuexts"
+test "$_avx"       = yes && cpuexts="AVX $cpuexts"
 test "$_cmov"      = yes && cpuexts="CMOV $cpuexts"
 test "$_fast_cmov" = yes && cpuexts="FAST_CMOV $cpuexts"
 test "$_fast_clz"  = yes && cpuexts="FAST_CLZ $cpuexts"
@@ -5174,7 +5197,7 @@ echores "$_sdl"
 # conflicts between -lGL and -framework OpenGL
 echocheck "OpenGL"
 #Note: this test is run even with --enable-gl since we autodetect linker flags
-if (test "$_x11" = yes || test "$_sdl" = yes || win32) && test "$_gl" != no ; then
+if (test "$_x11" = yes || test "$_sdl" = yes || win32 || test "$_corevideo" = yes) && test "$_gl" != no ; then
   cat > $TMPC << EOF
 #ifdef GL_WIN32
 #include <windows.h>
@@ -5249,6 +5272,10 @@ EOF
       libs_mplayer="$libs_mplayer -lGL"
     fi
   fi
+  if test "$_corevideo" = yes ; then
+    _gl=yes
+    _gl_osx=yes
+  fi
 else
   _gl=no
 fi
@@ -5271,6 +5298,10 @@ if test "$_gl" = yes ; then
     def_gl_sdl='#define CONFIG_GL_SDL 1'
     res_comment="$res_comment sdl"
   fi
+  if test "$_gl_osx" = yes ; then
+    def_gl_osx='#define CONFIG_GL_OSX 1'
+    res_comment="$res_comment osx"
+  fi
   vomodules="opengl $vomodules"
 else
   def_gl='#undef CONFIG_GL'
@@ -5278,6 +5309,7 @@ else
   def_gl_x11='#undef CONFIG_GL_X11'
   def_gl_egl_x11='#undef CONFIG_GL_EGL_X11'
   def_gl_sdl='#undef CONFIG_GL_SDL'
+  def_gl_osx='#undef CONFIG_GL_OSX'
   novomodules="opengl $novomodules"
 fi
 echores "$_gl"
@@ -6278,34 +6310,22 @@ fi
 echores "$_toolame"
 
 echocheck "OggVorbis support"
-if test "$_tremor_internal" = yes; then
-  _libvorbis=no
-elif test "$_tremor" = auto; then
+if test "$_tremor" = auto; then
   _tremor=no
   statement_check tremor/ivorbiscodec.h 'vorbis_packet_blocksize(0, 0)' -logg -lvorbisidec && _tremor=yes && _libvorbis=no
 fi
 if test "$_libvorbis" = auto; then
   _libvorbis=no
   for vorbislibs in '-lvorbis -logg' '-lvorbis -lvorbisenc -logg' ; do
-    statement_check vorbis/vorbisenc.h 'vorbis_encode_ctl(0, 0, 0)' $vorbislibs && _libvorbis=yes && break
+    statement_check vorbis/vorbisenc.h 'vorbis_encode_ctl(0, 0, 0); ogg_stream_clear(0)' $vorbislibs && _libvorbis=yes && break
   done
 fi
-if test "$_tremor_internal" = yes ; then
+if test "$_tremor" = yes ; then
   _vorbis=yes
   def_vorbis='#define CONFIG_OGGVORBIS 1'
   def_tremor='#define CONFIG_TREMOR 1'
-  codecmodules="tremor(internal) $codecmodules"
-  res_comment="internal Tremor"
-  if test "$_tremor_low" = yes ; then
-    cflags_tremor_low="-D_LOW_ACCURACY_"
-    res_comment="internal low accuracy Tremor"
-  fi
-elif test "$_tremor" = yes ; then
-  _vorbis=yes
-  def_vorbis='#define CONFIG_OGGVORBIS 1'
-  def_tremor='#define CONFIG_TREMOR 1'
-  codecmodules="tremor(external) $codecmodules"
-  res_comment="external Tremor"
+  codecmodules="tremor $codecmodules"
+  res_comment="integer libvorbis"
   extra_ldflags="$extra_ldflags -logg -lvorbisidec"
 elif test "$_libvorbis" = yes ; then
   _vorbis=yes
@@ -6782,6 +6802,7 @@ echores "$_nemesi"
 echocheck "LIVE555 Streaming Media libraries"
 if test "$_live" = auto  && test "$networking" = yes ; then
   cat > $TMPCPP << EOF
+#define RTSPCLIENT_SYNCHRONOUS_INTERFACE 1
 #include <liveMedia.hh>
 #if (LIVEMEDIA_LIBRARY_VERSION_INT < 1141257600)
 #error Please upgrade to version 2006.03.03 or later of the "LIVE555 Streaming Media" libraries - available from <www.live555.com/liveMedia/>
@@ -6798,8 +6819,8 @@ EOF
              -I$_livelibdir/BasicUsageEnvironment/include \
              -I$_livelibdir/groupsock/include"
     ld_tmp="$_livelibdir/liveMedia/libliveMedia.a \
-            $_livelibdir/UsageEnvironment/libUsageEnvironment.a \
             $_livelibdir/BasicUsageEnvironment/libBasicUsageEnvironment.a \
+            $_livelibdir/UsageEnvironment/libUsageEnvironment.a \
             $_livelibdir/groupsock/libgroupsock.a \
             -lstdc++ $ld_sock"
     test -e "$_livelibdir/BasicUsageEnvironment/libBasicUsageEnvironment.a" &&
@@ -8131,6 +8152,8 @@ MANDIR  = \$(DESTDIR)$_mandir
 CONFDIR = \$(DESTDIR)$_confdir
 
 AR      = $_ar
+ARFLAGS = rc
+AR_O    = \$@
 AS      = $_cc
 CC      = $_cc
 CXX     = $_cc
@@ -8150,7 +8173,6 @@ CFLAGS_LIBDVDNAV         = $cflags_libdvdnav
 CFLAGS_NO_OMIT_LEAF_FRAME_POINTER = $cflags_no_omit_leaf_frame_pointer
 CFLAGS_STACKREALIGN      = $cflags_stackrealign
 CFLAGS_SVGALIB_HELPER    = $cflags_svgalib_helper
-CFLAGS_TREMOR_LOW        = $cflags_tremor_low
 
 EXTRALIBS          = $extra_ldflags $ld_static $extra_libs
 EXTRALIBS_MPLAYER  = $libs_mplayer
@@ -8224,6 +8246,7 @@ GL_WIN32 = $_gl_win32
 GL_X11 = $_gl_x11
 GL_EGL_X11 = $_gl_egl_x11
 GL_SDL = $_gl_sdl
+GL_OSX = $_gl_osx
 MATRIXVIEW = $matrixview
 GUI = $_gui
 GUI_GTK = $_gui_gtk
@@ -8295,7 +8318,6 @@ TDFXFB = $_tdfxfb
 TDFXVID = $_tdfxvid
 TGA = $_tga
 TOOLAME=$_toolame
-TREMOR_INTERNAL = $_tremor_internal
 TV = $_tv
 TV_BSDBT848 = $_tv_bsdbt848
 TV_DSHOW = $_tv_dshow
@@ -8419,6 +8441,7 @@ CONFIG_CRYSTALHD= $crystalhd
 CONFIG_ENCODERS = yes
 CONFIG_GPL      = yes
 CONFIG_MLIB     = $_mlib
+CONFIG_MPEGAUDIO=yes
 CONFIG_MUXERS   = yes
 CONFIG_NETWORK  = $networking
 CONFIG_RTPDEC   = $networking
@@ -8785,6 +8808,7 @@ $def_gl_win32
 $def_gl_x11
 $def_gl_egl_x11
 $def_gl_sdl
+$def_gl_osx
 $def_matrixview
 $def_ivtv
 $def_jpeg
@@ -8837,6 +8861,8 @@ $def_zr
 
 
 /* FFmpeg */
+#define av_restrict restrict
+
 $def_ffmpeg
 $def_ffmpeg_a
 $def_ffmpeg_so
@@ -8911,6 +8937,7 @@ $def_yasm
 #define CONFIG_SWSCALE_ALPHA 1
 
 #define HAVE_ALIGNED_STACK 1
+#define HAVE_ASM_MOD_Q 1
 #define HAVE_ATTRIBUTE_PACKED 1
 #define HAVE_GETHRTIME 0
 #define HAVE_INLINE_ASM 1
