@@ -6201,7 +6201,7 @@ if test "$_zlib" = yes ; then
   mplayer_encoders="$mplayer_encoders PNG_ENCODER"
 else
   def_zlib='#define CONFIG_ZLIB 0'
-  libavdecoders=$(echo $libavdecoders | sed -e s/FLASHSV_DECODER// -e s/FLASHSV2_DECODER// -e s/PNG_DECODER// -e s/ZMBV_DECODER// -e s/ZLIB_DECODER// -e s/DXA_DECODER// -e s/TSCC_DECODER// -e s/ZEROCODEC_DECODER//)
+  libavdecoders=$(echo $libavdecoders | sed -e s/FLASHSV_DECODER// -e s/FLASHSV2_DECODER// -e s/PNG_DECODER// -e s/ZMBV_DECODER// -e s/ZLIB_DECODER// -e s/DXA_DECODER// -e s/EXR_DECODER// -e s/TSCC_DECODER// -e s/ZEROCODEC_DECODER//)
   libavencoders=$(echo $libavencoders | sed -e s/FLASHSV_ENCODER// -e s/FLASHSV2_DECODER// -e s/FLASHSV2_ENCODER// -e s/PNG_ENCODER// -e s/ZMBV_ENCODER// -e s/ZLIB_ENCODER//)
 fi
 echores "$_zlib"
@@ -8414,6 +8414,7 @@ SLIBNAME_WITH_MAJOR = \$(SLIBNAME)-42
 CONFIG_AANDCTTABLES  = yes
 CONFIG_DCT     = yes
 CONFIG_DWT     = yes
+CONFIG_ERROR_RESILIENCE = yes
 CONFIG_FFT     = yes
 CONFIG_GOLOMB  = yes
 CONFIG_H264CHROMA = yes
@@ -8925,6 +8926,7 @@ $def_yasm
 #define CONFIG_AVSERVER 0
 #define CONFIG_FASTDIV 0
 #define CONFIG_FFSERVER 0
+#define CONFIG_FTRAPV 0
 #define CONFIG_GNUTLS 0
 #define CONFIG_GPL 1
 #define CONFIG_GRAY 0
