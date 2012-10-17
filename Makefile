@@ -353,6 +353,7 @@ SRCS_COMMON = asxparser.c \
               libmpcodecs/vd_null.c \
               libmpcodecs/vd_raw.c \
               libmpcodecs/vd_sgi.c \
+              libmpcodecs/vd_black.c \
               libmpcodecs/vf.c \
               libmpcodecs/vf_1bpp.c \
               libmpcodecs/vf_2xsai.c \
