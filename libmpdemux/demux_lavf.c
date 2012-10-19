@@ -565,11 +565,6 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
 
 	not_correct_pts = 0;
 	is_matroska_format = 0;
-    if(!strcmp("mpegts", priv->avif->name)) {
-		is_mpegts_format = 2;
-	} else if(!strcmp("matroska,webm", priv->avif->name)) {
-		is_matroska_format = 1;
-	}
 
     if(avformat_find_stream_info(avfc, NULL) < 0){
         mp_msg(MSGT_HEADER,MSGL_ERR,"LAVF_header: av_find_stream_info() failed\n");
@@ -584,6 +579,10 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
         t = av_dict_get(avfc->metadata, "major_brand", NULL, 0);
 		if(t && !strncmp("3gp", t->value, 3)) 
 			not_correct_pts = 1;
+	} else if(!strcmp("matroska,webm", priv->avif->name)) {
+		is_matroska_format = 1;
+	} else if(!strcmp("flv", priv->avif->name)) {
+		not_correct_pts = 1;
 	}
 
     for(i=0; i < avfc->nb_chapters; i++) {
