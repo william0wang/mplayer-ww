@@ -1,0 +1,1560 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-hans" lang="zh-hans" dir="ltr">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>MPlayer WW编译版 - 帮助主题</title>
+	<link rel="shortcut icon" href="img/mplayer.ico" type="image/x-icon" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/node.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/defaults.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/system.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/system-menus.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/user.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/forum.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/style.css" />
+	<link type="text/css" rel="stylesheet" media="print" href="css/print.css" />
+    <!--[if lt IE 7]><link type="text/css" rel="stylesheet" media="all" href="css/fix-ie.css" />    
+	<![endif]-->
+  </head>
+	<body class="sidebar-left">
+<!-- Layout -->
+	<div id="header-region" class="clear-block"></div>
+	<div id="wrapper">
+		<div id="container" class="clear-block">
+			<div id="header">
+				<div id="logo-floater">
+					<h1><a href="#" title="MPlayer william0wang 编译版"><img src="css/images/logo.png" alt="MPlayer william0wang 编译版" id="logo" /><span>MPlayer WW编译版 帮助文档</span></a></h1>
+				</div>
+				<ul class="links primary-links">
+					<li class="menu-144 active"><a href="http://mplayer-ww.com/?page=rel" target="_blank">最新发布版</a></li>
+					<li class="menu-144 active"><a href="http://mplayer-ww.com/?page=beta">最新测试版</a></li>
+					<li class="menu-144 active"><a href="http://mplayer-ww.com/forums/" target="_blank">BUG报告</a></li>
+				</ul>
+			</div> <!-- /header -->
+
+			<div id="sidebar-left" class="sidebar">
+				<div id="block-user-1" class="clear-block block block-user">
+					<h2>导航</h2>
+					<div class="content"><ul class="menu">
+						<li class="leaf first"><a href="default.html" title="">简介</a></li>
+						<li class="leaf active-trail">首选项说明</li>
+						<li class="leaf active-trail"><a href="changelog.html" title="">更新日志 2010</a></li>
+						<li class="leaf active-trail"><a href="changelog_old.html" title="">更新日志 2007-2009</a></li>
+						<li class="leaf last"><a href="faq.html" title="">常见问题及解答</a></li>
+					</ul></div>
+				</div>
+				<div id="block-menu-primary-links" class="clear-block block block-menu">
+					<h5>首选项说明</h5>
+					<div class="content"><ul class="menu">
+						<li class="leaf first"><a href="#player">播放器设置</a></li>
+						<li class="leaf active-trail"><a href="#video">视频设置</a></li>
+						<li class="leaf active-trail"><a href="#audio">音频设置</a></li>
+						<li class="leaf active-trail"><a href="#osd/sub">OSD/字幕设置</a></li>
+						<li class="leaf active-trail"><a href="#decode">解码器设置</a></li>
+						<li class="leaf active-trail"><a href="#profile">配置集设置</a></li>
+						<li class="leaf active-trail"><a href="#sp">高级设置</a></li>
+						<li class="leaf active-trail"><a href="#input">快捷键设置</a></li>
+						<li class="leaf active-trail"><a href="#assos">文件关联</a></li>
+						<li class="leaf active-trail"><a href="#other">其它功能</a></li>
+						<li class="leaf active-trail"><a href="#default">推荐设置</a></li>
+						<li class="leaf active-trail"><a href="#dvdnav">DVD菜单</a></li>
+						<li class="leaf active-trail"><a href="#lite">精简版与完全版</a></li>
+						<li class="leaf last"><a href="#home">主页</a></li>
+					</ul></div>
+				</div>
+
+			</div> <!-- /sidebar-left -->
+
+			<div id="center"><div id="squeeze"><div class="right-corner"><div class="left-corner">
+			<div class="breadcrumb">MEditor2</div>
+			<h2>首选项说明</h2>
+			<div class="clear-block">
+			<div id="node-4" class="node">  
+			<div class="content clear-block">
+			<ul name="播放器设置">
+				<h3 align="center">&nbsp;</h3>
+				<h3 align="center"><b><a name="player">播放器设置</a></b></h3>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table16">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>窗口独立线程</b></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table17">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				播放器窗口使用独立的线程进行处理，这样选择菜单或移动窗口时不会出现播放停顿的现象。<br>
+				在Vista、Windows 7的Aero特效下OpenGL输出会出现视频无法正常刷新的现象，因此Vista、Windows 7的Aero特效下OpenGL输出会自动停用该选项。<br>
+				在使用DirectX输出并且选择了打开文件全屏时，个别情况下可能会出现窗口消失的情况，不过还是推荐打开。</td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table202">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>显示播放器窗口</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table203">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				启动播放器时显示播放器窗口而不是文件选项对话框。</td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table204">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>隐藏边框(切换视图)</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table205">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				自动隐藏，鼠标移出屏幕后隐藏边框。<br>
+				手动隐藏，使用快捷键隐藏边框，默认快捷键为F12。</td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table24">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>特定文件单独配置</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table25">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				在文件播放时的相同目录之下寻找该特定文件的配置文件。<br>
+				例如： test.avi 相同目录中 test.avi.conf&nbsp; 来单独设置参数。<br>
+				警告: 播放未经信任的媒体可能有危险。</td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table26">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>ColorKey</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table27">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				设置为无时在DirectX输出下会出现其他程序窗口透明的现象。</td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table28">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>显示器长宽比</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table29">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				设置监视器或电视屏幕的宽高比，如果出现全屏视频未能填满整个显示器屏幕的情况时请使用该功能。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table224">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>音视频同步</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table225">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				普通模式和快速模式会加快视频同步速度，对rm文件有一定作用，但是会造成打开播放器瞬间视频速度不正常的现象。<br>
+				FLV模式和FLV强力同步模式对无法正常播放的flv文件比较有用。<br>
+				AVI修正模式对某些非常老的或损坏的avi文件播放有一定作用。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table226">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>连续播放</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table227">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				自动：原自动连续播放功能，影片结束时自动查找下一段相关视频进行播放。<br>
+				<br>
+				增强：增强的自动连续播放功能，支持与当前播放文件不同扩展名的文件连续播放。支持如下扩展名：avi，asf，wmv，.rm，rmvb，mkv，mp4，ogm，m4v，mpeg，mpg<br>
+				当参数等于 1 时，影片结束时自动查找下一段相关视频进行播放。<br>
+				当参数 n 大于 1 时，将需要自动播放的 n 个文件预先添加进当前播放列表。</td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table276">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>高精度计时器</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table277">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				Windows下的默认计时器间隔为 10-55毫秒，高精度计时器计时间隔为 1毫秒。启动后提供对视频回放的精确计时，有利于音视频同步，但会造成CPU占用率上升。</td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table290">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>提高窗口(GUI)优先级</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table291">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				当使用窗口独立线程时，窗口默认为低优先级，开启后可提高窗口响应速度，但可能会影响播放速度。</td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table292">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>打开新文件时刷新设置</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table293">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				使用菜单或拖放打开文件时，会重新读取设置，对于使用配置集的格式很有用，但打开文件时会变慢。</td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table294">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>不使用DVD菜单支持</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table295">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				不使用dvdnav支持DVD菜单，使用默认的方式播放DVD，兼容性更好。</td>
+				</table>
+
+			</ul>
+			<ul name="视频设置">
+				<h3 align="center">&nbsp;</h3>
+				<h3 align="center"><b><a name="video">视频设置</a></b></h3>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table70">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>DirectX (推荐)</b></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table71">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				Windows下的默认视频输出，兼容性最好，但无法兼容Vista、Windows 7的Aero特效。</td>
+				</table>
+				
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table228">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>Direct3D (Vista、Windows 7下推荐)</b></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table229">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				能够兼容Vista、Windows 7的Aero特效，且比OpenGL兼容性更好。<br>
+				可以进行多个视频的同时回放，而不损失质量。<br>
+				目前只能通过滤镜支持亮度、对比度、饱和度、色度和伽玛值设置。<br>
+				</table>
+				
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table228">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>OpenGL (推荐)</b></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table229">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				能够兼容Vista、Windows 7的Aero特效。<br>
+				可以进行多个视频的同时回放，而不损失质量。<br>
+				提供内置的亮度、对比度、饱和度、色度和伽玛值设置，不需要滤镜支持。<br>
+				在显卡性能较强的情况下回放的速度和质量高于DirectX输出。<br>
+				需要 GL_ARB_fragment_program 扩展和至少四个纹理单位。 提供亮度, 对比度, 饱和度,
+				色调和 gamma 控制。 对红, 绿和蓝色, Gamma 也能被独立设置。</td>
+				</table>
+				
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table298">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>OpenGL yuv=3</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table299">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				需要更高性能的显卡：使用片断程序, 用到 POW 指令。 需要 GL_ARB_fragment_program 
+				扩展和至少三个纹理单位。 提供亮度, 对比度, 饱和度, 色调和 gamma 控制。 对红, 绿和蓝色, Gamma 
+				也能被独立设置。 推荐方式通常更快。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table302">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>OpenGL yuv=4</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table303">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+					使用片断程序及附加的查询。 需要 GL_ARB_fragment_program 扩展和至少四个纹理单位。 提供亮度, 对比度, 
+					饱和度, 色调和 gamma 控制。 对红, 绿和蓝色, Gamma 也能被独立设置。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table300">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>OpenGL nVIDIA专用</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table301">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				使用寄存器组合。 这里使用 nVidia 专用的扩展 (GL_NV_register_combiners)。 
+				至少需要三个纹理单位。提供饱和度和色调的控制。<font color="#FF0000"> 此方法快速但不精确。</font></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table304">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>OpenGL ATI 旧显卡专用</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table305">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				使用 ATI 专用的方式（用于较老的显卡）。 这里使用 ATI 专用的扩展（GL_ATI_fragment_shader——不是 
+				GL_ARB_fragment_shader！）。至少需要三个纹理单位。提供饱和度和色调的控制。 
+				<font color="#FF0000">此方法快速但不精确。</font></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table306">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>OpenGL yuv=6</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table307">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				使用 3D 纹理通过查询做转换。 需要 GL_ARB_fragment_program 扩展和至少四个纹理单位。 
+				既然使用一个纹理和边框像素 。 提供亮度, 对比度, 饱和度, 色调和 gamma 控制。 对红, 绿和蓝色, Gamma 
+				也能被独立设置。<font color="#FF0000">在某些(也许是所有) ATI 显卡上极其慢(软件模拟),&nbsp; 
+				速度比其他方法更多地依赖于 GPU 内存带宽。</font></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table66">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>OpenGL 软件</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table67">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				使用软件YUV 到 RGB颜色转换，兼容于所有的 OpenGL 版本。 提供亮度, 对比度和饱和度控制。<font color="#FF0000">但会消耗更多的CPU，降低播放速度。</font></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table230">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>OpenGL第2代</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table231">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				支持 OSD 和大于最大纹理尺寸的视频。<font color="#FF0000">兼容性不如OpenGL第一代，并且无性能优势。</font></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table232">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>矩阵特效</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table233">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				以类似黑客帝国的特效方式回放视频，可选择分辨率和颜色。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table234">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>彩色文字控制台</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table235">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				以彩色文字方式在控制台中回放视频。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table236">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>输出每帧到图片</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table237">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				将视频的每帧保持为图片文件，支持JPG或PNG格式，图片文件保存在当前目录中(当前目录为影片所在目录或播放器所在目录)。使用时无视频窗口，使用系统托盘图标控制。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table238">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>输出视频到RAW文件</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table239">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				将视频流输出为无压缩的YUV 4:2:0 图像序列并储存到RAW视频文件，，视频文件保存在当前目录中。文件体积非常大，请确认是否有足够的存储空间。<br>
+				使用时无视频窗口，使用系统托盘图标控制。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table250">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>输无视频输出</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table251">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				无任何视频输出。<br>使用时无视频窗口，使用系统托盘图标控制。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table62">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>全屏进度条不闪屏</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table63">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				解决了OpenGL全屏时选择进度条闪屏问题，但是会将屏幕左下角一个像素的空间变成黑色，不过基本上很难发现。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table64">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>动态改变OSD大小</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table65">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				当窗口大小改变时, 改变 OSD 的行为方式 (默认是: 停用)。 启用时, 行为就像其他的视频输出, 对固定大小的字体更好。 停用时似乎对 
+				FreeType 更有利并使用全屏模式的边框。 无法在使用 ass 字幕的情况下正确地工作。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table72">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>允许丢帧</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table73">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				跳过显示一些帧从而在慢的机器上保持 A/V 同步。 视频滤镜不会应用到这些帧上。对于 B-帧 甚至解码也完全跳过。会使播放质量下降。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table20">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>重建文件索引</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table21">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				在没有找到索引的情况下重建文件的索引, 从而允许搜索。 对于损坏的/ 不完整的下载, 或制作低劣的文件有用。</td>
+				</table>
+
+
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table256">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>直接渲染</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table257">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				直接在显存中进行渲染，还不被所有的编解码器视频输出支持，可能导致 OSD/字幕 损坏!。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table76">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>截图滤镜</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table77">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				允许使用可以与按键绑定的被动模式下的命令以获取影片的截屏。&nbsp; 
+				命名为‘shotNNNN.png’的文件将保存在工作目录或自定义目录下，所用的编号为第一个 可以用的编号——不会覆盖任何文件。 
+				该滤镜在不用时不占用资源，并且支持任意色彩空间，所以将其打开很安全。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table78">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>截屏中渲染字体</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table79">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				将SSA/ASS的渲染移至截图滤镜之前。 这样做后的截屏内容将包含字幕。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table80">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>分辨率扩展</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table81">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				将影片的分辨率扩展（而不是缩放）至指定的值并将未缩放的原点移至x,y坐标。 可以用于把字幕/ OSD放置在该滤镜生成的黑边中。<font color="#0000FF"><br>
+				</font><font color="#FF0000">该滤镜与CoreAVC解码器冲突，使用CoreAVC解码器配置或设置了CoreAVC优先级时将自动停用该滤镜。</font><p>
+				参数为：[w:h:x:y:o:a:r] ，参数为空格时为自动扩展。<br>
+				<br>
+				&lt;w&gt;,&lt;h&gt;<br>
+				扩展后的宽、高（默认值：原始的宽、高）。 w和h的负数值将被视作为相对于原始大小的增量。<br>
+				<br>
+				示例：0:-50:0:0<br>
+				在图片的底部添加50像素的边。<br>
+				<br>
+				&lt;x&gt;,&lt;y&gt;<br>
+				原始图像在扩展后图像中的位置（默认：位于中心）<br>
+				<br>
+				&lt;o&gt;<br>
+				渲染OSD/ 字幕<br>
+				0：禁用（默认值）<br>
+				1：启用<br>
+				<br>
+				&lt;a&gt;<br>
+				扩展时适应某个宽高比而不是某个分辨率（默认值：0）。<br>
+				<br>
+				示例：800:::::4/3<br>
+				<br>
+				除非源视频有更高的分辨率，否则扩展至800x600，当出现前一种情况时，其将扩展直至填 满一个4/3宽高比的区域。<br>
+				<br>
+				&lt;r&gt;<br>
+				舍入数值以使宽和高值能被&lt;r&gt;整除（默认值：1）。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table82">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>重载高宽比</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table83">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				重载影片的高宽比, 万一播放中的文件的高宽比信息不正确或缺少。<br>
+				&nbsp;4:3 或 1.3333<br>
+				&nbsp;16:9 或 1.7777</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table84">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>切边滤镜</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table85">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				参数为：[w:h:x:y] ，参数为空格时不使用该滤镜。<br>
+				<br>
+				切割出图像的指定部分并丢弃其余部分。 对去掉宽银幕电影的黑边很有用。<br>
+				<br>
+				&lt;w&gt;,&lt;h&gt;<br>
+				切割出来部分的宽和高，默认值为原始的宽度和高度。<br>
+				<br>
+				&lt;x&gt;,&lt;y&gt;<br>
+				切割出来部分的位置，默认值是中央.</td>
+				</table>
+				
+			</ul>
+			<ul name="音频设置">
+				<h3 align="center">&nbsp;</h3>
+				<h3 align="center"><b><a name="audio">音频设置</a></b></h3>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table90">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>DirectSound</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table91">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				推荐使用，可以获得更低的音频回放延迟，但是在没用打开窗口独立线程情况下选择菜单或移动窗口时会重复播当前几秒的声音。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table240">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>Win32 WaveOut</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table241">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				Windows 默认音频输出，兼容性最好。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table246">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>输出音频到PCM/Wave文件</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table247">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				音频流输出为PCM音频并保存到wav文件中，wav文件保存在当前目录中。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table248">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>无音频输出</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table249">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				不输出任何声音。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table242">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>增益</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table243">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				锁定使用软件混音，设置最大扩音级别(以百分比为单位)。 值 200 允许你调整的音量最高达到目前级别的两倍。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table244">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>增益</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table245">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				锁定使用软件混音，设置最大扩音级别(以百分比为单位)。 值 200 允许你调整的音量最高达到目前级别的两倍。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table92">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>10波段8度均衡器</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table93">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				参数：[1:2:3:...:10]<p>10-八度波段图形均衡器, 其实现使用了 10 IIR 带通过滤器。 这意味着不管回放的是何种音频都行。10 
+				波段的中心频率各是:<br>
+				<br>
+				段号 频率<br>
+				<br>
+				0 31.25 Hz<br>
+				1 62.50 Hz<br>
+				2 125.00 Hz<br>
+				3 250.00 Hz<br>
+				4 500.00 Hz<br>
+				5 1.00 kHz<br>
+				6 2.00 kHz<br>
+				7 4.00 kHz<br>
+				8 8.00 kHz<br>
+				9 16.00 kHz<br>
+				<br>
+				如果此声音播放的采样率低于频率波段的中心频率, 此波段就被停用。 此过滤器的一个已知错误是, 最高波段的特性没有完全对称, 如果采样率 接近其波段的中心频率时。<br>
+				<br>
+				&lt;1&gt;:&lt;2&gt;:&lt;3&gt;:...:&lt;10&gt;<br>
+				<br>
+				浮点数代表各频率波段的增益分贝(dB) (-12~12)<br>
+				<br>
+				示例:&nbsp; 11:11:10:5:0:-12:0:5:12:12 <br>
+				放大声音的高端和底端的频率区段, 但几乎完全取消 1kHz 附近的声音。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table102">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>音频延迟</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table103">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				音频延迟数秒 (正或负的浮点数)，负值延迟音频，而正值延迟视频。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table274">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>音轨语言</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table275">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				指定使用音频语言的优先级列表。 例如：zh,ch,tw,en&nbsp; 代表简体中文、中文、繁体中文、英文</td>
+				</table>
+			</ul>
+			<ul name="OSD/字幕设置">
+				<h3 align="center">&nbsp;</h3>
+				<h3 align="center"><a name="osd/sub">OSD/字幕设置</a></h3>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table132">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>OSD字体</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table133">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				列表中列出的是字体目录下所有的字体文件名，选择需要的字体即可。<br>
+				也可输入其他目录下的字体如：C:\font.ttf</td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table134">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>OSD显示时间</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table135">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				在OSD中显示当前系统时间，不同选项显示效果不同。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table130">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>缩放模式</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table131">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				表示文字和 OSD 的尺度为字体高度</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table138">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>字幕字体</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table139">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				同OSD字体设置</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table142">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>字幕字体2</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table143">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				设置字幕第2字体，在影片播放过程中可以使用字体切换快捷键动态切换字体。</td>
+				</table>
+				<!--<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table120">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>字幕颜色</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table121">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				为文字字幕设置颜色。 颜色格式是 RRGGBBAA（红红绿绿蓝蓝透明）。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table122">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>边框颜色</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table123">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				为文字字幕设置边框 (轮廓) 颜色。 颜色格式是 RRGGBBAA（红红绿绿蓝蓝透明）。</td>
+				</table> -->
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table126">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>字幕延迟</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table127">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				字幕延迟 &lt;数&gt; 秒。可以是负数。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table128">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>字幕语言</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table129">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				指定使用字幕语言的优先级列表。 例如：zh,ch,tw,en&nbsp; 代表简体中文、中文、繁体中文、英文</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table118">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>SSA/ASS字幕效果</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table119">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				打开 SSA/ASS 字幕提供。 通过此选项, libass 将用于 SSA/ASS 外部字幕和 Matroska 中的字幕。 </td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table280">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>SSA/ASS黑边扩展</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table281">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				选择自动时，在未能填满屏幕的视频上方和下方增加黑边，并在黑边里显示ass、ssa、srt等字幕，可设置扩展后的高宽比。<font color="#FF0000">（不能与分辨率扩展功能同时使用）</font></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table310">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>支持SSA/ASS字体设置</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table311">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				打开 SSA/ASS 
+				字体设置支持后，MPlayer可以根据SSA/ASS字幕中的设置自动加载相应字体，如果系统中为找到合适的字体则使用默认字体。 
+				<font color="#FF0000">
+				初次使用时和系统安装新字体后，MPlayer需要更新字体缓存，这个过程可能需要几分钟时间(取决于系统性能)，请耐心等待。</font></td>
+				</table>
+			</ul>
+			<ul name="解码器设置">
+				<h3 align="center">&nbsp;</h3>
+				<h3 align="center"><b><a name="decode">解码器设置</a></b></h3>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table116">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>解码器配置文件 (codecs.ini)</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table117">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				外置默认的解码器配置文件：释放codecs.ini ，解码器设置与MPlayer内置配置相同。<br>
+				CoreAVC 优先的解码器配置：释放CoreAVC解码器优先的codecs.ini (<font color="#FF0000">会导致扩展滤镜颜色错误</font>)。<br>
+				CoreAVC DShow Native：释放DShow Native方式的CoreAVC优先的codecs.ini (<font color="#FF0000">会导致扩展滤镜颜色错误</font>)。<br
+				<br><font color="#1e8cdd">
+				安装CoreAVC：系统中安装并注册CoreAVC后，找到并将CoreAVCDecoder.ax复制到mplayer目录的codecs下即可。</font>
+				<br>
+				<br>
+				PS:使用默认设置时可以设置CoreAVC解码器优先级来使用CoreAVC解码器，但还是建议直接使用配置文件方式。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table252">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>DirectShow 分离器</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table253">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				基于Windows原生DirectShow的分离器和解码器调用方式，可完美支持大多数解码器和分离器，效果好于DShow Native。<br>
+				所有格式和编码的文件均可使用DirectShow方式播放，对于DirectShow不支持的文件则会使用内部分离器和解码器播放。<br>
+				可通过安装VSFilter实现双字幕，可以设置DriectVobSub字幕位置或关闭ASS字幕效果即可调整MPlayer的字幕位置。<br>
+				使用该功能需要安装解码器包如: K-lite、Win7codes等，否则只能支持系统默认支持的少数格式。<br><br>
+				已知问题：<br>
+				1.由于使用DirectShow，打开文件的速度会有所下降。<br>
+				2.DriectVobSub(VSFilter)选择其他字幕后可能会出现轻微不同步现象，快进快退后即可正常。<br>
+				3.少数情况下快进或快退后会出现轻微不同步现象，再次快进快退后即可正常。<br>
+				4.暂时不支持多音轨文件，请不要使用Haali等分离器的音轨切换功能。<br>
+				5.CoreAVC设置为显示托盘图标后无法自动消失。<br>
+				</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table166">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>DShow Native</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table253">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				基于Windows原生DirectShow的解码器调用方式，可支持CoreAVC、ffdshow、DiAVC、DivxH264等DShow解码器<br>
+				基于生DirectShow的解码器复制到codecs目录下(不注册)或者在系统中安装(注册)都可以正常使用。<br>
+				DShow Native正处于开发阶段，还存在一些问题。测试使用CoreAVC播放H264编码的MKV效果要好于内置的CoreAVC调用方式。<br>
+				</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table166">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>视频解码器优先级</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table253">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				播放器优先使用最上方的解码器进行解码，失败后使用其他解码器</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table166">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>音频解码器优先级</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table167">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				同视频解码器优先级设置</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table168">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>跳过所有循环过滤器</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table169">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				在 H.264 解码期间跳过循环过滤器(亦称为 "去块")。 既然被过滤的帧被当作解码依赖帧的引用, 在品质上 这比不进行去块步骤, 如不对 MPEG-2 
+				视频去块, 效果更差。 但是至少对高比特流的 HDTV 提供了大的提速且不损失视觉品质。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table170">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>跳过解码帧</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table171">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				完全跳过解码帧。 大的提速, 但是有痉挛的动作或有时糟糕的图像</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table254">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>以较低的分辨率解码</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table255">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				以较低的分辨率解码。提供大的提速，但常常导致难看的图像。 这不是有错误, 只是一个副作用, 全分辨率时不解码。<br>
+				<br>
+				&lt;数值&gt;,&lt;宽度&gt;<br>
+				0: 停用<br>
+				1: 1/2 分辨率<br>
+				2: 1/4 分辨率<br>
+				3: 1/8 分辨率<br>
+				<br>
+				如果 &lt;宽度&gt; 指定了, 只要视频的宽度超过或等于 &lt;宽度&gt;, 就使用低分辨率解码。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table172">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>缩放图像</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table173">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				参数值&lt;=8<br>
+				<br>
+				按因子 &lt;参数值&gt; 缩放图像。<br>
+				<br>
+				参数值&gt;8<br>
+				<br>
+				设置图像宽度为参数值, 并计算图像高度以保持高宽比。</td>
+				</table>
+			</ul>
+			<ul name="配置集设置">
+				<h3 align="center">&nbsp;</h3>
+				<h3 align="center"><b><a name="profile">配置集设置</a></b></h3>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table282">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>配置集</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table283">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				为某种文件格式、协议、视频输出或音频输出进行特殊设置。可以用来解决flv、rm等文件同步的特殊要求，或为DVD单独打开反交错(反拉丝)滤镜等。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table284">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>配置集分类</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table285">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				文件格式，例如：extension.flv 表示播放扩展名为flv的文件时的设置。<br>
+				协议，例如：protocol.dvd 表示播放DVD时的设置、protocol.http 表示播放HTTP地址时的设置。<br>
+				视频输出，例如：vo.directx 表示使用Directx视频输出时的设置。<br>
+				音频输出，例如：ao.dshow 表示使用DirectShow音频输出时的设置。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table286">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>添加/删除配置集</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table287">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				单击&quot;添加&quot;按钮，在列表中选择需要的配置集或输入列表中没有的配置集，确定后便可对配置集进行设置。<br>
+				单击&quot;删除&quot;按钮，删除当前选择的配置集。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table288">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>设置配置集</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table289">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				选择需要设置的配置集，然后在下面的列表中对该配置集进行设置。<br>
+				<font color="#FF0000">注意：配置集中的设置优先级高于于播放器全局设置</font></td>
+				</table>
+			</ul>
+			<ul name="高级设置">
+				<h3 align="center">&nbsp;</h3>
+				<h3 align="center"><b><a name="sp">高级设置</a></b></h3>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table158">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>自定义参数</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table159">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				可自定义首选项中没有的功能，每行一个参数，需要熟悉MPlayer配置文件格式。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table160">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>为每种关联的文件格式单独配置</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table161">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				在mplayer目录下新建SpecialConfig 文件夹，重新关联后可以为每种文件格式进行独立的配置，如 FLV文件的配置保存到 SpecialConfig 
+				文件夹下，文件名为 flv.ini ，独立配置中的参数优先级高于 mplayer.ini 中的相同设置，没有的设置从 mplayer.ini 
+				中继承，这个功能对某些格式的文件比较有用，例如FLV经常出现无法同步的现象，可以直接在flv.ini 添加如下参数：<br>
+				autosync=0<br>
+				mc=1 #这个值越小同步效果越强，如 mc=0.0001<br>
+				这样既可以使flv文件同步又不影响播放其它格式的文件。</td>
+				</table>
+			</ul>
+			<ul name="快捷键设置">
+				<h3 align="center">&nbsp;</h3>
+				<h3 align="center"><b><a name="input">快捷键设置</a></b></h3>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table154">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>添加/删除快捷键</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table155">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				直接编辑input.ini文件，来添加新快捷键，可以把快捷键设置为“无快捷键”来禁用某个快捷键或直接编辑input.ini文件。重新启动meditor2后会读取新的快捷键设置。</td>
+				</table>
+			</ul>
+			<ul name="文件关联">
+				<h3 align="center">&nbsp;</h3>
+				<h3 align="center"><b><a name="assos">文件关联</a></b></h3>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table162">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>应用关联</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table163">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				单击文件关联页面上的“关联”按钮进行关联，或单击编辑器的“确定”按钮关联并保持设置。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table174">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>Flash动画</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table175">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				关联到编辑器内置的flash播放器</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table176">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>DirectShow媒体文件</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table177">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				关联到编辑器内置的媒体播放器</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table36">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>自定义关联格式</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table37">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				单击“添加”按钮添加格式，然后编辑格式的扩展名和说明，单击编辑器的“应用”按钮保持自定义格式设置，或单击编辑器的“确定”按钮关联并保持设置</td>
+				</table>
+
+			</ul>
+			<ul name="其它功能">
+				<h3 align="center">&nbsp;</h3>
+				<h3 align="center"><b><a name="other">其它功能</a></b></h3>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table186">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>收藏夹</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table187">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				记住播放过的文件的信息：时间、音轨、字幕等<br>
+				<br>
+				收藏了多个文件时可以在收藏夹选项卡中管理收藏的文件，可以直接双击已收藏的文件来继续播放。当直接启动播放器时播放最后收藏的文件。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table308">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>Flash播放器</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table309">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				简单的Flash播放器(基于flash插件)<br>
+				<br>
+				用于播放MPlayer无法播放的swf的文件<br>
+				兼容MPlayer快捷键设置(input.ini中的设置，部分快捷键无法使用)<br>
+				支持MPlayer的全屏启动和前端显示设置(mplayer.ini中的设置)<br>
+				支持播放进度显示、播放列表、文件拖放，继承了MPlayer风格</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table196">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>媒体播放器</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table197">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				简单的媒体播放器(基于DirectShow)<br>
+				<br>
+				用于播放MPlayer无法播放的极少数的文件，如scm文件(需要相应的DirectShow插件)<br>
+				兼容MPlayer快捷键设置(input.ini中的设置，部分快捷键无法使用)<br>
+				支持MPlayer的全屏启动和前端显示设置(mplayer.ini中的设置)<br>
+				支持文件拖放、继承了MPlayer风格</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table190">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>注册/反注册Real在线</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table191">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				用于注册和反注册 Real在线视频控件，需要完全版的MPlayer。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table192">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>播放外置音频媒体</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table193">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				用于播放用于独立音频文件的媒体文件，某些格式的音频无法进行索引(快捷/快退)。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table200">
+				<tr valign="top" align="left">
+				<td width="10%">&nbsp;</td>
+				<td width="89%">
+				<b>比特精灵边下边放</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table201">
+				<tr valign="top" align="left">
+				<td width="21%">&nbsp;</td>
+				<td width="77%">
+				由于MPlayer不能很好的支持，这次直接使用内置媒体播放功能播放。</td>
+				</table>
+
+			</ul>
+			<ul name="推荐设置">
+				<h3 align="center">&nbsp;</h3>
+				<h3 align="center"><b><a name="default">推荐设置</a></b></h3>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table216">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>性能较低系统</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table217">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				参考配置：CPU 奔腾4 或 速龙xp 以下，内存256M及以下，显卡 GeFoce5200 或 RADEON 9200 及以下。<p>
+				由于系统性能较低，推荐设置以速度优化为主：<br>
+				1、使用DirectX或Direct3D视频输出。<br>
+				2、关闭除截图以外的所有视频滤镜。<br>
+				3、打开允许视频丢帧选项。<br>
+				4、播放器优先级设置为高。<br>
+				5、关闭除高级音频过滤器速度优化以外的所有音频滤镜。<br>
+				6、关闭音量增益。<br>
+				7、打开跳过循环过滤器解码设置。</td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table220">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>高性能系统</b></td>
+				</table>
+
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table221">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				参考配置：CPU Intel 奔腾D双核及以上 AMD 速龙X2 5000+及以上，内存1G及以上(Vista、Windows 7要求2G以上内存)，显卡 GeFoce6600 或 RADEON 9600及以上。<p>
+				由于系统性能较高，推荐设置以播放质量优化为主：<br>
+				1、推荐使用OpenGL或Direct3D视频输出，也可选择DirectX输出。<br>
+				2、推荐打开亮度/对比度/饱和度和色度调节滤镜(如果觉得视频较暗，可把亮度默认值设置为 3-5)。<br>
+				3、播放器优先级设置为自动或高于标准。<br>
+				4、推荐打开音量正常化滤镜。<br>
+				</table>
+				
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table222">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>Vista、Windows 7操作系统</b></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table223">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				推荐使用Direct3D或OpenGL视频输出，可兼容Aero(玻璃)特效。<br>
+				Direct3D兼容性比OpenGL更好，但Direct3D输出目前还不支持亮度/对比度/饱和度等调节功能。<br>
+				由于运行Vista、Windows 7的电脑的性能已经比较高，可参考高性能下的推荐设置。</td>
+				</table>
+			</ul>
+			<ul name="DVD菜单">
+				<h3 align="center">&nbsp;</h3>
+				<h3 align="center"><b><a name="dvdnav">DVD菜单</a></b></h3>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table216">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>DVD菜单支持(dvdnav)</b></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table217">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				使用dvdnav库支持DVD动态菜单，某些DVD会出现字幕数量检测错误问题，但不影响播放。<br>
+				<font color="#FF0000">OpenGL下需要打开动态OSD大小，使菜单高亮与画面匹配。</font>
+				</table>
+				
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table216">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>DVD菜单控制快捷键</b></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table217">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				Ctrl + Up(上): 向上<br>
+				Ctrl + Down(下): 向下<br>
+				Ctrl + Left(左): 向上<br>
+				Ctrl + Right(右): 向右<br>
+				Ctrl + 回车: 选择(当前项)<br>
+				Ctrl + Home: 根菜单<br>
+				Ctrl + End: 标题菜单</td>
+				</table>
+			</ul>
+			
+			<ul name="精简版与完全版区别">
+				<h3 align="center">&nbsp;</h3>
+				<h3 align="center"><b><a name="lite">精简版与完全版</a></b></h3>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table216">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>完全版相对于精简版的区别</b></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table217">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				1.包含了mplayer可用的所有解码器，可对一些不常见的格式进行解码。<br>
+				2.增加了对real网页内嵌视频的支持插件，也可让wmp等播放器支持rm/rmvb文件的播放。<br>
+				3.增加了多个实用的视频工具，包括MKV格式转换、MKV/PMP/FLV音视频提取、媒体信息查看、FLV文件修复、TS高清视频分割等工具，并可以用meditor2来创建工具的开始菜单项。<br>
+				4.增加了我编译的MPC播放器，增加了自动连续播放功能，完善多语言支持，用来播放mplayer无法播放的个别文件，如scm。<br>
+				</table>
+				
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table216">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>精简版与完全版的选择</b></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table217">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				如果你只是一般的用户，平时只观看电影、电视剧和动画等一般的视频，那精简版完全能满足你的需要了。<br>
+				如果你观看各种不常见的视频格式，或经常观看real内嵌视频而且不希望安装RealPlayer，或需要一些简单的附加功能时建议使用完全版。<br>
+				</table>
+			</ul>
+			
+			<ul name="主页">
+				<h3 align="center">&nbsp;</h3>
+				<h3 align="center"><b><a name="home">主页</a></b></h3>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table216">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>WW编译版</b></td>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table217">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				主页: <a href="http://mplayer-ww.sourceforge.net/">http://mplayer-ww.com/</a><br>
+				最新发布版: <a href="http://mplayer-ww.sourceforge.net/?page=rel">http://mplayer-ww.com/?page=rel</a><br>
+				最新测试版: <a href="http://mplayer-ww.sourceforge.net/?page=beta">http://mplayer-ww.com/?page=beta</a><br>
+				</table>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table216">
+				<tr valign="top" align="left">
+				<td width="10%"></td>
+				<td width="89%">
+				<b>MPlayer官方</b></td>
+				<table width="100%" border=0 rules="none" frame="void" cols="2" cellspacing="0" cellpadding="0" id="table217">
+				<tr valign="top" align="left">
+				<td width="21%"></td>
+				<td width="77%">
+				主页: <a href="http://www.mplayerhq.hu/">http://www.mplayerhq.hu/</a><br>
+				中文帮助文档: <a href="http://www.mplayerhq.hu/DOCS/man/zh_CN/mplayer.1.txt">http://www.mplayerhq.hu/DOCS/man/zh_CN/mplayer.1.txt</a><br>
+				英文帮助文档: <a href="http://www.mplayerhq.hu/DOCS/man/en/mplayer.1.txt">http://www.mplayerhq.hu/DOCS/man/en/mplayer.1.txt</a><br>
+				</table>
+				
+			</ul>
+			</div>
+
+			<div class="clear-block">
+			<div class="meta">
+			</div>
+
+			</div>
+
+			</div>
+			<div id="block-block-2" class="clear-block block block-block">
+			</div>
+			</div>
+			<div id="footer">
+				<div class="content"><p>Copyright &copy; 2000 &ndash; 2010 MPlayer Team.</p>
+				<p>Design by <a href="http://hi.baidu.com/jackiey0lee/" rel="bookmark" title="Blog">William wang</a>.</p>
+				<p><a href="https://sourceforge.net/projects/mplayer-ww/" target="_blank">SourceForge.net</a> | <a href="http://mplayer-ww.sourceforge.net/" target="_blank">HomePage</a> | <a href="http://www.mplayerhq.hu" title="MPlayer"  target="_blank">MPlayer</a></p>
+				</div>
+			</div>
+			</div></div></div></div> <!-- /.left-corner, /.right-corner, /#squeeze, /#center -->
+
+
+		</div> <!-- /container -->
+	</div>
+<!-- /layout -->
+
+    </body>
+</html>

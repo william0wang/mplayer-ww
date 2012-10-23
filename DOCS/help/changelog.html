@@ -1,0 +1,531 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-hans" lang="zh-hans" dir="ltr">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>MPlayer WW编译版 - 更新日志</title>
+	<link rel="shortcut icon" href="img/mplayer.ico" type="image/x-icon" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/node.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/defaults.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/system.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/system-menus.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/user.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/forum.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/style.css" />
+	<link type="text/css" rel="stylesheet" media="print" href="css/print.css" />
+    <!--[if lt IE 7]><link type="text/css" rel="stylesheet" media="all" href="css/fix-ie.css" />    
+	<![endif]-->
+  </head>
+	<body class="sidebar-left">
+<!-- Layout -->
+	<div id="header-region" class="clear-block"></div>
+	<div id="wrapper">
+		<div id="container" class="clear-block">
+			<div id="header">
+				<div id="logo-floater">
+					<h1><a href="#" title="MPlayer william0wang 编译版"><img src="css/images/logo.png" alt="MPlayer william0wang 编译版" id="logo" /><span>MPlayer WW编译版 帮助文档</span></a></h1>
+				</div>
+				<ul class="links primary-links">
+					<li class="menu-144 active"><a href="default_en.html">English</a></li>
+					<li class="menu-144 active"><a href="http://mplayer-ww.com/?page=rel" target="_blank">最新发布版</a></li>
+					<li class="menu-144 active"><a href="http://mplayer-ww.com/?page=beta">最新测试版</a></li>
+					<li class="menu-144 active"><a href="http://mplayer-ww.com/forums/" target="_blank">BUG报告</a></li>
+				</ul>
+			</div> <!-- /header -->
+
+			<div id="sidebar-left" class="sidebar">
+				<div id="block-user-1" class="clear-block block block-user">
+					<h2>导航</h2>
+					<div class="content"><ul class="menu">
+						<li class="leaf first"><a href="default.html" title="">简介</a></li>
+						<li class="leaf active-trail"><a href="man_page.html" title="">首选项说明</a></li>
+						<li class="leaf active-trail">更新日志 2010</li>
+						<li class="leaf active-trail"><a href="changelog_old.html" title="">更新日志 2007-2009</a></li>
+						<li class="leaf last"><a href="faq.html" title="">常见问题及解答</a></li>
+					</ul></div>
+				</div>
+				<div id="block-menu-primary-links" class="clear-block block block-menu">
+					<h5>更新日志</h5>
+					<div class="content"><ul class="menu">
+						<li class="leaf first"><a href="#MPlayerChangelog" title="">MPlayer更新日志</a></li>
+						<li class="leaf active-trail"><a href="#MEditor3Changelog">meditor(v3)更新日志</a></li>
+						<li class="leaf last"><a href="#MEditor2Changelog">MEditor2更新日志</a></li>
+					</ul></div>
+				</div>
+			</div> <!-- /sidebar-left -->
+
+			<div id="center"><div id="squeeze"><div class="right-corner"><div class="left-corner">
+			<div class="breadcrumb">Changelog</div>
+			<h2>更新日志</h2>
+			<div class="clear-block">
+			<div id="node-4" class="node">  
+			<div class="content clear-block">
+<ul name = "MPlayer更新日志">
+	<br><h2><a name="MPlayerChangelog">MPlayer 更新日志</a></h2><br>
+	<li>SVN-r35250(20121019)<br>
+	- 修正HDTV(MPET-TS/TS)文件播放的问题。<br>
+	- 修正FLV文件播放的问题(待测试)。<br>
+	- 使用 GCC 4.7.1 编译。<br>
+	<br></li>
+	<li>SVN-r35130(20120831)<br>
+	- 修正RM/RMVB文件播放结束后崩溃的问题。<br>
+	<br></li>
+	<li>SVN-r35125(20120828)<br>
+	- 修正播放和快进过程中崩溃的问题。<br>
+	<br></li>
+	<li>SVN-r35111(20120824)<br>
+	- 修正屏幕截图PNG文件未压缩的问题。<br>
+	<br></li>
+	<li>SVN-r35030(20120716)<br>
+	- 增加Direct3D自动黑位修正功能，解决画面发白的问题。<br>
+	- Direct3D黑位修正支持硬件加速。<br>
+	- 窗口模式下快捷键缩放画面支持更多尺寸。<br>
+	- 修正收藏夹中某些格式不能定位到正确位置的问题。<br>
+	<br></li>
+	<li>SVN-r35010(20120706)<br>
+	- 修正一些文件播放问题。<br>
+	<br></li>
+	<li>SVN-r34850(20120412)<br>
+	- 修正DirectShow分离器无法使用的问题。<br>
+	- 更新DirectShow分离器和解码器。<br>
+	- 更新 MediaInfo 0.7.56.0<br>
+	- 增强包更新 MPC-HC 1.6.2.4344<br>
+	<br></li>
+	<li>SVN-r34800(20120308)<br>
+	- 使用 GCC 4.6.2 编译。<br>
+	- 关于菜单中增加了一个捐助按钮。<br>
+	- 修正无法播放蓝光DVD的问题。<br>
+	- 修正屏保时间无法恢复默认值的问题。<br>
+	<br></li>
+	<li>SVN-r34771(20120224)<br>
+	- 修正无法截图的问题。<br>
+	<br></li>
+	<li>SVN-r34728(20120216)<br>
+	- 修正禁用屏保的BUG。<br>
+	<br></li>
+	<li>SVN-r34577(20120116)<br>
+	- 修正某些MP4播放问题。<br>
+	- 新的官方图标和logo。<br>
+	<br></li>
+	<li>SVN-r34393(20111205)<br>
+	- 修正一些不同步的问题。<br>
+	- 修正CoreAVC播放不正常问题。<br>
+	- 修正播放某些音视频格式无法播放问题。<br>
+	- 尝试支持LAV CUVID解码器。<br>
+	- 去掉内置的ESC退出快捷键。<br>
+	<br></li>
+	<li>SVN-r34362(20111124)<br>
+	- 修正播放MKV文件时可能出现音视频不同步问题。<br>
+	<br></li>
+	<li>SVN-r34341(20111111)<br>
+	- 使用 GCC 4.6.1 编译。<br>
+	- 增大无皮肤时窗口大小。<br>
+	<br></li>
+	<li>SVN-r34106(20110916)<br>
+	- 修正MKV播放问题。<br>
+	<br></li>
+	<li>SVN-r34029(20110901)<br>
+	- 尝试修正MKV卡的问题，待测试。<br>
+	- 新的文件关联图标(感谢 hhg1990)。<br>
+	<br></li>
+	<li>SVN-r34000(20110819)<br>
+	- 使用 lavf 作为默认 MKV 分离器。<br>
+	- 修正某些MP4/3GP文件无法播放的问题。<br>
+	- 修正某些MP4文件无法缓慢的问题。<br>
+	- 尝试修正更改屏保时间的问题。<br>
+	- 使用meditor2作为默认首选项。<br>
+	- 增加文件关联菜单项。<br>
+	<br></li>
+	<li>SVN-r33825(20110707)<br>
+	- 修正某些VOB/MPEG文件无法播放问题。<br>
+	<br></li>
+	<li>SVN-r33538(20110602)<br>
+	- 新版本使用 GCC 4.5.2 编译。<br>
+	- 使用 lavf 作为默认mp4/mov分离器。<br>
+	<br></li>
+	<li>SVN-r33064(20110310)<br>
+	- 修正未播放视频时双击界面无法打开文件的问题。<br>
+	- 首选项关联到meditor(v3)。<br>
+	- 更新subdownloader.dll。<br>
+	<br></li>
+	<li>SVN-r32800(20110121)<br>
+	- 修正最大化后当前字幕不显示的问题。<br>
+	- 更新字幕下载器2.1版，动态库2.0版。<br>
+	<br></li>
+	<li>SVN-r32669(20101201)<br>
+	- 增加打开文件菜单项，可打开带独立音轨的文件。<br>
+	- 增加打开Bluray菜单项，播放未加密的蓝光光盘。<br>
+	- 支持加密蓝光光盘播放，使用 bd:// 播放并且需要"KEYDB.cfg"文件。<br>
+	- 自动连续播放时优先播放相同扩展名的文件。<br>
+	- 修正打开URL有长度限制的问题。<br>
+	- 修正简体中文在非简体中文系统下乱码的问题。<br>
+	<br></li>
+	<li>SVN-r32630(20101118)<br>
+	- 使用lavf作为MP4和MOV解码器。<br>
+	- 修正CoreAVC与lavf解码器的兼容问题。<br>
+	- 修正同时使用CoreAVC和ASS扩展花屏的问题。<br>
+	<br></li>
+	<li>SVN-r32620(20101111)<br>
+	- 使用ffaac作为默认AAC解码器。<br>
+	- 使用ffdca作为默认DTS解码器。<br>
+	- 降低使用缓存时本地文件读取频率。<br>
+	- 修正播放某些MP4/MOV文件时卡的问题。<br>
+	- 修正播放某些MPEG-TS高清文件时卡的问题。<br>
+	<br></li>
+	<li>SVN-r32559(20101029)<br>
+	- 增加打开URL菜单项，方便打开URL地址。<br>
+	- OpenGL/Direct3D下支持鼠标X1/X2快捷键。<br>
+	- OpenGL始终创建新显示窗口(ATI显卡下待测试)。<br>
+	- 修正媒体信息显示长度可能小于0的问题。<br>
+	- 修正MKV/OGG等内嵌字幕时字幕菜单显示错误的问题。<br>
+	<br></li>
+	<li>SVN-r32510(20101019)<br>
+	- Windows 2000/XP系统下不再使用自动缓存功能。<br>
+	- 修正DirectX下最大化后视频可能超出屏幕的问题。<br>
+	- 修正OpenGL/DirectX下连续播放无法显示字幕的问题。<br>
+	- 修正使用DVDNAV播放DVD时字幕菜单错误的问题。<br>
+	- 新colorkey使用0x010203，避免DirectX全屏灰色黑边的问题。<br>
+	<br></li>
+	<li>SVN-r32492(20101015)<br>
+	- 更换默认的MKV分离器，兼容性更好。<br>
+	- 修正MKV分离器不能切换到FLAC音轨的问题。<br>
+	- 修正MKV分离器无法播放mkvmerge 4.1以上版的MKV文件的问题。<br>
+	<br></li>
+	<li>SVN-r32256(20100916)<br>
+	- 修正部分MKV、FLV文件音视频不同步的问题。<br>
+	- 修正非管理员用户无法使用DSP插件的问题。<br>
+	<br></li>
+	<li>SVN-r32128(20100910)<br>
+	- 修正使用CoreAVC时快进后视频停顿问题。<br>
+	<br></li>
+	<li>SVN-r32065(20100909)<br>
+	- 当MKV文件音频格式为cook时自动切换到DirectShow分离器。<br>
+	- 重新使用LAVF解码MKV文件，解决部分文件无法播放的问题。<br>
+	- 增加更新程序，用于检查和下载更新。(meditor v3)。<br>
+	- 修正连续播放MP4文件时宽高比可能不正确的问题。<br>
+	- 修正部分文件格式快进快退不正常的问题。<br>
+	<br></li>
+	<li>SVN-r32021(20100827)<br>
+	- 在2K/XP/2003下不使用文件读取缓冲。<br>
+	- 暂时不使用lavf解码MKV和MP3文件。<br>
+	- 修正播放结束或刷新是崩溃的问题。<br>
+	- 修正调整字幕大小时可能假死的问题。<br>
+	- 支持播放电视卡 tv:// (待测试)。<br>
+	- 新的媒体信息程序，支持MediaInfo.dll。<br>
+	- meditor v3 预览版。(当前仅有生成缩略图功能)。<br>
+	- 增加部分Codecs for DirectShow文件。<br>
+	<br></li>
+	<li>SVN-r31981(20100819)<br>
+	- 开启ASS效果时支持SRT字幕特效。<br>
+	- 修正SRT字幕特效代码直接显示的问题。<br>
+	- 修正无视频时不显示播放器窗口的问题。<br>
+	- 修正某些MKV/OGG文件播放间歇性卡的问题。<br>
+	- 修正某些MKV/OGG文件播放快进快退时关闭的问题。<br>
+	- 更新Real解码器: drvc.dll <br>
+	<br></li>
+	<li>SVN-r31918(20100805)<br>
+	- 修正播放大于2G的RM/RMVB文件时无法快进和快进缓慢的问题。<br>
+	- 修正ASF/WMV文件播放时间歇性卡的问题。<br>
+	- 修正ASF/WMV文件在2K/XP/2003下快进崩溃的问题。<br>
+	- 修正禁用电源管理在笔记本上无效的问题。<br>
+	- 修正内嵌文本字幕时间轴错误的问题。<br>
+	- 修正使用自动缓存时可能造成崩溃的问题。<br>
+	- 皮肤：支持自定义Logo背景色。<br>
+	<br></li>
+	<li>SVN-r31834(20100729)<br>
+	- 进一步优化自动缓存功能。<br>
+	- OpenGL下禁用Win7任务栏效果以避免播放器崩溃。<br>
+	- 修正某些WMV文件播放时卡的问题(待测试)。<br>
+	- 修正某些MKV、TS文件播放时卡的问题。<br>
+	- 修正某些MKV中RM编码时无法正常播放的问题。<br>
+	- 修正FLAC音频编码信息错误的问题。<br>
+	<br></li>
+	<li>SVN-r31736(20100716)<br>
+	- 强化自动缓存功能，支持更多格式和文件。<br>
+	- 字幕菜单增加更多信息方便识别。<br>
+	- 修正字幕菜单可能出现乱码的问题。<br>
+	- 默认设置中去掉FLV配置集。<br>
+	<br></li>
+	<li>SVN-r31645(20100708)<br>
+	- 增加本地文件自动缓存功能，解决高清视频播放时卡的问题。<br>
+	- 使用缓存时不再使用读取缓冲机制。<br>
+	- 修正DirectX下logo显示可能不完全的问题。<br>
+	- 新的默认皮肤。(基于IRUO v2.0，感谢cyex提供)<br>
+	<br></li>
+	<li>SVN-r31346(20100608)<br>
+	- 增加WebM格式及VP8解码器。(by official)<br>
+	- 使用lavf中的mkv分离器作为默认MKV分离器。<br>
+	- 修正直接谋些播放RAR压缩的文件有时出错的问题。<br>
+	- 修正DirectX下透明皮肤全屏幕时不能透明的问题。<br>
+	- DirectShow分离器播放结束时清理CoreAVC和VSFilter图标。<br>
+	- 更新 unrar.dll 3.93.0<br>
+	<br></li>
+	<li>SVN-r31139(20100513)<br>
+	- 新版本使用 GCC 4.5.0 编译。<br>
+	- 支持加载 DivX H.264 解码器。<br>
+	- 隐藏边框时不再限制窗口最小尺寸。<br>
+	- 未播放视频时也可以拖动任意位置移到窗口。<br>
+	- 根据文件比特率而不是视频比特率计算内存缓冲容量。<br>
+	- 忽略1秒以内的时间回退，避免字幕和时间信息闪烁。<br>
+	- 使用DirectShow分离器时优先使用VSFilter加载字幕。<br>
+	- 修正使用ASS字体时可能出现崩溃的问题。<br>
+	<br></li>
+	<li>SVN-r31105(20100430)<br>
+	- MTS/M2TS格式文件支持多线程解码。<br>
+	- 新的本地文件读取缓冲机制，取代缓存设置。(待测试)<br>
+	- 打开DVD时可直接选择光驱或文件夹，不再需要提前设置。<br>
+	- 自动检测DVD菜单，直接鼠标控制DVD菜单。<br>
+	- 播放列表显示正在播放的文件，并分开显示文件名和文件路径。<br>
+	- DirectShow分离器支持动态帧速率(vfr)视频。(例如 Firends)<br>
+	- DirectShow分离器自动尝试codecs下的分离器和解码器。(需要 Codecs for DirectShow)<br>
+	- 标题栏正在播放的文件名显示在MPlayer名称前。<br>
+	- 查看文件信息时显示更详细的容器信息。<br>
+	- 修正只有重启播放器才能切换DVD路径的问题。<br>
+	- 修正使用CoreAVC播放视频后系统托盘图标不消失问题。<br>
+	- 修正播放大于2G的RMVB文件时可能崩溃的问题。(待测试)<br>
+	<br></li>
+	<li>SVN-r31036(20100415)<br>
+	- 新版本使用GCC 4.4.3 编译。<br>
+	- 自动收藏文件时可以设置启动时是否提示。<br>
+	- 初步支持ASS/SSA"@字体"显示纵向文字。(by libass)<br>
+	- 播放列表窗口可调整大小，最小化时隐藏播放列表窗口。<br>
+	- 内存小于1.5G时不自动设置缓存，避免高码率文件无法播放的问题。<br>
+	- 修正播放无扩展名文件时可能崩溃的问题。<br>
+	- 修正最大化切换文件时无法保持状态的问题。<br>
+	- 修正打开和添加文件时不能选择过多文件的问题。<br>
+	- 修正最小化切换文件时可能出现窗口和窗口无法再次出现问题。<br>
+	- 修正单文件循环播放时无法切换到播放列表中其他文件的问题。<br>
+	- 修正使用DirectShow分离器时特殊情况下可能出现假死的问题。<br>
+	<br></li>
+	<li>SVN-r30980(20100402)<br>
+	- 增加DirectShow分离器，完美兼容大多数分离器和解码器，详情请查看帮助-解码器设置。<br>
+	- 使用DirectShow代替用AVS打开功能，可通过安装VSFilter实现双字幕。<br>
+	- FontConfig缓存存放在fonts\cache下，使用多系统时建议设置到用户目录(fonts.conf)。<br>
+	- QuickTime X 皮肤边框颜色加深。<br>
+	<br></li>
+	<li>SVN-r30929(20100319)<br>
+	- 将ffmpeg编译成动态链接库。(性能与稳定性待测试)<br>
+	- 连续播放时保存之前设置的字体大小。<br>
+	- Vista/Win7下提示自动设置缓存，解决硬盘读写时卡的问题。<br>
+	- 强制黑位修正时如果未找到需要的dll则显示提示信息。<br>
+	- 皮肤支持显示两个时间信息，详情查看readme_skin.txt。<br>
+	- 修正某些文字无法在标题栏正确显示的问题。<br>
+	- 修正皮肤文字颜色有时错误的问题。<br>
+	- 修正圆角皮肤有时失效的问题。<br>
+	- 新增 QuickTime X, QuickTime X for DirectX 皮肤。<br>
+	- 默认设置DVDNAV不使用缓存，请查看mplayer.ini。<br>
+	<br></li>
+	<li>SVN-r30800(20100305)<br>
+	- 增加了Bink分离器及解码器。(by official)<br>
+	- 增加DShowNative方式调用CoreAVC、ffdshow等解码器，详细信息请查看帮助。<br>
+	- 打开文件对话框支持Win7/Vista风格。<br>
+	- 增加WMP12的wmvsdecd解码器。<br>
+	- 使用ENCA增强字幕编码检测能力，新字幕编码参数为'enca:zh:GBK'<br>
+	- 修正OpenGL下最小化时可能假死的问题。<br>
+	- 修正Win7/Vista下调用WVC1解码器出错的问题。<br>
+	- 修正2000、XP、2003系统下播放DVD崩溃的问题。<br>
+	<br></li>
+	<li>SVN-r30509(20100205)<br>
+	- 支持包含特殊字符的Unicode文件名。<br>
+	- 支持拖放打开播放列表文件。<br>
+	- 修正只打开一个播放器无效的问题。<br>
+	- 修正禁用电源管理在Win7下无效的问题。<br>
+	- 修正不使用ASS字体时仍然更新字体缓存的问题。<br>
+	- 修正打开播放列表时也查找连续播放文件的问题。<br>
+	- 修正OpenGL下播放纯音乐时最小化可能崩溃的问题。<br>
+	- 修正OpenGL窗口模式下有时字幕显示会超出屏幕下方的问题。<br>
+	<br></li>
+	<li>SVN-r30452(20100129)<br>
+	- 增加下载字幕并自动加载显示功能，需要字幕下载器v1.2以上版本(tools\SubDownloader.exe)。<br>
+	- 字幕菜单增加'下载'菜单项，快捷键Ctrl+D，并且始终显示字幕菜单。<br>
+	- 增加将所有字幕按ASS方式渲染选项，可分开渲染不太字幕格式。<br>
+	- 修正手动打开新文件时可能不显示字幕的问题。<br>
+	- 修正新版libass造成某些中文字体边框丢失的问题。<br>
+	- 新版libass在有黑边时比例会出错，默认关闭自动黑边功能。<br>
+	<br></li>
+	<li>SVN-r30380(20100122)<br>
+	- Direct3D增加强制黑位(颜色)修正选项。<br>
+	- 使用边框皮肤时也可自动隐藏控制栏。<br>
+	- 隐藏边框时不再显示系统边框。<br>
+	- 重新开启IPv6支持且兼容Win2K系统。<br>
+	- 皮肤：可由皮肤设置是否自动隐藏和透明度。<br>
+	- 皮肤：进度条支持居中显示。<br>
+	<br></li>
+	<li>SVN-r30229(20100108)<br>
+	- DirectX支持自动隐藏控制栏。<br>
+	- 增加隐藏控制栏选项，不透明时也可隐藏。<br>
+	- 修正CoreAVC,WMV DMO与字幕黑边同时使用时造成颜色错误的问题。<br>
+	- 修正播放DVD时播放进度错误的问题。<br>
+	- 修正截图时提示Aero与DirectX不兼容造成死锁的问题。<br>
+	- 修正DPI大于96时视频均衡器窗口显示不完全的问题。<br>
+	- 暂时去掉IPv6支持以兼容win2k系统。<br>
+	- 默认配置中重新开启ASS字幕黑边扩展功能。<br>
+	- 专用于DirectX的aero_simple_directx和aero_wmp12_directx皮肤。<br>
+	<br></li>
+</ul>
+<ul name = "meditor(v3)更新日志">
+	<br><h2><a name="MEditor3Changelog">meditor(v3)更新日志</a></h2><br>
+	<li>20100602<br>
+	- 修正增加自定义关联格式后崩溃的问题。<br>
+	- 一些其他更新。<br>
+	<br></li>
+	<li>20100310<br>
+	- 增加打开meditor2按钮。<br>
+	- 修正某些设置可能丢失的问题。<br>
+	<br></li>
+	<li>20101201<br>
+	- 完成首选项-外观设置页面。<br>
+	- 完成首选项-播放器设置页面。<br>
+	- 完成首选项-额外参数设置页面。<br>
+	- 完成首选项-其它设置页面。<br>
+	- 合并massoc.exe功能<br>
+	<br></li>
+	<li>20101118<br>
+	- 自动更新增加从不同服务器下载，提高更新成功率。<br>
+	<br></li>
+	<li>20101029<br>
+	- 增加快捷键和文件关联功能。<br>
+	- 增加Flash播放器和DirectShow播放器。<br>
+	- 媒体信息增加保存到文本文件功能。<br>
+	<br></li>
+	<li>20101019<br>
+	- 清理文件前结束正在执行的程序。<br>
+	- 修正下载更新后无法自动解压的问题。<br>
+	<br></li>
+	<li>20100916<br>
+	- 自动升级成功后清理不再使用的文件。(清理文件列表: help\mcleanup.lst)<br>
+	- 修正下载更新时文字闪跃的问题。<br>
+	<br></li>
+	<li>20100910<br>
+	- 修正检查更新时将本地发布版识别为测试版的问题。<br>
+	<br></li>
+	<li>20100908<br>
+	- 增加检查并下载更新功能。<br>
+	- 修正保存缩略图更改文件名时必须手动添加.jpg的问题。<br>
+	<br></li>
+	<li>20100827<br>
+	- 提供保存缩略图功能。<br>
+	<br></li>
+</ul>
+<ul name = "MEditor2更新日志">
+	<br><h2><a name="MEditor2Changelog">MEditor2 更新日志</a></h2><br>
+	<li>20101015<br>
+	- 修正退出时可能会使系统关机的问题。<br>
+	- 修正CoreAVC优先设置无效的问题。<br>
+	- 更新codecs.ini。<br>
+	<br></li>
+	<li>20100908<br>
+	- 更新codecs.ini。<br>
+	<br></li>
+	<li>20100827<br>
+	- 去掉保存缩略图功能，由meditor v3 提供。<br>
+	- 去掉显示媒体信息功能，由单独程序提供。<br>
+	- 一些其他更新。<br>
+	<br></li>
+	<li>20100805<br>
+	- 更新codecs.ini，修改过codecs.ini设置的用户请重新保存设置。<br>
+	<br></li>
+	<li>20100729<br>
+	- 文件关联增加f4v格式。<br>
+	- 一些其他更新。<br>
+	<br></li>
+	<li>20100716<br>
+	- 修正生成缩略图启动失败的问题。<br>
+	- 修正缓存设置的一些问题。<br>
+	- 一些其他更新。<br>
+	<br></li>
+	<li>20100708<br>
+	- 增加自动缓存设置：缓存容量设置为自动。<br>
+	- 一些其他更新。<br>
+	<br></li>
+	<li>20100608<br>
+	- 基于WTL重写massoc模块。<br>
+	- 使用massoc.ini保存文件关联配置。<br>
+	- 支持删除默认关联格式。<br>
+	- 支持自定义默认关联格式信息、图标序号等。<br>
+	- 自定义文件关联格式完全兼容Vista/Win7模式。<br>
+	- DSP选项默认选择dsp_enhancer。<br>
+	- 修正XP/2003下确定或应用时可能出现关机画面的问题。<br>
+	- 一些其他更新。<br>
+	<br></li>
+	<li>20100513<br>
+	- 增加 DivX H.264 Decoder 配置。<br>
+	- 一些其他更新。<br>
+	<br></li>
+	<li>20100430<br>
+	- Flash播放器使用弹出菜单。<br>
+	- 去掉SDL音频视频输出。<br>
+	- 不再压缩程序文件提高兼容性。<br>
+	- 一些其他更新。<br>
+	<br></li>
+	<li>20100415<br>
+	- 增加启动时提示播放收藏文件选项。<br>
+	- 修正文件关联后刷新桌面的问题。<br>
+	- 一些其他更新。<br>
+	<br></li>
+	<li>20100402<br>
+	- 增加DirectShow分离器设置(解码器选项卡)。<br>
+	- 修正设置后始终显示缓存提示的问题。<br>
+	- 一些其他更新。<br>
+	<br></li>
+	<li>20100319<br>
+	- UPX压缩时不使用lzma算法以避免杀毒软件误报。(UPX居然也会误报)<br>
+	- 设置缓存的细节修改。<br>
+	- 一些其他更新。<br>
+	<br></li>
+	<li>20100305<br>
+	- 增加CoreAVC DShow Native解码器配置文件。<br>
+	- 增加CoreAVC、DiAVC、DivxH264、FFDShow等解码器优先级设置。<br>
+	- 增加Win7/Vista默认程序文件关联方式。<br>
+	- 修正swf文件关联图标无法正常显示的问题。<br>
+	- 一些其他更新。<br>
+	<br></li>
+	<li>20100205<br>
+	- 增加OpenGL(自动检测)视频输出设置，自动检测是否支持硬件颜色转换。<br>
+	<br></li>
+	<li>20100129<br>
+	- 增加将所有字幕按ASS方式渲染设置。<br>
+	- 增加了缓存设置的大小。<br>
+	- 一些其他更新。<br>
+	<br></li>
+	<li>20100118<br>
+	- 更新默认OpenGL参数可明显提高速度，请使用OpenGL的用户重新设置。<br>
+	- 增加Direct3D强制黑位修正设置。<br>
+	- 增加自动隐藏控制栏设置。<br>
+	- 一些其他更新。<br>
+	<br></li>
+	<li>20100108<br>
+	- 增加隐藏控制栏选项，要求不使用边框皮肤。<br>
+	- 增加是否提示Aero与DirectX不兼容设置。<br>
+	- 去掉矩阵特效颜色设置。<br>
+	- 更新内置快捷键说明。<br>
+	- 去掉重复的eq2滤镜。<br>
+	- 一些其他更新。<br>
+	<br></li>
+</ul>
+			</div>
+			<div class="clear-block">
+			<div class="meta">
+			</div>
+
+			</div>
+
+			</div>
+			<div id="block-block-2" class="clear-block block block-block">
+			</div>
+			</div>
+			<div id="footer">
+				<div class="content"><p>Copyright &copy; 2000 &ndash; 2010 MPlayer Team.</p>
+				<p>Design by <a href="http://hi.baidu.com/jackiey0lee/" rel="bookmark" title="Blog">William wang</a>.</p>
+				<p><a href="https://sourceforge.net/projects/mplayer-ww/" target="_blank">SourceForge.net</a> | <a href="http://mplayer-ww.sourceforge.net/" target="_blank">HomePage</a> | <a href="http://www.mplayerhq.hu" title="MPlayer"  target="_blank">MPlayer</a></p>
+				</div>
+			</div>
+			</div></div></div></div> <!-- /.left-corner, /.right-corner, /#squeeze, /#center -->
+
+
+		</div> <!-- /container -->
+	</div>
+<!-- /layout -->
+
+    </body>
+</html>

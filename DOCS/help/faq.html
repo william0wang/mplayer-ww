@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-hans" lang="zh-hans" dir="ltr">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>MPlayer WW编译版 - FAQ</title>
+	<link rel="shortcut icon" href="img/mplayer.ico" type="image/x-icon" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/node.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/defaults.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/system.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/system-menus.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/user.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/forum.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/style.css" />
+	<link type="text/css" rel="stylesheet" media="print" href="css/print.css" />
+    <!--[if lt IE 7]><link type="text/css" rel="stylesheet" media="all" href="css/fix-ie.css" />    
+	<![endif]-->
+  </head>
+	<body class="sidebar-left">
+<!-- Layout -->
+	<div id="header-region" class="clear-block"></div>
+	<div id="wrapper">
+		<div id="container" class="clear-block">
+			<div id="header">
+				<div id="logo-floater">
+					<h1><a href="#" title="MPlayer william0wang 编译版"><img src="css/images/logo.png" alt="MPlayer william0wang 编译版" id="logo" /><span>MPlayer WW编译版 帮助文档</span></a></h1>
+				</div>
+				<ul class="links primary-links">
+					<li class="menu-144 active"><a href="http://mplayer-ww.com/?page=rel" target="_blank">最新发布版</a></li>
+					<li class="menu-144 active"><a href="http://mplayer-ww.com/?page=beta">最新测试版</a></li>
+					<li class="menu-144 active"><a href="http://mplayer-ww.com/forums/" target="_blank">BUG报告</a></li>
+				</ul>
+			</div> <!-- /header -->
+
+			<div id="sidebar-left" class="sidebar">
+				<div id="block-user-1" class="clear-block block block-user">
+					<h2>导航</h2>
+					<div class="content"><ul class="menu">
+						<li class="leaf first"><a href="default.html" title="">简介</a></li>
+						<li class="leaf active-trail"><a href="man_page.html" title="">首选项说明</a></li>
+						<li class="leaf active-trail"><a href="changelog.html" title="">更新日志 2010</a></li>
+						<li class="leaf active-trail"><a href="changelog_old.html" title="">更新日志 2007-2009</a></li>
+						<li class="leaf last">常见问题及解答</li>
+					</ul></div>
+				</div>
+
+			</div> <!-- /sidebar-left -->
+
+			<div id="center"><div id="squeeze"><div class="right-corner"><div class="left-corner">
+			<div class="breadcrumb">FAQ</div>
+			<h2>常见问题及解答</h2>
+			<div class="clear-block">
+			<div id="node-4" class="node">  
+			<div class="content clear-block">
+<ul>
+	<li>1 .Q：为什么选择菜单或移动窗口时播放会停顿并且有时会重复播几秒的声音？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 	这是由于没用打开窗口独立线程造成的，重复播几秒的声音是因为音频输出选项了DirectSound，在DirectX输出下打开窗口独立线程个别情况下可能会出现一些小问题，不过还是推荐打开。</li><br>
+	<li>2 .Q：OpenGL输出有说明优势？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 	MPlayer的DirectX输出在Vista下不能使用Aero特效，OpenGL不仅能兼容Aero还可以同时进行多个视频的回放，而且在显卡性能较强的情况下速度和质量也比DirectX好。</li><br>
+	<li>3 .Q：为什么我使用OpenGL输出会出问题？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: OpenGL输出的兼容性不太好，这方面显然DirectX更好，要支持OpenGL最主要的是显卡的性能，估计能使用Vista的电脑用OpenGL基本不会有问题的。（我的6600下的OpenGL比DirectX要好）</li><br>
+	<li>4 .Q：为什么OpenGL下字幕会显示在上方？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 这是因为使用了KK版设置subpos=-1引起的，改为subpos=90就可以了，也可以使用配置编辑器重新保存一次设置。</li><br>
+	<li>5 .Q：为什么非全屏模式是播放视频会黑屏？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 这是DirectX下的一个经典问题原因未知，不过可以通过改变显卡驱动的多显示设置来恢复，也可以试试使用OpenGL输出。</li><br>
+	<li>6 .Q：为什么双击文件后无法播放？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 出现这种现象有很多种原因，最常见的原因有：<br>
+	a、影片相应的字幕文件使用的不支持的编码，可以通过将字幕文件另存为系统默认编码或Unicode编码(请将MPlayer字幕编码设置中"UTF8"改写为"UTF-8"，否则使用UTF-8编码的字幕的影片无法播放)。<br>
+	b、文件名中有乱码，可以通过改文件名来解决这个问题，或直接将文件拖动到MPlayer中播放。<br>
+	c、文件损坏或无法解码，可以通过一些修正视频的参数来尝试播放。</li><br>
+	<li>7 .Q：为什么播放的影片效果偏暗？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: MPlayer在播放一些明亮的影片时色彩更加艳丽，但是对于阴暗的影片亮度会不足，可以把默认的亮度设置为3-5，这样就不会再暗了。</li><br>
+	<li>8 .Q：为什么播放的影片有水波纹，播放效果很差？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 这是因为没有打开反隔行扫描滤镜造成的，请打开反隔行扫描滤镜。</li><br>
+	<li>9 .Q：为什么字幕无法显示到黑边里？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 这是因为没有打开扩展滤镜造成的，请打开扩展滤镜，具体参数请参考帮助文件。</li><br>
+	<li>10.Q：为什么播放器无法启动？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 这是因为播放器设置文件错误造成的，请删除 mplayer.ini 和 input.ini ，然后使用编辑器重新设置。</li><br>
+	<li>11.Q：如何改善rm、rmvb文件音视频不同步情况？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 可以打开高级音频过滤器，并将选项设置为精度优化，可大幅改善不同步情况。但是可能影响播放速度，可使用配置集单独为rm和rmvb文件打开精度优化。</li><br>
+	<li>12.Q：如何解决Vista下使用OpenGL输出时出现全屏后无法正常显示视频的问题？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 可以关闭全屏无闪屏支持来解决问题该问题(但鼠标操作会造成闪屏)，如果您习惯快捷键操作也可以通过不显示控制条来解决该问题。</li><br>
+	<li>13.Q：为什么调节字幕位置快捷键无效？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 这是SSA/ASS字幕造成的，ass字幕内有确定的位置无法进行调节，srt字幕可调节。关闭SSA/ASS特效后所有字幕位置都可以调节。</li><br>
+	<li>14.Q：为什么Vista下用OpenGL时移动窗口或进行菜单操作时播放会停顿？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 这是因为Vista下的Aero特效与OpenGL的窗口独立线程不兼容，只能关闭独立线程。当不使用Aero特效时不会出现这个问题。</li><br>
+	<li>15.Q：为什么播放FLV文件出现音视频不同步？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 这是由于FLV文件MetaData信息错误造成的，可以通过在配置集中添加 extension.flv ，并打开FLA / RM同步选项（新版默认已经打开）。</li><br>
+	<li>16.Q：全屏下如果快速退出播放器？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 默认快捷键为 ESC 和 q，请大家多看看常用快捷键操作。</li><br>
+	<li>17.Q：为什么DVD菜单位置与画面不匹配？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 因为你正在使用OpenGL输出，OpenGL下需要打开动态OSD大小(与ASS字幕不能完全兼容)，使菜单高亮与画面匹配。</li><br>
+	<li>18.Q：为什么OpenGL下OSD不能随视频改变大小？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: OpenGL下需要打开动态OSD大小功能使OSD随视频改变大小，但该功能与ASS字幕不能完全兼容。</li><br>
+	<li>19.Q：为什么sub/idx字幕没办法加载？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 这是vodsub字幕格式加载必须满足以下要求，sub和idx字幕文件名必须相同，而且必须和影片文件名完全一样才能加载(r27214以后版本仅要求包含影片文件名)，对使用rar压缩的字幕压缩包名称也有相同要求。vodsub字幕在播放文件时会自动加载，无法使用菜单或者拖放等方式手动加载。</li><br>
+	<li>20.Q：MPlayer是否支持双字幕同时显示？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 目前还不支持，在同一时间里只能显示一个字幕。</li><br>
+	<li>21.Q：为什么某些WMV文件音视频不同步？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 发现这个问题的例子文件是奥运歌曲"北京欢迎你.wmv"，这是由于这个文件的fps信息错误造成的，目前还没有好的解决办法。</li><br>
+	<li>22.Q：如何显示当前播放时间？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 使用快捷键O/o可以切换OSD显示当前播放时间和剩余时间，也可以自定义OSD快捷键。</li><br>
+	<li>23.Q：为什么播放时会有黑边？<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;A: 因为默认打开了ASS黑边自动扩展功能，只要有字幕文件就会根据显示器分辨率扩展黑边，如果不需要可以在字幕设置里关闭该功能。</li><br>
+
+
+</ul>
+			</div>
+
+			<div class="clear-block">
+			<div class="meta">
+			</div>
+
+			</div>
+
+			</div>
+			<div id="block-block-2" class="clear-block block block-block">
+			</div>
+			</div>
+			<div id="footer">
+				<div class="content"><p>Copyright &copy; 2000 &ndash; 2010 MPlayer Team.</p>
+				<p>Design by <a href="http://hi.baidu.com/jackiey0lee/" rel="bookmark" title="Blog">William wang</a>.</p>
+				<p><a href="https://sourceforge.net/projects/mplayer-ww/" target="_blank">SourceForge.net</a> | <a href="http://mplayer-ww.sourceforge.net/" target="_blank">HomePage</a> | <a href="http://www.mplayerhq.hu" title="MPlayer"  target="_blank">MPlayer</a></p>
+				</div>
+			</div>
+			</div></div></div></div> <!-- /.left-corner, /.right-corner, /#squeeze, /#center -->
+
+
+		</div> <!-- /container -->
+	</div>
+<!-- /layout -->
+
+    </body>
+</html>
