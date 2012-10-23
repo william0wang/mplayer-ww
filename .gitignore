@@ -37,8 +37,6 @@ ffmpeg/
 libvo/aspecttest
 loader/qtx/list
 loader/qtx/qtxload
-mp3lib/test
-mp3lib/test2
 TOOLS/alaw-gen
 TOOLS/alaw.dat
 TOOLS/alaw.out
@@ -69,7 +67,4 @@ mkp
 /release
 /release_console
 /release_player
-
-
-
 /mkd

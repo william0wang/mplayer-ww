@@ -592,8 +592,10 @@ int gui(int what, void *data)
                 case STREAMTYPE_DVD:
                 {
                     char tmp[512];
+#ifdef CONFIG_DVDREAD
                     dvd_chapter = guiInfo.Chapter;
                     dvd_angle = guiInfo.Angle;
+#endif
                     sprintf(tmp,"dvd://%d", guiInfo.Track);
                     uiSetFileName(NULL, tmp, SAME_STREAMTYPE);
                     break;
@@ -663,6 +665,12 @@ int gui(int what, void *data)
                     stream_control(stream, STREAM_CTRL_GET_NUM_CHAPTERS, &guiInfo.Chapters);
                     guiInfo.Angles = 0;
                     stream_control(stream, STREAM_CTRL_GET_NUM_ANGLES, &guiInfo.Angles);
+                    guiInfo.Track = 0;
+                    stream_control(stream, STREAM_CTRL_GET_CURRENT_TITLE, &guiInfo.Track);
+                    guiInfo.Track++;
+                    // guiInfo.Chapter will be set by mplayer
+                    guiInfo.Angle = 1;
+                    stream_control(stream, STREAM_CTRL_GET_ANGLE, &guiInfo.Angle);
 #ifdef CONFIG_DVDREAD
                     dvdp = stream->priv;
                     guiInfo.AudioStreams = dvdp->nr_of_channels;
@@ -670,8 +678,6 @@ int gui(int what, void *data)
                     guiInfo.Subtitles = dvdp->nr_of_subtitles;
                     memcpy(guiInfo.Subtitle, dvdp->subtitles, sizeof(dvdp->subtitles));
 #endif
-                    guiInfo.Chapter = dvd_chapter + 1;
-                    guiInfo.Angle = dvd_angle + 1;
                     break;
             }
             break;
