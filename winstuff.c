@@ -1631,7 +1631,7 @@ void check_update(void) {
 		sprintf(url, "--check-update --version %s --date %s", svn, date);
 		ShellExecute(0, NULL, nfilename, url, NULL, SW_SHOW);
 	} else {
-		sprintf(url,"http://mplayer-ww.com/?update=1&svn=%s&date=%s", svn, date);
+		sprintf(url,"http://www.mplayer-ww.com/?update=1&svn=%s&date=%s", svn, date);
 		ShellExecute(0, NULL, url, NULL, NULL, SW_NORMAL);
 	}
 	free(nfilename);

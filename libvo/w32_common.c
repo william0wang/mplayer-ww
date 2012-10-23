@@ -1849,13 +1849,13 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 						case IDM_DONATE:
 							show_cursor(3);
 							if(sys_Language == 1)
-								ShellExecute(0, NULL, "http://mplayer-ww.com/?page=donate", NULL, NULL, SW_NORMAL);
+								ShellExecute(0, NULL, "http://www.mplayer-ww.com/?page=donate", NULL, NULL, SW_NORMAL);
 							else
-								ShellExecute(0, NULL, "http://mplayer-ww.com/eng/donate.html", NULL, NULL, SW_NORMAL);
+								ShellExecute(0, NULL, "http://www.mplayer-ww.com/eng/donate.html", NULL, NULL, SW_NORMAL);
 							break;
 						case IDM_HOMEPAGE:
 							show_cursor(3);
-							ShellExecute(0, NULL, "http://mplayer-ww.com", NULL, NULL, SW_NORMAL);
+							ShellExecute(0, NULL, "http://www.mplayer-ww.com", NULL, NULL, SW_NORMAL);
 							break;
 						case IDM_MANPAGE:
 							show_cursor(3);
