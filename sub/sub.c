@@ -946,6 +946,8 @@ Breakline:
 		    obj->params.subtitle.utbl[utblc++] = c;
 		    k++;
 		}
+		if (utblc > MAX_UCS)
+		    break;
 		obj->params.subtitle.utbl[utblc++] = ' ';
 	    }
 	    obj->params.subtitle.utbl[utblc - 1] = 0;
