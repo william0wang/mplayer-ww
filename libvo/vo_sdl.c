@@ -578,7 +578,6 @@ static void set_fullmode (int mode) {
 
 static int
 config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uint32_t flags, char *title, uint32_t format)
-//static int sdl_setup (int width, int height)
 {
 	struct sdl_priv_s *priv = &sdl_priv;
 
@@ -619,18 +618,16 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
 		priv->sdlfullflags |= SDL_ANYFORMAT;
 	}
 
-    /* SDL can only scale YUV data */
-    if(priv->mode == RGB || priv->mode == BGR) {
-        d_width = width;
-        d_height = height;
-    }
-
 	/* Save the original Image size */
     priv->width  = width;
     priv->height = height;
     priv->dstwidth  = vo_dwidth;
     priv->dstheight = vo_dheight;
-printf("w/h: %i %i\n", vo_dwidth, vo_dheight);
+    /* SDL can only scale YUV data */
+    if(priv->mode == RGB || priv->mode == BGR) {
+        priv->dstwidth = width;
+        priv->dstheight = height;
+    }
 
     priv->format = format;
 
