@@ -77,18 +77,18 @@
 #define FRAMERATE_5994 7
 #define FRAMERATE_60 8
 
-static char ftypes[] = {'?', 'I', 'P', 'B'};
+static const char ftypes[] = {'?', 'I', 'P', 'B'};
 #define FTYPE(x) (ftypes[(x)])
 
-static const char *framerates[] = {
+static const char * const framerates[] = {
 	"unchanged", "23.976", "24", "25", "29.97", "30", "50", "59.94", "60"
 };
 
-static const char *aspect_ratios[] = {
+static const char * const aspect_ratios[] = {
 	"unchanged", "1/1", "4/3", "16/9", "2.21/1"
 };
 
-static char *conf_mux = "mpeg2";
+static const char *conf_mux = "mpeg2";
 static uint32_t conf_packet_size = 0;		//dvd
 static uint32_t conf_muxrate = 0;		//kb/s
 static float conf_vaspect = 0;
@@ -1496,7 +1496,6 @@ static int flush_buffers(muxer_t *muxer, int finalize)
 	muxer_stream_t *s, *vs, *as;
 	muxer_headers_t *vpriv = NULL, *apriv = NULL;
 	muxer_priv_t *priv = (muxer_priv_t *) muxer->priv;
-	double duration;
 	uint64_t iduration, iaduration;
 
 	/*
@@ -1534,11 +1533,9 @@ static int flush_buffers(muxer_t *muxer, int finalize)
 
 		vpriv = (muxer_headers_t*) vs->priv;
 
-		duration = 0;
 		iduration = 0;
 		for(i = 0; i < n; i++)
 			iduration += vpriv->framebuf[i].idur;
-		duration = (double) (iduration / 27000000.0);
 
 		if(as != NULL)
 		{
@@ -1780,7 +1777,7 @@ static size_t parse_mpeg12_video(muxer_stream_t *s, muxer_priv_t *priv, muxer_he
 		mp_msg(MSGT_MUXER, MSGL_FATAL, "\r\nPARSE_MPEG12: add_frames(%zu) failed, exit\r\n", len);
 		return 0;
 	}
-	mp_msg(MSGT_MUXER, MSGL_DBG2, "\r\nVIDEO FRAME, PT: %C, tr: %d, diff: %d, dts: %.3f, pts: %.3f, pdt: %u, gop_reset: %d\r\n",
+	mp_msg(MSGT_MUXER, MSGL_DBG2, "\r\nVIDEO FRAME, PT: %c, tr: %d, diff: %d, dts: %.3f, pts: %.3f, pdt: %u, gop_reset: %d\r\n",
 		ftypes[pt], temp_ref, frames_diff, ((double) spriv->last_dts/27000000.0f),
 		((double) spriv->last_pts/27000000.0f), spriv->picture.display_time, gop_reset);
 
