@@ -130,8 +130,8 @@ void _dvdcss_test( dvdcss_t dvdcss )
 
     if( i_ret < 0 )
     {
-        print_error( dvdcss, "css error: could not get RPC status, region-free drive?" );
-        return;
+        print_error( dvdcss, "css error: could not get RPC status. Assuming RPC-I drive." );
+        i_type = i_mask = i_rpc = 0;
     }
 
     switch( i_rpc )
@@ -1152,8 +1152,7 @@ static int CrackDiscKey( dvdcss_t dvdcss, uint8_t *p_disc_key )
      */
 
     /* initialize lookup tables for k[1] */
-    K1table = malloc( 65536 * K1TABLEWIDTH );
-    memset( K1table, 0 , 65536 * K1TABLEWIDTH );
+    K1table = calloc( 65536, K1TABLEWIDTH );
     if( K1table == NULL )
     {
         return -1;
@@ -1184,10 +1183,10 @@ static int CrackDiscKey( dvdcss_t dvdcss, uint8_t *p_disc_key )
     }
 
     /* Initing our Really big table */
-    BigTable = malloc( 16777216 * sizeof(int) );
-    memset( BigTable, 0 , 16777216 * sizeof(int) );
+    BigTable = calloc( 16777216, sizeof(int) );
     if( BigTable == NULL )
     {
+        free( K1table );
         return -1;
     }
 
