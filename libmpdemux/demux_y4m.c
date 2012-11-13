@@ -83,11 +83,11 @@ static void read_streaminfo(demuxer_t *demuxer);
 //     1 = successfully read a packet
 static int demux_y4m_fill_buffer(demuxer_t *demux, demux_stream_t *dsds) {
   demux_stream_t *ds=demux->video;
-  demux_packet_t *dp;
+  demux_packet_t *dp = NULL;
   y4m_priv_t *priv=demux->priv;
   y4m_frame_info_t fi;
   unsigned char *buf[3];
-  int err, size;
+  int size;
   int nextc;
 
   nextc = stream_read_char(demux->stream);
@@ -112,15 +112,13 @@ static int demux_y4m_fill_buffer(demuxer_t *demux, demux_stream_t *dsds) {
 
   if (priv->is_older)
   {
-    int c;
-
-    c = stream_read_char(demux->stream); /* F */
+    int c = stream_read_char(demux->stream); /* F */
     if (c == -256)
-	return 0; /* EOF */
+	goto err_out; /* EOF */
     if (c != 'F')
     {
 	mp_msg(MSGT_DEMUX, MSGL_V, "Bad frame at %d\n", (int)stream_tell(demux->stream)-1);
-	return 0;
+	goto err_out;
     }
     stream_skip(demux->stream, 5); /* RAME\n */
     stream_read(demux->stream, buf[0], size);
@@ -129,9 +127,10 @@ static int demux_y4m_fill_buffer(demuxer_t *demux, demux_stream_t *dsds) {
   }
   else
   {
-    if ((err=y4m_read_frame(demux->stream, priv->si, &fi, buf)) != Y4M_OK) {
+    int err = y4m_read_frame(demux->stream, priv->si, &fi, buf);
+    if (err != Y4M_OK) {
       mp_msg(MSGT_DEMUX, MSGL_ERR, "error reading frame %s\n", y4m_strerr(err));
-      return 0;
+      goto err_out;
     }
   }
 
@@ -143,6 +142,11 @@ static int demux_y4m_fill_buffer(demuxer_t *demux, demux_stream_t *dsds) {
   ds_add_packet(ds, dp);
 
   return 1;
+
+err_out:
+  if (dp)
+    free_demux_packet(dp);
+  return 0;
 }
 
 static void read_streaminfo(demuxer_t *demuxer)
@@ -159,15 +163,15 @@ static void read_streaminfo(demuxer_t *demuxer)
 
 	stream_skip(demuxer->stream, 8); /* YUV4MPEG */
 	stream_skip(demuxer->stream, 1); /* space */
-	stream_read(demuxer->stream, (char *)&buf[0], 3);
+	stream_read(demuxer->stream, buf, 3);
 	buf[3] = 0;
 	sh->disp_w = atoi(buf);
 	stream_skip(demuxer->stream, 1); /* space */
-	stream_read(demuxer->stream, (char *)&buf[0], 3);
+	stream_read(demuxer->stream, buf, 3);
 	buf[3] = 0;
 	sh->disp_h = atoi(buf);
 	stream_skip(demuxer->stream, 1); /* space */
-	stream_read(demuxer->stream, (char *)&buf[0], 1);
+	stream_read(demuxer->stream, buf, 1);
 	buf[1] = 0;
 	frame_rate_code = atoi(buf);
 	stream_skip(demuxer->stream, 1); /* new-line */
@@ -300,9 +304,9 @@ static void demux_close_y4m(demuxer_t *demuxer)
     if(!priv)
       return;
     if (!priv->is_older)
-	y4m_fini_stream_info(((y4m_priv_t*)demuxer->priv)->si);
-    free(((y4m_priv_t*)demuxer->priv)->si);
-    free(demuxer->priv);
+	y4m_fini_stream_info(priv->si);
+    free(priv->si);
+    free(priv);
     return;
 }
 
