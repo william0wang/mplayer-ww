@@ -1910,17 +1910,19 @@ static int mp_input_print_cmd_list(m_option_t* cfg) {
  */
 int
 mp_input_check_interrupt(int time) {
-  mp_cmd_t* cmd;
-  if((cmd = mp_input_get_cmd(time,0,1)) == NULL)
+  mp_cmd_t *cmd = mp_input_get_cmd(time,0,1);
+  if (!cmd)
     return 0;
   switch(cmd->id) {
   case MP_CMD_QUIT:
   case MP_CMD_PLAY_TREE_STEP:
   case MP_CMD_PLAY_TREE_UP_STEP:
   case MP_CMD_PLAY_ALT_SRC_STEP:
+    mp_cmd_free(cmd);
     // The cmd will be executed when we are back in the main loop
     return 1;
   }
+  mp_cmd_free(cmd);
   // remove the cmd from the queue
   cmd = mp_input_get_cmd(time,0,0);
   mp_cmd_free(cmd);
