@@ -615,7 +615,9 @@ void wsDestroyWindow(wsTWindow *win)
     int l;
 
     l = wsSearch(win->WindowID);
-    wsWindowList[l] = NULL;
+
+    if (l != -1)
+        wsWindowList[l] = NULL;
 
     if (win->wsCursor != None) {
         XFreeCursor(wsDisplay, win->wsCursor);
@@ -1194,12 +1196,14 @@ void wsResizeWindow(wsTWindow *win, int sx, int sy)
         XMapWindow(wsDisplay, win->WindowID);
 }
 
-// ----------------------------------------------------------------------------------------------
-//    Iconify window.
-// ----------------------------------------------------------------------------------------------
-void wsIconify(wsTWindow win)
+/**
+ * @brief Iconify a window.
+ *
+ * @param win pointer to a ws window structure
+ */
+void wsIconify(wsTWindow *win)
 {
-    XIconifyWindow(wsDisplay, win.WindowID, 0);
+    XIconifyWindow(wsDisplay, win->WindowID, 0);
 }
 
 /**
@@ -1290,27 +1294,6 @@ void wsSetForegroundRGB(wsTWindow *win, int r, int g, int b)
     }
 
     XSetForeground(wsDisplay, win->wGC, color);
-}
-
-// ----------------------------------------------------------------------------------------------
-//    Draw string at x,y with fc ( foreground color ) and bc ( background color ).
-// ----------------------------------------------------------------------------------------------
-void wsDrawString(wsTWindow win, int x, int y, char *str, int fc, int bc)
-{
-    XSetForeground(wsDisplay, win.wGC, bc);
-    XFillRectangle(wsDisplay, win.WindowID, win.wGC, x, y,
-                   XTextWidth(win.Font, str, strlen(str)) + 20,
-                   win.FontHeight + 2);
-    XSetForeground(wsDisplay, win.wGC, fc);
-    XDrawString(wsDisplay, win.WindowID, win.wGC, x + 10, y + 13, str, strlen(str));
-}
-
-// ----------------------------------------------------------------------------------------------
-//    Calculation string width.
-// ----------------------------------------------------------------------------------------------
-int wsTextWidth(wsTWindow win, char *str)
-{
-    return XTextWidth(win.Font, str, strlen(str)) + 20;
 }
 
 // ----------------------------------------------------------------------------------------------

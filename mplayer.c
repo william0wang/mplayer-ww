@@ -1960,6 +1960,7 @@ static int generate_video_frame(sh_video_t *sh_video, demux_stream_t *d_video)
             start   = NULL;
             pts     = MP_NOPTS_VALUE;
             hit_eof = 1;
+            drop_frame = 0;
         }
         if (in_size > max_framesize)
             max_framesize = in_size;
@@ -2454,9 +2455,9 @@ static int sleep_until_update(float *time_frame, float *aq_sleep_time)
 
     // flag 256 means: libvo driver does its timing (dvb card)
     if (!(vo_flags & 256)) {
-        if (*time_frame > 1.5) {
+        if (*time_frame > 0.3) {
             // Avoid sleeping too long without reacting to user input
-            usec_sleep(1000000);
+            usec_sleep(200000);
             *time_frame -= GetRelativeTime();
             frame_time_remaining = 1;
 	} else if (*time_frame > 0.001)

@@ -669,10 +669,15 @@ int ds_fill_buffer(demux_stream_t *ds)
                    "ds_fill_buffer(unknown 0x%X) called\n", (unsigned int) ds);
     }
     while (1) {
+        int apacks = demux->audio ? demux->audio->packs : 0;
+        int abytes = demux->audio ? demux->audio->bytes : 0;
+        int vpacks = demux->video ? demux->video->packs : 0;
+        int vbytes = demux->video ? demux->video->bytes : 0;
         if (ds->packs) {
             demux_packet_t *p = ds->first;
             // obviously not yet EOF after all
             ds->eof = 0;
+            ds->fill_count = 0;
 #if 0
             if (demux->reference_clock != MP_NOPTS_VALUE) {
                 if (   p->pts != MP_NOPTS_VALUE
@@ -707,20 +712,23 @@ int ds_fill_buffer(demux_stream_t *ds)
             --ds->packs;
             return 1;
         }
+        // avoid buffering too far ahead in e.g. badly interleaved files
+        // or when one stream is shorter, without breaking large audio
+        // delay with well interleaved files.
+        if (ds->fill_count > 20)
+            break;
         // avoid printing the "too many ..." message over and over
         if (ds->eof)
             break;
-        if (demux->audio->packs >= MAX_PACKS
-            || demux->audio->bytes >= MAX_PACK_BYTES) {
+        if (apacks >= MAX_PACKS || abytes >= MAX_PACK_BYTES) {
             mp_msg(MSGT_DEMUXER, MSGL_ERR, MSGTR_TooManyAudioInBuffer,
-                   demux->audio->packs, demux->audio->bytes);
+                   apacks, abytes);
             mp_msg(MSGT_DEMUXER, MSGL_HINT, MSGTR_MaybeNI);
             break;
         }
-        if (demux->video->packs >= MAX_PACKS
-            || demux->video->bytes >= MAX_PACK_BYTES) {
+        if (vpacks >= MAX_PACKS || vbytes >= MAX_PACK_BYTES) {
             mp_msg(MSGT_DEMUXER, MSGL_ERR, MSGTR_TooManyVideoInBuffer,
-                   demux->video->packs, demux->video->bytes);
+                   vpacks, vbytes);
             mp_msg(MSGT_DEMUXER, MSGL_HINT, MSGTR_MaybeNI);
             break;
         }
@@ -742,6 +750,15 @@ int ds_fill_buffer(demux_stream_t *ds)
                    "ds_fill_buffer()->demux_fill_buffer() failed\n");
             break; // EOF
         }
+        if (demux->audio)
+            ds->fill_count += demux->audio->packs - apacks;
+        if (demux->video && demux->video->packs > vpacks &&
+            // Empty packets or "skip" packets in e.g. AVI can cause issues.
+            demux->video->bytes > vbytes + 100 &&
+            // when video needs parsing we will have lots of video packets
+            // in-between audio packets, so ignore them in that case.
+            demux->video->sh && !((sh_video_t *)demux->video->sh)->needs_parsing)
+            ds->fill_count++;
     }
     ds->buffer_pos = ds->buffer_size = 0;
     ds->buffer = NULL;

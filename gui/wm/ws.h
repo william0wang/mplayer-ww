@@ -234,12 +234,12 @@ void wsDestroyWindow(wsTWindow *win);
 void wsMoveWindow(wsTWindow *win, Bool abs, int x, int y);
 void wsMoveWindowWithin(wsTWindow *win, Bool abs, int x, int y);
 void wsResizeWindow(wsTWindow *win, int sx, int sy);
-void wsIconify(wsTWindow win);
+void wsIconify(wsTWindow *win);
 void wsRaiseWindowTop(Display *dpy, Window win);
 void wsSetBackground(wsTWindow *win, int color);
 void wsSetForegroundRGB(wsTWindow *win, int r, int g, int b);
 void wsSetBackgroundRGB(wsTWindow *win, int r, int g, int b);
-#define wsClearWindow(win) XClearWindow(wsDisplay, win.WindowID)
+#define wsClearWindow(win) XClearWindow(wsDisplay, (win)->WindowID)
 void wsSetTitle(wsTWindow *win, char *name);
 void wsVisibleWindow(wsTWindow *win, int show);
 void wsWindowDecoration(wsTWindow *win, long d);
@@ -248,12 +248,6 @@ void wsFullScreen(wsTWindow *win);
 void wsPostRedisplay(wsTWindow *win);
 void wsSetShape(wsTWindow *win, char *data);
 void wsSetIcon(Display *dpy, Window win, guiIcon_t *icon);
-
-// ----------------------------------------------------------------------------------------------
-//    Draw string at x,y with fc ( foreground color ) and bc ( background color ).
-// ----------------------------------------------------------------------------------------------
-void wsDrawString(wsTWindow win, int x, int y, char *str, int fc, int bc);
-int wsTextWidth(wsTWindow win, char *str);
 
 // ----------------------------------------------------------------------------------------------
 //    Show / hide mouse cursor.

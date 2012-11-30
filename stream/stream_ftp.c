@@ -54,17 +54,10 @@ static struct stream_priv_s {
   char *buf;
   char *cmd_buf;
 } stream_priv_dflts = {
-  "anonymous","no@spam",
-  NULL,
-  21,
-  NULL,
-  NULL,
-  NULL,
-
-  -1,
-  0,0,
-  NULL,
-  NULL,
+  .user = "anonymous",
+  .pass = "no@spam",
+  .port = 21,
+  .handle = -1,
 };
 
 #define CMD_BUFSIZE 8192
@@ -371,7 +364,7 @@ static int FtpOpenPort(struct stream_priv_s* p) {
 
   sscanf(par+1,"%u,%u,%u,%u,%u,%u",&num[0],&num[1],&num[2],
 	 &num[3],&num[4],&num[5]);
-  snprintf(str,127,"%d.%d.%d.%d",num[0],num[1],num[2],num[3]);
+  snprintf(str,sizeof(str),"%d.%d.%d.%d",num[0],num[1],num[2],num[3]);
   fd = connect2Server(str,(num[4]<<8)+num[5],0);
 
   if(fd < 0)
@@ -395,7 +388,7 @@ static int FtpOpenData(stream_t* s,off_t newpos) {
   if(s->fd < 0) return 0;
 
   if(newpos > 0) {
-    snprintf(p->cmd_buf,CMD_BUFSIZE - 1,"REST %"PRId64, (int64_t)newpos);
+    snprintf(p->cmd_buf,CMD_BUFSIZE,"REST %"PRId64, (int64_t)newpos);
 
     resp = FtpSendCmd(p->cmd_buf,p,rsp_txt);
     if(resp != 3) {
@@ -412,9 +405,9 @@ static int FtpOpenData(stream_t* s,off_t newpos) {
 	  mp_msg(MSGT_OPEN,MSGL_ERR, "[ftp] command 'RETR' failed: Get pure filename failed\n");
       return 0;
   }
-  snprintf(p->cmd_buf,CMD_BUFSIZE - 1,"RETR %s",purefile);
+  snprintf(p->cmd_buf,CMD_BUFSIZE,"RETR %s",purefile);
 #else
-  snprintf(p->cmd_buf,CMD_BUFSIZE - 1,"RETR %s",p->filename);
+  snprintf(p->cmd_buf,CMD_BUFSIZE,"RETR %s",p->filename);
 #endif //CONFIG_FTP_P2P
 
   resp = FtpSendCmd(p->cmd_buf,p,rsp_txt);
@@ -522,10 +515,10 @@ static void close_f(stream_t *s) {
 
 
 
-static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
+static int open_f(stream_t *stream,int mode, void* opts, av_unused int* file_format) {
   int resp;
   int64_t len = 0;
-  struct stream_priv_s* p = (struct stream_priv_s*)opts;
+  struct stream_priv_s* p = opts;
   char rsp_txt[256];
 
 #ifdef CONFIG_FTP_P2P
@@ -574,12 +567,12 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
   }
 
   // Login
-  snprintf(p->cmd_buf,CMD_BUFSIZE - 1,"USER %s",p->user);
+  snprintf(p->cmd_buf,CMD_BUFSIZE,"USER %s",p->user);
   resp = FtpSendCmd(p->cmd_buf,p,rsp_txt);
 
   // password needed
   if(resp == 3) {
-    snprintf(p->cmd_buf,CMD_BUFSIZE - 1,"PASS %s",p->pass);
+    snprintf(p->cmd_buf,CMD_BUFSIZE,"PASS %s",p->pass);
     resp = FtpSendCmd(p->cmd_buf,p,rsp_txt);
     if(resp != 2) {
       mp_msg(MSGT_OPEN,MSGL_ERR, "[ftp] command '%s' failed: %s\n",p->cmd_buf,rsp_txt);
@@ -630,7 +623,7 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
   resp = FtpSendCmd(buffcmd,p,rsp_txt);
 #else
   // Get the filesize
-  snprintf(p->cmd_buf,CMD_BUFSIZE - 1,"SIZE %s",p->filename);
+  snprintf(p->cmd_buf,CMD_BUFSIZE,"SIZE %s",p->filename);
   resp = FtpSendCmd(p->cmd_buf,p,rsp_txt);
 #endif
 
@@ -654,6 +647,7 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
   stream->priv = p;
   stream->fill_buffer = fill_buffer;
   stream->close = close_f;
+  stream->type = STREAMTYPE_STREAM;
 
   return STREAM_OK;
 }

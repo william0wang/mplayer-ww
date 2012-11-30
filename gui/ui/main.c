@@ -194,7 +194,6 @@ void uiEventHandling( int msg,float param )
         uiEventHandling( ivPlayDVD, 0 );
         break;
    case evPlayDVD:
-        guiInfo.Track=1;
         guiInfo.Chapter=1;
         guiInfo.Angle=1;
    case ivPlayDVD:
@@ -208,10 +207,10 @@ play:
 
         if ( ( msg == evPlaySwitchToPause )&&( guiInfo.Playing == GUI_PAUSE ) ) goto NoPause;
 
-	if ( listMgr( PLAYLIST_ITEM_GET_CURR,0 ) &&( guiInfo.StreamType == STREAMTYPE_FILE ) )
+	if ( isPlaylistStreamtype && listMgr( PLAYLIST_ITEM_GET_CURR,0 ) )
 	 {
-	  plItem * next = listMgr( PLAYLIST_ITEM_GET_CURR,0 );
-	  uiSetFileName( next->path,next->name,SAME_STREAMTYPE );
+	  plItem * curr = listMgr( PLAYLIST_ITEM_GET_CURR,0 );
+	  uiSetFileName( curr->path,curr->name,SAME_STREAMTYPE );
 	 }
 
         switch ( guiInfo.StreamType )
@@ -249,6 +248,8 @@ play:
 	       guiInfoMediumClear( CLEAR_ALL - CLEAR_DVD - CLEAR_FILE );
 	       if ( guiInfo.Playing != GUI_PAUSE )
 	        {
+		 if ( !guiInfo.Track )
+                   guiInfo.Track=1;
                  guiInfo.NewPlay=GUI_FILE_SAME;
 		}
                break;
@@ -271,7 +272,6 @@ NoPause:
         uiMainAutoPlay=1;
 //	guiInfo.StreamType=STREAMTYPE_FILE;
    case evLoad:
-	listMgr( PLAYLIST_DELETE,0 );
         gtkShow( evLoad,NULL );
         break;
    case evLoadSubtitle:  gtkShow( evLoadSubtitle,NULL );  break;
@@ -337,8 +337,8 @@ set_volume:
    case evIconify:
         switch ( iparam )
          {
-          case 0: wsIconify( guiApp.mainWindow ); break;
-          case 1: wsIconify( guiApp.videoWindow ); break;
+          case 0: wsIconify( &guiApp.mainWindow ); break;
+          case 1: wsIconify( &guiApp.videoWindow ); break;
          }
         break;
    case evHalfSize:
@@ -400,7 +400,7 @@ set_volume:
 	  case 1:
 	  default: movie_aspect=-1;
 	 }
-	wsClearWindow( guiApp.videoWindow );
+	wsClearWindow( &guiApp.videoWindow );
 	if ( guiInfo.StreamType == STREAMTYPE_VCD ) uiEventHandling( evPlayVCD, 0 );
 	 else if ( guiInfo.StreamType == STREAMTYPE_DVD ) uiEventHandling( ivPlayDVD, 0 );
 	 else
@@ -483,8 +483,8 @@ void uiMainMouseHandle( int Button,int X,int Y,int RX,int RY )
             item=&guiApp.mainItems[SelectedItem];
             item->pressed=btnReleased;
            }
+          if ( currentselected == - 1 || SelectedItem == -1 ) { itemtype=0; break; }
           SelectedItem=-1;
-          if ( currentselected == - 1 ) { itemtype=0; break; }
           value=0;
           switch( itemtype )
            {
@@ -512,12 +512,15 @@ void uiMainMouseHandle( int Button,int X,int Y,int RX,int RY )
    case wsP5MouseButton: value=-2.5f; goto rollerhandled;
    case wsP4MouseButton: value= 2.5f;
 rollerhandled:
-          item=&guiApp.mainItems[currentselected];
-          if ( ( item->type == itHPotmeter )||( item->type == itVPotmeter )||( item->type == itPotmeter ) )
+          if (currentselected != - 1)
            {
-            item->value+=value;
-            btnModify( item->message,item->value );
-            uiEventHandling( item->message,item->value );
+            item=&guiApp.mainItems[currentselected];
+            if ( ( item->type == itHPotmeter )||( item->type == itVPotmeter )||( item->type == itPotmeter ) )
+             {
+              item->value+=value;
+              btnModify( item->message,item->value );
+              uiEventHandling( item->message,item->value );
+             }
            }
           break;
 
@@ -607,6 +610,7 @@ void uiDandDHandler(int num,char** files)
 
   char* subtitles = NULL;
   char* filename = NULL;
+  char* s;
 
   if (num <= 0)
     return;
@@ -648,15 +652,18 @@ void uiDandDHandler(int num,char** files)
 
       item = calloc(1,sizeof(plItem));
 
+      s = strrchr( str,'/' );
+
       /* FIXME: decompose file name ? */
       /* yes -- Pontscho */
-      if ( strrchr( str,'/' ) ) {
-	char * s = strrchr( str,'/' ); *s=0; s++;
+      if ( s ) {
+	*s=0; s++;
 	item->name = gstrdup( s );
 	item->path = gstrdup( str );
       } else {
+	// NOTE TO MYSELF: this shouldn't happen, make sure we have a full path
 	item->name = strdup(str);
-	item->path = strdup("");
+	item->path = strdup(".");
       }
       listMgr(PLAYLIST_ITEM_APPEND,item);
     } else {

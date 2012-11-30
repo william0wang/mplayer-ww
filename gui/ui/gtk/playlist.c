@@ -32,6 +32,7 @@
 #include "stream/stream.h"
 
 #include "gui/cfg.h"
+#include "gui/interface.h"
 #include "gui/ui/widgets.h"
 #include "gui/util/list.h"
 #include "gui/util/mem.h"
@@ -215,6 +216,7 @@ static void plButtonReleased( GtkButton * button,gpointer user_data )
 //	  guiInfo.NewPlay=GUI_FILE_NEW;
 //	  guiInfo.StreamType=STREAMTYPE_FILE;
 	 }
+	else if (isPlaylistStreamtype && !guiInfo.Playing) uiSetFileName(NULL, NULL, STREAMTYPE_DUMMY);
        }
   case 0: // cancel
        HidePlayList();
@@ -395,7 +397,7 @@ static void plCTree( GtkCTree * ctree,GtkCTreeNode * parent_node,gpointer user_d
 	 subdir=check_for_subdir( path );
 	 node=gtk_ctree_insert_node( ctree,parent_node,NULL,(name ? &name : &text ),4,pxOpenedBook,msOpenedBook,pxClosedBook,msClosedBook,!subdir,FALSE );
 	 gtk_ctree_node_set_row_data_full( ctree,node,DirNode,NULL );
-	 if ( subdir ) node=gtk_ctree_insert_node( ctree,node,NULL,&dummy,4,NULL,NULL,NULL,NULL,FALSE,FALSE );
+	 if ( subdir ) gtk_ctree_insert_node( ctree,node,NULL,&dummy,4,NULL,NULL,NULL,NULL,FALSE,FALSE );
 	}
        free( path ); path=NULL;
       }
