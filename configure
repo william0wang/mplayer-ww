@@ -1521,6 +1521,8 @@ TMPC="$mplayer_tmpdir/tmp.c"
 TMPCPP="$mplayer_tmpdir/tmp.cpp"
 TMPH="$mplayer_tmpdir/tmp.h"
 TMPS="$mplayer_tmpdir/tmp.S"
+# We will update this later once we know the executable suffix
+TMPEXE="$mplayer_tmpdir/tmp"
 
 rm -f "$TMPLOG"
 echo configuration: $configuration > "$TMPLOG"
@@ -7819,6 +7821,22 @@ fi
 echocheck "linker support for --nxcompat --no-seh --dynamicbase"
 if cflag_check "-Wl,--nxcompat -Wl,--no-seh -Wl,--dynamicbase" ; then
   extra_ldflags="-Wl,--nxcompat -Wl,--no-seh -Wl,--dynamicbase $extra_ldflags"
+  echores "yes"
+else
+  echores "no"
+fi
+
+echocheck "linker support for --large-address-aware"
+if cflag_check "-Wl,--large-address-aware" ; then
+  extra_ldflags="-Wl,--large-address-aware $extra_ldflags"
+  echores "yes"
+else
+  echores "no"
+fi
+
+echocheck "linker support for --version-script"
+if cflag_check "-Wl,--version-script,binary.ver" ; then
+  extra_ldflags="-Wl,--version-script,binary.ver $extra_ldflags"
   echores "yes"
 else
   echores "no"

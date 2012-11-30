@@ -38,7 +38,7 @@
 #include "libvo/video_out.h"
 #include "mp_core.h"
 
-int uiGotoTheNext = 1;
+int uiProcessNextInPlaylist = 1;
 
 void uiFullScreen(void)
 {
@@ -79,7 +79,7 @@ void uiPlay(void)
     gui(GUI_SET_STATE, (void *)GUI_PLAY);
     uiVideoRender = 0;
     wsSetBackgroundRGB(&guiApp.videoWindow, 0, 0, 0);
-    wsClearWindow(guiApp.videoWindow);
+    wsClearWindow(&guiApp.videoWindow);
 }
 
 void uiPause(void)
@@ -169,7 +169,7 @@ void uiChangeSkin(char *name)
     if (!guiInfo.Playing) {
         uiVideoRender = 1;
         wsSetBackgroundRGB(&guiApp.videoWindow, guiApp.video.R, guiApp.video.G, guiApp.video.B);
-        wsClearWindow(guiApp.videoWindow);
+        wsClearWindow(&guiApp.videoWindow);
         wsPostRedisplay(&guiApp.videoWindow);
     }
 
@@ -221,9 +221,6 @@ void uiChangeSkin(char *name)
 
 void uiSetFileName(char *dir, char *name, int type)
 {
-    if (!name)
-        return;
-
     if (!dir)
         setdup(&guiInfo.Filename, name);
     else
@@ -241,7 +238,6 @@ void uiSetFileName(char *dir, char *name, int type)
 void uiCurr(void)
 {
     plItem *curr;
-    int stop = 0;
 
     if (guiInfo.Playing == GUI_PAUSE)
         return;
@@ -258,15 +254,12 @@ void uiCurr(void)
 
         if (curr) {
             uiSetFileName(curr->path, curr->name, STREAMTYPE_FILE);
-            uiGotoTheNext = (guiInfo.Playing ? 0 : 1);
+            uiProcessNextInPlaylist = 0;
             break;
         }
 
         return;
     }
-
-    if (stop)
-        uiEventHandling(evStop, 0);
 
     if (guiInfo.Playing == GUI_PLAY)
         uiEventHandling(evPlay, 0);
@@ -314,7 +307,7 @@ void uiPrev(void)
 
         if (prev) {
             uiSetFileName(prev->path, prev->name, STREAMTYPE_FILE);
-            uiGotoTheNext = (guiInfo.Playing ? 0 : 1);
+            uiProcessNextInPlaylist = (guiInfo.Playing ? 0 : 1);
             guiInfo.Track--;
             break;
         }
@@ -375,7 +368,7 @@ void uiNext(void)
 
         if (next) {
             uiSetFileName(next->path, next->name, STREAMTYPE_FILE);
-            uiGotoTheNext = (guiInfo.Playing ? 0 : 1);
+            uiProcessNextInPlaylist = (guiInfo.Playing ? 0 : 1);
             guiInfo.Track++;
             break;
         }

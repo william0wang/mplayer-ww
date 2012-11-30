@@ -19,6 +19,9 @@
 #ifndef MPLAYER_GUI_LIST_H
 #define MPLAYER_GUI_LIST_H
 
+/// StreamTypes that are permitted in a playlist
+#define isPlaylistStreamtype (guiInfo.StreamType == STREAMTYPE_FILE || guiInfo.StreamType == STREAMTYPE_STREAM)
+
 /// listMgr() commands
 enum {
     PLAYLIST_GET,
@@ -53,6 +56,11 @@ void *listMgr(int cmd, void *data);
 //@{
 void listRepl(char ***list, const char *search, const char *replace);
 void listSet(char ***list, const char *entry);
+//@}
+
+/// @name high-level list operations
+//@{
+int add_to_gui_playlist(const char *what, int how);
 //@}
 
 #endif /* MPLAYER_GUI_LIST_H */

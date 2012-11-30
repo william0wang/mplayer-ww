@@ -152,7 +152,6 @@ static int stereo_mode;
 static int stipple;
 static enum MPGLType backend;
 
-static int int_pause;
 static int eq_bri = 0;
 static int eq_cont = 0;
 static int eq_sat = 0;
@@ -171,6 +170,8 @@ static unsigned int slice_height = 1;
 
 // performance statistics
 static int imgcnt, dr_imgcnt, dr_rejectcnt;
+
+static int did_render;
 
 static void redraw(void);
 
@@ -793,7 +794,6 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
   is_yuv |= (xs << 8) | (ys << 16);
   glFindFormat(format, NULL, &gl_texfmt, &gl_format, &gl_type);
 
-  int_pause = 0;
   vo_flipped = !!(flags & VOFLAG_FLIPPING);
 
   if (create_window(d_width, d_height, flags, title) < 0)
@@ -823,7 +823,7 @@ static void check_events(void)
         initGl(vo_dwidth, vo_dheight);
     }
     if(e&VO_EVENT_RESIZE) resize(vo_dwidth,vo_dheight);
-    if(e&VO_EVENT_EXPOSE && int_pause) redraw();
+    else if(e&VO_EVENT_EXPOSE) redraw();
 }
 
 /**
@@ -989,24 +989,33 @@ static void do_render(void) {
   }
   if (is_yuv || custom_prog)
     glDisableYUVConversion(gl_target, yuvconvtype);
+  did_render = 1;
 }
 
 static void flip_page(void) {
+  // We might get an expose event between draw_image and its
+  // corresponding flip_page.
+  // For double-buffering we would then flip in a clear backbuffer.
+  // Easiest way to handle it is by keeping track if the
+  // current GL buffer contains a properly rendered video.
+  // did_render will always be false for single buffer.
+  if (!did_render) {
+    do_render();
+    do_render_osd(RENDER_OSD | RENDER_EOSD);
+  }
   if (vo_doublebuffering) {
     if (use_glFinish) mpglFinish();
     glctx.swapGlBuffers(&glctx);
     if (aspect_scaling() && use_aspect)
       mpglClear(GL_COLOR_BUFFER_BIT);
   } else {
-    do_render();
-    do_render_osd(RENDER_OSD | RENDER_EOSD);
     if (use_glFinish) mpglFinish();
     else mpglFlush();
   }
+  did_render = 0;
 }
 
 static void redraw(void) {
-  if (vo_doublebuffering) { do_render(); do_render_osd(RENDER_OSD | RENDER_EOSD); }
   flip_page();
 }
 
@@ -1522,12 +1531,10 @@ static int control(uint32_t request, void *data)
   switch (request) {
   case VOCTRL_PAUSE:
     vo_paused = 1;
-    int_pause = (request == VOCTRL_PAUSE);
     if(!vo_fs && vo_ontop == 2) w32Cmd(CMD_PAUSE_CONTINUE,0);
  	return VO_TRUE;
   case VOCTRL_RESUME:
     vo_paused = 0;
-    int_pause = (request == VOCTRL_PAUSE);
     w32Cmd(CMD_PAUSE_CONTINUE,0);
   	return VO_TRUE;
   case VOCTRL_QUERY_FORMAT:
