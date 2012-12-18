@@ -26,6 +26,7 @@
 
 #include "list.h"
 #include "string.h"
+#include "gui/app/gui.h"
 
 #include "mp_msg.h"
 #include "path.h"
@@ -45,9 +46,13 @@ static urlItem *urlList;
  *         pointer to current list item (ITEM command) or
  *         NULL (DELETE or unknown command)
  *
+ * @note PLAYLIST_ITEM_GET_POS returns the position number as pointer
+ *       (if @a data is NULL the last position number, i.e. number of items),
+ *       and position 0 means "not found"
  */
 void *listMgr(int cmd, void *data)
 {
+    unsigned int pos;
     plItem *pdat  = (plItem *)data;
     urlItem *udat = (urlItem *)data;
 
@@ -93,6 +98,21 @@ void *listMgr(int cmd, void *data)
         } else
             return listMgr(PLAYLIST_ITEM_APPEND, pdat);
 
+    case PLAYLIST_ITEM_FIND:
+
+        if (plList) {
+            plItem *item = plList;
+
+            do {
+                if (gstrcmp(item->path, pdat->path) == 0 && gstrcmp(item->name, pdat->name) == 0)
+                    return item;
+
+                item = item->next;
+            } while (item);
+        }
+
+        return NULL;
+
     case PLAYLIST_ITEM_SET_CURR:
 
         plCurrent = pdat;
@@ -101,6 +121,31 @@ void *listMgr(int cmd, void *data)
     case PLAYLIST_ITEM_GET_CURR:
 
         return plCurrent;
+
+    case PLAYLIST_ITEM_GET_POS:
+
+        pos = 0;
+
+        if (plList) {
+            unsigned int i = 0;
+            plItem *item   = plList;
+
+            do {
+                i++;
+
+                if (item == pdat) {
+                    pos = i;
+                    break;
+                }
+
+                item = item->next;
+            } while (item);
+
+            if (!pdat)
+                pos = i;
+        }
+
+        return (void *)pos;
 
     case PLAYLIST_ITEM_GET_PREV:
 
@@ -285,7 +330,7 @@ void listRepl(char ***list, const char *search, const char *replace)
  * @param what file to be added
  * @param how command (#PLAYLIST_ITEM_APPEND or #PLAYLIST_ITEM_INSERT) to be performed
  *
- * @return 1 (ok) or 0 (error)
+ * @return #True (ok) or #False (error)
  */
 int add_to_gui_playlist(const char *what, int how)
 {
@@ -294,7 +339,7 @@ int add_to_gui_playlist(const char *what, int how)
     plItem *item;
 
     if (!what || !*what || (how != PLAYLIST_ITEM_APPEND && how != PLAYLIST_ITEM_INSERT))
-        return 0;
+        return False;
 
     file = mp_basename(what);
     path = strdup(what);
@@ -307,7 +352,7 @@ int add_to_gui_playlist(const char *what, int how)
     item = calloc(1, sizeof(plItem));
 
     if (!item)
-        return 0;
+        return False;
 
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[list] adding %s/%s\n", path, file);
 
@@ -316,5 +361,5 @@ int add_to_gui_playlist(const char *what, int how)
 
     listMgr(how, item);
 
-    return 1;
+    return True;
 }

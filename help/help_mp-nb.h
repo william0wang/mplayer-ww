@@ -9,7 +9,9 @@ static const char help_text[]=
 "Valg:\n"
 " -vo <drv[:dev]> velg video-ut driver og enhet (se '-vo help' for liste)\n"
 " -ao <drv[:dev]> velg lyd-ut driver og enhet (se '-ao help' for liste)\n"
+#ifdef CONFIG_VCD
 " vcd://<sporno>   spill VCD (video cd) spor fra enhet i stedet for fil\n"
+#endif
 #ifdef CONFIG_DVDREAD
 " dvd://<tittelno> spill DVD tittel/spor fra enhet i stedet for fil\n"
 #endif
@@ -161,8 +163,6 @@ static const char help_text[]=
 
 // ====================== GUI messages/buttons ========================
 
-#ifdef CONFIG_GUI
-
 // --- labels ---
 #define MSGTR_About "Om"
 #define MSGTR_FileSelect "Åpne fil..."
@@ -235,5 +235,3 @@ static const char help_text[]=
 #define MSGTR_MSGBOX_LABEL_FatalError "fatal feil..."
 #define MSGTR_MSGBOX_LABEL_Error "fail..."
 #define MSGTR_MSGBOX_LABEL_Warning "advarsel..."
-
-#endif

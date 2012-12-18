@@ -16,10 +16,16 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+/**
+ * @file
+ * @brief String utilities
+ */
+
 #include <stdlib.h>
 #include <string.h>
 
 #include "string.h"
+#include "gui/app/gui.h"
 #include "gui/interface.h"
 
 #include "config.h"
@@ -88,7 +94,7 @@ char *strswap(char *in, char from, char to)
 char *trim(char *in)
 {
     char *src, *dest;
-    int freeze = 0;
+    int freeze = False;
 
     src = dest = in;
 
@@ -123,7 +129,7 @@ char *trim(char *in)
 char *decomment(char *in)
 {
     char *p;
-    int nap = 0;
+    int nap = False;
 
     p = in;
 
@@ -145,6 +151,14 @@ char *decomment(char *in)
     return in;
 }
 
+/**
+ * @brief A strchr() that can handle NULL pointers.
+ *
+ * @param str string to examine
+ * @param c character to find
+ *
+ * @return return value of strchr() or NULL, if @a str is NULL
+ */
 char *gstrchr(const char *str, int c)
 {
     if (!str)
@@ -153,6 +167,14 @@ char *gstrchr(const char *str, int c)
     return strchr(str, c);
 }
 
+/**
+ * @brief A strcmp() that can handle NULL pointers.
+ *
+ * @param a string to be compared
+ * @param b string which is compared
+ *
+ * @return return value of strcmp() or -1, if @a a or @a b are NULL
+ */
 int gstrcmp(const char *a, const char *b)
 {
     if (!a && !b)
@@ -170,7 +192,7 @@ int gstrcmp(const char *a, const char *b)
  * @param b string which is compared
  * @param n number of characters compared at the most
  *
- * @return return value of strncmp() or -1, if a or b are NULL
+ * @return return value of strncmp() or -1, if @a a or @a b are NULL
  */
 int gstrncmp(const char *a, const char *b, size_t n)
 {
@@ -205,10 +227,10 @@ char *gstrdup(const char *str)
  *
  *        The string is duplicated by calling #gstrdup().
  *
- * @note @a *old is freed prior to the assignment.
- *
  * @param old pointer to a variable suitable to store the new pointer
  * @param str string to be duplicated
+ *
+ * @note @a *old is freed prior to the assignment.
  */
 void setdup(char **old, const char *str)
 {
@@ -220,11 +242,11 @@ void setdup(char **old, const char *str)
  * @brief Assign a newly allocated string
  *        containing the path created from a directory and a filename.
  *
- * @note @a *old is freed prior to the assignment.
- *
  * @param old pointer to a variable suitable to store the new pointer
  * @param dir directory
  * @param name filename
+ *
+ * @note @a *old is freed prior to the assignment.
  */
 void setddup(char **old, const char *dir, const char *name)
 {
@@ -252,6 +274,7 @@ char *TranslateFilename(int how, char *fname, size_t maxlen)
 
     switch (guiInfo.StreamType) {
     case STREAMTYPE_FILE:
+
         if (guiInfo.Filename && *guiInfo.Filename) {
             p = strrchr(guiInfo.Filename,
 #if HAVE_DOS_PATHS
@@ -275,28 +298,35 @@ char *TranslateFilename(int how, char *fname, size_t maxlen)
                 fname[len - 5] = 0;
         } else
             av_strlcpy(fname, MSGTR_NoFileLoaded, maxlen);
+
         break;
 
     case STREAMTYPE_STREAM:
+
         av_strlcpy(fname, guiInfo.Filename, maxlen);
         break;
 
     case STREAMTYPE_CDDA:
+
         snprintf(fname, maxlen, MSGTR_Title, guiInfo.Track);
         break;
 
     case STREAMTYPE_VCD:
+
         snprintf(fname, maxlen, MSGTR_Title, guiInfo.Track - 1);
         break;
 
     case STREAMTYPE_DVD:
+
         if (guiInfo.Chapter)
             snprintf(fname, maxlen, MSGTR_Chapter, guiInfo.Chapter);
         else
-            av_strlcat(fname, MSGTR_NoChapter, maxlen);
+            av_strlcpy(fname, MSGTR_NoChapter, maxlen);
+
         break;
 
     default:
+
         av_strlcpy(fname, MSGTR_NoMediaOpened, maxlen);
         break;
     }
@@ -323,13 +353,13 @@ char *TranslateFilename(int how, char *fname, size_t maxlen)
 /**
  * @brief Read characters from @a file.
  *
- * @note Reading stops with an end-of-line character or at end of file.
- *
  * @param str pointer to a buffer to receive the read characters
  * @param size number of characters read at the most (including a terminating null-character)
  * @param file file to read from
  *
  * @return str (success) or NULL (error)
+ *
+ * @note Reading stops with an end-of-line character or at end of file.
  */
 char *fgetstr(char *str, int size, FILE *file)
 {

@@ -49,6 +49,9 @@
 #include "sub/ass_mp.h"
 #include "sub/eosd.h"
 
+#include "cpudetect.h"
+#include "libavutil/x86_cpu.h"
+
 #define _r(c)  ((c)>>24)
 #define _g(c)  (((c)>>16)&0xFF)
 #define _b(c)  (((c)>>8)&0xFF)
@@ -61,6 +64,15 @@
 #define MAP_16BIT(v) RSHIFT(0x102 * (v), 8)
 /* map 0 - 0xFF -> 0 - 0x10101 */
 #define MAP_24BIT(v) RSHIFT(0x10203 * (v), 8)
+
+#if HAVE_SSE4
+
+DECLARE_ASM_CONST(16, uint32_t, sse_int32_80h[4])
+    = { 0x80, 0x80, 0x80, 0x80 };
+DECLARE_ASM_CONST(16, uint32_t, sse_int32_map_factor[4])
+    = { 0x102, 0x102, 0x102, 0x102 };
+
+#endif // HAVE_SSE4
 
 static const struct vf_priv_s {
     int outh, outw;
@@ -150,6 +162,7 @@ static void prepare_buffer_422(vf_instance_t *vf)
             size_t p = i * outw + j;
             dst_u[p] = (dst_u[p] + dst_u[p + 1]) / 2;
             dst_v[p] = (dst_v[p] + dst_v[p + 1]) / 2;
+            dst_u[p + 1] = dst_v[p + 1] = 0;
         }
     }
 }
@@ -203,6 +216,119 @@ static void render_frame_yuv422(vf_instance_t *vf)
     }
 }
 
+#if HAVE_SSE4
+
+static void render_frame_yuv422_sse4(vf_instance_t *vf)
+{
+    uint8_t *alpha = vf->priv->alphas[0];
+    uint8_t *src_y = vf->priv->planes[0],
+            *src_u = vf->priv->planes[1],
+            *src_v = vf->priv->planes[2];
+    int outw = vf->priv->outw,
+        outh = vf->priv->outh;
+    struct dirty_rows_extent *dr = vf->priv->dirty_rows;
+    uint8_t *dst = vf->dmpi->planes[0];
+    int stride = vf->dmpi->stride[0];
+    int32_t is_uyvy = vf->priv->outfmt == IMGFMT_UYVY;
+    int i;
+
+    for (i = 0; i < outh; i++) {
+        size_t xmin = dr[i].xmin & ~7,
+               xmax = dr[i].xmax;
+        __asm__ volatile (
+            "pxor   %%xmm7, %%xmm7 \n\t"
+            "jmp    4f \n\t"
+            "1: \n\t"
+
+            "cmpl   $-1,    0(%[alpha], %[j], 1) \n\t"
+            "jne    2f \n\t"
+            "cmpl   $-1,    4(%[alpha], %[j], 1) \n\t"
+            "jne    2f \n\t"
+            "jmp    3f \n\t"
+
+            "2: \n\t"
+            "movq       (%[alpha], %[j], 1),    %%xmm0 \n\t"
+            "punpcklbw  %%xmm7, %%xmm0 \n\t"
+            "movdqa     %%xmm0, %%xmm1 \n\t"
+            "punpcklwd  %%xmm7, %%xmm0 \n\t"
+            "punpckhwd  %%xmm7, %%xmm1 \n\t"
+            "pmulld     "MANGLE(sse_int32_map_factor)", %%xmm0 \n\t"
+            "pmulld     "MANGLE(sse_int32_map_factor)", %%xmm1 \n\t"
+            "paddd      "MANGLE(sse_int32_80h)",    %%xmm0 \n\t"
+            "paddd      "MANGLE(sse_int32_80h)",    %%xmm1 \n\t"
+            "psrld      $8, %%xmm0 \n\t"
+            "psrld      $8, %%xmm1 \n\t"
+            "movdqa     %%xmm0, %%xmm2 \n\t"
+            "movdqa     %%xmm1, %%xmm3 \n\t"
+            "packssdw   %%xmm1, %%xmm0 \n\t"
+            "phaddd     %%xmm3, %%xmm2 \n\t"
+            "psrld      $1, %%xmm2 \n\t"
+            "packssdw   %%xmm7, %%xmm2 \n\t"
+            "punpcklwd  %%xmm2, %%xmm2 \n\t"
+
+            "movdqu     (%[dst], %[j], 2),  %%xmm1 \n\t"
+            "movdqa     %%xmm1, %%xmm3 \n\t"
+            "cmpl       $0, %[f] \n\t"
+            "je         11f \n\t"
+            "psrlw      $8, %%xmm1 \n\t"
+            "psllw      $8, %%xmm3 \n\t"
+            "psrlw      $8, %%xmm3 \n\t"
+            "jmp        12f \n\t"
+            "11: \n\t"
+            "psllw      $8, %%xmm1 \n\t"
+            "psrlw      $8, %%xmm1 \n\t"
+            "psrlw      $8, %%xmm3 \n\t"
+            "12: \n\t"
+            "pmullw     %%xmm0, %%xmm1 \n\t"
+            "pmullw     %%xmm2, %%xmm3 \n\t"
+            "psrlw      $8, %%xmm1 \n\t"
+            "psrlw      $8, %%xmm3 \n\t"
+            "packuswb   %%xmm7, %%xmm1 \n\t"
+            "packuswb   %%xmm7, %%xmm3 \n\t"
+            "mov        %[src_y],   %%"REG_S" \n\t"
+            "movq       (%%"REG_S", %[j], 1),   %%xmm4 \n\t"
+            "mov        %[src_u],   %%"REG_S" \n\t"
+            "movq       (%%"REG_S", %[j], 1),   %%xmm5 \n\t"
+            "mov        %[src_v],   %%"REG_S" \n\t"
+            "movq       (%%"REG_S", %[j], 1),   %%xmm6 \n\t"
+            "packuswb   %%xmm7, %%xmm5 \n\t"
+            "packuswb   %%xmm7, %%xmm6 \n\t"
+            "punpcklbw  %%xmm6, %%xmm5 \n\t"
+            "cmpl       $0, %[f] \n\t"
+            "je         21f \n\t"
+            "punpcklbw  %%xmm1, %%xmm3 \n\t"
+            "punpcklbw  %%xmm4, %%xmm5 \n\t"
+            "paddb      %%xmm5, %%xmm3 \n\t"
+            "movdqu     %%xmm3, (%[dst], %[j], 2) \n\t"
+            "jmp        22f \n\t"
+            "21: \n\t"
+            "punpcklbw  %%xmm3, %%xmm1 \n\t"
+            "punpcklbw  %%xmm5, %%xmm4 \n\t"
+            "paddb      %%xmm4, %%xmm1 \n\t"
+            "movdqu     %%xmm1, (%[dst], %[j], 2) \n\t"
+            "22: \n\t"
+
+            "3: \n\t"
+            "add    $8, %[j] \n\t"
+            "4: \n\t"
+            "cmp    %[xmax],    %[j] \n\t"
+            "jl     1b \n\t"
+
+            : : [dst]   "r" (dst + i * stride),
+                [alpha] "r" (alpha + i * outw),
+                [src_y] "g" (src_y + i * outw),
+                [src_u] "g" (src_u + i * outw),
+                [src_v] "g" (src_v + i * outw),
+                [j]     "r" (xmin),
+                [xmax]  "g" (xmax),
+                [f]     "g" (is_uyvy)
+            : REG_S
+        );
+    }
+}
+
+#endif // HAVE_SSE4
+
 static void prepare_buffer_420p(vf_instance_t *vf)
 {
     int outw = vf->priv->outw,
@@ -229,6 +355,28 @@ static void prepare_buffer_420p(vf_instance_t *vf)
                         dst_v[q2] + dst_v[q2 + 1] + 2) / 4;
         }
     }
+
+#if HAVE_SSE4
+    // for render_frame_yuv420p_sse4
+    if (gCpuCaps.hasSSE4 && outw % 32 == 0) {
+        for (i = 0; i < outh; i += 2) {
+            int xmin = FFMIN(dirty_rows[i].xmin, dirty_rows[i + 1].xmin) & ~1,
+                xmax = FFMAX(dirty_rows[i].xmax, dirty_rows[i + 1].xmax);
+            if (xmin >= xmax)
+                continue;
+            for (j = xmin & ~31; j < xmin; j += 2) {
+                size_t p = i * outw / 4 + j / 2;
+                dst_a[p] = 0xFF;
+                dst_u[p] = dst_v[p] = 0;
+            }
+            for (j = xmax; j < FFALIGN(xmax, 32); j += 2) {
+                size_t p = i * outw / 4 + j / 2;
+                dst_a[p] = 0xFF;
+                dst_u[p] = dst_v[p] = 0;
+            }
+        }
+    }
+#endif // HAVE_SSE4
 }
 
 static void render_frame_yuv420p(vf_instance_t *vf)
@@ -280,6 +428,151 @@ static void render_frame_yuv420p(vf_instance_t *vf)
     }
 }
 
+#if HAVE_SSE4
+
+#define CHECK_16_ALPHA \
+            "cmpl   $-1,     0(%[alpha], %[j], 1) \n\t" \
+            "jne    2f \n\t"                            \
+            "cmpl   $-1,     4(%[alpha], %[j], 1) \n\t" \
+            "jne    2f \n\t"                            \
+            "cmpl   $-1,     8(%[alpha], %[j], 1) \n\t" \
+            "jne    2f \n\t"                            \
+            "cmpl   $-1,    12(%[alpha], %[j], 1) \n\t" \
+            "jne    2f \n\t"                            \
+            "jmp    3f \n\t"
+
+#define MAP_16_ALPHA \
+            "movq       0(%[alpha], %[j], 1),   %%xmm0 \n\t"        \
+            "movq       8(%[alpha], %[j], 1),   %%xmm2 \n\t"        \
+            "punpcklbw  %%xmm7, %%xmm0 \n\t"                        \
+            "punpcklbw  %%xmm7, %%xmm2 \n\t"                        \
+            "movdqa     %%xmm0, %%xmm1 \n\t"                        \
+            "movdqa     %%xmm2, %%xmm3 \n\t"                        \
+            "punpcklwd  %%xmm7, %%xmm0 \n\t"                        \
+            "punpckhwd  %%xmm7, %%xmm1 \n\t"                        \
+            "punpcklwd  %%xmm7, %%xmm2 \n\t"                        \
+            "punpckhwd  %%xmm7, %%xmm3 \n\t"                        \
+            "pmulld     "MANGLE(sse_int32_map_factor)", %%xmm0 \n\t"\
+            "pmulld     "MANGLE(sse_int32_map_factor)", %%xmm1 \n\t"\
+            "pmulld     "MANGLE(sse_int32_map_factor)", %%xmm2 \n\t"\
+            "pmulld     "MANGLE(sse_int32_map_factor)", %%xmm3 \n\t"\
+            "paddd      "MANGLE(sse_int32_80h)",    %%xmm0 \n\t"    \
+            "paddd      "MANGLE(sse_int32_80h)",    %%xmm1 \n\t"    \
+            "paddd      "MANGLE(sse_int32_80h)",    %%xmm2 \n\t"    \
+            "paddd      "MANGLE(sse_int32_80h)",    %%xmm3 \n\t"    \
+            "psrld      $8, %%xmm0 \n\t"                            \
+            "psrld      $8, %%xmm1 \n\t"                            \
+            "psrld      $8, %%xmm2 \n\t"                            \
+            "psrld      $8, %%xmm3 \n\t"                            \
+            "packssdw   %%xmm1, %%xmm0 \n\t"                        \
+            "packssdw   %%xmm3, %%xmm2 \n\t"
+
+#define DO_RENDER \
+            "movq       0(%%"REG_D", %[j], 1),  %%xmm1 \n\t"    \
+            "movq       8(%%"REG_D", %[j], 1),  %%xmm3 \n\t"    \
+            "punpcklbw  %%xmm7, %%xmm1 \n\t"                    \
+            "punpcklbw  %%xmm7, %%xmm3 \n\t"                    \
+            "pmullw     %%xmm0, %%xmm1 \n\t"                    \
+            "pmullw     %%xmm2, %%xmm3 \n\t"                    \
+            "psrlw      $8, %%xmm1 \n\t"                        \
+            "psrlw      $8, %%xmm3 \n\t"                        \
+            "packuswb   %%xmm3, %%xmm1 \n\t"                    \
+            "movdqa     (%%"REG_S", %[j], 1),   %%xmm4 \n\t"    \
+            "paddb      %%xmm4, %%xmm1 \n\t"                    \
+            "movdqu     %%xmm1, (%%"REG_D", %[j], 1) \n\t"
+
+static void render_frame_yuv420p_sse4(vf_instance_t *vf)
+{
+    struct dirty_rows_extent *dr = vf->priv->dirty_rows;
+    uint8_t *alpha;
+    uint8_t *src_y = vf->priv->planes[0],
+            *src_u = vf->priv->planes[1],
+            *src_v = vf->priv->planes[2];
+    uint8_t *dst_y = vf->dmpi->planes[0],
+            *dst_u = vf->dmpi->planes[1],
+            *dst_v = vf->dmpi->planes[2];
+    int stride;
+    int outw = vf->priv->outw,
+        outh = vf->priv->outh;
+    int i;
+
+    // y
+    alpha = vf->priv->alphas[0];
+    stride = vf->dmpi->stride[0];
+    for (i = 0; i < outh; i++) {
+        size_t xmin = dr[i].xmin & ~15,
+               xmax = dr[i].xmax;
+        __asm__ volatile (
+            "pxor   %%xmm7, %%xmm7 \n\t"
+            "jmp    4f \n\t"
+
+            "1: \n\t"
+            CHECK_16_ALPHA
+
+            "2: \n\t"
+            MAP_16_ALPHA
+            DO_RENDER
+
+            "3: \n\t"
+            "add    $16,    %[j] \n\t"
+            "4: \n\t"
+            "cmp    %[xmax],    %[j] \n\t"
+            "jl     1b \n\t"
+
+            : : [j] "r" (xmin),
+                [xmax] "g" (xmax),
+                [alpha] "r" (alpha + i * outw),
+                [src]   "S" (src_y + i * outw),
+                [dst]   "D" (dst_y + i * stride)
+        );
+    }
+
+    // u & v
+    alpha = vf->priv->alphas[1];
+    stride = vf->dmpi->stride[1];
+    for (i = 0; i < outh / 2; i++) {
+        size_t xmin = FFMIN(dr[i * 2].xmin, dr[i * 2 + 1].xmin) & ~31,
+               xmax = FFMAX(dr[i * 2].xmax, dr[i * 2 + 1].xmax);
+        __asm__ volatile (
+            "pxor   %%xmm7, %%xmm7 \n\t"
+            "jmp    4f \n\t"
+
+            "1: \n\t"
+            CHECK_16_ALPHA
+
+            "2: \n\t"
+            MAP_16_ALPHA
+            "mov    %[src_u],   %%"REG_S"  \n\t"
+            "mov    %[dst_u],   %%"REG_D"  \n\t"
+            DO_RENDER
+            "mov    %[src_v],   %%"REG_S"  \n\t"
+            "mov    %[dst_v],   %%"REG_D"  \n\t"
+            DO_RENDER
+
+            "3: \n\t"
+            "add    $16,    %[j] \n\t"
+            "4: \n\t"
+            "cmp    %[xmax],    %[j] \n\t"
+            "jl     1b \n\t"
+
+            : : [j] "r" (xmin / 2),
+                [xmax] "g" ((xmax + 1) / 2),
+                [alpha] "r" (alpha + i * outw / 2),
+                [src_u] "g" (src_u + i * outw / 2),
+                [src_v] "g" (src_v + i * outw / 2),
+                [dst_u] "g" (dst_u + i * stride),
+                [dst_v] "g" (dst_v + i * stride)
+            :   REG_S, REG_D
+        );
+    }
+}
+
+#undef CHECK_16_ALPHA
+#undef MAP_16_ALPHA
+#undef MUL_ALPHA
+
+#endif // HAVE_SSE4
+
 static void clean_buffer(vf_instance_t *vf)
 {
     int outw = vf->priv->outw,
@@ -322,30 +615,6 @@ static int config(struct vf_instance *vf,
     int planes, alphas;
     int i;
 
-    switch (outfmt) {
-    case IMGFMT_YV12:
-    case IMGFMT_I420:
-    case IMGFMT_IYUV:
-        vf->priv->is_planar = 1;
-        planes = 3;
-        alphas = 2;
-        vf->priv->draw_image = draw_image_yuv;
-        vf->priv->render_frame = render_frame_yuv420p;
-        vf->priv->prepare_buffer = prepare_buffer_420p;
-        break;
-    case IMGFMT_UYVY:
-    case IMGFMT_YUY2:
-        vf->priv->is_planar = 0;
-        planes = 3;
-        alphas = 1;
-        vf->priv->draw_image = draw_image_yuv;
-        vf->priv->render_frame = render_frame_yuv422;
-        vf->priv->prepare_buffer = prepare_buffer_422;
-        break;
-    default:
-        return 0;
-    }
-
 	ass_last_pts = -303;
     if(ass_auto_expand && get_sub_size())
     {
@@ -370,6 +639,38 @@ static int config(struct vf_instance *vf,
     vf->priv->outfmt = outfmt;
     vf->priv->outh = outh = height + ass_top_margin + ass_bottom_margin;
     vf->priv->outw = outw = width;
+
+    switch (outfmt) {
+    case IMGFMT_YV12:
+    case IMGFMT_I420:
+    case IMGFMT_IYUV:
+        vf->priv->is_planar = 1;
+        planes = 3;
+        alphas = 2;
+        vf->priv->draw_image = draw_image_yuv;
+        vf->priv->render_frame = render_frame_yuv420p;
+        vf->priv->prepare_buffer = prepare_buffer_420p;
+#if HAVE_SSE4
+        if (gCpuCaps.hasSSE4 && outw % 32 == 0)
+            vf->priv->render_frame = render_frame_yuv420p_sse4;
+#endif
+        break;
+    case IMGFMT_UYVY:
+    case IMGFMT_YUY2:
+        vf->priv->is_planar = 0;
+        planes = 3;
+        alphas = 1;
+        vf->priv->draw_image = draw_image_yuv;
+        vf->priv->render_frame = render_frame_yuv422;
+        vf->priv->prepare_buffer = prepare_buffer_422;
+#if HAVE_SSE4
+        if (gCpuCaps.hasSSE4 && outw % 8 == 0)
+            vf->priv->render_frame = render_frame_yuv422_sse4;
+#endif
+        break;
+    default:
+        return 0;
+    }
 
     if (!opt_screen_size_x && !opt_screen_size_y) {
         d_width  = d_width  * vf->priv->outw / width;
@@ -447,21 +748,21 @@ static void blank(mp_image_t *mpi, int y1, int y2)
     int chroma_rows = (y2 - y1) >> mpi->chroma_y_shift;
 
     if (mpi->flags & MP_IMGFLAG_PLANAR) {
-    dst = mpi->planes[0] + y1 * mpi->stride[0];
-    for (y = 0; y < y2 - y1; ++y) {
-        memset(dst, color[0], mpi->w);
-        dst += mpi->stride[0];
-    }
-    dst = mpi->planes[1] + (y1 >> mpi->chroma_y_shift) * mpi->stride[1];
-    for (y = 0; y < chroma_rows; ++y) {
-        memset(dst, color[1], mpi->chroma_width);
-        dst += mpi->stride[1];
-    }
-    dst = mpi->planes[2] + (y1 >> mpi->chroma_y_shift) * mpi->stride[2];
-    for (y = 0; y < chroma_rows; ++y) {
-        memset(dst, color[2], mpi->chroma_width);
-        dst += mpi->stride[2];
-    }
+        dst = mpi->planes[0] + y1 * mpi->stride[0];
+        for (y = 0; y < y2 - y1; ++y) {
+            memset(dst, color[0], mpi->w);
+            dst += mpi->stride[0];
+        }
+        dst = mpi->planes[1] + (y1 >> mpi->chroma_y_shift) * mpi->stride[1];
+        for (y = 0; y < chroma_rows; ++y) {
+            memset(dst, color[1], mpi->chroma_width);
+            dst += mpi->stride[1];
+        }
+        dst = mpi->planes[2] + (y1 >> mpi->chroma_y_shift) * mpi->stride[2];
+        for (y = 0; y < chroma_rows; ++y) {
+            memset(dst, color[2], mpi->chroma_width);
+            dst += mpi->stride[2];
+        }
     } else {
         unsigned char packed_color[4];
         int x;
@@ -512,30 +813,30 @@ static int prepare_image(struct vf_instance *vf, mp_image_t *mpi)
     // copy mpi->dmpi...
     if (mpi->flags & MP_IMGFLAG_PLANAR) {
         memcpy_pic(vf->dmpi->planes[0] +  ass_top_margin * vf->dmpi->stride[0],
-		   mpi->planes[0],
-		   mpi->w,
-		   mpi->h,
-		   vf->dmpi->stride[0],
-		   mpi->stride[0]);
+                   mpi->planes[0],
+                   mpi->w,
+                   mpi->h,
+                   vf->dmpi->stride[0],
+                   mpi->stride[0]);
         memcpy_pic(vf->dmpi->planes[1] + (ass_top_margin >> mpi->chroma_y_shift) * vf->dmpi->stride[1],
-		   mpi->planes[1],
-		   mpi->w >> mpi->chroma_x_shift,
-                   mpi->h >> mpi->chroma_y_shift,
-		   vf->dmpi->stride[1],
-                   mpi->stride[1]);
-        memcpy_pic(vf->dmpi->planes[2] + (ass_top_margin >> mpi->chroma_y_shift) * vf->dmpi->stride[2],
-		   mpi->planes[2],
+                   mpi->planes[1],
                    mpi->w >> mpi->chroma_x_shift,
                    mpi->h >> mpi->chroma_y_shift,
-		   vf->dmpi->stride[2],
+                   vf->dmpi->stride[1],
+                   mpi->stride[1]);
+        memcpy_pic(vf->dmpi->planes[2] + (ass_top_margin >> mpi->chroma_y_shift) * vf->dmpi->stride[2],
+                   mpi->planes[2],
+                   mpi->w >> mpi->chroma_x_shift,
+                   mpi->h >> mpi->chroma_y_shift,
+                   vf->dmpi->stride[2],
                    mpi->stride[2]);
     } else {
         memcpy_pic(vf->dmpi->planes[0] + ass_top_margin * vf->dmpi->stride[0],
-		   mpi->planes[0],
+                   mpi->planes[0],
                    mpi->w * (vf->dmpi->bpp / 8),
-		   mpi->h,
+                   mpi->h,
                    vf->dmpi->stride[0],
-		   mpi->stride[0]);
+                   mpi->stride[0]);
         vf->dmpi->planes[1] = mpi->planes[1];   // passthrough rgb8 palette
     }
     if (ass_top_margin)

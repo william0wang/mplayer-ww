@@ -19,7 +19,6 @@
 #ifndef MPLAYER_GUI_INTERFACE_H
 #define MPLAYER_GUI_INTERFACE_H
 
-#include "config.h"
 #include "libaf/af.h"
 #include "libmpdemux/stheader.h"
 #include "m_config.h"
@@ -30,7 +29,7 @@
 // These are in support of the non-GUI files that interact with
 // the GUI and that only need to include interface.h for this.
 // ------------------------------------------------------------
-#include "cfg.h"
+#include "app/cfg.h"
 
 extern int use_gui;             // this is defined in mplayer.c
 // ------------------------------------------------------------
@@ -54,6 +53,12 @@ enum {
     GUI_SET_STATE,
     GUI_SET_STREAM,
     GUI_SET_VIDEO
+};
+
+/// guiPlaylist() instructions
+enum {
+    GUI_PLAYLIST_INIT,
+    GUI_PLAYLIST_ADD
 };
 
 //@{
@@ -99,6 +104,8 @@ typedef struct {
     int VideoWidth;
     int VideoHeight;
 
+    char *CodecName;
+
     int StreamType;
     int AudioChannels;
 
@@ -129,6 +136,7 @@ typedef struct {
     float Balance;
 
     int NewPlay;              // public, read access by MPlayer
+    int PlaylistNext;
 } guiInterface_t;
 
 extern guiInterface_t guiInfo;
@@ -138,8 +146,7 @@ extern guiInterface_t guiInfo;
 int gui(int what, void *data);
 void guiDone(void);
 void guiInit(void);
-int guiPlaylistAdd(play_tree_t *my_playtree, m_config_t *config);
-int guiPlaylistInitialize(play_tree_t *my_playtree, m_config_t *config, int enqueue);
+int guiPlaylist(int what, play_tree_t *playtree, m_config_t *config, int enqueue);
 //@}
 
 /// @name GUI -> MPlayer

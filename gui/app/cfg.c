@@ -21,9 +21,10 @@
 #include <string.h>
 
 #include "cfg.h"
-#include "interface.h"
-#include "util/list.h"
-#include "util/string.h"
+#include "gui.h"
+#include "gui/interface.h"
+#include "gui/util/list.h"
+#include "gui/util/string.h"
 
 #include "config.h"
 #include "help_mp.h"
@@ -82,11 +83,11 @@ int gtkSubDumpSrt;
 
 gtkASS_t gtkASS;
 
-int gtkEnablePlayBar = 1;
+int gtkEnablePlayBar = True;
 int gtkLoadFullscreen;
-int gtkShowVideoWindow = 1;
+int gtkShowVideoWindow = True;
 
-int gui_save_pos    = 1;
+int gui_save_pos    = True;
 int gui_main_pos_x  = -3;
 int gui_main_pos_y  = -3;
 int gui_video_pos_x = -3;
@@ -232,11 +233,11 @@ static const m_option_t gui_opts[] = {
     { NULL,                          NULL,                     0,                     0,           0,     0,          NULL }
 };
 
-int cfg_gui_include(m_option_t *conf, const char *filename)
+int cfg_gui_include(m_option_t *conf, const char *file)
 {
     (void)conf;
 
-    return m_config_parse_config_file(gui_conf, filename, 0);
+    return m_config_parse_config_file(gui_conf, file, 0);
 }
 
 void cfg_read(void)
@@ -244,7 +245,7 @@ void cfg_read(void)
     char *fname, line[512];
     FILE *file;
 
-    player_idle_mode = 1;   // GUI is in idle mode by default
+    player_idle_mode = True;   // GUI is in idle mode by default
 
     /* configuration */
 

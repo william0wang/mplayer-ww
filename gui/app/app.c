@@ -22,7 +22,8 @@
  */
 
 #include "app.h"
-#include "skin/font.h"
+#include "gui.h"
+#include "gui/skin/font.h"
 
 #include "libavutil/common.h"
 
@@ -106,16 +107,16 @@ void appFreeStruct(void)
     int i;
 
     appClearItem(&guiApp.main);
-    guiApp.mainDecoration = 0;
+    guiApp.mainDecoration = False;
 
     appClearItem(&guiApp.video);
 
     appClearItem(&guiApp.playbar);
-    guiApp.playbarIsPresent = 0;
+    guiApp.playbarIsPresent = False;
 
     appClearItem(&guiApp.menu);
     appClearItem(&guiApp.menuSelected);
-    guiApp.menuIsPresent = 0;
+    guiApp.menuIsPresent = False;
 
     for (i = 0; i <= guiApp.IndexOfMainItems; i++)
         appClearItem(&guiApp.mainItems[i]);
@@ -190,16 +191,19 @@ void btnModify(int event, float state)
         if (guiApp.mainItems[i].message == event) {
             switch (guiApp.mainItems[i].type) {
             case itButton:
+
                 guiApp.mainItems[i].pressed = (int)state;
                 break;
 
             case itPotmeter:
             case itVPotmeter:
             case itHPotmeter:
+
                 if (state < 0.0f)
                     state = 0.0f;
                 if (state > 100.0f)
                     state = 100.0f;
+
                 guiApp.mainItems[i].value = state;
                 break;
             }
@@ -210,16 +214,19 @@ void btnModify(int event, float state)
         if (guiApp.playbarItems[i].message == event) {
             switch (guiApp.playbarItems[i].type) {
             case itButton:
+
                 guiApp.playbarItems[i].pressed = (int)state;
                 break;
 
             case itPotmeter:
             case itVPotmeter:
             case itHPotmeter:
+
                 if (state < 0.0f)
                     state = 0.0f;
                 if (state > 100.0f)
                     state = 100.0f;
+
                 guiApp.playbarItems[i].value = state;
                 break;
             }

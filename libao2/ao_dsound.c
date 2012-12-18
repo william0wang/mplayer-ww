@@ -81,13 +81,6 @@ static const GUID KSDATAFORMAT_SUBTYPE_PCM = {0x1,0x0000,0x0010, {0x80,0x00,0x00
 #define SPEAKER_TOP_BACK_RIGHT         0x20000
 #define SPEAKER_RESERVED               0x80000000
 
-#define DSSPEAKER_HEADPHONE         0x00000001
-#define DSSPEAKER_MONO              0x00000002
-#define DSSPEAKER_QUAD              0x00000003
-#define DSSPEAKER_STEREO            0x00000004
-#define DSSPEAKER_SURROUND          0x00000005
-#define DSSPEAKER_5POINT1           0x00000006
-
 #ifndef _WAVEFORMATEXTENSIBLE_
 typedef struct {
     WAVEFORMATEX    Format;
@@ -331,7 +324,7 @@ static int write_buffer(unsigned char *data, int len)
   	    // it's this easy because buffer size and len are always
   	    // aligned to multiples of channels*bytespersample
   	    // there's probably some room for speed improvements here
-  	    const int chantable[6] = {0, 1, 4, 5, 2, 3}; // reorder "matrix"
+  	    static const int chantable[6] = {0, 1, 4, 5, 2, 3}; // reorder "matrix"
   	    int i, j;
   	    int numsamp,sampsize;
 
@@ -418,12 +411,12 @@ static int control(int cmd, void *arg)
 static int init(int rate, int channels, int format, int flags)
 {
     int res;
-	if (!InitDirectSound()) return 0;
 
-	// ok, now create the buffers
 	WAVEFORMATEXTENSIBLE wformat;
 	DSBUFFERDESC dsbpridesc;
 	DSBUFFERDESC dsbdesc;
+
+	if (!InitDirectSound()) return 0;
 
 	//check if the channel count and format is supported in general
 	if (channels > 8) {
@@ -569,8 +562,14 @@ static void uninit(int immed)
 	if(immed)reset();
 	else{
 		DWORD status;
-		usec_sleep(get_delay() * 1000 * 1000);
 		IDirectSoundBuffer_Play(hdsbuf, 0, 0, 0);
+		// This should not be necessary, but a lot of drivers
+		// do not correctly report the status here, causing
+		// audio to be discarded. So we sleep approximately
+		// the right amount of time first.
+		usec_sleep(get_delay() * 1000 * 1000);
+		while(!IDirectSoundBuffer_GetStatus(hdsbuf,&status) && (status&DSBSTATUS_PLAYING))
+			usec_sleep(5000);
 	}
 	DestroyBuffer();
 	UninitDirectSound();

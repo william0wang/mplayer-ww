@@ -503,28 +503,28 @@ SRCS_MPLAYER-$(MATRIXVIEW)   += libvo/vo_matrixview.c libvo/matrixview.c
 SRCS_MPLAYER-$(GUI)          += gui/util/bitmap.c \
                                 gui/util/list.c \
                                 gui/util/string.c
-SRCS_MPLAYER-$(GUI_GTK)      += gui/app.c \
-                                gui/cfg.c \
+SRCS_MPLAYER-$(GUI_GTK)      += gui/app/app.c \
+                                gui/app/cfg.c \
+                                gui/dialog/about.c \
+                                gui/dialog/dialog.c \
+                                gui/dialog/equalizer.c \
+                                gui/dialog/fileselect.c \
+                                gui/dialog/menu.c \
+                                gui/dialog/msgbox.c \
+                                gui/dialog/playlist.c \
+                                gui/dialog/preferences.c \
+                                gui/dialog/skinbrowser.c \
+                                gui/dialog/tools.c \
+                                gui/dialog/url.c \
                                 gui/interface.c \
                                 gui/skin/font.c \
                                 gui/skin/skin.c \
                                 gui/ui/actions.c \
-                                gui/ui/gtk/about.c \
-                                gui/ui/gtk/equalizer.c \
-                                gui/ui/gtk/fileselect.c \
-                                gui/ui/gtk/menu.c \
-                                gui/ui/gtk/msgbox.c \
-                                gui/ui/gtk/playlist.c \
-                                gui/ui/gtk/preferences.c \
-                                gui/ui/gtk/skinbrowser.c \
-                                gui/ui/gtk/tools.c \
-                                gui/ui/gtk/url.c \
                                 gui/ui/main.c \
                                 gui/ui/menu.c \
                                 gui/ui/playbar.c \
                                 gui/ui/render.c \
                                 gui/ui/video.c \
-                                gui/ui/widgets.c \
                                 gui/util/cut.c \
                                 gui/wm/ws.c \
                                 gui/wm/wsxdnd.c \
@@ -702,9 +702,10 @@ INSTALL_TARGETS-$(MPLAYER)  += install-mplayer  install-mplayer-man
 
 DIRS =  . \
         gui \
+        gui/app \
+        gui/dialog \
         gui/skin \
         gui/ui \
-        gui/ui/gtk \
         gui/util \
         gui/win32 \
         gui/wm \
@@ -855,7 +856,7 @@ $(foreach lang, $(DOC_LANG_ALL),$(eval $(lang-def)))
 # Make sure all generated header files are created.
 codec-cfg.o: codecs.conf.h
 $(DEP_FILES) $(MENCODER_DEPS) $(MPLAYER_DEPS): help_mp.h
-mpcommon.o winstuff.o libvo/w32_common.o libvo/vo_directx.o osdep/mplayer-rc.o gui/ui/gtk/about.o gui/win32/gui.o: version.h
+mpcommon.o winstuff.o libvo/w32_common.o libvo/vo_directx.o osdep/mplayer-rc.o gui/dialog/about.o gui/win32/gui.o: version.h
 
 osdep/mplayer-rc.o: osdep/mplayer.exe.manifest
 
@@ -958,17 +959,18 @@ uninstall:
 clean:
 	-$(MAKE) -C ffmpeg $@
 	-rm -rf tests/res
-	-rm -f $(call ADD_ALL_DIRS,/*.o /*.a /*.ho /*~)
+	-rm -f $(call ADD_ALL_DIRS,/*.o /*.d /*.a /*.ho /*~)
 	-rm -f $(call ADD_ALL_EXESUFS,mplayer mencoder)
+	-rm -f $(VIDIX_PCI_FILES)
+	-rm -f $(call ADD_ALL_EXESUFS,codec-cfg cpuinfo)
+	-rm -f codecs.conf.h help_mp.h version.h
 	-rm -rf DOCS/tech/doxygen DOCS/HTML
 
 distclean: clean testsclean toolsclean driversclean dhahelperclean
 	-$(MAKE) -C ffmpeg $@
 	-rm -f DOCS/xml/html-chunk.xsl DOCS/xml/html-single.xsl
-	-rm -f $(call ADD_ALL_DIRS,/*.d)
-	-rm -f config.* codecs.conf.h help_mp.h version.h TAGS tags
-	-rm -f $(VIDIX_PCI_FILES)
-	-rm -f $(call ADD_ALL_EXESUFS,codec-cfg cpuinfo)
+	-rm -f $(foreach lang,$(DOC_LANG_ALL),DOCS/xml/$(lang)/main.xml)
+	-rm -f config.* TAGS tags
 
 doxygen:
 	doxygen DOCS/tech/Doxyfile
