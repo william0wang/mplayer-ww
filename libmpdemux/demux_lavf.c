@@ -374,8 +374,10 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
                 switch (codec->pix_fmt) {
                     case PIX_FMT_RGB24:
                         codec->codec_tag= MKTAG(24, 'B', 'G', 'R');
+                        break;
                     case PIX_FMT_BGR24:
                         codec->codec_tag= MKTAG(24, 'R', 'G', 'B');
+                        break;
                 }
             } else if(is_matroska_format && (codec->codec_id == CODEC_ID_RV40 ||
 				codec->codec_id == CODEC_ID_RV30 || codec->codec_id == CODEC_ID_RV20)) {
@@ -619,6 +621,7 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
     if(!priv->video_streams){
         if(!priv->audio_streams){
 	    mp_msg(MSGT_HEADER,MSGL_ERR,"LAVF: no audio or video headers found - broken file?\n");
+            if (!priv->sub_streams)
             return NULL;
         }
         demuxer->video->id=-2; // audio-only

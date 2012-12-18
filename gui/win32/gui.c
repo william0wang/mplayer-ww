@@ -29,6 +29,7 @@
 #include <windowsx.h>
 #include <shlobj.h>
 
+#include "config.h"
 #include "mpcommon.h"
 #include "mplayer.h"
 #include "mp_fifo.h"
@@ -42,7 +43,7 @@
 #include "libmpcodecs/vd.h"
 #include "gui/interface.h"
 #include "gui/ui/actions.h"
-#include "gui/ui/gmplayer.h"
+#include "gui/ui/ui.h"
 #include "gui/util/mem.h"
 #include "gui.h"
 #include "dialogs.h"
@@ -63,7 +64,7 @@ float video_aspect;
 
 DWORD oldtime;
 NOTIFYICONDATA nid;
-int console_state = 0;
+int console_state = FALSE;
 play_tree_t *playtree = NULL;
 
 static HBRUSH    colorbrush = NULL;           //Handle to colorkey brush
@@ -121,8 +122,8 @@ static void console_toggle(gui_t *gui)
     if (console_state)
     {
         FreeConsole();
-        console = 0;
-        console_state = 0;
+        console = FALSE;
+        console_state = FALSE;
     }
     else
     {
@@ -130,7 +131,7 @@ static void console_toggle(gui_t *gui)
         CONSOLE_SCREEN_BUFFER_INFO coninfo;
         FILE *fp;
         HWND hwnd = NULL;
-        console = 1;
+        console = TRUE;
         AllocConsole();
         SetConsoleTitle(mplayer_version);
 
@@ -155,7 +156,7 @@ static void console_toggle(gui_t *gui)
         *stderr = *fp;
         setvbuf(stderr, NULL, _IONBF, 0);
         print_version("MPlayer");
-        console_state = 1;
+        console_state = TRUE;
     }
 
     if (gui)
@@ -165,21 +166,21 @@ static void console_toggle(gui_t *gui)
     }
 }
 
-void capitalize(char *filename)
+void capitalize(char *fname)
 {
     unsigned int i;
     BOOL cap = TRUE;
-    for (i=0; i < strlen(filename); i++)
+    for (i=0; i < strlen(fname); i++)
     {
         if (cap)
         {
             cap = FALSE;
-            filename[i] = toupper(filename[i]);
+            fname[i] = toupper(fname[i]);
         }
-        else if (filename[i] == ' ')
+        else if (fname[i] == ' ')
             cap = TRUE;
         else
-            filename[i] = tolower(filename[i]);
+            fname[i] = tolower(fname[i]);
     }
 }
 static void display_about_box(HWND hWnd)
@@ -500,7 +501,7 @@ static LRESULT CALLBACK VideoProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                 for(i=0; i<filecount; i++)
                 {
                     DragQueryFile((HDROP) wParam, i, file, MAX_PATH);
-                    uiSetFileName(NULL, file, STREAMTYPE_FILE);
+                    uiSetFile(NULL, file, STREAMTYPE_FILE);
                     if(!parse_filename(file, playtree, mconfig, 1))
                         gui->playlist->add_track(gui->playlist, file, NULL, NULL, 0);
                 }
@@ -772,7 +773,7 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
             {
                 PCOPYDATASTRUCT cdData;
                 cdData = (PCOPYDATASTRUCT) lParam;
-                uiSetFileName(NULL, cdData->lpData, STREAMTYPE_FILE);
+                uiSetFile(NULL, cdData->lpData, STREAMTYPE_FILE);
                 if(!parse_filename(cdData->lpData, playtree, mconfig, 1))
                     gui->playlist->add_track(gui->playlist, cdData->lpData, NULL, NULL, 0);
                 gui->startplay(gui);
@@ -789,7 +790,7 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                 for(i=0; i<filecount; i++)
                 {
                     DragQueryFile((HDROP) wParam, i, file, MAX_PATH);
-                    uiSetFileName(NULL, file, STREAMTYPE_FILE);
+                    uiSetFile(NULL, file, STREAMTYPE_FILE);
                     if(!parse_filename(file, playtree, mconfig, 1))
                         gui->playlist->add_track(gui->playlist, file, NULL, NULL, 0);
                 }
@@ -866,20 +867,20 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                 {
                     char volname[MAX_PATH];
                     char menuitem[MAX_PATH];
-                    int flags = MF_STRING, enable = 0;
+                    int flags = MF_STRING, enable = FALSE;
                     mp_msg(MSGT_GPLAYER, MSGL_V, "[GUI] checking %s for CD/VCD/SVCD/DVDs\n", device + pos);
 #ifdef CONFIG_DVDREAD
                     sprintf(searchpath, "%sVIDEO_TS", device + pos);
                     if(GetFileAttributes(searchpath) != INVALID_FILE_ATTRIBUTES)
-                        enable = 1;
+                        enable = TRUE;
 #endif
                     sprintf(searchpath, "%sMpegav", device + pos);
                     if(GetFileAttributes(searchpath) != INVALID_FILE_ATTRIBUTES)
-                        enable = 1;
+                        enable = TRUE;
 #ifdef CONFIG_CDDA
                     sprintf(searchpath, "%sTrack01.cda", device + pos);
                     if(GetFileAttributes(searchpath) != INVALID_FILE_ATTRIBUTES)
-                        enable = 1;
+                        enable = TRUE;
 #endif
                     flags |= (enable ? MF_ENABLED : MF_GRAYED);
                     volname[0] = 0;
@@ -1039,7 +1040,7 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
             {
                 char device[MAX_PATH];
                 char searchpath[MAX_PATH];
-                char filename[MAX_PATH];
+                char file[MAX_PATH];
                 int len, pos = 0, cdromdrive = 0;
                 len = GetLogicalDriveStrings(MAX_PATH, device);
                 while(pos < len)
@@ -1073,8 +1074,8 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                                     gui->playlist->clear_playlist(gui->playlist);
                                     do
                                     {
-                                        sprintf(filename, "%smpegav/%s", device + pos, finddata.cFileName);
-                                        gui->playlist->add_track(gui->playlist, filename, NULL, NULL, 0);
+                                        sprintf(file, "%smpegav/%s", device + pos, finddata.cFileName);
+                                        gui->playlist->add_track(gui->playlist, file, NULL, NULL, 0);
                                     }
                                     while(FindNextFile(searchhndl, &finddata));
                                     FindClose(searchhndl);

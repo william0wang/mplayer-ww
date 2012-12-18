@@ -25,8 +25,9 @@
 #include <string.h>
 
 #include "config.h"
-#include "gmplayer.h"
-#include "gui/app.h"
+#include "ui.h"
+#include "gui/app/app.h"
+#include "gui/app/gui.h"
 #include "gui/interface.h"
 #include "gui/skin/font.h"
 #include "gui/skin/skin.h"
@@ -55,28 +56,23 @@
 #include "m_property.h"
 #include "mp_core.h"
 #include "mpcommon.h"
-
-#define CLEAR_FILE 1
-#define CLEAR_VCD  2
-#define CLEAR_DVD  4
-#define CLEAR_ALL  (CLEAR_FILE + CLEAR_VCD + CLEAR_DVD)
+#include "libavutil/common.h"
 
 #define GUI_REDRAW_WAIT 375
 
 #include "actions.h"
-#include "widgets.h"
+#include "gui/dialog/dialog.h"
 
 unsigned int GetTimerMS( void );
 
 unsigned char * mainDrawBuffer = NULL;
-int             uiMainRender = 1;
+int             uiMainRender = True;
 
-int             uiMainAutoPlay = 0;
-int             uiMiddleMenu = 0;
+int             uiMainAutoPlay = False;
 
-int             mainVisible = 1;
+int             mainVisible = True;
 
-int             boxMoved = 0;
+int             boxMoved = False;
 int             sx = 0,sy = 0;
 int             i,pot = 0;
 
@@ -98,31 +94,31 @@ void uiMainDraw( void )
 
    fast_memcpy( mainDrawBuffer,guiApp.main.Bitmap.Image,guiApp.main.Bitmap.ImageSize );
    RenderAll( &guiApp.mainWindow,guiApp.mainItems,guiApp.IndexOfMainItems,mainDrawBuffer );
-   uiMainRender=0;
+   uiMainRender=False;
   }
  wsPutImage( &guiApp.mainWindow );
 // XFlush( wsDisplay );
 }
 
-static void guiInfoMediumClear (int what)
+static void MediumPrepare (int type)
 {
-  if (what & CLEAR_FILE)
+  switch (type)
   {
-    nfree(guiInfo.Filename);
-    nfree(guiInfo.SubtitleFilename);
-    nfree(guiInfo.AudioFilename);
-    listMgr(PLAYLIST_DELETE, 0);
-  }
+    case STREAMTYPE_DVD:
+      listMgr(PLAYLIST_DELETE, 0);
+      break;
 
-  if (what & CLEAR_VCD) guiInfo.Tracks = 0;
-
-  if (what & CLEAR_DVD)
-  {
-    guiInfo.AudioStreams = 0;
-    guiInfo.Subtitles = 0;
-    guiInfo.Tracks = 0;
-    guiInfo.Chapters = 0;
-    guiInfo.Angles = 0;
+    case STREAMTYPE_CDDA:
+    case STREAMTYPE_VCD:
+      listMgr(PLAYLIST_DELETE, 0);
+    case STREAMTYPE_FILE:
+    case STREAMTYPE_STREAM:
+    case STREAMTYPE_PLAYLIST:
+      guiInfo.AudioStreams = 0;
+      guiInfo.Subtitles = 0;
+      guiInfo.Chapters = 0;
+      guiInfo.Angles = 0;
+      break;
   }
 }
 
@@ -130,7 +126,7 @@ static unsigned last_redraw_time = 0;
 
 void uiEventHandling( int msg,float param )
 {
- int iparam = (int)param;
+ int iparam = (int)param, osd;
  mixer_t *mixer = mpctx_get_mixer(guiInfo.mpcontext);
 
  switch( msg )
@@ -162,7 +158,6 @@ void uiEventHandling( int msg,float param )
    case ivSetCDTrack:
         guiInfo.Track=iparam;
    case evPlayCD:
- 	guiInfoMediumClear ( CLEAR_ALL );
 	guiInfo.StreamType=STREAMTYPE_CDDA;
 	goto play;
 #endif
@@ -170,7 +165,6 @@ void uiEventHandling( int msg,float param )
    case ivSetVCDTrack:
         guiInfo.Track=iparam;
    case evPlayVCD:
- 	guiInfoMediumClear ( CLEAR_ALL );
 	guiInfo.StreamType=STREAMTYPE_VCD;
 	goto play;
 #endif
@@ -197,7 +191,6 @@ void uiEventHandling( int msg,float param )
         guiInfo.Chapter=1;
         guiInfo.Angle=1;
    case ivPlayDVD:
- 	guiInfoMediumClear( CLEAR_ALL - CLEAR_DVD );
         guiInfo.StreamType=STREAMTYPE_DVD;
 	goto play;
 #endif
@@ -207,25 +200,19 @@ play:
 
         if ( ( msg == evPlaySwitchToPause )&&( guiInfo.Playing == GUI_PAUSE ) ) goto NoPause;
 
-	if ( isPlaylistStreamtype && listMgr( PLAYLIST_ITEM_GET_CURR,0 ) )
-	 {
-	  plItem * curr = listMgr( PLAYLIST_ITEM_GET_CURR,0 );
-	  uiSetFileName( curr->path,curr->name,SAME_STREAMTYPE );
-	 }
+        MediumPrepare( guiInfo.StreamType );
 
         switch ( guiInfo.StreamType )
          {
 	  case STREAMTYPE_FILE:
 	  case STREAMTYPE_STREAM:
 	  case STREAMTYPE_PLAYLIST:
-	       guiInfoMediumClear( CLEAR_ALL - CLEAR_FILE );
 	       if ( !guiInfo.Track )
 	         guiInfo.Track=1;
 	       guiInfo.NewPlay=GUI_FILE_NEW;
 	       break;
 
           case STREAMTYPE_CDDA:
-	       guiInfoMediumClear( CLEAR_ALL - CLEAR_VCD - CLEAR_FILE );
 	       if ( guiInfo.Playing != GUI_PAUSE )
 	        {
 		 if ( !guiInfo.Track )
@@ -235,7 +222,6 @@ play:
 	       break;
 
           case STREAMTYPE_VCD:
-	       guiInfoMediumClear( CLEAR_ALL - CLEAR_VCD - CLEAR_FILE );
 	       if ( guiInfo.Playing != GUI_PAUSE )
 	        {
 		 if ( !guiInfo.Track )
@@ -245,7 +231,6 @@ play:
 	       break;
 
           case STREAMTYPE_DVD:
-	       guiInfoMediumClear( CLEAR_ALL - CLEAR_DVD - CLEAR_FILE );
 	       if ( guiInfo.Playing != GUI_PAUSE )
 	        {
 		 if ( !guiInfo.Track )
@@ -269,7 +254,7 @@ NoPause:
 	break;
 
    case evLoadPlay:
-        uiMainAutoPlay=1;
+        uiMainAutoPlay=True;
 //	guiInfo.StreamType=STREAMTYPE_FILE;
    case evLoad:
         gtkShow( evLoad,NULL );
@@ -303,17 +288,10 @@ NoPause:
 
    case evSetVolume:
         guiInfo.Volume=param;
-	goto set_volume;
-   case evSetBalance:
-        guiInfo.Balance=param;
-set_volume:
         {
 	 float l = guiInfo.Volume * ( ( 100.0 - guiInfo.Balance ) / 50.0 );
 	 float r = guiInfo.Volume * ( ( guiInfo.Balance ) / 50.0 );
-	 if ( l > guiInfo.Volume ) l=guiInfo.Volume;
-	 if ( r > guiInfo.Volume ) r=guiInfo.Volume;
-//	 printf( "!!! v: %.2f b: %.2f -> %.2f x %.2f\n",guiInfo.Volume,guiInfo.Balance,l,r );
-         mixer_setvolume( mixer,l,r );
+         mixer_setvolume( mixer,FFMIN(l,guiInfo.Volume),FFMIN(r,guiInfo.Volume) );
 	}
 	if ( osd_level )
 	 {
@@ -324,6 +302,21 @@ set_volume:
 	 }
         break;
 
+   case evSetBalance:
+        guiInfo.Balance=param;
+        mixer_setbalance( mixer,(guiInfo.Balance - 50.0 ) / 50.0 );   // transform 0..100 to -1..1
+        osd = osd_level;
+        osd_level = 0;
+        uiEventHandling(evSetVolume, guiInfo.Volume);
+        osd_level = osd;
+        if ( osd_level )
+         {
+          osd_visible=(GetTimerMS() + 1000) | 1;
+          vo_osd_progbar_type=OSD_BALANCE;
+          vo_osd_progbar_value=( ( guiInfo.Balance ) * 256.0 ) / 100.0;
+          vo_osd_changed( OSDTYPE_PROGBAR );
+         }
+        break;
 
    case evMenu:
         /*if (guiApp.menuIsPresent)   NOTE TO MYSELF: Uncomment only after mouse
@@ -417,7 +410,7 @@ set_volume:
             break;
           last_redraw_time = now;
         }
-        uiMainRender=1;
+        uiMainRender=True;
         wsPostRedisplay( &guiApp.mainWindow );
 	wsPostRedisplay( &guiApp.playbarWindow );
         break;
@@ -459,10 +452,10 @@ void uiMainMouseHandle( int Button,int X,int Y,int RX,int RY )
 
    case wsPLMouseButton:
 	  gtkShow( ivHidePopUpMenu,NULL );
-          sx=X; sy=Y; boxMoved=1; itemtype=itPLMButton;
+          sx=X; sy=Y; boxMoved=True; itemtype=itPLMButton;
           SelectedItem=currentselected;
           if ( SelectedItem == -1 ) break;
-          boxMoved=0;
+          boxMoved=False;
           item=&guiApp.mainItems[SelectedItem];
           itemtype=item->type;
           item->pressed=btnPressed;
@@ -477,7 +470,7 @@ void uiMainMouseHandle( int Button,int X,int Y,int RX,int RY )
            }
           break;
    case wsRLMouseButton:
-          boxMoved=0;
+          boxMoved=False;
           if ( SelectedItem != -1 )   // NOTE TO MYSELF: only if itButton, itHPotmeter or itVPotmeter
            {
             item=&guiApp.mainItems[SelectedItem];
@@ -531,7 +524,7 @@ rollerhandled:
            {
             case itPLMButton:
                  wsMoveWindow( &guiApp.mainWindow,True,RX - abs( sx ),RY - abs( sy ) );
-                 uiMainRender=0;
+                 uiMainRender=False;
                  break;
             case itPRMButton:
                  uiMenuMouseHandle( RX,RY );
@@ -553,8 +546,6 @@ potihandled:
           break;
   }
 }
-
-int keyPressed = 0;
 
 void uiMainKeyHandle( int KeyCode,int Type,int Key )
 {
@@ -609,7 +600,7 @@ void uiDandDHandler(int num,char** files)
   int f = 0;
 
   char* subtitles = NULL;
-  char* filename = NULL;
+  char* file = NULL;
   char* s;
 
   if (num <= 0)
@@ -645,8 +636,8 @@ void uiDandDHandler(int num,char** files)
       }
 
       /* clear playlist */
-      if (filename == NULL) {
-	filename = files[f];
+      if (file == NULL) {
+	file = files[f];
 	listMgr(PLAYLIST_DELETE,0);
       }
 
@@ -672,8 +663,8 @@ void uiDandDHandler(int num,char** files)
     free( str );
   }
 
-  if (filename) {
-    uiSetFileName( NULL,filename,STREAMTYPE_FILE );
+  if (file) {
+    uiSetFile( NULL,file,STREAMTYPE_FILE );
     if ( guiInfo.Playing == GUI_PLAY ) uiEventHandling( evStop,0 );
     uiEventHandling( evPlay,0 );
   }

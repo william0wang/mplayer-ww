@@ -17,12 +17,12 @@
  */
 
 #include "config.h"
-#include "gui/app.h"
+#include "gui/app/app.h"
 #include "help_mp.h"
 #include "version.h"
 
-#include "gui/ui/pixmaps/emblem.xpm"
-#include "gui/ui/widgets.h"
+#include "pixmaps/emblem.xpm"
+#include "dialog.h"
 #include "about.h"
 #include "tools.h"
 

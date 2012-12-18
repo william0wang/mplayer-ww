@@ -213,7 +213,7 @@ int term_osd = 1;
 static char *term_osd_esc = "\x1b[A\r\x1b[K";
 static char *playing_msg;
 // seek:
-static double seek_to_sec;
+static double seek_to_sec = MP_NOPTS_VALUE;
 static off_t seek_to_byte;
 static off_t step_sec;
 static int loop_seek;
@@ -1065,7 +1065,7 @@ static int playtree_add_playlist(play_tree_t *entry)
 #ifdef CONFIG_GUI
     if (use_gui) {
         if (entry) {
-            guiPlaylistAdd(entry, mconfig);
+            guiPlaylist(GUI_PLAYLIST_ADD, entry, mconfig, 0);
             play_tree_free_list(entry, 1);
         }
     } else
@@ -3061,7 +3061,7 @@ int main(int argc, char *argv[])
             play_tree_add_bpf(mpctx->playtree, cwd);
         }
         // Import initital playtree into GUI.
-        guiPlaylistInitialize(mpctx->playtree, mconfig, enqueue);
+        guiPlaylist(GUI_PLAYLIST_INIT, mpctx->playtree, mconfig, enqueue);
     }
 #endif /* CONFIG_GUI */
 
@@ -3919,7 +3919,7 @@ goto_enable_cache:
 
         adjust_stream_offset_ex(get_stream_offset_ex());
 
-        if (seek_to_sec) {
+        if (seek_to_sec != MP_NOPTS_VALUE) {
             seek(mpctx, seek_to_sec, SEEK_ABSOLUTE);
             end_at.pos += seek_to_sec;
         }
@@ -4175,6 +4175,11 @@ goto_enable_cache:
                 mpctx->eof    = 0;
                 abs_seek_pos  = SEEK_ABSOLUTE;
                 rel_seek_secs = seek_to_sec;
+                if (seek_to_sec == MP_NOPTS_VALUE) {
+                    // the first pts is not necessarily 0
+                    abs_seek_pos  = SEEK_ABSOLUTE | SEEK_FACTOR;
+                    rel_seek_secs = 0;
+                }
                 loop_seek     = 1;
             }
 

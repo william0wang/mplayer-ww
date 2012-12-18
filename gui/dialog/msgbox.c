@@ -18,14 +18,13 @@
 
 #include <string.h>
 
-#include "config.h"
-#include "gui/app.h"
+#include "gui/app/app.h"
 #include "help_mp.h"
 
-#include "gui/ui/pixmaps/error.xpm"
-#include "gui/ui/pixmaps/warning.xpm"
+#include "pixmaps/error.xpm"
+#include "pixmaps/warning.xpm"
 
-#include "gui/ui/widgets.h"
+#include "dialog.h"
 #include "msgbox.h"
 #include "tools.h"
 

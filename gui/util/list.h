@@ -19,16 +19,15 @@
 #ifndef MPLAYER_GUI_LIST_H
 #define MPLAYER_GUI_LIST_H
 
-/// StreamTypes that are permitted in a playlist
-#define isPlaylistStreamtype (guiInfo.StreamType == STREAMTYPE_FILE || guiInfo.StreamType == STREAMTYPE_STREAM)
-
 /// listMgr() commands
 enum {
     PLAYLIST_GET,
     PLAYLIST_ITEM_APPEND,
     PLAYLIST_ITEM_INSERT,
+    PLAYLIST_ITEM_FIND,
     PLAYLIST_ITEM_SET_CURR,
     PLAYLIST_ITEM_GET_CURR,
+    PLAYLIST_ITEM_GET_POS,
     PLAYLIST_ITEM_GET_PREV,
     PLAYLIST_ITEM_GET_NEXT,
     PLAYLIST_ITEM_DEL_CURR,

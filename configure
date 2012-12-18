@@ -54,6 +54,10 @@ if ! test -e ffmpeg ; then
     if ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
         rm -rf ffmpeg
         echo "Failed to get a FFmpeg checkout"
+        echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
+        echo "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2"
+        echo "To use a github mirror via http (e.g. because a firewall blocks git):"
+        echo "git clone --depth 1 https://github.com/FFmpeg/FFmpeg ffmpeg; touch ffmpeg/mp_auto_pull"
         exit 1
     fi
     touch ffmpeg/mp_auto_pull
@@ -9114,6 +9118,7 @@ if x86; then
 # Create a skeleton config.asm with just the ARCH_ definitions for FFmpeg.
 > "$TMPS"
 echo "%define CONFIG_GPL 1" >> "$TMPS"
+echo "%define HAVE_ALIGNED_STACK 1" >> "$TMPS"
 echo "$(ff_config_enable "$arch_all" "$arch" "%" "ARCH")" >> "$TMPS"
 echo "$(ff_config_enable "$subarch_all" "$subarch" "%" "ARCH")" >> "$TMPS"
 echo "$(ff_config_enable "$cpuexts_all" "$cpuexts" "%" "HAVE" "_EXTERNAL")" >> "$TMPS"

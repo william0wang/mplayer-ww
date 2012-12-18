@@ -39,13 +39,14 @@
 #include "libavutil/intreadwrite.h"
 #include "libvo/x11_common.h"
 
-#include "widgets.h"
-#include "gui/app.h"
+#include "dialog.h"
+#include "gui/app/app.h"
+#include "gui/app/gui.h"
 #include "gui/interface.h"
 #include "gui/wm/ws.h"
 
-#include "actions.h"
-#include "gtk/fileselect.h"
+#include "gui/ui/actions.h"
+#include "fileselect.h"
 
 GtkWidget *PopUpMenu = NULL;
 
@@ -54,16 +55,16 @@ GtkWidget *ErrorPixmap;
 
 int gtkPopupMenu      = 0;
 int gtkPopupMenuParam = 0;
-int gtkInitialized    = 0;
+int gtkInitialized    = False;
 
-#include "gtk/skinbrowser.h"
-#include "gtk/playlist.h"
-#include "gtk/msgbox.h"
-#include "gtk/about.h"
-#include "gtk/preferences.h"
-#include "gtk/menu.h"
-#include "gtk/url.h"
-#include "gtk/equalizer.h"
+#include "skinbrowser.h"
+#include "playlist.h"
+#include "msgbox.h"
+#include "about.h"
+#include "preferences.h"
+#include "menu.h"
+#include "url.h"
+#include "equalizer.h"
 
 static const char gui_icon_name[] = "mplayer";
 
@@ -151,7 +152,7 @@ void gtkInit(void)
 
     gtkLoadIcon(theme, 48, &gdkIcon, &gdkIconMask);
 
-    gtkInitialized = 1;
+    gtkInitialized = True;
 }
 
 void gtkAddIcon(GtkWidget *window)

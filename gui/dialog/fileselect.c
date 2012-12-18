@@ -24,13 +24,14 @@
 #include <unistd.h>
 
 #include "config.h"
-#include "gui/ui/gmplayer.h"
+#include "gui/ui/ui.h"
 
-#include "gui/ui/pixmaps/up.xpm"
-#include "gui/ui/pixmaps/dir.xpm"
-#include "gui/ui/pixmaps/file.xpm"
+#include "pixmaps/up.xpm"
+#include "pixmaps/dir.xpm"
+#include "pixmaps/file.xpm"
 
-#include "gui/app.h"
+#include "gui/app/app.h"
+#include "gui/app/gui.h"
 #include "gui/interface.h"
 #include "gui/util/list.h"
 #include "gui/util/mem.h"
@@ -40,7 +41,7 @@
 #include "stream/stream.h"
 #include "libavutil/common.h"
 
-#include "gui/ui/widgets.h"
+#include "dialog.h"
 #include "fileselect.h"
 #include "preferences.h"
 #include "tools.h"
@@ -171,13 +172,13 @@ static char * get_current_dir_name_utf8( void )
 static void clist_append_fname(GtkWidget * list, char *fname,
                                GdkPixmap *pixmap, GdkPixmap *mask) {
   gint pos;
-  gchar *filename, *str[2];
-  filename = g_filename_to_utf8(fname, -1, NULL, NULL, NULL);
+  gchar *filename_utf8, *str[2];
+  filename_utf8 = g_filename_to_utf8(fname, -1, NULL, NULL, NULL);
   str[0] = NULL;
-  str[1] = filename ? filename : fname;
+  str[1] = filename_utf8 ? filename_utf8 : fname;
   pos = gtk_clist_append(GTK_CLIST(list), str);
   gtk_clist_set_pixmap(GTK_CLIST(list), pos, 0, pixmap, mask);
-  g_free(filename);
+  g_free(filename_utf8);
 }
 
 static void CheckDir( GtkWidget * list )
@@ -503,7 +504,7 @@ static void fs_Ok_released( GtkButton * button, gpointer user_data )
    case fsVideoSelector:
           for (l = 0; fsVideoFilterNames[l][0]; l++)
             if (strcmp(fsVideoFilterNames[l][0], MSGTR_Filter_Playlists) == 0) break;
-          uiSetFileName( fsSelectedDirectory,fsSelectedFile, fsLastVideoFilterSelected == l ? STREAMTYPE_PLAYLIST : STREAMTYPE_FILE );
+          uiSetFile( fsSelectedDirectory,fsSelectedFile, fsLastVideoFilterSelected == l ? STREAMTYPE_PLAYLIST : STREAMTYPE_FILE );
           selected = g_strconcat(fsSelectedDirectory, "/", fsSelectedFile, NULL);
           if (selected)
           {
@@ -540,7 +541,7 @@ static void fs_Ok_released( GtkButton * button, gpointer user_data )
    item=item->next;
   }
  if ( i ) fsTopList_items=g_list_prepend( fsTopList_items,(gchar *)get_current_dir_name_utf8() );
- if ( uiMainAutoPlay ) { uiMainAutoPlay=0; uiEventHandling( evPlay,0 ); }
+ if ( uiMainAutoPlay ) { uiMainAutoPlay=False; uiEventHandling( evPlay,0 ); }
   else gui( GUI_SET_STATE,(void *) GUI_STOP );
 }
 

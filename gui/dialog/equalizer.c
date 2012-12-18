@@ -26,9 +26,8 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "config.h"
-#include "gui/app.h"
-#include "gui/cfg.h"
+#include "gui/app/app.h"
+#include "gui/app/cfg.h"
 #include "gui/interface.h"
 #include "help_mp.h"
 #include "libaf/equalizer.h"
@@ -38,7 +37,7 @@
 #include "libmpdemux/demuxer.h"
 #include "libmpdemux/stheader.h"
 #include "libmpcodecs/dec_video.h"
-#include "gui/ui/widgets.h"
+#include "dialog.h"
 #include "gui/util/mem.h"
 #include "gui/util/string.h"
 

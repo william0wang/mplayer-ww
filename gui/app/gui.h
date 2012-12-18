@@ -16,21 +16,26 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef MPLAYER_GUI_ACTIONS_H
-#define MPLAYER_GUI_ACTIONS_H
+/**
+ * @file
+ * @brief Internal declarations and definitions
+ */
 
-void uiAbsSeek(float sec);
-void uiChangeSkin(char *name);
-void uiCurr(void);
-void uiFullScreen(void);
-void uiNext(void);
-void uiPause(void);
-void uiPlay(void);
-void uiPrev(void);
-void uiRelSeek(float percent);
-void uiSetFile(char *dir, char *name, int type);
-void uiState(void);
-void uiUnsetFile(void);
-void uiUnsetMedia(int totals);
+#ifndef MPLAYER_GUI_GUI_H
+#define MPLAYER_GUI_GUI_H
 
-#endif /* MPLAYER_GUI_ACTIONS_H */
+//@{
+/// boolean symbolic constant
+#if !defined(True) && !defined(False)
+#define True  1
+#define False 0
+#endif
+//@}
+
+/// a pseudo stream type indicating not to change the current one
+#define SAME_STREAMTYPE (STREAMTYPE_DUMMY - 1)
+
+/// StreamTypes that are permitted in a playlist
+#define isPlaylistStreamtype (guiInfo.StreamType == STREAMTYPE_FILE || guiInfo.StreamType == STREAMTYPE_STREAM)
+
+#endif /* MPLAYER_GUI_GUI_H */

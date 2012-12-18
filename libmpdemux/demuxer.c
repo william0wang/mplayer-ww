@@ -111,6 +111,9 @@ extern const demuxer_desc_t demuxer_desc_aac;
 extern const demuxer_desc_t demuxer_desc_nut;
 extern const demuxer_desc_t demuxer_desc_mng;
 
+// never add this to the list
+extern const demuxer_desc_t demuxer_desc_demuxers;
+
 /* Please do not add any new demuxers here. If you want to implement a new
  * demuxer, add it to libavformat, except for wrappers around external
  * libraries and demuxers requiring binary support. */
@@ -224,6 +227,8 @@ demux_stream_t *new_demuxer_stream(struct demuxer *demuxer, int id)
 static const demuxer_desc_t *get_demuxer_desc_from_type(int file_format)
 {
     int i;
+    if (file_format == DEMUXER_TYPE_DEMUXERS)
+        return &demuxer_desc_demuxers;
 
     for (i = 0; demuxer_list[i]; i++)
         if (file_format == demuxer_list[i]->type)
@@ -715,7 +720,10 @@ int ds_fill_buffer(demux_stream_t *ds)
         // avoid buffering too far ahead in e.g. badly interleaved files
         // or when one stream is shorter, without breaking large audio
         // delay with well interleaved files.
-        if (ds->fill_count > 20)
+        // This needs to be enough for at least 1 second of packets
+        // since libavformat mov demuxer does not try to interleave
+        // with more than 1s precision.
+        if (ds->fill_count > 80)
             break;
         // avoid printing the "too many ..." message over and over
         if (ds->eof)

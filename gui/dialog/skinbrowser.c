@@ -23,16 +23,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "config.h"
 #include "skinbrowser.h"
 #include "tools.h"
 
-#include "gui/app.h"
-#include "gui/cfg.h"
+#include "gui/app/app.h"
+#include "gui/app/cfg.h"
+#include "gui/app/gui.h"
 #include "gui/skin/skin.h"
 #include "help_mp.h"
 
-#include "gui/ui/widgets.h"
+#include "dialog.h"
 
 GtkWidget * SkinList = NULL;
 char      * sbSelectedSkin=NULL;
@@ -88,7 +88,7 @@ int gtkFillSkinList( gchar * mdir )
     }
   }
  globfree( &gg );
- return 1;
+ return True;
 }
 
 static void prButton( GtkButton * button,gpointer user_data )

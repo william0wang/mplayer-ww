@@ -22,7 +22,8 @@
 #ifndef MPLAYER_GUI_WS_H
 #define MPLAYER_GUI_WS_H
 
-#include "gui/ui/widgets.h"
+#include "gui/dialog/dialog.h"
+#include "config.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -84,6 +85,7 @@
 #define wsRGB15 7
 #define wsBGR15 8
 
+#define wsNone                   0
 #define wsWindowVisible          1
 #define wsWindowPartialVisible   2
 #define wsWindowNotVisible       4
@@ -95,7 +97,7 @@
 #define wsWindowRolled         256
 #define wsWindowClosed         512
 
-#define wsNone       0
+#define wsNo         0
 #define wsMapped     1
 #define wsFocused    2
 #define wsVisible    3
@@ -242,7 +244,7 @@ void wsSetBackgroundRGB(wsTWindow *win, int r, int g, int b);
 #define wsClearWindow(win) XClearWindow(wsDisplay, (win)->WindowID)
 void wsSetTitle(wsTWindow *win, char *name);
 void wsVisibleWindow(wsTWindow *win, int show);
-void wsWindowDecoration(wsTWindow *win, long d);
+void wsWindowDecoration(wsTWindow *win, Bool decor);
 void wsSetLayer(Display *wsDisplay, Window win, int layer);
 void wsFullScreen(wsTWindow *win);
 void wsPostRedisplay(wsTWindow *win);
