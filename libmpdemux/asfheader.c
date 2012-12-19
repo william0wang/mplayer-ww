@@ -508,7 +508,10 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
           asf->asf_frame_start_found=0;
           asf->asf_is_dvr_ms=1;
           asf->dvr_last_vid_pts=0.0;
-        } else asf->asf_is_dvr_ms=0;
+        } else {
+          asf->asf_is_dvr_ms=0;
+          sh_video->needs_parsing=1;
+        }
         if (!get_ext_stream_properties(hdr, hdr_len, streamh->stream_no, asf, 1))
             goto len_err_out;
         if (get_meta(hdr, hdr_len, streamh->stream_no, &asp_ratio)) {
