@@ -573,15 +573,15 @@ GtkWidget * create_PopUpMenu( void )
 //   SubMenu=AddSubMenu( Menu,MSGTR_MENU_Size );
 //    AddMenuItem( SubMenu,MSGTR_MENU_NormalSize"      ", evNormalSize );
 //    AddMenuItem( SubMenu,MSGTR_MENU_DoubleSize, evDoubleSize );
-//    AddMenuItem( SubMenu,MSGTR_MENU_FullScreen, evFullScreen );
+//    AddMenuItem( SubMenu,MSGTR_MENU_FullScreen, evFullScreen + ( True << 16 ) );
 
 //  if ( guiInfo.Playing )
    {
     AspectMenu=AddSubMenu( window1, (const char*)aspect_xpm, Menu,MSGTR_MENU_AspectRatio );
-    AddMenuItem( window1, (const char*)aspect11_xpm, AspectMenu,MSGTR_MENU_Original,( 1 << 16 ) + evSetAspect );
-    AddMenuItem( window1, (const char*)aspect169_xpm, AspectMenu,"16:9",( 2 << 16 ) + evSetAspect );
-    AddMenuItem( window1, (const char*)aspect43_xpm, AspectMenu,"4:3",( 3 << 16 ) + evSetAspect );
-    AddMenuItem( window1, (const char*)aspect235_xpm, AspectMenu,"2.35",( 4 << 16 ) + evSetAspect );
+    AddMenuItem( window1, (const char*)aspect11_xpm, AspectMenu,MSGTR_MENU_Original,evSetAspect + ( 1 << 16 ) );
+    AddMenuItem( window1, (const char*)aspect169_xpm, AspectMenu,"16:9",evSetAspect + ( 2 << 16 ) );
+    AddMenuItem( window1, (const char*)aspect43_xpm, AspectMenu,"4:3",evSetAspect + ( 3 << 16 ) );
+    AddMenuItem( window1, (const char*)aspect235_xpm, AspectMenu,"2.35",evSetAspect + ( 4 << 16 ) );
    }
 
   if ( guiInfo.Playing && demuxer && guiInfo.StreamType != STREAMTYPE_DVD )
@@ -659,7 +659,7 @@ GtkWidget * create_PopUpMenu( void )
     H=AddMenuCheckItem( window1, (const char*)half_xpm, Menu,MSGTR_MENU_HalfSize,b_half,evHalfSize );
     N=AddMenuCheckItem( window1, (const char*)normal_xpm, Menu,MSGTR_MENU_NormalSize"      ",b1,evNormalSize );
     D=AddMenuCheckItem( window1, (const char*)double_xpm, Menu,MSGTR_MENU_DoubleSize,b2,evDoubleSize );
-    F=AddMenuCheckItem( window1, (const char*)full_xpm, Menu,MSGTR_MENU_FullScreen,guiApp.videoWindow.isFullScreen,evFullScreen );
+    F=AddMenuCheckItem( window1, (const char*)full_xpm, Menu,MSGTR_MENU_FullScreen,guiApp.videoWindow.isFullScreen,evFullScreen + ( True << 16 ) );
   if ( !guiInfo.Playing )
    {
     gtk_widget_set_sensitive( H,FALSE );
