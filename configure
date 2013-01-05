@@ -447,6 +447,7 @@ Codecs:
   --disable-ladspa          disable LADSPA plugin support [autodetect]
   --disable-libbs2b         disable libbs2b audio filter support [autodetect]
   --disable-libdv           disable libdv 0.9.5 en/decoding support [autodetect]
+  --disable-libilbc         disable libilbc decoding support [autodetect]
   --disable-libopus         disable libopus decoding support [autodetect]
   --disable-mpg123          disable libmpg123 MP3 decoding support [autodetect]
   --disable-mad             disable libmad (MPEG audio) support [autodetect]
@@ -773,6 +774,7 @@ _faac_lavc=auto
 _aacplus_lavc=auto
 _ladspa=auto
 _libbs2b=auto
+_libilbc=auto
 _libopus=auto
 _xmms=no
 _vcd=auto
@@ -1186,6 +1188,8 @@ for ac_option do
   --disable-ladspa)     _ladspa=no      ;;
   --enable-libbs2b)     _libbs2b=yes    ;;
   --disable-libbs2b)    _libbs2b=no     ;;
+  --enable-libilbc)     _libilbc=yes    ;;
+  --disable-libilbc)    _libilbc=no     ;;
   --enable-libopus)     _libopus=yes    ;;
   --disable-libopus)    _libopus=no     ;;
   --enable-xmms)        _xmms=yes       ;;
@@ -3053,7 +3057,7 @@ if arm ; then
   echores "$_iwmmxt"
 fi
 
-cpuexts_all='ALTIVEC AVX MMX MMX2 MMXEXT AMD3DNOW AMD3DNOWEXT SSE SSE2 SSE3 SSSE3 SSE4 SSE42 FAST_CMOV CMOV FAST_CLZ ARMV5TE ARMV6 ARMV6T2 ARMVFP VFPV3 NEON IWMMXT MMI VIS MVI'
+cpuexts_all='ALTIVEC AVX MMX MMX2 MMXEXT AMD3DNOW AMD3DNOWEXT SSE SSE2 SSE3 SSSE3 SSE4 SSE42 FAST_CMOV CMOV FAST_CLZ ARMV5TE ARMV6 ARMV6T2 VFP VFPV3 NEON IWMMXT MMI VIS MVI'
 test "$_altivec"   = yes && cpuexts="ALTIVEC $cpuexts"
 test "$_mmx"       = yes && cpuexts="MMX $cpuexts"
 test "$_mmxext"    = yes && cpuexts="MMX2 $cpuexts"
@@ -3073,7 +3077,7 @@ test "$_fast_clz"  = yes && cpuexts="FAST_CLZ $cpuexts"
 test "$_armv5te"   = yes && cpuexts="ARMV5TE $cpuexts"
 test "$_armv6"     = yes && cpuexts="ARMV6 $cpuexts"
 test "$_armv6t2"   = yes && cpuexts="ARMV6T2 $cpuexts"
-test "$_armvfp"    = yes && cpuexts="ARMVFP $cpuexts"
+test "$_armvfp"    = yes && cpuexts="VFP $cpuexts"
 test "$vfpv3"      = yes && cpuexts="VFPV3 $cpuexts"
 test "$neon"       = yes && cpuexts="NEON $cpuexts"
 test "$_iwmmxt"    = yes && cpuexts="IWMMXT $cpuexts"
@@ -5011,12 +5015,14 @@ fi
 echocheck "MNG support"
 if test "$_mng" = auto ; then
   _mng=no
-  return_statement_check libmng.h 'const char * p_ver = mng_version_text()' '!p_ver || p_ver[0] == 0' -lmng -lz && _mng=yes
+  for mnglibs in '-lmng -lz' '-lmng -ljpeg -lz' ; do
+    return_statement_check libmng.h 'const char * p_ver = mng_version_text()' '!p_ver || p_ver[0] == 0' $mnglibs && _mng=yes
+  done
 fi
 echores "$_mng"
 if test "$_mng" = yes ; then
   def_mng='#define CONFIG_MNG 1'
-  extra_ldflags="$extra_ldflags -lmng -lz"
+  extra_ldflags="$extra_ldflags $mnglibs"
   vomodules="mng $vomodules"
 else
   def_mng='#undef CONFIG_MNG'
@@ -6653,6 +6659,22 @@ fi
 res_comment="in libavcodec: $_aacplus_lavc"
 echores "$_aacplus_lavc"
 
+
+echocheck "libilbc support"
+if test "$_libilbc" = auto; then
+  _libilbc=no
+  statement_check ilbc.h 'WebRtcIlbcfix_InitDecode(0, 0, 0);' -lilbc && _libilbc=yes
+fi
+echores "$_libilbc"
+if test "$_libilbc" = yes ; then
+  def_libilbc='#define CONFIG_LIBILBC 1'
+  extra_ldflags="$extra_ldflags -lilbc"
+  libavdecoders="$libavdecoders LIBILBC_DECODER"
+  codecmodules="ilbc $codecmodules"
+else
+  def_libilbc='#define CONFIG_ILBC 0'
+  nocodecmodules="ilbc $nocodecmodules"
+fi
 
 
 echocheck "libopus decoding support"
@@ -8496,7 +8518,9 @@ CONFIG_MPEGVIDEO    = yes
 CONFIG_MPEGVIDEOENC = yes
 CONFIG_RANGECODER   = yes
 CONFIG_RDFT    = yes
+CONFIG_RTPENC_CHAIN = yes
 CONFIG_SINEWIN = yes
+CONFIG_VIDEODSP = yes
 CONFIG_VP3DSP  = yes
 
 $mak_hardcoded_tables
@@ -8734,6 +8758,7 @@ $def_libdv
 $def_liblzo
 $def_libmpeg2
 $def_libmpeg2_internal
+$def_libilbc
 $def_libopus
 $def_mad
 $def_mp3lame
