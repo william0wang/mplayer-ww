@@ -48,14 +48,14 @@
 #include "gui/ui/actions.h"
 #include "fileselect.h"
 
-GtkWidget *PopUpMenu = NULL;
+static GtkWidget *PopUpMenu;
 
 GtkWidget *WarningPixmap;
 GtkWidget *ErrorPixmap;
 
-int gtkPopupMenu      = 0;
-int gtkPopupMenuParam = 0;
-int gtkInitialized    = False;
+int gtkPopupMenu;
+int gtkPopupMenuParam;
+static int gtkInitialized;
 
 #include "skinbrowser.h"
 #include "playlist.h"
@@ -75,6 +75,16 @@ static const char gui_icon_name[] = "mplayer";
 
 guiIcon_t guiIcon;
 
+/**
+ * @brief Add an icon to the #guiIcon icon structure.
+ *
+ * @param theme theme to load the icon from
+ * @param size size of the icon to load
+ * @param gdkIcon location to store a pointer to the created pixmap
+ * @param gdkIconMask location to store a pointer to the created mask
+ *
+ * @return #True (ok) or #False (error)
+ */
 static int gtkLoadIcon(GtkIconTheme *theme, gint size, GdkPixmap **gdkIcon, GdkBitmap **gdkIconMask)
 {
     GdkPixbuf *pixbuf;
@@ -115,7 +125,12 @@ static int gtkLoadIcon(GtkIconTheme *theme, gint size, GdkPixmap **gdkIcon, GdkB
     return (pixbuf != NULL);
 }
 
-void gtkInit(void)
+/**
+ * @brief Initialize the GTK user interface.
+ *
+ * @param display_name name of the X display to use or NULL (using the DISPLAY environment variable)
+ */
+void gtkInit(char *display_name)
 {
     int argc = 0;
     char *arg[3], **argv = arg;
@@ -127,9 +142,9 @@ void gtkInit(void)
 
     arg[argc++] = GMPlayer;
 
-    if (mDisplayName) {            // MPlayer option '-display' was given
+    if (display_name) {            // MPlayer option '-display' was given
         arg[argc++] = "--display"; // Pass corresponding command line arguments to GTK,
-        arg[argc++] = mDisplayName; // to open the requested display for the GUI, too.
+        arg[argc++] = display_name; // to open the requested display for the GUI, too.
     }
 
 #ifdef CONFIG_GTK2
@@ -137,6 +152,7 @@ void gtkInit(void)
 #endif
 
     gtk_init(&argc, &argv);
+    wsSetErrorHandler();           // GDK has just set its own handler
 
     theme = gtk_icon_theme_get_default();
 
@@ -155,6 +171,11 @@ void gtkInit(void)
     gtkInitialized = True;
 }
 
+/**
+ * @brief Add the #guiIcon icons to a GTK window.
+ *
+ * @param window pointer to a GtkWindow widget
+ */
 void gtkAddIcon(GtkWidget *window)
 {
     wsSetIcon(gdk_display, GDK_WINDOW_XWINDOW(window->window), &guiIcon);
@@ -241,15 +262,25 @@ void gtkMessageBox(int type, const gchar *str)
             gtk_main_iteration_do(0);
 }
 
-void gtkSetLayer(GtkWidget *wdg)
+/**
+ * @brief Set the layer for a GTK window.
+ *
+ * @param window pointer to a GtkWindow widget
+ */
+void gtkSetLayer(GtkWidget *window)
 {
-    wsSetLayer(gdk_display, GDK_WINDOW_XWINDOW(wdg->window), guiApp.videoWindow.isFullScreen);
-    gtkActive(wdg);
+    wsSetLayer(gdk_display, GDK_WINDOW_XWINDOW(window->window), guiApp.videoWindow.isFullScreen);
+    gtkActive(window);
 }
 
-void gtkActive(GtkWidget *wdg)
+/**
+ * @brief Activate a GTK window, i.e. raise it to the top.
+ *
+ * @param window pointer to a GtkWindow widget
+ */
+void gtkActive(GtkWidget *window)
 {
-    wsRaiseWindowTop(gdk_display, GDK_WINDOW_XWINDOW(wdg->window));
+    wsRaiseWindowTop(gdk_display, GDK_WINDOW_XWINDOW(window->window));
 }
 
 void gtkShow(int type, char *param)
