@@ -22,10 +22,10 @@
 #include "ws.h"
 
 void wsXDNDInitialize(void);
-Bool wsXDNDProcessSelection(wsTWindow* wnd,XEvent *event);
+Bool wsXDNDProcessSelection(wsWindow* win,XEvent *event);
 Bool wsXDNDProcessClientMessage(XClientMessageEvent *event);
-void wsXDNDMakeAwareness(wsTWindow* window);
-void wsXDNDClearAwareness(wsTWindow* window);
+void wsXDNDMakeAwareness(wsWindow* win);
+void wsXDNDClearAwareness(wsWindow* win);
 
 /* header was ripped from xdnd's example on its page */
 

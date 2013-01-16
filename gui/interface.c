@@ -81,12 +81,16 @@ void guiInit(void)
 
     mp_msg(MSGT_GPLAYER, MSGL_V, "GUI init.\n");
 
+    /* check options */
+
     if (!cdrom_device)
         cdrom_device = strdup(DEFAULT_CDROM_DEVICE);
     if (!dvd_device)
         dvd_device = strdup(DEFAULT_DVD_DEVICE);
+#ifdef CONFIG_DXR3
     if (!gtkDXR3Device)
         gtkDXR3Device = strdup("/dev/em8300-0");
+#endif
 
     if (stream_cache_size > 0) {
         gtkCacheOn   = True;
@@ -104,10 +108,10 @@ void guiInit(void)
     gtkASS.top_margin    = ass_top_margin;
     gtkASS.bottom_margin = ass_bottom_margin;
 
-    gtkInit();
+    /* initialize graphical user interfaces */
 
-    /* initialize X */
     wsXInit(mDisplay);
+    gtkInit(mDisplayName);
 
     /* load skin */
 
@@ -168,7 +172,7 @@ void guiInit(void)
     if (guiWinID >= 0)
         guiApp.mainWindow.Parent = guiWinID;
 
-    wsCreateWindow(&guiApp.videoWindow, guiApp.video.x, guiApp.video.y, guiApp.video.width, guiApp.video.height, wsNoBorder, wsShowMouseCursor | wsHandleMouseButton | wsHandleMouseMove, wsShowFrame | wsHideWindow, "MPlayer - Video");
+    wsCreateWindow(&guiApp.videoWindow, guiApp.video.x, guiApp.video.y, guiApp.video.width, guiApp.video.height, 0, wsShowMouseCursor | wsHandleMouseButton | wsHandleMouseMove, wsShowFrame | wsHideWindow | wsWaitMap | wsAspect, "MPlayer - Video");
     wsDestroyImage(&guiApp.videoWindow);
     wsCreateImage(&guiApp.videoWindow, guiApp.video.Bitmap.Width, guiApp.video.Bitmap.Height);
     wsXDNDMakeAwareness(&guiApp.videoWindow);
@@ -180,8 +184,8 @@ void guiInit(void)
 
 // i=wsHideFrame|wsMaxSize|wsHideWindow;
 // if ( guiApp.mainDecoration ) i=wsShowFrame|wsMaxSize|wsHideWindow;
-    i = wsShowFrame | wsMaxSize | wsHideWindow;
-    wsCreateWindow(&guiApp.mainWindow, guiApp.main.x, guiApp.main.y, guiApp.main.width, guiApp.main.height, wsNoBorder, wsShowMouseCursor | wsHandleMouseButton | wsHandleMouseMove, i, "MPlayer");
+    i = wsShowFrame | wsMinSize | wsMaxSize | wsHideWindow;
+    wsCreateWindow(&guiApp.mainWindow, guiApp.main.x, guiApp.main.y, guiApp.main.width, guiApp.main.height, 0, wsShowMouseCursor | wsHandleMouseButton | wsHandleMouseMove, i, "MPlayer");
     wsSetShape(&guiApp.mainWindow, guiApp.main.Mask.Image);
     wsXDNDMakeAwareness(&guiApp.mainWindow);
 
@@ -220,16 +224,7 @@ void guiInit(void)
     if (gtkShowVideoWindow) {
         wsVisibleWindow(&guiApp.videoWindow, wsShowWindow);
 
-        {
-            XEvent xev;
-
-            do
-                XNextEvent(wsDisplay, &xev);
-            while (xev.type != MapNotify || xev.xmap.event != guiApp.videoWindow.WindowID);
-
-            guiApp.videoWindow.Mapped = wsMapped;
-            guiInfo.VideoWindow       = True;
-        }
+        guiInfo.VideoWindow = True;
 
         if (gtkLoadFullscreen)
             uiFullScreen();
@@ -802,7 +797,7 @@ int gui(int what, void *data)
 
     case GUI_HANDLE_X_EVENT:
 
-        wsEvents(wsDisplay, data);
+        wsEvents(data);
         gtkEventHandling();
         break;
 

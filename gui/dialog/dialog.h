@@ -38,7 +38,6 @@
 
 extern GtkWidget *PlayList;
 extern GtkWidget *Options;
-extern GtkWidget *PopUpMenu;
 
 extern GtkWidget *WarningPixmap;
 extern GtkWidget *ErrorPixmap;
@@ -65,7 +64,7 @@ extern guiIcon_t guiIcon;
 
 void widgetsCreate(void);
 
-void gtkInit(void);
+void gtkInit(char *display_name);
 void gtkAddIcon(GtkWidget *window);
 
 int gtkFillSkinList(gchar *dir);
@@ -77,7 +76,7 @@ void gtkEventHandling(void);
 
 void gtkShow(int type, char *param);
 void gtkMessageBox(int type, const gchar *str);
-void gtkSetLayer(GtkWidget *wdg);
-void gtkActive(GtkWidget *wdg);
+void gtkSetLayer(GtkWidget *window);
+void gtkActive(GtkWidget *window);
 
 #endif /* MPLAYER_GUI_DIALOG_H */
