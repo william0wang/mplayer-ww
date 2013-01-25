@@ -304,9 +304,9 @@ static void SimplePotmeterPutImage(guiImage *bf, int x, int y, float frac)
     }
 }
 
-void RenderAll(wsWindow *window, wItem *Items, int nrItems, char *db)
+void RenderAll(wsWindow *window, guiItem *Items, int nrItems, char *db)
 {
-    wItem *item;
+    guiItem *item;
     guiImage *image = NULL;
     int i, ofs;
 
@@ -416,5 +416,5 @@ void RenderAll(wsWindow *window, wItem *Items, int nrItems, char *db)
         }
     }
 
-    wsConvert(window, db);
+    wsImageRender(window, db);
 }

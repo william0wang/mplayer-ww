@@ -24,6 +24,7 @@
 #include <limits.h>
 #include "config.h"
 #include "mp_msg.h"
+#include "fmt-conversion.h"
 #include "help_mp.h"
 #include "mencoder.h"
 #include "aviheader.h"
@@ -40,8 +41,6 @@
 #include "libavutil/avstring.h"
 
 #include "mp_taglists.h"
-
-enum PixelFormat imgfmt2pixfmt(int fmt);
 
 #define BIO_BUFFER_SIZE 32768
 
@@ -156,7 +155,7 @@ static muxer_stream_t* lavf_new_stream(muxer_t *muxer, int type)
 	spriv->avstream->id = 1;
 
 	ctx = spriv->avstream->codec;
-	ctx->codec_id = CODEC_ID_NONE;
+	ctx->codec_id = AV_CODEC_ID_NONE;
 	switch(type)
 	{
 		case MUXER_TYPE_VIDEO:

@@ -91,7 +91,7 @@ static void ActivateMenuItem( int Item )
 // fprintf( stderr,"[menu] item: %d.%d\n",Item&0xffff,Item>>16 );
  gtkPopupMenu=Item & 0x0000ffff;
  gtkPopupMenuParam=Item >> 16;
- uiEventHandling( Item & 0x0000ffff,Item >> 16 );
+ uiMainEvent( Item & 0x0000ffff,Item >> 16 );
 }
 
 static GtkWidget * AddMenuCheckItem(GtkWidget *window1, const char * immagine_xpm, GtkWidget* Menu,const char* label, gboolean state, int Number)
@@ -654,7 +654,7 @@ GtkWidget * create_PopUpMenu( void )
            ( guiApp.videoWindow.Height == guiInfo.VideoHeight * 2 ) ) b2=True;
       else if ( ( guiApp.videoWindow.Width == guiInfo.VideoWidth / 2 ) &&
                 ( guiApp.videoWindow.Height == guiInfo.VideoHeight / 2 ) ) b_half=True;
-      else b1=True;
+      else b1=( guiApp.videoWindow.Width == guiInfo.VideoWidth && guiApp.videoWindow.Height == guiInfo.VideoHeight );
      } else b1=!guiApp.videoWindow.isFullScreen;
     H=AddMenuCheckItem( window1, (const char*)half_xpm, Menu,MSGTR_MENU_HalfSize,b_half,evHalfSize );
     N=AddMenuCheckItem( window1, (const char*)normal_xpm, Menu,MSGTR_MENU_NormalSize"      ",b1,evNormalSize );

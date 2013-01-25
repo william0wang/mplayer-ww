@@ -71,8 +71,6 @@ static const char gui_icon_name[] = "mplayer";
 #define THRESHOLD 128   // transparency values equal to or above this will become
                         // opaque, all values below this will become transparent
 
-/* init & close gtk */
-
 guiIcon_t guiIcon;
 
 /**
@@ -112,7 +110,7 @@ static int gtkLoadIcon(GtkIconTheme *theme, gint size, GdkPixmap **gdkIcon, GdkB
             data = gdk_pixbuf_get_pixels(pixbuf);
 
             for (i = csize; i < guiIcon.collection_size; data += 4, i++)
-                guiIcon.collection[i] = (uint32_t)(data[3] << 24) | AV_RB24(data);  // RGBA -> ARGB
+                guiIcon.collection[i] = (uint32_t)(data[3] << 24) | AV_RB24(data); // RGBA -> ARGB
         }
 
         g_object_unref(pixbuf);
@@ -142,8 +140,8 @@ void gtkInit(char *display_name)
 
     arg[argc++] = GMPlayer;
 
-    if (display_name) {            // MPlayer option '-display' was given
-        arg[argc++] = "--display"; // Pass corresponding command line arguments to GTK,
+    if (display_name) {             // MPlayer option '-display' was given
+        arg[argc++] = "--display";  // Pass corresponding command line arguments to GTK,
         arg[argc++] = display_name; // to open the requested display for the GUI, too.
     }
 
@@ -152,7 +150,7 @@ void gtkInit(char *display_name)
 #endif
 
     gtk_init(&argc, &argv);
-    wsSetErrorHandler();           // GDK has just set its own handler
+    wsSetErrorHandler();      // GDK has just set its own handler
 
     theme = gtk_icon_theme_get_default();
 
@@ -178,7 +176,7 @@ void gtkInit(char *display_name)
  */
 void gtkAddIcon(GtkWidget *window)
 {
-    wsSetIcon(gdk_display, GDK_WINDOW_XWINDOW(window->window), &guiIcon);
+    wsWindowIcon(gdk_display, GDK_WINDOW_XWINDOW(window->window), &guiIcon);
 }
 
 void gtkClearList(GtkWidget *list)
@@ -269,7 +267,7 @@ void gtkMessageBox(int type, const gchar *str)
  */
 void gtkSetLayer(GtkWidget *window)
 {
-    wsSetLayer(gdk_display, GDK_WINDOW_XWINDOW(window->window), guiApp.videoWindow.isFullScreen);
+    wsWindowLayer(gdk_display, GDK_WINDOW_XWINDOW(window->window), guiApp.videoWindow.isFullScreen);
     gtkActive(window);
 }
 
@@ -280,7 +278,7 @@ void gtkSetLayer(GtkWidget *window)
  */
 void gtkActive(GtkWidget *window)
 {
-    wsRaiseWindowTop(gdk_display, GDK_WINDOW_XWINDOW(window->window));
+    wsWindowRaiseTop(gdk_display, GDK_WINDOW_XWINDOW(window->window));
 }
 
 void gtkShow(int type, char *param)

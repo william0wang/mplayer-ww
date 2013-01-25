@@ -1,7 +1,4 @@
 /*
- * AutoSpace Window System for Linux/Win32 v0.61
- * written by pontscho/fresh!mindworkz
- *
  * This file is part of MPlayer.
  *
  * MPlayer is free software; you can redistribute it and/or modify
@@ -17,29 +14,27 @@
  * You should have received a copy of the GNU General Public License along
  * with MPlayer; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * based on: AutoSpace Window System for Linux/Win32,
+ *           written by pontscho/fresh!mindworkz
  */
 
 #ifndef MPLAYER_GUI_WS_H
 #define MPLAYER_GUI_WS_H
 
-#include "gui/dialog/dialog.h"
-#include "config.h"
-
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/keysym.h>
-#include <X11/Xatom.h>
+
+#include "gui/dialog/dialog.h"
+
+#include "config.h"
+
 #ifdef HAVE_SHM
 #include <X11/extensions/XShm.h>
 #endif
 
 #define  wsKeyReleased   0
 #define  wsKeyPressed    1
-
-#define  wsShift        (1L << 0)
-#define  wsLock         (1L << 1)
-#define  wsCtrl         (1L << 2)
-#define  wsAlt          (1L << 3)
 
 #define  wsPLMouseButton 1
 #define  wsPMMouseButton 2
@@ -56,16 +51,12 @@
 #define  wsMoveMouse     255
 
 #define  wsShowMouseCursor   1
-#define  wsMouse             1
 #define  wsHideMouseCursor   0
-#define  wsNoMouse           0
 #define  wsHandleMouseButton 2
 #define  wsHandleMouseMove   4
 
 #define  wsHideFrame    0
-#define  wsNoFrame      0
 #define  wsShowFrame    1
-#define  wsFrame        1
 #define  wsMaxSize      2
 #define  wsMinSize      4
 #define  wsShowWindow   8
@@ -73,17 +64,6 @@
 #define  wsOverredirect 32
 #define  wsWaitMap      64
 #define  wsAspect       128
-
-#define  wsSysName "AutoSpace Window System LiTe"
-
-#define wsRGB32 1
-#define wsBGR32 2
-#define wsRGB24 3
-#define wsBGR24 4
-#define wsRGB16 5
-#define wsBGR16 6
-#define wsRGB15 7
-#define wsBGR15 8
 
 #define wsNone                   0
 #define wsWindowVisible          1
@@ -105,17 +85,9 @@
 #define wsPVisible   5
 #define wsRolled     6
 
-#define wsWMUnknown  0
-#define wsWMNetWM    1
-#define wsWMKDE      2
-#define wsWMIceWM    3
-#define wsWMWMaker   4
-
-typedef   void (*wsTReDraw)(void);
-typedef   void (*wsTReSize)(unsigned int X, unsigned int Y, unsigned int width, unsigned int height);
-typedef   void (*wsTIdle)(void);
-typedef   void (*wsTKeyHandler)(int KeyCode, int Type, int Key);
+typedef   void (*wsTDrawHandler)(void);
 typedef   void (*wsTMouseHandler)(int Button, int X, int Y, int RX, int RY);
+typedef   void (*wsTKeyHandler)(int KeyCode, int Type, int Key);
 typedef   void (*wsTDNDHandler)(int num, char **str);
 
 typedef struct {
@@ -123,14 +95,12 @@ typedef struct {
     Window Parent;
     int X, Y, Width, Height;
     int OldX, OldY, OldWidth, OldHeight;
-    int MaxX, MaxY;
-    int isFullScreen;
-    int BorderWidth;
+    Bool isFullScreen;
     int Property;
     unsigned char *bImage;
     XImage *xImage;
     Pixmap Mask;
-    int Decorations;
+    Bool Decoration;
 
     int State;
     int Visible;
@@ -138,12 +108,10 @@ typedef struct {
     int Focused;
     int Rolled;
 
-    wsTReDraw ReDraw;
-    wsTReSize ReSize;
-    wsTIdle Idle;
-    wsTKeyHandler KeyHandler;
+    wsTDrawHandler DrawHandler;
     wsTMouseHandler MouseHandler;
-    wsTDNDHandler DandDHandler;
+    wsTKeyHandler KeyHandler;
+    wsTDNDHandler DNDHandler;
 
     int Alt;
     int Shift;
@@ -158,7 +126,6 @@ typedef struct {
     Atom AtomProtocols;
     Atom AtomsProtocols[3];
     Atom AtomLeaderClient;
-    Atom AtomRemote;
     Atom AtomWMSizeHint;
     Atom AtomWMNormalHint;
 
@@ -169,14 +136,10 @@ typedef struct {
     unsigned short int *ImageDataw;
     unsigned int *ImageDatadw;
     GC wGC;
-    XGCValues wGCV;
     unsigned long WindowMask;
     XVisualInfo VisualInfo;
     XSetWindowAttributes WindowAttrib;
     XWMHints WMHints;
-
-    XFontStruct *Font;
-    int FontHeight;
 
     Cursor wsCursor;
     char wsCursorData[1];
@@ -191,74 +154,43 @@ extern int wsOrgX;
 extern int wsOrgY;
 
 extern Display *wsDisplay;
-extern int wsScreen;
-extern Window wsRootWin;
-extern int wsLayer;
-
-extern unsigned char *wsImageData;
-
-extern XEvent wsEvent;
-
-extern int wsDepthOnScreen;
-extern int wsRedMask;
-extern int wsGreenMask;
-extern int wsBlueMask;
-
-extern int wsUseXShm;
 
 // ----------------------------------------------------------------------------------------------
-//  wsKeyTable
-// ----------------------------------------------------------------------------------------------
-extern unsigned long wsKeyTable[512];
-
-void wsXDone(void);
-void wsXInit(Display *display);
+void wsDone(void);
+void wsInit(Display *display);
 void wsSetErrorHandler(void);
 
-int wsGetDepthOnScreen(void);
+void wsMouseAutohide(void);
+void wsEvent(XEvent *event);
+void wsEvents(void);
 
-void wsDoExit(void);
-void wsMainLoop(void);
-void wsAutohideCursor(void);
-Bool wsEvents(XEvent *event);
-void wsHandleEvents(void);
-
-void wsCreateWindow(wsWindow *win, int x, int y, int w, int h, int b, int c, unsigned char p, char *label);
-void wsDestroyWindow(wsWindow *win);
-void wsMoveWindow(wsWindow *win, Bool abs, int x, int y);
-void wsMoveWindowWithin(wsWindow *win, Bool abs, int x, int y);
-void wsResizeWindow(wsWindow *win, int sx, int sy);
-void wsIconify(wsWindow *win);
-void wsRaiseWindowTop(Display *display, Window Win);
-void wsSetBackground(wsWindow *win, int color);
-void wsSetForegroundRGB(wsWindow *win, int r, int g, int b);
-void wsSetBackgroundRGB(wsWindow *win, int r, int g, int b);
-void wsClearWindow(wsWindow *win);
-void wsSetTitle(wsWindow *win, char *name);
-void wsVisibleWindow(wsWindow *win, int show);
-void wsWindowDecoration(wsWindow *win, Bool decor);
-void wsSetLayer(Display *display, Window Win, Bool fullscreen);
-void wsFullScreen(wsWindow *win);
-void wsPostRedisplay(wsWindow *win);
-void wsSetShape(wsWindow *win, char *data);
-void wsSetIcon(Display *display, Window Win, guiIcon_t *icon);
+void wsWindowCreate(wsWindow *win, int x, int y, int w, int h, int p, int c, char *label);
+void wsWindowDestroy(wsWindow *win);
+void wsWindowMove(wsWindow *win, Bool abs, int x, int y);
+void wsWindowMoveWithin(wsWindow *win, Bool abs, int x, int y);
+void wsWindowResize(wsWindow *win, int w, int h);
+void wsWindowIconify(wsWindow *win);
+void wsWindowRaiseTop(Display *display, Window Win);
+void wsWindowBackground(wsWindow *win, int r, int g, int b);
+void wsWindowVisibility(wsWindow *win, int vis);
+void wsWindowLayer(Display *display, Window Win, Bool fullscreen);
+void wsWindowFullscreen(wsWindow *win);
+void wsWindowRedraw(wsWindow *win);
+void wsWindowShape(wsWindow *win, char *data);
+void wsWindowIcon(Display *display, Window Win, guiIcon_t *icon);
 
 // ----------------------------------------------------------------------------------------------
 //    Show / hide mouse cursor.
 // ----------------------------------------------------------------------------------------------
-void wsVisibleMouse(wsWindow *win, int m);
-void wsSetMousePosition(wsWindow *win, int x, int y);
+void wsMouseVisibility(wsWindow *win, int vis);
 
 // ----------------------------------------------------------------------------------------------
 // Image handling
 // ----------------------------------------------------------------------------------------------
-void wsCreateImage(wsWindow *win, int Width, int Height);
-void wsConvert(wsWindow *win, unsigned char *Image);
-void wsPutImage(wsWindow *win);
-void wsResizeImage(wsWindow *win, int Width, int Height);
-void wsDestroyImage(wsWindow *win);
-int wsGetOutMask(void);
-
-#define wgIsRect(X, Y, tX, tY, bX, bY) (((X) > (tX)) && ((Y) > (tY)) && ((X) < (bX)) && ((Y) < (bY)))
+void wsImageCreate(wsWindow *win, int w, int h);
+void wsImageRender(wsWindow *win, unsigned char *img);
+void wsImageDraw(wsWindow *win);
+void wsImageResize(wsWindow *win, int w, int h);
+void wsImageDestroy(wsWindow *win);
 
 #endif /* MPLAYER_GUI_WS_H */

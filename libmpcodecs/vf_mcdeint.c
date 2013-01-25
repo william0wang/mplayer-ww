@@ -54,6 +54,7 @@ Known Issues:
 #include "mp_msg.h"
 #include "cpudetect.h"
 
+#include "libavutil/common.h"
 #include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "libavcodec/avcodec.h"
@@ -182,7 +183,7 @@ static int config(struct vf_instance *vf,
         int width, int height, int d_width, int d_height,
         unsigned int flags, unsigned int outfmt){
         int i;
-        AVCodec *enc= avcodec_find_encoder(CODEC_ID_SNOW);
+        AVCodec *enc= avcodec_find_encoder(AV_CODEC_ID_SNOW);
 
         for(i=0; i<3; i++){
             AVCodecContext *avctx_enc;

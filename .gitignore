@@ -10,6 +10,7 @@ codecs2html
 codecs.conf.h
 config.*
 cpuinfo
+ffmpeg
 gmplayer
 help_mp.h
 mencoder

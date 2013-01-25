@@ -32,7 +32,7 @@
 #include "gui/dialog/dialog.h"
 
 unsigned char * menuDrawBuffer = NULL;
-int             menuRender = True;
+static int      uiMenuRender = True;
 int             menuItem = -1;
 int             oldMenuItem = -1;
 int             menuX,menuY;
@@ -45,9 +45,9 @@ static void uiMenuDraw( void )
  int             x,y,tmp;
 
  if ( !guiApp.menuIsPresent || !guiApp.menu.Bitmap.Image ) return;
- if ( !menuRender && !guiApp.menuWindow.Visible ) return;
+ if ( !uiMenuRender && !guiApp.menuWindow.Visible ) return;
 
- if ( menuRender || menuItem != oldMenuItem )
+ if ( uiMenuRender || menuItem != oldMenuItem )
   {
    memcpy( menuDrawBuffer,guiApp.menu.Bitmap.Image,guiApp.menu.Bitmap.ImageSize );
 /* --- */
@@ -64,13 +64,13 @@ static void uiMenuDraw( void )
     }
    oldMenuItem=menuItem;
 /* --- */
-   wsConvert( &guiApp.menuWindow,menuDrawBuffer );
-   menuRender=False;
+   wsImageRender( &guiApp.menuWindow,menuDrawBuffer );
+   uiMenuRender=False;
   }
- wsPutImage( &guiApp.menuWindow );
+ wsImageDraw( &guiApp.menuWindow );
 }
 
-void uiMenuMouseHandle( int RX,int RY )
+void uiMenuMouse( int RX,int RY )
 {
  int x,y,i;
 
@@ -81,66 +81,17 @@ void uiMenuMouseHandle( int RX,int RY )
  y=RY - guiApp.menuWindow.Y;
  if ( ( x < 0 ) || ( y < 0  ) || ( x > guiApp.menu.width ) || ( y > guiApp.menu.height ) )
   {
-   wsPostRedisplay( &guiApp.menuWindow );
+   wsWindowRedraw( &guiApp.menuWindow );
    return;
   }
 
  for( i=0;i<=guiApp.IndexOfMenuItems;i++ )
   {
-   if ( wgIsRect( x,y,
+   if ( isInside( x,y,
          guiApp.menuItems[i].x,guiApp.menuItems[i].y,
          guiApp.menuItems[i].x+guiApp.menuItems[i].width,guiApp.menuItems[i].y+guiApp.menuItems[i].height ) ) { menuItem=i; break; }
   }
- wsPostRedisplay( &guiApp.menuWindow );
-}
-
-void uiShowMenu( int mx,int my )
-{
- int x,y;
-
- if ( !guiApp.menuIsPresent || !guiApp.menu.Bitmap.Image ) return;
-
- x=mx;
- if ( x + guiApp.menuWindow.Width > wsMaxX ) x=wsMaxX - guiApp.menuWindow.Width - 1 + wsOrgX;
- y=my;
- if ( y + guiApp.menuWindow.Height > wsMaxY ) y=wsMaxY - guiApp.menuWindow.Height - 1 + wsOrgY;
-
- menuX=x; menuY=y;
-
- menuItem = 0;
-
- wsMoveWindow( &guiApp.menuWindow,True,x,y );
- wsRaiseWindowTop( wsDisplay,guiApp.menuWindow.WindowID );
- wsSetLayer( wsDisplay,guiApp.menuWindow.WindowID,1 );
- menuRender=True;
- wsVisibleWindow( &guiApp.menuWindow,wsShowWindow );
- wsPostRedisplay( &guiApp.menuWindow );
-}
-
-void uiHideMenu( int mx,int my,int w )
-{
- int x,y,i=menuItem;
-
- if ( !guiApp.menuIsPresent || !guiApp.menu.Bitmap.Image ) return;
-
- x=mx-menuX;
- y=my-menuY;
-// x=RX - guiApp.menuWindow.X;
-// y=RY - guiApp.menuWindow.Y;
-
- wsVisibleWindow( &guiApp.menuWindow,wsHideWindow );
-
- if ( ( x < 0 ) || ( y < 0 ) ) return;
-
-// printf( "---------> %d %d,%d\n",i,x,y );
-// printf( "--------> mi: %d,%d %dx%d\n",guiApp.menuItems[i].x,guiApp.menuItems[i].y,guiApp.menuItems[i].width,guiApp.menuItems[i].height );
- if ( wgIsRect( x,y,
-        guiApp.menuItems[i].x,guiApp.menuItems[i].y,
-        guiApp.menuItems[i].x+guiApp.menuItems[i].width,
-        guiApp.menuItems[i].y+guiApp.menuItems[i].height ) )
-   {
-    uiEventHandling( guiApp.menuItems[i].message,(float)w );
-   }
+ wsWindowRedraw( &guiApp.menuWindow );
 }
 
 void uiMenuInit( void )
@@ -158,17 +109,66 @@ void uiMenuInit( void )
    return;
   }
 
- wsCreateWindow( &guiApp.menuWindow,
+ wsWindowCreate( &guiApp.menuWindow,
  guiApp.menu.x,guiApp.menu.y,guiApp.menu.width,guiApp.menu.height,
- 0,wsShowMouseCursor|wsHandleMouseButton|wsHandleMouseMove,wsOverredirect|wsHideFrame|wsMaxSize|wsMinSize|wsHideWindow,"MPlayer menu" );
+ wsOverredirect|wsHideFrame|wsMaxSize|wsMinSize|wsHideWindow,wsShowMouseCursor|wsHandleMouseButton|wsHandleMouseMove,"MPlayer menu" );
 
- wsSetShape( &guiApp.menuWindow,guiApp.menu.Mask.Image );
+ wsWindowShape( &guiApp.menuWindow,guiApp.menu.Mask.Image );
 
  mp_msg( MSGT_GPLAYER,MSGL_DBG2,"[menu] menuWindow ID: 0x%x\n",(int)guiApp.menuWindow.WindowID );
 
  menuIsInitialized=True;
- guiApp.menuWindow.ReDraw=uiMenuDraw;
-// guiApp.menuWindow.MouseHandler=uiMenuMouseHandle;
-// guiApp.menuWindow.KeyHandler=uiMainKeyHandle;
- menuRender=True; wsPostRedisplay( &guiApp.menuWindow );
+ guiApp.menuWindow.DrawHandler=uiMenuDraw;
+// guiApp.menuWindow.MouseHandler=uiMenuMouse;
+// guiApp.menuWindow.KeyHandler=uiMainKey;
+ uiMenuRender=True; wsWindowRedraw( &guiApp.menuWindow );
+}
+
+void uiMenuShow( int mx,int my )
+{
+ int x,y;
+
+ if ( !guiApp.menuIsPresent || !guiApp.menu.Bitmap.Image ) return;
+
+ x=mx;
+ if ( x + guiApp.menuWindow.Width > wsMaxX ) x=wsMaxX - guiApp.menuWindow.Width - 1 + wsOrgX;
+ y=my;
+ if ( y + guiApp.menuWindow.Height > wsMaxY ) y=wsMaxY - guiApp.menuWindow.Height - 1 + wsOrgY;
+
+ menuX=x; menuY=y;
+
+ menuItem = 0;
+
+ wsWindowMove( &guiApp.menuWindow,True,x,y );
+ wsWindowRaiseTop( wsDisplay,guiApp.menuWindow.WindowID );
+ wsWindowLayer( wsDisplay,guiApp.menuWindow.WindowID,1 );
+ uiMenuRender=True;
+ wsWindowVisibility( &guiApp.menuWindow,wsShowWindow );
+ wsWindowRedraw( &guiApp.menuWindow );
+}
+
+void uiMenuHide( int mx,int my,int w )
+{
+ int x,y,i=menuItem;
+
+ if ( !guiApp.menuIsPresent || !guiApp.menu.Bitmap.Image ) return;
+
+ x=mx-menuX;
+ y=my-menuY;
+// x=RX - guiApp.menuWindow.X;
+// y=RY - guiApp.menuWindow.Y;
+
+ wsWindowVisibility( &guiApp.menuWindow,wsHideWindow );
+
+ if ( ( x < 0 ) || ( y < 0 ) ) return;
+
+// printf( "---------> %d %d,%d\n",i,x,y );
+// printf( "--------> mi: %d,%d %dx%d\n",guiApp.menuItems[i].x,guiApp.menuItems[i].y,guiApp.menuItems[i].width,guiApp.menuItems[i].height );
+ if ( isInside( x,y,
+        guiApp.menuItems[i].x,guiApp.menuItems[i].y,
+        guiApp.menuItems[i].x+guiApp.menuItems[i].width,
+        guiApp.menuItems[i].y+guiApp.menuItems[i].height ) )
+   {
+    uiMainEvent( guiApp.menuItems[i].message,(float)w );
+   }
 }

@@ -37,6 +37,7 @@
 #include "vf.h"
 #include "vf_scale.h"
 
+#include "libavutil/mem.h"
 #include "libswscale/swscale.h"
 #include "libavcodec/avcodec.h"
 
@@ -354,7 +355,7 @@ static int vf_open(vf_instance_t *vf, char *args)
 
     vf->priv->avctx->pix_fmt = PIX_FMT_RGB24;
     avcodec_register_all();
-    if (avcodec_open2(vf->priv->avctx, avcodec_find_encoder(CODEC_ID_PNG), NULL)) {
+    if (avcodec_open2(vf->priv->avctx, avcodec_find_encoder(AV_CODEC_ID_PNG), NULL)) {
         mp_msg(MSGT_VFILTER, MSGL_FATAL, "Could not open libavcodec PNG encoder\n");
         return 0;
     }
