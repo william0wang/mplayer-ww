@@ -83,7 +83,7 @@ static void uiPlaybarDraw( void )
 	  uiPlaybarFade=0;
 	  vo_mouse_autohide=False;
 	 }
-        wsMoveWindow( &guiApp.playbarWindow,True,x,playbarLength );
+        wsWindowMove( &guiApp.playbarWindow,True,x,playbarLength );
 	break;
    case 2: // fade out
 	playbarLength+=10;
@@ -93,10 +93,10 @@ static void uiPlaybarDraw( void )
 	  uiPlaybarFade=0;
 	  playbarVisible=False;
           vo_mouse_autohide=True;
-          wsVisibleWindow( &guiApp.playbarWindow,wsHideWindow );
+          wsWindowVisibility( &guiApp.playbarWindow,wsHideWindow );
 	  return;
 	 }
-        wsMoveWindow( &guiApp.playbarWindow,True,x,playbarLength );
+        wsWindowMove( &guiApp.playbarWindow,True,x,playbarLength );
 	break;
   }
 
@@ -110,16 +110,16 @@ static void uiPlaybarDraw( void )
 
    fast_memcpy( playbarDrawBuffer,guiApp.playbar.Bitmap.Image,guiApp.playbar.Bitmap.ImageSize );
    RenderAll( &guiApp.playbarWindow,guiApp.playbarItems,guiApp.IndexOfPlaybarItems,playbarDrawBuffer );
-   wsConvert( &guiApp.playbarWindow,playbarDrawBuffer );
+   wsImageRender( &guiApp.playbarWindow,playbarDrawBuffer );
   }
- wsPutImage( &guiApp.playbarWindow );
+ wsImageDraw( &guiApp.playbarWindow );
 }
 
-static void uiPlaybarMouseHandle( int Button, int X, int Y, int RX, int RY )
+static void uiPlaybarMouse( int Button, int X, int Y, int RX, int RY )
 {
  static int     itemtype = 0;
         int     i;
-        wItem * item = NULL;
+        guiItem * item = NULL;
 	float   value = 0.0f;
 
  static int     SelectedItem = -1;
@@ -127,17 +127,17 @@ static void uiPlaybarMouseHandle( int Button, int X, int Y, int RX, int RY )
 
  for ( i=0;i <= guiApp.IndexOfPlaybarItems;i++ )
    if ( ( guiApp.playbarItems[i].pressed != btnDisabled )&&
-      ( wgIsRect( X,Y,guiApp.playbarItems[i].x,guiApp.playbarItems[i].y,guiApp.playbarItems[i].x+guiApp.playbarItems[i].width,guiApp.playbarItems[i].y+guiApp.playbarItems[i].height ) ) )
+      ( isInside( X,Y,guiApp.playbarItems[i].x,guiApp.playbarItems[i].y,guiApp.playbarItems[i].x+guiApp.playbarItems[i].width,guiApp.playbarItems[i].y+guiApp.playbarItems[i].height ) ) )
     { currentselected=i; break; }
 
  switch ( Button )
   {
    case wsPMMouseButton:
         gtkShow( ivHidePopUpMenu,NULL );
-        uiShowMenu( RX,RY );
+        uiMenuShow( RX,RY );
         break;
    case wsRMMouseButton:
-        uiHideMenu( RX,RY,0 );
+        uiMenuHide( RX,RY,0 );
         break;
    case wsRRMouseButton:
         gtkShow( ivShowPopUpMenu,NULL );
@@ -177,16 +177,16 @@ static void uiPlaybarMouseHandle( int Button, int X, int Y, int RX, int RY )
 	  case itPotmeter:
 	  case itHPotmeter:
 	       btnModify( item->message,(float)( X - item->x ) / item->width * 100.0f );
-	       uiEventHandling( item->message,item->value );
+	       uiMainEvent( item->message,item->value );
 	       value=item->value;
 	       break;
 	  case itVPotmeter:
 	       btnModify( item->message, ( 1. - (float)( Y - item->y ) / item->height) * 100.0f );
-	       uiEventHandling( item->message,item->value );
+	       uiMainEvent( item->message,item->value );
 	       value=item->value;
 	       break;
 	 }
-	uiEventHandling( item->message,value );
+	uiMainEvent( item->message,value );
 
 	itemtype=0;
 	break;
@@ -201,7 +201,7 @@ rollerhandled:
            {
             item->value+=value;
             btnModify( item->message,item->value );
-            uiEventHandling( item->message,item->value );
+            uiMainEvent( item->message,item->value );
            }
 	 }
 	break;
@@ -211,7 +211,7 @@ rollerhandled:
 	switch ( itemtype )
 	 {
 	  case itPRMButton:
-	       uiMenuMouseHandle( RX,RY );
+	       uiMenuMouse( RX,RY );
 	       break;
 	  case itPotmeter:
 	       item->value=(float)( X - item->x ) / item->width * 100.0f;
@@ -224,24 +224,11 @@ rollerhandled:
 potihandled:
 	       if ( item->value > 100.0f ) item->value=100.0f;
 	       if ( item->value < 0.0f ) item->value=0.0f;
-	       uiEventHandling( item->message,item->value );
+	       uiMainEvent( item->message,item->value );
 	       break;
 	 }
         break;
   }
-}
-
-void uiPlaybarShow( int y )
-{
- if ( !guiApp.playbarIsPresent || !gtkEnablePlayBar ) return;
- if ( !guiApp.videoWindow.isFullScreen ) return;
-
- if ( y > guiApp.videoWindow.Height - guiApp.playbar.height )
-  {
-   if ( !uiPlaybarFade ) wsVisibleWindow( &guiApp.playbarWindow,wsShowWindow );
-   uiPlaybarFade=1; playbarVisible=True; wsPostRedisplay( &guiApp.playbarWindow );
-  }
-  else if ( !uiPlaybarFade ) uiPlaybarFade=2;
 }
 
 void uiPlaybarInit( void )
@@ -257,15 +244,28 @@ void uiPlaybarInit( void )
   }
 
  guiApp.playbarWindow.Parent=guiApp.videoWindow.WindowID;
- wsCreateWindow( &guiApp.playbarWindow,
+ wsWindowCreate( &guiApp.playbarWindow,
    guiApp.playbar.x,guiApp.playbar.y,guiApp.playbar.width,guiApp.playbar.height,
-   0,wsShowMouseCursor|wsHandleMouseButton|wsHandleMouseMove,wsHideFrame|wsHideWindow,"PlayBar" );
+   wsHideFrame|wsHideWindow,wsShowMouseCursor|wsHandleMouseButton|wsHandleMouseMove,"PlayBar" );
 
- wsSetShape( &guiApp.playbarWindow,guiApp.playbar.Mask.Image );
+ wsWindowShape( &guiApp.playbarWindow,guiApp.playbar.Mask.Image );
 
- guiApp.playbarWindow.ReDraw=(void *)uiPlaybarDraw;
- guiApp.playbarWindow.MouseHandler=uiPlaybarMouseHandle;
- guiApp.playbarWindow.KeyHandler=uiMainKeyHandle;
+ guiApp.playbarWindow.DrawHandler=uiPlaybarDraw;
+ guiApp.playbarWindow.MouseHandler=uiPlaybarMouse;
+ guiApp.playbarWindow.KeyHandler=uiMainKey;
 
  playbarLength=guiApp.videoWindow.Height;
+}
+
+void uiPlaybarShow( int y )
+{
+ if ( !guiApp.playbarIsPresent || !gtkEnablePlayBar ) return;
+ if ( !guiApp.videoWindow.isFullScreen ) return;
+
+ if ( y > guiApp.videoWindow.Height - guiApp.playbar.height )
+  {
+   if ( !uiPlaybarFade ) wsWindowVisibility( &guiApp.playbarWindow,wsShowWindow );
+   uiPlaybarFade=1; playbarVisible=True; wsWindowRedraw( &guiApp.playbarWindow );
+  }
+  else if ( !uiPlaybarFade ) uiPlaybarFade=2;
 }

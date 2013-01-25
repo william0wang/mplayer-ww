@@ -137,7 +137,7 @@ static inline void encode_dc(MpegEncContext *s, int val,
     }
 }
 
-static void encode_block(MpegEncContext *s, DCTELEM *block, int n)
+static void encode_block(MpegEncContext *s, int16_t *block, int n)
 {
     int mant, nbits, code, i, j;
     int component, dc, run, last_index, val;
@@ -200,7 +200,7 @@ static void encode_block(MpegEncContext *s, DCTELEM *block, int n)
         put_bits(&s->pb, huff_size_ac[0], huff_code_ac[0]);
 }
 
-static inline void clip_coeffs(MpegEncContext *s, DCTELEM *block, int last_index)
+static inline void clip_coeffs(MpegEncContext *s, int16_t *block, int last_index)
 {
     int i;
     const int maxlevel= s->max_qcoeff;
@@ -330,7 +330,7 @@ jpeg_enc_t *jpeg_enc_init(int w, int h, int y_psize, int y_rsize,
 	/* alloc bogus avctx to keep MPV_common_init from segfaulting */
 	j->s->avctx = calloc(sizeof(*j->s->avctx), 1);
 	/* Set up to encode mjpeg */
-	j->s->avctx->codec_id = CODEC_ID_MJPEG;
+	j->s->avctx->codec_id = AV_CODEC_ID_MJPEG;
 
 	/* make MPV_common_init allocate important buffers, like s->block */
 	j->s->avctx->thread_count = 1;

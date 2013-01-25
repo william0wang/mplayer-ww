@@ -40,6 +40,7 @@
 #include "vf.h"
 
 #include "libvo/fastmemcpy.h"
+#include "libavutil/common.h"
 #include "libavutil/mem.h"
 
 vf_instance_t *last_vf=NULL;

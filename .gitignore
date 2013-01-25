@@ -12,6 +12,7 @@ codecs2html
 codecs.conf.h
 config.*
 cpuinfo
+ffmpeg
 gmplayer
 help_mp.h
 mencoder
@@ -33,7 +34,6 @@ DOCS/xml/*/main.xml
 drivers/mga_vid_test
 drivers/tdfx_vid_test
 ffmpeg/
-
 libvo/aspecttest
 loader/qtx/list
 loader/qtx/qtxload

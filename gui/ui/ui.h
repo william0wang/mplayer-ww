@@ -19,33 +19,28 @@
 #ifndef MPLAYER_GUI_UI_H
 #define MPLAYER_GUI_UI_H
 
-extern int             uiVideoRender;
-extern int             uiMainRender;
-
 extern unsigned char * mainDrawBuffer;
 extern unsigned char * menuDrawBuffer;
 extern int             mainVisible;
 
-extern int             uiMainAutoPlay;
+extern int             uiLoadPlay;
 extern int             uiPlaybarFade;
 
 extern int             sx, sy;
 
-void uiInit( void * disp );
-
 void uiMainDraw( void );
-void uiEventHandling( int msg, float param );
-void uiMainMouseHandle( int Button, int X, int Y, int RX, int RY );
-void uiMainKeyHandle( int KeyCode, int Type, int Key );
-void uiDandDHandler(int num, char** files);
+void uiMainEvent( int msg, float param );
+void uiMainMouse( int Button, int X, int Y, int RX, int RY );
+void uiMainKey( int KeyCode, int Type, int Key );
+void uiMainDND(int num, char** files);
 
 void uiVideoDraw( void );
-void uiVideoMouseHandle( int Button, int X, int Y, int RX, int RY );
+void uiVideoMouse( int Button, int X, int Y, int RX, int RY );
 
 void uiMenuInit( void );
-void uiHideMenu( int mx, int my, int w );
-void uiShowMenu( int mx, int my );
-void uiMenuMouseHandle( int RX, int RY );
+void uiMenuHide( int mx, int my, int w );
+void uiMenuShow( int mx, int my );
+void uiMenuMouse( int RX, int RY );
 
 void uiPlaybarInit( void );
 void uiPlaybarShow( int y );

@@ -2608,12 +2608,10 @@ EOF
 fi
 if test "$_big_endian" = yes ; then
   _byte_order='big-endian'
-  def_words_endian='#define WORDS_BIGENDIAN 1'
   def_bigendian='#define HAVE_BIGENDIAN 1'
   def_av_bigendian='#define AV_HAVE_BIGENDIAN 1'
 else
   _byte_order='little-endian'
-  def_words_endian='#undef WORDS_BIGENDIAN'
   def_bigendian='#define HAVE_BIGENDIAN 0'
   def_av_bigendian='#define AV_HAVE_BIGENDIAN 0'
 fi
@@ -3236,7 +3234,7 @@ fi
 echores "$_kstat"
 
 
-for func in atanf cbrtf cosf expf exp2 exp2f isnan isinf llrint llrintf log2 log2f log10f lrint lrintf rint round roundf sinf trunc truncf; do
+for func in atanf cbrt cbrtf cosf expf exp2 exp2f isnan isinf llrint llrintf log2 log2f log10f lrint lrintf rint round roundf sinf trunc truncf; do
 echocheck $func
 eval _$func=no
 statement_check math.h "${func}(2.0)" -D_ISOC99_SOURCE && eval _$func=yes
@@ -3612,6 +3610,14 @@ fi
 echores "$_malloc"
 
 
+echocheck "aligned malloc"
+aligned_malloc=no
+def_aligned_malloc='#define HAVE_ALIGNED_MALLOC 0'
+statement_check malloc.h '_aligned_malloc(0)' && aligned_malloc=yes &&
+  def_aligned_malloc='#define HAVE_ALIGNED_MALLOC 1'
+echores "$aligned_malloc"
+
+
 echocheck "memalign()"
 # XXX restrict to x86 ? extend to other CPUs/cacheline sizes ?
 def_memalign_hack='#define CONFIG_MEMALIGN_HACK 0'
@@ -3685,6 +3691,14 @@ if test "$_mman_has_map_failed" = yes ; then
 else
   def_mman_has_map_failed='#define MAP_FAILED ((void *) -1)'
 fi
+
+
+echocheck "mprotect"
+mprotect=no
+def_mprotect='#define HAVE_MPROTECT 0'
+statement_check_broken stddef.h sys/mman.h 'mprotect(NULL, 0, 0)' && mprotect=yes
+echores "$mprotect"
+
 
 echocheck "dynamic loader"
 _dl=no
@@ -3771,25 +3785,19 @@ if test "$_w32threads" = auto ; then
 fi
 test "$_w32threads" = yes && def_threads='#define HAVE_THREADS 1' && def_w32threads='#define HAVE_W32THREADS 1'
 echores "$_w32threads"
+fi #if win32; then
+
+
 echocheck "direct.h"
 _direct_h=no
 header_check direct.h && _direct_h=yes
 if [ $_direct_h = yes ]; then
   def_direct_h='#define HAVE_DIRECT_H 1'
 else
-  def_direct_h='#define HAVE_DIRECT_H 0'
+  # libdvdcss checks this via #ifdef, so we need #undef here.
+  def_direct_h='#undef HAVE_DIRECT_H'
 fi
 echores "$_direct_h"
-echocheck "io.h"
-_io_h=no
-header_check io.h && _io_h=yes
-if [ $_io_h = yes ]; then
-  def_io_h='#define HAVE_IO_H 1'
-else
-  def_io_h='#define HAVE_IO_H 0'
-fi
-echores "$_io_h"
-fi #if win32; then
 
 
 if os2 ; then
@@ -3805,6 +3813,25 @@ fi
 test "$_os2threads" = yes && def_threads='#define HAVE_THREADS 1' && def_os2threads='#define HAVE_OS2THREADS 1'
 echores "$_os2threads"
 fi #if os2
+
+
+echocheck "windows.h"
+windows_h=no
+def_windows_h='#define HAVE_WINDOWS_H 0'
+header_check windows.h && windows_h=yes && def_windows_h='#define HAVE_WINDOWS_H 1'
+echores "$windows_h"
+
+
+echocheck "io.h"
+_io_h=no
+header_check io.h && _io_h=yes
+if [ $_io_h = yes ]; then
+  def_io_h='#define HAVE_IO_H 1'
+else
+  def_io_h='#define HAVE_IO_H 0'
+fi
+echores "$_io_h"
+
 
 echocheck "rpath"
 if test "$_rpath" = yes ; then
@@ -5143,17 +5170,7 @@ echores "$_gif"
 case "$_gif" in yes*)
   echocheck "broken giflib workaround"
   def_gif_tvt_hack='#define CONFIG_GIF_TVT_HACK 1'
-
-  cat > $TMPC << EOF
-#include <stdio.h>
-#include <gif_lib.h>
-int main(void) {
-  GifFileType gif = {.UserData = NULL};
-  printf("UserData is at address %p\n", gif.UserData);
-  return 0;
-}
-EOF
-  if cc_check "$ld_gif" ; then
+  if statement_check_broken stdio.h gif_lib.h 'GifFileType gif = {.UserData = NULL}; printf("UserData is at address %p\n", gif.UserData)' "$ld_gif" ; then
     def_gif_tvt_hack='#undef CONFIG_GIF_TVT_HACK'
     echores "disabled"
   else
@@ -5708,7 +5725,6 @@ cat > $TMPC << EOF
 #endif
 int main(void) {
   alSourceQueueBuffers(0, 0, 0);
-//  alGetSourcei(0, AL_SAMPLE_OFFSET, 0);
   return 0;
 }
 EOF
@@ -6485,12 +6501,8 @@ echocheck "liba52 support"
 def_liba52='#undef CONFIG_LIBA52'
 if test "$_liba52" = auto ; then
   _liba52=no
-  cat > $TMPC << EOF
-#include <inttypes.h>
-#include <a52dec/a52.h>
-int main(void) { a52_state_t *testHand; testHand=a52_init(0); return 0; }
-EOF
-  cc_check -la52 && _liba52=yes && extra_ldflags="$extra_ldflags -la52"
+  statement_check_broken inttypes.h a52dec/a52.h 'a52_state_t *testHand; testHand=a52_init(0)' -la52 &&
+    _liba52=yes && extra_ldflags="$extra_ldflags -la52"
 fi
 if test "$_liba52" = yes ; then
   def_liba52='#define CONFIG_LIBA52 1'
@@ -7246,8 +7258,8 @@ EOF
 fi
 if test "$_libvpx_lavc" = yes ; then
   def_libvpx_lavc='#define CONFIG_LIBVPX 1'
-  libavdecoders="$libavdecoders LIBVPX_DECODER"
-  libavencoders="$libavencoders LIBVPX_ENCODER"
+  libavdecoders="$libavdecoders LIBVPX_VP8_DECODER"
+  libavencoders="$libavencoders LIBVPX_VP8_ENCODER"
   codecmodules="libvpx $codecmodules"
 else
   def_libvpx_lavc='#define CONFIG_LIBVPX 0'
@@ -8718,7 +8730,6 @@ $def_armthumb
 $def_bigendian
 $def_ebx_available
 $def_vfp_args
-$def_words_endian
 $(ff_config_enable "$arch_all" "$arch" "#" "ARCH")
 $(ff_config_enable "$subarch_all" "$subarch" "#" "ARCH")
 $(ff_config_enable "$cpuexts_all" "$cpuexts" "#" "HAVE")
@@ -8909,6 +8920,7 @@ $def_jpeg
 $def_kva
 $def_md5sum
 $def_mga
+$def_mlib
 $def_mng
 $def_postproc
 $def_png
@@ -8967,57 +8979,84 @@ $def_ffmpeg_so
 #define CONFIG_MUXERS 1
 $def_rtpdec
 
+/* selectable features */
+$def_hardcoded_tables
+$def_libavcodec_mpegaudio_hp
+$def_network
+$def_vf_lavfi
+
+/* headers */
 $def_arpa_inet_h
-$def_bswap
+$def_direct_h
+$def_io_h
+$def_poll_h
+$def_windows_h
+
+/* external libraries */
+$def_aacplus_lavc
 $def_bzlib
+$def_crystalhd
+$def_faac_lavc
+$def_libdirac_lavc
+$def_libgsm
+$def_libopencore_amrnb
+$def_libopencore_amrwb
+$def_libopenjpeg
+$def_librtmp
+$def_libschroedinger_lavc
+$def_mp3lame_lavc
+$def_x264_lavc
+$def_xvid_lavc
+
+/* system features */
+$def_fast_64bit
+$def_fast_unaligned
+$def_gnu_as
+$def_ibm_asm
+$def_local_aligned_8
+$def_local_aligned_16
+$def_os2threads
+$def_pic
+$def_pthreads
+$def_threads
+$def_w32threads
+$def_xform_asm
+$def_xmm_clobbers
+$def_yasm
+
+/* system functions */
+$def_aligned_malloc
+$def_bswap
 $def_dcbzl
 $def_atanf
 $def_atan2f
+$def_cbrt
 $def_cbrtf
 $def_cosf
 $def_expf
 $def_exp2
 $def_exp2f
-$def_fast_64bit
-$def_fast_unaligned
-$def_gnu_as
-$def_hardcoded_tables
-$def_ibm_asm
 $def_isinf
 $def_isnan
 $def_ldexpf
-$def_libavcodec_mpegaudio_hp
 $def_llrint
 $def_llrintf
-$def_local_aligned_8
-$def_local_aligned_16
 $def_log2
 $def_log2f
 $def_log10f
 $def_lrint
 $def_lrintf
-$def_mlib
 $def_mkstemp
 $def_mmap
-$def_network
-$def_os2threads
-$def_pic
-$def_poll_h
 $def_posix_memalign
 $def_powf
-$def_pthreads
+$def_mprotect
 $def_rint
 $def_round
 $def_roundf
 $def_sinf
-$def_threads
 $def_trunc
 $def_truncf
-$def_vf_lavfi
-$def_w32threads
-$def_xform_asm
-$def_xmm_clobbers
-$def_yasm
 
 #define AV_HAVE_INCOMPATIBLE_FORK_ABI 0
 #define CONFIG_AUDIO_FLOAT 0
@@ -9091,23 +9130,6 @@ $def_yasm
 
 #define LIBAV_CONFIGURATION FFMPEG_CONFIGURATION
 #define LIBAV_LICENSE FFMPEG_LICENSE
-
-/* External libraries used through FFmpeg. */
-$def_aacplus_lavc
-$def_crystalhd
-$def_faac_lavc
-$def_libdirac_lavc
-$def_libgsm
-$def_libopencore_amrnb
-$def_libopencore_amrwb
-$def_libopenjpeg
-$def_librtmp
-$def_libschroedinger_lavc
-$def_mp3lame_lavc
-$def_x264_lavc
-$def_xvid_lavc
-$def_direct_h
-$def_io_h
 
 $(ff_config_enable "$libavdecoders_all"  "$libavdecoders" "#")
 $(ff_config_enable "$libavencoders_all"  "$libavencoders" "#")
