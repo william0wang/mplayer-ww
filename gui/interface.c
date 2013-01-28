@@ -26,6 +26,7 @@
 #include "app/gui.h"
 #include "dialog/dialog.h"
 #include "skin/skin.h"
+#include "ui/actions.h"
 #include "ui/ui.h"
 #include "util/list.h"
 #include "util/mem.h"
@@ -76,7 +77,7 @@ static int initialized;
  */
 void guiInit(void)
 {
-    int i;
+    int ret;
     plItem *playlist;
 
     mp_msg(MSGT_GPLAYER, MSGL_V, "GUI init.\n");
@@ -124,16 +125,16 @@ void guiInit(void)
     if (!skinName)
         skinName = strdup("default");
 
-    i = skinRead(skinName);
+    ret = skinRead(skinName);
 
-    if (i == -1 && strcmp(skinName, "default") != 0) {
+    if (ret == -1 && strcmp(skinName, "default") != 0) {
         mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_SKIN_SKINCFG_SelectedSkinNotFound, skinName);
 
         skinName = strdup("default");
-        i = skinRead(skinName);
+        ret      = skinRead(skinName);
     }
 
-    switch (i) {
+    switch (ret) {
     case -1:
         gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_SKIN_SKINCFG_SkinNotFound, skinName);
         mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
@@ -144,13 +145,6 @@ void guiInit(void)
     }
 
     /* initialize windows */
-
-    mainDrawBuffer = malloc(guiApp.main.Bitmap.ImageSize);
-
-    if (!mainDrawBuffer) {
-        gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_NEMDB);
-        mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
-    }
 
     if (gui_save_pos) {
         if (gui_main_pos_x != -3)
@@ -172,45 +166,16 @@ void guiInit(void)
     if (guiWinID >= 0)
         guiApp.mainWindow.Parent = guiWinID;
 
-    wsWindowCreate(&guiApp.videoWindow, guiApp.video.x, guiApp.video.y, guiApp.video.width, guiApp.video.height, wsShowFrame | wsHideWindow | wsWaitMap | wsAspect, wsShowMouseCursor | wsHandleMouseButton | wsHandleMouseMove, "MPlayer - Video");
-    wsImageDestroy(&guiApp.videoWindow);
-    wsImageCreate(&guiApp.videoWindow, guiApp.video.Bitmap.Width, guiApp.video.Bitmap.Height);
-    wsXDNDMakeAwareness(&guiApp.videoWindow);
+    uiMainInit();      // main window must be first!
+    uiVideoInit();     // video window must be second!
+    uiPlaybarInit();
+    uiMenuInit();
 
     WinID = guiApp.videoWindow.WindowID;
-
-    uiMenuInit();
-    uiPlaybarInit();
-
-// i=wsHideFrame|wsMaxSize|wsHideWindow;
-// if ( guiApp.mainDecoration ) i=wsShowFrame|wsMaxSize|wsHideWindow;
-    i = (guiApp.mainDecoration ? wsShowFrame : 0) | wsMinSize | wsMaxSize | wsHideWindow;
-    wsWindowCreate(&guiApp.mainWindow, guiApp.main.x, guiApp.main.y, guiApp.main.width, guiApp.main.height, i, wsShowMouseCursor | wsHandleMouseButton | wsHandleMouseMove, "MPlayer");
-    wsWindowShape(&guiApp.mainWindow, guiApp.main.Mask.Image);
-    wsXDNDMakeAwareness(&guiApp.mainWindow);
-
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[interface] mainWindow ID: 0x%x\n", (int)guiApp.mainWindow.WindowID);
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[interface] videoWindow ID: 0x%x\n", (int)guiApp.videoWindow.WindowID);
-
-    guiApp.mainWindow.DrawHandler  = uiMainDraw;
-    guiApp.mainWindow.MouseHandler = uiMainMouse;
-    guiApp.mainWindow.KeyHandler   = uiMainKey;
-    guiApp.mainWindow.DNDHandler   = uiMainDND;
-
-    guiApp.videoWindow.DrawHandler  = uiVideoDraw;
-    guiApp.videoWindow.MouseHandler = uiVideoMouse;
-    guiApp.videoWindow.KeyHandler   = uiMainKey;
-    guiApp.videoWindow.DNDHandler   = uiMainDND;
-
-    if (guiApp.video.Bitmap.Image)
-        wsImageRender(&guiApp.videoWindow, guiApp.video.Bitmap.Image);
 
     btnModify(evSetVolume, guiInfo.Volume);
     btnModify(evSetBalance, guiInfo.Balance);
     btnModify(evSetMoviePosition, guiInfo.Position);
-
-    wsWindowIcon(wsDisplay, guiApp.mainWindow.WindowID, &guiIcon);
-    wsWindowIcon(wsDisplay, guiApp.videoWindow.WindowID, &guiIcon);
 
     wsWindowVisibility(&guiApp.mainWindow, wsShowWindow);
 
@@ -266,7 +231,13 @@ void guiDone(void)
 
         cfg_write();
 
-        // NOTE TO MYSELF: destroy the windows
+        if (guiApp.menuIsPresent)
+            uiMenuDone();
+        if (guiApp.playbarIsPresent)
+            uiPlaybarDone();
+
+        uiVideoDone();
+        uiMainDone();
 
         wsDone();
     }
@@ -376,23 +347,23 @@ int gui(int what, void *data)
 
         switch ((int)data) {
         case MP_CMD_VO_FULLSCREEN:
-            uiMainEvent(evFullScreen, True);
+            uiEvent(evFullScreen, True);
             break;
 
         case MP_CMD_PLAY_TREE_STEP:
-            uiMainEvent(evNext, 0);
+            uiEvent(evNext, 0);
             break;
 
         case -MP_CMD_PLAY_TREE_STEP:
-            uiMainEvent(evPrev, 0);
+            uiEvent(evPrev, 0);
             break;
 
         case MP_CMD_STOP:
-            uiMainEvent(evStop, 0);
+            uiEvent(evStop, 0);
             break;
 
         case MP_CMD_QUIT:
-            uiMainEvent(evExit, 0);
+            uiEvent(evExit, 0);
             break;
         }
 
@@ -404,7 +375,7 @@ int gui(int what, void *data)
         msg = appFindMessage((const char *)data);
 
         if ((msg == evMenu) || appFindItem(msg))
-            uiMainEvent(msg, 0);
+            uiEvent(msg, 0);
 
         break;
 
@@ -761,7 +732,7 @@ int gui(int what, void *data)
 
     case GUI_REDRAW:
 
-        uiMainEvent(ivRedraw, 0);
+        uiEvent(ivRedraw, 0);
         break;
 
     case GUI_SETUP_VIDEO_WINDOW:
@@ -777,7 +748,7 @@ int gui(int what, void *data)
         }
 
         if (gtkLoadFullscreen ^ guiApp.videoWindow.isFullScreen)
-            uiMainEvent(evFullScreen, True);
+            uiEvent(evFullScreen, True);
 
         if (guiWinID >= 0)
             wsWindowMove(&guiApp.mainWindow, True, 0, guiInfo.VideoHeight);
@@ -796,7 +767,7 @@ int gui(int what, void *data)
 
         guiInfo.sh_video = NULL;
 
-        uiMainEvent(ivRedraw, True);
+        uiEvent(ivRedraw, True);
 
         if (guiInfo.Playing) {
             if (!guiInfo.PlaylistNext) {
@@ -859,7 +830,7 @@ int gui(int what, void *data)
                     wsWindowVisibility(&guiApp.videoWindow, wsShowWindow);
 
                 if (gtkLoadFullscreen ^ guiApp.videoWindow.isFullScreen)
-                    uiMainEvent(evFullScreen, False);
+                    uiEvent(evFullScreen, False);
             } else {
                 wsWindowVisibility(&guiApp.videoWindow, wsHideWindow);
                 guiInfo.VideoWindow = False;

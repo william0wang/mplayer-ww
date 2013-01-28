@@ -30,7 +30,7 @@
 #include "tools.h"
 #include "gui/interface.h"
 #include "gui/app/app.h"
-#include "gui/ui/ui.h"
+#include "gui/ui/actions.h"
 #include "dialog.h"
 #include "gui/util/list.h"
 #include "gui/util/string.h"
@@ -105,7 +105,7 @@ static void on_Button_pressed( GtkButton * button,gpointer user_data )
      uiSetFile( NULL,str,STREAMTYPE_STREAM ); guiInfo.NewPlay=GUI_FILE_NEW;
      listMgr(PLAYLIST_DELETE, 0);
      add_to_gui_playlist(str, PLAYLIST_ITEM_APPEND);
-     uiMainEvent( evPlay,0 );
+     uiEvent( evPlay,0 );
     }
   }
  HideURLDialogBox();
