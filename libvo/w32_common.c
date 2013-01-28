@@ -1946,7 +1946,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 							mp.cbSize = sizeof(mp);
 							mp.hwndOwner = hWnd;
 							mp.hInstance = GetModuleHandle(NULL);
-							mp.lpszText = "MPlayer WW "VERSION"\n\nCopyright (C) 2000-2011 MPlayer Team\n\n\nMPlayer is distributed under the terms of the GNU\n General Public License Version 2. \nSourcecode is available at http://www.mplayerhq.hu";
+							mp.lpszText = "MPlayer WW "VERSION"\n\nCopyright (C) 2000-2013 MPlayer Team\n\n\nMPlayer is distributed under the terms of the GNU\n General Public License Version 2. \nSourcecode is available at http://www.mplayerhq.hu";
 							mp.lpszCaption = "About";
 							mp.dwStyle = MB_USERICON | MB_OK | (vo_ontop?MB_TOPMOST:0);
 							mp.lpszIcon = (LPSTR)IDI_APPICON;
