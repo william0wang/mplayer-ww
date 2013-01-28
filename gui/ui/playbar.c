@@ -33,6 +33,7 @@
 #include "gui/wm/ws.h"
 
 #include "help_mp.h"
+#include "mp_msg.h"
 #include "mp_core.h"
 #include "libvo/x11_common.h"
 #include "libvo/fastmemcpy.h"
@@ -177,16 +178,16 @@ static void uiPlaybarMouse( int Button, int X, int Y, int RX, int RY )
 	  case itPotmeter:
 	  case itHPotmeter:
 	       btnModify( item->message,(float)( X - item->x ) / item->width * 100.0f );
-	       uiMainEvent( item->message,item->value );
+	       uiEvent( item->message,item->value );
 	       value=item->value;
 	       break;
 	  case itVPotmeter:
 	       btnModify( item->message, ( 1. - (float)( Y - item->y ) / item->height) * 100.0f );
-	       uiMainEvent( item->message,item->value );
+	       uiEvent( item->message,item->value );
 	       value=item->value;
 	       break;
 	 }
-	uiMainEvent( item->message,value );
+	uiEvent( item->message,value );
 
 	itemtype=0;
 	break;
@@ -201,7 +202,7 @@ rollerhandled:
            {
             item->value+=value;
             btnModify( item->message,item->value );
-            uiMainEvent( item->message,item->value );
+            uiEvent( item->message,item->value );
            }
 	 }
 	break;
@@ -211,7 +212,7 @@ rollerhandled:
 	switch ( itemtype )
 	 {
 	  case itPRMButton:
-	       uiMenuMouse( RX,RY );
+	       if (guiApp.menuIsPresent) guiApp.menuWindow.MouseHandler( 0,RX,RY,0,0 );
 	       break;
 	  case itPotmeter:
 	       item->value=(float)( X - item->x ) / item->width * 100.0f;
@@ -224,7 +225,7 @@ rollerhandled:
 potihandled:
 	       if ( item->value > 100.0f ) item->value=100.0f;
 	       if ( item->value < 0.0f ) item->value=0.0f;
-	       uiMainEvent( item->message,item->value );
+	       uiEvent( item->message,item->value );
 	       break;
 	 }
         break;
@@ -234,8 +235,6 @@ potihandled:
 void uiPlaybarInit( void )
 {
  if ( !guiApp.playbarIsPresent ) return;
-
- nfree( playbarDrawBuffer );
 
  if ( ( playbarDrawBuffer = malloc( guiApp.playbar.Bitmap.ImageSize ) ) == NULL )
   {
@@ -248,13 +247,21 @@ void uiPlaybarInit( void )
    guiApp.playbar.x,guiApp.playbar.y,guiApp.playbar.width,guiApp.playbar.height,
    wsHideFrame|wsHideWindow,wsShowMouseCursor|wsHandleMouseButton|wsHandleMouseMove,"PlayBar" );
 
+ mp_msg( MSGT_GPLAYER,MSGL_DBG2,"[playbar] playbarWindow ID: 0x%x\n",(int)guiApp.playbarWindow.WindowID );
+
  wsWindowShape( &guiApp.playbarWindow,guiApp.playbar.Mask.Image );
 
  guiApp.playbarWindow.DrawHandler=uiPlaybarDraw;
  guiApp.playbarWindow.MouseHandler=uiPlaybarMouse;
- guiApp.playbarWindow.KeyHandler=uiMainKey;
+ guiApp.playbarWindow.KeyHandler=guiApp.mainWindow.KeyHandler;
 
  playbarLength=guiApp.videoWindow.Height;
+}
+
+void uiPlaybarDone( void )
+{
+  nfree(playbarDrawBuffer);
+  wsWindowDestroy(&guiApp.playbarWindow);
 }
 
 void uiPlaybarShow( int y )

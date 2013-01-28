@@ -22,6 +22,7 @@
 
 #include "libvo/x11_common.h"
 #include "help_mp.h"
+#include "mp_msg.h"
 #include "mp_core.h"
 
 #include "ui.h"
@@ -29,10 +30,12 @@
 #include "gui/app/gui.h"
 #include "gui/interface.h"
 #include "gui/dialog/dialog.h"
+#include "gui/wm/ws.h"
+#include "gui/wm/wsxdnd.h"
 
 int             videoVisible = 0;
 
-void uiVideoDraw( void )
+static void uiVideoDraw( void )
 {
  if ( guiApp.videoWindow.State == wsWindowClosed ) mplayer( MPLAYER_EXIT_GUI, EXIT_QUIT, 0 );
 
@@ -50,7 +53,7 @@ void uiVideoDraw( void )
   }
 }
 
-void uiVideoMouse( int Button,int X,int Y,int RX,int RY )
+static void uiVideoMouse( int Button,int X,int Y,int RX,int RY )
 {
  static int mplVideoMoved = 0;
  static int msButton = 0;
@@ -89,7 +92,7 @@ void uiVideoMouse( int Button,int X,int Y,int RX,int RY )
                     }
                    break;
             case wsPMMouseButton:
-                   uiMenuMouse( RX,RY );
+                   if (guiApp.menuIsPresent) guiApp.menuWindow.MouseHandler( 0,RX,RY,0,0 );
                    break;
 	    default: uiPlaybarShow( Y ); break;
            }
@@ -105,4 +108,26 @@ void uiVideoMouse( int Button,int X,int Y,int RX,int RY )
           mplVideoMoved=0;
           break;
   }
+}
+
+void uiVideoInit (void)
+{
+  wsWindowCreate(&guiApp.videoWindow, guiApp.video.x, guiApp.video.y, guiApp.video.width, guiApp.video.height, wsShowFrame | wsHideWindow | wsWaitMap | wsAspect, wsShowMouseCursor | wsHandleMouseButton | wsHandleMouseMove, "MPlayer - Video");
+  mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[video] videoWindow ID: 0x%x\n", (int) guiApp.videoWindow.WindowID);
+  wsWindowIcon(wsDisplay, guiApp.videoWindow.WindowID, &guiIcon);
+  if (guiApp.video.Bitmap.Image)
+  {
+    wsImageResize(&guiApp.videoWindow, guiApp.video.Bitmap.Width, guiApp.video.Bitmap.Height);
+    wsImageRender(&guiApp.videoWindow, guiApp.video.Bitmap.Image);
+  }
+  wsXDNDMakeAwareness(&guiApp.videoWindow);
+  guiApp.videoWindow.DrawHandler = uiVideoDraw;
+  guiApp.videoWindow.MouseHandler = uiVideoMouse;
+  guiApp.videoWindow.KeyHandler = guiApp.mainWindow.KeyHandler;
+  guiApp.videoWindow.DNDHandler = guiApp.mainWindow.DNDHandler;
+}
+
+void uiVideoDone (void)
+{
+  wsWindowDestroy(&guiApp.videoWindow);
 }

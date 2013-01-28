@@ -28,7 +28,7 @@
 
 #include "menu.h"
 #include "dialog.h"
-#include "gui/ui/ui.h"
+#include "gui/ui/actions.h"
 #include "gui/app/app.h"
 #include "gui/app/gui.h"
 #include "gui/interface.h"
@@ -91,7 +91,7 @@ static void ActivateMenuItem( int Item )
 // fprintf( stderr,"[menu] item: %d.%d\n",Item&0xffff,Item>>16 );
  gtkPopupMenu=Item & 0x0000ffff;
  gtkPopupMenuParam=Item >> 16;
- uiMainEvent( Item & 0x0000ffff,Item >> 16 );
+ uiEvent( Item & 0x0000ffff,Item >> 16 );
 }
 
 static GtkWidget * AddMenuCheckItem(GtkWidget *window1, const char * immagine_xpm, GtkWidget* Menu,const char* label, gboolean state, int Number)
