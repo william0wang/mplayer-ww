@@ -673,6 +673,7 @@ int ds_fill_buffer(demux_stream_t *ds)
             mp_dbg(MSGT_DEMUXER, MSGL_DBG3,
                    "ds_fill_buffer(unknown 0x%X) called\n", (unsigned int) ds);
     }
+    int is_real_demuxer = (demux->file_format == DEMUXER_TYPE_REAL);
     while (1) {
         int apacks = demux->audio ? demux->audio->packs : 0;
         int abytes = demux->audio ? demux->audio->bytes : 0;
@@ -758,15 +759,17 @@ int ds_fill_buffer(demux_stream_t *ds)
                    "ds_fill_buffer()->demux_fill_buffer() failed\n");
             break; // EOF
         }
-        if (demux->audio)
-            ds->fill_count += demux->audio->packs - apacks;
-        if (demux->video && demux->video->packs > vpacks &&
-            // Empty packets or "skip" packets in e.g. AVI can cause issues.
-            demux->video->bytes > vbytes + 100 &&
-            // when video needs parsing we will have lots of video packets
-            // in-between audio packets, so ignore them in that case.
-            demux->video->sh && !((sh_video_t *)demux->video->sh)->needs_parsing)
-            ds->fill_count++;
+        if(!is_real_demuxer) {
+            if (demux->audio)
+                ds->fill_count += demux->audio->packs - apacks;
+            if (demux->video && demux->video->packs > vpacks &&
+                // Empty packets or "skip" packets in e.g. AVI can cause issues.
+                demux->video->bytes > vbytes + 100 &&
+                // when video needs parsing we will have lots of video packets
+                // in-between audio packets, so ignore them in that case.
+                demux->video->sh && !((sh_video_t *)demux->video->sh)->needs_parsing)
+                ds->fill_count++;
+        }
     }
     ds->buffer_pos = ds->buffer_size = 0;
     ds->buffer = NULL;
