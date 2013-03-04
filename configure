@@ -9149,6 +9149,7 @@ $def_truncf
 #define CONFIG_AUDIO_FRAME_QUEUE 1
 #define CONFIG_DCT 1
 #define CONFIG_DWT 1
+#define CONFIG_ERROR_RESILIENCE 1
 #define CONFIG_FFT 1
 #define CONFIG_GOLOMB 1
 #define CONFIG_H264CHROMA 1
@@ -9159,6 +9160,7 @@ $def_truncf
 #define CONFIG_LPC 1
 #define CONFIG_LZO 1
 #define CONFIG_MDCT 1
+#define CONFIG_MPEGVIDEO 1
 #define CONFIG_RDFT 1
 #define CONFIG_VIDEODSP 1
 
