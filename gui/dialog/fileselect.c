@@ -386,18 +386,23 @@ void HideFileSelect( void )
 static void fs_PersistantHistory( char * subject )
 {
  unsigned int i;
+ char * entry;
 
- if ( fsType != fsVideoSelector ) return;
+ if ( !subject ) return;
 
  for ( i=0;i < FF_ARRAY_ELEMS(fsHistory);i++ )
-  if ( fsHistory[i] && !strcmp( fsHistory[i],subject ) )
+  if ( gstrcmp( fsHistory[i],subject ) == 0 )
    {
-    char * tmp = fsHistory[i]; fsHistory[i]=fsHistory[0]; fsHistory[0]=tmp;
-    return;
+    entry=fsHistory[i];
+    break;
    }
- nfree( fsHistory[FF_ARRAY_ELEMS(fsHistory) - 1] );
- for ( i=FF_ARRAY_ELEMS(fsHistory) - 1;i;i-- ) fsHistory[i]=fsHistory[i - 1];
- fsHistory[0]=gstrdup( subject );
+ if ( i == FF_ARRAY_ELEMS(fsHistory) )
+  {
+   entry=strdup( subject );
+   free( fsHistory[--i] );
+  }
+ for ( ;i;i-- ) fsHistory[i]=fsHistory[i - 1];
+ fsHistory[0]=entry;
 }
 /* ----------------------------------------------- */
 
