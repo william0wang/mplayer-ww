@@ -821,7 +821,7 @@ _charset="UTF-8"
 _dynamic_plugins=no
 _crash_debug=no
 _sighandler=yes
-relocatable=no
+relocatable=auto
 _libdv=auto
 _cdparanoia=auto
 _cddb=auto
@@ -8567,6 +8567,7 @@ SLIBNAME_WITH_MAJOR = \$(SLIBNAME)-42
 CONFIG_AANDCTTABLES  = yes
 CONFIG_AUDIO_FRAME_QUEUE = yes
 CONFIG_DCT     = yes
+CONFIG_DSPUTIL = yes
 CONFIG_DWT     = yes
 CONFIG_ERROR_RESILIENCE = yes
 CONFIG_FFT     = yes
@@ -9162,6 +9163,7 @@ $def_truncf
 #define CONFIG_AANDCTTABLES 1
 #define CONFIG_AUDIO_FRAME_QUEUE 1
 #define CONFIG_DCT 1
+#define CONFIG_DSPUTIL 1
 #define CONFIG_DWT 1
 #define CONFIG_ERROR_RESILIENCE 1
 #define CONFIG_FFT 1
