@@ -18,6 +18,7 @@ _config="configure \
     --disable-toolame \
     --disable-twolame \
     --disable-md5sum \
+    --disable-relocatable \
     --disable-vidix-pcidb \
     --disable-libdirac-lavc \
     --enable-static \
