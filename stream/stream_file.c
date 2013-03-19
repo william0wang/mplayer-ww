@@ -37,6 +37,10 @@
 #if HAVE_SETMODE
 #include <io.h>
 #endif
+#ifdef __MINGW32__
+#include <windows.h>
+#include <share.h>
+#endif
 
 #include "mp_msg.h"
 #include "stream.h"
@@ -646,7 +650,7 @@ static int write_buffer(stream_t *s, char* buffer, int len) {
   return len;
 }
 
-static int seek(stream_t *s,off_t newpos) {
+static int seek(stream_t *s, int64_t newpos) {
   s->pos = newpos;
 #ifdef __MINGW32__
   LARGE_INTEGER pos, npos;
@@ -721,7 +725,7 @@ static int seek(stream_t *s,off_t newpos) {
   return 1;
 }
 
-static int seek_forward(stream_t *s,off_t newpos) {
+static int seek_forward(stream_t *s, int64_t newpos) {
   if(newpos<s->pos){
     mp_msg(MSGT_STREAM,MSGL_INFO,"Cannot seek backward in linear streams!\n");
     return 0;
@@ -777,12 +781,33 @@ char *get_rar_stream_basename(stream_t *s)
 	else
 		return NULL;
 }
+
+static int win32_open(const char *fname, int m, int omode)
+{
+    int cnt;
+    int fd = -1;
+    wchar_t fname_w[MAX_PATH];
+    int WINAPI (*mb2wc)(UINT, DWORD, LPCSTR, int, LPWSTR, int) = NULL;
+    HMODULE kernel32 = GetModuleHandle("Kernel32.dll");
+    if (!kernel32) goto fallback;
+    mb2wc = GetProcAddress(kernel32, "MultiByteToWideChar");
+    if (!mb2wc) goto fallback;
+    cnt = mb2wc(CP_UTF8, MB_ERR_INVALID_CHARS, fname, -1, fname_w, sizeof(fname_w) / sizeof(*fname_w));
+    if (cnt <= 0) goto fallback;
+    fd = _wsopen(fname_w, m, SH_DENYNO, omode);
+    if (fd != -1 || (m & O_CREAT))
+        return fd;
+
+fallback:
+    return _sopen(fname, m, SH_DENYNO, omode);
+}
+
 #endif
 
 static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
   int f;
   mode_t m = 0;
-  off_t len;
+  int64_t len;
   unsigned char *filename;
   struct stream_priv_s* p = (struct stream_priv_s*)opts;
   int is_pipe = 0;
@@ -841,9 +866,6 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
     }
   } else {
       mode_t openmode = S_IRUSR|S_IWUSR;
-#ifndef __MINGW32__
-      openmode |= S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH;
-#endif
 #ifdef __MINGW32__
     char *s = strrchr(filename,'.');
     if (mode == STREAM_READ) {
@@ -869,9 +891,13 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
 		      return STREAM_ERROR;
 		    }
 		}
-	} else
-#endif
+	} else {
+      f = win32_open(filename, m, openmode);
+	}
+#else
+      openmode |= S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH;
       f=open(filename,m, openmode);
+#endif
     if(f<0) {
       mp_msg(MSGT_OPEN,MSGL_ERR,MSGTR_FileNotFound,filename);
       m_struct_free(&stream_opts,opts);

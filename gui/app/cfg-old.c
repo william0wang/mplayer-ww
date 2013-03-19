@@ -16,39 +16,32 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <string.h>
-#include <strings.h>
-#include <libavutil/avutil.h>
-#include <libavutil/common.h>
+/**
+ * @file
+ * @brief Translation of old settings or old configure options
+ */
 
-#include "bstr.h"
-
-int bstrcmp(struct bstr str1, struct bstr str2)
+/**
+ * @brief Convert a filename which is either in UTF-8
+ *        or in an encoding specified in G_FILENAME_ENCODING.
+ *
+ * @param fname filename
+ *
+ * @return converted filename
+ */
+static const gchar *cfg_old_filename_from_utf8(const gchar *fname)
 {
-    int ret = memcmp(str1.start, str2.start, FFMIN(str1.len, str2.len));
+#ifdef CFG_OLD_PLAYLIST
+    static gchar *name;
 
-    if (!ret) {
-        if (str1.len == str2.len)
-            return 0;
-        else if (str1.len > str2.len)
-            return 1;
-        else
-            return -1;
+    if (g_utf8_validate(fname, -1, NULL)) {
+        free(name);
+        name = g_filename_from_utf8(fname, -1, NULL, NULL, NULL);
+
+        return name;
     }
-    return ret;
+#endif
+    return fname;
 }
 
-int bstrcasecmp(struct bstr str1, struct bstr str2)
-{
-    int ret = strncasecmp(str1.start, str2.start, FFMIN(str1.len, str2.len));
-
-    if (!ret) {
-        if (str1.len == str2.len)
-            return 0;
-        else if (str1.len > str2.len)
-            return 1;
-        else
-            return -1;
-    }
-    return ret;
-}
+#undef CFG_OLD_PLAYLIST

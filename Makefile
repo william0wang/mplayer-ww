@@ -71,6 +71,7 @@ SRCS_COMMON-$(FASTMEMCPY)            += libvo/aclib.c
 SRCS_COMMON-$(FFMPEG)                += av_helpers.c                \
                                         av_opts.c                   \
                                         libaf/af_lavcac3enc.c       \
+                                        libaf/af_lavcresample.c     \
                                         libmpcodecs/ad_ffmpeg.c     \
                                         libmpcodecs/ad_spdif.c      \
                                         libmpcodecs/vd_ffmpeg.c     \
@@ -955,7 +956,7 @@ uninstall:
 	rm -f $(MANDIR)/man1/mplayer.1 $(MANDIR)/man1/mencoder.1
 	rm -f $(foreach lang,$(MAN_LANGS),$(foreach man,mplayer.1 mencoder.1,$(MANDIR)/$(lang)/man1/$(man)))
 
-clean:
+clean: testsclean toolsclean driversclean dhahelperclean
 	-$(MAKE) -C ffmpeg $@
 	-rm -rf tests/res
 	-rm -f $(call ADD_ALL_DIRS,/*.o /*.d /*.a /*.ho /*~)
@@ -965,7 +966,7 @@ clean:
 	-rm -f codecs.conf.h help_mp.h version.h
 	-rm -rf DOCS/tech/doxygen DOCS/HTML
 
-distclean: clean testsclean toolsclean driversclean dhahelperclean
+distclean: clean
 	-$(MAKE) -C ffmpeg $@
 	-rm -f DOCS/xml/html-chunk.xsl DOCS/xml/html-single.xsl
 	-rm -f $(foreach lang,$(DOC_LANG_ALL),DOCS/xml/$(lang)/main.xml)
@@ -1023,7 +1024,7 @@ endif
 
 TEST_OBJS = mp_msg.o mp_fifo.o osdep/$(GETCH) osdep/$(TIMER) -ltermcap -lm
 
-codec-cfg-test$(EXESUF): codec-cfg.c codecs.conf.h help_mp.h $(TEST_OBJS)
+codec-cfg-test$(EXESUF): codec-cfg.c codecs.conf.h help_mp.h
 	$(CC) -I. -Iffmpeg -DTESTING -o $@ $^
 
 codecs2html$(EXESUF): codec-cfg.c help_mp.h
@@ -1036,11 +1037,9 @@ LOADER_TEST_OBJS = $(SRCS_WIN32_EMULATION:.c=.o) $(SRCS_QTX_EMULATION:.S=.o) ffm
 loader/qtx/list$(EXESUF) loader/qtx/qtxload$(EXESUF): CFLAGS += -g
 loader/qtx/list$(EXESUF) loader/qtx/qtxload$(EXESUF): $(LOADER_TEST_OBJS)
 
-TESTS = codecs2html codec-cfg-test libvo/aspecttest
+TESTS-$(ARCH_X86_32) += loader/qtx/list loader/qtx/qtxload
 
-ifdef ARCH_X86_32
-TESTS += loader/qtx/list loader/qtx/qtxload
-endif
+TESTS := codecs2html codec-cfg-test libvo/aspecttest $(TESTS-yes)
 
 TESTS_DEP_FILES = $(addsuffix .d,$(TESTS))
 
@@ -1049,11 +1048,9 @@ tests: $(addsuffix $(EXESUF),$(TESTS))
 testsclean:
 	-rm -f $(call ADD_ALL_EXESUFS,$(TESTS))
 
-TOOLS = $(addprefix TOOLS/,alaw-gen asfinfo avi-fix avisubdump compare dump_mp4 movinfo netstream subrip vivodump)
+TOOLS-$(ARCH_X86) += fastmemcpybench modify_reg
 
-ifdef ARCH_X86
-TOOLS += TOOLS/fastmemcpybench TOOLS/modify_reg
-endif
+TOOLS := $(addprefix TOOLS/,alaw-gen asfinfo avi-fix avisubdump compare dump_mp4 movinfo netstream subrip vivodump $(TOOLS-yes))
 
 ALLTOOLS = $(TOOLS) TOOLS/bmovl-test TOOLS/vfw2menc
 

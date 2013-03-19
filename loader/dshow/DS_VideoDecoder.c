@@ -46,6 +46,7 @@ static REFERENCE_TIME frame_time = 1;
 #endif
 #include <stdio.h>
 #include <stdlib.h>  // labs
+#include <strings.h>
 
 // strcmp((const char*)info.dll,...)  is used instead of  (... == ...)
 // so Arpi could use char* pointer in his simplified DS_VideoDecoder class

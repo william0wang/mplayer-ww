@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <unistd.h>
 
 #include <sys/types.h>
@@ -1340,6 +1341,8 @@ static void demux_resync(demuxer_t *demuxer)
     sh_video_t *sh_video = demuxer->video->sh;
     sh_audio_t *sh_audio = demuxer->audio->sh;
     demux_control(demuxer, DEMUXER_CTRL_RESYNC, NULL);
+    demuxer->audio->fill_count = -80;
+    demuxer->video->fill_count = -80;
     if (sh_video) {
         resync_video_stream(sh_video);
     }

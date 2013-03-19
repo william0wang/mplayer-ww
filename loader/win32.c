@@ -16,6 +16,8 @@ for DLL to know too much about its environment.
  * http://svn.mplayerhq.hu/mplayer/trunk/
  */
 
+#define _BSD_SOURCE
+
 #include "config.h"
 #include "mangle.h"
 
@@ -53,6 +55,7 @@ for DLL to know too much about its environment.
 #include "path.h"
 
 #include <stdlib.h>
+#include <strings.h>
 #include <assert.h>
 #include <stdarg.h>
 #include <ctype.h>

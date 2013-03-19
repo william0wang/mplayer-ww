@@ -3687,7 +3687,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    common_preinit();
+    common_preinit(&argc, &argv);
     initHelp();
     set_playlist_mpctx(mpctx);
 
