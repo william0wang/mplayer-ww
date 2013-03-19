@@ -559,12 +559,8 @@ static void sanitize_os(void)
  */
 void common_preinit(int *argc_ptr, char **argv_ptr[])
 {
-#ifdef __MINGW32__
-    get_win32_cmdline(argc_ptr, argv_ptr);
-#else
     (void)argc_ptr;
     (void)argv_ptr;
-#endif
     sanitize_os();
     InitTimer();
     srand(GetTimerMS());
