@@ -20,6 +20,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
@@ -38,6 +39,7 @@
 #include "osdep/getch2.h"
 #include "osdep/keycodes.h"
 #include "osdep/timer.h"
+#include "libavutil/common.h"
 #include "libavutil/avstring.h"
 #include "mp_msg.h"
 #include "help_mp.h"
@@ -1477,6 +1479,7 @@ mp_input_get_key_name(int key) {
 
 int
 mp_input_get_key_from_name(const char *name) {
+  uint32_t utf8 = 0;
   int i,ret = 0,len = strlen(name);
   if(len == 1) { // Direct key code
     ret = (unsigned char)name[0];
@@ -1488,6 +1491,10 @@ mp_input_get_key_from_name(const char *name) {
     if(strcasecmp(key_names[i].name,name) == 0)
       return key_names[i].key;
   }
+
+  GET_UTF8(utf8, (uint8_t)*name++, return -1;)
+  if (*name == 0 && utf8 < KEY_BASE)
+    return utf8;
 
   return -1;
 }

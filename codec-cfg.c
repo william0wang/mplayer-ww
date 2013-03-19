@@ -40,10 +40,11 @@
 #include <ctype.h>
 #include <assert.h>
 #include <string.h>
+#include <strings.h>
 
 #include "config.h"
 #include "mp_msg.h"
-#ifdef CODECS2HTML
+#if defined(CODECS2HTML) || defined(TESTING)
 #ifdef __GNUC__
 #define mp_msg(t, l, m, args...) fprintf(stderr, m, ##args)
 #else

@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <time.h>
 #include <unistd.h>
 #include <assert.h>
@@ -2967,7 +2968,7 @@ int main(int argc, char *argv[])
     int profile_config_loaded;
     int i;
 
-    common_preinit();
+    common_preinit(&argc, &argv);
 
 #if defined(__MINGW32__) || defined(__CYGWIN__)
     unrar_init();

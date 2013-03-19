@@ -67,7 +67,7 @@ void (GLAPIENTRY *mpglTexEnvi)(GLenum, GLenum, GLint);
 void (GLAPIENTRY *mpglColor4ub)(GLubyte, GLubyte, GLubyte, GLubyte);
 void (GLAPIENTRY *mpglColor4f)(GLfloat, GLfloat, GLfloat, GLfloat);
 void (GLAPIENTRY *mpglClearColor)(GLclampf, GLclampf, GLclampf, GLclampf);
-void (GLAPIENTRY *mpglClearDepth)(GLclampd);
+void (GLAPIENTRY *mpglClearDepth)(double);
 void (GLAPIENTRY *mpglDepthFunc)(GLenum);
 void (GLAPIENTRY *mpglEnable)(GLenum);
 void (GLAPIENTRY *mpglDisable)(GLenum);
@@ -92,6 +92,7 @@ void (GLAPIENTRY *mpglLightfv)(GLenum, GLenum, const GLfloat *);
 void (GLAPIENTRY *mpglColorMaterial)(GLenum, GLenum);
 void (GLAPIENTRY *mpglShadeModel)(GLenum);
 void (GLAPIENTRY *mpglGetIntegerv)(GLenum, GLint *);
+static void (GLAPIENTRY *mpglGetTexLevelParameteriv)(GLenum, GLint, GLenum, GLint *);
 void (GLAPIENTRY *mpglColorMask)(GLboolean, GLboolean, GLboolean, GLboolean);
 
 /**
@@ -454,6 +455,7 @@ static const extfunc_desc_t extfuncs[] = {
   DEF_FUNC_DESC(ColorMaterial),
   DEF_FUNC_DESC(ShadeModel),
   DEF_FUNC_DESC(GetIntegerv),
+  DEF_FUNC_DESC(GetTexLevelParameteriv),
   DEF_FUNC_DESC(ColorMask),
 
   // here start the real extensions
@@ -584,7 +586,7 @@ void glCreateClearTex(GLenum target, GLenum fmt, GLenum format, GLenum type, GLi
   if (format == GL_LUMINANCE && type == GL_UNSIGNED_SHORT) {
     // ensure we get enough bits
     GLint bits = 0;
-    glGetTexLevelParameteriv(target, 0, GL_TEXTURE_LUMINANCE_SIZE, &bits);
+    mpglGetTexLevelParameteriv(target, 0, GL_TEXTURE_LUMINANCE_SIZE, &bits);
     if (bits > 0 && bits < 14 && (use_depth_l16 || HAVE_BIGENDIAN)) {
       fmt = GL_DEPTH_COMPONENT16;
       format = GL_DEPTH_COMPONENT;
@@ -2179,7 +2181,7 @@ static int sdl_check_events(void) {
 
 #endif
 
-#ifdef CONFIG_GL_EGL_X11
+#if defined(CONFIG_GL_EGL_X11) || defined(CONFIG_GL_EGL_ANDROID)
 static EGLDisplay eglDisplay = EGL_NO_DISPLAY;
 static EGLSurface eglSurface = EGL_NO_SURFACE;
 
@@ -2189,7 +2191,16 @@ static EGLSurface eglSurface = EGL_NO_SURFACE;
  * So we have to use a non-portable way that in addition
  * might also return symbols from a different library
  * that the one providing the current context, great job!
+ * In addition the implementation of eglGetProcAddress
+ * on Galaxy S2 Android seems to actively return wrong
+ * pointers, it just gets better and better...
  */
+#ifdef CONFIG_GL_EGL_ANDROID
+static EGLNativeWindowType vo_window;
+#define eglGetProcAddress(a) 0
+#define mDisplay EGL_DEFAULT_DISPLAY
+EGLNativeWindowType android_createDisplaySurface(void);
+#endif
 static void *eglgpa(const GLubyte *name) {
   void *res = eglGetProcAddress(name);
   if (!res) {
@@ -2205,10 +2216,23 @@ static int setGlWindow_egl(MPGLContext *ctx)
   static const EGLint cfg_attribs[] = { EGL_NONE };
   static const EGLint ctx_attribs[] = { EGL_NONE };
   EGLContext *context = &ctx->context.egl;
-  Window win = vo_window;
   EGLContext new_context = NULL;
   EGLConfig eglConfig;
   int num_configs;
+#ifdef CONFIG_GL_EGL_ANDROID
+  EGLint w, h;
+  if (vo_window) {
+    eglQuerySurface(eglDisplay, eglSurface, EGL_WIDTH, &w);
+    eglQuerySurface(eglDisplay, eglSurface, EGL_HEIGHT, &h);
+    vo_screenwidth = vo_dwidth = w;
+    vo_screenheight = vo_dheight = h;
+    return SET_WINDOW_OK;
+  }
+  if (!vo_window)
+    vo_window = android_createDisplaySurface();
+  if (!vo_window)
+    return SET_WINDOW_FAILED;
+#endif
   if (eglDisplay == EGL_NO_DISPLAY) {
     eglDisplay = eglGetDisplay(mDisplay);
     if (eglDisplay == EGL_NO_DISPLAY) {
@@ -2228,7 +2252,7 @@ static int setGlWindow_egl(MPGLContext *ctx)
   if (!eglChooseConfig(eglDisplay, cfg_attribs, &eglConfig, 1, &num_configs) ||
       num_configs != 1)
     return SET_WINDOW_FAILED;
-  eglSurface = eglCreateWindowSurface(eglDisplay, eglConfig, win, NULL);
+  eglSurface = eglCreateWindowSurface(eglDisplay, eglConfig, vo_window, NULL);
   if (eglSurface == EGL_NO_SURFACE)
     return SET_WINDOW_FAILED;
 
@@ -2239,8 +2263,14 @@ static int setGlWindow_egl(MPGLContext *ctx)
     return SET_WINDOW_FAILED;
 
   // set new values
-  vo_window = win;
+#ifdef CONFIG_GL_EGL_X11
   vo_x11_update_geometry();
+#else
+  eglQuerySurface(eglDisplay, eglSurface, EGL_WIDTH, &w);
+  eglQuerySurface(eglDisplay, eglSurface, EGL_HEIGHT, &h);
+  vo_screenwidth = vo_dwidth = w;
+  vo_screenheight = vo_dheight = h;
+#endif
   *context = new_context;
 
   getFunctions(eglgpa, eglQueryString(eglDisplay, EGL_EXTENSIONS));
@@ -2287,6 +2317,10 @@ static int dummy_check_events(void) {
   return 0;
 }
 
+static void dummy_fullscreen(void) {
+  vo_fs = !vo_fs;
+}
+
 static void dummy_update_xinerama_info(void) {
   if (vo_screenwidth <= 0 || vo_screenheight <= 0) {
     mp_msg(MSGT_VO, MSGL_ERR, "You must specify the screen dimensions "
@@ -2307,6 +2341,8 @@ int init_mpglcontext(MPGLContext *ctx, enum MPGLType type) {
     if (res) return res;
     res = init_mpglcontext(ctx, GLTYPE_SDL);
     if (res) return res;
+    res = init_mpglcontext(ctx, GLTYPE_EGL_ANDROID);
+    if (res) return res;
     res = init_mpglcontext(ctx, GLTYPE_EGL_X11);
     return res;
   }
@@ -2316,6 +2352,7 @@ int init_mpglcontext(MPGLContext *ctx, enum MPGLType type) {
   ctx->swapGlBuffers = swapGlBuffers_dummy;
   ctx->update_xinerama_info = dummy_update_xinerama_info;
   ctx->check_events = dummy_check_events;
+  ctx->fullscreen = dummy_fullscreen;
   ctx->type = type;
   switch (ctx->type) {
 #ifdef CONFIG_GL_WIN32
@@ -2350,6 +2387,13 @@ int init_mpglcontext(MPGLContext *ctx, enum MPGLType type) {
     ctx->check_events = sdl_check_events;
     ctx->fullscreen = vo_sdl_fullscreen;
     return vo_sdl_init();
+#endif
+#ifdef CONFIG_GL_EGL_ANDROID
+  case GLTYPE_EGL_ANDROID:
+    ctx->setGlWindow = setGlWindow_egl;
+    ctx->releaseGlContext = releaseGlContext_egl;
+    ctx->swapGlBuffers = swapGlBuffers_egl;
+    return 1;
 #endif
 #ifdef CONFIG_GL_EGL_X11
   case GLTYPE_EGL_X11:
