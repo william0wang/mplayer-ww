@@ -2732,6 +2732,8 @@ else
   warn_cflags=yes
 fi
 
+CFLAGS="-D_ISOC99_SOURCE -D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600 $CFLAGS"
+
 if test "$cc_vendor" = "gnu" ; then
   cflag_check -fno-tree-vectorize && CFLAGS="$CFLAGS -fno-tree-vectorize"
   cflag_check -Wundef && WARNFLAGS="-Wundef $WARNFLAGS"
@@ -2741,8 +2743,6 @@ if test "$cc_vendor" = "gnu" ; then
   cflag_check -Wdisabled-optimization && WARN_CFLAGS="-Wdisabled-optimization $WARN_CFLAGS"
   cflag_check -Wmissing-prototypes && WARN_CFLAGS="-Wmissing-prototypes $WARN_CFLAGS"
   cflag_check -Wstrict-prototypes && WARN_CFLAGS="-Wstrict-prototypes $WARN_CFLAGS"
-else
-  CFLAGS="-D_ISOC99_SOURCE $CFLAGS"
 fi
 
 cflag_check -mno-omit-leaf-frame-pointer && cflags_no_omit_leaf_frame_pointer="-mno-omit-leaf-frame-pointer"
@@ -3290,7 +3290,7 @@ echores "$_kstat"
 for func in atanf cbrt cbrtf cosf expf exp2 exp2f isnan isinf llrint llrintf log2 log2f log10f lrint lrintf rint round roundf sinf trunc truncf; do
 echocheck $func
 eval _$func=no
-statement_check math.h "${func}(2.0)" -D_ISOC99_SOURCE && eval _$func=yes
+statement_check math.h "${func}(2.0)" && eval _$func=yes
 if eval test "x\$_$func" = "xyes"; then
   eval def_$func="\"#define HAVE_$(echo $func | toupper) 1\""
   echores yes
@@ -3304,7 +3304,7 @@ done
 for func in atan2f ldexpf powf; do
 echocheck $func
 eval _$func=no
-statement_check math.h "${func}(1.0,1.0)" -D_ISOC99_SOURCE && eval _$func=yes
+statement_check math.h "${func}(1.0,1.0)" && eval _$func=yes
 if eval test "x\$_$func" = "xyes"; then
   eval def_$func="\"#define HAVE_$(echo $func | toupper) 1\""
   echores yes
@@ -3317,7 +3317,7 @@ done
 
 echocheck "mkstemp"
 _mkstemp=no
-define_statement_check "_XOPEN_SOURCE 600" "stdlib.h" 'mkstemp("")' && _mkstemp=yes
+statement_check stdlib.h 'mkstemp("")' && _mkstemp=yes
 if test "$_mkstemp" = yes ; then
   def_mkstemp='#define HAVE_MKSTEMP 1'
 else
@@ -3689,7 +3689,7 @@ echores "$_memalign"
 echocheck "posix_memalign()"
 posix_memalign=no
 def_posix_memalign='#define HAVE_POSIX_MEMALIGN 0'
-define_statement_check "_XOPEN_SOURCE 600" "stdlib.h" 'posix_memalign(NULL, 0, 0)' &&
+statement_check stdlib.h 'posix_memalign(NULL, 0, 0)' &&
     posix_memalign=yes && def_posix_memalign='#define HAVE_POSIX_MEMALIGN 1'
 echores "$posix_memalign"
 
@@ -4114,13 +4114,8 @@ echores "$strsep"
 echocheck "vsscanf()"
 vsscanf=yes
 def_vsscanf='#define HAVE_VSSCANF 1'
-cat > $TMPC << EOF
-#define _ISOC99_SOURCE
-#include <stdarg.h>
-#include <stdio.h>
-int main(void) { va_list ap; vsscanf("foo", "bar", ap); return 0; }
-EOF
-cc_check || { vsscanf=no ; def_vsscanf='#undef HAVE_VSSCANF' ; }
+statement_check_broken stdarg.h stdio.h 'va_list ap; vsscanf("foo", "bar", ap)' ||
+    { vsscanf=no ; def_vsscanf='#undef HAVE_VSSCANF' ; }
 echores "$vsscanf"
 
 
@@ -5322,6 +5317,14 @@ else
   noaomodules="sdl $noaomodules"
 fi
 echores "$_sdl"
+
+
+echocheck "SDL image"
+sdl_image=no
+if test "$_sdl" = yes ; then
+  header_check SDL/SDL_image.h -lSDL_image && sdl_image=yes
+fi
+echores "$sdl_image"
 
 
 # make sure this stays below CoreVideo to avoid issues due to namespace
@@ -6853,6 +6856,7 @@ if test "$_win32dll" = auto ; then
     _win32dll=yes
   fi
 fi
+_win32_emulation=no
 if test "$_win32dll" = yes ; then
   def_win32dll='#define CONFIG_WIN32DLL 1'
   if ! win32 ; then
@@ -8418,6 +8422,7 @@ GUI_GTK = $_gui_gtk
 GUI_WIN32 = $_gui_win32
 HAVE_POSIX_SELECT = $_posix_select
 HAVE_SYS_MMAN_H = $_mman
+HAVE_WINDOWS_H = $windows_h
 IVTV = $_ivtv
 JACK = $_jack
 JOYSTICK = $_joystick
@@ -8473,6 +8478,7 @@ RADIO_CAPTURE=$_radio_capture
 REAL_CODECS = $_real
 S3FB = $_s3fb
 SDL = $_sdl
+SDL_IMAGE = $sdl_image
 SPEEX = $_speex
 STREAM_CACHE = $_stream_cache
 SGIAUDIO = $_sgiaudio
@@ -8547,7 +8553,7 @@ CONFIG_SWRESAMPLE = $ffmpeg_a
 ASFLAGS    = \$(CFLAGS)
 AS_DEPFLAGS= $DEPFLAGS
 HOSTCC     = \$(HOST_CC)
-HOSTCFLAGS = -D_ISOC99_SOURCE -D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600 -I. -O3
+HOSTCFLAGS = -D_ISOC99_SOURCE -D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600 -I. -Iffmpeg -O3
 HOSTLIBS   = -lm
 AS_O       = -o \$@
 CC_O       = -o \$@
