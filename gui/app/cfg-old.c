@@ -22,8 +22,9 @@
  */
 
 /**
- * @brief Convert a filename which is either in UTF-8
- *        or in an encoding specified in G_FILENAME_ENCODING.
+ * @brief Convert a filename into the original byte sequence
+ *        according to the encoding specified in G_FILENAME_ENCODING,
+ *        if it's currently in UTF-8.
  *
  * @param fname filename
  *
@@ -31,7 +32,7 @@
  */
 static const gchar *cfg_old_filename_from_utf8(const gchar *fname)
 {
-#ifdef CFG_OLD_PLAYLIST
+#if defined(CFG_OLD_PLAYLIST) || defined(CFG_OLD_FILESELECT)
     static gchar *name;
 
     if (g_utf8_validate(fname, -1, NULL)) {
@@ -44,4 +45,5 @@ static const gchar *cfg_old_filename_from_utf8(const gchar *fname)
     return fname;
 }
 
+#undef CFG_OLD_FILESELECT
 #undef CFG_OLD_PLAYLIST
