@@ -42,6 +42,7 @@ extern int save_volume,save_sec,save_audio_id,save_dvdsub_id,save_vobsub_id,save
 extern int reload, auto_play;
 extern int player_idle_mode;
 extern int _map_buffer_factor;
+extern int full_color_range;
 
 extern void save_status(void);
 
@@ -138,6 +139,7 @@ int detect_directx = 1;
 int detect_cache = 1;
 int auto_hide_control = 1;
 int always_use_ass = 1;
+int d3d_autolevel = 0;
 logo_t gui_logo;
 skin_t gui_skin;
 
@@ -1859,6 +1861,7 @@ static void detect_theme(void)
 }
 
 typedef IDirect3D9 * (WINAPI *ImpDirect3DCreate9)(UINT);
+typedef int * (WINAPI *D3DFullColorRangePtr)();
 
 int detect_vo_system(void)
 {
@@ -1963,6 +1966,19 @@ int detect_vo_system(void)
 
 	if(!always_thread && is_vista && using_aero && using_theme && vo_dirver == VO_DIRV_OPENGL)
 		gui_thread = 0;
+
+	full_color_range = 1;
+	if(d3d_autolevel) {
+		HANDLE dsnav_dll = LoadLibraryA("dshownative.dll");
+		if (dsnav_dll) {
+			D3DFullColorRangePtr pD3DFullColorRange = (D3DFullColorRangePtr) GetProcAddress(dsnav_dll, "D3DFullColorRange");
+			if (pD3DFullColorRange && !pD3DFullColorRange()) {
+				full_color_range = 0;
+			}
+			FreeLibrary(dsnav_dll);
+		}
+	}
+
 
 	return 0;
 }

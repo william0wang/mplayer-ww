@@ -193,6 +193,7 @@ extern int sys_Language;
 extern int always_quit;
 extern int loop_all;
 extern int vo_dirver;
+extern int d3d_autolevel;
 extern int generate_preview;
 static char *help_texts = NULL;
 static double demuxer_get_current_time_ex(demuxer_t *demuxer);
@@ -3675,7 +3676,7 @@ static int seek(MPContext *mpctx, double amount, int style)
 #ifndef DISABLE_MAIN
 int main(int argc, char *argv[])
 {
-    char using_vo[9];
+    char using_vo[256];
     char * mem_ptr;
 
     int opt_exit = 0; // Flag indicating whether MPlayer should exit without playing anything.
@@ -3760,22 +3761,23 @@ int main(int argc, char *argv[])
         exit_player_with_rc(EXIT_NONE, 0);
 
     if(video_driver_list && !generate_preview) {
-        strncpy(using_vo , video_driver_list[0] , 9);
-        using_vo[8] = 0;
-        if(strcasecmp(using_vo,"direct3d") == 0)
+        strncpy(using_vo , video_driver_list[0] , 256);
+        using_vo[255] = 0;
+
+        if(strnicmp(using_vo,"direct3d", 8) == 0) {
             vo_dirver = VO_DIRV_DIRECT3D;
-        else {
-            using_vo[2] = 0;
-            if(strcasecmp(using_vo,"gl") == 0 || strcasecmp(using_vo,"ma") == 0)
-                vo_dirver = VO_DIRV_OPENGL;
-			else if(strcasecmp(using_vo,"sd") == 0)
-                vo_dirver = VO_DIRV_SDL;
-            else if(strcasecmp(using_vo,"yu") == 0|| strcasecmp(using_vo,"pn") == 0
-                || strcasecmp(using_vo,"jp") == 0 || strcasecmp(using_vo,"nu") == 0)
-                vo_dirver = VO_DIRV_OTHER;
+            if(strstr(using_vo, ":noautolevel"))
+                d3d_autolevel = 0;
             else
-                vo_dirver = VO_DIRV_DIRECTX;
-        }
+                d3d_autolevel = 1;
+        } else if(strnicmp(using_vo,"directx", 7) == 0)
+            vo_dirver = VO_DIRV_DIRECTX;
+        else if(strnicmp(using_vo,"sdl", 3) == 0)
+            vo_dirver = VO_DIRV_SDL;
+        else if(strnicmp(using_vo,"gl", 2) == 0 || strnicmp(using_vo,"ma", 2) == 0)
+            vo_dirver = VO_DIRV_OPENGL;
+        else
+            vo_dirver = VO_DIRV_OTHER;
     }
 
     if(detect_vo_system())

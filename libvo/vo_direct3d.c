@@ -47,6 +47,7 @@ static const vo_info_t info =
 
 static int levelconv;
 static int autolevel;
+int full_color_range = 1;
 
 /*
  * Link essential libvo functions: preinit, config, control, draw_frame,
@@ -198,8 +199,6 @@ static void calc_fs_rect(void)
     priv->is_clear_needed = 1;
 }
 
-typedef int * (WINAPI *D3DFullColorRangePtr)();
-
 /** @brief prepare YUV to RGB converting TV to PC levels.
  *  @return 0 on success, -1 on failure
  */
@@ -207,13 +206,12 @@ static int d3dx9_prepare_levelconv()
 {
     int i;
     HRESULT hr;
-    HANDLE d3dx9_dll;
+    HANDLE d3dx9_dll = NULL;
     char dll_str[32];
     char src_data[2048];
     ID3DXBuffer *d3dx_shader = NULL;
     ID3DXBuffer *d3dx_error = NULL;
     D3DXCompileShaderPtr m_pD3DXCompileShader;
-	D3DFullColorRangePtr pD3DFullColorRange;
 
     if(priv->device_ps_major < 2 || (!levelconv && !autolevel)) {
 		levelconv = 0;
@@ -221,19 +219,10 @@ static int d3dx9_prepare_levelconv()
         return -1;
 	}
 
-	if(!levelconv && autolevel && (priv->flag_vertex_processing & D3DCREATE_HARDWARE_VERTEXPROCESSING)) {
+	if(!levelconv && !full_color_range && autolevel && (priv->flag_vertex_processing & D3DCREATE_HARDWARE_VERTEXPROCESSING)) {
 		autolevel = 0;
-		d3dx9_dll = LoadLibraryA("dshownative.dll");
-		if (d3dx9_dll) {
-			pD3DFullColorRange = (D3DFullColorRangePtr) GetProcAddress(d3dx9_dll, "D3DFullColorRange");
-			if (pD3DFullColorRange) {
-				if (!pD3DFullColorRange()) {
-					levelconv = 1;
-					mp_msg(MSGT_VO, MSGL_INFO, "VO: [direct3d] Auto color range converting TV (16-235) to PC (0-255)!\n");
-				} 
-			}
-			FreeLibrary(d3dx9_dll);
-		}
+        full_color_range = 1;
+        mp_msg(MSGT_VO, MSGL_INFO, "VO: [direct3d] Auto color range converting TV (16-235) to PC (0-255)!\n");
 	}
 
     if(!levelconv)
