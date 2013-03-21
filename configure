@@ -1731,7 +1731,6 @@ else # if test -z "$_target"
   fi
 fi
 
-extra_cflags="-I. -Iffmpeg $extra_cflags"
 _timer=timer-linux.c
 _getch=getch2.c
 
@@ -2732,7 +2731,13 @@ else
   warn_cflags=yes
 fi
 
-CFLAGS="-D_ISOC99_SOURCE -D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600 $CFLAGS"
+CFLAGS="-D_ISOC99_SOURCE -I. -Iffmpeg $CFLAGS"
+HOSTCFLAGS="-D_ISOC99_SOURCE -I. -Iffmpeg -O3"
+
+# On glibc, add some more CPPFLAGS for enabling required functionality.
+cpp_condition_check features.h "defined __GLIBC__" &&
+  CFLAGS="-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600 $CFLAGS" &&
+  HOSTCFLAGS="-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600 $HOSTCFLAGS" &&
 
 if test "$cc_vendor" = "gnu" ; then
   cflag_check -fno-tree-vectorize && CFLAGS="$CFLAGS -fno-tree-vectorize"
@@ -8553,7 +8558,7 @@ CONFIG_SWRESAMPLE = $ffmpeg_a
 ASFLAGS    = \$(CFLAGS)
 AS_DEPFLAGS= $DEPFLAGS
 HOSTCC     = \$(HOST_CC)
-HOSTCFLAGS = -D_ISOC99_SOURCE -D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600 -I. -Iffmpeg -O3
+HOSTCFLAGS = $HOSTCFLAGS
 HOSTLIBS   = -lm
 AS_O       = -o \$@
 CC_O       = -o \$@
