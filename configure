@@ -1753,7 +1753,7 @@ if win32 ; then
   _exesuf=".exe"
   extra_cflags="$extra_cflags -fno-common"
   # -lwinmm is always needed for osdep/timer-win2.c
-  extra_ldflags="$extra_ldflags -lwinmm"
+  timer_libs=-lwinmm
   _pe_executable=yes
   _timer=timer-win2.c
   _priority=yes
@@ -2751,7 +2751,7 @@ if test "$cc_vendor" = "gnu" ; then
 fi
 
 cflag_check -mno-omit-leaf-frame-pointer && cflags_no_omit_leaf_frame_pointer="-mno-omit-leaf-frame-pointer"
-cflag_check -MD -MP && DEPFLAGS="-MD -MP"
+cflag_check -MMD -MP && DEPFLAGS="-MMD -MP"
 
 
 if test -n "$LDFLAGS" ; then
@@ -3937,7 +3937,7 @@ EOF
   _iconv=no
   for ld_tmp in "" "-liconv" "-liconv $ld_dl" ; do
     cc_check $ld_tmp && extra_ldflags="$extra_ldflags $ld_tmp" &&
-      _iconv=yes && break
+      ld_iconv="$ld_tmp" && _iconv=yes && break
   done
 fi
 if test "$_iconv" = yes ; then
@@ -4060,12 +4060,13 @@ if test "$_termcap" = auto ; then
   _termcap=no
   for ld_tmp in "-lncurses" "-ltinfo" "-ltermcap"; do
     statement_check term.h 'tgetent(0, 0)' $ld_tmp &&
-      extra_ldflags="$extra_ldflags $ld_tmp" && _termcap=yes && break
+      extra_ldflags="$extra_ldflags $ld_tmp" &&
+      ld_termcap="$ld_tmp" && _termcap=yes && break
   done
 fi
 if test "$_termcap" = yes ; then
   def_termcap='#define HAVE_TERMCAP 1'
-  test $ld_tmp && res_comment="using $ld_tmp"
+  test $ld_termcap && res_comment="using $ld_termcap"
 else
   def_termcap='#undef HAVE_TERMCAP'
 fi
@@ -8348,9 +8349,11 @@ CFLAGS_NO_OMIT_LEAF_FRAME_POINTER = $cflags_no_omit_leaf_frame_pointer
 CFLAGS_STACKREALIGN      = $cflags_stackrealign
 CFLAGS_SVGALIB_HELPER    = $cflags_svgalib_helper
 
-EXTRALIBS          = $extra_ldflags $ld_static $extra_libs
+EXTRALIBS          = $extra_ldflags $ld_static $timer_libs $extra_libs
 EXTRALIBS_MPLAYER  = $libs_mplayer
 EXTRALIBS_MENCODER = $libs_mencoder
+
+MP_MSG_LIBS = $ld_iconv $ld_termcap $timer_libs
 
 GETCH = $_getch
 HELP_FILE = $_mp_help

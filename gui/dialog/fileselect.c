@@ -57,7 +57,6 @@ char * get_current_dir_name( void );
 #endif
 
 char          * fsSelectedFile = NULL;
-gchar         * fsSelectedDirectoryUtf8 = NULL;
 unsigned char * fsThatDir = ".";
 const gchar   * fsFilter = "*";
 
@@ -254,10 +253,23 @@ static void CheckDir( GtkWidget * list )
  gtk_widget_show( list );
 }
 
+static void fs_AddPathUtf8 (const char *name, GtkPositionType pos)
+{
+  gchar *utf8name;
+
+  utf8name = g_filename_display_name(name);
+
+  if (pos == GTK_POS_TOP) fsTopList_items = g_list_prepend(fsTopList_items, utf8name);
+  else fsTopList_items = g_list_append(fsTopList_items, utf8name);
+
+  g_hash_table_insert(fsPathTable, strdup(utf8name), strdup(name));
+}
+
 void ShowFileSelect( int type,int modal )
 {
  int i, k, fsMedium;
  char * tmp = NULL, * dir = NULL;
+ const gchar *fname;
  struct stat f;
 
  if ( fsFileSelect ) gtkActive( fsFileSelect );
@@ -340,38 +352,35 @@ void ShowFileSelect( int type,int modal )
    if ( !dir[0] ) nfree( dir );
   }
 
- if ( fsTopList_items ) g_list_free( fsTopList_items ); fsTopList_items=NULL;
+ if ( fsTopList_items )
+ {
+   g_list_foreach(fsTopList_items, (GFunc) g_free, NULL);
+   g_list_free(fsTopList_items);
+   fsTopList_items = NULL;
+ }
  if ( fsPathTable ) g_hash_table_destroy( fsPathTable ); fsPathTable=g_hash_table_new_full(g_str_hash, g_str_equal, free, free);
  {
   unsigned int  i, c = 1;
-  gchar *uname;
 
   if ( fsMedium )
    {
     for ( i=0;i < FF_ARRAY_ELEMS(fsHistory);i++ )
      if ( fsHistory[i] )
       {
-       const gchar *fname;
        fname = cfg_old_filename_from_utf8(fsHistory[i]);
-       uname = g_filename_display_name(fname);
-       fsTopList_items=g_list_append( fsTopList_items,uname );
-       g_hash_table_insert(fsPathTable, strdup(uname), strdup(fname));
+       fs_AddPathUtf8(fname, GTK_POS_BOTTOM);
        if ( c ) c=gstrcmp( dir,fname );
       }
    }
-  if ( c && dir )
-   {
-     uname = g_filename_display_name( dir );
-     fsTopList_items=g_list_prepend( fsTopList_items,uname );
-     g_hash_table_insert(fsPathTable, strdup(uname), strdup(dir));
-   }
+  if ( c && dir ) fs_AddPathUtf8(dir, GTK_POS_TOP);
  }
  free( dir );
- if ( getenv( "HOME" ) ) fsTopList_items=g_list_append( fsTopList_items,getenv( "HOME" ) );
- else fsTopList_items=g_list_append( fsTopList_items,"/home" );
- if (stat( "/media",&f ) == 0) fsTopList_items=g_list_append( fsTopList_items,"/media" );
- if (stat( "/mnt",&f ) == 0) fsTopList_items=g_list_append( fsTopList_items,"/mnt" );
- fsTopList_items=g_list_append( fsTopList_items,"/" );
+ fname = getenv( "HOME" );
+ if ( fname ) fs_AddPathUtf8(fname, GTK_POS_BOTTOM);
+ else fsTopList_items=g_list_append( fsTopList_items,g_strdup( "/home" ) );
+ if (stat( "/media",&f ) == 0) fsTopList_items=g_list_append( fsTopList_items,g_strdup( "/media" ) );
+ if (stat( "/mnt",&f ) == 0) fsTopList_items=g_list_append( fsTopList_items,g_strdup( "/mnt" ) );
+ fsTopList_items=g_list_append( fsTopList_items,g_strdup( "/" ) );
  gtk_combo_set_popdown_strings( GTK_COMBO( fsCombo4 ),fsTopList_items );
 
  gtk_widget_grab_focus( fsFNameList );
@@ -488,34 +497,38 @@ static void fs_fsPathCombo_changed( GtkEditable * editable,
 
 static void fs_Up_released( GtkButton * button, gpointer user_data )
 {
+ char *utf8dir;
+
  chdir( ".." );
  fsSelectedFile=fsThatDir;
  CheckDir( fsFNameList );
- gtk_entry_set_text( GTK_ENTRY( fsPathCombo ),(unsigned char *)get_current_dir_name_utf8() );
+ utf8dir = get_current_dir_name_utf8();
+ gtk_entry_set_text( GTK_ENTRY( fsPathCombo ),(unsigned char *)utf8dir );
+ g_free(utf8dir);
  return;
 }
 
 static void fs_Ok_released( GtkButton * button, gpointer user_data )
 {
  char          * fsSelectedDirectory;
- GList         * item;
- int             i = 1, l;
+ int             l;
  struct stat     fs;
  gchar         * selected;
 
  if( ( stat( fsSelectedFile,&fs ) == 0 ) && S_ISDIR( fs.st_mode ) )
   {
+   char *utf8dir;
    if ( chdir( fsSelectedFile ) != 0 ) return;
    fsSelectedFile=fsThatDir;
    CheckDir( fsFNameList );
-   gtk_entry_set_text( GTK_ENTRY( fsPathCombo ),(unsigned char *)get_current_dir_name_utf8() );
+   utf8dir = get_current_dir_name_utf8();
+   gtk_entry_set_text( GTK_ENTRY( fsPathCombo ),(unsigned char *)utf8dir );
+   g_free(utf8dir);
    gtk_widget_grab_focus( fsFNameList );
    return;
   }
 
         fsSelectedDirectory=(unsigned char *)get_current_dir_name();
-        g_free( fsSelectedDirectoryUtf8 );
-        fsSelectedDirectoryUtf8=get_current_dir_name_utf8();
  switch ( fsType )
   {
    case fsVideoSelector:
@@ -549,21 +562,9 @@ static void fs_Ok_released( GtkButton * button, gpointer user_data )
 	  break;
   }
 
- HideFileSelect();
-
- item=fsTopList_items;
- while( item )
-  {
-   if ( !strcmp( item->data,fsSelectedDirectoryUtf8 ) ) i=0;
-   item=item->next;
-  }
- if ( i )
- {
-   fsTopList_items=g_list_prepend( fsTopList_items,fsSelectedDirectoryUtf8 );
-   g_hash_table_insert(fsPathTable, strdup(fsSelectedDirectoryUtf8), strdup(fsSelectedDirectory));
- }
-
  free(fsSelectedDirectory);
+
+ HideFileSelect();
 
  if ( uiLoadPlay ) { uiLoadPlay=False; uiEvent( evPlay,0 ); }
   else gui( GUI_SET_STATE,(void *) GUI_STOP );
