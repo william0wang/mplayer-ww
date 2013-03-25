@@ -34,7 +34,7 @@ typedef CRITICAL_SECTION pthread_mutex_t;
 #define pthread_mutex_init(a, b) InitializeCriticalSection(a)
 #define pthread_mutex_lock(a)    EnterCriticalSection(a)
 #define pthread_mutex_unlock(a)  LeaveCriticalSection(a)
-#define pthread_mutex_destroy(a)
+#define pthread_mutex_destroy(a) DeleteCriticalSection(a)
 
 #ifndef HAVE_GETTIMEOFDAY
 /* replacement gettimeofday implementation */
@@ -60,7 +60,7 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
 #endif /* WIN32 */
 
 /* where should libdvdnav write its messages (stdout/stderr) */
-#define MSG_OUT stdout
+#define MSG_OUT stderr
 
 /* Maximum length of an error string */
 #define MAX_ERR_LEN 255
@@ -75,6 +75,14 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
 #ifndef DVD_VIDEO_LB_LEN
 #define DVD_VIDEO_LB_LEN 2048
 #endif
+
+typedef enum {
+  DSI_ILVU_PRE   = 1 << 15, /* set during the last 3 VOBU preceeding an interleaved block. */
+  DSI_ILVU_BLOCK = 1 << 14, /* set for all VOBU in an interleaved block */
+  DSI_ILVU_FIRST = 1 << 13, /* set for the first VOBU for a given angle or scene within a ILVU, or the first VOBU in the preparation (PREU) sequence */
+  DSI_ILVU_LAST  = 1 << 12, /* set for the last VOBU for a given angle or scene within a ILVU, or the last VOBU in the preparation (PREU) sequence */
+  DSI_ILVU_MASK  = 0xf000
+} DSI_ILVU;
 
 typedef struct read_cache_s read_cache_t;
 

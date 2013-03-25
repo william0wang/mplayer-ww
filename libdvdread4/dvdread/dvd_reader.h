@@ -70,9 +70,13 @@ typedef struct dvd_reader_s dvd_reader_t;
 typedef struct dvd_file_s dvd_file_t;
 
 /**
- * Opaque type that is used to provide statistics on a handle.
+ * Public type that is used to provide statistics on a handle.
  */
-typedef struct dvd_stat_s dvd_stat_t;
+typedef struct {
+  off_t size;          /**< Total size of file in bytes */
+  int nr_parts;        /**< Number of file parts */
+  off_t parts_size[9]; /**< Size of each part in bytes */
+} dvd_stat_t;
 
 /**
  * Opens a block device of a DVD-ROM file, or an image file, or a directory

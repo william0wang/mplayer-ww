@@ -52,12 +52,12 @@ static dvdnav_status_t dvdnav_clear(dvdnav_t * this) {
   if (this->file) DVDCloseFile(this->file);
   this->file = NULL;
 
+  memset(&this->position_current,0,sizeof(this->position_current));
   memset(&this->pci,0,sizeof(this->pci));
   memset(&this->dsi,0,sizeof(this->dsi));
   this->last_cmd_nav_lbn = SRI_END_OF_CELL;
 
   /* Set initial values of flags */
-  this->position_current.still = 0;
   this->skip_still = 0;
   this->sync_wait = 0;
   this->sync_wait_skip = 0;
@@ -178,9 +178,9 @@ dvdnav_status_t dvdnav_reset(dvdnav_t *this) {
 #ifdef LOG_DEBUG
   fprintf(MSG_OUT, "libdvdnav: clearing dvdnav\n");
 #endif
+  pthread_mutex_unlock(&this->vm_lock);
   result = dvdnav_clear(this);
 
-  pthread_mutex_unlock(&this->vm_lock);
   return result;
 }
 
@@ -336,8 +336,9 @@ static int32_t dvdnav_get_vobu(dvdnav_t *this, dsi_t *nav_dsi, pci_t *nav_pci, d
     dvdnav_angle_change(this, 1);
   }
 #endif
-
-  if(num_angle != 0) {
+  /* only use ILVU information if we are at the last vobunit in ILVU */
+  /* otherwise we will miss nav packets from vobunits inbetween */
+  if(num_angle != 0 && (nav_dsi->sml_pbi.category & DSI_ILVU_MASK) == (DSI_ILVU_BLOCK | DSI_ILVU_LAST)) {
 
     if((next = nav_pci->nsml_agli.nsml_agl_dsta[angle-1]) != 0) {
       if((next & 0x3fffffff) != 0) {
@@ -844,6 +845,22 @@ uint8_t dvdnav_get_video_aspect(dvdnav_t *this) {
 
   return retval;
 }
+int dvdnav_get_video_resolution(dvdnav_t *this, uint32_t *width, uint32_t *height) {
+  int w, h;
+
+  if(!this->started) {
+    printerr("Virtual DVD machine not started.");
+    return -1;
+  }
+
+  pthread_mutex_lock(&this->vm_lock);
+  vm_get_video_res(this->vm, &w, &h);
+  pthread_mutex_unlock(&this->vm_lock);
+
+  *width  = w;
+  *height = h;
+  return 0;
+}
 
 uint8_t dvdnav_get_video_scale_permission(dvdnav_t *this) {
   uint8_t         retval;
@@ -1146,7 +1163,7 @@ user_ops_t dvdnav_get_restrictions(dvdnav_t* this) {
   union {
     user_ops_t ops_struct;
     uint32_t   ops_int;
-  } ops;
+  } ops, tmp;
 
   ops.ops_int = 0;
 
@@ -1156,10 +1173,12 @@ user_ops_t dvdnav_get_restrictions(dvdnav_t* this) {
   }
 
   pthread_mutex_lock(&this->vm_lock);
-  ops.ops_int |= *(uint32_t*)&this->pci.pci_gi.vobu_uop_ctl;
+  ops.ops_struct = this->pci.pci_gi.vobu_uop_ctl;
 
-  if(this->vm && this->vm->state.pgc)
-    ops.ops_int |= *(uint32_t*)&this->vm->state.pgc->prohibited_ops;
+  if(this->vm && this->vm->state.pgc) {
+    tmp.ops_struct = this->vm->state.pgc->prohibited_ops;
+    ops.ops_int |= tmp.ops_int;
+  }
   pthread_mutex_unlock(&this->vm_lock);
 
   return ops.ops_struct;
