@@ -1483,6 +1483,12 @@ done
 mplayer_tmpdir="$tmpdir/mplayer-configure-$RANDOM-$$"
 mkdir $mplayer_tmpdir || die "Unable to create tmpdir."
 
+cleanup() {
+  rm -rf "$mplayer_tmpdir"
+}
+
+trap cleanup EXIT
+
 TMPLOG="config.log"
 TMPC="$mplayer_tmpdir/tmp.c"
 TMPCPP="$mplayer_tmpdir/tmp.cpp"
@@ -3389,9 +3395,9 @@ fi
 echores "$_struct_addrinfo"
 
 if test "$_struct_addrinfo" = yes; then
-  def_addrinfo="#define HAVE_STRUCT_ADDRINFO 1"
+  def_struct_addrinfo="#define HAVE_STRUCT_ADDRINFO 1"
 else
-  def_addrinfo="#define HAVE_STRUCT_ADDRINFO 0"
+  def_struct_addrinfo="#define HAVE_STRUCT_ADDRINFO 0"
 fi
 
 
@@ -3436,9 +3442,9 @@ fi
 echores "$_struct_sockaddr_storage"
 
 if test "$_struct_sockaddr_storage" = yes; then
-  def_sockaddr_storage="#define HAVE_STRUCT_SOCKADDR_STORAGE 1"
+  def_struct_sockaddr_storage="#define HAVE_STRUCT_SOCKADDR_STORAGE 1"
 else
-  def_sockaddr_storage="#define HAVE_STRUCT_SOCKADDR_STORAGE 0"
+  def_struct_sockaddr_storage="#define HAVE_STRUCT_SOCKADDR_STORAGE 0"
 fi
 
 
@@ -3846,13 +3852,8 @@ fi #if win32; then
 
 echocheck "direct.h"
 _direct_h=no
-header_check direct.h && _direct_h=yes
-if [ $_direct_h = yes ]; then
-  def_direct_h='#define HAVE_DIRECT_H 1'
-else
-  # libdvdcss checks this via #ifdef, so we need #undef here.
-  def_direct_h='#undef HAVE_DIRECT_H'
-fi
+def_direct_h='#define HAVE_DIRECT_H 0'
+header_check direct.h && _direct_h=yes && def_direct_h='#define HAVE_DIRECT_H 1'
 echores "$_direct_h"
 
 
@@ -3965,94 +3966,6 @@ fi
 echores "$_soundcard_h"
 
 
-echocheck "sys/dvdio.h"
-_dvdio=no
-# FreeBSD 8.1 has broken dvdio.h
-header_check_broken sys/types.h sys/dvdio.h && _dvdio=yes
-if test "$_dvdio" = yes ; then
-  def_dvdio='#define DVD_STRUCT_IN_SYS_DVDIO_H 1'
-else
-  def_dvdio='#undef DVD_STRUCT_IN_SYS_DVDIO_H'
-fi
-echores "$_dvdio"
-
-
-echocheck "sys/cdio.h"
-_cdio=no
-# at least OpenSolaris has a broken cdio.h
-header_check_broken sys/types.h sys/cdio.h && _cdio=yes
-if test "$_cdio" = yes ; then
-  def_cdio='#define DVD_STRUCT_IN_SYS_CDIO_H 1'
-else
-  def_cdio='#undef DVD_STRUCT_IN_SYS_CDIO_H'
-fi
-echores "$_cdio"
-
-
-echocheck "linux/cdrom.h"
-_cdrom=no
-header_check linux/cdrom.h && _cdrom=yes
-if test "$_cdrom" = yes ; then
-  def_cdrom='#define DVD_STRUCT_IN_LINUX_CDROM_H 1'
-else
-  def_cdrom='#undef DVD_STRUCT_IN_LINUX_CDROM_H'
-fi
-echores "$_cdrom"
-
-
-echocheck "dvd.h"
-_dvd=no
-header_check dvd.h && _dvd=yes
-if test "$_dvd" = yes ; then
-  def_dvd='#define DVD_STRUCT_IN_DVD_H 1'
-else
-  def_dvd='#undef DVD_STRUCT_IN_DVD_H'
-fi
-echores "$_dvd"
-
-
-if bsdos; then
-echocheck "BSDI dvd.h"
-_bsdi_dvd=no
-header_check dvd.h && _bsdi_dvd=yes
-if test "$_bsdi_dvd" = yes ; then
-  def_bsdi_dvd='#define DVD_STRUCT_IN_BSDI_DVDIOCTL_DVD_H 1'
-else
-  def_bsdi_dvd='#undef DVD_STRUCT_IN_BSDI_DVDIOCTL_DVD_H'
-fi
-echores "$_bsdi_dvd"
-fi #if bsdos
-
-
-if hpux; then
-# also used by AIX, but AIX does not support VCD and/or libdvdread
-echocheck "HP-UX SCSI header"
-_hpux_scsi_h=no
-header_check sys/scsi.h && _hpux_scsi_h=yes
-if test "$_hpux_scsi_h" = yes ; then
-  def_hpux_scsi_h='#define HPUX_SCTL_IO 1'
-else
-  def_hpux_scsi_h='#undef HPUX_SCTL_IO'
-fi
-echores "$_hpux_scsi_h"
-fi #if hpux
-
-
-if sunos; then
-echocheck "userspace SCSI headers (Solaris)"
-_sol_scsi_h=no
-header_check sys/scsi/scsi_types.h &&
-  header_check_broken sys/types.h sys/scsi/impl/uscsi.h &&
-   _sol_scsi_h=yes
-if test "$_sol_scsi_h" = yes ; then
-  def_sol_scsi_h='#define SOLARIS_USCSI 1'
-else
-  def_sol_scsi_h='#undef SOLARIS_USCSI'
-fi
-echores "$_sol_scsi_h"
-fi #if sunos
-
-
 echocheck "termcap"
 if test "$_termcap" = auto ; then
   _termcap=no
@@ -4110,7 +4023,7 @@ echores "$_shm"
 echocheck "strsep()"
 strsep=yes
 def_strsep='#define HAVE_STRSEP 1'
-statement_check string.h 'char *s = "Hello, world!"; strsep(&s, ",")' ||
+define_statement_check _BSD_SOURCE string.h 'char *s = "Hello, world!"; strsep(&s, ",")' ||
     { strsep=no ; def_strsep='#undef HAVE_STRSEP' ; }
 echores "$strsep"
 
@@ -4187,13 +4100,9 @@ echores "$_setmode"
 if sunos; then
 echocheck "sysi86()"
 _sysi86=no
-statement_check sys/sysi86.h 'sysi86(0)' && _sysi86=yes
-if test "$_sysi86" = yes ; then
-  def_sysi86='#define HAVE_SYSI86 1'
-  statement_check sys/sysi86.h 'int sysi86(int, void*); sysi86(0)' && def_sysi86_iv='#define HAVE_SYSI86_iv 1'
-else
-  def_sysi86='#undef HAVE_SYSI86'
-fi
+def_sysi86='#define HAVE_SYSI86 0'
+statement_check sys/sysi86.h 'int sysi86(int, void*); sysi86(0)' &&
+  _sysi86=yes && def_sysi86='#define HAVE_SYSI86 1'
 echores "$_sysi86"
 fi #if sunos
 
@@ -6012,16 +5921,14 @@ echores "$_bluray"
 echocheck "dvdread"
 if test "$_dvdread_internal" = auto ; then
   _dvdread_internal=no
-  _dvdread=no
-  if (linux || freebsd || netbsd || openbsd || dragonfly || sunos || hpux) &&
-     (test "$_dvd" = yes || test "$_cdrom" = yes || test "$_cdio" = yes ||
-      test "$_dvdio" = yes || test "$_bsdi_dvd" = yes) ||
+  if linux || freebsd || netbsd || openbsd || dragonfly || sunos || hpux ||
      darwin || win32 || os2; then
     _dvdread_internal=yes
     _dvdread=yes
     extra_cflags="-Ilibdvdread4 $extra_cflags"
   fi
-elif test "$_dvdread" = auto ; then
+fi
+if test "$_dvdread" = auto ; then
   _dvdread=no
   if test "$_dl" = yes; then
     _dvdreadcflags=$($_dvdreadconfig --cflags 2> /dev/null)
@@ -6052,13 +5959,60 @@ echores "$_dvdread"
 
 
 echocheck "internal libdvdcss"
+def_broken_mkdir='#undef HAVE_BROKEN_MKDIR'
+def_dvdio='#undef DVD_STRUCT_IN_SYS_DVDIO_H'
+def_dvd='#undef DVD_STRUCT_IN_DVD_H'
+def_cdio='#undef DVD_STRUCT_IN_SYS_CDIO_H'
+def_cdrom='#undef DVD_STRUCT_IN_LINUX_CDROM_H'
+def_hpux_scsi_h='#undef HPUX_SCTL_IO'
+def_sol_scsi_h='#undef SOLARIS_USCSI'
+def_sys_uio_h='#undef HAVE_SYS_UIO_H'
+_dvdio=no
+_dvd=no
+_cdio=no
+_cdrom=no
+_sol_scsi_h=no
+_hpux_scsi_h=no
 if test "$_libdvdcss_internal" = auto && test "$_dvdread_internal" = yes ; then
   _libdvdcss_internal=no
   test -d libdvdcss && _libdvdcss_internal=yes
-  hpux && test "$_hpux_scsi_h" = no && _libdvdcss_internal=no
+
+  if header_check linux/cdrom.h ; then
+     _cdrom=yes
+     def_cdrom='#define DVD_STRUCT_IN_LINUX_CDROM_H 1'
+  # FreeBSD 8.1 has broken dvdio.h
+  elif header_check_broken sys/types.h sys/dvdio.h ; then
+    _dvdio=yes
+    def_dvdio='#define DVD_STRUCT_IN_SYS_DVDIO_H 1'
+  elif header_check dvd.h ; then
+    _dvd=yes
+    def_dvd='#define DVD_STRUCT_IN_DVD_H 1'
+  # at least OpenSolaris has a broken cdio.h
+  elif header_check_broken sys/types.h sys/cdio.h ; then
+    _cdio=yes
+    def_cdio='#define DVD_STRUCT_IN_SYS_CDIO_H 1'
+  fi
+
+  if sunos; then
+    header_check sys/scsi/scsi_types.h &&
+      header_check_broken sys/types.h sys/scsi/impl/uscsi.h &&
+        _sol_scsi_h=yes && def_sol_scsi_h='#define SOLARIS_USCSI 1'
+  elif hpux; then
+    # also used by AIX, but AIX does not support VCD and/or libdvdread
+    header_check sys/scsi.h && _hpux_scsi_h=yes &&
+      def_hpux_scsi_h='#define HPUX_SCTL_IO 1' ||
+      _libdvdcss_internal=no
+  fi
+
+  statement_check_broken stddef.h sys/stat.h 'mkdir(NULL, 0)' ||
+    def_broken_mkdir='#define HAVE_BROKEN_MKDIR 1'
+
+  header_check "sys/uio.h" &&
+    def_sys_uio_h='#define HAVE_SYS_UIO_H 1'
+
 fi
 if test "$_libdvdcss_internal" = yes ; then
-  if linux || netbsd || openbsd || bsdos || wine ; then
+  if linux || netbsd || openbsd || wine ; then
     def_dvd_linux='#define HAVE_LINUX_DVD_STRUCT 1'
     openbsd && def_dvd_openbsd='#define HAVE_OPENBSD_DVD_STRUCT 1'
   elif freebsd || dragonfly ; then
@@ -6067,9 +6021,9 @@ if test "$_libdvdcss_internal" = yes ; then
     def_dvd_darwin='#define DARWIN_DVD_IOCTL'
     extra_ldflags="$extra_ldflags -framework IOKit -framework Carbon"
   elif cygwin ; then
-    cflags_libdvdcss="-DSYS_CYGWIN -DWIN32"
-  elif os2 ; then
-    cflags_libdvdcss="-DSYS_OS2"
+    cflags_libdvdcss="-D_WIN32_IE=0x0500 -mwin32"
+  elif mingw32 ; then
+    cflags_libdvdcss="-D_WIN32_IE=0x0500"
   fi
   cflags_libdvdcss_dvdread="-Ilibdvdcss"
   def_dvdcss="#define HAVE_DVDCSS_DVDCSS_H 1"
@@ -8710,6 +8664,11 @@ cat > $TMPH << EOF
 #undef FAST_OSD
 #undef FAST_OSD_TABLE
 
+/* Required for libdvdcss and some files below stream/. */
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
 /* Define this to enable MPEG-1/2 image postprocessing in libmpeg2 */
 #define MPEG12_POSTPROC 1
 #define ATTRIBUTE_ALIGNED_MAX 16
@@ -8723,23 +8682,34 @@ cat > $TMPH << EOF
 #define MPLAYER_LIBDIR "$_libdir"
 
 /* definitions needed by included libraries */
-#define HAVE_INTTYPES_H 1
 /* libmpeg2 */
 $def_fast_inttypes
 /* libdvdcss */
 #define HAVE_ERRNO_H 1
+#define HAVE_INTTYPES_H 1
+#define HAVE_UNISTD_H 1
+$def_broken_mkdir
+$def_cdio
+$def_cdrom
+$def_dvd
+$def_dvd_bsd
+$def_dvd_darwin
+$def_dvd_linux
+$def_dvd_openbsd
+$def_dvdcss
+$def_dvdio
+$def_hpux_scsi_h
+$def_sol_scsi_h
+$def_sys_uio_h
+
 /* libdvdcss + libdvdread */
 #define HAVE_LIMITS_H 1
-/* libdvdcss */
-#define HAVE_UNISTD_H 1
-/* libdvdread */
-#define STDC_HEADERS 1
-#define HAVE_MEMCPY 1
-/* libdvdnav */
-#define READ_CACHE_TRACE 0
 /* libdvdread */
 #define HAVE_DLFCN_H 1
-$def_dvdcss
+#define HAVE_MEMCPY 1
+#define STDC_HEADERS 1
+/* libdvdnav */
+#define READ_CACHE_TRACE 0
 
 
 /* system headers */
@@ -8829,22 +8799,11 @@ $(ff_config_enable "$cpuexts_all" "$cpuexts" "#" "HAVE" "_INLINE")
 #define DEFAULT_CDROM_DEVICE "$default_cdrom_device"
 #define DEFAULT_DVD_DEVICE   "$default_dvd_device"
 $def_bluray
-$def_bsdi_dvd
 $def_cddb
-$def_cdio
 $def_cdparanoia
-$def_cdrom
-$def_dvd
-$def_dvd_bsd
-$def_dvd_darwin
-$def_dvd_linux
-$def_dvd_openbsd
-$def_dvdio
 $def_dvdnav
 $def_dvdread
-$def_hpux_scsi_h
 $def_libcdio
-$def_sol_scsi_h
 $def_vcd
 
 
@@ -8964,14 +8923,7 @@ $def_live
 $def_nemesi
 $def_networking
 $def_smb
-$def_socklen_t
-$def_struct_ipv6_mreq
-$def_struct_sockaddr_in6
-$def_struct_sockaddr_sa_len
 $def_vstream
-$def_addrinfo
-$def_getaddrinfo
-$def_sockaddr_storage
 
 
 /* libvo options */
@@ -9107,6 +9059,12 @@ $def_local_aligned_16
 $def_os2threads
 $def_pic
 $def_pthreads
+$def_socklen_t
+$def_struct_addrinfo
+$def_struct_ipv6_mreq
+$def_struct_sockaddr_in6
+$def_struct_sockaddr_sa_len
+$def_struct_sockaddr_storage
 $def_threads
 $def_w32threads
 $def_xform_asm
@@ -9125,6 +9083,7 @@ $def_cosf
 $def_expf
 $def_exp2
 $def_exp2f
+$def_getaddrinfo
 $def_isinf
 $def_isnan
 $def_ldexpf
@@ -9159,6 +9118,7 @@ $def_truncf
 #define CONFIG_GRAY 0
 #define CONFIG_LIBMODPLUG 0
 #define CONFIG_LIBVORBIS 0
+#define CONFIG_MEMORY_POISONING 0
 #define CONFIG_OPENSSL 0
 #define CONFIG_POWERPC_PERF 0
 /* For now prefer speed over avoiding potential invalid reads */
@@ -9376,4 +9336,4 @@ EOF
 fi
 
 # Last move:
-rm -rf "$mplayer_tmpdir"
+cleanup
