@@ -36,47 +36,18 @@
 #include "gui/util/string.h"
 #include "help_mp.h"
 
-GtkWidget * URL = NULL;
+GtkWidget * URLDialog = NULL;
 
 static GtkWidget * URLCombo;
 static GtkWidget * URLEntry;
 static GList     * URLComboEntrys = NULL;
 
-void ShowURLDialogBox( void )
+static void HideURLDialog( void )
 {
- urlItem * item;
-
- if ( URL ) gtkActive( URL );
-   else URL=create_URL();
-
- item = listMgr( URLLIST_GET,0 );
-
- if ( item )
-  {
-   g_list_free( URLComboEntrys );
-   URLComboEntrys=NULL;
-   while( item )
-    {
-     URLComboEntrys=g_list_append( URLComboEntrys,(gchar *)item->url );
-     item=item->next;
-    }
-  }
-
- if ( URLComboEntrys )
-  {
-   gtk_entry_set_text( GTK_ENTRY( URLEntry ),URLComboEntrys->data );
-   gtk_combo_set_popdown_strings( GTK_COMBO( URLCombo ),URLComboEntrys );
-  }
-
- gtk_widget_show( URL );
-}
-
-static void HideURLDialogBox( void )
-{
- if ( !URL ) return;
- gtk_widget_hide( URL );
- gtk_widget_destroy( URL );
- URL=0;
+ if ( !URLDialog ) return;
+ gtk_widget_hide( URLDialog );
+ gtk_widget_destroy( URLDialog );
+ URLDialog=0;
 }
 
 static void on_Button_pressed( GtkButton * button,gpointer user_data )
@@ -108,10 +79,10 @@ static void on_Button_pressed( GtkButton * button,gpointer user_data )
      uiEvent( evPlay,0 );
     }
   }
- HideURLDialogBox();
+ HideURLDialog();
 }
 
-GtkWidget * create_URL( void )
+static GtkWidget * create_URLDialog( void )
 {
  GtkWidget * vbox1;
  GtkWidget * hbox1;
@@ -122,20 +93,20 @@ GtkWidget * create_URL( void )
 
  accel_group=gtk_accel_group_new();
 
- URL=gtk_window_new( GTK_WINDOW_TOPLEVEL );
- gtk_widget_set_name( URL,"URL" );
- gtk_object_set_data( GTK_OBJECT( URL ),"URL",URL );
- gtk_widget_set_usize( URL,384,70 );
- GTK_WIDGET_SET_FLAGS( URL,GTK_CAN_DEFAULT );
- gtk_window_set_title( GTK_WINDOW( URL ),MSGTR_Network );
- gtk_window_set_position( GTK_WINDOW( URL ),GTK_WIN_POS_CENTER );
- gtk_window_set_policy( GTK_WINDOW( URL ),TRUE,TRUE,FALSE );
- gtk_window_set_wmclass( GTK_WINDOW( URL ),"Network","MPlayer" );
+ URLDialog=gtk_window_new( GTK_WINDOW_TOPLEVEL );
+ gtk_widget_set_name( URLDialog,"URL" );
+ gtk_object_set_data( GTK_OBJECT( URLDialog ),"URL",URLDialog );
+ gtk_widget_set_usize( URLDialog,384,70 );
+ GTK_WIDGET_SET_FLAGS( URLDialog,GTK_CAN_DEFAULT );
+ gtk_window_set_title( GTK_WINDOW( URLDialog ),MSGTR_Network );
+ gtk_window_set_position( GTK_WINDOW( URLDialog ),GTK_WIN_POS_CENTER );
+ gtk_window_set_policy( GTK_WINDOW( URLDialog ),TRUE,TRUE,FALSE );
+ gtk_window_set_wmclass( GTK_WINDOW( URLDialog ),"Network","MPlayer" );
 
- gtk_widget_realize( URL );
- gtkAddIcon( URL );
+ gtk_widget_realize( URLDialog );
+ gtkAddIcon( URLDialog );
 
- vbox1=AddVBox( AddDialogFrame( URL ),0 );
+ vbox1=AddVBox( AddDialogFrame( URLDialog ),0 );
  hbox1=AddHBox( vbox1,1 );
  AddLabel( "URL: ",hbox1 );
 
@@ -162,12 +133,41 @@ GtkWidget * create_URL( void )
  gtk_widget_add_accelerator( Ok,"clicked",accel_group,GDK_Return,0,GTK_ACCEL_VISIBLE );
  gtk_widget_add_accelerator( Cancel,"clicked",accel_group,GDK_Escape,0,GTK_ACCEL_VISIBLE );
 
- gtk_signal_connect( GTK_OBJECT( URL ),"destroy",GTK_SIGNAL_FUNC( WidgetDestroy ),&URL );
+ gtk_signal_connect( GTK_OBJECT( URLDialog ),"destroy",GTK_SIGNAL_FUNC( WidgetDestroy ),&URLDialog );
  gtk_signal_connect( GTK_OBJECT( Ok ),"clicked",GTK_SIGNAL_FUNC( on_Button_pressed ),(void *)1 );
  gtk_signal_connect( GTK_OBJECT( Cancel ),"clicked",GTK_SIGNAL_FUNC( on_Button_pressed ),NULL );
 
  gtk_widget_grab_focus( URLEntry );
- gtk_window_add_accel_group( GTK_WINDOW( URL ),accel_group );
+ gtk_window_add_accel_group( GTK_WINDOW( URLDialog ),accel_group );
 
- return URL;
+ return URLDialog;
+}
+
+void ShowURLDialog( void )
+{
+ urlItem * item;
+
+ if ( URLDialog ) gtkActive( URLDialog );
+   else URLDialog=create_URLDialog();
+
+ item = listMgr( URLLIST_GET,0 );
+
+ if ( item )
+  {
+   g_list_free( URLComboEntrys );
+   URLComboEntrys=NULL;
+   while( item )
+    {
+     URLComboEntrys=g_list_append( URLComboEntrys,(gchar *)item->url );
+     item=item->next;
+    }
+  }
+
+ if ( URLComboEntrys )
+  {
+   gtk_entry_set_text( GTK_ENTRY( URLEntry ),URLComboEntrys->data );
+   gtk_combo_set_popdown_strings( GTK_COMBO( URLCombo ),URLComboEntrys );
+  }
+
+ gtk_widget_show( URLDialog );
 }

@@ -56,15 +56,15 @@
 char * get_current_dir_name( void );
 #endif
 
-char          * fsSelectedFile = NULL;
-unsigned char * fsThatDir = ".";
+const char    * fsSelectedFile = NULL;
+const char    * fsThisDir = ".";
 const gchar   * fsFilter = "*";
 
 int             fsType    = 0;
 
 static gint     fsCurrFNameListSelected, fsLastFNameListSelected;
 
-char * fsVideoFilterNames[][2] =
+char * fsVideoAudioFilterNames[][2] =
          {
 	   { MSGTR_Filter_AVIFiles,      "*.avi" },
 	   { MSGTR_Filter_DivXFiles,     "*.divx" },
@@ -86,7 +86,7 @@ char * fsVideoFilterNames[][2] =
 	   { MSGTR_Filter_AllFiles,      "*" },
 	   { NULL,NULL }
 	 };
-int fsLastVideoFilterSelected = -1;
+int fsLastVideoAudioFilterSelected = -1;
 
 char * fsSubtitleFilterNames[][2] =
          {
@@ -142,7 +142,7 @@ int fsLastFontFilterSelected = -1;
 
 GtkWidget   * fsFileNamesList;
 GtkWidget   * fsFNameList;
-GtkWidget   * fsFileSelect = NULL;
+GtkWidget   * FileSelector = NULL;
 GdkColormap * fsColorMap;
 GtkWidget   * fsOk;
 GtkWidget   * fsUp;
@@ -254,24 +254,32 @@ static void CheckDir( GtkWidget * list )
  gtk_widget_show( list );
 }
 
+static GList *fs_AddPath (GList *list, gpointer data, GtkPositionType pos)
+{
+  if (!g_list_find_custom(list, data, (GCompareFunc) strcmp))
+  {
+    if (pos == GTK_POS_TOP) list = g_list_prepend(list, data);
+    else list = g_list_append(list, data);
+  }
+
+  return list;
+}
+
 static void fs_AddPathUtf8 (const char *name, GtkPositionType pos)
 {
   gchar *utf8name;
 
   utf8name = g_filename_display_name(name);
-
-  if (pos == GTK_POS_TOP) fsTopList_items = g_list_prepend(fsTopList_items, utf8name);
-  else fsTopList_items = g_list_append(fsTopList_items, utf8name);
-
+  fsTopList_items = fs_AddPath(fsTopList_items, utf8name, pos);
   g_hash_table_insert(fsPathTable, strdup(utf8name), strdup(name));
 }
 
 static void HideFileSelect( void )
 {
- if ( !fsFileSelect ) return;
- gtk_widget_hide( fsFileSelect );
- gtk_widget_destroy( fsFileSelect );
- fsFileSelect=NULL;
+ if ( !FileSelector ) return;
+ gtk_widget_hide( FileSelector );
+ gtk_widget_destroy( FileSelector );
+ FileSelector=NULL;
  fsLastFNameListSelected = fsCurrFNameListSelected;
 }
 
@@ -315,12 +323,12 @@ static void fs_fsFilterCombo_changed( GtkEditable * editable,
 
  switch ( fsType )
   {
-   case fsVideoSelector:
-          for( i=0;fsVideoFilterNames[i][0];i++ )
-           if( !strcmp( str,fsVideoFilterNames[i][0] ) )
-            { fsFilter=fsVideoFilterNames[i][1]; fsLastVideoFilterSelected = i;	break; }
+   case FILESELECT_VIDEO_AUDIO:
+          for( i=0;fsVideoAudioFilterNames[i][0];i++ )
+           if( !strcmp( str,fsVideoAudioFilterNames[i][0] ) )
+            { fsFilter=fsVideoAudioFilterNames[i][1]; fsLastVideoAudioFilterSelected = i;	break; }
           break;
-   case fsSubtitleSelector:
+   case FILESELECT_SUBTITLE:
           for( i=0;fsSubtitleFilterNames[i][0];i++ )
            if( !strcmp( str,fsSubtitleFilterNames[i][0] ) )
             { fsFilter=fsSubtitleFilterNames[i][1]; fsLastSubtitleFilterSelected = i; break; }
@@ -330,12 +338,12 @@ static void fs_fsFilterCombo_changed( GtkEditable * editable,
            if( !strcmp( str,fsOtherFilterNames[i][0] ) )
             { fsFilter=fsOtherFilterNames[i][1]; break; }
           break;*/
-   case fsAudioSelector:
+   case FILESELECT_AUDIO:
           for( i=0;fsAudioFileNames[i][0];i++ )
            if( !strcmp( str,fsAudioFileNames[i][0] ) )
             { fsFilter=fsAudioFileNames[i][1]; fsLastAudioFilterSelected = i; break; }
 	  break;
-   case fsFontSelector:
+   case FILESELECT_FONT:
           for( i=0;fsFontFileNames[i][0];i++ )
 	    if( !strcmp( str,fsFontFileNames[i][0] ) )
 	     { fsFilter=fsFontFileNames[i][1]; fsLastFontFilterSelected = i; break; }
@@ -372,11 +380,11 @@ static void fs_Up_released( GtkButton * button, gpointer user_data )
  gchar *utf8dir;
 
  chdir( ".." );
- fsSelectedFile=fsThatDir;
  CheckDir( fsFNameList );
  utf8dir = get_current_dir_name_utf8();
  gtk_entry_set_text( GTK_ENTRY( fsPathCombo ),utf8dir );
  g_free(utf8dir);
+ fsSelectedFile=fsThisDir;
  return;
 }
 
@@ -391,22 +399,22 @@ static void fs_Ok_released( GtkButton * button, gpointer user_data )
   {
    gchar *utf8dir;
    if ( chdir( fsSelectedFile ) != 0 ) return;
-   fsSelectedFile=fsThatDir;
    CheckDir( fsFNameList );
    utf8dir = get_current_dir_name_utf8();
    gtk_entry_set_text( GTK_ENTRY( fsPathCombo ),utf8dir );
    g_free(utf8dir);
    gtk_widget_grab_focus( fsFNameList );
+   fsSelectedFile=fsThisDir;
    return;
   }
 
         fsSelectedDirectory=get_current_dir_name();
  switch ( fsType )
   {
-   case fsVideoSelector:
-          for (l = 0; fsVideoFilterNames[l][0]; l++)
-            if (strcmp(fsVideoFilterNames[l][0], MSGTR_Filter_Playlists) == 0) break;
-          uiSetFile( fsSelectedDirectory,fsSelectedFile, fsLastVideoFilterSelected == l ? STREAMTYPE_PLAYLIST : STREAMTYPE_FILE );
+   case FILESELECT_VIDEO_AUDIO:
+          for (l = 0; fsVideoAudioFilterNames[l][0]; l++)
+            if (strcmp(fsVideoAudioFilterNames[l][0], MSGTR_Filter_Playlists) == 0) break;
+          uiSetFile( fsSelectedDirectory,fsSelectedFile, fsLastVideoAudioFilterSelected == l ? STREAMTYPE_PLAYLIST : STREAMTYPE_FILE );
           selected = g_strconcat(fsSelectedDirectory, "/", fsSelectedFile, NULL);
           if (selected)
           {
@@ -417,17 +425,17 @@ static void fs_Ok_released( GtkButton * button, gpointer user_data )
           guiInfo.NewPlay=GUI_FILE_NEW; sub_fps=0;
           fs_PersistantHistory( fsSelectedDirectory );
           break;
-   case fsSubtitleSelector:
+   case FILESELECT_SUBTITLE:
           setddup( &guiInfo.SubtitleFilename,fsSelectedDirectory,fsSelectedFile );
 	  mplayerLoadSubtitle( guiInfo.SubtitleFilename );
           break;
 /*   case fsOtherSelector:
           setddup( &guiInfo.Othername,fsSelectedDirectory,fsSelectedFile );
           break;*/
-   case fsAudioSelector:
+   case FILESELECT_AUDIO:
           setddup( &guiInfo.AudioFilename,fsSelectedDirectory,fsSelectedFile );
           break;
-   case fsFontSelector:
+   case FILESELECT_FONT:
           setddup( &font_name,fsSelectedDirectory,fsSelectedFile );
 	  mplayerLoadFont();
 	  if ( Preferences ) gtk_entry_set_text( GTK_ENTRY( prEFontName ),font_name );
@@ -506,7 +514,7 @@ static gboolean fs_fsFNameList_event( GtkWidget * widget,
 
 static void fs_Destroy( void )
 {
- WidgetDestroy( fsFileSelect, &fsFileSelect );
+ WidgetDestroy( FileSelector, &FileSelector );
 
  g_hash_table_destroy( fsPathTable );
 
@@ -530,26 +538,26 @@ static GtkWidget * create_FileSelect( void )
  GtkStyle      * upstyle;
 
 
- fsFileSelect=gtk_window_new( GTK_WINDOW_TOPLEVEL );
- gtk_widget_set_name( fsFileSelect,"fsFileSelect" );
- gtk_object_set_data( GTK_OBJECT( fsFileSelect ),"fsFileSelect",fsFileSelect );
- gtk_widget_set_usize( fsFileSelect,512,300 );
- GTK_WIDGET_SET_FLAGS( fsFileSelect,GTK_CAN_DEFAULT );
- gtk_widget_set_events( fsFileSelect,GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_FOCUS_CHANGE_MASK | GDK_STRUCTURE_MASK | GDK_PROPERTY_CHANGE_MASK | GDK_VISIBILITY_NOTIFY_MASK );
- gtk_window_set_title( GTK_WINDOW( fsFileSelect ),MSGTR_FileSelect );
- gtk_window_set_position( GTK_WINDOW( fsFileSelect ),GTK_WIN_POS_CENTER );
- gtk_window_set_policy( GTK_WINDOW( fsFileSelect ),TRUE,TRUE,TRUE );
- gtk_window_set_wmclass( GTK_WINDOW( fsFileSelect ),"FileSelect","MPlayer" );
+ FileSelector=gtk_window_new( GTK_WINDOW_TOPLEVEL );
+ gtk_widget_set_name( FileSelector,"FileSelector" );
+ gtk_object_set_data( GTK_OBJECT( FileSelector ),"FileSelector",FileSelector );
+ gtk_widget_set_usize( FileSelector,512,300 );
+ GTK_WIDGET_SET_FLAGS( FileSelector,GTK_CAN_DEFAULT );
+ gtk_widget_set_events( FileSelector,GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_FOCUS_CHANGE_MASK | GDK_STRUCTURE_MASK | GDK_PROPERTY_CHANGE_MASK | GDK_VISIBILITY_NOTIFY_MASK );
+ gtk_window_set_title( GTK_WINDOW( FileSelector ),MSGTR_FileSelect );
+ gtk_window_set_position( GTK_WINDOW( FileSelector ),GTK_WIN_POS_CENTER );
+ gtk_window_set_policy( GTK_WINDOW( FileSelector ),TRUE,TRUE,TRUE );
+ gtk_window_set_wmclass( GTK_WINDOW( FileSelector ),"FileSelect","MPlayer" );
  fsColorMap=gdk_colormap_get_system();
 
- gtk_widget_realize( fsFileSelect );
- gtkAddIcon( fsFileSelect );
+ gtk_widget_realize( FileSelector );
+ gtkAddIcon( FileSelector );
 
- style=gtk_widget_get_style( fsFileSelect );
- dpixmap=gdk_pixmap_colormap_create_from_xpm_d( fsFileSelect->window,fsColorMap,&dmask,&style->bg[GTK_STATE_NORMAL],(gchar **)dir_xpm );
- fpixmap=gdk_pixmap_colormap_create_from_xpm_d( fsFileSelect->window,fsColorMap,&fmask,&style->bg[GTK_STATE_NORMAL],(gchar **)file_xpm );
+ style=gtk_widget_get_style( FileSelector );
+ dpixmap=gdk_pixmap_colormap_create_from_xpm_d( FileSelector->window,fsColorMap,&dmask,&style->bg[GTK_STATE_NORMAL],(gchar **)dir_xpm );
+ fpixmap=gdk_pixmap_colormap_create_from_xpm_d( FileSelector->window,fsColorMap,&fmask,&style->bg[GTK_STATE_NORMAL],(gchar **)file_xpm );
 
- vbox4=AddVBox( AddDialogFrame( fsFileSelect ),0 );
+ vbox4=AddVBox( AddDialogFrame( FileSelector ),0 );
  hbox4=AddHBox( vbox4,1 );
 
  fsCombo4=gtk_combo_new();
@@ -569,8 +577,8 @@ static GtkWidget * create_FileSelect( void )
  gtk_box_pack_start( GTK_BOX( hbox4 ),vseparator1,FALSE,TRUE,0 );
  gtk_widget_set_usize( vseparator1,7,20 );
 
- upstyle=gtk_widget_get_style( fsFileSelect );
- uppixmap=gdk_pixmap_colormap_create_from_xpm_d( fsFileSelect->window,fsColorMap,&upmask,&upstyle->bg[GTK_STATE_NORMAL],(gchar **)up_xpm );
+ upstyle=gtk_widget_get_style( FileSelector );
+ uppixmap=gdk_pixmap_colormap_create_from_xpm_d( FileSelector->window,fsColorMap,&upmask,&upstyle->bg[GTK_STATE_NORMAL],(gchar **)up_xpm );
  uppixmapwid=gtk_pixmap_new( uppixmap,upmask );
  gtk_widget_show( uppixmapwid );
 
@@ -605,7 +613,7 @@ static GtkWidget * create_FileSelect( void )
  List=gtk_combo_new();
  gtk_widget_set_name( List,"List" );
  gtk_widget_ref( List );
- gtk_object_set_data_full( GTK_OBJECT( fsFileSelect ),"List",List,(GtkDestroyNotify)gtk_widget_unref );
+ gtk_object_set_data_full( GTK_OBJECT( FileSelector ),"List",List,(GtkDestroyNotify)gtk_widget_unref );
  gtk_widget_show( List );
  gtk_box_pack_start( GTK_BOX( vbox4 ),List,FALSE,FALSE,0 );
  gtk_widget_set_usize( List,-2,20 );
@@ -625,8 +633,8 @@ static GtkWidget * create_FileSelect( void )
  fsOk=AddButton( MSGTR_Ok,hbuttonbox3 );
  fsCancel=AddButton( MSGTR_Cancel,hbuttonbox3 );
 
- gtk_signal_connect( GTK_OBJECT( fsFileSelect ),"destroy",GTK_SIGNAL_FUNC( fs_Destroy ), NULL );
- gtk_signal_connect( GTK_OBJECT( fsFileSelect ),"key_release_event",GTK_SIGNAL_FUNC( on_FileSelect_key_release_event ),NULL );
+ gtk_signal_connect( GTK_OBJECT( FileSelector ),"destroy",GTK_SIGNAL_FUNC( fs_Destroy ), NULL );
+ gtk_signal_connect( GTK_OBJECT( FileSelector ),"key_release_event",GTK_SIGNAL_FUNC( on_FileSelect_key_release_event ),NULL );
 
  gtk_signal_connect( GTK_OBJECT( fsFilterCombo ),"changed",GTK_SIGNAL_FUNC( fs_fsFilterCombo_changed ),fsFilterCombo );
  gtk_signal_connect( GTK_OBJECT( fsFilterCombo ),"activate",GTK_SIGNAL_FUNC( fs_fsFilterCombo_activate ),fsFilterCombo );
@@ -641,35 +649,35 @@ static GtkWidget * create_FileSelect( void )
  gtk_signal_connect( GTK_OBJECT( fsFNameList ),"select_row",(GtkSignalFunc)fs_fsFNameList_select_row,NULL );
  gtk_signal_connect( GTK_OBJECT( fsFNameList ),"event", (GtkSignalFunc)fs_fsFNameList_event,NULL );
 
- return fsFileSelect;
+ return FileSelector;
 }
 
-void ShowFileSelect( int type,int modal )
+void ShowFileSelector( int type )
 {
  int i, k, fsMedium;
  char * tmp = NULL, * dir = NULL;
  const gchar *fname;
  struct stat f;
 
- if ( fsFileSelect ) gtkActive( fsFileSelect );
-  else fsFileSelect=create_FileSelect();
+ if ( FileSelector ) gtkActive( FileSelector );
+  else FileSelector=create_FileSelect();
 
  fsType=type;
  switch ( type )
   {
-   case fsVideoSelector:
-        gtk_window_set_title( GTK_WINDOW( fsFileSelect ),MSGTR_FileSelect );
+   case FILESELECT_VIDEO_AUDIO:
+        gtk_window_set_title( GTK_WINDOW( FileSelector ),MSGTR_FileSelect );
         fsList_items=NULL;
-        for( i=0;fsVideoFilterNames[i][0];i++ )
-          fsList_items=g_list_append( fsList_items,fsVideoFilterNames[i][0] );
-	k = fsLastVideoFilterSelected;
+        for( i=0;fsVideoAudioFilterNames[i][0];i++ )
+          fsList_items=g_list_append( fsList_items,fsVideoAudioFilterNames[i][0] );
+	k = fsLastVideoAudioFilterSelected;
         gtk_combo_set_popdown_strings( GTK_COMBO( List ),fsList_items );
         g_list_free( fsList_items );
-        gtk_entry_set_text( GTK_ENTRY( fsFilterCombo ),fsVideoFilterNames[k >= 0 ? k : i-2][0] );
+        gtk_entry_set_text( GTK_ENTRY( fsFilterCombo ),fsVideoAudioFilterNames[k >= 0 ? k : i-2][0] );
 	//tmp=guiInfo.Filename;
         break;
-   case fsSubtitleSelector:
-        gtk_window_set_title( GTK_WINDOW( fsFileSelect ),MSGTR_SubtitleSelect );
+   case FILESELECT_SUBTITLE:
+        gtk_window_set_title( GTK_WINDOW( FileSelector ),MSGTR_SubtitleSelect );
         fsList_items=NULL;
         for( i=0;fsSubtitleFilterNames[i][0];i++ )
           fsList_items=g_list_append( fsList_items,fsSubtitleFilterNames[i][0] );
@@ -680,7 +688,7 @@ void ShowFileSelect( int type,int modal )
 	tmp=guiInfo.SubtitleFilename;
         break;
 /*   case fsOtherSelector:
-        gtk_window_set_title( GTK_WINDOW( fsFileSelect ),MSGTR_OtherSelect );
+        gtk_window_set_title( GTK_WINDOW( FileSelector ),MSGTR_OtherSelect );
         fsList_items=NULL;
         for( i=0;fsOtherFilterNames[i][0];i++ )
           fsList_items=g_list_append( fsList_items,fsOtherFilterNames[i][0] );
@@ -689,8 +697,8 @@ void ShowFileSelect( int type,int modal )
         gtk_entry_set_text( GTK_ENTRY( fsFilterCombo ),fsOtherFilterNames[0][0] );
 	tmp=guiInfo.Othername;
         break;*/
-   case fsAudioSelector:
-	gtk_window_set_title( GTK_WINDOW( fsFileSelect ),MSGTR_AudioFileSelect );
+   case FILESELECT_AUDIO:
+	gtk_window_set_title( GTK_WINDOW( FileSelector ),MSGTR_AudioFileSelect );
 	fsList_items=NULL;
 	for( i=0;fsAudioFileNames[i][0];i++ )
 	  fsList_items=g_list_append( fsList_items,fsAudioFileNames[i][0] );
@@ -700,8 +708,8 @@ void ShowFileSelect( int type,int modal )
 	gtk_entry_set_text( GTK_ENTRY( fsFilterCombo ),fsAudioFileNames[k >= 0 ? k : i-2][0] );
 	tmp=guiInfo.AudioFilename;
 	break;
-   case fsFontSelector:
-        gtk_window_set_title( GTK_WINDOW( fsFileSelect ),MSGTR_FontSelect );
+   case FILESELECT_FONT:
+        gtk_window_set_title( GTK_WINDOW( FileSelector ),MSGTR_FontSelect );
 	fsList_items=NULL;
 	for( i=0;fsFontFileNames[i][0];i++ )
 	  fsList_items=g_list_append( fsList_items,fsFontFileNames[i][0] );
@@ -713,7 +721,7 @@ void ShowFileSelect( int type,int modal )
 	break;
   }
 
- fsMedium=(fsType == fsVideoSelector || fsType == fsSubtitleSelector || fsType == fsAudioSelector);
+ fsMedium=(fsType == FILESELECT_VIDEO_AUDIO || fsType == FILESELECT_SUBTITLE || fsType == FILESELECT_AUDIO);
 
  if ( tmp && tmp[0] && !strstr( tmp,"://" ) )
   {
@@ -749,10 +757,10 @@ void ShowFileSelect( int type,int modal )
  free( dir );
  fname = getenv( "HOME" );
  if ( fname ) fs_AddPathUtf8(fname, GTK_POS_BOTTOM);
- else fsTopList_items=g_list_append( fsTopList_items,g_strdup( "/home" ) );
- if (stat( "/media",&f ) == 0) fsTopList_items=g_list_append( fsTopList_items,g_strdup( "/media" ) );
- if (stat( "/mnt",&f ) == 0) fsTopList_items=g_list_append( fsTopList_items,g_strdup( "/mnt" ) );
- fsTopList_items=g_list_append( fsTopList_items,g_strdup( "/" ) );
+ else fsTopList_items=fs_AddPath( fsTopList_items,g_strdup( "/home" ),GTK_POS_BOTTOM );
+ if (stat( "/media",&f ) == 0) fsTopList_items=fs_AddPath( fsTopList_items,g_strdup( "/media" ),GTK_POS_BOTTOM );
+ if (stat( "/mnt",&f ) == 0) fsTopList_items=fs_AddPath( fsTopList_items,g_strdup( "/mnt" ),GTK_POS_BOTTOM );
+ fsTopList_items=fs_AddPath( fsTopList_items,g_strdup( "/" ),GTK_POS_BOTTOM );
  gtk_combo_set_popdown_strings( GTK_COMBO( fsCombo4 ),fsTopList_items );
 
  gtk_widget_grab_focus( fsFNameList );
@@ -761,7 +769,5 @@ void ShowFileSelect( int type,int modal )
  gtk_clist_select_row( GTK_CLIST( fsFNameList ),fsLastFNameListSelected,1 );
  fsLastFNameListSelected = 0;
 
- gtk_window_set_modal( GTK_WINDOW( fsFileSelect ),modal );
-
- gtk_widget_show( fsFileSelect );
+ gtk_widget_show( FileSelector );
 }

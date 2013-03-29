@@ -320,27 +320,27 @@ void gtkShow(int type, char *param)
         break;
 
     case evPlaylist:
-        ShowPlayList();
-        gtkSetLayer(PlayList);
+        ShowPlaylist();
+        gtkSetLayer(Playlist);
         break;
 
     case evLoad:
-        ShowFileSelect(fsVideoSelector, 0);
-        gtkSetLayer(fsFileSelect);
+        ShowFileSelector(FILESELECT_VIDEO_AUDIO);
+        gtkSetLayer(FileSelector);
         break;
 
     case evLoadSubtitle:
-        ShowFileSelect(fsSubtitleSelector, 0);
-        gtkSetLayer(fsFileSelect);
+        ShowFileSelector(FILESELECT_SUBTITLE);
+        gtkSetLayer(FileSelector);
         break;
 
     case evLoadAudioFile:
-        ShowFileSelect(fsAudioSelector, 0);
-        gtkSetLayer(fsFileSelect);
+        ShowFileSelector(FILESELECT_AUDIO);
+        gtkSetLayer(FileSelector);
         break;
 
     case evAbout:
-        ShowAboutBox();
+        ShowAbout();
         gtkSetLayer(About);
         break;
 
@@ -368,8 +368,8 @@ void gtkShow(int type, char *param)
         break;
 
     case evLoadURL:
-        ShowURLDialogBox();
-        gtkSetLayer(URL);
+        ShowURLDialog();
+        gtkSetLayer(URLDialog);
         break;
     }
 }
