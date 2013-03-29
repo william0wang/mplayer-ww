@@ -21,14 +21,16 @@
 
 #include <gtk/gtk.h>
 
-#define fsVideoSelector    0
-#define fsSubtitleSelector 1
-//#define fsOtherSelector    2
-#define fsAudioSelector    3
-#define fsFontSelector     4
+/// File Selector types
+enum {
+    FILESELECT_VIDEO_AUDIO,
+    FILESELECT_SUBTITLE,
+    FILESELECT_AUDIO,
+    FILESELECT_FONT
+};
 
-extern GtkWidget   * fsFileSelect;
+extern GtkWidget *FileSelector;
 
-void ShowFileSelect( int type, int modal );
+void ShowFileSelector(int type);
 
 #endif /* MPLAYER_GUI_FILESELECT_H */

@@ -46,7 +46,7 @@
 #define CFG_OLD_PLAYLIST 1
 #include "gui/app/cfg-old.c"
 
-       GtkWidget * PlayList = NULL;
+       GtkWidget * Playlist = NULL;
 static GtkWidget * CTDirTree;
 static GtkWidget * CLFiles;
 static GtkWidget * CLSelected;
@@ -90,86 +90,16 @@ static int compare_func(const void *a, const void *b)
  return i;
 }
 
-static void scan_dir( char * path );
-
-void ShowPlayList( void )
+static void HidePlaylist( void )
 {
- plItem * next;
-
- if ( PlayList ) gtkActive( PlayList );
-  else PlayList=create_PlayList();
-
- if ( old_path && *old_path )
-  {
-   char         * currentdir = strdup( old_path );
-   char         * tpath,* pos;
-   GtkCTreeNode * node,* nextnode;
-   gboolean       leaf;
-   tpath=strdup( "/" );
-   pos=strtok( currentdir,"/" );
-   node=gtk_ctree_find_by_row_data_custom( GTK_CTREE( CTDirTree ),NULL,"/",compare_func );
-   do
-    {
-     char * tpathnew = g_strconcat( tpath,pos,"/",NULL );
-     free( tpath ); tpath=tpathnew;
-     nextnode=gtk_ctree_find_by_row_data_custom( GTK_CTREE( CTDirTree ),node,tpath,compare_func );
-     if ( !nextnode ) break;
-     node=nextnode;
-     pos=strtok( NULL,"/" );
-     gtk_ctree_get_node_info( GTK_CTREE( CTDirTree ),node,NULL,NULL,NULL,NULL,NULL,NULL,&leaf,NULL );
-     if ( !leaf && pos ) gtk_ctree_expand( GTK_CTREE( CTDirTree ),node );
-      else
-       {
-        DirNodeType * DirNode;
-        gtk_ctree_select( GTK_CTREE( CTDirTree ),node );
-	DirNode=gtk_ctree_node_get_row_data( GTK_CTREE( CTDirTree ),node );
-	current_path=DirNode->path;
-        scan_dir( DirNode->path );
-	free( CLFileSelected );
-	CLFileSelected=calloc( 1,NrOfEntrys * sizeof( int ) );
-	break;
-       }
-    } while( pos );
-   free( tpath );
-   free( currentdir );
-  }
-  else gtk_ctree_select( GTK_CTREE( CTDirTree ),parent );
-
- gtk_clist_freeze( GTK_CLIST( CLSelected ) );
- gtk_clist_clear( GTK_CLIST( CLSelected ) );
- next = listMgr( PLAYLIST_GET,0 );
- if ( next )
-  {
-   while ( next || next->next )
-    {
-     char * text[1][5]; text[0][4]="";
-     text[0][0]=g_filename_display_name( next->name );
-     text[0][1]=g_filename_display_name( next->path );
-     text[0][2]=next->name;
-     text[0][3]=next->path;
-     gtk_clist_append( GTK_CLIST( CLSelected ),text[0] );
-     g_free( text[0][0] );
-     g_free( text[0][1] );
-     NrOfSelected++;
-     if ( next->next ) next=next->next; else break;
-    }
-   CLListSelected=calloc( 1,NrOfSelected * sizeof( int ) );
-  }
- gtk_clist_thaw( GTK_CLIST( CLSelected ) );
-
- gtk_widget_show( PlayList );
-}
-
-void HidePlayList( void )
-{
- if ( !PlayList ) return;
+ if ( !Playlist ) return;
  NrOfSelected=NrOfEntrys=0;
  nfree( CLListSelected ); nfree( CLFileSelected );
  free( old_path );
  old_path=strdup( current_path );
- gtk_widget_hide( PlayList );
- gtk_widget_destroy( PlayList );
- PlayList=NULL;
+ gtk_widget_hide( Playlist );
+ gtk_widget_destroy( Playlist );
+ Playlist=NULL;
 }
 
 static void plRowSelect( GtkCList * clist,gint row,gint column,GdkEvent * event,gpointer user_data )
@@ -247,7 +177,7 @@ static void plButtonReleased( GtkButton * button,gpointer user_data )
 	free(curr.name);
        }
   case 0: // cancel
-       HidePlayList();
+       HidePlaylist();
        break;
   case 2: // remove
        {
@@ -485,7 +415,7 @@ static void plCTRow(GtkCList * clist, gint row, gint column, GdkEvent * event, g
  CLFileSelected=calloc( 1,NrOfEntrys * sizeof( int ) );
 }
 
-GtkWidget * create_PlayList( void )
+static GtkWidget * create_Playlist( void )
 {
   GtkWidget 	* vbox1;
   GtkWidget 	* hbox1;
@@ -503,18 +433,18 @@ GtkWidget * create_PlayList( void )
 
   accel_group=gtk_accel_group_new();
 
-  PlayList=gtk_window_new( GTK_WINDOW_TOPLEVEL );
-  gtk_object_set_data( GTK_OBJECT( PlayList ),"PlayList",PlayList );
-  gtk_widget_set_usize( PlayList,512,384 );
-  gtk_window_set_title( GTK_WINDOW( PlayList ),MSGTR_PlayList );
-  gtk_window_set_position( GTK_WINDOW( PlayList ),GTK_WIN_POS_CENTER );
-//  gtk_window_set_policy( GTK_WINDOW( PlayList ),FALSE,FALSE,FALSE );
-  gtk_window_set_wmclass( GTK_WINDOW( PlayList ),"Playlist","MPlayer" );
+  Playlist=gtk_window_new( GTK_WINDOW_TOPLEVEL );
+  gtk_object_set_data( GTK_OBJECT( Playlist ),"PlayList",Playlist );
+  gtk_widget_set_usize( Playlist,512,384 );
+  gtk_window_set_title( GTK_WINDOW( Playlist ),MSGTR_PlayList );
+  gtk_window_set_position( GTK_WINDOW( Playlist ),GTK_WIN_POS_CENTER );
+//  gtk_window_set_policy( GTK_WINDOW( Playlist ),FALSE,FALSE,FALSE );
+  gtk_window_set_wmclass( GTK_WINDOW( Playlist ),"Playlist","MPlayer" );
 
-  gtk_widget_realize( PlayList );
-  gtkAddIcon( PlayList );
+  gtk_widget_realize( Playlist );
+  gtkAddIcon( Playlist );
 
-  vbox1=AddVBox( AddDialogFrame( PlayList ),0 );
+  vbox1=AddVBox( AddDialogFrame( Playlist ),0 );
   hbox1=AddHBox( NULL,1 );
    gtk_box_pack_start( GTK_BOX( vbox1 ),hbox1,TRUE,TRUE,0 );
 
@@ -535,8 +465,8 @@ GtkWidget * create_PlayList( void )
   gtk_clist_column_titles_show( GTK_CLIST( CTDirTree ) );
   gtk_clist_set_shadow_type( GTK_CLIST( CTDirTree ),GTK_SHADOW_NONE );
 
-  if ( !pxOpenedBook ) pxOpenedBook=gdk_pixmap_create_from_xpm_d( PlayList->window,&msOpenedBook,&transparent,(gchar **)dir2_xpm );
-  if ( !pxClosedBook ) pxClosedBook=gdk_pixmap_create_from_xpm_d( PlayList->window,&msClosedBook,&transparent,(gchar **)open2_xpm );
+  if ( !pxOpenedBook ) pxOpenedBook=gdk_pixmap_create_from_xpm_d( Playlist->window,&msOpenedBook,&transparent,(gchar **)dir2_xpm );
+  if ( !pxClosedBook ) pxClosedBook=gdk_pixmap_create_from_xpm_d( Playlist->window,&msClosedBook,&transparent,(gchar **)open2_xpm );
 
   parent=gtk_ctree_insert_node( GTK_CTREE( CTDirTree ),NULL,NULL,&root,4,pxOpenedBook,msOpenedBook,pxClosedBook,msClosedBook,FALSE,FALSE );
   DirNode=malloc( sizeof( DirNodeType ) );
@@ -617,7 +547,7 @@ GtkWidget * create_PlayList( void )
 
   gtk_widget_add_accelerator( Cancel,"clicked",accel_group,GDK_Escape,0,GTK_ACCEL_VISIBLE );
 
-  gtk_signal_connect( GTK_OBJECT( PlayList ),"destroy",GTK_SIGNAL_FUNC( WidgetDestroy ),&PlayList );
+  gtk_signal_connect( GTK_OBJECT( Playlist ),"destroy",GTK_SIGNAL_FUNC( WidgetDestroy ),&Playlist );
 
   gtk_signal_connect( GTK_OBJECT( CLFiles ),"select_row",GTK_SIGNAL_FUNC( plRowSelect ),(void *)0 );
   gtk_signal_connect( GTK_OBJECT( CLFiles ),"unselect_row",GTK_SIGNAL_FUNC( plUnRowSelect ),(void *)0 );
@@ -637,7 +567,75 @@ GtkWidget * create_PlayList( void )
   gtk_signal_connect( GTK_OBJECT( Cancel ),"released",GTK_SIGNAL_FUNC( plButtonReleased ),(void*)0 );
   gtk_signal_connect( GTK_OBJECT( Cancel ),"key_release_event",GTK_SIGNAL_FUNC( plKeyReleased ),(void*)0 );
 
-  gtk_window_add_accel_group( GTK_WINDOW( PlayList ),accel_group );
+  gtk_window_add_accel_group( GTK_WINDOW( Playlist ),accel_group );
 
-  return PlayList;
+  return Playlist;
+}
+
+void ShowPlaylist( void )
+{
+ plItem * next;
+
+ if ( Playlist ) gtkActive( Playlist );
+  else Playlist=create_Playlist();
+
+ if ( old_path && *old_path )
+  {
+   char         * currentdir = strdup( old_path );
+   char         * tpath,* pos;
+   GtkCTreeNode * node,* nextnode;
+   gboolean       leaf;
+   tpath=strdup( "/" );
+   pos=strtok( currentdir,"/" );
+   node=gtk_ctree_find_by_row_data_custom( GTK_CTREE( CTDirTree ),NULL,"/",compare_func );
+   do
+    {
+     char * tpathnew = g_strconcat( tpath,pos,"/",NULL );
+     free( tpath ); tpath=tpathnew;
+     nextnode=gtk_ctree_find_by_row_data_custom( GTK_CTREE( CTDirTree ),node,tpath,compare_func );
+     if ( !nextnode ) break;
+     node=nextnode;
+     pos=strtok( NULL,"/" );
+     gtk_ctree_get_node_info( GTK_CTREE( CTDirTree ),node,NULL,NULL,NULL,NULL,NULL,NULL,&leaf,NULL );
+     if ( !leaf && pos ) gtk_ctree_expand( GTK_CTREE( CTDirTree ),node );
+      else
+       {
+        DirNodeType * DirNode;
+        gtk_ctree_select( GTK_CTREE( CTDirTree ),node );
+	DirNode=gtk_ctree_node_get_row_data( GTK_CTREE( CTDirTree ),node );
+	current_path=DirNode->path;
+        scan_dir( DirNode->path );
+	free( CLFileSelected );
+	CLFileSelected=calloc( 1,NrOfEntrys * sizeof( int ) );
+	break;
+       }
+    } while( pos );
+   free( tpath );
+   free( currentdir );
+  }
+  else gtk_ctree_select( GTK_CTREE( CTDirTree ),parent );
+
+ gtk_clist_freeze( GTK_CLIST( CLSelected ) );
+ gtk_clist_clear( GTK_CLIST( CLSelected ) );
+ next = listMgr( PLAYLIST_GET,0 );
+ if ( next )
+  {
+   while ( next || next->next )
+    {
+     char * text[1][5]; text[0][4]="";
+     text[0][0]=g_filename_display_name( next->name );
+     text[0][1]=g_filename_display_name( next->path );
+     text[0][2]=next->name;
+     text[0][3]=next->path;
+     gtk_clist_append( GTK_CLIST( CLSelected ),text[0] );
+     g_free( text[0][0] );
+     g_free( text[0][1] );
+     NrOfSelected++;
+     if ( next->next ) next=next->next; else break;
+    }
+   CLListSelected=calloc( 1,NrOfSelected * sizeof( int ) );
+  }
+ gtk_clist_thaw( GTK_CLIST( CLSelected ) );
+
+ gtk_widget_show( Playlist );
 }
