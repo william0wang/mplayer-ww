@@ -18,29 +18,22 @@
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
+#include <string.h>
 
 #include "tools.h"
 
-void WidgetDestroy( GtkWidget * widget,GtkWidget ** widget_pointer )
-{
- if ( !widget_pointer ) return;
- gtk_widget_hide( *widget_pointer );
- gtk_widget_destroy( *widget_pointer );
- *widget_pointer=NULL;
-}
-
-GtkWidget * AddDialogFrame( GtkWidget * parent )
+GtkWidget * gtkAddDialogFrame( GtkWidget * parent )
 {
  GtkWidget * frame;
- frame=AddFrame( NULL,GTK_SHADOW_IN,parent,1 );
+ frame=gtkAddFrame( NULL,GTK_SHADOW_IN,parent,1 );
  gtk_container_set_border_width( GTK_CONTAINER( frame ),1 );
- frame=AddFrame( NULL,GTK_SHADOW_NONE,frame,1 );
- frame=AddFrame( NULL,GTK_SHADOW_ETCHED_OUT,frame,1 );
- frame=AddFrame( NULL,GTK_SHADOW_NONE,frame,1 );
+ frame=gtkAddFrame( NULL,GTK_SHADOW_NONE,frame,1 );
+ frame=gtkAddFrame( NULL,GTK_SHADOW_ETCHED_OUT,frame,1 );
+ frame=gtkAddFrame( NULL,GTK_SHADOW_NONE,frame,1 );
  return frame;
 }
 
-GtkWidget * AddFrame( const char * title,int type,GtkWidget * parent,int add )
+GtkWidget * gtkAddFrame( const char * title,int type,GtkWidget * parent,int add )
 {
  GtkWidget * frame = NULL;
  frame=gtk_frame_new( title );
@@ -53,7 +46,7 @@ GtkWidget * AddFrame( const char * title,int type,GtkWidget * parent,int add )
  return frame;
 }
 
-GtkWidget * AddLabel( const char * title,GtkWidget * parent )
+GtkWidget * gtkAddLabel( const char * title,GtkWidget * parent )
 {
  GtkWidget * label;
  label=gtk_label_new( title );
@@ -65,7 +58,7 @@ GtkWidget * AddLabel( const char * title,GtkWidget * parent )
  return label;
 }
 
-GtkWidget * AddVBox( GtkWidget * parent,int type )
+GtkWidget * gtkAddVBox( GtkWidget * parent,int type )
 {
  GtkWidget * vbox;
  vbox=gtk_vbox_new( FALSE,0 );
@@ -79,7 +72,7 @@ GtkWidget * AddVBox( GtkWidget * parent,int type )
  return vbox;
 }
 
-GtkWidget * AddHBox( GtkWidget * parent,int type )
+GtkWidget * gtkAddHBox( GtkWidget * parent,int type )
 {
  GtkWidget * hbox;
  hbox=gtk_hbox_new( FALSE,0 );
@@ -93,7 +86,7 @@ GtkWidget * AddHBox( GtkWidget * parent,int type )
  return hbox;
 }
 
-GtkWidget * AddCheckButton( const char * title, GtkWidget * parent )
+GtkWidget * gtkAddCheckButton( const char * title, GtkWidget * parent )
 {
  GtkWidget * CB;
  CB=gtk_check_button_new_with_label( title );
@@ -103,7 +96,7 @@ GtkWidget * AddCheckButton( const char * title, GtkWidget * parent )
  return CB;
 }
 
-GtkWidget * AddRadioButton( const char * title,GSList ** group,GtkWidget * parent )
+GtkWidget * gtkAddRadioButton( const char * title,GSList ** group,GtkWidget * parent )
 {
  GtkWidget * RB;
  RB=gtk_radio_button_new_with_label( *group,title );
@@ -114,7 +107,7 @@ GtkWidget * AddRadioButton( const char * title,GSList ** group,GtkWidget * paren
  return RB;
 }
 
-GtkWidget * AddSpinButton( const char * title,GtkAdjustment * adj,GtkWidget * parent )
+GtkWidget * gtkAddSpinButton( const char * title,GtkAdjustment * adj,GtkWidget * parent )
 {
  GtkWidget * SB;
  GtkWidget * label;
@@ -129,7 +122,7 @@ GtkWidget * AddSpinButton( const char * title,GtkAdjustment * adj,GtkWidget * pa
  return SB;
 }
 
-GtkWidget * AddButton( const char * title,GtkWidget * parent )
+GtkWidget * gtkAddButton( const char * title,GtkWidget * parent )
 {
  GtkWidget * B;
  B=gtk_button_new_with_label( title );
@@ -139,7 +132,7 @@ GtkWidget * AddButton( const char * title,GtkWidget * parent )
  return B;
 }
 
-GtkWidget * AddHSeparator( GtkWidget * parent )
+GtkWidget * gtkAddHSeparator( GtkWidget * parent )
 {
  GtkWidget * hseparator;
  hseparator=gtk_hseparator_new();
@@ -150,7 +143,7 @@ GtkWidget * AddHSeparator( GtkWidget * parent )
  return hseparator;
 }
 
-GtkWidget * AddHButtonBox( GtkWidget * parent )
+GtkWidget * gtkAddHButtonBox( GtkWidget * parent )
 {
  GtkWidget * hbuttonbox;
  hbuttonbox=gtk_hbutton_box_new();
@@ -161,7 +154,7 @@ GtkWidget * AddHButtonBox( GtkWidget * parent )
  return hbuttonbox;
 }
 
-GtkWidget * AddHScaler( GtkAdjustment * adj,GtkWidget * parent,int digit )
+GtkWidget * gtkAddHScale( GtkAdjustment * adj,GtkWidget * parent,int digit )
 {
  GtkWidget * HS;
  HS=gtk_hscale_new( adj );
@@ -173,7 +166,7 @@ GtkWidget * AddHScaler( GtkAdjustment * adj,GtkWidget * parent,int digit )
  return HS;
 }
 
-GtkWidget * AddVScaler( GtkAdjustment * adj,GtkWidget * parent,int digit )
+GtkWidget * gtkAddVScale( GtkAdjustment * adj,GtkWidget * parent,int digit )
 {
  GtkWidget * VS;
  VS=gtk_vscale_new( adj );
@@ -186,7 +179,7 @@ GtkWidget * AddVScaler( GtkAdjustment * adj,GtkWidget * parent,int digit )
  return VS;
 }
 
-GtkWidget * AddComboBox( GtkWidget * parent )
+GtkWidget * gtkAddCombo( GtkWidget * parent )
 {
  GtkWidget * CB;
  CB=gtk_combo_new();
@@ -194,4 +187,19 @@ GtkWidget * AddComboBox( GtkWidget * parent )
  gtk_widget_show( CB );
  if ( parent ) gtk_box_pack_start( GTK_BOX( parent ),CB,TRUE,TRUE,0 );
  return CB;
+}
+
+int gtkFindInCList (GtkWidget *list, char *item)
+{
+  gint j;
+  gchar *tmpstr;
+
+  for (j = 0; j < GTK_CLIST(list)->rows; j++)
+  {
+    gtk_clist_get_text(GTK_CLIST(list), j, 0, &tmpstr);
+
+    if (!strcmp(tmpstr, item)) return j;
+  }
+
+  return -1;
 }

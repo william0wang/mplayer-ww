@@ -1509,6 +1509,7 @@ if test -e ffmpeg/.svn ; then
 fi
 
 if test -e ffmpeg/mp_auto_pull ; then
+    echo "Updating FFmpeg, (re)move ffmpeg/mp_auto_pull to disable"
     (cd ffmpeg && git checkout master)
     if ! (cd ffmpeg && git pull --rebase --ff-only) ; then
         echo "git pull failed, (re)move ffmpeg/mp_auto_pull to disable pulling"
@@ -2853,6 +2854,9 @@ if x86_32 ; then
 fi #if x86_32
 
 
+# Check if we need to compile as PIC for this combination of architecture, toolchain,
+# gcc configuration (e.g. hardened or not) and compiler options.
+# Needs to be after the relocatable handling, since PIE changes whether we need PIC or not.
 echocheck "PIC"
 def_pic='#define CONFIG_PIC 0'
 pic=no

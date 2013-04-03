@@ -19,36 +19,15 @@
 #ifndef MPLAYER_GUI_DIALOG_H
 #define MPLAYER_GUI_DIALOG_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 #include <X11/Xlib.h>
-#include <X11/Xproto.h>
 
-#include "osdep/shmem.h"
-#include "gui/ui/actions.h"
-#include "mplayer.h"
-
-#define GTK_MB_SIMPLE 0
-#define GTK_MB_MODAL 1
-#define GTK_MB_FATAL 2
-#define GTK_MB_ERROR 4
-#define GTK_MB_WARNING 8
-
-extern GtkWidget *Options;
-
-extern GtkWidget *WarningPixmap;
-extern GtkWidget *ErrorPixmap;
-
-extern GtkWidget *SkinList;
-extern GtkWidget *gtkMessageBoxText;
-
-extern int gtkPopupMenu;
-extern int gtkPopupMenuParam;
-
-extern char *sbMPlayerDirInHome;
-extern char *sbMPlayerPrefixDir;
+/// MessageBox types
+enum {
+    MSGBOX_WARNING,
+    MSGBOX_ERROR,
+    MSGBOX_FATAL
+};
 
 typedef struct {
     Pixmap small;
@@ -61,21 +40,12 @@ typedef struct {
 
 extern guiIcon_t guiIcon;
 
-void widgetsCreate(void);
-
-void gtkInit(char *display_name);
 void gtkAddIcon(GtkWidget *window);
-
-int gtkFillSkinList(gchar *dir);
-void gtkClearList(GtkWidget *list);
-void gtkSetDefaultToCList(GtkWidget *list, char *item);
-int gtkFindCList(GtkWidget *list, char *item);
-
 void gtkEventHandling(void);
-
-void gtkShow(int type, char *param);
+void gtkInit(char *display_name);
 void gtkMessageBox(int type, const gchar *str);
+void gtkRaise(GtkWidget *window);
 void gtkSetLayer(GtkWidget *window);
-void gtkActive(GtkWidget *window);
+void gtkShow(int type, char *param);
 
 #endif /* MPLAYER_GUI_DIALOG_H */

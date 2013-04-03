@@ -21,7 +21,7 @@
  * @brief Font file parser and font rendering
  */
 
-#include <gtk/gtk.h>
+#include <glib.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,8 +32,8 @@
 #include "gui/util/mem.h"
 #include "gui/util/string.h"
 
-#include "libavutil/avstring.h"
 #include "mp_msg.h"
+#include "libavutil/avstring.h"
 
 #define MAX_FONTS 25
 

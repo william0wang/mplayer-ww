@@ -22,8 +22,10 @@
 #include <gtk/gtk.h>
 
 extern GtkWidget * MessageBox;
+extern GtkWidget * WarningPixmap;
+extern GtkWidget * ErrorPixmap;
+extern GtkWidget * gtkMessageBoxText;
 
-GtkWidget * create_MessageBox( void );
 void ShowMessageBox( const char * msg );
 
 #endif /* MPLAYER_GUI_MSGBOX_H */
