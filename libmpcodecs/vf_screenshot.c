@@ -70,7 +70,6 @@ static int config(struct vf_instance *vf,
     vf->priv->outbuffer = realloc(vf->priv->outbuffer, vf->priv->outbuffer_size);
     vf->priv->avctx->width = d_width;
     vf->priv->avctx->height = d_height;
-    vf->priv->avctx->pix_fmt = PIX_FMT_RGB24;
     vf->priv->dw = d_width;
     vf->priv->dh = d_height;
     vf->priv->stride = (3*vf->priv->dw+15)&~15;
@@ -101,10 +100,8 @@ static void write_png(struct vf_priv_s *priv)
     
     pic.data[0] = priv->buffer;
     pic.linesize[0] = priv->stride;
-    if(!avcodec_encode_video2(priv->avctx, &pkt, &pic, &got_packet)) {
-        if (got_packet)
-            fwrite(pkt.data, pkt.size, 1, fp);
-    }
+    if(!avcodec_encode_video2(priv->avctx, &pkt, &pic, &got_packet) && got_packet)
+        fwrite(pkt.data, pkt.size, 1, fp);
 
     fclose (fp);
 }
@@ -329,9 +326,9 @@ static int vf_open(vf_instance_t *vf, char *args)
     vf->control=control;
     vf->put_image=put_image;
     vf->query_format=query_format;
-    vf->start_slice=start_slice;
-    vf->draw_slice=draw_slice;
-    vf->get_image=get_image;
+    // vf->start_slice=start_slice;
+    // vf->draw_slice=draw_slice;
+    // vf->get_image=get_image;
     vf->uninit=uninit;
     vf->priv=malloc(sizeof(struct vf_priv_s));
     vf->priv->frameno=0;
@@ -340,7 +337,6 @@ static int vf_open(vf_instance_t *vf, char *args)
     vf->priv->buffer=0;
     vf->priv->outbuffer=0;
     vf->priv->ctx=0;
-
     vf->priv->avctx = avcodec_alloc_context3(NULL);
 
     if (args) {
