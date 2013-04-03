@@ -29,6 +29,7 @@
 #include "gui/app/app.h"
 #include "gui/app/cfg.h"
 #include "gui/app/gui.h"
+#include "gui/ui/actions.h"
 #include "gui/skin/skin.h"
 #include "help_mp.h"
 
@@ -44,55 +45,10 @@ static char * prev=NULL;
 
 GtkWidget * SkinBrowser = NULL;
 
-void ShowSkinBrowser( void )
-{
- if ( SkinBrowser ) gtkActive( SkinBrowser );
-   else SkinBrowser=create_SkinBrowser();
-}
-
-static void HideSkinBrowser( void )
-{
- if ( !SkinBrowser ) return;
- gtk_widget_hide( SkinBrowser );
- gtk_widget_destroy( SkinBrowser );
- SkinBrowser=NULL;
-}
-
-int gtkFillSkinList( gchar * mdir )
-{
- gchar         * str[2];
- gchar         * tmp;
- int             i;
- glob_t          gg;
- struct stat     fs;
-
- gtkOldSkin=strdup( skinName );
- prev=gtkOldSkin;
-
- str[0]="default";
- str[1]="";
- if ( gtkFindCList( SkinList,str[0] ) == -1 ) gtk_clist_append( GTK_CLIST( SkinList ),str );
-
- glob( mdir,GLOB_NOSORT,NULL,&gg );
- for( i=0;i<(int)gg.gl_pathc;i++ )
-  {
-   if ( !strcmp( gg.gl_pathv[i],"." ) || !strcmp( gg.gl_pathv[i],".." ) ) continue;
-   if ( ( stat( gg.gl_pathv[i],&fs ) == 0 ) && S_ISDIR( fs.st_mode ) )
-    {
-     tmp=strrchr( gg.gl_pathv[i],'/' );
-     if (tmp) tmp++;
-     else tmp = gg.gl_pathv[i];
-     if ( !strcmp( tmp,"default" ) ) continue;
-     str[0]=tmp;
-     if ( gtkFindCList( SkinList,str[0] ) == -1 ) gtk_clist_append( GTK_CLIST( SkinList ),str );
-    }
-  }
- globfree( &gg );
- return True;
-}
-
 static void prButton( GtkButton * button,gpointer user_data )
 {
+ (void) button;
+
  if ( sbSelectedSkin )
  {
   switch ( (int)user_data )
@@ -107,28 +63,31 @@ static void prButton( GtkButton * button,gpointer user_data )
 	break;
   }
  }
- HideSkinBrowser();
+ gtk_widget_destroy( SkinBrowser );
 }
 
 static void on_SkinList_select_row( GtkCList * clist,gint row,gint column,GdkEvent * event,gpointer user_data )
 {
+ (void) column;
+ (void) user_data;
+
  gtk_clist_get_text( clist,row,0,&sbSelectedSkin );
  if ( strcmp( prev,sbSelectedSkin ) )
   {
    prev=sbSelectedSkin;
    uiChangeSkin( sbSelectedSkin );
-   gtkActive( SkinBrowser );
+   gtkRaise( SkinBrowser );
   }
  if( !event ) return;
  if( event->type == GDK_2BUTTON_PRESS )
   {
    free( skinName );
    skinName=strdup( sbSelectedSkin );
-   HideSkinBrowser();
+   gtk_widget_destroy( SkinBrowser );
   }
 }
 
-GtkWidget * create_SkinBrowser( void )
+static GtkWidget * CreateSkinBrowser( void )
 {
  GtkWidget     * vbox5;
  GtkWidget     * scrolledwindow1;
@@ -154,9 +113,9 @@ GtkWidget * create_SkinBrowser( void )
  gtk_widget_realize( SkinBrowser );
  gtkAddIcon( SkinBrowser );
 
- vbox5=AddVBox( AddDialogFrame( SkinBrowser ),0 );
- AddLabel( MSGTR_SKIN_LABEL,vbox5 );
- AddHSeparator( vbox5 );
+ vbox5=gtkAddVBox( gtkAddDialogFrame( SkinBrowser ),0 );
+ gtkAddLabel( MSGTR_SKIN_LABEL,vbox5 );
+ gtkAddHSeparator( vbox5 );
 
  scrolledwindow1=gtk_scrolled_window_new( NULL,NULL );
  gtk_widget_set_name( scrolledwindow1,"scrolledwindow1" );
@@ -178,19 +137,19 @@ GtkWidget * create_SkinBrowser( void )
  gtk_clist_column_titles_hide( GTK_CLIST( SkinList ) );
  gtk_clist_set_shadow_type( GTK_CLIST( SkinList ),GTK_SHADOW_ETCHED_OUT );
 
- AddHSeparator( vbox5 );
+ gtkAddHSeparator( vbox5 );
 
- hbuttonbox4=AddHButtonBox( vbox5 );
+ hbuttonbox4=gtkAddHButtonBox( vbox5 );
   gtk_button_box_set_layout( GTK_BUTTON_BOX( hbuttonbox4 ),GTK_BUTTONBOX_SPREAD );
   gtk_button_box_set_spacing( GTK_BUTTON_BOX( hbuttonbox4 ),10 );
 
- Ok=AddButton( MSGTR_Ok,hbuttonbox4 );
- Cancel=AddButton( MSGTR_Cancel,hbuttonbox4 );
+ Ok=gtkAddButton( MSGTR_Ok,hbuttonbox4 );
+ Cancel=gtkAddButton( MSGTR_Cancel,hbuttonbox4 );
 
  gtk_widget_add_accelerator( Ok,"clicked",accel_group,GDK_Return,0,GTK_ACCEL_VISIBLE );
  gtk_widget_add_accelerator( Cancel,"clicked",accel_group,GDK_Escape,0,GTK_ACCEL_VISIBLE );
 
- gtk_signal_connect( GTK_OBJECT( SkinBrowser ),"destroy",GTK_SIGNAL_FUNC( WidgetDestroy ),&SkinBrowser );
+ gtk_signal_connect( GTK_OBJECT( SkinBrowser ),"destroy",GTK_SIGNAL_FUNC( gtk_widget_destroyed ),&SkinBrowser );
  gtk_signal_connect( GTK_OBJECT( SkinList ),"select_row",GTK_SIGNAL_FUNC( on_SkinList_select_row ),NULL );
  gtk_signal_connect( GTK_OBJECT( Ok ),"clicked",GTK_SIGNAL_FUNC( prButton ),(void *)1 );
  gtk_signal_connect( GTK_OBJECT( Cancel ),"clicked",GTK_SIGNAL_FUNC( prButton ),(void *)0 );
@@ -204,4 +163,43 @@ GtkWidget * create_SkinBrowser( void )
  gtk_widget_grab_focus( SkinList );
 
  return SkinBrowser;
+}
+
+void ShowSkinBrowser( void )
+{
+ if ( SkinBrowser ) gtkRaise( SkinBrowser );
+   else SkinBrowser=CreateSkinBrowser();
+}
+
+int FillSkinList( gchar * mdir )
+{
+ gchar         * str[2];
+ gchar         * tmp;
+ int             i;
+ glob_t          gg;
+ struct stat     fs;
+
+ gtkOldSkin=strdup( skinName );
+ prev=gtkOldSkin;
+
+ str[0]="default";
+ str[1]="";
+ if ( gtkFindInCList( SkinList,str[0] ) == -1 ) gtk_clist_append( GTK_CLIST( SkinList ),str );
+
+ glob( mdir,GLOB_NOSORT,NULL,&gg );
+ for( i=0;i<(int)gg.gl_pathc;i++ )
+  {
+   if ( !strcmp( gg.gl_pathv[i],"." ) || !strcmp( gg.gl_pathv[i],".." ) ) continue;
+   if ( ( stat( gg.gl_pathv[i],&fs ) == 0 ) && S_ISDIR( fs.st_mode ) )
+    {
+     tmp=strrchr( gg.gl_pathv[i],'/' );
+     if (tmp) tmp++;
+     else tmp = gg.gl_pathv[i];
+     if ( !strcmp( tmp,"default" ) ) continue;
+     str[0]=tmp;
+     if ( gtkFindInCList( SkinList,str[0] ) == -1 ) gtk_clist_append( GTK_CLIST( SkinList ),str );
+    }
+  }
+ globfree( &gg );
+ return True;
 }

@@ -30,22 +30,18 @@
 
 GtkWidget * gtkMessageBoxText;
 GtkWidget * MessageBox = NULL;
-
-void ShowMessageBox( const char * msg )
-{
- if ( MessageBox ) { gtk_widget_hide( MessageBox ); gtk_widget_destroy( MessageBox ); }
- MessageBox=create_MessageBox();
- if ( strlen( msg ) < 20 ) gtk_widget_set_usize( MessageBox,196,-1 );
-}
+GtkWidget * WarningPixmap;
+GtkWidget * ErrorPixmap;
 
 static void on_Ok_released( GtkButton * button,gpointer user_data  )
 {
- gtk_widget_hide( MessageBox );
+ (void) button;
+ (void) user_data;
+
  gtk_widget_destroy( MessageBox );
- MessageBox=NULL;
 }
 
-GtkWidget * create_MessageBox( void )
+static GtkWidget * CreateMessageBox( void )
 {
  GtkWidget * vbox1;
  GtkWidget * hbox1;
@@ -71,8 +67,8 @@ GtkWidget * create_MessageBox( void )
  gtk_widget_realize( MessageBox );
  gtkAddIcon( MessageBox );
 
- vbox1=AddVBox( AddDialogFrame( MessageBox ),0 );
- hbox1=AddHBox( vbox1,1 );
+ vbox1=gtkAddVBox( gtkAddDialogFrame( MessageBox ),0 );
+ hbox1=gtkAddHBox( vbox1,1 );
 
  pixmapstyle=gtk_widget_get_style( MessageBox );
 
@@ -99,17 +95,24 @@ GtkWidget * create_MessageBox( void )
  gtk_label_set_justify( GTK_LABEL( gtkMessageBoxText ),GTK_JUSTIFY_CENTER );
  gtk_label_set_line_wrap( GTK_LABEL( gtkMessageBoxText ),FALSE );
 
- AddHSeparator( vbox1 );
- hbuttonbox1=AddHButtonBox( vbox1 );
- Ok=AddButton( MSGTR_Ok,hbuttonbox1 );
+ gtkAddHSeparator( vbox1 );
+ hbuttonbox1=gtkAddHButtonBox( vbox1 );
+ Ok=gtkAddButton( MSGTR_Ok,hbuttonbox1 );
 
  gtk_widget_add_accelerator( Ok,"clicked",accel_group,GDK_Return,0,GTK_ACCEL_VISIBLE );
  gtk_widget_add_accelerator( Ok,"clicked",accel_group,GDK_Escape,0,GTK_ACCEL_VISIBLE );
 
- gtk_signal_connect( GTK_OBJECT( MessageBox ),"destroy",GTK_SIGNAL_FUNC( WidgetDestroy ),&MessageBox );
+ gtk_signal_connect( GTK_OBJECT( MessageBox ),"destroy",GTK_SIGNAL_FUNC( gtk_widget_destroyed ),&MessageBox );
  gtk_signal_connect( GTK_OBJECT( Ok ),"clicked",GTK_SIGNAL_FUNC( on_Ok_released ),NULL );
 
  gtk_window_add_accel_group( GTK_WINDOW( MessageBox ),accel_group );
 
  return MessageBox;
+}
+
+void ShowMessageBox( const char * msg )
+{
+ if ( MessageBox ) gtk_widget_destroy( MessageBox );
+ MessageBox=CreateMessageBox();
+ if ( strlen( msg ) < 20 ) gtk_widget_set_usize( MessageBox,196,-1 );
 }

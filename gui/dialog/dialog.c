@@ -16,56 +16,36 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdint.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#include <stdlib.h>
 #include <string.h>
-#include <signal.h>
-
-#include <gdk/gdkprivate.h>
-#include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
-#include <gdk/gdk.h>
-#include <gtk/gtk.h>
+
+#include "dialog.h"
+#include "about.h"
+#include "equalizer.h"
+#include "fileselect.h"
+#include "menu.h"
+#include "msgbox.h"
+#include "playlist.h"
+#include "preferences.h"
+#include "skinbrowser.h"
+#include "tools.h"
+#include "url.h"
+#include "gui/interface.h"
+#include "gui/app/app.h"
+#include "gui/app/gui.h"
+#include "gui/util/string.h"
+#include "gui/wm/ws.h"
 
 #include "config.h"
 #include "help_mp.h"
 #include "mp_msg.h"
 #include "libavutil/intreadwrite.h"
-#include "libvo/x11_common.h"
-
-#include "dialog.h"
-#include "gui/app/app.h"
-#include "gui/app/gui.h"
-#include "gui/interface.h"
-#include "gui/util/string.h"
-#include "gui/wm/ws.h"
-
-#include "gui/ui/actions.h"
-#include "fileselect.h"
 
 static GtkWidget *PopUpMenu;
 
-GtkWidget *WarningPixmap;
-GtkWidget *ErrorPixmap;
-
-int gtkPopupMenu;
-int gtkPopupMenuParam;
 static int gtkInitialized;
-
-#include "skinbrowser.h"
-#include "playlist.h"
-#include "msgbox.h"
-#include "about.h"
-#include "preferences.h"
-#include "menu.h"
-#include "url.h"
-#include "equalizer.h"
 
 static const char gui_icon_name[] = "mplayer";
 
@@ -188,34 +168,6 @@ void gtkAddIcon(GtkWidget *window)
     wsWindowIcon(gdk_display, GDK_WINDOW_XWINDOW(window->window), &guiIcon);
 }
 
-void gtkClearList(GtkWidget *list)
-{
-    gtk_clist_clear(GTK_CLIST(list));
-}
-
-int gtkFindCList(GtkWidget *list, char *item)
-{
-    gint j;
-    gchar *tmpstr;
-
-    for (j = 0; j < GTK_CLIST(list)->rows; j++) {
-        gtk_clist_get_text(GTK_CLIST(list), j, 0, &tmpstr);
-
-        if (!strcmp(tmpstr, item))
-            return j;
-    }
-
-    return -1;
-}
-
-void gtkSetDefaultToCList(GtkWidget *list, char *item)
-{
-    gint i;
-
-    if ((i = gtkFindCList(list, item)) > -1)
-        gtk_clist_select_row(GTK_CLIST(list), i, 0);
-}
-
 void gtkEventHandling(void)
 {
     int i;
@@ -242,19 +194,19 @@ void gtkMessageBox(int type, const gchar *str)
         gtk_label_set_line_wrap(GTK_LABEL(gtkMessageBoxText), FALSE);
 
     switch (type) {
-    case GTK_MB_FATAL:
+    case MSGBOX_FATAL:
         gtk_window_set_title(GTK_WINDOW(MessageBox), MSGTR_MSGBOX_LABEL_FatalError);
         gtk_widget_hide(WarningPixmap);
         gtk_widget_show(ErrorPixmap);
         break;
 
-    case GTK_MB_ERROR:
+    case MSGBOX_ERROR:
         gtk_window_set_title(GTK_WINDOW(MessageBox), MSGTR_MSGBOX_LABEL_Error);
         gtk_widget_hide(WarningPixmap);
         gtk_widget_show(ErrorPixmap);
         break;
 
-    case GTK_MB_WARNING:
+    case MSGBOX_WARNING:
         gtk_window_set_title(GTK_WINDOW(MessageBox), MSGTR_MSGBOX_LABEL_Warning);
         gtk_widget_show(WarningPixmap);
         gtk_widget_hide(ErrorPixmap);
@@ -264,7 +216,7 @@ void gtkMessageBox(int type, const gchar *str)
     gtk_widget_show(MessageBox);
     gtkSetLayer(MessageBox);
 
-    if (type == GTK_MB_FATAL)
+    if (type == MSGBOX_FATAL)
         while (MessageBox)
             gtk_main_iteration_do(0);
 }
@@ -277,7 +229,7 @@ void gtkMessageBox(int type, const gchar *str)
 void gtkSetLayer(GtkWidget *window)
 {
     wsWindowLayer(gdk_display, GDK_WINDOW_XWINDOW(window->window), guiApp.videoWindow.isFullScreen);
-    gtkActive(window);
+    gtkRaise(window);
 }
 
 /**
@@ -285,9 +237,17 @@ void gtkSetLayer(GtkWidget *window)
  *
  * @param window pointer to a GtkWindow widget
  */
-void gtkActive(GtkWidget *window)
+void gtkRaise(GtkWidget *window)
 {
     wsWindowRaiseTop(gdk_display, GDK_WINDOW_XWINDOW(window->window));
+}
+
+static void gtkSelectInCList(GtkWidget *list, char *item)
+{
+    gint i;
+
+    if ((i = gtkFindInCList(list, item)) > -1)
+        gtk_clist_select_row(GTK_CLIST(list), i, 0);
 }
 
 void gtkShow(int type, char *param)
@@ -301,16 +261,16 @@ void gtkShow(int type, char *param)
     case evSkinBrowser:
         ShowSkinBrowser();
 
-//        gtkClearList( SkinList );
-        if (gtkFillSkinList(sbMPlayerPrefixDir) &&
-            gtkFillSkinList(sbMPlayerDirInHome)) {
-            gtkSetDefaultToCList(SkinList, param);
+//        gtk_clist_clear(GTK_CLIST(SkinList));
+        if (FillSkinList(sbMPlayerPrefixDir) &&
+            FillSkinList(sbMPlayerDirInHome)) {
+            gtkSelectInCList(SkinList, param);
             gtk_clist_sort(GTK_CLIST(SkinList));
             gtk_widget_show(SkinBrowser);
             gtkSetLayer(SkinBrowser);
         } else {
             gtk_widget_destroy(SkinBrowser);
-            gtkMessageBox(GTK_MB_ERROR, "Skin dirs not found ... Please install skins.");
+            gtkMessageBox(MSGBOX_ERROR, "Skin dirs not found ... Please install skins.");
         }
 
         break;
@@ -353,7 +313,7 @@ void gtkShow(int type, char *param)
             gtk_widget_destroy(PopUpMenu);
         }
 
-        PopUpMenu = create_PopUpMenu();
+        PopUpMenu = CreatePopUpMenu();
         gtk_menu_popup(GTK_MENU(PopUpMenu), NULL, NULL, NULL, NULL, 0, 0);
         break;
 

@@ -29,9 +29,14 @@
 GtkWidget * About = NULL;
 
 static void abWidgetDestroy( GtkButton * button, gpointer user_data )
-{ WidgetDestroy( NULL,&About ); }
+{
+  (void) button;
+  (void) user_data;
 
-static GtkWidget * create_About( void )
+  gtk_widget_destroy( About );
+}
+
+static GtkWidget * CreateAbout( void )
 {
   GtkWidget     * vbox;
   GtkWidget     * pixmap1;
@@ -66,7 +71,7 @@ static GtkWidget * create_About( void )
   gtk_widget_realize( About );
   gtkAddIcon( About );
 
-  vbox=AddVBox( AddDialogFrame( About ),0 );
+  vbox=gtkAddVBox( gtkAddDialogFrame( About ),0 );
 
   pixmapstyle=gtk_widget_get_style( About );
   pixmapwid=gdk_pixmap_colormap_create_from_xpm_d( About->window,gdk_colormap_get_system(),&mask,&pixmapstyle->bg[GTK_STATE_NORMAL],(gchar **) emblem_xpm );
@@ -77,7 +82,7 @@ static GtkWidget * create_About( void )
   gtk_box_pack_start( GTK_BOX( vbox ),pixmap1,FALSE,FALSE,0 );
   gtk_widget_set_usize( pixmap1,-2,174 );
 
-  AddHSeparator( vbox );
+  gtkAddHSeparator( vbox );
 
   scrolledwindow1=gtk_scrolled_window_new( NULL,NULL );
   gtk_widget_set_name( scrolledwindow1,"scrolledwindow1" );
@@ -332,10 +337,10 @@ static GtkWidget * create_About( void )
 	"     * Franciszek Wilamowski\n"
 	"     * Michael Zeising", -1 );
 
-  AddHSeparator( vbox );
-  Ok=AddButton( MSGTR_Ok,AddHButtonBox( vbox ) );
+  gtkAddHSeparator( vbox );
+  Ok=gtkAddButton( MSGTR_Ok,gtkAddHButtonBox( vbox ) );
 
-  gtk_signal_connect( GTK_OBJECT( About ),"destroy",GTK_SIGNAL_FUNC( WidgetDestroy ),&About );
+  gtk_signal_connect( GTK_OBJECT( About ),"destroy",GTK_SIGNAL_FUNC( gtk_widget_destroyed ),&About );
   gtk_signal_connect_object( GTK_OBJECT( Ok ),"clicked",GTK_SIGNAL_FUNC( abWidgetDestroy ),NULL );
 
   gtk_widget_add_accelerator( Ok,"clicked",accel_group,GDK_Escape,0,GTK_ACCEL_VISIBLE );
@@ -347,7 +352,7 @@ static GtkWidget * create_About( void )
 
 void ShowAbout( void )
 {
- if ( About ) gtkActive( About );
-   else About=create_About();
+ if ( About ) gtkRaise( About );
+   else About=CreateAbout();
  gtk_widget_show( About );
 }

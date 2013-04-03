@@ -86,6 +86,9 @@
 #endif
 #include "pixmaps/empty1px.xpm"
 
+int gtkPopupMenu;
+int gtkPopupMenuParam;
+
 static void ActivateMenuItem( int Item )
 {
 // fprintf( stderr,"[menu] item: %d.%d\n",Item&0xffff,Item>>16 );
@@ -402,7 +405,7 @@ static const char * GetLanguage( int language )
 #endif
 
 
-GtkWidget * DVDSubMenu;
+static GtkWidget * DVDSubMenu;
 GtkWidget * DVDTitleMenu;
 GtkWidget * DVDChapterMenu;
 GtkWidget * DVDAudioLanguageMenu;
@@ -413,7 +416,7 @@ GtkWidget * VCDTitleMenu;
 GtkWidget * CDSubMenu;
 GtkWidget * CDTitleMenu;
 
-GtkWidget * create_PopUpMenu( void )
+GtkWidget * CreatePopUpMenu( void )
 {
  GtkWidget * window1;
  GtkWidget * Menu = NULL;
