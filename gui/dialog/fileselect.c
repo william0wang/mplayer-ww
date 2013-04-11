@@ -55,11 +55,11 @@ char *get_current_dir_name(void);
 #define get_current_dir_name() getcwd(NULL, PATH_MAX)
 #endif
 
-const char *fsSelectedFile = NULL;
-const char *fsThisDir      = ".";
-const gchar *fsFilter      = "*";
+const char *fsSelectedFile;
+const char *fsThisDir = ".";
+const gchar *fsFilter = "*";
 
-int fsType = 0;
+int fsType;
 
 static gint fsCurrFNameListSelected, fsLastFNameListSelected;
 
@@ -136,15 +136,15 @@ int fsLastFontFilterSelected = -1;
 
 GtkWidget *fsFileNamesList;
 GtkWidget *fsFNameList;
-GtkWidget *FileSelector = NULL;
+GtkWidget *FileSelector;
 GdkColormap *fsColorMap;
 GtkWidget *fsOk;
 GtkWidget *fsUp;
 GtkWidget *fsCancel;
 GtkWidget *fsCombo4;
 GtkWidget *fsPathCombo;
-GList *fsList_items    = NULL;
-GList *fsTopList_items = NULL;
+GList *fsList_items;
+GList *fsTopList_items;
 GHashTable *fsPathTable;
 GtkWidget *List;
 GtkWidget *fsFilterCombo;
@@ -605,15 +605,11 @@ static GtkWidget *CreateFileSelect(void)
     GtkStyle *upstyle;
 
     FileSelector = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_widget_set_name(FileSelector, "FileSelector");
-    gtk_object_set_data(GTK_OBJECT(FileSelector), "FileSelector", FileSelector);
     gtk_widget_set_usize(FileSelector, 512, 300);
-    GTK_WIDGET_SET_FLAGS(FileSelector, GTK_CAN_DEFAULT);
     gtk_widget_set_events(FileSelector, GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_FOCUS_CHANGE_MASK | GDK_STRUCTURE_MASK | GDK_PROPERTY_CHANGE_MASK | GDK_VISIBILITY_NOTIFY_MASK);
     gtk_window_set_title(GTK_WINDOW(FileSelector), MSGTR_FileSelect);
     gtk_window_set_position(GTK_WINDOW(FileSelector), GTK_WIN_POS_CENTER);
-    gtk_window_set_policy(GTK_WINDOW(FileSelector), TRUE, TRUE, TRUE);
-    gtk_window_set_wmclass(GTK_WINDOW(FileSelector), "FileSelect", "MPlayer");
+    gtk_window_set_wmclass(GTK_WINDOW(FileSelector), "FileSelector", MPlayer);
     fsColorMap = gdk_colormap_get_system();
 
     gtk_widget_realize(FileSelector);
@@ -627,18 +623,15 @@ static GtkWidget *CreateFileSelect(void)
     hbox4 = gtkAddHBox(vbox4, 1);
 
     fsCombo4 = gtk_combo_new();
-    gtk_widget_set_name(fsCombo4, "fsCombo4");
     gtk_widget_show(fsCombo4);
     gtk_box_pack_start(GTK_BOX(hbox4), fsCombo4, TRUE, TRUE, 0);
     gtk_widget_set_usize(fsCombo4, -2, 20);
 
     fsPathCombo = GTK_COMBO(fsCombo4)->entry;
-    gtk_widget_set_name(fsPathCombo, "fsPathCombo");
     gtk_widget_show(fsPathCombo);
     gtk_widget_set_usize(fsPathCombo, -2, 20);
 
     vseparator1 = gtk_vseparator_new();
-    gtk_widget_set_name(vseparator1, "vseparator1");
     gtk_widget_show(vseparator1);
     gtk_box_pack_start(GTK_BOX(hbox4), vseparator1, FALSE, TRUE, 0);
     gtk_widget_set_usize(vseparator1, 7, 20);
@@ -660,14 +653,12 @@ static GtkWidget *CreateFileSelect(void)
     gtk_box_pack_start(GTK_BOX(vbox4), hbox6, TRUE, TRUE, 0);
 
     fsFNameListWindow = gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_set_name(fsFNameListWindow, "fsFNameListWindow");
     gtk_widget_show(fsFNameListWindow);
     gtk_box_pack_start(GTK_BOX(hbox6), fsFNameListWindow, TRUE, TRUE, 0);
     gtk_widget_set_usize(fsFNameListWindow, -2, 145);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(fsFNameListWindow), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
     fsFNameList = gtk_clist_new(2);
-    gtk_widget_set_name(fsFNameList, "fsFNameList");
     gtk_container_add(GTK_CONTAINER(fsFNameListWindow), fsFNameList);
     gtk_clist_set_column_width(GTK_CLIST(fsFNameList), 0, 80);
     gtk_clist_set_selection_mode(GTK_CLIST(fsFNameList), GTK_SELECTION_BROWSE);
@@ -677,7 +668,6 @@ static GtkWidget *CreateFileSelect(void)
     gtkAddHSeparator(vbox4);
 
     List = gtk_combo_new();
-    gtk_widget_set_name(List, "List");
     gtk_widget_ref(List);
     gtk_object_set_data_full(GTK_OBJECT(FileSelector), "List", List, (GtkDestroyNotify)gtk_widget_unref);
     gtk_widget_show(List);
@@ -685,7 +675,6 @@ static GtkWidget *CreateFileSelect(void)
     gtk_widget_set_usize(List, -2, 20);
 
     fsFilterCombo = GTK_COMBO(List)->entry;
-    gtk_widget_set_name(fsFilterCombo, "fsFilterCombo");
     gtk_widget_show(fsFilterCombo);
     gtk_entry_set_editable(GTK_ENTRY(fsFilterCombo), FALSE);
     gtk_widget_set_usize(fsFilterCombo, -2, 20);
