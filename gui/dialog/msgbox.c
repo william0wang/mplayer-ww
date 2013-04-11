@@ -19,6 +19,7 @@
 #include <string.h>
 
 #include "gui/app/app.h"
+#include "gui/app/gui.h"
 #include "help_mp.h"
 
 #include "pixmaps/error.xpm"
@@ -55,14 +56,12 @@ static GtkWidget * CreateMessageBox( void )
  accel_group=gtk_accel_group_new();
 
  MessageBox=gtk_window_new( GTK_WINDOW_TOPLEVEL );
- gtk_widget_set_name( MessageBox,"MessageBox" );
- gtk_object_set_data( GTK_OBJECT( MessageBox ),"MessageBox",MessageBox );
  gtk_widget_set_events( MessageBox,GDK_EXPOSURE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_VISIBILITY_NOTIFY_MASK );
  gtk_window_set_title( GTK_WINDOW( MessageBox ),"MPlayer ..." );
  gtk_window_set_position( GTK_WINDOW( MessageBox ),GTK_WIN_POS_CENTER );
  gtk_window_set_modal( GTK_WINDOW( MessageBox ),TRUE );
- gtk_window_set_policy( GTK_WINDOW( MessageBox ),TRUE,TRUE,FALSE );
- gtk_window_set_wmclass( GTK_WINDOW( MessageBox ),"Message","MPlayer" );
+ gtk_window_set_policy( GTK_WINDOW( MessageBox ),FALSE,FALSE,TRUE );
+ gtk_window_set_wmclass( GTK_WINDOW( MessageBox ),"Message",MPlayer );
 
  gtk_widget_realize( MessageBox );
  gtkAddIcon( MessageBox );
@@ -77,18 +76,15 @@ static GtkWidget * CreateMessageBox( void )
  pixmapwid=gdk_pixmap_colormap_create_from_xpm_d( MessageBox->window,gdk_colormap_get_system(),&mask,&pixmapstyle->bg[GTK_STATE_NORMAL],(gchar ** )error_xpm );
  ErrorPixmap=gtk_pixmap_new( pixmapwid,mask );
 
- gtk_widget_set_name( WarningPixmap,"pixmap1" );
  gtk_widget_hide( WarningPixmap );
  gtk_box_pack_start( GTK_BOX( hbox1 ),WarningPixmap,FALSE,FALSE,0 );
  gtk_widget_set_usize( WarningPixmap,55,-2 );
 
- gtk_widget_set_name( ErrorPixmap,"pixmap1" );
  gtk_widget_hide( ErrorPixmap );
  gtk_box_pack_start( GTK_BOX( hbox1 ),ErrorPixmap,FALSE,FALSE,0 );
  gtk_widget_set_usize( ErrorPixmap,55,-2 );
 
  gtkMessageBoxText=gtk_label_new( "Text jol. Ha ezt megerted,akkor neked nagyon jo a magyar tudasod,te." );
- gtk_widget_set_name( gtkMessageBoxText,"gtkMessageBoxText" );
  gtk_widget_show( gtkMessageBoxText );
  gtk_box_pack_start( GTK_BOX( hbox1 ),gtkMessageBoxText,TRUE,TRUE,0 );
 // gtk_label_set_justify( GTK_LABEL( gtkMessageBoxText ),GTK_JUSTIFY_FILL );

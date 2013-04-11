@@ -28,6 +28,7 @@
 #include "ws.h"
 #include "wsxdnd.h"
 #include "gui/interface.h"
+#include "gui/app/gui.h"
 
 #include "config.h"
 #include "help_mp.h"
@@ -604,13 +605,15 @@ buttonreleased:
     XSync(wsDisplay, False);
 }
 
+/**
+ * @brief Process all pending events.
+ */
 void wsEvents(void)
 {
     XEvent xev;
-    /* handle pending events */
+
     while (XPending(wsDisplay)) {
         XNextEvent(wsDisplay, &xev);
-//   printf("### X event: %d  [%d]\n",xev.type,delay);
         wsEvent(&xev);
     }
 }
@@ -861,9 +864,9 @@ void wsWindowCreate(wsWindow *win, int x, int y, int w, int h, int p, int c, cha
                                   win->VisualInfo.visual,
                                   win->WindowMask, &win->WindowAttrib);
 
-    wsClassHint.res_name = "MPlayer";
+    wsClassHint.res_name = "GUI";
 
-    wsClassHint.res_class = "MPlayer";
+    wsClassHint.res_class = MPlayer;
     XSetClassHint(wsDisplay, win->WindowID, &wsClassHint);
 
     wsWindowSizeHint(win);

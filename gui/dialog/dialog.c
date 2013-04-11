@@ -43,16 +43,16 @@
 #include "mp_msg.h"
 #include "libavutil/intreadwrite.h"
 
-static GtkWidget *PopUpMenu;
-
-static int gtkInitialized;
-
-static const char gui_icon_name[] = "mplayer";
-
 #define THRESHOLD 128   // transparency values equal to or above this will become
                         // opaque, all values below this will become transparent
 
 guiIcon_t guiIcon;
+
+static const char guiIconName[] = "mplayer";
+
+static GtkWidget *PopUpMenu;
+
+static int gtkInitialized;
 
 /**
  * @brief Add an icon to the #guiIcon icon structure.
@@ -70,7 +70,7 @@ static int gtkLoadIcon(GtkIconTheme *theme, gint size, GdkPixmap **gdkIcon, GdkB
     guchar *data;
     int csize, i;
 
-    pixbuf = gtk_icon_theme_load_icon(theme, gui_icon_name, size, 0, NULL);
+    pixbuf = gtk_icon_theme_load_icon(theme, guiIconName, size, 0, NULL);
 
     if (pixbuf)
         gdk_pixbuf_render_pixmap_and_mask_for_colormap(pixbuf, gdk_colormap_get_system(), gdkIcon, gdkIconMask, THRESHOLD);
@@ -96,7 +96,7 @@ static int gtkLoadIcon(GtkIconTheme *theme, gint size, GdkPixmap **gdkIcon, GdkB
 
         g_object_unref(pixbuf);
     } else
-        mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_ICONERROR, gui_icon_name, size);
+        mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_ICONERROR, guiIconName, size);
 
     /* start up GTK which realizes the pixmaps */
     gtk_main_iteration_do(FALSE);
@@ -122,7 +122,7 @@ void gtkInit(char *display_name)
 
     mp_msg(MSGT_GPLAYER, MSGL_V, "GTK init.\n");
 
-    arg[argc++] = GMPlayer;
+    arg[argc++] = gmplayer;
 
     if (display_name) {             // MPlayer option '-display' was given
         arg[argc++] = "--display";  // Pass corresponding command line arguments to GTK,
@@ -168,12 +168,13 @@ void gtkAddIcon(GtkWidget *window)
     wsWindowIcon(gdk_display, GDK_WINDOW_XWINDOW(window->window), &guiIcon);
 }
 
-void gtkEventHandling(void)
+/**
+ * @brief Process all pending events.
+ */
+void gtkEvents(void)
 {
-    int i;
-
-    for (i = 0; i < 25; i++)
-        gtk_main_iteration_do(0);
+    while (gtk_events_pending())
+        gtk_main_iteration();
 }
 
 /* funcs */
@@ -262,8 +263,8 @@ void gtkShow(int type, char *param)
         ShowSkinBrowser();
 
 //        gtk_clist_clear(GTK_CLIST(SkinList));
-        if (FillSkinList(sbMPlayerPrefixDir) &&
-            FillSkinList(sbMPlayerDirInHome)) {
+        if (FillSkinList(sbSkinDirInHome) &&
+            FillSkinList(sbSkinDirInData)) {
             gtkSelectInCList(SkinList, param);
             gtk_clist_sort(GTK_CLIST(SkinList));
             gtk_widget_show(SkinBrowser);

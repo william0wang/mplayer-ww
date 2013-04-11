@@ -68,7 +68,7 @@ guiInterface_t guiInfo = {
     .PlaylistNext = True
 };
 
-static int initialized;
+static int guiInitialized;
 
 /* MPlayer -> GUI */
 
@@ -116,11 +116,11 @@ void guiInit(void)
 
     /* load skin */
 
-    skinDirInHome  = get_path("skins");
-    skinMPlayerDir = MPLAYER_DATADIR "/skins";
+    skinDirInHome = get_path("skins");
+    skinDirInData = MPLAYER_DATADIR "/skins";
 
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[interface] skin directory #1: %s\n", skinDirInHome);
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[interface] skin directory #2: %s\n", skinMPlayerDir);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[interface] skin directory #2: %s\n", skinDirInData);
 
     if (!skinName)
         skinName = strdup("default");
@@ -208,7 +208,7 @@ void guiInit(void)
 
     mplayerLoadFont();
 
-    initialized = True;
+    guiInitialized = True;
 }
 
 /**
@@ -216,7 +216,7 @@ void guiInit(void)
  */
 void guiDone(void)
 {
-    if (initialized) {
+    if (guiInitialized) {
         if (gui_save_pos) {
             gui_main_pos_x  = guiApp.mainWindow.X;
             gui_main_pos_y  = guiApp.mainWindow.Y;
@@ -335,9 +335,10 @@ int gui(int what, void *data)
 
         if (!guiInfo.Playing || !guiInfo.VideoWindow)
             wsEvents();
+        /* else it's handled by the vo driver calling GUI_HANDLE_X_EVENT */
 
         wsMouseAutohide();
-        gtkEventHandling();
+        gtkEvents();
 
         break;
 
@@ -760,7 +761,6 @@ int gui(int what, void *data)
     case GUI_HANDLE_X_EVENT:
 
         wsEvent(data);
-        gtkEventHandling();
         break;
 
     case GUI_END_FILE:
