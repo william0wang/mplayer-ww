@@ -236,6 +236,51 @@ static int pixfmt2imgfmt2(enum AVPixelFormat fmt, enum AVCodecID cid)
     return pixfmt2imgfmt(fmt);
 }
 
+
+/**
+ * Function to set slice/dr related settings that need to be reset after
+ * initializing hardware acceleration failed */
+static void set_dr_slice_settings(struct AVCodecContext *avctx, const AVCodec *lavc_codec)
+{
+    sh_video_t *sh     = avctx->opaque;
+    vd_ffmpeg_ctx *ctx = sh->context;
+    // slice is rather broken with threads, so disable that combination unless
+    // explicitly requested
+    int use_slices = vd_use_slices > 0 || (vd_use_slices <  0 && lavc_param_threads <= 1);
+
+    ctx->do_slices = use_slices && (lavc_codec->capabilities & CODEC_CAP_DRAW_HORIZ_BAND);
+
+    ctx->do_dr1 = (lavc_codec->capabilities & CODEC_CAP_DR1) &&
+        lavc_codec->id != AV_CODEC_ID_INTERPLAY_VIDEO &&
+        lavc_codec->id != AV_CODEC_ID_H264 &&
+        lavc_codec->id != AV_CODEC_ID_VP8;
+    ctx->nonref_dr = 0;
+    // TODO: fix and enable again. This currently causes issues when using filters
+    // and seeking, usually failing with the "Ran out of numbered images" message,
+    // but bugzilla #2118 might be related as well.
+    if (0 && lavc_codec->id == AV_CODEC_ID_H264) {
+        ctx->do_dr1 = 1;
+        ctx->nonref_dr = 1;
+    }
+    if (lavc_param_vismv || (lavc_param_debug & (FF_DEBUG_VIS_MB_TYPE|FF_DEBUG_VIS_QP))) {
+        ctx->do_slices = ctx->do_dr1 = 0;
+    }
+    if(ctx->do_dr1){
+        avctx->flags |= CODEC_FLAG_EMU_EDGE;
+        avctx->  reget_buffer =
+        avctx->    get_buffer =     get_buffer;
+        avctx->release_buffer = release_buffer;
+    } else {
+        avctx->flags &= ~CODEC_FLAG_EMU_EDGE;
+        avctx->  reget_buffer = avcodec_default_reget_buffer;
+        avctx->    get_buffer = avcodec_default_get_buffer;
+        avctx->release_buffer = avcodec_default_release_buffer;
+    }
+    avctx->slice_flags = 0;
+    avctx->thread_count = lavc_param_threads;
+    avctx->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
+}
+
 static void set_format_params(struct AVCodecContext *avctx,
                               enum AVPixelFormat fmt)
 {
@@ -268,7 +313,7 @@ static void set_format_params(struct AVCodecContext *avctx,
             ctx->do_slices = 1;
         }
     } else {
-        avctx->slice_flags &= ~(SLICE_FLAG_CODED_ORDER|SLICE_FLAG_ALLOW_FIELD);
+        set_dr_slice_settings(avctx, avctx->codec);
     }
 }
 
@@ -278,10 +323,6 @@ static int init(sh_video_t *sh){
     vd_ffmpeg_ctx *ctx;
     AVCodec *lavc_codec;
     int lowres_w=0;
-    int do_vis_debug= lavc_param_vismv || (lavc_param_debug&(FF_DEBUG_VIS_MB_TYPE|FF_DEBUG_VIS_QP));
-    // slice is rather broken with threads, so disable that combination unless
-    // explicitly requested
-    int use_slices = vd_use_slices > 0 || (vd_use_slices <  0 && lavc_param_threads <= 1);
     AVDictionary *opts = NULL;
 
     init_avcodec();
@@ -298,21 +339,6 @@ static int init(sh_video_t *sh){
         return 0;
     }
 
-    if(use_slices && (lavc_codec->capabilities&CODEC_CAP_DRAW_HORIZ_BAND) && !do_vis_debug)
-        ctx->do_slices=1;
-
-    if (lavc_codec->capabilities & CODEC_CAP_DR1 && !do_vis_debug &&
-        lavc_codec->id != AV_CODEC_ID_INTERPLAY_VIDEO &&
-        lavc_codec->id != AV_CODEC_ID_H264 &&
-        lavc_codec->id != AV_CODEC_ID_VP8)
-        ctx->do_dr1=1;
-    // TODO: fix and enable again. This currently causes issues when using filters
-    // and seeking, usually failing with the "Ran out of numbered images" message,
-    // but bugzilla #2118 might be related as well.
-    if (0 && lavc_codec->id == AV_CODEC_ID_H264) {
-        ctx->do_dr1 = 1;
-        ctx->nonref_dr = 1;
-    }
     ctx->ip_count= ctx->b_count= 0;
 
     ctx->pic = avcodec_alloc_frame();
@@ -322,13 +348,6 @@ static int init(sh_video_t *sh){
     avctx->codec_id = lavc_codec->id;
 
     avctx->get_format = get_format;
-    if(ctx->do_dr1){
-        avctx->flags|= CODEC_FLAG_EMU_EDGE;
-        avctx->    get_buffer=     get_buffer;
-        avctx->release_buffer= release_buffer;
-        avctx->  reget_buffer=     get_buffer;
-    }
-
     avctx->flags|= lavc_param_bitexact;
 
     avctx->coded_width = sh->disp_w;
@@ -459,8 +478,7 @@ static int init(sh_video_t *sh){
     if(sh->bih)
         avctx->bits_per_coded_sample= sh->bih->biBitCount;
 
-    avctx->thread_count = lavc_param_threads;
-    avctx->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
+    set_dr_slice_settings(avctx, lavc_codec);
     if(lavc_codec->capabilities & CODEC_CAP_HWACCEL)
         // HACK around badly placed checks in mpeg_mc_decode_init
         set_format_params(avctx, PIX_FMT_XVMC_MPEG2_IDCT);
