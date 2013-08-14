@@ -176,14 +176,14 @@ static uint32_t draw_image(mp_image_t* mpi){
     pkt.size = outbuffer_size;
     res = avcodec_encode_video2(avctx, &pkt, &pic, &got_pkt);
 
-    if(res < 0){
+    if (res < 0 || !got_pkt) {
  	    mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_PNG_ErrorInCreatePng);
-            fclose(outfile);
-	    return 1;
+    } else {
+        fwrite(outbuffer, pkt.size, 1, outfile);
     }
 
-    fwrite(outbuffer, pkt.size, 1, outfile);
     fclose(outfile);
+    av_free_packet(&pkt);
 
     return VO_TRUE;
 }
