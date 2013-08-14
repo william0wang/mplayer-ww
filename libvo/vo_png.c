@@ -146,9 +146,10 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
 static uint32_t draw_image(mp_image_t* mpi){
     AVFrame pic;
     int buffersize;
-    int res;
+    int res, got_pkt;
     char buf[100];
     FILE *outfile;
+    AVPacket pkt;
 
     // if -dr or -slices then do nothing:
     if(mpi->flags&(MP_IMGFLAG_DIRECT|MP_IMGFLAG_DRAW_CALLBACK)) return VO_TRUE;
@@ -170,7 +171,10 @@ static uint32_t draw_image(mp_image_t* mpi){
         outbuffer = av_malloc(buffersize);
         outbuffer_size = buffersize;
     }
-    res = avcodec_encode_video(avctx, outbuffer, outbuffer_size, &pic);
+    av_init_packet(&pkt);
+    pkt.data = outbuffer;
+    pkt.size = outbuffer_size;
+    res = avcodec_encode_video2(avctx, &pkt, &pic, &got_pkt);
 
     if(res < 0){
  	    mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_PNG_ErrorInCreatePng);
@@ -178,7 +182,7 @@ static uint32_t draw_image(mp_image_t* mpi){
 	    return 1;
     }
 
-    fwrite(outbuffer, res, 1, outfile);
+    fwrite(outbuffer, pkt.size, 1, outfile);
     fclose(outfile);
 
     return VO_TRUE;
