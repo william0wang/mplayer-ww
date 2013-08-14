@@ -277,8 +277,6 @@ static void set_dr_slice_settings(struct AVCodecContext *avctx, const AVCodec *l
         avctx->release_buffer = avcodec_default_release_buffer;
     }
     avctx->slice_flags = 0;
-    avctx->thread_count = lavc_param_threads;
-    avctx->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
 }
 
 static void set_format_params(struct AVCodecContext *avctx,
@@ -293,12 +291,6 @@ static void set_format_params(struct AVCodecContext *avctx,
         vd_ffmpeg_ctx *ctx = sh->context;
         ctx->do_dr1    = 1;
         ctx->nonref_dr = 0;
-        // HACK: FFmpeg thread handling is a major mess and
-        // hinders any attempt to decide on hwaccel after the
-        // codec is open. We really want this to change, so
-        // just beat it until it's dead
-        avctx->thread_count    = 1;
-        avctx->active_thread_type = 0;
         avctx->get_buffer      = get_buffer;
         avctx->release_buffer  = release_buffer;
         avctx->reget_buffer    = get_buffer;
@@ -482,6 +474,8 @@ static int init(sh_video_t *sh){
     if(lavc_codec->capabilities & CODEC_CAP_HWACCEL)
         // HACK around badly placed checks in mpeg_mc_decode_init
         set_format_params(avctx, PIX_FMT_XVMC_MPEG2_IDCT);
+    avctx->thread_count = lavc_param_threads;
+    avctx->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
 
     /* open it */
     if (avcodec_open2(avctx, lavc_codec, &opts) < 0) {
