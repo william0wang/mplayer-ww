@@ -690,6 +690,15 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 #endif
     flip = flags & VOFLAG_FLIPPING;
 
+    if (image_format == format &&
+        vid_width    == width  &&
+        vid_height   == height) {
+        // at most aspect change, avoid reinit
+        vo_x11_create_vo_window(&vinfo, vo_dx, vo_dy, d_width, d_height,
+                                flags, CopyFromParent, "vdpau", title);
+        resize();
+        return 0;
+    }
     image_format = format;
     vid_width    = width;
     vid_height   = height;
@@ -1118,6 +1127,9 @@ static uint32_t get_image(mp_image_t *mpi)
 static int query_format(uint32_t format)
 {
     int default_flags = VFCAP_CSP_SUPPORTED | VFCAP_CSP_SUPPORTED_BY_HW | VFCAP_HWSCALE_UP | VFCAP_HWSCALE_DOWN | VFCAP_OSD | VFCAP_EOSD | VFCAP_EOSD_UNSCALED | VFCAP_FLIP;
+    // if we are already using it we obviously support it
+    if (format == image_format && decoder != VDP_INVALID_HANDLE)
+        return default_flags;
     switch (format) {
     case IMGFMT_BGRA:
         if (force_mixer)
@@ -1251,6 +1263,9 @@ static const char help_msg[] =
 static int preinit(const char *arg)
 {
     int i;
+    image_format = 0;
+    vid_width    = 0;
+    vid_height   = 0;
 
     deint = 0;
     deint_type = 3;
