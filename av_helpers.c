@@ -22,6 +22,7 @@
 #include "libavformat/avformat.h"
 #include "mp_msg.h"
 #include "av_helpers.h"
+#include "libaf/reorder_ch.h"
 
 int avcodec_initialized;
 int avformat_initialized;
@@ -112,4 +113,29 @@ void init_avformat(void)
         avformat_initialized = 1;
         av_log_set_callback(mp_msp_av_log_callback);
     }
+}
+
+int lavc_encode_audio(AVCodecContext *ctx, void *src, int src_len, void *dst, int dst_len)
+{
+    int bps = av_get_bytes_per_sample(ctx->sample_fmt);
+    int n;
+    int got;
+    AVPacket pkt;
+    AVFrame frame;
+    if ((ctx->channels == 6 || ctx->channels == 5) &&
+        (!strcmp(ctx->codec->name,"ac3") || !strcmp(ctx->codec->name,"libfaac"))) {
+        int isac3 = !strcmp(ctx->codec->name,"ac3");
+        reorder_channel_nch(src, AF_CHANNEL_LAYOUT_MPLAYER_DEFAULT,
+                            isac3 ? AF_CHANNEL_LAYOUT_LAVC_DEFAULT : AF_CHANNEL_LAYOUT_AAC_DEFAULT,
+                            ctx->channels,
+                            src_len / bps, bps);
+    }
+    pkt.data = dst;
+    pkt.size = dst_len;
+    frame.data[0] = src;
+    frame.linesize[0] = src_len / ctx->channels;
+    frame.nb_samples = frame.linesize[0] / bps;
+    n = avcodec_encode_audio2(ctx, &pkt, &frame, &got);
+    if (n < 0) return n;
+    return got ? pkt.size : 0;
 }

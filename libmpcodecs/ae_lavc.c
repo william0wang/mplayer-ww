@@ -118,20 +118,9 @@ static int bind_lavc(audio_encoder_t *encoder, muxer_stream_t *mux_a)
 static int encode_lavc(audio_encoder_t *encoder, uint8_t *dest, void *src, int size, int max_size)
 {
 	int n;
-	if ((encoder->params.channels == 6 || encoder->params.channels == 5) &&
-			(!strcmp(lavc_acodec->name,"ac3") ||
-			!strcmp(lavc_acodec->name,"libfaac"))) {
-		int isac3 = !strcmp(lavc_acodec->name,"ac3");
-		int bps = av_get_bytes_per_sample(lavc_actx->sample_fmt);
-		reorder_channel_nch(src, AF_CHANNEL_LAYOUT_MPLAYER_DEFAULT,
-		                    isac3 ? AF_CHANNEL_LAYOUT_LAVC_DEFAULT
-		                          : AF_CHANNEL_LAYOUT_AAC_DEFAULT,
-		                    encoder->params.channels,
-		                    size / bps, bps);
-	}
-	n = avcodec_encode_audio(lavc_actx, dest, size, src);
-        compressed_frame_size = n;
-	return n;
+	n = lavc_encode_audio(lavc_actx, src, size, dest, max_size);
+	compressed_frame_size = n < 0 ? 0 : n;
+	return compressed_frame_size;
 }
 
 
