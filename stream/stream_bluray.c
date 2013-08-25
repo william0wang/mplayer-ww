@@ -105,6 +105,48 @@ static int bluray_stream_fill_buffer(stream_t *s, char *buf, int len)
     return bd_read(b->bd, buf, len);
 }
 
+static BLURAY_TITLE_INFO *get_langs(const struct bluray_priv_s *b, enum stream_ctrl_type type,
+                                    const BLURAY_STREAM_INFO **si, int *count)
+{
+    BLURAY_TITLE_INFO *ti = bd_get_title_info(b->bd, b->current_title, b->current_angle);
+    *count = 0;
+    if (ti->clip_count) {
+        switch (type) {
+        case stream_ctrl_audio:
+            *count = ti->clips[0].audio_stream_count;
+            *si = ti->clips[0].audio_streams;
+            break;
+        case stream_ctrl_sub:
+            *count = ti->clips[0].pg_stream_count;
+            *si = ti->clips[0].pg_streams;
+            break;
+        }
+        if (*count > 0)
+            return ti;
+    }
+    *si = NULL;
+    bd_free_title_info(ti);
+    return NULL;
+}
+
+int bluray_id_from_lang(stream_t *s, enum stream_ctrl_type type, const char *lang)
+{
+    struct bluray_priv_s *b = s->priv;
+    const BLURAY_STREAM_INFO *si;
+    int count;
+    BLURAY_TITLE_INFO *ti = get_langs(b, type, &si, &count);
+    while (count-- > 0) {
+        if (strstr(si->lang, lang)) {
+            bd_free_title_info(ti);
+            return si->pid;
+        }
+        si++;
+    }
+    if (ti)
+        bd_free_title_info(ti);
+    return -1;
+}
+
 static int bluray_stream_control(stream_t *s, int cmd, void *arg)
 {
     struct bluray_priv_s *b = s->priv;
@@ -196,31 +238,20 @@ static int bluray_stream_control(stream_t *s, int cmd, void *arg)
 
     case STREAM_CTRL_GET_LANG: {
         struct stream_lang_req *req = arg;
-        BLURAY_TITLE_INFO *ti = bd_get_title_info(b->bd, b->current_title, b->current_angle);
-        if (ti->clip_count) {
-            BLURAY_STREAM_INFO *si = NULL;
-            int count = 0;
-            switch (req->type) {
-            case stream_ctrl_audio:
-                count = ti->clips[0].audio_stream_count;
-                si = ti->clips[0].audio_streams;
-                break;
-            case stream_ctrl_sub:
-                count = ti->clips[0].pg_stream_count;
-                si = ti->clips[0].pg_streams;
-                break;
+        const BLURAY_STREAM_INFO *si;
+        int count;
+        BLURAY_TITLE_INFO *ti = get_langs(b, req->type, &si, &count);
+        while (count-- > 0) {
+            if (si->pid == req->id) {
+                memcpy(req->buf, si->lang, 4);
+                req->buf[4] = 0;
+                bd_free_title_info(ti);
+                return STREAM_OK;
             }
-            while (count-- > 0) {
-                if (si->pid == req->id) {
-                    memcpy(req->buf, si->lang, 4);
-                    req->buf[4] = 0;
-                    bd_free_title_info(ti);
-                    return STREAM_OK;
-                }
-                si++;
-            }
+            si++;
         }
-        bd_free_title_info(ti);
+        if (ti)
+            bd_free_title_info(ti);
         return STREAM_ERROR;
     }
 

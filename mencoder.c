@@ -671,6 +671,13 @@ if(stream->type==STREAMTYPE_BD){
   if(dvdsub_lang && dvdsub_id==-1) dvdsub_id=bd_sid_from_lang(stream,dvdsub_lang);
 }
 
+#ifdef CONFIG_LIBBLURAY
+if(stream->type==STREAMTYPE_BLURAY){
+  if(audio_lang && audio_id==-1) audio_id=bluray_id_from_lang(stream,stream_ctrl_audio,audio_lang);
+  if(dvdsub_lang && dvdsub_id==-1) dvdsub_id=bluray_id_from_lang(stream,stream_ctrl_sub,dvdsub_lang);
+}
+#endif
+
 #ifdef CONFIG_DVDREAD
 if(stream->type==STREAMTYPE_DVD){
   if(audio_lang && audio_id==-1) audio_id=dvd_aid_from_lang(stream,audio_lang);

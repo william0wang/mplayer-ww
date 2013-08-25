@@ -396,6 +396,8 @@ typedef struct {
  int channels;
 } stream_language_t;
 
+int bluray_id_from_lang(stream_t *s, enum stream_ctrl_type type, const char *lang);
+
 int parse_chapter_range(const m_option_t *conf, const char *range);
 
 #endif /* MPLAYER_STREAM_H */
