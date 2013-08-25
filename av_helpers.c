@@ -117,11 +117,13 @@ void init_avformat(void)
 
 int lavc_encode_audio(AVCodecContext *ctx, void *src, int src_len, void *dst, int dst_len)
 {
+    void *orig_src = src;
     int bps = av_get_bytes_per_sample(ctx->sample_fmt);
+    int planar = ctx->channels > 1 && av_sample_fmt_is_planar(ctx->sample_fmt);
     int n;
     int got;
     AVPacket pkt;
-    AVFrame frame;
+    AVFrame *frame = avcodec_alloc_frame();
     if ((ctx->channels == 6 || ctx->channels == 5) &&
         (!strcmp(ctx->codec->name,"ac3") || !strcmp(ctx->codec->name,"libfaac"))) {
         int isac3 = !strcmp(ctx->codec->name,"ac3");
@@ -132,10 +134,27 @@ int lavc_encode_audio(AVCodecContext *ctx, void *src, int src_len, void *dst, in
     }
     pkt.data = dst;
     pkt.size = dst_len;
-    frame.data[0] = src;
-    frame.linesize[0] = src_len / ctx->channels;
-    frame.nb_samples = frame.linesize[0] / bps;
-    n = avcodec_encode_audio2(ctx, &pkt, &frame, &got);
+    frame->nb_samples = src_len / ctx->channels / bps;
+    if (planar) {
+        // TODO: this is horribly inefficient.
+        int ch;
+        src = av_mallocz(src_len);
+        for (ch = 0; ch < ctx->channels; ch++) {
+            uint8_t *tmps = (uint8_t *)orig_src + ch*bps;
+            uint8_t *tmpd = (uint8_t *)src + ch*src_len/ctx->channels;
+            int s;
+            for (s = 0; s < frame->nb_samples; s++) {
+                memcpy(tmpd, tmps, bps);
+                tmps += ctx->channels * bps;
+                tmpd += bps;
+            }
+        }
+    }
+    n = avcodec_fill_audio_frame(frame, ctx->channels, ctx->sample_fmt, src, src_len, 1);
+    if (n < 0) return 0;
+    n = avcodec_encode_audio2(ctx, &pkt, frame, &got);
+    avcodec_free_frame(&frame);
+    if (planar) av_free(src);
     if (n < 0) return n;
     return got ? pkt.size : 0;
 }

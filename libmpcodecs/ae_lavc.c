@@ -181,13 +181,13 @@ int mpae_init_lavc(audio_encoder_t *encoder)
 		const enum AVSampleFormat *fmts;
 		lavc_actx->sample_fmt = lavc_acodec->sample_fmts[0]; // fallback to first format
 		for (fmts = lavc_acodec->sample_fmts; *fmts != AV_SAMPLE_FMT_NONE; fmts++) {
-			if (samplefmt2affmt(*fmts) == encoder->params.sample_format) { // preferred format found
+			if (samplefmt2affmt(av_get_packed_sample_fmt(*fmts)) == encoder->params.sample_format) { // preferred format found
 				lavc_actx->sample_fmt = *fmts;
 				break;
 			}
 		}
 	}
-	encoder->input_format = samplefmt2affmt(lavc_actx->sample_fmt);
+	encoder->input_format = samplefmt2affmt(av_get_packed_sample_fmt(lavc_actx->sample_fmt));
 	if (encoder->input_format == AF_FORMAT_UNKNOWN) {
             mp_msg(MSGT_MENCODER,MSGL_ERR, "Audio encoder requires unknown or unsupported input format\n");
             return 0;
