@@ -202,6 +202,7 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 
 
     while (left > 0) {
+        void *in = NULL;
         if (left + s->pending_len < s->expect_len) {
             memcpy(s->pending_data + s->pending_len, src, left);
             src += left;
@@ -220,29 +221,21 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
                 src += needs;
                 left -= needs;
             }
-
-            if (c->nch >= 5)
-                reorder_channel_nch(s->pending_data,
-                                    AF_CHANNEL_LAYOUT_MPLAYER_DEFAULT,
-                                    AF_CHANNEL_LAYOUT_LAVC_DEFAULT,
-                                    c->nch,
-                                    s->expect_len / 2, 2);
-
-            len = avcodec_encode_audio(s->lavc_actx, dest, destsize,
-                                       (void *)s->pending_data);
+            in = s->pending_data;
             s->pending_len = 0;
         }
         else {
-            if (c->nch >= 5)
-                reorder_channel_nch(src,
-                                    AF_CHANNEL_LAYOUT_MPLAYER_DEFAULT,
-                                    AF_CHANNEL_LAYOUT_LAVC_DEFAULT,
-                                    c->nch,
-                                    s->expect_len / 2, 2);
-            len = avcodec_encode_audio(s->lavc_actx,dest,destsize,(void *)src);
+            in = src;
             src += s->expect_len;
             left -= s->expect_len;
         }
+        if (c->nch >= 5)
+            reorder_channel_nch(in,
+                                AF_CHANNEL_LAYOUT_MPLAYER_DEFAULT,
+                                AF_CHANNEL_LAYOUT_LAVC_DEFAULT,
+                                c->nch,
+                                s->expect_len / 2, 2);
+        len = avcodec_encode_audio(s->lavc_actx, dest, destsize, in);
         mp_msg(MSGT_AFILTER, MSGL_DBG2, "avcodec_encode_audio got %d, pending %d.\n",
                len, s->pending_len);
 
