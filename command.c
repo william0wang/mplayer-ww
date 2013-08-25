@@ -1552,6 +1552,7 @@ static int mp_property_sub(m_option_t *prop, int action, void *arg,
         if (d_sub->id > -2)
             reset_spu = 1;
         d_sub->id = -2;
+        d_sub->sh = NULL;
     }
 #ifdef CONFIG_ASS
     ass_track = 0;
