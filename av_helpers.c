@@ -120,13 +120,13 @@ int lavc_encode_audio(AVCodecContext *ctx, void *src, int src_len, void *dst, in
     void *orig_src = src;
     int bps = av_get_bytes_per_sample(ctx->sample_fmt);
     int planar = ctx->channels > 1 && av_sample_fmt_is_planar(ctx->sample_fmt);
+    int isac3 = ctx->codec->id == AV_CODEC_ID_AC3;
     int n;
     int got;
     AVPacket pkt;
     AVFrame *frame = avcodec_alloc_frame();
     if ((ctx->channels == 6 || ctx->channels == 5) &&
-        (!strcmp(ctx->codec->name,"ac3") || !strcmp(ctx->codec->name,"libfaac"))) {
-        int isac3 = !strcmp(ctx->codec->name,"ac3");
+        (isac3 || !strcmp(ctx->codec->name,"libfaac"))) {
         reorder_channel_nch(src, AF_CHANNEL_LAYOUT_MPLAYER_DEFAULT,
                             isac3 ? AF_CHANNEL_LAYOUT_LAVC_DEFAULT : AF_CHANNEL_LAYOUT_AAC_DEFAULT,
                             ctx->channels,
