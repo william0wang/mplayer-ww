@@ -77,11 +77,10 @@ while((len=demux_read_data(sh->ds,&sh->a_in_buffer[sh->a_in_buffer_len],
     mad_stream_buffer (&this->stream, sh->a_in_buffer, sh->a_in_buffer_len);
     ret=mad_frame_decode (&this->frame, &this->stream);
     if (this->stream.next_frame) {
-	int num_bytes =
-	    (char*)sh->a_in_buffer+sh->a_in_buffer_len - (char*)this->stream.next_frame;
-	memmove(sh->a_in_buffer, this->stream.next_frame, num_bytes);
-	mp_msg(MSGT_DECAUDIO,MSGL_DBG2,"libmad: %d bytes processed\n",sh->a_in_buffer_len-num_bytes);
-	sh->a_in_buffer_len = num_bytes;
+	unsigned processed = this->stream.next_frame - (uint8_t *)sh->a_in_buffer;
+	sh->a_in_buffer_len -= processed;
+	memmove(sh->a_in_buffer, this->stream.next_frame, sh->a_in_buffer_len);
+	mp_msg(MSGT_DECAUDIO,MSGL_DBG2,"libmad: %d bytes processed\n",processed);
     }
     if (ret == 0) return 1; // OK!!!
     // error! try to resync!
