@@ -364,8 +364,12 @@ int muxer_init_muxer_lavf(muxer_t *muxer)
 		mp_msg(MSGT_MUXER, MSGL_FATAL, "Cannot get specified format.\n");
 		goto fail;
 	}
-	if (fmt->flags & AVFMT_NOFILE)
-            av_strlcpy(priv->oc->filename, out_filename, sizeof(priv->oc->filename));
+	if (fmt->flags & AVFMT_NOFILE) {
+            const char *src = out_filename;
+            if (!strncmp(out_filename, "ffmpeg://dummy://", 17)) src += 17;
+            else if (!strncmp(out_filename, "ffmpeg://", 9)) src += 9;
+            av_strlcpy(priv->oc->filename, src, sizeof(priv->oc->filename));
+	}
 	priv->oc->oformat = fmt;
 
 
