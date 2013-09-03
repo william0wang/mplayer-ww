@@ -121,7 +121,7 @@ static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
     }
     if (!strncmp(filename, prefix, strlen(prefix)))
         filename += strlen(prefix);
-    dummy = !strncmp(filename, "rtsp:", 5);
+    dummy = !strncmp(filename, "rtsp:", 5) || !strncmp(filename, "dummy:", 6);
     mp_msg(MSGT_OPEN, MSGL_V, "[ffmpeg] Opening %s\n", filename);
 
     if (!dummy && avio_open(&ctx, filename, flags) < 0)
