@@ -703,33 +703,13 @@ static int control(struct vf_instance *vf, int request, void* data){
 
 static int query_format(struct vf_instance *vf, unsigned int fmt){
     switch(fmt){
-    case IMGFMT_YV12:
     case IMGFMT_IYUV:
     case IMGFMT_I420:
-        if(lavc_param_format == IMGFMT_YV12)
-            return VFCAP_CSP_SUPPORTED | VFCAP_ACCEPT_STRIDE;
-        break;
-    case IMGFMT_411P:
-        if(lavc_param_format == IMGFMT_411P)
-            return VFCAP_CSP_SUPPORTED | VFCAP_ACCEPT_STRIDE;
-        break;
-    case IMGFMT_422P:
-        if(lavc_param_format == IMGFMT_422P)
-            return VFCAP_CSP_SUPPORTED | VFCAP_ACCEPT_STRIDE;
-        break;
-    case IMGFMT_444P:
-        if(lavc_param_format == IMGFMT_444P)
-            return VFCAP_CSP_SUPPORTED | VFCAP_ACCEPT_STRIDE;
-        break;
-    case IMGFMT_YVU9:
-        if(lavc_param_format == IMGFMT_YVU9)
-            return VFCAP_CSP_SUPPORTED | VFCAP_ACCEPT_STRIDE;
-        break;
-    case IMGFMT_BGR32:
-        if(lavc_param_format == IMGFMT_BGR32)
-            return VFCAP_CSP_SUPPORTED | VFCAP_ACCEPT_STRIDE;
+        fmt = IMGFMT_YV12;
         break;
     }
+    if(lavc_param_format == fmt)
+        return VFCAP_CSP_SUPPORTED | VFCAP_ACCEPT_STRIDE;
     return 0;
 }
 
