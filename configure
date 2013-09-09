@@ -3630,6 +3630,14 @@ if test "$_sctp" = no ; then
 fi
 echores "$_sctp"
 
+echocheck "sys/un.h"
+un_h=no
+header_check sys/un.h && un_h=yes
+if test "$un_h" = "no" ; then
+  libavprotocols=$(filter_out_component protocol 'UNIX')
+fi
+echores "$un_h"
+
 echocheck "sys/poll.h"
 poll_h=no
 def_poll_h='#define HAVE_POLL_H 0'
