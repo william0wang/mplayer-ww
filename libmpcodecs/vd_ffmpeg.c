@@ -88,6 +88,7 @@ typedef struct {
     int b_count;
     AVRational last_sample_aspect_ratio;
     int palette_sent;
+    int use_hwaccel;
 } vd_ffmpeg_ctx;
 
 #include "m_option.h"
@@ -282,20 +283,21 @@ static void set_dr_slice_settings(struct AVCodecContext *avctx, const AVCodec *l
 static void set_format_params(struct AVCodecContext *avctx,
                               enum AVPixelFormat fmt)
 {
+    sh_video_t *sh     = avctx->opaque;
+    vd_ffmpeg_ctx *ctx = sh->context;
     int imgfmt;
     if (fmt == PIX_FMT_NONE)
         return;
+    ctx->use_hwaccel = fmt == AV_PIX_FMT_VDPAU;
     imgfmt = pixfmt2imgfmt2(fmt, avctx->codec_id);
     if (IMGFMT_IS_HWACCEL(imgfmt)) {
-        sh_video_t *sh     = avctx->opaque;
-        vd_ffmpeg_ctx *ctx = sh->context;
         ctx->do_dr1    = 1;
         ctx->nonref_dr = 0;
         avctx->get_buffer      = get_buffer;
         avctx->release_buffer  = release_buffer;
         avctx->reget_buffer    = get_buffer;
         mp_msg(MSGT_DECVIDEO, MSGL_INFO, MSGTR_MPCODECS_XVMCAcceleratedMPEG2);
-        if (IMGFMT_IS_VDPAU(imgfmt)) {
+        if (ctx->use_hwaccel) {
             avctx->draw_horiz_band = NULL;
             avctx->slice_flags = 0;
             ctx->do_slices = 0;
@@ -526,14 +528,20 @@ static void draw_slice(struct AVCodecContext *s,
                         int y, int type, int height){
     mp_image_t *mpi = src->opaque;
     sh_video_t *sh = s->opaque;
+    vd_ffmpeg_ctx *ctx = sh->context;
     uint8_t *source[MP_MAX_PLANES]= {src->data[0] + offset[0], src->data[1] + offset[1], src->data[2] + offset[2]};
     int strides[MP_MAX_PLANES] = {src->linesize[0], src->linesize[1], src->linesize[2]};
     if (!src->data[0]) {
         mp_msg(MSGT_DECVIDEO, MSGL_FATAL, "BUG in FFmpeg, draw_slice called with NULL pointer!\n");
         return;
     }
-    if (mpi && IMGFMT_IS_VDPAU(mpi->imgfmt)) {
+    if (mpi && ctx->use_hwaccel) {
         mp_msg(MSGT_DECVIDEO, MSGL_FATAL, "BUG in FFmpeg, draw_slice called for VDPAU!\n");
+        return;
+    }
+    if (IMGFMT_IS_VDPAU(mpi->imgfmt)) {
+        struct vdpau_render_state *render = mpi->priv;
+        vdpau_render_wrapper(s, src, &render->info, render->bitstream_buffers_used, render->bitstream_buffers);
         return;
     }
     if (height < 0)
@@ -704,7 +712,7 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
         avctx->draw_horiz_band= draw_slice;
     }
 #if CONFIG_VDPAU
-    if (IMGFMT_IS_VDPAU(mpi->imgfmt)) {
+    if (ctx->use_hwaccel) {
         struct vdpau_render_state *render = mpi->priv;
         AVVDPAUContext *vdpc;
         avctx->draw_horiz_band= NULL;
