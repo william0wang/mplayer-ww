@@ -539,11 +539,13 @@ static void draw_slice(struct AVCodecContext *s,
         mp_msg(MSGT_DECVIDEO, MSGL_FATAL, "BUG in FFmpeg, draw_slice called for VDPAU!\n");
         return;
     }
+#if CONFIG_VDPAU
     if (IMGFMT_IS_VDPAU(mpi->imgfmt)) {
         struct vdpau_render_state *render = mpi->priv;
         vdpau_render_wrapper(s, src, &render->info, render->bitstream_buffers_used, render->bitstream_buffers);
         return;
     }
+#endif
     if (height < 0)
     {
         int i;
