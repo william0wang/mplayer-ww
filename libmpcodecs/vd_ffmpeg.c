@@ -1081,6 +1081,10 @@ static enum AVPixelFormat get_format(struct AVCodecContext *avctx,
     int i;
 
     for(i=0;fmt[i]!=PIX_FMT_NONE;i++){
+        // it is incorrect of FFmpeg to even offer these, filter them out
+        if(!(avctx->codec->capabilities & CODEC_CAP_HWACCEL_VDPAU) &&
+           (fmt[i] == AV_PIX_FMT_VDPAU_MPEG1 || fmt[i] == AV_PIX_FMT_VDPAU_MPEG2))
+            continue;
         imgfmt = pixfmt2imgfmt2(fmt[i], avctx->codec_id);
         if(!IMGFMT_IS_HWACCEL(imgfmt)) continue;
         mp_msg(MSGT_DECVIDEO, MSGL_INFO, MSGTR_MPCODECS_TryingPixfmt, i);
