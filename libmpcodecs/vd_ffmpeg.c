@@ -540,7 +540,7 @@ static void draw_slice(struct AVCodecContext *s,
         return;
     }
 #if CONFIG_VDPAU
-    if (IMGFMT_IS_VDPAU(mpi->imgfmt)) {
+    if (mpi && IMGFMT_IS_VDPAU(mpi->imgfmt)) {
         struct vdpau_render_state *render = mpi->priv;
         vdpau_render_wrapper(s, src, &render->info, render->bitstream_buffers_used, render->bitstream_buffers);
         return;
