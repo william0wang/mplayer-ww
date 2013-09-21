@@ -508,6 +508,7 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
 }
 
 static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
+    AVDictionary *opts;
     AVFormatContext *avfc;
     AVDictionaryEntry *t = NULL;
     lavf_priv_t *priv= demuxer->priv;
@@ -535,7 +536,7 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
     }
 
     if(opt_avopt){
-        if(parse_avopts(avfc, opt_avopt) < 0){
+        if(av_dict_parse_string(&opts, opt_avopt, "=", ",", 0) < 0){
             mp_msg(MSGT_HEADER,MSGL_ERR, "Your options /%s/ look like gibberish to me pal\n", opt_avopt);
             return NULL;
         }
@@ -563,10 +564,17 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
         avfc->pb = priv->pb;
     }
 
-    if(avformat_open_input(&avfc, mp_filename, priv->avif, NULL)<0){
+    if(avformat_open_input(&avfc, mp_filename, priv->avif, &opts)<0){
         mp_msg(MSGT_HEADER,MSGL_ERR,"LAVF_header: av_open_input_stream() failed\n");
         return NULL;
     }
+    if (av_dict_count(opts)) {
+        AVDictionaryEntry *e = NULL;
+        while ((e = av_dict_get(opts, "", e, AV_DICT_IGNORE_SUFFIX)))
+            mp_msg(MSGT_HEADER,MSGL_ERR,"Unknown option %s\n", e->key);
+        return 0;
+    }
+    av_dict_free(&opts);
 
     priv->avfc= avfc;
 
