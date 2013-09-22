@@ -3648,6 +3648,8 @@ goto_enable_cache:
             reinit_audio_chain();
             if (mpctx->sh_audio && mpctx->sh_audio->codec)
                 mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_AUDIO_CODEC=%s\n", mpctx->sh_audio->codec->name);
+            if (mpctx->audio_out)
+                mpctx->audio_out->control(AOCONTROL_FILENAME, (void *)mp_basename(filename));
         }
 
         current_module = "av_init";
