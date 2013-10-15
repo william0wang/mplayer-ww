@@ -1290,9 +1290,6 @@ static int preinit(const char *arg)
         colorspace = 1;
     }
 
-    if (!vo_init() || win_x11_init_vdpau_procs())
-        return -1;
-
     // full grayscale palette.
     for (i = 0; i < PALETTE_SIZE; ++i)
         palette[i] = (i << 16) | (i << 8) | i;
@@ -1308,6 +1305,9 @@ static int preinit(const char *arg)
     procamp.contrast   = 1.0;
     procamp.saturation = 1.0;
     procamp.hue        = 0.0;
+
+    if (!vo_init() || win_x11_init_vdpau_procs())
+        return -1;
 
     return 0;
 }
