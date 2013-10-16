@@ -1100,6 +1100,7 @@ static const char help_text[]=
 "Versuche den scale-Filter zu deiner Filterliste hinzuzufügen,\n"\
 "z.B. mit -vf spp,scale an Stelle von -vf spp.\n"
 #define MSGTR_VO_GenericError "Dieser Fehler ist aufgetreten"
+#define MSGTR_VO_OutputDirectory "Ausgabeverzeichnis"
 #define MSGTR_VO_UnableToAccess "Zugriff nicht möglich."
 #define MSGTR_VO_ExistsButNoDirectory "Existiert schon, ist aber kein Verzeichnis."
 #define MSGTR_VO_DirExistsButNotWritable "Ausgabeverzeichnis existiert schon, ist aber nicht beschreibbar."
