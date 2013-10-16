@@ -790,7 +790,6 @@ static const char help_text[]=
 #define MSGTR_VO_UnableToAccess "Nemám přístup k"
 #define MSGTR_VO_ExistsButNoDirectory "již existuje, ale není to adresář."
 #define MSGTR_VO_DirExistsButNotWritable "Výstupní adresář již existuje, ale nelze do něj zapisovat."
-#define MSGTR_VO_DirExistsAndIsWritable "Výstupní adresář již existuje a lze do něj zapisovat."
 #define MSGTR_VO_CantCreateDirectory "Nelze vytvořit výstupní adresář."
 #define MSGTR_VO_CantCreateFile "Nelze vytvořit výstupní soubor."
 #define MSGTR_VO_DirectoryCreateSuccess "Úspěšně vytvořen výstupní adresář."

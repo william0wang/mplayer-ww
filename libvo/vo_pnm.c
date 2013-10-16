@@ -228,8 +228,7 @@ static void pnm_mkdir(char *buf, int verbose) {
                 }
 
                 if (strcmp(buf, ".") != 0) {
-                mp_msg(MSGT_VO, MSGL_INFO, "%s: %s - %s\n", info.short_name,
-                        buf, MSGTR_VO_DirExistsAndIsWritable);
+                    mp_msg(MSGT_VO, MSGL_INFO, "%s: %s: %s\n", info.short_name, MSGTR_VO_OutputDirectory, buf);
                 }
                 break;
 

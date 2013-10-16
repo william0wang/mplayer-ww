@@ -1103,7 +1103,6 @@ static const char help_text[]=
 #define MSGTR_VO_UnableToAccess "Zugriff nicht möglich."
 #define MSGTR_VO_ExistsButNoDirectory "Existiert schon, ist aber kein Verzeichnis."
 #define MSGTR_VO_DirExistsButNotWritable "Ausgabeverzeichnis existiert schon, ist aber nicht beschreibbar."
-#define MSGTR_VO_DirExistsAndIsWritable "Ausgabeverzeichnis existiert schon und ist beschreibbar."
 #define MSGTR_VO_CantCreateDirectory "Kann Ausgabeverzeichnis nicht erstellen."
 #define MSGTR_VO_CantCreateFile "Kann Ausgabedatei nicht erstellen."
 #define MSGTR_VO_DirectoryCreateSuccess "Ausgabeverzeichnis erfolgreich erstellt."

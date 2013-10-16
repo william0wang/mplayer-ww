@@ -763,7 +763,6 @@ static const char help_text[]=
 #define MSGTR_VO_UnableToAccess "Kan inte accessa"
 #define MSGTR_VO_ExistsButNoDirectory "finns redan, men är inte en katalog."
 #define MSGTR_VO_DirExistsButNotWritable "Ut-katalog finns redan, men är inte skrivbar."
-#define MSGTR_VO_DirExistsAndIsWritable "Utkatalog finns redan och är skrivbar."
 #define MSGTR_VO_CantCreateDirectory "Oförmögen att skapa ut-katalog."
 #define MSGTR_VO_CantCreateFile "Oförmögen att skapa utfil."
 #define MSGTR_VO_DirectoryCreateSuccess "Ut-katalog skapad."

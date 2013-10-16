@@ -892,10 +892,10 @@ static const char help_text[]=
                 "Try appending the scale filter to your filter list,\n"\
                 "e.g. -vf spp,scale instead of -vf spp.\n"
 #define MSGTR_VO_GenericError "This error has occurred"
+#define MSGTR_VO_OutputDirectory "output directory"
 #define MSGTR_VO_UnableToAccess "Unable to access"
 #define MSGTR_VO_ExistsButNoDirectory "already exists, but is not a directory."
 #define MSGTR_VO_DirExistsButNotWritable "Output directory already exists, but is not writable."
-#define MSGTR_VO_DirExistsAndIsWritable "Output directory already exists and is writable."
 #define MSGTR_VO_CantCreateDirectory "Unable to create output directory."
 #define MSGTR_VO_CantCreateFile "Unable to create output file."
 #define MSGTR_VO_DirectoryCreateSuccess "Output directory successfully created."

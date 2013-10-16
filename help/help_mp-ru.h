@@ -791,7 +791,6 @@ static const char help_text[]=
 #define MSGTR_VO_UnableToAccess "Не могу получить доступ"
 #define MSGTR_VO_ExistsButNoDirectory "уже существует, но не является директорией."
 #define MSGTR_VO_DirExistsButNotWritable "Директория вывода уже существует, но не доступна для записи."
-#define MSGTR_VO_DirExistsAndIsWritable "Директория вывода уже существует и доступна для записи."
 #define MSGTR_VO_CantCreateDirectory "Не могу создать директорию вывода."
 #define MSGTR_VO_CantCreateFile "Не могу создать выходной файл."
 #define MSGTR_VO_DirectoryCreateSuccess "Директория вывода успешно создана."

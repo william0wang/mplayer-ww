@@ -784,7 +784,6 @@ static const char help_text[]=
 #define MSGTR_VO_UnableToAccess "Неможлово отримати доступ"
 #define MSGTR_VO_ExistsButNoDirectory "вже існує, але це не директорія."
 #define MSGTR_VO_DirExistsButNotWritable "Директорія виводу вже існує, але не доступна для запису."
-#define MSGTR_VO_DirExistsAndIsWritable "Директорія виводу вже існує та доступна для запису."
 #define MSGTR_VO_CantCreateDirectory "Не можу створити директорію виводу."
 #define MSGTR_VO_CantCreateFile "Не можу створити файл виводу."
 #define MSGTR_VO_DirectoryCreateSuccess "Директорія виводу успішно створена."

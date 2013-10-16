@@ -895,7 +895,6 @@ static const char help_text[]=
 #define MSGTR_VO_UnableToAccess "无法访问"
 #define MSGTR_VO_ExistsButNoDirectory "已经存在，但不是一个目录。"
 #define MSGTR_VO_DirExistsButNotWritable "输出目录已经存在，但是不可写。"
-#define MSGTR_VO_DirExistsAndIsWritable "输出目录已经存在并且可写。"
 #define MSGTR_VO_CantCreateDirectory "无法创建输出目录。"
 #define MSGTR_VO_CantCreateFile "无法创建输出文件。"
 #define MSGTR_VO_DirectoryCreateSuccess "输出目录创建成功。"

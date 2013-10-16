@@ -800,7 +800,6 @@ static const char help_text[]=
 #define MSGTR_VO_UnableToAccess "Достъпът е невъзможен"
 #define MSGTR_VO_ExistsButNoDirectory "вече съществува, но не е директория."
 #define MSGTR_VO_DirExistsButNotWritable "Директорията съществува, но не е разрешен запис."
-#define MSGTR_VO_DirExistsAndIsWritable "Директорията съществува и е разрешена за запис."
 #define MSGTR_VO_CantCreateDirectory "Директорията не може да бъде създадена."
 #define MSGTR_VO_CantCreateFile "Файлът не може да бъде създаден."
 #define MSGTR_VO_DirectoryCreateSuccess "Директорията е успешно създадена."
