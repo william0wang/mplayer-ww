@@ -227,9 +227,7 @@ static void pnm_mkdir(char *buf, int verbose) {
                     exit_player(EXIT_ERROR);
                 }
 
-                if (strcmp(buf, ".") != 0) {
-                    mp_msg(MSGT_VO, MSGL_INFO, "%s: %s: %s\n", info.short_name, MSGTR_VO_OutputDirectory, buf);
-                }
+                mp_msg(MSGT_VO, MSGL_INFO, "%s: %s: %s\n", info.short_name, MSGTR_VO_OutputDirectory, buf);
                 break;
 
             default:
