@@ -151,6 +151,9 @@ static const struct AVCodecTag mp_bmp_tags[] = {
     { AV_CODEC_ID_DSICINVIDEO,       MKTAG('D', 'C', 'I', 'V') },
     { AV_CODEC_ID_DXA,               MKTAG('D', 'X', 'A', '1') },
     { AV_CODEC_ID_FLIC,              MKTAG('f', 'l', 'i', 'c') },
+#if LIBAVUTIL_VERSION_MICRO >= 100
+    { AV_CODEC_ID_HEVC,              MKTAG('H', 'E', 'V', 'C') },
+#endif
     { AV_CODEC_ID_IDCIN,             MKTAG('I', 'D', 'C', 'I') },
     { AV_CODEC_ID_INTERPLAY_VIDEO,   MKTAG('I', 'N', 'P', 'V') },
     { AV_CODEC_ID_JV,                MKTAG('F', 'F', 'J', 'V') },
