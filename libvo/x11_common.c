@@ -778,7 +778,7 @@ void vo_x11_uninit(void)
         if (vo_window != None)
         {
             XClearWindow(mDisplay, vo_window);
-            if (WinID < 0)
+            if (WinID < 0 && vo_window != mRootWin)
             {
                 XEvent xev;
 
