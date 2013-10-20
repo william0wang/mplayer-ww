@@ -589,7 +589,6 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
 
     if(avformat_find_stream_info(avfc, NULL) < 0){
         mp_msg(MSGT_HEADER,MSGL_ERR,"LAVF_header: av_find_stream_info() failed\n");
-        return NULL;
     }
 
     /* Add metadata. */
