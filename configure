@@ -8520,6 +8520,7 @@ RANLIB     = $_ranlib
 YASM       = $_yasm
 DEPYASM    = $_yasm
 YASMFLAGS  = $YASMFLAGS
+STRIP      = strip
 
 CONFIG_FFPROBE       = no
 CONFIG_LAVFI_INDEV   = no
