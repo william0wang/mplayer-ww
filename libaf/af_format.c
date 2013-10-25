@@ -45,15 +45,15 @@
 #include "af_format_alaw.h"
 
 // Switch endianness
-static void endian(void* in, void* out, int len, int bps);
+static void endian(const void* in, void* out, int len, int bps);
 // From signed to unsigned and the other way
 static void si2us(void* data, int len, int bps);
 // Change the number of bits per sample
-static void change_bps(void* in, void* out, int len, int inbps, int outbps);
+static void change_bps(const void* in, void* out, int len, int inbps, int outbps);
 // From float to int signed
-static void float2int(float* in, void* out, int len, int bps);
+static void float2int(const float* in, void* out, int len, int bps);
 // From signed int to float
-static void int2float(void* in, float* out, int len, int bps);
+static void int2float(const void* in, float* out, int len, int bps);
 
 static af_data_t* play(struct af_instance_s* af, af_data_t* data);
 static af_data_t* play_swapendian(struct af_instance_s* af, af_data_t* data);
@@ -345,7 +345,7 @@ af_info_t af_info_format = {
   af_open
 };
 
-static inline uint32_t load24bit(void* data, int pos) {
+static inline uint32_t load24bit(const void* data, int pos) {
 #if HAVE_BIGENDIAN
   return (((uint32_t)((uint8_t*)data)[3*pos])<<24) |
 	 (((uint32_t)((uint8_t*)data)[3*pos+1])<<16) |
@@ -370,7 +370,7 @@ static inline void store24bit(void* data, int pos, uint32_t expanded_value) {
 }
 
 // Function implementations used by play
-static void endian(void* in, void* out, int len, int bps)
+static void endian(const void* in, void* out, int len, int bps)
 {
   register int i;
   switch(bps){
@@ -413,7 +413,7 @@ static void si2us(void* data, int len, int bps)
   } while (i += bps);
 }
 
-static void change_bps(void* in, void* out, int len, int inbps, int outbps)
+static void change_bps(const void* in, void* out, int len, int inbps, int outbps)
 {
   register int i;
   switch(inbps){
@@ -484,7 +484,7 @@ static void change_bps(void* in, void* out, int len, int inbps, int outbps)
   }
 }
 
-static void float2int(float* in, void* out, int len, int bps)
+static void float2int(const float* in, void* out, int len, int bps)
 {
   float f;
   register int i;
@@ -519,7 +519,7 @@ static void float2int(float* in, void* out, int len, int bps)
   }
 }
 
-static void int2float(void* in, float* out, int len, int bps)
+static void int2float(const void* in, float* out, int len, int bps)
 {
   register int i;
   switch(bps){
