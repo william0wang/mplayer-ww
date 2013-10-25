@@ -175,13 +175,13 @@ static int compute_bitrate(struct mpg123_frameinfo *i)
  * also throw in ID3v2 info which libmpg123 collects anyway. */
 static void print_header_compact(struct mpg123_frameinfo *i)
 {
-    static const char *smodes[5] = {
+    static const char * const smodes[5] = {
         "stereo", "joint-stereo", "dual-channel", "mono", "invalid"
     };
-    static const char *layers[4] = {
+    static const char * const layers[4] = {
         "Unknown", "I", "II", "III"
     };
-    static const char *versions[4] = {
+    static const char * const versions[4] = {
         "1.0", "2.0", "2.5", "x.x"
     };
 
