@@ -255,6 +255,7 @@ static void set_dr_slice_settings(struct AVCodecContext *avctx, const AVCodec *l
     ctx->do_dr1 = (lavc_codec->capabilities & CODEC_CAP_DR1) &&
         lavc_codec->id != AV_CODEC_ID_INTERPLAY_VIDEO &&
         lavc_codec->id != AV_CODEC_ID_H264 &&
+        lavc_codec->id != AV_CODEC_ID_HEVC &&
         lavc_codec->id != AV_CODEC_ID_VP8;
     ctx->nonref_dr = 0;
     // TODO: fix and enable again. This currently causes issues when using filters
