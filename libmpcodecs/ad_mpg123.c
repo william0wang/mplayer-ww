@@ -379,7 +379,7 @@ static int decode_a_bit(sh_audio_t *sh, unsigned char *buf, int count)
  * 1 on success, 0 on error */
 static int reopen_stream(sh_audio_t *sh)
 {
-    struct ad_mpg123_context *con = (struct ad_mpg123_context*) sh->context;
+    struct ad_mpg123_context *con = sh->context;
 
     mpg123_close(con->handle);
     /* No resetting of the context:
@@ -443,7 +443,7 @@ static int init(sh_audio_t *sh)
 
 static void uninit(sh_audio_t *sh)
 {
-    struct ad_mpg123_context *con = (struct ad_mpg123_context*) sh->context;
+    struct ad_mpg123_context *con = sh->context;
 
     mpg123_close(con->handle);
     mpg123_delete(con->handle);
