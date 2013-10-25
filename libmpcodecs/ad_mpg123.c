@@ -84,8 +84,7 @@ static int preinit(sh_audio_t *sh)
     if (mpg123_init() != MPG123_OK)
         return 0;
 
-    sh->context = malloc(sizeof(struct ad_mpg123_context));
-    con = sh->context;
+    sh->context = con = calloc(sizeof(*con), 1);
     /* Auto-choice of optimized decoder (first argument NULL). */
     con->handle = mpg123_new(NULL, &err);
     if (!con->handle)
