@@ -43,7 +43,6 @@
 // Data for specific instances of this filter
 typedef struct af_volume_s
 {
-  int   enable[AF_NCH];		// Enable/disable / channel
   float	max[AF_NCH];		// Max Power level [dB]
   float level[AF_NCH];		// Gain level for each channel
   int soft;			// Enable/disable soft clipping
@@ -83,12 +82,6 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
   case AF_CONTROL_POST_CREATE:
     s->fast = ((((af_cfg_t*)arg)->force & AF_INIT_FORMAT_MASK) ==
       AF_INIT_FLOAT) ? 0 : 1;
-    return AF_OK;
-  case AF_CONTROL_VOLUME_ON_OFF | AF_CONTROL_SET:
-    memcpy(s->enable,(int*)arg,AF_NCH*sizeof(int));
-    return AF_OK;
-  case AF_CONTROL_VOLUME_ON_OFF | AF_CONTROL_GET:
-    memcpy((int*)arg,s->enable,AF_NCH*sizeof(int));
     return AF_OK;
   case AF_CONTROL_VOLUME_SOFTCLIP | AF_CONTROL_SET:
     s->soft = *(int*)arg;
@@ -136,13 +129,11 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
     int16_t*    a   = (int16_t*)c->audio;	// Audio data
     int         len = c->len/2;			// Number of samples
     for(ch = 0; ch < nch ; ch++){
-      if(s->enable[ch]){
 	register int vol = (int)(255.0 * s->level[ch]);
 	for(i=ch;i<len;i+=nch){
 	  register int x = (a[i] * vol) >> 8;
 	  a[i]=av_clip_int16(x);
 	}
-      }
     }
   }
   // Machine is fast and data is floating point
@@ -151,7 +142,6 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
     int       	len 	= c->len/4;		// Number of samples
     for(ch = 0; ch < nch ; ch++){
       // Volume control (fader)
-      if(s->enable[ch]){
 	for(i=ch;i<len;i+=nch){
 	  register float x 	= a[i];
 	  register float pow 	= x*x;
@@ -169,7 +159,6 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 	    x=av_clipf(x,-1.0,1.0);
 	  a[i] = x;
 	}
-      }
     }
   }
   return c;
@@ -188,7 +177,6 @@ static int af_open(af_instance_t* af){
     return AF_ERROR;
   // Enable volume control and set initial volume to 0dB.
   for(i=0;i<AF_NCH;i++){
-    ((af_volume_t*)af->setup)->enable[i] = 1;
     ((af_volume_t*)af->setup)->level[i]  = 1.0;
   }
   return AF_OK;

@@ -156,9 +156,6 @@ typedef struct af_control_ext_s{
 
 // Volume
 
-// Turn volume control on and off, arg is int*
-#define AF_CONTROL_VOLUME_ON_OFF	0x00000B00 | AF_CONTROL_FILTER_SPECIFIC
-
 // Turn soft clipping of the volume on and off, arg is binary
 #define AF_CONTROL_VOLUME_SOFTCLIP	0x00000C00 | AF_CONTROL_FILTER_SPECIFIC
 
