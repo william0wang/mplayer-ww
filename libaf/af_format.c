@@ -494,8 +494,34 @@ static void float2int(const float* in, void* out, int len, int bps)
       ((int8_t *)out)[i] = av_clip_int8(lrintf(128.0f * in[i]));
     break;
   case(2):
+#if HAVE_NEON
+    {
+    const float *in_end = in + len;
+    while (in < in_end - 7) {
+      __asm__(
+          "vld1.32 {q0,q1}, [%0]!\n\t"
+          "vcvt.s32.f32 q0, q0, #31\n\t"
+          "vqrshrn.s32  d0, q0, #15\n\t"
+          "vcvt.s32.f32 q1, q1, #31\n\t"
+          "vqrshrn.s32  d1, q1, #15\n\t"
+          "vst1.16 {q0}, [%1]!\n\t"
+      : "+r"(in), "+r"(out)
+      :: "q0", "q1", "memory");
+    }
+    while (in < in_end) {
+      __asm__(
+          "vld1.32 {d0[0]}, [%0]!\n\t"
+          "vcvt.s32.f32 d0, d0, #31\n\t"
+          "vqrshrn.s32  d0, q0, #15\n\t"
+          "vst1.16 {d0[0]}, [%1]!\n\t"
+      : "+r"(in), "+r"(out)
+      :: "d0", "memory");
+    }
+    }
+#else
     for(i=0;i<len;i++)
       ((int16_t*)out)[i] = av_clip_int16(lrintf(32768.0f * in[i]));
+#endif
     break;
   case(3):
     for(i=0;i<len;i++){
