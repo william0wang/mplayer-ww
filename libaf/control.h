@@ -165,12 +165,6 @@ typedef struct af_control_ext_s{
 // Set volume level, arg is a float* with the volume for all the channels
 #define AF_CONTROL_VOLUME_LEVEL		0x00000D00 | AF_CONTROL_FILTER_SPECIFIC
 
-// Probed power level for all channels, arg is a float*
-#define AF_CONTROL_VOLUME_PROBE		0x00000E00 | AF_CONTROL_FILTER_SPECIFIC
-
-// Maximum probed power level for all channels, arg is a float*
-#define AF_CONTROL_VOLUME_PROBE_MAX	0x00000F00 | AF_CONTROL_FILTER_SPECIFIC
-
 // Compressor/expander
 
 // Turn compressor/expander on and off

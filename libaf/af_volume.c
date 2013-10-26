@@ -25,13 +25,7 @@
    AF_CONTROL_VOLUME_LEVEL.
 
    The filter has support for soft-clipping, it is enabled by
-   AF_CONTROL_VOLUME_SOFTCLIPP. It has also a probing feature which
-   can be used to measure the power in the audio stream, both an
-   instantaneous value and the maximum value can be probed. The
-   probing is enable by AF_CONTROL_VOLUME_PROBE_ON_OFF and is done on a
-   per channel basis. The result from the probing is obtained using
-   AF_CONTROL_VOLUME_PROBE_GET and AF_CONTROL_VOLUME_PROBE_GET_MAX. The
-   probed values are calculated in dB.
+   AF_CONTROL_VOLUME_SOFTCLIPP.
 */
 
 #include <stdio.h>
@@ -50,10 +44,8 @@
 typedef struct af_volume_s
 {
   int   enable[AF_NCH];		// Enable/disable / channel
-  float	pow[AF_NCH];		// Estimated power level [dB]
   float	max[AF_NCH];		// Max Power level [dB]
   float level[AF_NCH];		// Gain level for each channel
-  float time;			// Forgetting factor for power estimate
   int soft;			// Enable/disable soft clipping
   int fast;			// Use fix-point volume control
 }af_volume_t;
@@ -76,11 +68,6 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
       af->data->bps    = 2;
     }
     else{
-      // Cutoff set to 10Hz for forgetting factor
-      float x = 2.0*M_PI*15.0/(float)af->data->rate;
-      float t = 2.0-cos(x);
-      s->time = 1.0 - (t - sqrt(t*t - 1));
-      mp_msg(MSGT_AFILTER, MSGL_DBG2, "[volume] Forgetting factor = %0.5f\n",s->time);
       af->data->format = AF_FORMAT_FLOAT_NE;
       af->data->bps    = 4;
     }
@@ -113,10 +100,6 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     return af_from_dB(AF_NCH,(float*)arg,s->level,20.0,-200.0,60.0);
   case AF_CONTROL_VOLUME_LEVEL | AF_CONTROL_GET:
     return af_to_dB(AF_NCH,s->level,(float*)arg,20.0);
-  case AF_CONTROL_VOLUME_PROBE | AF_CONTROL_GET:
-    return af_to_dB(AF_NCH,s->pow,(float*)arg,10.0);
-  case AF_CONTROL_VOLUME_PROBE_MAX | AF_CONTROL_GET:
-    return af_to_dB(AF_NCH,s->max,(float*)arg,10.0);
   case AF_CONTROL_PRE_DESTROY:{
     float m = 0.0;
     int i;
@@ -169,7 +152,6 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
     for(ch = 0; ch < nch ; ch++){
       // Volume control (fader)
       if(s->enable[ch]){
-	float	t   = 1.0 - s->time;
 	for(i=ch;i<len;i+=nch){
 	  register float x 	= a[i];
 	  register float pow 	= x*x;
@@ -178,12 +160,6 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 	    s->max[ch] = pow;
 	  // Set volume
 	  x *= s->level[ch];
-	  // Peak meter
-	  pow 	= x*x;
-	  if(pow > s->pow[ch])
-	    s->pow[ch] = pow;
-	  else
-	    s->pow[ch] = t*s->pow[ch] + pow*s->time; // LP filter
 	  /* Soft clipping, the sound of a dream, thanks to Jon Wattes
 	     post to Musicdsp.org */
 	  if(s->soft)
