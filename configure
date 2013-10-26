@@ -58,9 +58,9 @@ compile_check() {
   echo >> "$TMPLOG"
   cat "$source" >> "$TMPLOG"
   echo >> "$TMPLOG"
-  echo "$_cc $WARNFLAGS $WARN_CFLAGS $CFLAGS $source $extra_cflags $ld_static $extra_ldflags $libs_mplayer $libs_mencoder -o $TMPEXE $@ -lm" >> "$TMPLOG"
+  echo "$_cc $WARNFLAGS $WARN_CFLAGS $CFLAGS $source $extra_cflags $ld_static $extra_ldflags $libs_mplayer $libs_mencoder -o $TMPEXE $@ $libm" >> "$TMPLOG"
   rm -f "$TMPEXE"
-  $_cc $WARNFLAGS $WARN_CFLAGS $CFLAGS "$source" $extra_cflags $ld_static $extra_ldflags $libs_mplayer $libs_mencoder -o "$TMPEXE" "$@" -lm >> "$TMPLOG" 2>&1
+  $_cc $WARNFLAGS $WARN_CFLAGS $CFLAGS "$source" $extra_cflags $ld_static $extra_ldflags $libs_mplayer $libs_mencoder -o "$TMPEXE" "$@" $libm >> "$TMPLOG" 2>&1
   TMPRES="$?"
   echo >> "$TMPLOG"
   echo >> "$TMPLOG"
@@ -1797,6 +1797,8 @@ TMPEXE="$mplayer_tmpdir/tmp$_exesuf"
 echocheck "working compiler"
 cflag_check "" || die "Compiler is not functioning correctly. Check your installation and custom CFLAGS $CFLAGS ."
 echo "yes"
+
+cflag_check "-lm" && libm="-lm"
 
 if test -z "$_target" ; then
   cat > $TMPC << EOF
@@ -8048,7 +8050,7 @@ else
 fi
 echores "$_dvdnav"
 
-extra_ldflags="$extra_ldflags -lm"
+extra_ldflags="$extra_ldflags $libm"
 
 # DO NOT ADD ANY TESTS THAT USE LINKER FLAGS HERE (like cc_check).
 # Read dvdnav comment above.
@@ -8508,7 +8510,7 @@ ASFLAGS    = \$(CFLAGS)
 AS_DEPFLAGS= $DEPFLAGS
 HOSTCC     = \$(HOST_CC)
 HOSTCFLAGS = $HOSTCFLAGS
-HOSTLIBS   = -lm
+HOSTLIBS   = $libm
 AS_O       = -o \$@
 CC_O       = -o \$@
 CXX_O      = -o \$@
