@@ -26,6 +26,7 @@
 #include <math.h>
 #include <limits.h>
 
+#include "libavutil/common.h"
 #include "af.h"
 
 // Data for specific instances of this filter
@@ -94,7 +95,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     return af_to_ms(AF_NCH,s->release,(float*)arg,af->data->rate);
   case AF_CONTROL_COMP_RATIO | AF_CONTROL_SET:
     for(i=0;i<AF_NCH;i++)
-      s->ratio[i] = clamp(((float*)arg)[i],1.0,10.0);
+      s->ratio[i] = av_clipf(((float*)arg)[i],1.0,10.0);
     return AF_OK;
   case AF_CONTROL_COMP_RATIO | AF_CONTROL_GET:
     for(i=0;i<AF_NCH;i++)

@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "libavutil/common.h"
 #include "mp_msg.h"
 #include "af.h"
 
@@ -49,7 +50,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     if(!arg) return AF_ERROR;
 
     af->data->rate   = ((af_data_t*)arg)->rate;
-    af->data->nch    = max(s->ch+1,((af_data_t*)arg)->nch);
+    af->data->nch    = FFMAX(s->ch+1,((af_data_t*)arg)->nch);
     af->data->format = AF_FORMAT_FLOAT_NE;
     af->data->bps    = 4;
 

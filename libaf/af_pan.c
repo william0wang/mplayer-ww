@@ -25,6 +25,7 @@
 #include <math.h>
 #include <limits.h>
 
+#include "libavutil/common.h"
 #include "mp_msg.h"
 #include "af.h"
 
@@ -123,10 +124,10 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     if (s->nch)
       return AF_ERROR;
     if (af->data->nch >= 2) {
-      s->level[0][0] = min(1.f, 1.f - val);
-      s->level[0][1] = max(0.f, val);
-      s->level[1][0] = max(0.f, -val);
-      s->level[1][1] = min(1.f, 1.f + val);
+      s->level[0][0] = FFMIN(1.f, 1.f - val);
+      s->level[0][1] = FFMAX(0.f, val);
+      s->level[1][0] = FFMAX(0.f, -val);
+      s->level[1][1] = FFMIN(1.f, 1.f + val);
     }
     return AF_OK;
   }

@@ -18,6 +18,7 @@
 
 #include <math.h>
 #include <string.h>
+#include "libavutil/common.h"
 #include "af.h"
 
 /* Convert to gain value from dB. Returns AF_OK if of and AF_ERROR if
@@ -33,7 +34,7 @@ int af_from_dB(int n, float* in, float* out, float k, float mi, float ma)
     if(in[i]<=-200)
       out[i]=0.0;
     else
-      out[i]=pow(10.0,clamp(in[i],mi,ma)/k);
+      out[i]=pow(10.0,av_clipf(in[i],mi,ma)/k);
   }
   return AF_OK;
 }
@@ -65,7 +66,7 @@ int af_from_ms(int n, float* in, int* out, int rate, float mi, float ma)
     return AF_ERROR;
 
   for(i=0;i<n;i++)
-    out[i]=(int)((float)rate * clamp(in[i],mi,ma)/1000.0);
+    out[i]=(int)((float)rate * av_clipf(in[i],mi,ma)/1000.0);
 
   return AF_OK;
 }

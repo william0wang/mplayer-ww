@@ -42,6 +42,7 @@
 #include <math.h>
 #include <limits.h>
 
+#include "libavutil/common.h"
 #include "mp_msg.h"
 #include "af.h"
 
@@ -121,7 +122,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     int i;
     if(!s->fast){
       for(i=0;i<AF_NCH;i++)
-	m=max(m,s->max[i]);
+	m=FFMAX(m,s->max[i]);
 	af_to_dB(1, &m, &m, 10.0);
 	mp_msg(MSGT_AFILTER, MSGL_INFO, "[volume] The maximum volume was %0.2fdB \n", m);
     }
@@ -156,7 +157,7 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 	register int vol = (int)(255.0 * s->level[ch]);
 	for(i=ch;i<len;i+=nch){
 	  register int x = (a[i] * vol) >> 8;
-	  a[i]=clamp(x,SHRT_MIN,SHRT_MAX);
+	  a[i]=av_clip_int16(x);
 	}
       }
     }
@@ -189,7 +190,7 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 	    x=af_softclip(x);
 	  // Hard clipping
 	  else
-	    x=clamp(x,-1.0,1.0);
+	    x=av_clipf(x,-1.0,1.0);
 	  a[i] = x;
 	}
       }
