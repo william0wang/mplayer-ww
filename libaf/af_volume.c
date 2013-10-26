@@ -142,7 +142,7 @@ static void uninit(struct af_instance_s* af)
 static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 {
   af_data_t*    c   = data;			// Current working data
-  af_volume_t*  s   = (af_volume_t*)af->setup; 	// Setup for this instance
+  af_volume_t*  s   = af->setup;		// Setup for this instance
   int           ch  = 0;			// Channel counter
   register int	nch = c->nch;			// Number of channels
   register int  i   = 0;
