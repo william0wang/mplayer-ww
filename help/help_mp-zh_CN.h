@@ -1,4 +1,4 @@
-// Synced with help_mp-en.h rev. 36413
+// Synced with help_mp-en.h rev. 36470
 //
 // Translated by JRaSH <jrash06@gmail.com>
 
@@ -892,6 +892,7 @@ static const char help_text[]=
                 "请尝试在滤镜列表尾部添加缩放滤镜，\n"\
                 "例如，用 -vf spp,scale 代替 -vf spp。\n"
 #define MSGTR_VO_GenericError "该错误已经发生"
+#define MSGTR_VO_OutputDirectory "输出目录"
 #define MSGTR_VO_UnableToAccess "无法访问"
 #define MSGTR_VO_ExistsButNoDirectory "已经存在，但不是一个目录。"
 #define MSGTR_VO_DirExistsButNotWritable "输出目录已经存在，但是不可写。"
