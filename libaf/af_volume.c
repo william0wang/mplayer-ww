@@ -111,6 +111,36 @@ static void uninit(struct af_instance_s* af)
     free(af->setup);
 }
 
+static av_always_inline void s16_inner_loop(int16_t *data, int len, int offset, int step, float level)
+{
+  int i;
+  register int vol = (int)(255.0 * level);
+  for (i = offset; i < len; i += step)
+  {
+    register int x = (data[i] * vol) >> 8;
+    data[i] = av_clip_int16(x);
+  }
+}
+
+static av_always_inline void float_inner_loop(float *data, int len, int offset, int step, float level, int softclip)
+{
+  int i;
+  for (i = offset; i < len; i += step)
+  {
+    register float x = data[i];
+    // Set volume
+    x *= level;
+    /* Soft clipping, the sound of a dream, thanks to Jon Wattes
+       post to Musicdsp.org */
+    if (softclip)
+      x = af_softclip(x);
+    // Hard clipping
+    else
+      x = av_clipf(x,-1.0,1.0);
+    data[i] = x;
+  }
+}
+
 // Filter data through filter
 static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 {
@@ -119,18 +149,20 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
   int           ch  = 0;			// Channel counter
   register int	nch = c->nch;			// Number of channels
   register int  i   = 0;
+  int same_vol = 1;
 
+  for (ch = 1; ch < nch; ch++)
+  {
+    same_vol &= s->level[ch] == s->level[ch - 1];
+  }
   // Basic operation volume control only (used on slow machines)
   if(af->data->format == (AF_FORMAT_S16_NE)){
     int16_t*    a   = (int16_t*)c->audio;	// Audio data
     int         len = c->len/2;			// Number of samples
-    for(ch = 0; ch < nch ; ch++){
-	register int vol = (int)(255.0 * s->level[ch]);
-	for(i=ch;i<len;i+=nch){
-	  register int x = (a[i] * vol) >> 8;
-	  a[i]=av_clip_int16(x);
-	}
-    }
+    if (same_vol)
+      s16_inner_loop(a, len, 0, 1, s->level[0]);
+    else for (ch = 0; ch < nch; ch++)
+      s16_inner_loop(a, len, ch, nch, s->level[ch]);
   }
   // Machine is fast and data is floating point
   else if(af->data->format == (AF_FORMAT_FLOAT_NE)){
@@ -139,22 +171,12 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
     for (i = 0; !s->fast && i < len; i++)
       // Check maximum power value
       s->max = FFMAX(s->max, a[i] * a[i]);
-    for(ch = 0; ch < nch ; ch++){
-      // Volume control (fader)
-	for(i=ch;i<len;i+=nch){
-	  register float x 	= a[i];
-	  // Set volume
-	  x *= s->level[ch];
-	  /* Soft clipping, the sound of a dream, thanks to Jon Wattes
-	     post to Musicdsp.org */
-	  if(s->soft)
-	    x=af_softclip(x);
-	  // Hard clipping
-	  else
-	    x=av_clipf(x,-1.0,1.0);
-	  a[i] = x;
-	}
-    }
+    if (same_vol && s->soft)
+      float_inner_loop(a, len, 0, 1, s->level[0], 1);
+    else if (same_vol)
+      float_inner_loop(a, len, 0, 1, s->level[0], 0);
+    else for (ch = 0; ch < nch; ch++)
+      float_inner_loop(a, len, ch, nch, s->level[ch], s->soft);
   }
   return c;
 }
