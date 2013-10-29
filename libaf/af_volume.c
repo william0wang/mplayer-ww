@@ -43,7 +43,7 @@
 // Data for specific instances of this filter
 typedef struct af_volume_s
 {
-  float	max[AF_NCH];		// Max Power level [dB]
+  float	max;			// Max Power level [dB]
   float level[AF_NCH];		// Gain level for each channel
   int soft;			// Enable/disable soft clipping
   int fast;			// Use fix-point volume control
@@ -93,17 +93,13 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     return af_from_dB(AF_NCH,(float*)arg,s->level,20.0,-200.0,60.0);
   case AF_CONTROL_VOLUME_LEVEL | AF_CONTROL_GET:
     return af_to_dB(AF_NCH,s->level,(float*)arg,20.0);
-  case AF_CONTROL_PRE_DESTROY:{
-    float m = 0.0;
-    int i;
+  case AF_CONTROL_PRE_DESTROY:
     if(!s->fast){
-      for(i=0;i<AF_NCH;i++)
-	m=FFMAX(m,s->max[i]);
+	float m = s->max;
 	af_to_dB(1, &m, &m, 10.0);
 	mp_msg(MSGT_AFILTER, MSGL_INFO, "[volume] The maximum volume was %0.2fdB \n", m);
     }
     return AF_OK;
-  }
   }
   return AF_UNKNOWN;
 }
@@ -140,14 +136,13 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
   else if(af->data->format == (AF_FORMAT_FLOAT_NE)){
     float*   	a   	= (float*)c->audio;	// Audio data
     int       	len 	= c->len/4;		// Number of samples
+    for (i = 0; !s->fast && i < len; i++)
+      // Check maximum power value
+      s->max = FFMAX(s->max, a[i] * a[i]);
     for(ch = 0; ch < nch ; ch++){
       // Volume control (fader)
 	for(i=ch;i<len;i+=nch){
 	  register float x 	= a[i];
-	  register float pow 	= x*x;
-	  // Check maximum power value
-	  if(pow > s->max[ch])
-	    s->max[ch] = pow;
 	  // Set volume
 	  x *= s->level[ch];
 	  /* Soft clipping, the sound of a dream, thanks to Jon Wattes
