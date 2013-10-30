@@ -778,7 +778,7 @@ void vo_x11_uninit(void)
         if (vo_window != None)
         {
             XClearWindow(mDisplay, vo_window);
-            if (WinID < 0)
+            if (WinID < 0 && vo_window != mRootWin)
             {
                 XEvent xev;
 
@@ -826,45 +826,29 @@ err:
     return 0;
 }
 
-int vo_x11_check_events(Display * mydisplay)
+static int handle_x11_event(Display *mydisplay, XEvent *event)
 {
-    int ret = 0;
-    XEvent Event;
+    int key = 0;
     uint8_t buf[16] = {0};
     KeySym keySym;
     static XComposeStatus stat;
     static int ctrl_state;
-
-    if (vo_mouse_autohide && mouse_waiting_hide &&
-                                 (GetTimerMS() - mouse_timer >= 1000)) {
-        vo_hidecursor(mydisplay, vo_window);
-        mouse_waiting_hide = 0;
-    }
-
-    if (WinID > 0)
-        ret |= check_resize();
-    while (XPending(mydisplay))
-    {
-        XNextEvent(mydisplay, &Event);
 #ifdef CONFIG_GUI
         if (use_gui)
         {
-            gui(GUI_HANDLE_X_EVENT, &Event);
-            if (vo_window != Event.xany.window)
-                continue;
+            gui(GUI_HANDLE_X_EVENT, event);
+            if (vo_window != event->xany.window)
+                return 0;
         }
 #endif
-//       printf("\rEvent.type=%X  \n",Event.type);
-        switch (Event.type)
+        switch (event->type)
         {
             case Expose:
-                ret |= VO_EVENT_EXPOSE;
-                break;
+                return VO_EVENT_EXPOSE;
             case ConfigureNotify:
                 if (vo_window == None)
                     break;
-                ret |= check_resize();
-                break;
+                return check_resize();
             case KeyPress:
             case KeyRelease:
                 {
@@ -874,7 +858,7 @@ int vo_x11_check_events(Display * mydisplay)
                     if ( use_gui ) { break; }
 #endif
 
-                    XLookupString(&Event.xkey, buf, sizeof(buf), &keySym,
+                    XLookupString(&event->xkey, buf, sizeof(buf), &keySym,
                                   &stat);
                     key =
                         ((keySym & 0xff00) !=
@@ -882,18 +866,18 @@ int vo_x11_check_events(Display * mydisplay)
                     utf8 = buf[0] > 0xc0 ? to_utf8(buf) : 0;
                     if (utf8) key = 0;
                     if (key == wsLeftCtrl || key == wsRightCtrl) {
-                        ctrl_state = Event.type == KeyPress;
+                        ctrl_state = event->type == KeyPress;
                         mplayer_put_key(KEY_CTRL |
                             (ctrl_state ? MP_KEY_DOWN : 0));
-                    } else if (Event.type == KeyRelease) {
+                    } else if (event->type == KeyRelease) {
                         break;
                     }
                     // Attempt to fix if somehow our state got out of
                     // sync with reality.
                     // This usually happens when a shortcut involving CTRL
                     // was used to switch to a different window/workspace.
-                    if (ctrl_state != !!(Event.xkey.state & 4)) {
-                        ctrl_state = !!(Event.xkey.state & 4);
+                    if (ctrl_state != !!(event->xkey.state & 4)) {
+                        ctrl_state = !!(event->xkey.state & 4);
                         mplayer_put_key(KEY_CTRL |
                             (ctrl_state ? MP_KEY_DOWN : 0));
                     }
@@ -901,59 +885,32 @@ int vo_x11_check_events(Display * mydisplay)
                         if (utf8) mplayer_put_key(utf8);
                         else vo_x11_putkey(key);
                     }
-                    ret |= VO_EVENT_KEYPRESS;
+                    return VO_EVENT_KEYPRESS;
                 }
                 break;
             case MotionNotify:
-                vo_mouse_movement(Event.xmotion.x, Event.xmotion.y);
+                vo_mouse_movement(event->xmotion.x, event->xmotion.y);
 
-                if (vo_mouse_autohide)
-                {
-                    vo_showcursor(mydisplay, vo_window);
-                    mouse_waiting_hide = 1;
-                    mouse_timer = GetTimerMS();
-                }
-                break;
+                return VO_EVENT_MOUSE;
             case ButtonPress:
-                if (vo_mouse_autohide)
-                {
-                    vo_showcursor(mydisplay, vo_window);
-                    mouse_waiting_hide = 1;
-                    mouse_timer = GetTimerMS();
-                }
-#ifdef CONFIG_GUI
-                // Ignore mouse button 1-3 under GUI.
-                if (use_gui && (Event.xbutton.button >= 1)
-                    && (Event.xbutton.button <= 3))
-                    break;
-#endif
-                mplayer_put_key((MOUSE_BTN0 + Event.xbutton.button -
-                                 1) | MP_KEY_DOWN);
-                break;
+                key = MP_KEY_DOWN;
             case ButtonRelease:
-                if (vo_mouse_autohide)
-                {
-                    vo_showcursor(mydisplay, vo_window);
-                    mouse_waiting_hide = 1;
-                    mouse_timer = GetTimerMS();
-                }
 #ifdef CONFIG_GUI
                 // Ignore mouse button 1-3 under GUI.
-                if (use_gui && (Event.xbutton.button >= 1)
-                    && (Event.xbutton.button <= 3))
-                    break;
+                if (use_gui && (event->xbutton.button >= 1)
+                    && (event->xbutton.button <= 3))
+                    return VO_EVENT_MOUSE;
 #endif
-                mplayer_put_key(MOUSE_BTN0 + Event.xbutton.button - 1);
-                break;
+                key |= MOUSE_BTN0 + event->xbutton.button - 1;
+                mplayer_put_key(key);
+                return VO_EVENT_MOUSE;
             case PropertyNotify:
                 {
                     char *name =
-                        XGetAtomName(mydisplay, Event.xproperty.atom);
+                        XGetAtomName(mydisplay, event->xproperty.atom);
 
                     if (!name)
                         break;
-
-//          fprintf(stderr,"[ws] PropertyNotify ( 0x%x ) %s ( 0x%x )\n",vo_window,name,Event.xproperty.atom );
 
                     XFree(name);
                 }
@@ -970,11 +927,37 @@ int vo_x11_check_events(Display * mydisplay)
                 mplayer_put_key(KEY_CLOSE_WIN);
                 break;
 	    case ClientMessage:
-                if (Event.xclient.message_type == XAWM_PROTOCOLS &&
-                    Event.xclient.data.l[0] == XAWM_DELETE_WINDOW)
+                if (event->xclient.message_type == XAWM_PROTOCOLS &&
+                    event->xclient.data.l[0] == XAWM_DELETE_WINDOW)
                     mplayer_put_key(KEY_CLOSE_WIN);
                 break;
         }
+        return 0;
+}
+
+int vo_x11_check_events(Display * mydisplay)
+{
+    int ret = 0;
+    XEvent Event;
+
+    if (vo_mouse_autohide && mouse_waiting_hide &&
+                                 (GetTimerMS() - mouse_timer >= 1000)) {
+        vo_hidecursor(mydisplay, vo_window);
+        mouse_waiting_hide = 0;
+    }
+
+    if (WinID > 0)
+        ret |= check_resize();
+    while (XPending(mydisplay))
+    {
+        XNextEvent(mydisplay, &Event);
+        ret |= handle_x11_event(mydisplay, &Event);
+    }
+    if (vo_mouse_autohide && (ret & VO_EVENT_MOUSE))
+    {
+        vo_showcursor(mydisplay, vo_window);
+        mouse_waiting_hide = 1;
+        mouse_timer = GetTimerMS();
     }
     return ret;
 }
@@ -1117,6 +1100,16 @@ void vo_x11_create_vo_window(XVisualInfo *vis, int x, int y,
                              Colormap col_map,
                              const char *classname, const char *title)
 {
+  if (flags & VOFLAG_HIDDEN) {
+    // unmapped windows cause lots of issues, in particular
+    // -geometry might be ignore when finally mapping them etc.
+    if (vo_window == None)
+      vo_window = mRootWin;
+    window_state = VOFLAG_HIDDEN;
+    goto final;
+  } else if (vo_window == mRootWin && (window_state & VOFLAG_HIDDEN)) {
+    vo_window = None;
+  }
   if (vo_wintitle)
     title = vo_wintitle;
   if (WinID >= 0) {
@@ -1155,8 +1148,6 @@ void vo_x11_create_vo_window(XVisualInfo *vis, int x, int y,
                       x, y, width, height, vis->depth, col_map);
     window_state = VOFLAG_HIDDEN;
   }
-  if (flags & VOFLAG_HIDDEN)
-    goto final;
   XStoreName(mDisplay, vo_window, title);
   XChangeProperty(mDisplay, vo_window, XA_NET_WM_NAME, XAUTF8_STRING,
                   8, PropModeReplace, title, strlen(title));
@@ -1179,10 +1170,9 @@ void vo_x11_create_vo_window(XVisualInfo *vis, int x, int y,
     // wait for map
     do {
       XNextEvent(mDisplay, &xev);
+      handle_x11_event(mDisplay, &xev);
     } while (xev.type != MapNotify || xev.xmap.event != vo_window);
     vo_x11_clearwindow(mDisplay, vo_window);
-    XSelectInput(mDisplay, vo_window, NoEventMask);
-    XSync(mDisplay, False);
     vo_x11_selectinput_witherr(mDisplay, vo_window,
           StructureNotifyMask | KeyPressMask | KeyReleaseMask | PointerMotionMask |
           ButtonPressMask | ButtonReleaseMask | ExposureMask);

@@ -73,7 +73,7 @@ void vo_osx_uninit(void)
 
 int vo_osx_config(uint32_t width, uint32_t height, uint32_t flags)
 {
-    [oglv config:width:height:flags];
+    [oglv configWidth:width height:height flags:flags];
     return 1;
 }
 
@@ -183,8 +183,10 @@ void vo_osx_swap_buffers(void)
 	[super dealloc];
 }
 
-- (void) config:(uint32_t)width:(uint32_t)height:(uint32_t)flags
+- (void) configWidth:(uint32_t)width height:(uint32_t)height flags:(uint32_t)flags
 {
+	if (flags & VOFLAG_HIDDEN)
+		return;
 	config_movie_aspect((float)width/height);
 
 	vo_dwidth  = width  *= self->winSizeMult;
@@ -212,9 +214,8 @@ void vo_osx_swap_buffers(void)
 
 	[self ontop];
 
-	if (!(flags & VOFLAG_HIDDEN))
-		//show window
-		[window makeKeyAndOrderFront:self];
+	//show window
+	[window makeKeyAndOrderFront:self];
 }
 
 - (void) drawRect: (NSRect *) bounds

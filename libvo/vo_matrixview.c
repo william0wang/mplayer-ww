@@ -50,19 +50,6 @@ const LIBVO_EXTERN(matrixview)
 
 static MPGLContext glctx;
 
-#ifdef CONFIG_GL_X11
-static int wsGLXAttrib[] = {
-    GLX_RGBA,
-    GLX_RED_SIZE,1,
-    GLX_GREEN_SIZE,1,
-    GLX_BLUE_SIZE,1,
-    GLX_DEPTH_SIZE,1,
-    GLX_DOUBLEBUFFER,
-    None
-};
-#endif
-
-static int int_pause;
 static int eq_contrast;
 static int eq_brightness;
 static uint32_t image_width;
@@ -104,6 +91,11 @@ static void brightness_set(int value)
     matrixview_brightness_set(brightness);
 }
 
+static void resize(void)
+{
+    matrixview_reshape(vo_dwidth, vo_dheight);
+    flip_page();
+}
 
 static int config(uint32_t width, uint32_t height,
                   uint32_t d_width, uint32_t d_height,
@@ -113,28 +105,8 @@ static int config(uint32_t width, uint32_t height,
     image_width  = width;
     image_format = format;
 
-    int_pause = 0;
-
-#ifdef CONFIG_GL_WIN32
-    if (glctx.type == GLTYPE_W32 && !vo_w32_config(d_width, d_height, flags))
+    if (mpglcontext_create_window(&glctx, d_width, d_height, flags, title) < 0)
         return -1;
-#endif
-#ifdef CONFIG_GL_X11
-    if (glctx.type == GLTYPE_X11) {
-        XVisualInfo *vinfo=glXChooseVisual( mDisplay,mScreen,wsGLXAttrib );
-        if (vinfo == NULL) {
-            mp_msg(MSGT_VO, MSGL_ERR, "[matrixview] no GLX support present\n");
-            return -1;
-        }
-        mp_msg(MSGT_VO, MSGL_V, "[matrixview] GLX chose visual with ID 0x%x\n",
-               (int)vinfo->visualid);
-
-        vo_x11_create_vo_window(vinfo, vo_dx, vo_dy, d_width, d_height, flags,
-                                XCreateColormap(mDisplay, mRootWin,
-                                                vinfo->visual, AllocNone),
-                                "matrixview", title);
-    }
-#endif /* CONFIG_GL_WIN32 */
     if (glctx.setGlWindow(&glctx) == SET_WINDOW_FAILED)
         return -1;
 
@@ -159,6 +131,10 @@ static int config(uint32_t width, uint32_t height,
     contrast_set(eq_contrast);
     brightness_set(eq_brightness);
     matrixview_reshape(vo_dwidth, vo_dheight);
+
+#ifdef CONFIG_GL_OSX
+    vo_osx_redraw_func = resize;
+#endif
     return 0;
 }
 
@@ -167,9 +143,8 @@ static void check_events(void)
 {
     int e = glctx.check_events();
     if (e & VO_EVENT_RESIZE) {
-        matrixview_reshape(vo_dwidth, vo_dheight);
-    }
-    if (e & VO_EVENT_EXPOSE && int_pause)
+        resize();
+    } else if (e & VO_EVENT_EXPOSE)
         flip_page();
 }
 
@@ -182,7 +157,10 @@ static void draw_osd(void)
 
 static void flip_page(void)
 {
-    matrixview_draw(vo_dwidth, vo_dheight, GetTimer(), 0.0, map_image[0]);
+    matrixview_draw(GetTimer(), map_image[0]);
+    // Needed at least on PPC Mac Mini on OSX. Should not hurt
+    // much to do always.
+    mpglFlush();
     glctx.swapGlBuffers(&glctx);
 }
 
@@ -244,10 +222,7 @@ static const opt_t subopts[] =
 
 static int preinit(const char *arg)
 {
-    enum MPGLType gltype = GLTYPE_X11;
-#ifdef CONFIG_GL_WIN32
-    gltype = GLTYPE_W32;
-#endif
+    enum MPGLType gltype = GLTYPE_AUTO;
     if (!init_mpglcontext(&glctx, gltype))
         return -1;
 
@@ -280,10 +255,6 @@ static int preinit(const char *arg)
 static int control(uint32_t request, void *data)
 {
     switch (request) {
-    case VOCTRL_PAUSE:
-    case VOCTRL_RESUME:
-        int_pause = (request == VOCTRL_PAUSE);
-        return VO_TRUE;
     case VOCTRL_QUERY_FORMAT:
         return query_format(*(uint32_t*)data);
     case VOCTRL_ONTOP:
@@ -291,7 +262,7 @@ static int control(uint32_t request, void *data)
         return VO_TRUE;
     case VOCTRL_FULLSCREEN:
         glctx.fullscreen();
-        matrixview_reshape(vo_dwidth, vo_dheight);
+        resize();
         return VO_TRUE;
     case VOCTRL_BORDER:
         glctx.border();

@@ -326,6 +326,7 @@ const m_option_t common_opts[] = {
 
 // ------------------------- stream options --------------------
 
+    {"chapter", parse_chapter_range, CONF_TYPE_FUNC_PARAM, 0, 0, 0, NULL},
 #ifdef CONFIG_STREAM_CACHE
     {"cache", &stream_cache_size, CONF_TYPE_INT, CONF_RANGE, 32, 0x7fffffff, NULL},
     {"nocache", &stream_cache_size, CONF_TYPE_FLAG, 0, 1, 0, NULL},
@@ -343,7 +344,6 @@ const m_option_t common_opts[] = {
     {"dvd-speed", &dvd_speed, CONF_TYPE_INT, 0, 0, 0, NULL},
     {"dvd", "-dvd N has been removed, use dvd://N instead.\n" , CONF_TYPE_PRINT, 0, 0, 0, NULL},
     {"dvdangle", &dvd_angle, CONF_TYPE_INT, CONF_RANGE, 1, 99, NULL},
-    {"chapter", dvd_parse_chapter_range, CONF_TYPE_FUNC_PARAM, 0, 0, 0, NULL},
 #else
     {"dvd-device", "MPlayer was compiled without libdvdread support.\n", CONF_TYPE_PRINT, 0, 0, 0, NULL},
     {"dvd-speed", "MPlayer was compiled without libdvdread support.\n", CONF_TYPE_PRINT, 0, 0, 0, NULL},
@@ -352,10 +352,9 @@ const m_option_t common_opts[] = {
     {"bluray-device",  &bluray_device,  CONF_TYPE_STRING, 0,          0,  0, NULL},
 #ifdef CONFIG_LIBBLURAY
     {"bluray-angle",   &bluray_angle,   CONF_TYPE_INT,    CONF_RANGE, 0, 999, NULL},
-    {"bluray-chapter", &bluray_chapter, CONF_TYPE_INT,    CONF_RANGE, 0, 999, NULL},
+    {"bluray-chapter", "The -bluray-chapter option was broken and thus removed, use -chapter instead.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
 #else
     {"bluray-angle",   "MPlayer was compiled without libbluray support.\n", CONF_TYPE_PRINT, 0, 0, 0, NULL},
-    {"bluray-chapter", "MPlayer was compiled without libbluray support.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
 #endif /* CONFIG_LIBBLURAY */
     {"alang", &audio_lang, CONF_TYPE_STRING, 0, 0, 0, NULL},
     {"slang", &dvdsub_lang, CONF_TYPE_STRING, 0, 0, 0, NULL},
@@ -395,21 +394,10 @@ const m_option_t common_opts[] = {
 
 #ifdef CONFIG_LIVE555
     {"sdp", "-sdp has been removed, use sdp://file instead.\n", CONF_TYPE_PRINT, 0, 0, 0, NULL},
-    {"rtsp-stream-over-http", &rtsp_transport_http, CONF_TYPE_FLAG, 0, 0, 1, NULL},
-#else
-    {"rtsp-stream-over-http", "-rtsp-stream-over-http requires the \"LIVE555 Streaming Media\" library.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
 #endif /* CONFIG_LIVE555 */
-#if defined(CONFIG_LIBNEMESI) || defined(CONFIG_LIVE555)
-    // -rtsp-stream-over-tcp option, specifying TCP streaming of RTP/RTCP
+    {"rtsp-stream-over-http", &rtsp_transport_http, CONF_TYPE_FLAG, 0, 0, 1, NULL},
     {"rtsp-stream-over-tcp", &rtsp_transport_tcp, CONF_TYPE_FLAG, 0, 0, 1, NULL},
-#else
-    {"rtsp-stream-over-tcp", "-rtsp-stream-over-tcp requires the \"LIVE555 Streaming Media\" or \"libnemesi\" libraries.\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
-#endif /* defined(CONFIG_LIBNEMESI) || defined(CONFIG_LIVE555) */
-#ifdef CONFIG_LIBNEMESI
     {"rtsp-stream-over-sctp", &rtsp_transport_sctp, CONF_TYPE_FLAG, 0, 0, 1, NULL},
-#else
-    {"rtsp-stream-over-sctp", "-rtsp-stream-over-sctp requires the \"libnemesi\" library\n", CONF_TYPE_PRINT, CONF_NOCFG, 0, 0, NULL},
-#endif /* CONFIG_LIBNEMESI */
 #ifdef CONFIG_NETWORKING
     {"rtsp-port", &rtsp_port, CONF_TYPE_INT, CONF_RANGE, -1, 65535, NULL},
     {"rtsp-destination", &rtsp_destination, CONF_TYPE_STRING, CONF_MIN, 0, 0, NULL},
@@ -556,7 +544,7 @@ const m_option_t common_opts[] = {
     {"ssf", scaler_filter_conf, CONF_TYPE_SUBCONFIG, 0, 0, 0, NULL},
     {"zoom", &softzoom, CONF_TYPE_FLAG, 0, 0, 1, NULL},
     {"nozoom", &softzoom, CONF_TYPE_FLAG, 0, 1, 0, NULL},
-    {"aspect", &movie_aspect, CONF_TYPE_FLOAT, CONF_RANGE, -1, 10.0, NULL},
+    {"aspect", &movie_aspect, CONF_TYPE_FLOAT, CONF_RANGE, 0.01, 10.0, NULL},
     {"noaspect", &movie_aspect, CONF_TYPE_FLAG, 0, 0, 0, NULL},
     {"xy", &screen_size_xy, CONF_TYPE_FLOAT, CONF_RANGE, 0.001, 4096, NULL},
 

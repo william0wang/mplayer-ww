@@ -970,7 +970,6 @@ static const char help_text[]=
 #define MSGTR_VO_UnableToAccess "Erişilemiyor"
 #define MSGTR_VO_ExistsButNoDirectory "zaten var, ancak bir dizin değil."
 #define MSGTR_VO_DirExistsButNotWritable "Çıktı dizini zaten var, ancak yazılabilir değil."
-#define MSGTR_VO_DirExistsAndIsWritable " Çıktı dizini zaten var ve yazılabilir."
 #define MSGTR_VO_CantCreateDirectory "Çıktı dizini oluşturulamıyor."
 #define MSGTR_VO_CantCreateFile "Çıktı dosyası oluşturulamıyor."
 #define MSGTR_VO_DirectoryCreateSuccess "Çıktı dizini başarıyla oluşturuldu."

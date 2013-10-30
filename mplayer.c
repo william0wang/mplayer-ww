@@ -449,6 +449,8 @@ extern int set_playlist_mpctx(MPContext *mpctx_in);
 extern int playtree_update(MPContext * mpctx);
 extern void getFindname(const char *name, char *ret);
 
+static int allow_playlist_parsing;
+
 /* This header requires all the global variable declarations. */
 #include "cfg-mplayer.h"
 
@@ -2653,7 +2655,7 @@ static int generate_video_frame(sh_video_t *sh_video, demux_stream_t *d_video)
     double pts;
 
     while (1) {
-        int drop_frame = check_framedrop(sh_video->frametime);
+        int drop_frame = 0;
         void *decoded_frame;
         current_module = "decode video";
         // XXX Time used in this call is not counted in any performance
@@ -2668,8 +2670,8 @@ static int generate_video_frame(sh_video_t *sh_video, demux_stream_t *d_video)
             start   = NULL;
             pts     = MP_NOPTS_VALUE;
             hit_eof = 1;
-            drop_frame = 0;
-        }
+        } else
+	    drop_frame = check_framedrop(sh_video->frametime);
         if (in_size > max_framesize)
             max_framesize = in_size;
         current_module = "decode video";
@@ -3301,6 +3303,13 @@ err_out:
     return 0;
 }
 
+static void advance_timer(double amount)
+{
+    mpctx->sh_video->timer += amount;
+    if (mpctx->sh_audio)
+        mpctx->delay -= amount;
+}
+
 static double update_video(int *blit_frame)
 {
     sh_video_t *const sh_video = mpctx->sh_video;
@@ -3364,9 +3373,7 @@ static double update_video(int *blit_frame)
                 return -1;
 
             if (full_frame) {
-                sh_video->timer += frame_time;
-                if (mpctx->sh_audio)
-                    mpctx->delay -= frame_time;
+                advance_timer(frame_time);
                 // video_read_frame can change fps (e.g. for ASF video)
                 vo_fps = sh_video->fps;
                 update_subtitles(sh_video, sh_video->pts, mpctx->d_sub, 0);
@@ -3408,9 +3415,7 @@ static double update_video(int *blit_frame)
         if (!frame_time)
             frame_time = sh_video->frametime;
         sh_video->last_pts = sh_video->pts;
-        sh_video->timer   += frame_time;
-        if (mpctx->sh_audio)
-            mpctx->delay -= frame_time;
+        advance_timer(frame_time);
         *blit_frame = res > 0;
     }
     return frame_time;
@@ -3471,7 +3476,6 @@ static void pause_loop(void)
             mpctx->video_out->check_events();
 #ifdef CONFIG_GUI
         if (use_gui) {
-            gui(GUI_HANDLE_EVENTS, 0);
             gui(GUI_REDRAW, 0);
             if (guiInfo.Playing != GUI_PAUSE || (rel_seek_secs || abs_seek_pos))
                 break;
@@ -4073,7 +4077,6 @@ play_next_file:
         while (guiInfo.Playing != GUI_PLAY) {
             mp_cmd_t *cmd;
             usec_sleep(20000);
-            gui(GUI_HANDLE_EVENTS, 0);
             gui(GUI_REDRAW, 0);
             if ((cmd = mp_input_get_cmd(0, 0, 0)) != NULL) {
                 if (cmd->id == MP_CMD_GUI)
@@ -4274,8 +4277,12 @@ goto_re_open_stream:
         current_module = "handle_playlist";
         mp_msg(MSGT_CPLAYER, MSGL_V, "Parsing playlist %s...\n",
                filename_recode(filename));
-        entry      = parse_playtree(mpctx->stream, use_gui);
-        mpctx->eof = playtree_add_playlist(entry);
+        if (allow_playlist_parsing) {
+            entry      = parse_playtree(mpctx->stream, use_gui);
+            mpctx->eof = playtree_add_playlist(entry);
+        } else {
+            mp_msg(MSGT_CPLAYER, MSGL_ERR, "Playlist parsing disabled for security reasons. Ignoring file.\n");
+        }
         goto goto_next_file;
     }
     mpctx->stream->start_pos += seek_to_byte;
@@ -4333,6 +4340,15 @@ goto_re_open_stream:
         if (dvdsub_lang && dvdsub_id == -1)
             dvdsub_id = bd_sid_from_lang(mpctx->stream, dvdsub_lang);
     }
+
+#ifdef CONFIG_LIBBLURAY
+    if (mpctx->stream->type == STREAMTYPE_BLURAY) {
+        if (audio_lang && audio_id == -1)
+            audio_id = bluray_id_from_lang(mpctx->stream, stream_ctrl_audio, audio_lang);
+        if (dvdsub_lang && dvdsub_id == -1)
+            dvdsub_id = bluray_id_from_lang(mpctx->stream, stream_ctrl_sub, dvdsub_lang);
+    }
+#endif
 
 #ifdef CONFIG_DVDREAD
     if (mpctx->stream->type == STREAMTYPE_DVD) {
@@ -4790,6 +4806,8 @@ goto_enable_cache:
             reinit_audio_chain();
             if (mpctx->sh_audio && mpctx->sh_audio->codec)
                 mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_AUDIO_CODEC=%s\n", mpctx->sh_audio->codec->name);
+            if (mpctx->audio_out)
+                mpctx->audio_out->control(AOCONTROL_FILENAME, (void *)mp_basename(filename));
         }
 
         current_module = "av_init";
@@ -4968,6 +4986,8 @@ goto_enable_cache:
                     if (frame_time < 0) {
                         // if we have no more video, sleep some arbitrary time
                         frame_time = 1.0 / 20.0;
+                        // Ensure vo_pts is updated so that ao_pcm will not hang.
+                        advance_timer(frame_time);
                         // only stop playing when audio is at end as well
                         if (!mpctx->sh_audio || mpctx->d_audio->eof)
                             mpctx->eof = 1;
@@ -4982,11 +5002,6 @@ goto_enable_cache:
 
 //    current_module="draw_osd";
 //    if(vo_config_count) mpctx->video_out->draw_osd();
-
-#ifdef CONFIG_GUI
-                if (use_gui)
-                    gui(GUI_HANDLE_EVENTS, 0);
-#endif
 
                 current_module = "vo_check_events";
                 if (vo_config_count)
@@ -5188,7 +5203,6 @@ goto_enable_cache:
 
 #ifdef CONFIG_GUI
             if (use_gui) {
-                gui(GUI_HANDLE_EVENTS, 0);
                 if (mpctx->demuxer->file_format == DEMUXER_TYPE_AVI && mpctx->sh_video && mpctx->sh_video->video.dwLength > 2) {
                     // get pos from frame number / total frames
                     guiInfo.Position = (float)mpctx->d_video->pack_no * 100.0f / mpctx->sh_video->video.dwLength;

@@ -32,6 +32,7 @@
 #include "help_mp.h"
 #include "m_config.h"
 #include "mpcommon.h"
+#include "codec-cfg.h"
 
 #include "libvo/fastmemcpy.h"
 
@@ -55,6 +56,11 @@
 #include "av_helpers.h"
 #endif
 #include "libavutil/avstring.h"
+
+// Options shared between demuxers
+int rtsp_transport_http = 0;
+int rtsp_transport_tcp = 0;
+int rtsp_transport_sctp = 0;
 
 // This is quite experimental, in particular it will mess up the pts values
 // in the queue - on the other hand it might fix some issues like generating
@@ -571,6 +577,8 @@ static void get_parser(sh_common_t *sh, AVCodecContext **avctx, AVCodecParserCon
         return;
 
     allocate_parser(avctx, parser, sh->format);
+    if (!*parser && sh->codec) // fallback to support forcing a codec
+        allocate_parser(avctx, parser, sh->codec->fourcc[0]);
     sh->avctx  = *avctx;
     sh->parser = *parser;
 }

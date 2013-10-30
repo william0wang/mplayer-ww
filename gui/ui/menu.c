@@ -130,6 +130,7 @@ void uiMenuDone( void )
 {
   nfree(menuDrawBuffer);
   wsWindowDestroy(&guiApp.menuWindow);
+  wsEvents();
 }
 
 void uiMenuShow( int mx,int my )
@@ -177,6 +178,6 @@ void uiMenuHide( int mx,int my,int w )
         guiApp.menuItems[i].x+guiApp.menuItems[i].width,
         guiApp.menuItems[i].y+guiApp.menuItems[i].height ) )
    {
-    uiEvent( guiApp.menuItems[i].message,(float)w );
+    uiEvent( guiApp.menuItems[i].message,w );
    }
 }

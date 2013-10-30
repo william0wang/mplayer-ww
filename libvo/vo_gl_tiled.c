@@ -105,6 +105,7 @@ struct TexSquare
 
 static GLint getInternalFormat(void)
 {
+  r_sz = g_sz = b_sz = a_sz = 0;
   switch (glctx.type) {
 #ifdef CONFIG_GL_WIN32
   case GLTYPE_W32:
@@ -112,9 +113,7 @@ static GLint getInternalFormat(void)
   PIXELFORMATDESCRIPTOR pfd;
   HDC vo_hdc = vo_w32_get_dc(vo_w32_window);
   int pf = GetPixelFormat(vo_hdc);
-  if (!DescribePixelFormat(vo_hdc, pf, sizeof pfd, &pfd)) {
-    r_sz = g_sz = b_sz = a_sz = 0;
-  } else {
+  if (DescribePixelFormat(vo_hdc, pf, sizeof pfd, &pfd)) {
     r_sz = pfd.cRedBits;
     g_sz = pfd.cGreenBits;
     b_sz = pfd.cBlueBits;
@@ -471,11 +470,7 @@ static void resize(int x,int y){
       glViewport( 0 + x_offset, 0 + y_offset, x, y - y_height );
   }
 
-  glMatrixMode(GL_PROJECTION);
   glLoadMatrixf(matrix);
-
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
 }
 extern float w32_factor_x,w32_factor_y;
 extern int w32_delta_x,w32_delta_y;
@@ -518,17 +513,6 @@ static void draw_alpha(int x0,int y0, int w,int h, unsigned char* src, unsigned 
    if (!draw) return;
    draw(w,h,src,srca,stride,ImageData+bpp*(y0*image_width+x0),bpp*image_width);
 }
-
-#ifdef CONFIG_GL_WIN32
-
-static int config_w32(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uint32_t flags, char *title, uint32_t format) {
-  if (!vo_w32_config(d_width, d_height, flags))
-    return -1;
-
-  return 0;
-}
-
-#endif
 
 #ifdef CONFIG_GL_X11
 static int choose_glx_visual(Display *dpy, int scr, XVisualInfo *res_vi)
@@ -587,7 +571,7 @@ static int choose_glx_visual(Display *dpy, int scr, XVisualInfo *res_vi)
   return (best_weight < 1000000) ? 0 : -1;
 }
 
-static int config_glx(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uint32_t flags, char *title, uint32_t format) {
+static int config_glx(uint32_t d_width, uint32_t d_height, uint32_t flags, char *title) {
   XVisualInfo *vinfo, vinfo_buf;
     vinfo = choose_glx_visual(mDisplay,mScreen,&vinfo_buf) < 0 ? NULL : &vinfo_buf;
     if (vinfo == NULL) {
@@ -640,6 +624,7 @@ static int initGl(uint32_t d_width, uint32_t d_height)
     params.chrom_texw = params.texw >> xs;
     params.chrom_texh = params.texh >> ys;
     params.csp_params.input_shift = -depth & 7;
+    params.is_planar = is_yuv;
     glSetupYUVConversion(&params);
   }
 
@@ -680,12 +665,11 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
 
   int_pause = 0;
 
-#ifdef CONFIG_GL_WIN32
-  if (config_w32(width, height, d_width, d_height, flags, title, format) == -1)
-#endif
 #ifdef CONFIG_GL_X11
-  if (config_glx(width, height, d_width, d_height, flags, title, format) == -1)
+  if (glctx.type == GLTYPE_X11 && config_glx(d_width, d_height, flags, title) == -1)
+    return -1;
 #endif
+  if (glctx.type != GLTYPE_X11 && mpglcontext_create_window(&glctx, d_width, d_height, flags, title) < 0)
     return -1;
 
   if (glctx.setGlWindow(&glctx) == SET_WINDOW_FAILED)
@@ -888,11 +872,8 @@ static const opt_t subopts[] = {
 
 static int preinit(const char *arg)
 {
-  enum MPGLType gltype = GLTYPE_X11;
+  enum MPGLType gltype = GLTYPE_AUTO;
   // set defaults
-#ifdef CONFIG_GL_WIN32
-  gltype = GLTYPE_W32;
-#endif
   use_yuv = -1;
   use_glFinish = 1;
   if (subopt_parse(arg, subopts) != 0) {
@@ -914,13 +895,12 @@ static int preinit(const char *arg)
   }
     if(!init_mpglcontext(&glctx, gltype)) goto err_out;
     if (use_yuv == -1) {
-#ifdef CONFIG_GL_WIN32
-      if (config_w32(320, 200, 320, 200, VOFLAG_HIDDEN, "", 0) == -1)
-#endif
 #ifdef CONFIG_GL_X11
-      if (config_glx(320, 200, 320, 200, VOFLAG_HIDDEN, "", 0) == -1)
-#endif
+      if (glctx.type == GLTYPE_X11 && config_glx(320, 200, VOFLAG_HIDDEN, "") == -1)
         goto err_out;
+#endif
+      if (glctx.type != GLTYPE_X11 && mpglcontext_create_window(&glctx, 320, 200, VOFLAG_HIDDEN, "") < 0)
+        return -1;
       if (glctx.setGlWindow(&glctx) == SET_WINDOW_FAILED)
         goto err_out;
       use_yuv = glAutodetectYUVConversion();

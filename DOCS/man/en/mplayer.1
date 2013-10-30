@@ -1246,6 +1246,26 @@ Useless with modern Linux kernels configured for desktop use as they already
 wake up the process with similar accuracy when using normal timed sleep.
 .
 .TP
+.B \-pausing <0\-3> (MPlayer only)
+Specifies the default pausing behaviour of commands, i.e. whether MPlayer
+will continue playback or stay paused after the command has finished.
+See DOCS/tech/slave.txt for further details.
+.PD 0
+.RSs
+.IPs 0
+resume
+.IPs 1
+pause (pausing)
+.IPs 2
+keep the paused / playing status (pausing_keep)
+.IPs 3
+toggle the paused / playing status (pausing_toggle)
+.IPs 4
+pause without frame step (experimental) (pausing_keep_force)
+.RE
+.PD 1
+.
+.TP
 .B \-playing\-msg <string>
 Print out a string before starting playback.
 The following expansions are supported:
@@ -1263,11 +1283,27 @@ Expand TEXT only if the property NAME is not available.
 Play files according to a playlist file (ASX, Winamp, SMIL, or
 one-file-per-line format).
 .br
+.I WARNING:
+The way MPlayer parses and uses playlist files is not safe against
+maliciously constructed files.
+Such files may trigger harmful actions.
+This has been the case for all MPlayer versions, but unfortunately this
+fact was not well documented earlier, and some people have even misguidedly
+recommended use of -playlist with untrusted sources.
+Do NOT use -playlist with random internet sources or files you don't trust!
+.br
 .I NOTE:
 This option is considered an entry so options found after it will apply
 only to the elements of this playlist.
 .br
 FIXME: This needs to be clarified and documented thoroughly.
+.
+.TP
+.B \-allow-dangerous-playlist-parsing
+This enables parsing any file as a playlist if e.g. a server advertises
+a file as playlist.
+Only enable if you know all servers involved are trustworthy.
+MPlayer's playlist code is not designed to handle malicious playlist files.
 .
 .TP
 .B \-rtc\-device <device>
@@ -1432,10 +1468,6 @@ Some Blu\-ray discs contain scenes that can be viewed from multiple angles.
 Here you can tell MPlayer which angles to use (default: 1).
 .
 .TP
-.B \-bluray\-chapter <chapter ID> (Blu\-ray only)
-Tells MPlayer which Blu\-ray chapter to start the current title from (default: 1).
-.
-.TP
 .B \-bluray\-device <path to disc> (Blu\-ray only)
 Specify the Blu\-ray disc location. Must be a directory with Blu\-ray structure.
 .
@@ -1543,7 +1575,7 @@ full 7.1
 .PD 1
 .
 .TP
-.B \-chapter <chapter ID>[\-<endchapter ID>] (dvd:// and dvdnav:// only)
+.B \-chapter <chapter ID>[\-<endchapter ID>]
 Specify which chapter to start playing at.
 Optionally specify which chapter to end playing at (default: 1).
 .
@@ -3086,6 +3118,10 @@ Explicitly choose the ESD server to use (default: localhost).
 audio output through JACK (Jack Audio Connection Kit)
 .PD 0
 .RSs
+.IPs (no)connect
+Automatically create connections to output ports (default: enabled).
+When enabled, the maximum number of output channels will be limited to
+the number of available output ports.
 .IPs port=<name>
 Connects to the ports with the given name (default: physical ports).
 .IPs name=<client name>
@@ -3594,6 +3630,25 @@ Positive values mean multiples of the default range.
 Negative numbers mean you can zoom in up to a factor of \-panscanrange+1.
 E.g.\& \-panscanrange \-3 allows a zoom factor of up to 4.
 This feature is experimental.
+.
+.TP
+.B \-border\-pos\-x <0.0\-1.0> (-vo gl,xv,xvmc,vdpau,direct3d only, default 0.5)
+When black borders are added to adjust for aspect, this determines where they are placed.
+0.0 places borders on the right, 1.0 on the left.
+Values outside the range 0.0 \- 1.0 will add extra black borders on one side
+and remove part of the image on the other side.
+.
+.TP
+.B \-border\-pos\-y <0.0\-1.0> (-vo gl,xv,xvmc,vdpau,direct3d only, default 0.5)
+As \-border\-pos\-x but for top/bottom borders.
+0.0 places borders on the bottom, 1.0 on the top.
+.
+.TP
+.B \-monitor\-orientation <0-3> (experimental)
+Rotate display by 90, 180 or 270 degrees.
+Rotates also the OSD, not just the video image itself.
+Currently only supported by the gl video output driver.
+For all other video outputs -vf ass,expand=osd=1,rotate=n can be used, in the future this might even happen automatically.
 .
 .TP
 .B \-refreshrate <Hz>
@@ -4159,6 +4214,8 @@ Select the backend/OpenGL implementation to use (default: -1).
 3: X11/EGL (highly experimental)
 .br
 4: OSX/Cocoa
+.br
+5: Android (very bad hack, only for testing)
 .RE
 .IPs (no)ati\-hack
 ATI drivers may give a corrupted image when PBOs are used (when using \-dr
@@ -4217,15 +4274,15 @@ At least three texture units are needed.
 Provides saturation and hue control.
 This method is fast but inexact.
 .br
-2: Use a fragment program.
-Needs the GL_ARB_fragment_program extension and at least three texture units.
-Provides brightness, contrast, saturation and hue control.
-.br
-3: Use a fragment program using the POW instruction.
+2: Use a fragment program using the POW instruction.
 Needs the GL_ARB_fragment_program extension and at least three texture units.
 Provides brightness, contrast, saturation, hue and gamma control.
 Gamma can also be set independently for red, green and blue.
 Method 4 is usually faster.
+.br
+3: Same as 2.
+They exist as distinct values for legacy reasons, MPlayer now inserts
+the extra instructions for gamma control on-demand.
 .br
 4: Use a fragment program with additional lookup.
 Needs the GL_ARB_fragment_program extension and at least four texture units.

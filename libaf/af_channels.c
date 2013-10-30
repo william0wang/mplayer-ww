@@ -25,6 +25,7 @@
 #include <string.h>
 #include <inttypes.h>
 
+#include "libavutil/common.h"
 #include "mp_msg.h"
 #include "af.h"
 
@@ -150,14 +151,14 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
 
       // If mono: fake stereo
       if(((af_data_t*)arg)->nch == 1 || channel_state){
-	s->nr = min(af->data->nch,2);
+	s->nr = FFMIN(af->data->nch,2);
 	for(i=0;i<s->nr;i++){
 	  s->route[i][FR] = channel_state&1;
 	  s->route[i][TO] = i;
 	}
       }
       else{
-	s->nr = min(af->data->nch, ((af_data_t*)arg)->nch);
+	s->nr = FFMIN(af->data->nch, ((af_data_t*)arg)->nch);
 	for(i=0;i<s->nr;i++){
 	  s->route[i][FR] = i;
 	  s->route[i][TO] = i;

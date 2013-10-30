@@ -21,7 +21,10 @@
 #ifndef MPLAYER_AV_HELPERS_H
 #define MPLAYER_AV_HELPERS_H
 
+struct AVCodecContext;
+
 void init_avcodec(void);
 void init_avformat(void);
+int lavc_encode_audio(struct AVCodecContext *ctx, void *src, int src_len, void *dst, int dst_len);
 
 #endif /* MPLAYER_AV_HELPERS_H */

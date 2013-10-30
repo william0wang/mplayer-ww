@@ -134,8 +134,7 @@ static void jpeg_mkdir(const char *buf, int verbose) {
                     exit_player(EXIT_ERROR);
                 }
 
-                mp_msg(MSGT_VO, MSGL_INFO, "%s: %s - %s\n", info.short_name,
-                        buf, MSGTR_VO_DirExistsAndIsWritable);
+                mp_msg(MSGT_VO, MSGL_INFO, "%s: %s: %s\n", info.short_name, MSGTR_VO_OutputDirectory, buf);
                 break;
 
             default:

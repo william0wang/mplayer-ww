@@ -325,25 +325,4 @@ void af_fix_parameters(af_data_t *data);
 #define RESIZE_LOCAL_BUFFER(a,d)\
 ((a->data->len < af_lencalc(a->mul,d))?af_resize_local_buffer(a,d):AF_OK)
 
-/* Some other useful macro definitions*/
-#ifndef min
-#define min(a,b)(((a)>(b))?(b):(a))
-#endif
-
-#ifndef max
-#define max(a,b)(((a)>(b))?(a):(b))
-#endif
-
-#ifndef clamp
-#define clamp(a,min,max) (((a)>(max))?(max):(((a)<(min))?(min):(a)))
-#endif
-
-#ifndef sign
-#define sign(a) (((a)>0)?(1):(-1))
-#endif
-
-#ifndef lrnd
-#define lrnd(a,b) ((b)((a)>=0.0?(a)+0.5:(a)-0.5))
-#endif
-
 #endif /* MPLAYER_AF_H */

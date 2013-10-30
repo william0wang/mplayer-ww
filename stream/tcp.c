@@ -20,6 +20,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#define _BSD_SOURCE
+
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -161,6 +163,8 @@ connect2Server_with_af(char *host, int port, int af,int verb) {
 			if(verb) mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_NW_CantResolv, af2String(af), host);
 			return TCP_ERROR_FATAL;
 		}
+
+		if (af != hp->h_addrtype) return TCP_ERROR_FATAL;
 
 		memcpy( our_s_addr, hp->h_addr_list[0], hp->h_length );
 	}

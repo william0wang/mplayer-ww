@@ -73,6 +73,7 @@ typedef enum
 	VIDEO_H264 	= 0x10000005,
 	VIDEO_AVC	= mmioFOURCC('a', 'v', 'c', '1'),
 	VIDEO_DIRAC	= mmioFOURCC('d', 'r', 'a', 'c'),
+	VIDEO_HEVC	= mmioFOURCC('H', 'E', 'V', 'C'),
 	VIDEO_VC1	= mmioFOURCC('W', 'V', 'C', '1'),
 	AUDIO_MP2   	= 0x50,
 	AUDIO_A52   	= 0x2000,
@@ -279,6 +280,7 @@ static int IS_VIDEO(es_stream_type_t type)
 	case VIDEO_H264:
 	case VIDEO_AVC:
 	case VIDEO_DIRAC:
+	case VIDEO_HEVC:
 	case VIDEO_VC1:
 		return 1;
 	}
@@ -877,6 +879,8 @@ static off_t ts_detect_streams(demuxer_t *demuxer, tsdemux_init_t *param)
 			mp_msg(MSGT_DEMUXER, MSGL_INFO, "VIDEO VC1(pid=%d) ", param->vpid);
 		else if(param->vtype == VIDEO_AVC)
 			mp_msg(MSGT_DEMUXER, MSGL_INFO, "VIDEO AVC(NAL-H264, pid=%d) ", param->vpid);
+		else if(param->vtype == VIDEO_HEVC)
+			mp_msg(MSGT_DEMUXER, MSGL_INFO, "VIDEO HEVC(pid=%d) ", param->vpid);
 	}
 	else
 	{
@@ -2367,6 +2371,10 @@ static int parse_descriptors(struct pmt_es_t *es, uint8_t *ptr)
 				{
 					es->type = AUDIO_S302M;
 				}
+				else if(d[0] == 'H' && d[1] == 'E' && d[2] == 'V' && d[3] == 'C')
+				{
+					es->type = VIDEO_HEVC;
+				}
 				else
 					es->type = UNKNOWN;
 				mp_msg(MSGT_DEMUX, MSGL_DBG2, "FORMAT %s\n", es->format_descriptor);
@@ -3327,6 +3335,8 @@ static void demux_seek_ts(demuxer_t *demuxer, float rel_seek_secs, float audio_d
 		else if((sh_video->format == VIDEO_MPEG4) && (i==0x1B6))
 			break;
 		else if(sh_video->format == VIDEO_VC1 && (i==0x10E || i==0x10F))
+			break;
+		else if(sh_video->format == VIDEO_HEVC)
 			break;
 		else	//H264
 		{

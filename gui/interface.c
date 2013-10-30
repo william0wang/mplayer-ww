@@ -52,6 +52,7 @@
 #include "libmpcodecs/vf.h"
 #include "libvo/video_out.h"
 #include "libvo/x11_common.h"
+#include "osdep/timer.h"
 #ifdef CONFIG_DVDREAD
 #include "stream/stream_dvd.h"
 #endif
@@ -331,7 +332,9 @@ int gui(int what, void *data)
         uiState();
         break;
 
-    case GUI_HANDLE_EVENTS:
+    case GUI_REDRAW:
+
+        uiEvent(ivRedraw, 0);
 
         if (!guiInfo.Playing || !guiInfo.VideoWindow)
             wsEvents();
@@ -382,7 +385,10 @@ int gui(int what, void *data)
 
     case GUI_PREPARE:
 
+        uiEvent(ivRedraw, True);
         wsMouseVisibility(&guiApp.videoWindow, wsHideMouseCursor);
+        usec_sleep(20000);
+        wsEvents();
 
         if (guiInfo.NewPlay == GUI_FILE_NEW) {
             audio_id  = -1;
@@ -731,11 +737,6 @@ int gui(int what, void *data)
 
         break;
 
-    case GUI_REDRAW:
-
-        uiEvent(ivRedraw, 0);
-        break;
-
     case GUI_SETUP_VIDEO_WINDOW:
 
         guiInfo.VideoWidth  = vo_dwidth;
@@ -818,7 +819,7 @@ int gui(int what, void *data)
             }
 
             guiInfo.ElapsedTime = 0;
-            guiInfo.Position    = 0;
+            guiInfo.Position    = 0.0f;
 
             if (gtkShowVideoWindow) {
                 guiInfo.VideoWindow = True;
@@ -839,9 +840,9 @@ int gui(int what, void *data)
 
             gui(GUI_SET_STATE, (void *)GUI_STOP);
 
-            wsEvents();
             wsWindowRedraw(&guiApp.videoWindow);
             wsMouseVisibility(&guiApp.videoWindow, wsShowMouseCursor);
+            wsEvents();
         }
 
         break;
@@ -936,12 +937,12 @@ void mplayer(int what, float value, void *data)
         break;
 
     case MPLAYER_SET_FONT_OUTLINE:
-        subtitle_font_thickness = (8.0f / 100.0f) * value;
+        subtitle_font_thickness = 8.0 * value / 100.0;   // transform 0..100 to 0..8
         mplayerLoadFont();
         break;
 
     case MPLAYER_SET_FONT_BLUR:
-        subtitle_font_radius = (8.0f / 100.0f) * value;
+        subtitle_font_radius = 8.0 * value / 100.0;      // transform 0..100 to 0..8
         mplayerLoadFont();
         break;
 

@@ -106,12 +106,13 @@ static int osd_color;
 static int use_aspect;
 static int use_ycbcr;
 #define MASK_ALL_YUV (~(1 << YUV_CONVERSION_NONE))
-#define MASK_NOT_COMBINERS (~((1 << YUV_CONVERSION_NONE) | (1 << YUV_CONVERSION_COMBINERS)))
-#define MASK_GAMMA_SUPPORT (MASK_NOT_COMBINERS & ~(1 << YUV_CONVERSION_FRAGMENT))
+#define MASK_NOT_COMBINERS (~((1 << YUV_CONVERSION_NONE) | (1 << YUV_CONVERSION_COMBINERS) | (1 << YUV_CONVERSION_COMBINERS_ATI) | (1 << YUV_CONVERSION_TEXT_FRAGMENT)))
+#define MASK_GAMMA_SUPPORT MASK_NOT_COMBINERS
 static int use_yuv;
 static int colorspace;
 static int levelconv;
 static int is_yuv;
+static int is_xyz;
 static int lscale;
 static int cscale;
 static float filter_strength;
@@ -120,6 +121,7 @@ static int yuvconvtype;
 static int use_rectangle;
 static int using_tex_rect;
 static int err_shown;
+static int draw_width, draw_height;
 static uint32_t image_width;
 static uint32_t image_height;
 static uint32_t image_format;
@@ -187,39 +189,65 @@ extern int max_width;
 extern int w32_inited;
 extern int gl_new_window;
 extern int codec_swap_uv;
+static float video_matrix[16];
+static float osd_matrix[16];
 
-static void resize(int x,int y){
+static void resize(void) {
+  int i;
+
+  if(!using_gl || !w32_inited)
+    return;
+
+  draw_width  = (vo_rotate & 1) ? vo_dheight : vo_dwidth;
+  draw_height = (vo_rotate & 1) ? vo_dwidth  : vo_dheight;
   // simple orthogonal projection for 0-image_width;0-image_height
-  float matrix[16] = {
-    2.0/image_width,   0, 0, 0,
-    0, -2.0/image_height, 0, 0,
-    0, 0, 0, 0,
-    -1, 1, 0, 1
-  };
+  memset(video_matrix, 0, sizeof(video_matrix));
+  video_matrix[0]  = 2.0/image_width;
+  video_matrix[5]  = -2.0/image_height;
+  video_matrix[12] = -1;
+  video_matrix[13] = 1;
+  video_matrix[15] = 1;
+  memcpy(osd_matrix, video_matrix, sizeof(osd_matrix));
+  if (!scaled_osd) {
+    int vo_osdheight = draw_height;
+    if(!vo_fs && show_controlbar && full_view && !gl_new_window && vo_osdheight > controlbar_height_gl)
+   	  vo_osdheight -= controlbar_height_gl;
+
+    // simple orthogonal projection for 0-vo_dwidth;0-vo_dheight
+    osd_matrix[0] =  2.0/draw_width;
+    osd_matrix[5] = -2.0/vo_osdheight;
+  }
+  mp_msg(MSGT_VO, MSGL_V, "[gl] Resize: %dx%d\n", vo_dwidth, vo_dheight);
 
   int y_height = 0;
   int x_offset = 0;
   int y_offset = 0;
-  if(!using_gl || !w32_inited)
-    return;
-  mp_msg(MSGT_VO, MSGL_V, "[gl] Resize: %dx%d\n",x,y);
+
   if(!vo_fs) {
 	if(show_controlbar && full_view && !gl_new_window)
 		y_offset = y_height = controlbar_height_gl;
-	if(max_height > y)
-		y_offset = (max_height - y) / 2 + y_offset;
-	if(max_width > x)
-		x_offset = (max_width - x) / 2;
+	if(max_height > draw_height)
+		y_offset = (max_height - draw_height) / 2 + y_offset;
+	if(max_width > draw_width)
+		x_offset = (max_width - draw_width) / 2;
   }
+
   if (WinID >= 0) {
-    int left = 0, top = 0, w = x, h = y;
+    int left = 0, top = 0, w = vo_dwidth, h = vo_dheight;
     geometry(&left, &top, &w, &h, vo_dwidth, vo_dheight);
-    top = y - h - top;
+    top = vo_dheight - h - top;
     mpglViewport(left + x_offset, top + y_offset, w, h - y_height);
   } else
-  mpglViewport( 0 + x_offset,0 + y_offset, x, y - y_height);
+    mpglViewport(x_offset, y_offset, vo_dwidth, vo_dheight - y_height);
 
-  mpglMatrixMode(GL_PROJECTION);
+  for (i = 0; i < (vo_rotate & 3); i++) {
+    int j;
+    for (j = 0; j < 16; j += 4) {
+      ROTATE(float, video_matrix[j], video_matrix[j+1]);
+      ROTATE(float, osd_matrix[j], osd_matrix[j+1]);
+    }
+  }
+
   ass_border_x = ass_border_y = 0;
   if (aspect_scaling() && use_aspect) {
     int new_w, new_h;
@@ -228,19 +256,23 @@ static void resize(int x,int y){
     panscan_calc_windowed();
     new_w += vo_panscan_x;
     new_h += vo_panscan_y;
-    scale_x = (double)new_w / (double)x;
-    scale_y = (double)new_h / (double)y;
-    matrix[0]  *= scale_x;
-    matrix[12] *= scale_x;
-    matrix[5]  *= scale_y;
-    matrix[13] *= scale_y;
-    ass_border_x = (vo_dwidth - new_w) / 2;
-    ass_border_y = (vo_dheight - new_h) / 2;
+    scale_x = (double)new_w / (double)vo_dwidth;
+    scale_y = (double)new_h / (double)vo_dheight;
+    video_matrix[0]  *= scale_x;
+    video_matrix[4]  *= scale_x;
+    video_matrix[12] *= scale_x;
+    video_matrix[12] += (apply_border_pos(vo_dwidth, new_w, vo_border_pos_x) - apply_border_pos(vo_dwidth, new_w, 0.5)) * 2.0 / vo_dwidth;
+    video_matrix[1]  *= scale_y;
+    video_matrix[5]  *= scale_y;
+    video_matrix[13] *= scale_y;
+    video_matrix[13] -= (apply_border_pos(vo_dheight, new_h, vo_border_pos_y) - apply_border_pos(vo_dheight, new_h, 0.5)) * 2.0 / vo_dheight;
+    if (vo_rotate & 1) {
+      int tmp = new_w; new_w = new_h; new_h = tmp;
+    }
+    ass_border_x = apply_border_pos(draw_width, new_w, vo_border_pos_x);
+    ass_border_y = apply_border_pos(draw_height, new_h, vo_border_pos_y);
   }
-  mpglLoadMatrixf(matrix);
-
-  mpglMatrixMode(GL_MODELVIEW);
-  mpglLoadIdentity();
+  mpglLoadMatrixf(video_matrix);
 
   if (!scaled_osd) {
 #ifdef CONFIG_FREETYPE
@@ -257,17 +289,11 @@ extern float w32_factor_x,w32_factor_y;
 extern int w32_delta_x,w32_delta_y;
 void resize_fs_gl()
 {
-  // simple orthogonal projection for 0-image_width;0-image_height
-  float matrix[16] = {
-    2.0/image_width,   0, 0, 0,
-    0, -2.0/image_height, 0, 0,
-    0, 0, 0, 0,
-    -1, 1, 0, 1
-  };
-
 	int x,y,top,left;
+
 	if(!vo_fs || !using_gl || !w32_inited)
 		return;
+
 	if ( (w32_factor_x == 0) && (w32_factor_y == 0)) {
 		x = vo_screenwidth;
 		y = vo_screenheight;
@@ -280,30 +306,41 @@ void resize_fs_gl()
 	left = (vo_screenwidth-x)/2 + w32_delta_x;
 	top=(vo_screenheight-y)/2 - w32_delta_y;
 
-  	mp_msg(MSGT_VO, MSGL_V, "[gl] Resize_FS: %d , %d %dx%d\n",left,top,x,y);
-	  if (WinID >= 0) {
+  // simple orthogonal projection for 0-image_width;0-image_height
+  memset(video_matrix, 0, sizeof(video_matrix));
+  video_matrix[0]  = 2.0/image_width;
+  video_matrix[5]  = -2.0/image_height;
+  video_matrix[12] = -1;
+  video_matrix[13] = 1;
+  video_matrix[15] = 1;
+  memcpy(osd_matrix, video_matrix, sizeof(osd_matrix));
+  if (!scaled_osd) {
+    // simple orthogonal projection for 0-vo_dwidth;0-vo_dheight
+    osd_matrix[0] =  2.0/x;
+    osd_matrix[5] = -2.0/y;
+  }
+  mp_msg(MSGT_VO, MSGL_V, "[gl] Resize: %dx%d\n", x, y);
+
+  if (WinID >= 0) {
 		int  w = x, h = y;
 		geometry(&top, &left, &w, &h, x, y);
 		mpglViewport(top, left, w, h);
-	  } else
-	  mpglViewport( left , top,x, y );
+  } else
+    mpglViewport(left , top,x, y);
 
-	  mpglMatrixMode(GL_PROJECTION);
-	  ass_border_x = 0;
-	  ass_border_y = 0;
-	  mpglLoadMatrixf(matrix);
-	  mpglMatrixMode(GL_MODELVIEW);
-	  mpglLoadIdentity();
+  ass_border_x = 0;
+  ass_border_y = 0;
+  mpglLoadMatrixf(video_matrix);
 
-	  if (!scaled_osd) {
-		#ifdef HAVE_FREETYPE
-		  // adjust font size to display size
-		  force_load_font = 1;
-		#endif
-		  vo_osd_changed(OSDTYPE_OSD);
-	  }
-	  mpglClear(GL_COLOR_BUFFER_BIT);
-	  redraw();
+  if (!scaled_osd) {
+#ifdef CONFIG_FREETYPE
+    // adjust font size to display size
+    force_load_font = 1;
+#endif
+    vo_osd_changed(OSDTYPE_OSD);
+  }
+  mpglClear(GL_COLOR_BUFFER_BIT);
+  redraw();
 }
 
 static void texSize(int w, int h, int *texw, int *texh) {
@@ -340,6 +377,14 @@ static void update_yuvconv(void) {
   params.chrom_texw = params.texw >> xs;
   params.chrom_texh = params.texh >> ys;
   params.csp_params.input_shift = -depth & 7;
+  params.is_planar = is_yuv;
+  if (is_xyz) {
+    params.csp_params.format = MP_CSP_XYZ;
+    params.csp_params.input_shift = 0;
+    params.csp_params.rgamma *= 2.2;
+    params.csp_params.ggamma *= 2.2;
+    params.csp_params.bgamma *= 2.2;
+  }
   glSetupYUVConversion(&params);
   if (custom_prog) {
     FILE *f = fopen(custom_prog, "rb");
@@ -562,6 +607,7 @@ static int isSoftwareGl(void)
 {
   const char *renderer = mpglGetString(GL_RENDERER);
   return !renderer || strcmp(renderer, "Software Rasterizer") == 0 ||
+         strstr(renderer, "Software Renderer") ||
          strstr(renderer, "llvmpipe");
 }
 
@@ -621,7 +667,7 @@ static GLint get_scale_type(int chroma) {
  * \brief Initialize a (new or reused) OpenGL context.
  * set global gl-related variables to their default values
  */
-static int initGl(uint32_t d_width, uint32_t d_height) {
+static int initGl(void) {
   GLint scale_type = get_scale_type(0);
   autodetectGlExtensions();
   using_tex_rect = gl_format == GL_YCBCR_422_APPLE || use_rectangle == 1;
@@ -649,7 +695,7 @@ static int initGl(uint32_t d_width, uint32_t d_height) {
   if (mipmap_gen)
     mpglTexParameteri(gl_target, GL_GENERATE_MIPMAP, GL_TRUE);
 
-  if (is_yuv || stereo_mode == GL_3D_STIPPLE) {
+  if (is_yuv || is_xyz || custom_prog || stereo_mode == GL_3D_STIPPLE) {
     int i;
     mpglGenTextures(21, default_texs);
     default_texs[21] = 0;
@@ -659,6 +705,7 @@ static int initGl(uint32_t d_width, uint32_t d_height) {
       mpglBindTexture(GL_TEXTURE_RECTANGLE, default_texs[i + 7]);
       mpglBindTexture(GL_TEXTURE_3D, default_texs[i + 14]);
     }
+    mpglActiveTexture(GL_TEXTURE0);
   }
   if (stereo_mode == GL_3D_STIPPLE)
     glSetupAlphaStippleTex(stipple);
@@ -683,7 +730,7 @@ static int initGl(uint32_t d_width, uint32_t d_height) {
     mpglActiveTexture(GL_TEXTURE0);
     mpglBindTexture(gl_target, 0);
   }
-  if (is_yuv || custom_prog)
+  if (is_yuv || is_xyz || custom_prog)
   {
     if ((MASK_NOT_COMBINERS & (1 << use_yuv)) || custom_prog) {
       if (!mpglGenPrograms || !mpglBindProgram) {
@@ -696,7 +743,7 @@ static int initGl(uint32_t d_width, uint32_t d_height) {
     update_yuvconv();
   }
 
-  resize(d_width, d_height);
+  resize();
 
   mpglClearColor( 0.0f,0.0f,0.0f,0.0f );
   mpglClear( GL_COLOR_BUFFER_BIT );
@@ -709,51 +756,6 @@ static int create_window(uint32_t d_width, uint32_t d_height, uint32_t flags, co
 {
   if (stereo_mode == GL_3D_QUADBUFFER)
     flags |= VOFLAG_STEREO;
-#ifdef CONFIG_GL_WIN32
-  if (glctx.type == GLTYPE_W32 && !vo_w32_config(d_width, d_height, flags))
-    return -1;
-#endif
-#ifdef CONFIG_GL_OSX
-  if (glctx.type == GLTYPE_OSX && !vo_osx_config(d_width, d_height, flags))
-    return -1;
-#endif
-#ifdef CONFIG_GL_EGL_X11
-  if (glctx.type == GLTYPE_EGL_X11) {
-    XVisualInfo vinfo = { .visual = CopyFromParent, .depth = CopyFromParent };
-    vo_x11_create_vo_window(&vinfo, vo_dx, vo_dy, d_width, d_height, flags,
-            CopyFromParent, "gl", title);
-  }
-#endif
-#ifdef CONFIG_GL_X11
-  if (glctx.type == GLTYPE_X11) {
-    static int default_glx_attribs[] = {
-      GLX_RGBA, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1,
-      GLX_DOUBLEBUFFER, None
-    };
-    static int stereo_glx_attribs[]  = {
-      GLX_RGBA, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1,
-      GLX_DOUBLEBUFFER, GLX_STEREO, None
-    };
-    XVisualInfo *vinfo = NULL;
-    if (stereo_mode == GL_3D_QUADBUFFER) {
-      vinfo = glXChooseVisual(mDisplay, mScreen, stereo_glx_attribs);
-      if (!vinfo)
-        mp_msg(MSGT_VO, MSGL_ERR, "[gl] Could not find a stereo visual, "
-                                  "3D will probably not work!\n");
-    }
-    if (!vinfo)
-      vinfo = glXChooseVisual(mDisplay, mScreen, default_glx_attribs);
-    if (!vinfo) {
-      mp_msg(MSGT_VO, MSGL_ERR, "[gl] no GLX support present\n");
-      return -1;
-    }
-    mp_msg(MSGT_VO, MSGL_V, "[gl] GLX chose visual with ID 0x%x\n", (int)vinfo->visualid);
-
-    vo_x11_create_vo_window(vinfo, vo_dx, vo_dy, d_width, d_height, flags,
-            XCreateColormap(mDisplay, mRootWin, vinfo->visual, AllocNone),
-            "gl", title);
-  }
-#endif
 #ifdef CONFIG_GL_SDL
   if (glctx.type == GLTYPE_SDL) {
     // Ugly to do this here, but SDL ignores it if set later
@@ -764,20 +766,10 @@ static int create_window(uint32_t d_width, uint32_t d_height, uint32_t flags, co
       SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, swap_interval);
 #endif
     }
-    if (!vo_sdl_config(d_width, d_height, flags, title))
-        return -1;
   }
 #endif
-  return 0;
+  return mpglcontext_create_window(&glctx, d_width, d_height, flags, title);
 }
-
-#ifdef CONFIG_GL_OSX
-static void osx_redraw(void)
-{
-  // resize will call redraw to refresh the screen
-  resize(vo_dwidth, vo_dheight);
-}
-#endif
 
 /* connect to server, create and map window,
  * allocate colors and (shared) memory
@@ -792,18 +784,9 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
   image_format = format;
   is_yuv = mp_get_chroma_shift(image_format, &xs, &ys, NULL) > 0;
   is_yuv |= (xs << 8) | (ys << 16);
+  is_xyz = IMGFMT_IS_XYZ(image_format);
   glFindFormat(format, NULL, &gl_texfmt, &gl_format, &gl_type);
 
-  if (glctx.type == GLTYPE_OSX && vo_doublebuffering && !is_yuv) {
-    // doublebuffering causes issues when e.g. drawing yuy2 or rgb textures
-    // (nothing is draw) unless using glfinish which makes things slow.
-    // This is possibly because we do not actually request a double-buffered
-    // context.
-    // However single-buffering causes slowdown and artefacts when
-    // drawing planar formats. Mostly tested on PPC MacMini
-    mp_msg(MSGT_VO, MSGL_INFO, "[gl] -double not supported on OSX for interleaved formats, switching to -nodouble\n");
-    vo_doublebuffering = 0;
-  }
   vo_flipped = !!(flags & VOFLAG_FLIPPING);
 
   if (create_window(d_width, d_height, flags, title) < 0)
@@ -817,10 +800,10 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
     mp_msg(MSGT_VO, MSGL_ERR, "Can not enable mesa-buffer because AllocateMemoryMESA was not found\n");
     mesa_buffer = 0;
   }
-  initGl(vo_dwidth, vo_dheight);
+  initGl();
 
 #ifdef CONFIG_GL_OSX
-  vo_osx_redraw_func = osx_redraw;
+  vo_osx_redraw_func = resize;
 #endif
   return 0;
 }
@@ -830,9 +813,9 @@ static void check_events(void)
     int e=glctx.check_events();
     if(e&VO_EVENT_REINIT) {
         uninitGl();
-        initGl(vo_dwidth, vo_dheight);
+        initGl();
     }
-    if(e&VO_EVENT_RESIZE) resize(vo_dwidth,vo_dheight);
+    if(e&VO_EVENT_RESIZE) resize();
     else if(e&VO_EVENT_EXPOSE) redraw();
 }
 
@@ -904,22 +887,7 @@ static void do_render_osd(int type) {
   if (!draw_osd && !draw_eosd)
     return;
   // set special rendering parameters
-  if (!scaled_osd) {
-    int vo_osdheight = vo_dheight;
-    if(!vo_fs && show_controlbar && full_view && !gl_new_window && vo_osdheight > controlbar_height_gl)
-   	  vo_osdheight -= controlbar_height_gl;
-
-    // simple orthogonal projection for 0-vo_dwidth;0-vo_dheight
-    float matrix[16] = {
-      2.0/vo_dwidth,   0, 0, 0,
-      0, -2.0/vo_osdheight, 0, 0,
-      0,  0, 0, 0,
-      -1, 1, 0, 1
-    };
-    mpglMatrixMode(GL_PROJECTION);
-    mpglPushMatrix();
-    mpglLoadMatrixf(matrix);
-  }
+  mpglLoadMatrixf(osd_matrix);
   mpglEnable(GL_BLEND);
   if (draw_eosd) {
     mpglTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -953,8 +921,7 @@ static void do_render_osd(int type) {
   }
   // set rendering parameters back to defaults
   mpglDisable(GL_BLEND);
-  if (!scaled_osd)
-    mpglPopMatrix();
+  mpglLoadMatrixf(video_matrix);
   mpglBindTexture(gl_target, 0);
 }
 
@@ -964,8 +931,8 @@ static void draw_osd(void)
   if (vo_osd_changed(0)) {
     int osd_h, osd_w;
     clearOSD();
-    osd_w = scaled_osd ? image_width : vo_dwidth;
-    osd_h = scaled_osd ? image_height : vo_dheight;
+    osd_w = scaled_osd ? image_width  : draw_width;
+    osd_h = scaled_osd ? image_height : draw_height;
     if(!vo_fs && show_controlbar && full_view && !gl_new_window && osd_h > controlbar_height_gl)
       osd_h -= controlbar_height_gl;
     vo_draw_text_ext(osd_w, osd_h, ass_border_x, ass_border_y, ass_border_x, ass_border_y,
@@ -975,8 +942,8 @@ static void draw_osd(void)
 }
 
 static void do_render(void) {
-  mpglColor4f(1,1,1,1);
-  if (is_yuv || custom_prog)
+  mpglColor4ub(255, 255, 255, 255);
+  if (is_yuv || is_xyz || custom_prog)
     glEnableYUVConversion(gl_target, yuvconvtype);
   if (stereo_mode) {
     glEnable3DLeft(stereo_mode);
@@ -999,7 +966,7 @@ static void do_render(void) {
               using_tex_rect, is_yuv,
               mpi_flipped ^ vo_flipped, 0);
   }
-  if (is_yuv || custom_prog)
+  if (is_yuv || is_xyz || custom_prog)
     glDisableYUVConversion(gl_target, yuvconvtype);
   did_render = 1;
 }
@@ -1019,6 +986,13 @@ static void flip_page(void) {
     do_render_osd(RENDER_OSD | RENDER_EOSD);
   }
   if (use_glFinish) mpglFinish();
+  else if (glctx.type == GLTYPE_OSX && vo_doublebuffering && !is_yuv)
+    // At least on PPC Mac Mini this combination leads to
+    // no image at all being show, however for the planar YUV
+    // case the flush causes a significant slowdown.
+    // Note that always using single-buffering is not a good solution since
+    // it causes artefacts with planar YUV.
+    mpglFlush();
 
   if (vo_doublebuffering) {
     glctx.swapGlBuffers(&glctx);
@@ -1053,26 +1027,14 @@ static int draw_slice(uint8_t *src[], int stride[], int w,int h,int x,int y)
   return 0;
 }
 
-static uint32_t get_image(mp_image_t *mpi) {
+static int get_pbo_image(mp_image_t *mpi) {
   int needed_size;
-  dr_rejectcnt++;
   if (!mpglGenBuffers || !mpglBindBuffer || !mpglBufferData || !mpglMapBuffer) {
     if (!err_shown)
       mp_msg(MSGT_VO, MSGL_ERR, "[gl] extensions missing for dr\n"
                                 "Expect a _major_ speed penalty\n");
     err_shown = 1;
-    return VO_FALSE;
-  }
-  if (gl_bufferptr) return VO_FALSE;
-  if (mpi->flags & MP_IMGFLAG_READABLE) return VO_FALSE;
-  if (mpi->type != MP_IMGTYPE_STATIC && mpi->type != MP_IMGTYPE_TEMP &&
-      mpi->type != MP_IMGTYPE_IPB &&
-      mpi->type != MP_IMGTYPE_NUMBERED)
-    return VO_FALSE;
-  if (mesa_buffer) mpi->width = texture_width;
-  else if (ati_hack) {
-    mpi->width = texture_width;
-    mpi->height = texture_height;
+    return 0;
   }
   mpi->stride[0] = mpi->width * mpi->bpp / 8;
   needed_size = mpi->stride[0] * mpi->height + 31;
@@ -1107,7 +1069,7 @@ static uint32_t get_image(mp_image_t *mpi) {
       mp_msg(MSGT_VO, MSGL_ERR, "[gl] could not acquire buffer for dr\n"
                                 "Expect a _major_ speed penalty\n");
     err_shown = 1;
-    return VO_FALSE;
+    return 0;
   }
   if (is_yuv) {
     // planar YUV
@@ -1150,6 +1112,24 @@ static uint32_t get_image(mp_image_t *mpi) {
       mpi->planes[2] = gl_bufferptr_uv[1];
     }
   }
+  return 1;
+}
+
+static uint32_t get_image(mp_image_t *mpi) {
+  dr_rejectcnt++;
+  if (gl_bufferptr) return VO_FALSE;
+  if (mpi->flags & MP_IMGFLAG_READABLE) return VO_FALSE;
+  if (mpi->type != MP_IMGTYPE_STATIC && mpi->type != MP_IMGTYPE_TEMP &&
+      mpi->type != MP_IMGTYPE_IPB &&
+      mpi->type != MP_IMGTYPE_NUMBERED)
+    return VO_FALSE;
+  if (mesa_buffer) mpi->width = texture_width;
+  else if (ati_hack) {
+    mpi->width = texture_width;
+    mpi->height = texture_height;
+  }
+  if (!get_pbo_image(mpi))
+    return VO_FALSE;
   mpi->flags |= MP_IMGFLAG_DIRECT;
   dr_rejectcnt--;
   return VO_TRUE;
@@ -1268,13 +1248,8 @@ query_format(uint32_t format)
 {
     int depth;
     int caps = VFCAP_CSP_SUPPORTED | VFCAP_CSP_SUPPORTED_BY_HW |
-               VFCAP_FLIP |
+               VFCAP_FLIP | VFCAP_ACCEPT_STRIDE |
                VFCAP_HWSCALE_UP | VFCAP_HWSCALE_DOWN;
-    // TODO: This assumes backend auto-detection was run
-    // before this code.
-    // In addition strides might not work with X11 GLES either.
-    if (glctx.type != GLTYPE_EGL_ANDROID)
-      caps |= VFCAP_ACCEPT_STRIDE;
     if (use_osd)
       caps |= VFCAP_OSD | VFCAP_EOSD | (scaled_osd ? 0 : VFCAP_EOSD_UNSCALED);
     if (format == IMGFMT_RGB24 || format == IMGFMT_RGBA)
@@ -1282,6 +1257,8 @@ query_format(uint32_t format)
     if (use_yuv && mp_get_chroma_shift(format, NULL, NULL, &depth) &&
         (depth == 8 || depth == 16 || glYUVLargeRange(use_yuv)) &&
         (IMGFMT_IS_YUVP16_NE(format) || !IMGFMT_IS_YUVP16(format)))
+        return caps;
+    if ((MASK_NOT_COMBINERS & (1 << use_yuv)) && IMGFMT_IS_XYZ(format))
         return caps;
     // HACK, otherwise we get only b&w with some filters (e.g. -vf eq)
     // ideally MPlayer should be fixed instead not to use Y800 when it has the choice
@@ -1422,8 +1399,8 @@ static int preinit_internal(const char *arg, int allow_sw)
               "  yuv=<n>\n"
               "    0: use software YUV to RGB conversion.\n"
               "    1: use register combiners (nVidia only, for older cards).\n"
-              "    2: use fragment program.\n"
-              "    3: use fragment program with gamma correction.\n"
+              "    2: use fragment program with gamma correction.\n"
+              "    3: same as 2.\n"
               "    4: use fragment program with gamma correction via lookup.\n"
               "    5: use ATI-specific method (for older cards).\n"
               "    6: use lookup via 3D texture.\n"
@@ -1478,6 +1455,7 @@ static int preinit_internal(const char *arg, int allow_sw)
               "    2: SDL\n"
               "    3: X11/EGL (experimental)\n"
               "    4: OSX/Cocoa\n"
+              "    5: Android (experimental)\n"
               "\n" );
       return -1;
     }
@@ -1486,12 +1464,15 @@ static int preinit_internal(const char *arg, int allow_sw)
     if (use_yuv == -1 || !allow_sw) {
       if (create_window(320, 200, VOFLAG_HIDDEN, NULL) < 0)
         goto err_out;
-      if (glctx.setGlWindow(&glctx) == SET_WINDOW_FAILED)
-        goto err_out;
-      if (!allow_sw && isSoftwareGl())
-        goto err_out;
-      autodetectGlExtensions();
-    } else if (use_ycbcr == -1) {
+      if (glctx.setGlWindow(&glctx) != SET_WINDOW_FAILED) {
+        if (!allow_sw && isSoftwareGl())
+          goto err_out;
+        autodetectGlExtensions();
+      }
+    }
+    if (use_yuv == -1)
+      use_yuv = glctx.type == GLTYPE_EGL_X11 || glctx.type == GLTYPE_EGL_ANDROID ? YUV_CONVERSION_SL_PROGRAM : YUV_CONVERSION_FRAGMENT_LOOKUP; // mostly sensible fallback
+    if (use_ycbcr == -1) {
       // rare feature, not worth creating a window to detect
       use_ycbcr = 0;
     }
@@ -1566,7 +1547,7 @@ static int control(uint32_t request, void *data)
       if(vo_dheight <= 0 || vo_dwidth <= 0)
         break;
       struct mp_eosd_settings *r = data;
-      r->w = vo_dwidth; r->h = vo_dheight;
+      r->w = draw_width; r->h = draw_height;
       r->srcw = image_width; r->srch = image_height;
       r->mt = r->mb = r->ml = r->mr = 0;
       if (scaled_osd) {r->w = image_width; r->h = image_height;}
@@ -1584,18 +1565,18 @@ static int control(uint32_t request, void *data)
     return VO_TRUE;
   case VOCTRL_FULLSCREEN:
     glctx.fullscreen();
-    resize(vo_dwidth, vo_dheight);
+    resize();
     return VO_TRUE;
   case VOCTRL_BORDER:
     glctx.border();
-    resize(vo_dwidth, vo_dheight);
+    resize();
     return VO_TRUE;
   case VOCTRL_GET_PANSCAN:
     if (!use_aspect) return VO_NOTIMPL;
     return VO_TRUE;
   case VOCTRL_SET_PANSCAN:
     if (!use_aspect) return VO_NOTIMPL;
-    resize(vo_dwidth, vo_dheight);
+    resize();
     return VO_TRUE;
   case VOCTRL_GET_EQUALIZER:
     if (is_yuv) {
@@ -1630,7 +1611,7 @@ static int control(uint32_t request, void *data)
   case VOCTRL_GUI_RESIZE:
     {
       if(vo_fs) resize_fs_gl();
-      else resize(vo_dwidth, vo_dheight);
+      else resize();
       return VO_TRUE;
     }
   }

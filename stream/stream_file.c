@@ -47,6 +47,7 @@
 #include "help_mp.h"
 #include "m_option.h"
 #include "m_struct.h"
+#include "osdep/osdep.h"
 
 int is_rar_stream = 0;
 int enable_file_mapping = 1;

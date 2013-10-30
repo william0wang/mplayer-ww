@@ -25,6 +25,7 @@
 #include <string.h>
 #include <inttypes.h>
 
+#include "libavutil/common.h"
 #include "mp_msg.h"
 #include "af.h"
 
@@ -87,7 +88,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     s->ri = 0;
     for(i=0;i<AF_NCH;i++){
       mp_msg(MSGT_AFILTER, MSGL_DBG2, "[delay] Channel %i delayed by %0.3fms\n",
-	     i,clamp(s->d[i],0.0,1000.0));
+	     i,av_clipf(s->d[i],0.0,1000.0));
       mp_msg(MSGT_AFILTER, MSGL_DBG3, "[delay] Channel %i delayed by %i samples\n",
 	     i,s->wi[i]);
     }

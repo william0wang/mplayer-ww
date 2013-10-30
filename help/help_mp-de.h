@@ -200,6 +200,7 @@ static const char help_text[]=
 #define MSGTR_PtsAfterFiltersMissing "PTS nach Filter FEHLT\n"
 #define MSGTR_CommandLine "Kommandozeile:"
 #define MSGTR_MenuInitFailed "Initialisierung des Menüs fehlgeschlagen.\n"
+#define MSGTR_InvalidSwitchRatio "Ungültiges Seitenverhältnis '%f', es bleibt unverändert.\n"
 
 // --- edit decision lists
 #define MSGTR_EdlOutOfMem "Es kann nicht genug Speicher für EDL-Daten reserviert werden.\n"
@@ -878,6 +879,7 @@ static const char help_text[]=
 #define MSGTR_MENU_Exit "Beenden"
 #define MSGTR_MENU_Mute "Stummschaltung"
 #define MSGTR_MENU_Original "Original"
+#define MSGTR_MENU_235 "2,35:1"
 #define MSGTR_MENU_AspectRatio "Seitenverhältnis"
 #define MSGTR_MENU_AudioTrack "Audiospur"
 #define MSGTR_MENU_Track "Spur %d"
@@ -1098,10 +1100,10 @@ static const char help_text[]=
 "Versuche den scale-Filter zu deiner Filterliste hinzuzufügen,\n"\
 "z.B. mit -vf spp,scale an Stelle von -vf spp.\n"
 #define MSGTR_VO_GenericError "Dieser Fehler ist aufgetreten"
+#define MSGTR_VO_OutputDirectory "Ausgabeverzeichnis"
 #define MSGTR_VO_UnableToAccess "Zugriff nicht möglich."
 #define MSGTR_VO_ExistsButNoDirectory "Existiert schon, ist aber kein Verzeichnis."
 #define MSGTR_VO_DirExistsButNotWritable "Ausgabeverzeichnis existiert schon, ist aber nicht beschreibbar."
-#define MSGTR_VO_DirExistsAndIsWritable "Ausgabeverzeichnis existiert schon und ist beschreibbar."
 #define MSGTR_VO_CantCreateDirectory "Kann Ausgabeverzeichnis nicht erstellen."
 #define MSGTR_VO_CantCreateFile "Kann Ausgabedatei nicht erstellen."
 #define MSGTR_VO_DirectoryCreateSuccess "Ausgabeverzeichnis erfolgreich erstellt."

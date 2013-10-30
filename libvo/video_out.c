@@ -65,6 +65,9 @@ int vo_vsync = 0;
 int vo_fs = 0;
 int vo_fsmode = 0;
 float vo_panscan = 0.0f;
+float vo_border_pos_x = 0.5;
+float vo_border_pos_y = 0.5;
+int vo_rotate;
 int vo_ontop = 0;
 int vo_adapter_num=0;
 int vo_refresh_rate=0;
@@ -194,10 +197,10 @@ const vo_functions_t* const video_out_drivers[] =
 #ifdef CONFIG_XV
         &video_out_xv,
 #endif
-#ifdef CONFIG_X11
 #ifdef CONFIG_GL
         &video_out_gl_nosw,
 #endif
+#ifdef CONFIG_X11
         &video_out_x11,
         &video_out_xover,
 #endif
@@ -207,7 +210,7 @@ const vo_functions_t* const video_out_drivers[] =
 #ifdef CONFIG_GL
         &video_out_gl,
 #endif
-#if defined(CONFIG_GL_WIN32) || defined(CONFIG_GL_X11)
+#if defined(CONFIG_GL_WIN32) || defined(CONFIG_GL_X11) || defined(CONFIG_GL_OSX)
         &video_out_gl_tiled,
 #endif
 #ifdef CONFIG_DGA
@@ -403,6 +406,7 @@ int lookup_keymap_table(const struct mp_keymap *map, int key) {
  *        and destination rectangle like Direct3D and VDPAU
  */
 static void src_dst_split_scaling(int src_size, int dst_size, int scaled_src_size,
+                                  float bpos,
                                   int *src_start, int *src_end, int *dst_start, int *dst_end) {
   if (scaled_src_size > dst_size) {
     int border = src_size * (scaled_src_size - dst_size) / scaled_src_size;
@@ -415,7 +419,7 @@ static void src_dst_split_scaling(int src_size, int dst_size, int scaled_src_siz
   } else {
     *src_start = 0;
     *src_end   = src_size;
-    *dst_start = (dst_size - scaled_src_size) / 2;
+    *dst_start = apply_border_pos(dst_size, scaled_src_size, bpos);
     *dst_end   = *dst_start + scaled_src_size;
   }
 }
@@ -452,12 +456,12 @@ void calc_src_dst_rects(int src_width, int src_height, struct vo_rect *src, stru
     scaled_width  += vo_panscan_x;
     scaled_height += vo_panscan_y;
     if (borders) {
-      borders->left = (vo_dwidth  - scaled_width ) / 2;
-      borders->top  = (vo_dheight - scaled_height) / 2;
+      borders->left = apply_border_pos(vo_dwidth,  scaled_width,  vo_border_pos_x);
+      borders->top  = apply_border_pos(vo_dheight, scaled_height, vo_border_pos_y);
     }
-    src_dst_split_scaling(src_width, vo_dwidth, scaled_width,
+    src_dst_split_scaling(src_width, vo_dwidth, scaled_width, vo_border_pos_x,
                           &src->left, &src->right, &dst->left, &dst->right);
-    src_dst_split_scaling(src_height, vo_dheight, scaled_height,
+    src_dst_split_scaling(src_height, vo_dheight, scaled_height, vo_border_pos_y,
                           &src->top, &src->bottom, &dst->top, &dst->bottom);
   }
   src->left += crop->left; src->right  += crop->left;

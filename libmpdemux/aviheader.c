@@ -364,7 +364,7 @@ while(1){
 		le2me_VIDEO_FIELD_DESC(&vprp->FieldInfo[i]);
 	}
 	if (sh_video) {
-		sh_video->aspect = GET_AVI_ASPECT(vprp->dwFrameAspectRatio);
+		sh_video->original_aspect = GET_AVI_ASPECT(vprp->dwFrameAspectRatio);
 	}
 	if( mp_msg_test(MSGT_HEADER,MSGL_V) ) print_vprp(vprp,MSGL_V);
 	free(vprp);
@@ -461,7 +461,11 @@ while(1){
 
 }
 
-if (priv->suidx_size > 0 && priv->idx_size == 0) {
+// Some files contain a dummy non-odml index.
+// Ignore an index smaller than some arbitrary size.
+// Some Canon cameras recording in MJPEG do this
+// (encoder software identifier CanonMVI06).
+if (priv->suidx_size > 0 && priv->idx_size < 4) {
     /*
      * No NEWAVIINDEX, but we got an OpenDML index.
      */

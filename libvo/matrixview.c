@@ -34,18 +34,6 @@
 static float matrix_contrast   = 1.5;
 static float matrix_brightness = 1.0;
 
-// Settings for our light.  Try playing with these (or add more lights).
-static float Light_Ambient[]  = { 0.1f, 0.1f, 0.1f, 1.0f };
-static float Light_Diffuse[]  = { 1.2f, 1.2f, 1.2f, 1.0f };
-static float Light_Position[] = { 2.0f, 2.0f, 0.0f, 1.0f };
-
-static const uint8_t flare[4][4] = {
-    {  0,   0,   0,   0},
-    {  0, 180,   0,   0},
-    {  0,   0,   0,   0},
-    {  0,   0,   0,   0}
-};
-
 #define MAX_TEXT_X 0x4000
 #define MAX_TEXT_Y 0x4000
 static int text_x = 0;
@@ -60,46 +48,29 @@ static int text_y = 0;
 static uint8_t *speed;
 static uint8_t *text;
 static uint8_t *text_light;
-static float *text_depth;
 
 static float *bump_pic;
 
-static void draw_char(int num, float light, float x, float y, float z)
-{
-    float tx, ty;
-    int num2, num3;
+static void draw_flare(float x, float y, float z);
 
-    num &= 63;
+static void draw_char(int num, int light, int illuminated, float x, float y, float z)
+{
+    int light2 = 0;
+    float tx, ty;
+
+    num %= 55;
+    if (light < 10) light = 0;
     //light = light / 255;        //light=7-light;num+=(light*60);
-    light = light / 255 * matrix_brightness;
-    num2 = num / 10;
-    num3 = num - (num2 * 10);
-    ty = (float)num2 / 7;
-    tx = (float)num3 / 10;
-    mpglNormal3f(0.0f, 0.0f, 1.0f);        // Needed for lighting
-    mpglColor4f(0.0, 1.0, 0.0, light);        // Basic polygon color
-
-    mpglTexCoord2f(tx, ty);
-    mpglVertex3f(x, y, z);
-    mpglTexCoord2f(tx + 0.1, ty);
-    mpglVertex3f(x + 1, y, z);
-    mpglTexCoord2f(tx + 0.1, ty + 0.166);
-    mpglVertex3f(x + 1, y - 1, z);
-    mpglTexCoord2f(tx, ty + 0.166);
-    mpglVertex3f(x, y - 1, z);
-}
-
-static void draw_illuminatedchar(int num, float x, float y, float z)
-{
-    float tx, ty;
-    int num2, num3;
-
-    num2 = num / 10;
-    num3 = num - (num2 * 10);
-    ty = (float)num2 / 7;
-    tx = (float)num3 / 10;
-    mpglNormal3f(0.0f, 0.0f, 1.0f);        // Needed for lighting
-    mpglColor4f(1.0, 1.0, 1.0, .5);        // Basic polygon color
+    light *= matrix_brightness;
+    if (illuminated) {
+        draw_flare(x, y, z);
+        light += 128;
+        if (light > 255) light = 255;
+        light2 = 128;
+    }
+    ty = (float)(num / 10) / 6;
+    tx = (float)(num % 10) / 10;
+    mpglColor4ub(light2, light, light2, 255);        // Basic polygon color
 
     mpglTexCoord2f(tx, ty);
     mpglVertex3f(x, y, z);
@@ -113,25 +84,25 @@ static void draw_illuminatedchar(int num, float x, float y, float z)
 
 static void draw_flare(float x, float y, float z)        //flare
 {
-    mpglNormal3f(0.0f, 0.0f, 1.0f);        // Needed for lighting
-    mpglColor4f(1.0, 1.0, 1.0, .8);        // Basic polygon color
+    mpglColor4ub(204, 204, 204, 255);        // Basic polygon color
 
-    mpglTexCoord2f(0, 0);
+    mpglTexCoord2f(1.0 - 4.0/128, 1.0 - 4.0/64);
     mpglVertex3f(x - 1, y + 1, z);
-    mpglTexCoord2f(0.75, 0);
+    mpglTexCoord2f(1.0 - 1.0/128, 1.0 - 4.0/64);
     mpglVertex3f(x + 2, y + 1, z);
-    mpglTexCoord2f(0.75, 0.75);
+    mpglTexCoord2f(1.0 - 1.0/128, 1.0 - 1.0/64);
     mpglVertex3f(x + 2, y - 2, z);
-    mpglTexCoord2f(0, 0.75);
+    mpglTexCoord2f(1.0 - 4.0/128, 1.0 - 1.0/64);
     mpglVertex3f(x - 1, y - 2, z);
 }
 
-static void draw_text(uint8_t *pic)
+static void draw_text(const uint8_t *pic)
 {
     int x, y;
     int p = 0;
     int c, c_pic;
     int pic_fade = 255;
+    int illuminated;
 
     for (y = _text_y; y > -_text_y; y--) {
         for (x = -_text_x; x < _text_x; x++) {
@@ -159,32 +130,9 @@ static void draw_text(uint8_t *pic)
                 bump_pic[p] = Z_Depth;
             }
 
-            if (text[p] && c > 10)
-                draw_char(text[p] + 1, c, x, y, text_depth[p] + bump_pic[p]);
+            illuminated = text_light[p] > 128 && text_light[p + text_x] < 10;
+            draw_char(text[p], c, illuminated, x, y, bump_pic[p]);
 
-            if (text_depth[p] < 0.1)
-                text_depth[p] = 0;
-            else
-                text_depth[p] /= 1.1;
-
-            if (text_light[p] > 128 && text_light[p + text_x] < 10)
-                draw_illuminatedchar(text[p] + 1, x, y,
-                                     text_depth[p] + bump_pic[p]);
-
-            p++;
-        }
-    }
-}
-
-static void draw_flares(void)
-{
-    float x, y;
-    int p = 0;
-
-    for (y = _text_y; y > -_text_y; y--) {
-        for (x = -_text_x; x < _text_x; x++) {
-            if (text_light[p] > 128 && text_light[p + text_x] < 10)
-                draw_flare(x, y, text_depth[p] + bump_pic[p]);
             p++;
         }
     }
@@ -255,17 +203,6 @@ static void ourBuildTextures(void)
                    font_texture);
     mpglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     mpglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    mpglBindTexture(GL_TEXTURE_2D, 1);
-    mpglTexImage2D(GL_TEXTURE_2D, 0, 1, 4, 4, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE,
-                   flare);
-    mpglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    mpglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // Some pretty standard settings for wrapping and filtering.
-    mpglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    mpglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    mpglBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void matrixview_init(int w, int h)
@@ -277,32 +214,13 @@ void matrixview_init(int w, int h)
     // Color to clear color buffer to.
     mpglClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-    // Depth to clear depth buffer to; type of test.
-    mpglClearDepth(1.0);
-    mpglDepthFunc(GL_LESS);
-
-    // Enables Smooth Color Shading; try GL_FLAT for (lack of) fun.
-    mpglShadeModel(GL_SMOOTH);
-
-    // Set up a light, turn it on.
-    mpglLightfv(GL_LIGHT1, GL_POSITION, Light_Position);
-    mpglLightfv(GL_LIGHT1, GL_AMBIENT, Light_Ambient);
-    mpglLightfv(GL_LIGHT1, GL_DIFFUSE, Light_Diffuse);
-    mpglEnable(GL_LIGHT1);
-
-    // A handy trick -- have surface material mirror the color.
-    mpglColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-    mpglEnable(GL_COLOR_MATERIAL);
-
     // Allow adjusting of texture color via glColor
     mpglTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
     mpglEnable(GL_BLEND);
     mpglEnable(GL_TEXTURE_2D);
 
-    mpglDisable(GL_LIGHTING);
-    mpglBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    mpglDisable(GL_DEPTH_TEST);
+    mpglBlendFunc(GL_ONE, GL_ONE);
 
     matrixview_reshape(w, h);
 }
@@ -322,30 +240,19 @@ void matrixview_reshape(int w, int h)
     };
     mpglViewport(0, 0, w, h);
 
-    mpglMatrixMode(GL_PROJECTION);
     mpglLoadMatrixf(matrix);
-
-    mpglMatrixMode(GL_MODELVIEW);
-    mpglLoadIdentity();
 }
 
 
-void matrixview_draw(int w, int h, double currentTime, float frameTime,
-                     uint8_t *data)
+void matrixview_draw(double currentTime, const uint8_t *data)
 {
     // Clear the color and depth buffers.
-    mpglClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    mpglClear(GL_COLOR_BUFFER_BIT);
 
     // OK, let's start drawing our planer quads.
     mpglBegin(GL_QUADS);
     draw_text(data);
     mpglEnd();
-
-    mpglBindTexture(GL_TEXTURE_2D, 1);
-    mpglBegin(GL_QUADS);
-    draw_flares();
-    mpglEnd();
-    mpglBindTexture(GL_TEXTURE_2D, 0);
 
     make_change(currentTime);
 }
@@ -370,15 +277,12 @@ void matrixview_matrix_resize(int w, int h)
     text = NULL;
     free(text_light);
     text_light = NULL;
-    free(text_depth);
-    text_depth = NULL;
     if (w > MAX_TEXT_X || h > MAX_TEXT_Y)
         return;
     elems = w * (h + 1);
     speed      = calloc(w,     sizeof(*speed));
     text       = calloc(elems, sizeof(*text));
     text_light = calloc(elems, sizeof(*text_light));
-    text_depth = calloc(elems, sizeof(*text_depth));
     bump_pic   = calloc(elems, sizeof(*bump_pic));
     text_x = w;
     text_y = h;

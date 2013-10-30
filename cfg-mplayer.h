@@ -184,6 +184,9 @@ const m_option_t mplayer_opts[]={
     {"novsync", &vo_vsync, CONF_TYPE_FLAG, 0, 1, 0, NULL},
     {"panscan", &vo_panscan, CONF_TYPE_FLOAT, CONF_RANGE, -1.0, 1.0, NULL},
     {"panscanrange", &vo_panscanrange, CONF_TYPE_FLOAT, CONF_RANGE, -19.0, 99.0, NULL},
+    {"border-pos-x", &vo_border_pos_x, CONF_TYPE_FLOAT, CONF_RANGE, -1, 2, NULL},
+    {"border-pos-y", &vo_border_pos_y, CONF_TYPE_FLOAT, CONF_RANGE, -1, 2, NULL},
+    {"monitor-orientation", &vo_rotate, CONF_TYPE_INT, CONF_RANGE, 0, 3, NULL},
 
     {"grabpointer", &vo_grabpointer, CONF_TYPE_FLAG, 0, 0, 1, NULL},
     {"nograbpointer", &vo_grabpointer, CONF_TYPE_FLAG, 0, 1, 0, NULL},
@@ -327,6 +330,8 @@ const m_option_t mplayer_opts[]={
 
     {"noloop", &mpctx_s.loop_times, CONF_TYPE_FLAG, 0, 0, -1, NULL},
     {"loop", &mpctx_s.loop_times, CONF_TYPE_INT, CONF_RANGE, -1, 10000, NULL},
+    {"allow-dangerous-playlist-parsing", &allow_playlist_parsing, CONF_TYPE_FLAG, 0, 0, 1, NULL},
+    {"noallow-dangerous-playlist-parsing", &allow_playlist_parsing, CONF_TYPE_FLAG, 0, 1, 0, NULL},
     {"playlist", NULL, CONF_TYPE_STRING, CONF_NOCFG, 0, 0, NULL},
     {"shuffle", NULL, CONF_TYPE_FLAG, CONF_NOCFG, 0, 0, NULL},
     {"noshuffle", NULL, CONF_TYPE_FLAG, CONF_NOCFG, 0, 0, NULL},
@@ -359,6 +364,7 @@ const m_option_t mplayer_opts[]={
     {"mouse-movements", &enable_mouse_movements, CONF_TYPE_FLAG, CONF_GLOBAL, 0, 1, NULL},
     {"nomouse-movements", &enable_mouse_movements, CONF_TYPE_FLAG, CONF_GLOBAL, 1, 0, NULL},
     {"doubleclick-time", &doubleclick_time, CONF_TYPE_INT, CONF_RANGE, 0, 1000, NULL},
+    {"pausing", &pausing_default, CONF_TYPE_INT, CONF_RANGE, 0, 4, NULL},
 #ifdef CONFIG_TV
     {"tvscan", tvscan_conf, CONF_TYPE_SUBCONFIG, 0, 0, 0, NULL},
 #else

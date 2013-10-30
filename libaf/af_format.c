@@ -45,15 +45,15 @@
 #include "af_format_alaw.h"
 
 // Switch endianness
-static void endian(void* in, void* out, int len, int bps);
+static void endian(const void* in, void* out, int len, int bps);
 // From signed to unsigned and the other way
 static void si2us(void* data, int len, int bps);
 // Change the number of bits per sample
-static void change_bps(void* in, void* out, int len, int inbps, int outbps);
+static void change_bps(const void* in, void* out, int len, int inbps, int outbps);
 // From float to int signed
-static void float2int(float* in, void* out, int len, int bps);
+static void float2int(const float* in, void* out, int len, int bps);
 // From signed int to float
-static void int2float(void* in, float* out, int len, int bps);
+static void int2float(const void* in, float* out, int len, int bps);
 
 static af_data_t* play(struct af_instance_s* af, af_data_t* data);
 static af_data_t* play_swapendian(struct af_instance_s* af, af_data_t* data);
@@ -345,7 +345,7 @@ af_info_t af_info_format = {
   af_open
 };
 
-static inline uint32_t load24bit(void* data, int pos) {
+static inline uint32_t load24bit(const void* data, int pos) {
 #if HAVE_BIGENDIAN
   return (((uint32_t)((uint8_t*)data)[3*pos])<<24) |
 	 (((uint32_t)((uint8_t*)data)[3*pos+1])<<16) |
@@ -370,7 +370,7 @@ static inline void store24bit(void* data, int pos, uint32_t expanded_value) {
 }
 
 // Function implementations used by play
-static void endian(void* in, void* out, int len, int bps)
+static void endian(const void* in, void* out, int len, int bps)
 {
   register int i;
   switch(bps){
@@ -413,7 +413,7 @@ static void si2us(void* data, int len, int bps)
   } while (i += bps);
 }
 
-static void change_bps(void* in, void* out, int len, int inbps, int outbps)
+static void change_bps(const void* in, void* out, int len, int inbps, int outbps)
 {
   register int i;
   switch(inbps){
@@ -484,60 +484,86 @@ static void change_bps(void* in, void* out, int len, int inbps, int outbps)
   }
 }
 
-static void float2int(float* in, void* out, int len, int bps)
+static void float2int(const float* in, void* out, int len, int bps)
 {
   float f;
   register int i;
   switch(bps){
   case(1):
     for(i=0;i<len;i++)
-      ((int8_t *)out)[i] = av_clip_int8(lrintf(128.0 * in[i]));
+      ((int8_t *)out)[i] = av_clip_int8(lrintf(128.0f * in[i]));
     break;
   case(2):
+#if HAVE_NEON
+    {
+    const float *in_end = in + len;
+    while (in < in_end - 7) {
+      __asm__(
+          "vld1.32 {q0,q1}, [%0]!\n\t"
+          "vcvt.s32.f32 q0, q0, #31\n\t"
+          "vqrshrn.s32  d0, q0, #15\n\t"
+          "vcvt.s32.f32 q1, q1, #31\n\t"
+          "vqrshrn.s32  d1, q1, #15\n\t"
+          "vst1.16 {q0}, [%1]!\n\t"
+      : "+r"(in), "+r"(out)
+      :: "q0", "q1", "memory");
+    }
+    while (in < in_end) {
+      __asm__(
+          "vld1.32 {d0[0]}, [%0]!\n\t"
+          "vcvt.s32.f32 d0, d0, #31\n\t"
+          "vqrshrn.s32  d0, q0, #15\n\t"
+          "vst1.16 {d0[0]}, [%1]!\n\t"
+      : "+r"(in), "+r"(out)
+      :: "d0", "memory");
+    }
+    }
+#else
     for(i=0;i<len;i++)
-      ((int16_t*)out)[i] = av_clip_int16(lrintf(32768.0 * in[i]));
+      ((int16_t*)out)[i] = av_clip_int16(lrintf(32768.0f * in[i]));
+#endif
     break;
   case(3):
     for(i=0;i<len;i++){
-      f = in[i] * 8388608;
+      f = in[i] * 8388608.0f;
       store24bit(out, i,   av_clip(lrintf(f), -1*(1<<23), (1<<23)-1) << 8);
     }
     break;
   case(4):
     for(i=0;i<len;i++){
       f = in[i];
-      if (f <= -1.0)
+      if (f <= -1.0f)
         ((int32_t*)out)[i] = INT_MIN;
       else
-      if (f >=  1.0)//no need to use corrected constant, rounding won't cause overflow
+      if (f >=  1.0f)//no need to use corrected constant, rounding won't cause overflow
         ((int32_t*)out)[i] = INT_MAX;
       else
-        ((int32_t*)out)[i] = lrintf(f*2147483648.0);
+        ((int32_t*)out)[i] = lrintf(f*2147483648.0f);
 
     }
     break;
   }
 }
 
-static void int2float(void* in, float* out, int len, int bps)
+static void int2float(const void* in, float* out, int len, int bps)
 {
   register int i;
   switch(bps){
   case(1):
     for(i=0;i<len;i++)
-      out[i]=(1.0/128.0)*((int8_t*)in)[i];
+      out[i]=(1.0f/128.0f)*((int8_t*)in)[i];
     break;
   case(2):
     for(i=0;i<len;i++)
-      out[i]=(1.0/32768.0)*((int16_t*)in)[i];
+      out[i]=(1.0f/32768.0f)*((int16_t*)in)[i];
     break;
   case(3):
     for(i=0;i<len;i++)
-      out[i]=(1.0/2147483648.0)*((int32_t)load24bit(in, i));
+      out[i]=(1.0f/2147483648.0f)*((int32_t)load24bit(in, i));
     break;
   case(4):
     for(i=0;i<len;i++)
-      out[i]=(1.0/2147483648.0)*((int32_t*)in)[i];
+      out[i]=(1.0f/2147483648.0f)*((int32_t*)in)[i];
     break;
   }
 }

@@ -28,7 +28,6 @@
 #include "gui/app/gui.h"
 #include "gui/ui/actions.h"
 #include "gui/util/list.h"
-#include "gui/util/string.h"
 
 #include "help_mp.h"
 #include "stream/stream.h"
@@ -39,35 +38,52 @@ static GtkWidget *urlCombo;
 static GtkWidget *urlEntry;
 static GList *urlEntries;
 
+/**
+ * @brief Add the entered URL to the URL list and stream it,
+ *        if the button clicked is the OK button
+ *
+ * @note If the scheme is missing, http is assumed (and added).
+ *
+ * @param button object which received the signal
+ * @param user_data user data set when the signal handler was connected
+ *
+ * @note The button is determined by checking @a user_data.
+ */
 static void button_clicked(GtkButton *button, gpointer user_data)
 {
-    urlItem *item;
-
     (void)button;
 
     if (user_data) {
-        gchar *str = strdup(gtk_entry_get_text(GTK_ENTRY(urlEntry)));
+        char *str = strdup(gtk_entry_get_text(GTK_ENTRY(urlEntry)));
 
         if (str) {
             if (!strstr(str, "://")) {
-                gchar *tmp;
-                tmp = malloc(strlen(str) + 8);
-                sprintf(tmp, "http://%s", str);
+                char *tmp = malloc(strlen(str) + 8);
+
+                if (tmp)
+                    sprintf(tmp, "http://%s", str);
+
                 free(str);
                 str = tmp;
             }
 
-            urlEntries = g_list_prepend(urlEntries, (gchar *)str);
+            if (str) {
+                urlItem *item;
 
-            item      = calloc(1, sizeof(urlItem));
-            item->url = gstrdup(str);
-            listMgr(URLLIST_ITEM_ADD, item);
+                uiSetFile(NULL, str, STREAMTYPE_STREAM);
+                listMgr(PLAYLIST_DELETE, 0);
+                add_to_gui_playlist(str, PLAYLIST_ITEM_APPEND);
 
-            uiSetFile(NULL, str, STREAMTYPE_STREAM);
-            guiInfo.NewPlay = GUI_FILE_NEW;
-            listMgr(PLAYLIST_DELETE, 0);
-            add_to_gui_playlist(str, PLAYLIST_ITEM_APPEND);
-            uiEvent(evPlay, 0);
+                item = calloc(1, sizeof(urlItem));
+
+                if (item) {
+                    item->url = str;
+                    listMgr(URLLIST_ITEM_ADD, item);
+                }
+
+                guiInfo.NewPlay = GUI_FILE_NEW;
+                uiEvent(evPlay, 0);
+            }
         }
     }
 
@@ -150,7 +166,7 @@ void ShowURLDialog(void)
         urlEntries = NULL;
 
         while (item) {
-            urlEntries = g_list_append(urlEntries, (gchar *)item->url);
+            urlEntries = g_list_append(urlEntries, item->url);
             item       = item->next;
         }
     }

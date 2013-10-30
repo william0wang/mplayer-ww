@@ -20,11 +20,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#define _XOPEN_SOURCE 600
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "config.h"
 #include "mp_msg.h"
@@ -551,23 +549,24 @@ static int decode_audio_dts(unsigned char *indata_ptr, int len, unsigned char *b
   buf16[3] = fsize << 3;
 
   if (!convert_16bits) {
-#if HAVE_BIGENDIAN
-  /* BE stream */
-  if (indata_ptr[0] == 0x1f || indata_ptr[0] == 0x7f)
-#else
-  /* LE stream */
-  if (indata_ptr[0] == 0xff || indata_ptr[0] == 0xfe)
-#endif
-  memcpy(&buf[8], indata_ptr, fsize);
-  else
-  {
-  swab(indata_ptr, &buf[8], fsize);
-  if (fsize & 1) {
-    buf[8+fsize-1] = 0;
-    buf[8+fsize] = indata_ptr[fsize-1];
-    fsize++;
-  }
-  }
+    int be_stream = indata_ptr[0] == 0x1f || indata_ptr[0] == 0x7f;
+    if (be_stream == HAVE_BIGENDIAN)
+      memcpy(&buf[8], indata_ptr, fsize);
+    else
+    {
+      int i = fsize >> 1;
+      uint16_t *d = buf16 + 4;
+      uint8_t *s = indata_ptr;
+      while (i--) {
+        *d++ = HAVE_BIGENDIAN ? AV_RL16(s) : AV_RB16(s);
+        s += 2;
+      }
+      if (fsize & 1) {
+        // treat as if there was an additional 0
+        *d++ = HAVE_BIGENDIAN ? *s : *s << 8;
+        fsize++;
+      }
+    }
   }
   memset(&buf[fsize + 8], 0, nr_samples * 2 * 2 - (fsize + 8));
 

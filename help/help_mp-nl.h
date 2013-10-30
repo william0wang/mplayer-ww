@@ -747,7 +747,6 @@ static const char help_text[]=
 #define MSGTR_VO_UnableToAccess "Geen toegang"
 #define MSGTR_VO_ExistsButNoDirectory "bestaat al, maar is geen directory."
 #define MSGTR_VO_DirExistsButNotWritable "Output directory bestaat reeds, maar is alleen-lezen."
-#define MSGTR_VO_DirExistsAndIsWritable "Output directory bestaat reeds en is beschrijfbaar."
 #define MSGTR_VO_CantCreateDirectory "Kan de output directory niet aanmaken."
 #define MSGTR_VO_CantCreateFile "Kan het output bestand niet aanmaken."
 #define MSGTR_VO_DirectoryCreateSuccess "Output directory succesvol aangemaakt."

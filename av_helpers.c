@@ -22,6 +22,7 @@
 #include "libavformat/avformat.h"
 #include "mp_msg.h"
 #include "av_helpers.h"
+#include "libaf/reorder_ch.h"
 
 int avcodec_initialized;
 int avformat_initialized;
@@ -112,4 +113,48 @@ void init_avformat(void)
         avformat_initialized = 1;
         av_log_set_callback(mp_msp_av_log_callback);
     }
+}
+
+int lavc_encode_audio(AVCodecContext *ctx, void *src, int src_len, void *dst, int dst_len)
+{
+    void *orig_src = src;
+    int bps = av_get_bytes_per_sample(ctx->sample_fmt);
+    int planar = ctx->channels > 1 && av_sample_fmt_is_planar(ctx->sample_fmt);
+    int isac3 = ctx->codec->id == AV_CODEC_ID_AC3;
+    int n;
+    int got;
+    AVPacket pkt;
+    AVFrame *frame = avcodec_alloc_frame();
+    if ((ctx->channels == 6 || ctx->channels == 5) &&
+        (isac3 || !strcmp(ctx->codec->name,"libfaac"))) {
+        reorder_channel_nch(src, AF_CHANNEL_LAYOUT_MPLAYER_DEFAULT,
+                            isac3 ? AF_CHANNEL_LAYOUT_LAVC_DEFAULT : AF_CHANNEL_LAYOUT_AAC_DEFAULT,
+                            ctx->channels,
+                            src_len / bps, bps);
+    }
+    pkt.data = dst;
+    pkt.size = dst_len;
+    frame->nb_samples = src_len / ctx->channels / bps;
+    if (planar) {
+        // TODO: this is horribly inefficient.
+        int ch;
+        src = av_mallocz(src_len);
+        for (ch = 0; ch < ctx->channels; ch++) {
+            uint8_t *tmps = (uint8_t *)orig_src + ch*bps;
+            uint8_t *tmpd = (uint8_t *)src + ch*src_len/ctx->channels;
+            int s;
+            for (s = 0; s < frame->nb_samples; s++) {
+                memcpy(tmpd, tmps, bps);
+                tmps += ctx->channels * bps;
+                tmpd += bps;
+            }
+        }
+    }
+    n = avcodec_fill_audio_frame(frame, ctx->channels, ctx->sample_fmt, src, src_len, 1);
+    if (n < 0) return 0;
+    n = avcodec_encode_audio2(ctx, &pkt, frame, &got);
+    avcodec_free_frame(&frame);
+    if (planar) av_free(src);
+    if (n < 0) return n;
+    return got ? pkt.size : 0;
 }

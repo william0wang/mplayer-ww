@@ -94,6 +94,7 @@ int loadGPUProgram(GLenum target, char *prog);
 #define YUV_CONVERSION_FRAGMENT_LOOKUP3D 6
 //! use ATI specific "text" register combiners ("fragment program")
 #define YUV_CONVERSION_TEXT_FRAGMENT 7
+#define YUV_CONVERSION_SL_PROGRAM 8
 //! use normal bilinear scaling for textures
 #define YUV_SCALER_BILIN 0
 //! use higher quality bicubic scaling for textures
@@ -157,6 +158,7 @@ typedef struct {
   int texh;
   int chrom_texw;
   int chrom_texh;
+  int is_planar;
   float filter_strength;
   float noise_strength;
   int has_alpha_tex;
@@ -229,17 +231,14 @@ typedef struct MPGLContext {
 } MPGLContext;
 
 int init_mpglcontext(MPGLContext *ctx, enum MPGLType type);
+int mpglcontext_create_window(MPGLContext *ctx, uint32_t d_width, uint32_t d_height, uint32_t flags, const char *title);
 void uninit_mpglcontext(MPGLContext *ctx);
 
 extern GLenum (GLAPIENTRY *mpglGetError)(void);
 extern void (GLAPIENTRY *mpglBegin)(GLenum);
 extern void (GLAPIENTRY *mpglEnd)(void);
 extern void (GLAPIENTRY *mpglViewport)(GLint, GLint, GLsizei, GLsizei);
-extern void (GLAPIENTRY *mpglMatrixMode)(GLenum);
-extern void (GLAPIENTRY *mpglLoadIdentity)(void);
-extern void (GLAPIENTRY *mpglLoadMatrixf)(float *);
-extern void (GLAPIENTRY *mpglPushMatrix)(void);
-extern void (GLAPIENTRY *mpglPopMatrix)(void);
+extern void (GLAPIENTRY *mpglLoadMatrixf)(const float *);
 extern void (GLAPIENTRY *mpglClear)(GLbitfield);
 extern GLuint (GLAPIENTRY *mpglGenLists)(GLsizei);
 extern void (GLAPIENTRY *mpglDeleteLists)(GLuint, GLsizei);
@@ -249,10 +248,8 @@ extern void (GLAPIENTRY *mpglCallList)(GLuint);
 extern void (GLAPIENTRY *mpglCallLists)(GLsizei, GLenum, const GLvoid *);
 extern void (GLAPIENTRY *mpglGenTextures)(GLsizei, GLuint *);
 extern void (GLAPIENTRY *mpglDeleteTextures)(GLsizei, const GLuint *);
-extern void (GLAPIENTRY *mpglTexEnvf)(GLenum, GLenum, GLfloat);
 extern void (GLAPIENTRY *mpglTexEnvi)(GLenum, GLenum, GLint);
 extern void (GLAPIENTRY *mpglColor4ub)(GLubyte, GLubyte, GLubyte, GLubyte);
-extern void (GLAPIENTRY *mpglColor4f)(GLfloat, GLfloat, GLfloat, GLfloat);
 extern void (GLAPIENTRY *mpglClearColor)(GLclampf, GLclampf, GLclampf, GLclampf);
 extern void (GLAPIENTRY *mpglClearDepth)(double);
 extern void (GLAPIENTRY *mpglDepthFunc)(GLenum);

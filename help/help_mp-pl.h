@@ -924,7 +924,6 @@ static const char help_text[]=
 #define MSGTR_VO_UnableToAccess "Brak dostępu"
 #define MSGTR_VO_ExistsButNoDirectory "istnieje, ale nie jest folderem."
 #define MSGTR_VO_DirExistsButNotWritable "Folder wyjściowy istnieje ale nie ma praw do zapisu."
-#define MSGTR_VO_DirExistsAndIsWritable "Folder wyjściowy już istnieje i ma prawa zapisu."
 #define MSGTR_VO_CantCreateDirectory "Nie mogę stworzyć folderu wyjściowego."
 #define MSGTR_VO_CantCreateFile "Nie mogę stworzyć pliku wyjściowego."
 #define MSGTR_VO_DirectoryCreateSuccess "Folder wyjściowy utworzony pomyślnie."
