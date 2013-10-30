@@ -26,6 +26,7 @@
 #include <math.h>
 #include <limits.h>
 
+#include "libavutil/common.h"
 #include "af.h"
 
 // Data for specific instances of this filter
@@ -102,8 +103,8 @@ static af_data_t* play_s16(struct af_instance_s* af, af_data_t* data)
     l = avg + (int)(s->mul * (a[i] - avg));
     r = avg + (int)(s->mul * (a[i + 1] - avg));
 
-    a[i] = clamp(l, SHRT_MIN, SHRT_MAX);
-    a[i + 1] = clamp(r, SHRT_MIN, SHRT_MAX);
+    a[i] = av_clip_int16(l);
+    a[i + 1] = av_clip_int16(r);
   }
 
   return data;

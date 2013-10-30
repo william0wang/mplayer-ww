@@ -1,4 +1,4 @@
-.\" sync with en/mplayer.1 rev. 36136
+.\" sync with en/mplayer.1 rev. 36297
 .\" MPlayer (C) 2000-2013 MPlayer Team
 .\" This man page was/is translated by JRaSH<jrash06 at gmail.com>
 .
@@ -1246,6 +1246,26 @@ mplayer \-heartbeat\-cmd "gnome\-screensaver\-command \-p" file
 时方式的 sleep 时，这些内核已经以相类似的精度唤醒进程了。
 .
 .TP
+.B \-pausing <0\-3>（仅用于 MPlayer）
+指定命令默认使用的暂时行为，也就是命令结后，\
+MPlayer 是继续播放还是暂停。\
+参见 DOCS/tech/slave.txt 以了解更多详情。
+.PD 0
+.RSs
+.IPs 0
+继续
+.IPs 1
+暂停（pausing）
+.IPs 2
+保持暂停 / 播放状态（pausing_keep）
+.IPs 3
+切换暂停 / 播放状态（pausing_toggle）
+.IPs 4
+暂停同时画面帧无步进（实验性）（pausing_keep_force）
+.RE
+.PD 1
+.
+.TP
 .B \-playing\-msg <字符串>
 开始播放前打印字符串。\
 支持以下的变量替换：
@@ -1263,11 +1283,27 @@ mplayer \-heartbeat\-cmd "gnome\-screensaver\-command \-p" file
 根据播放列表播放文件（支持 ASX、Winamp、SMIL、或\
 每行一个文件名的格式）。
 .br
+.I 警告：\
+MPlayer 解析及使用播放列表文件的方式不具备防范恶意构建文件的\
+安全性。\
+这些文件可能触发危险行为。\
+该隐患存在于迄今所有的 MPlayer 的版本中，但不幸的是之前未能\
+将此情况妥善写入文档中，而且一些用户已受此误导而将 -playlist 用于\
+不可信来源的参数。\
+请勿将 -playlist 用于任意的因特网来源或你不信任的文件！
+.br
 .I 注意：
 该选项处理为一项条目，其后的选项仅应用于该播放列表\
 的元素。
 .br
 FIXME: 需彻底解释清楚并记入文档。
+.
+.TP
+.B \-allow-dangerous-playlist-parsing
+该选项允许将任何文件解析为播放列表。用于例如一台服务将一个文件公告为播放列表\
+类型的情况。\
+仅当清楚知道所有涉及的服务器都可信任时才启用该选项。\
+MPlayer 的播放列表处理代码设计上并不能应对恶意播放列表文件。
 .
 .TP
 .B \-rtc\-device <设备>
@@ -1432,10 +1468,6 @@ MPlayer 在输出详细信息模式下（\-v）运行时会打印可用的语言
 这个选项可以告诉 MPlayer 使用哪个角度（默认值：1）。
 .
 .TP
-.B \-bluray\-chapter <章节代码>（仅用于蓝光 DVD）
-告诉 MPlayer 从哪个蓝光 DVD 章节开始播放当前标题的内容（默认值：1）。
-.
-.TP
 .B \-bluray\-device <碟片路径>（仅用于蓝光 DVD）
 指定蓝光碟片的位置。必须是一个具有蓝光 DVD 结构的目录。
 .
@@ -1543,7 +1575,7 @@ MPlayer 要求解码器将音频解码为该选项所指定的\
 .PD 1
 .
 .TP
-.B \-chapter <章节代码>[\-<中止章节代码>]（仅用于 dvd:// 和 dvdnav://）
+.B \-chapter <章节代码>[\-<中止章节代码>]
 指定从哪个章节开始播放。\
 可同时指定播放至哪个场景中止（默认值：1）。
 .
@@ -3086,6 +3118,10 @@ OSS 音频输出驱动
 通过 JACK（Jack 音频连接组件）的音频输出
 .PD 0
 .RSs
+.IPs (no)connect
+自动创建至输出端口的连接（默认值：启用）。\
+当启用时，输出信道的数量最大限制为可用的\
+输出端口数量。
 .IPs port=<名称>
 连接至所给名称的端口（默认值：物理端口）。
 .IPs name=<客户端名称>
@@ -3594,6 +3630,25 @@ ggi 和 gl_tiled 的驱动都支持。
 值为负数表示可以放大至 \-panscanrange+1 所表示的因数。\
 例如 \-panscanrange \-3 允许缩放因子达到 4。\
 该功能是实验性的。
+.
+.TP
+.B \-border\-pos\-x <0.0\-1.0>（仅用于 -vo gl,xv,xvmc,vdpau,direct3d，默认值为 0.5）
+当使用黑边以调整画面大小适应屏幕宽高比时，该选项用于确定在何处摆放黑边。\
+值为 0.0 时将黑边放在右边，1.0 则放在左边。\
+值超出 0.0 \- 1.0 的范围时将在所对应的一边额外增加黑边的宽度并使另一边的部分画面\
+被移除。
+.
+.TP
+.B \-border\-pos\-y <0.0\-1.0>（仅用于 -vo gl,xv,xvmc,vdpau,direct3d only，默认值为 0.5）
+与 \-border\-pos\-x 相似，但用于上下位置的黑边。\
+值为 0.0 时将黑边放在底部，1.0 则放在底部。
+.
+.TP
+.B \-monitor\-orientation <0-3>（实验性选项）
+将显示的图像旋转 90、180 或 270 度。\
+也旋转 OSD，而不只是视频图像本身。\
+当前只有 gl 视频输出驱动支持。\
+对于其它视频输出类型可以使用 -vf ass,expand=osd=1,rotate=n。以后甚至可以自动应用这一行为。
 .
 .TP
 .B \-refreshrate <Hz>
@@ -4159,6 +4214,8 @@ OpenGL 视频输出驱动，简单版本。\
 3：X11/EGL（高度处于实验阶段）
 .br
 4：OSX/Cocoa
+.br
+5：Android（十分糟糕的实现，仅用于测试）
 .RE
 .IPs (no)ati\-hack
 当使用了 PBO 时（当使用了 \-dr 或强制使用 \-pbo 时），\
@@ -4217,15 +4274,15 @@ OSD 的颜色（默认值是：0x00ffffff，对应不透明的白色）。
 提供饱和度和色调的控制功能。\
 该方法速度快但不精确。
 .br
-2：使用片断程序。\
-需要 GL_ARB_fragment_program 扩展组件和至少三个纹理处理单元。\
-提供亮度、对比度、饱和度和色调控制。
-.br
-3：使用利用 POW 指令的片断程序。\
+2：使用利用 POW 指令的片断程序。\
 需要 GL_ARB_fragment_program 扩展组件和至少三个纹理处理单元。\
 提供亮度、对比度、饱和度、色调和伽玛校正值的控制功能。\
 伽玛校正值也能在红、绿和蓝三个方面单独设置。\
 方法 4 通常更快。
+.br
+3：与 2 相同。\
+为该类型专门分配一个值是出于历史原因，MPlayer 现在为按需启用的\
+伽玛校正值控制功能插入额外的指令。
 .br
 4：使用具有额外查阅操作的片断程序。\
 需要 GL_ARB_fragment_program 扩展组件和至少四个纹理处理单元。\

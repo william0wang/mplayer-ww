@@ -16,6 +16,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -105,6 +106,9 @@ static const stream_info_t* const auto_open_streams[] = {
 #endif
   &stream_info_rtp,
   &stream_info_udp,
+#ifdef CONFIG_FFMPEG
+  &stream_info_ffmpeg,
+#endif
   &stream_info_http2,
 #endif
 #ifdef CONFIG_DVBIN
@@ -141,9 +145,6 @@ static const stream_info_t* const auto_open_streams[] = {
 #endif
 #ifdef CONFIG_LIBBLURAY
   &stream_info_bluray,
-#endif
-#ifdef CONFIG_FFMPEG
-  &stream_info_ffmpeg,
 #endif
 
   &stream_info_null,
@@ -707,4 +708,40 @@ uint8_t *stream_read_until(stream_t *s, uint8_t *mem, int max,
   ptr[0] = 0;
   if(s->eof && ptr == mem) return NULL;
   return mem;
+}
+
+int parse_chapter_range(const m_option_t *conf, const char *range) {
+  const char *s;
+  char *t;
+  if (!range)
+    return M_OPT_MISSING_PARAM;
+  s = range;
+  dvd_chapter = 1;
+  dvd_last_chapter = 0;
+  if(*range && isdigit(*range)) {
+    dvd_chapter = strtol(range, (char **) &s, 10);
+    if(range == s) {
+      mp_msg(MSGT_OPEN, MSGL_ERR, MSGTR_DVDinvalidChapterRange, range);
+      return M_OPT_INVALID;
+    }
+  }
+  if(*s == 0)
+    return 0;
+  else if(*s != '-') {
+    mp_msg(MSGT_OPEN, MSGL_ERR, MSGTR_DVDinvalidChapterRange, range);
+    return M_OPT_INVALID;
+  }
+  ++s;
+  if(*s == 0)
+      return 0;
+  if(! isdigit(*s)) {
+    mp_msg(MSGT_OPEN, MSGL_ERR, MSGTR_DVDinvalidChapterRange, range);
+    return M_OPT_INVALID;
+  }
+  dvd_last_chapter = strtol(s, &t, 10);
+  if (s == t || *t) {
+    mp_msg(MSGT_OPEN, MSGL_ERR, MSGTR_DVDinvalidChapterRange, range);
+    return M_OPT_INVALID;
+  }
+  return 0;
 }

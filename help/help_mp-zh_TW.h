@@ -942,7 +942,6 @@ static const char help_text[]=
 #define MSGTR_VO_UnableToAccess "無法訪問"
 #define MSGTR_VO_ExistsButNoDirectory "已經存在, 但不是一個目録。"
 #define MSGTR_VO_DirExistsButNotWritable "輸出目録已經存在, 但是不可寫。"
-#define MSGTR_VO_DirExistsAndIsWritable "輸出目録已經存在并且可寫。"
 #define MSGTR_VO_CantCreateDirectory "無法創建輸出目録。"
 #define MSGTR_VO_CantCreateFile "無法創建輸出文件。"
 #define MSGTR_VO_DirectoryCreateSuccess "輸出目録創建成功。"

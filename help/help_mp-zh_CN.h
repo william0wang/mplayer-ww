@@ -1,4 +1,4 @@
-// Synced with help_mp-en.h rev. 35968
+// Synced with help_mp-en.h rev. 36470
 //
 // Translated by JRaSH <jrash06@gmail.com>
 
@@ -188,6 +188,7 @@ static const char help_text[]=
 #define MSGTR_PtsAfterFiltersMissing "缺失过滤器后的 PTS\n"
 #define MSGTR_CommandLine "命令行："
 #define MSGTR_MenuInitFailed "菜单初始化失败。\n"
+#define MSGTR_InvalidSwitchRatio "无效的宽高比‘%f’，宽高比将保持不变。\n"
 
 // --- edit decision lists
 #define MSGTR_EdlOutOfMem "无法分配足够的内存以存放 EDL 数据。\n"
@@ -672,6 +673,7 @@ static const char help_text[]=
 #define MSGTR_MENU_Exit "退出"
 #define MSGTR_MENU_Mute "静音"
 #define MSGTR_MENU_Original "原始的"
+#define MSGTR_MENU_235 "2.35:1"
 #define MSGTR_MENU_AspectRatio "宽高比"
 #define MSGTR_MENU_AudioTrack "音频轨迹"
 #define MSGTR_MENU_Track "轨迹 %d"
@@ -890,10 +892,10 @@ static const char help_text[]=
                 "请尝试在滤镜列表尾部添加缩放滤镜，\n"\
                 "例如，用 -vf spp,scale 代替 -vf spp。\n"
 #define MSGTR_VO_GenericError "该错误已经发生"
+#define MSGTR_VO_OutputDirectory "输出目录"
 #define MSGTR_VO_UnableToAccess "无法访问"
 #define MSGTR_VO_ExistsButNoDirectory "已经存在，但不是一个目录。"
 #define MSGTR_VO_DirExistsButNotWritable "输出目录已经存在，但是不可写。"
-#define MSGTR_VO_DirExistsAndIsWritable "输出目录已经存在并且可写。"
 #define MSGTR_VO_CantCreateDirectory "无法创建输出目录。"
 #define MSGTR_VO_CantCreateFile "无法创建输出文件。"
 #define MSGTR_VO_DirectoryCreateSuccess "输出目录创建成功。"

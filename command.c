@@ -1569,6 +1569,7 @@ static int mp_property_sub(m_option_t *prop, int action, void *arg,
         if (d_sub->id > -2)
             reset_spu = 1;
         d_sub->id = -2;
+        d_sub->sh = NULL;
     }
 #ifdef CONFIG_ASS
     ass_track = 0;
@@ -2734,10 +2735,13 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
         case MP_CMD_SWITCH_RATIO:
             if (!sh_video)
                 break;
-            if (cmd->nargs == 0 || cmd->args[0].v.f == -1)
-                movie_aspect = (float) sh_video->disp_w / sh_video->disp_h;
-            else
+            if (cmd->nargs == 0)
+                movie_aspect = -1.0;
+            else if (cmd->args[0].v.f == -1 || cmd->args[0].v.f >= 0)
                 movie_aspect = cmd->args[0].v.f;
+            else
+                mp_msg(MSGT_CPLAYER, MSGL_WARN, MSGTR_InvalidSwitchRatio,
+                       cmd->args[0].v.f);
             mpcodecs_config_vo(sh_video, sh_video->disp_w, sh_video->disp_h, 0);
             break;
 
@@ -2775,10 +2779,11 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
             file_filter = cmd->args[0].v.i;
             break;
 
-        case MP_CMD_QUIT:
-            exit_player_with_rc(EXIT_QUIT,
-                                (cmd->nargs > 0) ? cmd->args[0].v.i : 0);
-
+        case MP_CMD_QUIT: {
+                int rc = cmd->nargs > 0 ? cmd->args[0].v.i : 0;
+                mp_cmd_free(cmd);
+                exit_player_with_rc(EXIT_QUIT, rc);
+            }
         case MP_CMD_PLAY_TREE_STEP:{
                 int n = cmd->args[0].v.i == 0 ? 1 : cmd->args[0].v.i;
                 int force = cmd->args[1].v.i;

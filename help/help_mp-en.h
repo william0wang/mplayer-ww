@@ -188,6 +188,7 @@ static const char help_text[]=
 #define MSGTR_PtsAfterFiltersMissing "pts after filters MISSING\n"
 #define MSGTR_CommandLine "CommandLine:"
 #define MSGTR_MenuInitFailed "Menu init failed.\n"
+#define MSGTR_InvalidSwitchRatio "Invalid aspect ratio '%f', it remains unchanged.\n"
 
 // --- edit decision lists
 #define MSGTR_EdlOutOfMem "Can't allocate enough memory to hold EDL data.\n"
@@ -672,6 +673,7 @@ static const char help_text[]=
 #define MSGTR_MENU_Exit "Exit"
 #define MSGTR_MENU_Mute "Mute"
 #define MSGTR_MENU_Original "Original"
+#define MSGTR_MENU_235 "2.35:1"
 #define MSGTR_MENU_AspectRatio "Aspect ratio"
 #define MSGTR_MENU_AudioTrack "Audio track"
 #define MSGTR_MENU_Track "Track %d"
@@ -890,10 +892,10 @@ static const char help_text[]=
                 "Try appending the scale filter to your filter list,\n"\
                 "e.g. -vf spp,scale instead of -vf spp.\n"
 #define MSGTR_VO_GenericError "This error has occurred"
+#define MSGTR_VO_OutputDirectory "output directory"
 #define MSGTR_VO_UnableToAccess "Unable to access"
 #define MSGTR_VO_ExistsButNoDirectory "already exists, but is not a directory."
 #define MSGTR_VO_DirExistsButNotWritable "Output directory already exists, but is not writable."
-#define MSGTR_VO_DirExistsAndIsWritable "Output directory already exists and is writable."
 #define MSGTR_VO_CantCreateDirectory "Unable to create output directory."
 #define MSGTR_VO_CantCreateFile "Unable to create output file."
 #define MSGTR_VO_DirectoryCreateSuccess "Output directory successfully created."

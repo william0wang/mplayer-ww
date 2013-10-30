@@ -30,11 +30,19 @@
 #include "libmpcodecs/img_format.h"
 //#include "vidix/vidix.h"
 
+
+#define ROTATE(t, x, y) do { \
+  t rot_tmp = x; \
+  x = y; \
+  y = -rot_tmp; \
+} while(0)
+
 #define VO_EVENT_EXPOSE 1
 #define VO_EVENT_RESIZE 2
 #define VO_EVENT_KEYPRESS 4
 #define VO_EVENT_REINIT 8
 #define VO_EVENT_MOVE 16
+#define VO_EVENT_MOUSE 32
 
 /* Obsolete: VOCTRL_QUERY_VAA 1 */
 /* does the device support the required format */
@@ -107,6 +115,7 @@ typedef struct {
 #define VOFLAG_FLIPPING           0x08
 #define VOFLAG_HIDDEN             0x10  //< Use to create a hidden window
 #define VOFLAG_STEREO             0x20  //< Use to create a stereo-capable window
+#define VOFLAG_DEPTH              0x40  //< Request a depth buffer
 #define VOFLAG_XOVERLAY_SUB_VO 0x10000
 
 typedef struct vo_info_s
@@ -224,6 +233,9 @@ extern int vo_vsync;
 extern int vo_fs;
 extern int vo_fsmode;
 extern float vo_panscan;
+extern float vo_border_pos_x;
+extern float vo_border_pos_y;
+extern int vo_rotate;
 extern int vo_adapter_num;
 extern int vo_refresh_rate;
 extern int vo_keepaspect;
@@ -292,6 +304,15 @@ static inline int pixel_stride(unsigned fmt) {
 static inline int aspect_scaling(void)
 {
   return vo_fs || vo_keepaspect;
+}
+
+static inline int apply_border_pos(int full, int part, float pos) {
+  if (pos >= 0.0 && pos <= 1.0) {
+    return pos*(full - part);
+  }
+  if (pos < 0)
+    return pos * part;
+  return full - part + (pos - 1) * part;
 }
 
 #endif /* MPLAYER_VIDEO_OUT_H */

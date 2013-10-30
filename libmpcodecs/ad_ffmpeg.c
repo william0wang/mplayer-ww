@@ -47,6 +47,10 @@ LIBAD_EXTERN(ffmpeg)
 #include "libavcodec/avcodec.h"
 #include "libavutil/dict.h"
 
+struct adctx {
+    int last_samplerate;
+    int srate_changed;
+};
 
 static int preinit(sh_audio_t *sh)
 {
@@ -62,13 +66,16 @@ static int setup_format(sh_audio_t *sh_audio, const AVCodecContext *lavc_context
     if (!sample_format)
         sample_format = sh_audio->sample_format;
     if(sh_audio->wf){
+        struct adctx *c = lavc_context->opaque;
+        c->srate_changed |= c->last_samplerate && c->last_samplerate != samplerate;
+        c->last_samplerate = samplerate;
         // If the decoder uses the wrong number of channels all is lost anyway.
         // sh_audio->channels=sh_audio->wf->nChannels;
 
         if (lavc_context->codec_id == AV_CODEC_ID_AAC &&
             samplerate == 2*sh_audio->wf->nSamplesPerSec) {
             broken_srate = 1;
-        } else if (sh_audio->wf->nSamplesPerSec)
+        } else if (sh_audio->wf->nSamplesPerSec && !c->srate_changed)
             samplerate=sh_audio->wf->nSamplesPerSec;
     }
     if (lavc_context->channels != sh_audio->channels ||
@@ -106,6 +113,7 @@ static int init(sh_audio_t *sh_audio)
 
     lavc_context = avcodec_alloc_context3(lavc_codec);
     sh_audio->context=lavc_context;
+    lavc_context->opaque = av_mallocz(sizeof(struct adctx));
 
     snprintf(tmpstr, sizeof(tmpstr), "%f", drc_level);
     av_dict_set(&opts, "drc_scale", tmpstr, 0);
@@ -187,6 +195,7 @@ static void uninit(sh_audio_t *sh)
 
     if (avcodec_close(lavc_context) < 0)
 	mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_CantCloseCodec);
+    av_freep(&lavc_context->opaque);
     av_freep(&lavc_context->extradata);
     av_freep(&lavc_context);
 }
@@ -211,6 +220,45 @@ static av_always_inline void copy_samples_planar(size_t bps,
 {
     size_t s, c, o = 0;
 
+#if HAVE_NEON
+    if (nb_channels == 2 && bps == 4) {
+        const unsigned char *src0 = src[0];
+        const unsigned char *src1 = src[1];
+        size_t aligned = nb_samples & ~7;
+        const unsigned char *src0_end = src0 + aligned*bps;
+        while (src0 < src0_end) {
+           __asm__ (
+               "vld1.32 {q0}, [%0]!\n\t"
+               "vld1.32 {q1}, [%1]!\n\t"
+               "vld1.32 {q2}, [%0]!\n\t"
+               "vld1.32 {q3}, [%1]!\n\t"
+               "vst2.32 {q0,q1}, [%2]!\n\t"
+               "vst2.32 {q2,q3}, [%2]!\n\t"
+               : "+&r"(src0), "+&r"(src1), "+&r"(dst)
+               :: "q0", "q1", "q2", "q3", "memory");
+        }
+        o += aligned*bps;
+        nb_samples -= aligned;
+    } else if (nb_channels == 2 && bps == 2) {
+        const unsigned char *src0 = src[0];
+        const unsigned char *src1 = src[1];
+        size_t aligned = nb_samples & ~15;
+        const unsigned char *src0_end = src0 + aligned*bps;
+        while (src0 < src0_end) {
+           __asm__ (
+               "vld1.16 {q0}, [%0]!\n\t"
+               "vld1.16 {q1}, [%1]!\n\t"
+               "vld1.16 {q2}, [%0]!\n\t"
+               "vld1.16 {q3}, [%1]!\n\t"
+               "vst2.16 {q0,q1}, [%2]!\n\t"
+               "vst2.16 {q2,q3}, [%2]!\n\t"
+               : "+&r"(src0), "+&r"(src1), "+&r"(dst)
+               :: "q0", "q1", "q2", "q3", "memory");
+        }
+        o += aligned*bps;
+        nb_samples -= aligned;
+    }
+#endif
     for (s = 0; s < nb_samples; s++) {
         for (c = 0; c < nb_channels; c++) {
             memcpy(dst, src[c] + o, bps);

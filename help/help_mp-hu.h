@@ -802,7 +802,6 @@ static const char help_text[]=
 #define MSGTR_VO_UnableToAccess "Nem elérhető"
 #define MSGTR_VO_ExistsButNoDirectory "már létezik, de nem könyvtár."
 #define MSGTR_VO_DirExistsButNotWritable "A célkönyvtár már létezik, de nem írható."
-#define MSGTR_VO_DirExistsAndIsWritable "A célkönyvtár már létezik és írható."
 #define MSGTR_VO_CantCreateDirectory "Nem tudtam létrehozni a célkönyvtárat."
 #define MSGTR_VO_CantCreateFile "A kimeneti fájl nem hozható létre."
 #define MSGTR_VO_DirectoryCreateSuccess "A célkönyvtárat sikeresen létrehoztam."

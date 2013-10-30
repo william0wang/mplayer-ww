@@ -52,6 +52,8 @@ const char *vo_format_name(int format)
     case IMGFMT_BGRA:    return "BGRA";
     case IMGFMT_ARGB:    return "ARGB";
     case IMGFMT_RGBA:    return "RGBA";
+    case IMGFMT_XYZ12LE: return "XYZ 36-bit LE";
+    case IMGFMT_XYZ12BE: return "XYZ 36-bit BE";
     case IMGFMT_GBR24P:  return "Planar GBR 24-bit";
     case IMGFMT_GBR12P:  return "Planar GBR 36-bit";
     case IMGFMT_GBR14P:  return "Planar GBR 42-bit";
@@ -218,6 +220,11 @@ int mp_get_chroma_shift(int format, int *x_shift, int *y_shift, int *component_b
         xs = 31;
         ys = 31;
         break;
+    case IMGFMT_NV12:
+    case IMGFMT_NV21:
+        xs = 1;
+        ys = 1;
+        err = 1;
     default:
         err = 1;
         break;

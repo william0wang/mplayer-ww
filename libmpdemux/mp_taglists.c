@@ -31,6 +31,7 @@ static const struct AVCodecTag mp_wav_tags[] = {
     { AV_CODEC_ID_ADPCM_ADX,         MKTAG('S', 'a', 'd', 'x') },
 #if LIBAVUTIL_VERSION_MICRO >= 100
     { AV_CODEC_ID_ADPCM_AFC,         MKTAG('A', 'F', 'C', ' ') },
+    { AV_CODEC_ID_ADPCM_DTK,         MKTAG('D', 'T', 'K', ' ') },
 #endif
     { AV_CODEC_ID_ADPCM_IMA_APC,     MKTAG('A', 'P', 'C', 'A') },
     { AV_CODEC_ID_ADPCM_EA,          MKTAG('A', 'D', 'E', 'A') },
@@ -106,6 +107,9 @@ static const struct AVCodecTag mp_codecid_override_tags[] = {
     { AV_CODEC_ID_ESCAPE130,         MKTAG('E', '1', '3', '0') },
 #endif
     { AV_CODEC_ID_FLV1,              MKTAG('F', 'L', 'V', '1') },
+#if LIBAVUTIL_VERSION_MICRO >= 100
+    { AV_CODEC_ID_ADPCM_G726LE,      MKTAG('6', '2', '7', 'G') },
+#endif
     { AV_CODEC_ID_G729,              MKTAG('G', '7', '2', '9') },
     { AV_CODEC_ID_H264,              MKTAG('H', '2', '6', '4') },
     { AV_CODEC_ID_MP3,               0x55 },
@@ -123,10 +127,12 @@ static const struct AVCodecTag mp_codecid_override_tags[] = {
     { AV_CODEC_ID_PCM_S24LE,         1 },
     { AV_CODEC_ID_PCM_S32BE,         MKTAG('i', 'n', '3', '2') },
     { AV_CODEC_ID_PCM_S32LE,         1 },
+    { AV_CODEC_ID_PCM_F32LE,         MKTAG('2', '3', 'l', 'f') },
     { AV_CODEC_ID_MP2,               0x50 },
     { AV_CODEC_ID_MP3,               0x55},
     { AV_CODEC_ID_MPEG2VIDEO,        MKTAG('M', 'P', 'G', '2') },
     { AV_CODEC_ID_TRUEHD,            MKTAG('T', 'R', 'H', 'D') },
+    { AV_CODEC_ID_VC1,               MKTAG('V', 'C', '-', '1') },
     { 0, 0 },
 };
 
@@ -151,6 +157,9 @@ static const struct AVCodecTag mp_bmp_tags[] = {
     { AV_CODEC_ID_DSICINVIDEO,       MKTAG('D', 'C', 'I', 'V') },
     { AV_CODEC_ID_DXA,               MKTAG('D', 'X', 'A', '1') },
     { AV_CODEC_ID_FLIC,              MKTAG('f', 'l', 'i', 'c') },
+#if LIBAVUTIL_VERSION_MICRO >= 100
+    { AV_CODEC_ID_HEVC,              MKTAG('H', 'E', 'V', 'C') },
+#endif
     { AV_CODEC_ID_IDCIN,             MKTAG('I', 'D', 'C', 'I') },
     { AV_CODEC_ID_INTERPLAY_VIDEO,   MKTAG('I', 'N', 'P', 'V') },
     { AV_CODEC_ID_JV,                MKTAG('F', 'F', 'J', 'V') },

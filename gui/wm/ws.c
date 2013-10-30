@@ -219,8 +219,6 @@ void wsInit(Display *display)
     if (!wsUseXShape)
         mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_WS_NoXshape);
 
-    XSynchronize(wsDisplay, True);
-
     wsScreen  = DefaultScreen(wsDisplay);
     wsRootWin = RootWindow(wsDisplay, wsScreen);
 #ifdef CONFIG_XF86VM
@@ -600,9 +598,6 @@ buttonreleased:
         wsXDNDProcessSelection(wsWindowList[l], event);
         break;
     }
-
-    XFlush(wsDisplay);
-    XSync(wsDisplay, False);
 }
 
 /**
@@ -745,24 +740,6 @@ static void wsWindowDecoration(wsWindow *win)
                     PropModeReplace, (unsigned char *)&wsMotifWmHints, 5);
 }
 
-/**
- * @brief Wait until a window is mapped if its property requires it.
- *
- * @param win pointer to a ws window structure
- */
-static void wsWindowMapWait(wsWindow *win)
-{
-    XEvent xev;
-
-    if (win->Property & wsWaitMap) {
-        do
-            XNextEvent(wsDisplay, &xev);
-        while (xev.type != MapNotify || xev.xmap.event != win->WindowID);
-
-        win->Mapped = wsMapped;
-    }
-}
-
 // ----------------------------------------------------------------------------------------------
 //   Create window.
 //     X,Y   : window position
@@ -786,7 +763,18 @@ Window LeaderWindow;
 // ----------------------------------------------------------------------------------------------
 void wsWindowCreate(wsWindow *win, int x, int y, int w, int h, int p, int c, char *label)
 {
-    int depth;
+    int i, depth;
+
+    for (i = 0; i < wsWLCount; i++)
+        if (wsWindowList[i] == NULL)
+            break;
+
+    if (i == wsWLCount) {
+        mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_WS_TooManyOpenWindows);
+        mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
+    }
+
+    wsWindowList[i] = win;
 
     win->Property = p;
 
@@ -818,6 +806,8 @@ void wsWindowCreate(wsWindow *win, int x, int y, int w, int h, int p, int c, cha
     }
 
     XMatchVisualInfo(wsDisplay, wsScreen, depth, TrueColor, &win->VisualInfo);
+
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[ws] visual: ID %#lx\n", win->VisualInfo.visualid);
 
 /* --- */
     win->AtomLeaderClient = XInternAtom(wsDisplay, "WM_CLIENT_LEADER", False);
@@ -901,36 +891,13 @@ void wsWindowCreate(wsWindow *win, int x, int y, int w, int h, int p, int c, cha
     win->Mapped  = wsNo;
     win->Rolled  = wsNo;
 
-    if (p & wsShowWindow) {
-        XMapWindow(wsDisplay, win->WindowID);
-        wsWindowMapWait(win);
-    }
-
     wsImageCreate(win, win->Width, win->Height);
 /* End of creating -------------------------------------------------------------------------- */
-
-    {
-        int i;
-
-        for (i = 0; i < wsWLCount; i++)
-            if (wsWindowList[i] == NULL)
-                break;
-
-        if (i == wsWLCount) {
-            mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_WS_TooManyOpenWindows);
-            mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
-        }
-
-        wsWindowList[i] = win;
-    }
-
-    XFlush(wsDisplay);
-    XSync(wsDisplay, False);
 
     win->DrawHandler  = NULL;
     win->MouseHandler = NULL;
     win->KeyHandler   = NULL;
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[ws] window is created. ( %s ).\n", label);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[ws] window successfully created: %s\n", label);
 }
 
 void wsWindowDestroy(wsWindow *win)
@@ -1112,9 +1079,10 @@ void wsWindowBackground(wsWindow *win, int r, int g, int b)
         ;
     }
 
-    if (r == -1 && g == -1 && b == -1)
+    if (r == -1 && g == -1 && b == -1) {
+        XSync(wsDisplay, False);
         XSetWindowBackgroundPixmap(wsDisplay, win->WindowID, None);
-    else {
+    } else {
         XSetWindowBackground(wsDisplay, win->WindowID, color);
         XClearWindow(wsDisplay, win->WindowID);
     }
@@ -1246,7 +1214,6 @@ void wsWindowFullscreen(wsWindow *win)
         wsWindowLayer(wsDisplay, win->WindowID, vo_ontop);
 
     wsWindowRaiseTop(wsDisplay, win->WindowID);
-    XFlush(wsDisplay);
 }
 
 /**
@@ -1265,7 +1232,6 @@ void wsWindowVisibility(wsWindow *win, int vis)
     case wsShowWindow:
 
         XMapRaised(wsDisplay, win->WindowID);
-        wsWindowMapWait(win);
 
         if (vo_fs_type & vo_wm_FULLSCREEN)
             win->isFullScreen = False;
@@ -1277,8 +1243,6 @@ void wsWindowVisibility(wsWindow *win, int vis)
         XUnmapWindow(wsDisplay, win->WindowID);
         break;
     }
-
-    XFlush(wsDisplay);
 }
 
 /**
@@ -1317,7 +1281,6 @@ void wsWindowRedraw(wsWindow *win)
     if (win->DrawHandler) {
         win->State = wsWindowExpose;
         win->DrawHandler();
-        XFlush(wsDisplay);
     }
 }
 
@@ -1359,7 +1322,6 @@ void wsImageCreate(wsWindow *win, int w, int h)
         win->xImage->data     = win->Shminfo.shmaddr;
         win->Shminfo.readOnly = False;
         XShmAttach(wsDisplay, &win->Shminfo);
-        XSync(wsDisplay, False);
         shmctl(win->Shminfo.shmid, IPC_RMID, 0);
     } else
 #endif
@@ -1484,8 +1446,6 @@ void wsMouseVisibility(wsWindow *win, int vis)
         XDefineCursor(wsDisplay, win->WindowID, win->wsCursor);
         break;
     }
-
-    XFlush(wsDisplay);
 }
 
 /**

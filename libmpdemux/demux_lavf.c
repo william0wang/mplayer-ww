@@ -75,7 +75,6 @@ typedef struct lavf_priv {
     AVInputFormat *avif;
     AVFormatContext *avfc;
     AVIOContext *pb;
-    uint8_t buffer[BIO_BUFFER_SIZE];
     int audio_streams;
     int video_streams;
     int sub_streams;
@@ -405,10 +404,10 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
             sh_video->frametime=1/av_q2d(st->r_frame_rate);
             sh_video->format=bih->biCompression;
             if(st->sample_aspect_ratio.num && st->sample_aspect_ratio.num < 0xfffff)
-                sh_video->aspect = codec->width  * st->sample_aspect_ratio.num
+                sh_video->original_aspect = codec->width  * st->sample_aspect_ratio.num
                          / (float)(codec->height * st->sample_aspect_ratio.den);
             else
-                sh_video->aspect=codec->width  * codec->sample_aspect_ratio.num
+                sh_video->original_aspect = codec->width * codec->sample_aspect_ratio.num
                        / (float)(codec->height * codec->sample_aspect_ratio.den);
             sh_video->i_bps=codec->bit_rate/8;
             if (title && title->value)
@@ -451,7 +450,11 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
                 type = 't';
             else if (codec->codec_id == AV_CODEC_ID_MOV_TEXT)
                 type = 'm';
-            else if (codec->codec_id == AV_CODEC_ID_SSA)
+            else if (codec->codec_id == AV_CODEC_ID_SSA
+#if LIBAVUTIL_VERSION_MICRO >= 100
+                     || codec->codec_id == AV_CODEC_ID_ASS
+#endif /* LIBAVUTIL_VERSION_MICRO >= 100 */
+                )
                 type = 'a';
             else if (codec->codec_id == AV_CODEC_ID_DVD_SUBTITLE)
                 type = 'v';
@@ -515,6 +518,7 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
 }
 
 static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
+    AVDictionary *opts = NULL;
     AVFormatContext *avfc;
     AVDictionaryEntry *t = NULL;
     lavf_priv_t *priv= demuxer->priv;
@@ -541,23 +545,31 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
             mp_msg(MSGT_HEADER,MSGL_ERR, "demux_lavf, couldn't set option analyzeduration to %u\n", opt_analyzeduration);
     }
 
+    if (rtsp_transport_http || rtsp_transport_tcp)
+       av_dict_set(&opts, "rtsp_transport", rtsp_transport_http ? "http" : "tcp", 0);
+
     if(opt_avopt){
-        if(parse_avopts(avfc, opt_avopt) < 0){
+        if(av_dict_parse_string(&opts, opt_avopt, "=", ",", 0) < 0){
             mp_msg(MSGT_HEADER,MSGL_ERR, "Your options /%s/ look like gibberish to me pal\n", opt_avopt);
             return NULL;
         }
     }
 
     if(demuxer->stream->url) {
-        if (!strncmp(demuxer->stream->url, "ffmpeg://", 9))
+        if (!strncmp(demuxer->stream->url, "ffmpeg://dummy://", 17))
+            av_strlcpy(mp_filename, demuxer->stream->url + 17, sizeof(mp_filename));
+        else if (!strncmp(demuxer->stream->url, "ffmpeg://", 9))
             av_strlcpy(mp_filename, demuxer->stream->url + 9, sizeof(mp_filename));
+        else if (!strncmp(demuxer->stream->url, "rtsp://", 7))
+            av_strlcpy(mp_filename, demuxer->stream->url, sizeof(mp_filename));
         else
             av_strlcat(mp_filename, demuxer->stream->url, sizeof(mp_filename));
     } else
         av_strlcat(mp_filename, "foobar.dummy", sizeof(mp_filename));
 
     if (!(priv->avif->flags & AVFMT_NOFILE)) {
-        priv->pb = avio_alloc_context(priv->buffer, BIO_BUFFER_SIZE, 0,
+        uint8_t *buffer = av_mallocz(BIO_BUFFER_SIZE);
+        priv->pb = avio_alloc_context(buffer, BIO_BUFFER_SIZE, 0,
                                       demuxer, mp_read, NULL, mp_seek);
         priv->pb->read_seek = mp_read_seek;
         if (!demuxer->stream->end_pos || (demuxer->stream->flags & MP_STREAM_SEEK) != MP_STREAM_SEEK)
@@ -565,10 +577,23 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
         avfc->pb = priv->pb;
     }
 
-    if(avformat_open_input(&avfc, mp_filename, priv->avif, NULL)<0){
+    if(avformat_open_input(&avfc, mp_filename, priv->avif, &opts)<0){
         mp_msg(MSGT_HEADER,MSGL_ERR,"LAVF_header: av_open_input_stream() failed\n");
         return NULL;
     }
+    if (av_dict_count(opts)) {
+        AVDictionaryEntry *e = NULL;
+        int invalid = 0;
+        while ((e = av_dict_get(opts, "", e, AV_DICT_IGNORE_SUFFIX))) {
+            if (strcmp(e->key, "rtsp_transport")) {
+                invalid++;
+                mp_msg(MSGT_HEADER,MSGL_ERR,"Unknown option %s\n", e->key);
+            }
+        }
+        if (invalid)
+            return 0;
+    }
+    av_dict_free(&opts);
 
     priv->avfc= avfc;
 
@@ -582,7 +607,6 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
 
     if(avformat_find_stream_info(avfc, NULL) < 0){
         mp_msg(MSGT_HEADER,MSGL_ERR,"LAVF_header: av_find_stream_info() failed\n");
-        return NULL;
     }
 
     /* Add metadata. */
@@ -892,6 +916,7 @@ static void demux_close_lavf(demuxer_t *demuxer)
          av_freep(&priv->avfc->key);
          avformat_close_input(&priv->avfc);
         }
+        if (priv->pb) av_freep(&priv->pb->buffer);
         av_freep(&priv->pb);
         free(priv); demuxer->priv= NULL;
     }

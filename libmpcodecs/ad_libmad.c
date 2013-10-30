@@ -67,26 +67,25 @@ static int preinit(sh_audio_t *sh){
 
 static int read_frame(sh_audio_t *sh){
   mad_decoder_t *this = sh->context;
-  int len;
 
-while((len=demux_read_data(sh->ds,&sh->a_in_buffer[sh->a_in_buffer_len],
-          sh->a_in_buffer_size-sh->a_in_buffer_len))>0){
-  sh->a_in_buffer_len+=len;
   while(1){
     int ret;
     mad_stream_buffer (&this->stream, sh->a_in_buffer, sh->a_in_buffer_len);
     ret=mad_frame_decode (&this->frame, &this->stream);
     if (this->stream.next_frame) {
-	int num_bytes =
-	    (char*)sh->a_in_buffer+sh->a_in_buffer_len - (char*)this->stream.next_frame;
-	memmove(sh->a_in_buffer, this->stream.next_frame, num_bytes);
-	mp_msg(MSGT_DECAUDIO,MSGL_DBG2,"libmad: %d bytes processed\n",sh->a_in_buffer_len-num_bytes);
-	sh->a_in_buffer_len = num_bytes;
+	unsigned processed = this->stream.next_frame - (uint8_t *)sh->a_in_buffer;
+	sh->a_in_buffer_len -= processed;
+	memmove(sh->a_in_buffer, this->stream.next_frame, sh->a_in_buffer_len);
+	mp_msg(MSGT_DECAUDIO,MSGL_DBG2,"libmad: %d bytes processed\n",processed);
     }
     if (ret == 0) return 1; // OK!!!
     // error! try to resync!
-    if(this->stream.error==MAD_ERROR_BUFLEN) break;
-  }
+    if(this->stream.error==MAD_ERROR_BUFLEN) {
+        int len=demux_read_data(sh->ds,&sh->a_in_buffer[sh->a_in_buffer_len],
+                                sh->a_in_buffer_size-sh->a_in_buffer_len);
+        if (len <= 0) break;
+        sh->a_in_buffer_len+=len;
+    }
 }
 mp_msg(MSGT_DECAUDIO,MSGL_INFO,"Cannot sync MAD frame\n");
 return 0;

@@ -353,6 +353,8 @@ static void updatedisplay(gui_t *gui, HWND hwnd)
 
 static LRESULT CALLBACK VideoProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    float aspect;
+    char cmd[40];
     gui_t *gui = (gui_t *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
     if (gui && (gui->videowindow != hWnd)) return FALSE;
 
@@ -468,16 +470,26 @@ static LRESULT CALLBACK VideoProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                     mp_input_queue_cmd(mp_input_parse_cmd("mute"));
                     break;
                 case ID_ASPECT1:
-                    mp_input_queue_cmd(mp_input_parse_cmd("switch_ratio 1.777777"));
-                    break;
                 case ID_ASPECT2:
-                    mp_input_queue_cmd(mp_input_parse_cmd("switch_ratio 1.333333"));
-                    break;
                 case ID_ASPECT3:
-                    mp_input_queue_cmd(mp_input_parse_cmd("switch_ratio 2.35"));
-                    break;
                 case ID_ASPECT4:
-                    mp_input_queue_cmd(mp_input_parse_cmd("switch_ratio 0"));
+                    switch (LOWORD(wParam))
+                    {
+                        case ID_ASPECT1:
+                            aspect = 16.0f / 9.0f;
+                            break;
+                        case ID_ASPECT2:
+                            aspect = 4.0f / 3.0f;
+                            break;
+                        case ID_ASPECT3:
+                            aspect = 2.35f;
+                            break;
+                        default:
+                            aspect = -1;
+                            break;
+                    }
+                    snprintf(cmd, sizeof(cmd), "pausing_keep switch_ratio %f", aspect);
+                    mp_input_queue_cmd(mp_input_parse_cmd(cmd));
                     break;
                 case IDSUB_TOGGLE:
                     mp_input_queue_cmd(mp_input_parse_cmd("sub_visibility"));
@@ -1261,7 +1273,7 @@ static void create_videomenu(gui_t *gui)
     AppendMenu(gui->subtitlemenu, MF_STRING, IDSUB_CYCLE, acp(MSGTR_MENU_SubtitleLanguages));
     AppendMenu(gui->aspectmenu, MF_STRING, ID_ASPECT1, "16:9");
     AppendMenu(gui->aspectmenu, MF_STRING, ID_ASPECT2, "4:3");
-    AppendMenu(gui->aspectmenu, MF_STRING, ID_ASPECT3, "2.35");
+    AppendMenu(gui->aspectmenu, MF_STRING, ID_ASPECT3, acp(MSGTR_MENU_235));
     AppendMenu(gui->aspectmenu, MF_SEPARATOR, 0, 0);
     AppendMenu(gui->aspectmenu, MF_STRING, ID_ASPECT4, acp(MSGTR_MENU_Original));
     AppendMenu(gui->videomenu, MF_SEPARATOR, 0, 0);

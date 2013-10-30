@@ -799,7 +799,6 @@ static const char help_text[]=
 #define MSGTR_VO_UnableToAccess "Impossibile accedere a"
 #define MSGTR_VO_ExistsButNoDirectory "già esiste, ma non è una directory."
 #define MSGTR_VO_DirExistsButNotWritable "La directory di output esiste già ma non è scrivibile."
-#define MSGTR_VO_DirExistsAndIsWritable "La directory di output esiste già ed è scrivibile."
 #define MSGTR_VO_CantCreateDirectory "Non posso creare la directory di output."
 #define MSGTR_VO_CantCreateFile "Non posso creare il file di output."
 #define MSGTR_VO_DirectoryCreateSuccess "Directory di output creata con successo."

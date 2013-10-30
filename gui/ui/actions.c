@@ -48,7 +48,6 @@
 #include "mpcommon.h"
 #include "mplayer.h"
 #include "input/input.h"
-#include "libmpcodecs/vd.h"
 #include "libmpdemux/demuxer.h"
 #include "libvo/video_out.h"
 #include "libvo/wskeys.h"
@@ -93,6 +92,8 @@ void uiEvent(int ev, float param)
 {
     int iparam     = (int)param, osd;
     mixer_t *mixer = mpctx_get_mixer(guiInfo.mpcontext);
+    float aspect;
+    char cmd[40];
 
     switch (ev) {
 /* user events */
@@ -426,28 +427,24 @@ play:
 
         switch (iparam) {
         case 2:
-            movie_aspect = 16.0f / 9.0f;
+            aspect = 16.0f / 9.0f;
             break;
 
         case 3:
-            movie_aspect = 4.0f / 3.0f;
+            aspect = 4.0f / 3.0f;
             break;
 
         case 4:
-            movie_aspect = 2.35;
+            aspect = 2.35f;
             break;
 
         case 1:
         default:
-            movie_aspect = -1;
+            aspect = -1;
         }
 
-        if (guiInfo.StreamType == STREAMTYPE_VCD)
-            uiEvent(evPlayVCD, 0);
-        else if (guiInfo.StreamType == STREAMTYPE_DVD)
-            uiEvent(ivPlayDVD, 0);
-        else
-            guiInfo.NewPlay = GUI_FILE_NEW;
+        snprintf(cmd, sizeof(cmd), "pausing_keep switch_ratio %f", aspect);
+        mp_input_queue_cmd(mp_input_parse_cmd(cmd));
 
         break;
 

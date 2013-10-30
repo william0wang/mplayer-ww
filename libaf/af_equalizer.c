@@ -29,6 +29,7 @@
 #include <inttypes.h>
 #include <math.h>
 
+#include "libavutil/common.h"
 #include "mp_msg.h"
 #include "af.h"
 
@@ -146,7 +147,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     for(i=0;i<AF_NCH;i++){
       for(j=0;j<KM;j++){
 	((af_equalizer_t*)af->setup)->g[i][j] =
-	  pow(10.0,clamp(g[j],G_MIN,G_MAX)/20.0)-1.0;
+	  pow(10.0,av_clipf(g[j],G_MIN,G_MAX)/20.0)-1.0;
       }
     }
     return AF_OK;
@@ -159,7 +160,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
       return AF_ERROR;
 
     for(k = 0 ; k<KM ; k++)
-      s->g[ch][k] = pow(10.0,clamp(gain[k],G_MIN,G_MAX)/20.0)-1.0;
+      s->g[ch][k] = pow(10.0,av_clipf(gain[k],G_MIN,G_MAX)/20.0)-1.0;
 
     return AF_OK;
   }

@@ -956,7 +956,6 @@ static const char help_text[]=
 #define MSGTR_VO_UnableToAccess "Impossible d'accéder"
 #define MSGTR_VO_ExistsButNoDirectory "Existe déjà, mais n'est pas un répertoire."
 #define MSGTR_VO_DirExistsButNotWritable "Répertoire de sortie existe déjà, mais n'est pas en écriture."
-#define MSGTR_VO_DirExistsAndIsWritable "Répertoire de sortie existe déjà et n'est pas en écriture."
 #define MSGTR_VO_CantCreateDirectory "Impossible de créer répertoire de sortie."
 #define MSGTR_VO_CantCreateFile "Impossible de créer fichier de sortie."
 #define MSGTR_VO_DirectoryCreateSuccess "Répertoire de sortie créé avec succès."

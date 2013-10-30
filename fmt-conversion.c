@@ -64,6 +64,8 @@ static const struct {
     { IMGFMT_RGB64LE,    AV_PIX_FMT_RGBA64LE },
     { IMGFMT_RGB64BE,    AV_PIX_FMT_RGBA64BE },
 #endif /* LIBAVUTIL_VERSION_MICRO >= 100 */
+    { IMGFMT_XYZ12LE,    AV_PIX_FMT_XYZ12LE },
+    { IMGFMT_XYZ12BE,    AV_PIX_FMT_XYZ12BE },
     { IMGFMT_422A,       AV_PIX_FMT_YUVA422P },
     { IMGFMT_444A,       AV_PIX_FMT_YUVA444P },
     { IMGFMT_GBR24P,     AV_PIX_FMT_GBRP },
@@ -148,6 +150,7 @@ enum AVPixelFormat imgfmt2pixfmt(int fmt)
 {
     int i;
     enum AVPixelFormat pix_fmt;
+    if (IMGFMT_IS_VDPAU(fmt)) return AV_PIX_FMT_VDPAU;
     for (i = 0; conversion_map[i].fmt; i++)
         if (conversion_map[i].fmt == fmt)
             break;
@@ -178,7 +181,7 @@ static const struct {
     {AF_FORMAT_S16_NE, AV_SAMPLE_FMT_S16},
     {AF_FORMAT_S32_NE, AV_SAMPLE_FMT_S32},
     {AF_FORMAT_FLOAT_NE, AV_SAMPLE_FMT_FLT},
-    {0, AV_SAMPLE_FMT_NONE}
+    {AF_FORMAT_UNKNOWN, AV_SAMPLE_FMT_NONE}
 };
 
 enum AVSampleFormat affmt2samplefmt(int fmt)
@@ -204,7 +207,7 @@ int samplefmt2affmt(enum AVSampleFormat sample_fmt)
         if (samplefmt_conversion_map[i].sample_fmt == sample_fmt)
             break;
     fmt = samplefmt_conversion_map[i].fmt;
-    if (!fmt)
+    if (fmt == AF_FORMAT_UNKNOWN)
         mp_msg(MSGT_GLOBAL, MSGL_ERR, "Unsupported AVSampleFormat %i\n", sample_fmt);
     return fmt;
 }

@@ -300,7 +300,8 @@ int mpcodecs_config_vo(sh_video_t *sh, int w, int h,
         sh->aspect = movie_aspect;      // cmdline overrides autodetect
     else if (sh->stream_aspect != 0.0)
         sh->aspect = sh->stream_aspect;
-//  if(!sh->aspect) sh->aspect=1.0;
+    else
+        sh->aspect = sh->original_aspect;
 
     if (opt_screen_size_x || opt_screen_size_y) {
         screen_size_x = opt_screen_size_x;
@@ -330,7 +331,7 @@ int mpcodecs_config_vo(sh_video_t *sh, int w, int h,
                 screen_size_y = screen_size_xy * sh->disp_h / sh->disp_w;
             }
         }
-        if (sh->aspect > 0.01) {
+        if (sh->aspect >= 0.01) {
             int w;
             mp_msg(MSGT_CPLAYER, MSGL_INFO, MSGTR_MovieAspectIsSet,
                    sh->aspect);

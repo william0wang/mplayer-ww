@@ -6,7 +6,11 @@ MPlayer
     Other:
     * "run" slave/keybinding command now supports expanding properties
     * better support for > 8 bit formats in -vo gl
+    * support for XYZ color space in -vo gl
     * -vo gl now supports OSD (not EOSD though) with GLES backend.
+    * GLES backend now uses GLES v2 with YUV support via shaders
+    * -vo gl supports rotated display without needing video filters via
+      -monitor-orientation command-line option.
     * -vo gl now has an OSX/Cocoa backend, so it should be a better
       alternative to -vo corevideo now.
     * -vo gl2 renamed to -vo gl_tiled to stop people from assuming it is
@@ -23,6 +27,8 @@ MPlayer
       via OpenGL ES.
       Note that just a bit of seeking etc. would cause reproducible
       system reboots after just a few seconds on my Galaxy S2.
+    * Android: -wid is supported. This should allow using MPlayer in slave
+      mode, a native window pointer needs to be passed as -wid. Untested.
 
   1.1: "We gave up on 1.0"
 

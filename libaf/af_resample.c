@@ -234,7 +234,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
       s->i = 0;
 
       // Calculate cutoff frequency for filter
-      fc = 1/(float)(max(s->up,s->dn));
+      fc = 1/(float)(FFMAX(s->up,s->dn));
       // Allocate space for polyphase filter bank and prototype filter
       w = malloc(sizeof(float) * s->up *L);
       free(s->w);
@@ -277,7 +277,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     int sloppy=1;
     sscanf((char*)arg,"%i:%i:%i", &rate, &sloppy, &type);
     s->setup = (sloppy?FREQ_SLOPPY:FREQ_EXACT) |
-      (clamp(type,RSMP_LIN,RSMP_FLOAT));
+      (av_clip(type,RSMP_LIN,RSMP_FLOAT));
     return af->control(af,AF_CONTROL_RESAMPLE_RATE | AF_CONTROL_SET, &rate);
   }
   case AF_CONTROL_POST_CREATE:

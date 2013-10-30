@@ -58,9 +58,9 @@ compile_check() {
   echo >> "$TMPLOG"
   cat "$source" >> "$TMPLOG"
   echo >> "$TMPLOG"
-  echo "$_cc $WARNFLAGS $WARN_CFLAGS $CFLAGS $source $extra_cflags $ld_static $extra_ldflags $libs_mplayer $libs_mencoder -o $TMPEXE $@ -lm" >> "$TMPLOG"
+  echo "$_cc $WARNFLAGS $WARN_CFLAGS $CFLAGS $source $extra_cflags $ld_static $extra_ldflags $libs_mplayer $libs_mencoder -o $TMPEXE $@ $libm" >> "$TMPLOG"
   rm -f "$TMPEXE"
-  $_cc $WARNFLAGS $WARN_CFLAGS $CFLAGS "$source" $extra_cflags $ld_static $extra_ldflags $libs_mplayer $libs_mencoder -o "$TMPEXE" "$@" -lm >> "$TMPLOG" 2>&1
+  $_cc $WARNFLAGS $WARN_CFLAGS $CFLAGS "$source" $extra_cflags $ld_static $extra_ldflags $libs_mplayer $libs_mencoder -o "$TMPEXE" "$@" $libm >> "$TMPLOG" 2>&1
   TMPRES="$?"
   echo >> "$TMPLOG"
   echo >> "$TMPLOG"
@@ -861,6 +861,7 @@ _stream_cache=yes
 _priority=no
 def_dos_paths="#define HAVE_DOS_PATHS 0"
 def_stream_cache="#define CONFIG_STREAM_CACHE 1"
+def_path_max_check="#define CONFIG_PATH_MAX_CHECK 0"
 def_priority="#undef CONFIG_PRIORITY"
 def_pthread_cache="#undef PTHREAD_CACHE"
 shmem=no
@@ -1572,7 +1573,7 @@ libavdecoders=$(filter_out_component decoder 'LIB[A-Z0-9_]*')
 libavencoders=$(filter_out_component encoder 'LIB[A-Z0-9_]*')
 libavdemuxers=$(filter_out_component demuxer 'AVISYNTH LIB[A-Z0-9_]* REDIR')
 libavmuxers=$(filter_out_component muxer 'LIB[A-Z0-9_]* RTP RTSP SAP')
-libavprotocols=$(filter_out_component protocol 'BLURAY FFRTMPCRYPT HTTPS TLS')
+libavprotocols=$(filter_out_component protocol 'BLURAY FFRTMPCRYPT HTTPS LIB[A-Z0-9_]* TLS')
 libavfilters=$(filter_out_component filter 'FREI0R[A-Z0-9_]* LIB[A-Z0-9_]* MP OCV')
 
 # second pass command line parsing for options needing local FFmpeg checkout
@@ -1612,7 +1613,7 @@ if test "$(basename $_cc)" = "icc" || test "$(basename $_cc)" = "ecc"; then
       cc_version="v. ?.??, bad"
       cc_fail=yes
       ;;
-    10.1|11.1|12.0)
+    10.1|11.1|12.*|13.*)
       cc_version="$cc_version, ok"
       ;;
     *)
@@ -1696,7 +1697,8 @@ if test -z "$_target" ; then
 
 
   # host's CPU/instruction set
-  case "$(uname -m 2>&1)" in
+  set_host_arch() {
+  case "$1" in
       x86_64|amd64|i[3-9]86*|i86pc|x86|x86pc|k5|k6|k6_2|k6_3|k6-2|k6-3|pentium*|athlon*|i586_i686|i586-i686) host_arch=i386 ;;
       ia64) host_arch=ia64 ;;
       macppc|ppc*|Power*) host_arch=ppc ;;
@@ -1712,6 +1714,11 @@ if test -z "$_target" ; then
       xtensa*) host_arch=xtensa ;;
       *) host_arch=UNKNOWN ;;
   esac
+  }
+  set_host_arch "$(uname -m 2>&1)"
+  if test "$host_arch" = UNKNOWN ; then
+    set_host_arch "$(uname -p 2>&1)"
+  fi
 else # if test -z "$_target"
   for component in 3 2; do
     system_name=$(echo $_target | cut -d '-' -f $component)
@@ -1792,6 +1799,7 @@ if os2 ; then
   _priority=yes
   def_dos_paths="#define HAVE_DOS_PATHS 1"
   def_priority="#define CONFIG_PRIORITY 1"
+  def_path_max_check="#define CONFIG_PATH_MAX_CHECK 1"
 fi
 
 if wine ; then
@@ -1807,6 +1815,8 @@ TMPEXE="$mplayer_tmpdir/tmp$_exesuf"
 echocheck "working compiler"
 cflag_check "" || die "Compiler is not functioning correctly. Check your installation and custom CFLAGS $CFLAGS ."
 echo "yes"
+
+cflag_check "-lm" && libm="-lm"
 
 if test -z "$_target" ; then
   cat > $TMPC << EOF
@@ -2715,11 +2725,7 @@ fi # if darwin && test "$cc_vendor" = "gnu" ; then
 
 # Checking for CFLAGS
 _install_strip="-s"
-if test "$_profile" != "" || test "$_debug" != "" ; then
-  CFLAGS="-O2 $_march $_mcpu $_pipe $_debug $_profile"
-  WARNFLAGS="-W -Wall"
-  _install_strip=
-elif test -z "$CFLAGS" ; then
+if test -z "$CFLAGS" || test "$_profile" != "" || test "$_debug" != ""; then
   if test "$cc_vendor" = "intel" ; then
     CFLAGS="-O2 $_march $_mcpu $_pipe -fomit-frame-pointer"
     WARNFLAGS="-wd167 -wd556 -wd144"
@@ -2733,6 +2739,12 @@ elif test -z "$CFLAGS" ; then
     CFLAGS="-O4 $_march $_mcpu $_pipe -ffast-math -fomit-frame-pointer"
     WARNFLAGS="-Wall -Wno-switch -Wno-parentheses -Wpointer-arith -Wredundant-decls"
     extra_ldflags="$extra_ldflags -ffast-math"
+  fi
+
+  if test "$_profile" != "" || test "$_debug" != ""; then
+    CFLAGS="-O2 $_march $_mcpu $_pipe $_debug $_profile"
+    WARNFLAGS="-W -Wall $WARNFLAGS"
+    _install_strip=
   fi
 else
   warn_cflags=yes
@@ -2779,6 +2791,9 @@ if test $relocatable = "auto" ; then
   if test -n "$ld_static" ; then
     relocatable=no
     res_comment="PIE + static assumed to be broken"
+  elif win32 && ! wine ; then
+    relocatable=no
+    res_comment="unnecessary and broken on win32"
   elif x86_32 && cflag_check -pie ; then
     extra_ldflags="$extra_ldflags -pie"
     relocatable=yes
@@ -3130,7 +3145,7 @@ if arm ; then
   echores "$_iwmmxt"
 fi
 
-cpuexts_all='ALTIVEC AVX MMX MMX2 MMXEXT AMD3DNOW AMD3DNOWEXT SSE SSE2 SSE3 SSSE3 SSE4 SSE42 FAST_CMOV CMOV FAST_CLZ ARMV5TE ARMV6 ARMV6T2 VFP VFPV3 NEON IWMMXT MMI VIS MVI'
+cpuexts_all='ALTIVEC AVX MMX MMX2 MMXEXT AMD3DNOW AMD3DNOWEXT SSE SSE2 SSE3 SSSE3 SSE4 SSE42 FAST_CMOV I686 FAST_CLZ ARMV5TE ARMV6 ARMV6T2 VFP VFPV3 NEON IWMMXT MMI VIS MVI'
 test "$_altivec"   = yes && cpuexts="ALTIVEC $cpuexts"
 test "$_mmx"       = yes && cpuexts="MMX $cpuexts"
 test "$_mmxext"    = yes && cpuexts="MMX2 $cpuexts"
@@ -3144,7 +3159,7 @@ test "$_ssse3"     = yes && cpuexts="SSSE3 $cpuexts"
 test "$_sse4_1"    = yes && cpuexts="SSE4 $cpuexts"
 test "$_sse4_2"    = yes && cpuexts="SSE42 $cpuexts"
 test "$_avx"       = yes && cpuexts="AVX $cpuexts"
-test "$_cmov"      = yes && cpuexts="CMOV $cpuexts"
+test "$_cmov"      = yes && cpuexts="I686 $cpuexts"
 test "$_fast_cmov" = yes && cpuexts="FAST_CMOV $cpuexts"
 test "$_fast_clz"  = yes && cpuexts="FAST_CLZ $cpuexts"
 test "$_armv5te"   = yes && cpuexts="ARMV5TE $cpuexts"
@@ -3604,6 +3619,7 @@ echores "$_inet6"
 echocheck "gethostbyname2"
 if test "$_gethostbyname2" = auto ; then
 cat > $TMPC << EOF
+#define _BSD_SOURCE
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -3632,6 +3648,14 @@ if test "$_sctp" = no ; then
   libavprotocols=$(filter_out_component protocol 'SCTP')
 fi
 echores "$_sctp"
+
+echocheck "sys/un.h"
+un_h=no
+header_check sys/un.h && un_h=yes
+if test "$un_h" = "no" ; then
+  libavprotocols=$(filter_out_component protocol 'UNIX')
+fi
+echores "$un_h"
 
 echocheck "sys/poll.h"
 poll_h=no
@@ -3838,6 +3862,22 @@ else
 fi
 echores "$_pthreads"
 
+pthread_cancel=no
+if test "$_pthreads" = yes ; then
+  echocheck "pthread_cancel"
+cat > $TMPC << EOF
+#include <pthread.h>
+int main(void) { pthread_t t; return pthread_cancel(t); }
+EOF
+  cc_check $ld_pthread && pthread_cancel=yes
+  echores "$pthread_cancel"
+fi
+if test "$pthread_cancel" = yes ; then
+  def_pthread_cancel='#define HAVE_PTHREAD_CANCEL 1'
+else
+  def_pthread_cancel='#define HAVE_PTHREAD_CANCEL 0'
+fi
+
 if cygwin ; then
   if test "$_pthreads" = yes ; then
     def_pthread_cache="#define PTHREAD_CACHE 1"
@@ -3947,7 +3987,10 @@ int main(void) {
 }
 EOF
   _iconv=no
-  for ld_tmp in "" "-liconv" "-liconv $ld_dl" ; do
+  # NOTE: -L/usr/lib is a hack to avoid issues due to a
+  # broken libiconv that e.g. macports installs into /opt/local/lib
+  # which might get addded to the search path later by e.g. SDL
+  for ld_tmp in "" "-L/usr/lib -liconv" "-liconv" "-liconv $ld_dl" ; do
     cc_check $ld_tmp && extra_ldflags="$extra_ldflags $ld_tmp" &&
       ld_iconv="$ld_tmp" && _iconv=yes && break
   done
@@ -4562,7 +4605,7 @@ if test "$_vdpau" = yes ; then
   def_vdpau='#define CONFIG_VDPAU 1'
   libs_mplayer="$libs_mplayer -lvdpau"
   vomodules="vdpau $vomodules"
-  libavhwaccels="MPEG1_VDPAU_HWACCEL MPEG2_VDPAU_HWACCEL"
+  libavhwaccels="H263_VDPAU_HWACCEL H264_VDPAU_HWACCEL MPEG1_VDPAU_HWACCEL MPEG2_VDPAU_HWACCEL MPEG4_VDPAU_HWACCEL VC1_VDPAU_HWACCEL WMV3_VDPAU_HWACCEL"
 else
   def_vdpau='#define CONFIG_VDPAU 0'
   novomodules="vdpau $novomodules"
@@ -5087,10 +5130,12 @@ if test "$_gif" = yes ; then
   _gif=auto
 fi
 
+gif_new=no
 if test "$_gif" = auto ; then
   _gif=no
   for ld_gif in "-lungif" "-lgif" ; do
     statement_check gif_lib.h 'QuantizeBuffer(0, 0, 0, 0, 0, 0, 0, 0)' $ld_gif && _gif=yes && break
+    statement_check_broken stdlib.h gif_lib.h 'GifQuantizeBuffer(0, 0, 0, 0, 0, 0, 0, 0)' $ld_gif && _gif=yes && gif_new=yes && break
   done
 fi
 
@@ -5112,7 +5157,7 @@ if test "$_gif" = yes ; then
   def_gif='#define CONFIG_GIF 1'
   codecmodules="gif $codecmodules"
   vomodules="gif89a $vomodules"
-  res_comment="old version, some encoding functions disabled"
+  res_comment=""
   def_gif_4='#undef CONFIG_GIF_4'
   extra_ldflags="$extra_ldflags $ld_gif"
 
@@ -5131,7 +5176,8 @@ int main(void) {
 EOF
   if cc_check "$ld_gif" ; then
     def_gif_4='#define CONFIG_GIF_4 1'
-    res_comment=""
+  elif test "$gif_new" = no ; then
+    res_comment="old version, some encoding functions disabled"
   fi
 else
   def_gif='#undef CONFIG_GIF'
@@ -5297,10 +5343,7 @@ int main(int argc, char *argv[]) {
 #else
   glXCreateContext(NULL, NULL, NULL, True);
 #endif
-#ifdef GL_EGL_ANDROID
-  EGLNativeWindowType android_createDisplaySurface(void);
-  android_createDisplaySurface();
-#elif !defined(GL_EGL_X11)
+#if !defined(GL_EGL_X11) && !defined(GL_EGL_ANDROID)
   glFinish();
 #endif
   return 0;
@@ -5315,14 +5358,13 @@ EOF
       break
     fi
   done
-  if cc_check -DGL_EGL_ANDROID -lEGL -lui ; then
-    _gl=yes
-    _gl_egl_android=yes
-    libs_mplayer="$libs_mplayer -lEGL -lui $ld_dl"
-  fi
   if test "$_x11" = yes && cc_check -DGL_EGL_X11 -lEGL ; then
     _gl=yes
     _gl_egl_x11=yes
+    libs_mplayer="$libs_mplayer -lEGL $ld_dl"
+  elif cc_check -DGL_EGL_ANDROID -lEGL ; then
+    _gl=yes
+    _gl_egl_android=yes
     libs_mplayer="$libs_mplayer -lEGL $ld_dl"
   fi
   if win32 && cc_check -DGL_WIN32 -lopengl32 ; then
@@ -6320,7 +6362,7 @@ if test "$_zlib" = yes ; then
   mplayer_encoders="$mplayer_encoders PNG_ENCODER"
 else
   def_zlib='#define CONFIG_ZLIB 0'
-  libavdecoders=$(filter_out_component decoder 'FLASHSV FLASHSV2 PNG ZMBV ZLIB DXA EXR TSCC ZEROCODEC')
+  libavdecoders=$(filter_out_component decoder 'FLASHSV FLASHSV2 PNG ZMBV ZLIB DXA EXR G2M TSCC ZEROCODEC')
   libavencoders=$(filter_out_component encoder 'FLASHSV FLASHSV2 PNG ZMBV ZLIB')
 fi
 echores "$_zlib"
@@ -8064,7 +8106,7 @@ else
 fi
 echores "$_dvdnav"
 
-extra_ldflags="$extra_ldflags -lm"
+extra_ldflags="$extra_ldflags $libm"
 
 # DO NOT ADD ANY TESTS THAT USE LINKER FLAGS HERE (like cc_check).
 # Read dvdnav comment above.
@@ -8526,7 +8568,7 @@ ASFLAGS    = \$(CFLAGS)
 AS_DEPFLAGS= $DEPFLAGS
 HOSTCC     = \$(HOST_CC)
 HOSTCFLAGS = $HOSTCFLAGS
-HOSTLIBS   = -lm
+HOSTLIBS   = $libm
 AS_O       = -o \$@
 CC_O       = -o \$@
 CXX_O      = -o \$@
@@ -8538,6 +8580,7 @@ RANLIB     = $_ranlib
 YASM       = $_yasm
 DEPYASM    = $_yasm
 YASMFLAGS  = $YASMFLAGS
+STRIP      = strip
 
 CONFIG_FFPROBE       = no
 CONFIG_LAVFI_INDEV   = no
@@ -8565,6 +8608,7 @@ CONFIG_DCT     = yes
 CONFIG_DSPUTIL = yes
 CONFIG_DWT     = yes
 CONFIG_ERROR_RESILIENCE = yes
+CONFIG_EXIF    = yes
 CONFIG_FRAME_THREAD_ENCODER = yes
 CONFIG_FFT     = yes
 CONFIG_GOLOMB  = yes
@@ -8583,6 +8627,8 @@ CONFIG_MPEGVIDEO    = yes
 CONFIG_MPEGVIDEOENC = yes
 CONFIG_RANGECODER   = yes
 CONFIG_RDFT    = yes
+CONFIG_RIFFDEC = yes
+CONFIG_RIFFENC = yes
 CONFIG_RTPENC_CHAIN = yes
 CONFIG_SINEWIN = yes
 CONFIG_VIDEODSP = yes
@@ -8773,6 +8819,7 @@ $def_macosx_bundle
 $def_macosx_finder
 $def_maemo
 $def_memalign_hack
+$def_path_max_check
 $def_priority
 $def_quicktime
 $def_restrict_keyword
@@ -9071,6 +9118,7 @@ $def_local_aligned_16
 $def_os2threads
 $def_pic
 $def_pthreads
+$def_pthread_cancel
 $def_socklen_t
 $def_struct_addrinfo
 $def_struct_ipv6_mreq
@@ -9118,10 +9166,13 @@ $def_sinf
 $def_trunc
 $def_truncf
 
-#define AV_HAVE_INCOMPATIBLE_FORK_ABI 0
+#define HAVE_INCOMPATIBLE_LIBAV_ABI 0
+#define HAVE_MSVCRT 0
+#define HAVE_PRAGMA_DEPRECATED 0
 #define CONFIG_AUDIO_FLOAT 0
 #define CONFIG_AVCODEC 1
 #define CONFIG_AVSERVER 0
+#define CONFIG_DXVA2 0
 #define CONFIG_FASTDIV 0
 #define CONFIG_FFSERVER 0
 #define CONFIG_FTRAPV 0
@@ -9138,9 +9189,12 @@ $def_truncf
 #define CONFIG_SHARED 0
 #define CONFIG_SMALL 0
 #define CONFIG_SWSCALE_ALPHA 1
+#define CONFIG_VAAPI 0
 
 #define HAVE_ALIGNED_STACK 1
 #define HAVE_ASM_MOD_Q 1
+#define HAVE_ATOMICS_GCC 1
+#define HAVE_ATOMICS_NATIVE 1
 #define HAVE_ATTRIBUTE_PACKED 1
 #define HAVE_GETHRTIME 0
 #define HAVE_INLINE_ASM 1
@@ -9151,7 +9205,6 @@ $def_truncf
 #define HAVE_MIPSDSPR1 0
 #define HAVE_MIPSFPU 0
 #define HAVE_MM_EMPTY 0
-#define HAVE_PTHREAD_CANCEL 0
 #define HAVE_PPC4XX 0
 #define HAVE_RDTSC 0
 #define HAVE_STRERROR_R 0
@@ -9170,6 +9223,7 @@ $def_truncf
 #define CONFIG_DSPUTIL 1
 #define CONFIG_DWT 1
 #define CONFIG_ERROR_RESILIENCE 1
+#define CONFIG_EXIF 1
 #define CONFIG_FRAME_THREAD_ENCODER 1
 #define CONFIG_FFT 1
 #define CONFIG_GOLOMB 1
@@ -9183,6 +9237,8 @@ $def_truncf
 #define CONFIG_MDCT 1
 #define CONFIG_MPEGVIDEO 1
 #define CONFIG_RDFT 1
+#define CONFIG_RIFFDEC 1
+#define CONFIG_RIFFENC 1
 #define CONFIG_VIDEODSP 1
 
 /* Use these registers in FFmpeg x86 inline asm. No proper detection yet. */
@@ -9223,7 +9279,7 @@ cat > "$TMPH" << EOF
 #define AVUTIL_AVCONFIG_H
 $def_av_bigendian
 $def_av_fast_unaligned
-#define AV_HAVE_INCOMPATIBLE_FORK_ABI 0
+#define AV_HAVE_INCOMPATIBLE_LIBAV_ABI 0
 #endif /* AVUTIL_AVCONFIG_H */
 EOF
 

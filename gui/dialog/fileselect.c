@@ -367,15 +367,6 @@ static void fs_fsFilterCombo_changed(GtkEditable *editable,
     CheckDir(fsFNameList);
 }
 
-static void fs_fsFilterCombo_activate(GtkEntry *entry,
-                                      gpointer user_data)
-{
-    (void)entry;
-
-    fsFilter = gtk_entry_get_text(GTK_ENTRY(user_data));
-    CheckDir(fsFNameList);
-}
-
 static void fs_fsPathCombo_changed(GtkEditable *editable,
                                    gpointer user_data)
 {
@@ -383,21 +374,6 @@ static void fs_fsPathCombo_changed(GtkEditable *editable,
     gchar *dirname;
 
     (void)editable;
-
-    str     = gtk_entry_get_text(GTK_ENTRY(user_data));
-    dirname = g_hash_table_lookup(fsPathTable, str);
-
-    if (chdir(dirname ? (const unsigned char *)dirname : str) != -1)
-        CheckDir(fsFNameList);
-}
-
-static void fs_fsPathCombo_activate(GtkEntry *entry,
-                                    gpointer user_data)
-{
-    const unsigned char *str;
-    gchar *dirname;
-
-    (void)entry;
 
     str     = gtk_entry_get_text(GTK_ENTRY(user_data));
     dirname = g_hash_table_lookup(fsPathTable, str);
@@ -550,30 +526,48 @@ static void fs_Ok_released(GtkButton *button, gpointer user_data)
         gui(GUI_SET_STATE, (void *)GUI_STOP);
 }
 
-static gboolean on_FileSelect_key_release_event(GtkWidget *widget,
-                                                GdkEvent *event,
-                                                gpointer user_data)
+/**
+ * @brief Handle the escape, return and backspace key depending on the
+ *        @a widget it has been pressed on.
+ *
+ * @param widget object which received the signal
+ * @param event GdkEventKey which triggered the signal
+ * @param user_data user data set when the signal handler was connected
+ *
+ * @return TRUE to stop other handlers from being invoked for the event or
+ *         FALSE to propagate the event further
+ */
+static gboolean fs_key_release_event(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
     (void)user_data;
 
-    if (GTK_WIDGET_TYPE(widget) == GTK_TYPE_BUTTON) {
-        if (event->key.keyval == GDK_Return)
-            gtk_button_released(GTK_BUTTON(widget));
-    } else {
-        switch (event->key.keyval) {
-        case GDK_Escape:
+    switch (event->key.keyval) {
+    case GDK_Escape:
+
+        if (GTK_IS_SCROLLED_WINDOW(widget))
             gtk_button_released(GTK_BUTTON(fsCancel));
-            break;
 
-        case GDK_Return:
+        break;
+
+    case GDK_Return:
+
+        if (GTK_IS_SCROLLED_WINDOW(widget))
             gtk_button_released(GTK_BUTTON(fsOk));
-            break;
+        else if (GTK_IS_BUTTON(widget))
+            gtk_button_released(GTK_BUTTON(widget));
+        else if (GTK_IS_ENTRY(widget))
+            gtk_widget_grab_focus(fsFNameList);
 
-        case GDK_BackSpace:
+        break;
+
+    case GDK_BackSpace:
+
+        if (GTK_IS_SCROLLED_WINDOW(widget)) {
             gtk_button_released(GTK_BUTTON(fsUp));
             gtk_widget_grab_focus(fsFNameList);
-            break;
         }
+
+        break;
     }
 
     return FALSE;
@@ -689,19 +683,19 @@ static GtkWidget *CreateFileSelect(void)
     fsCancel = gtkAddButton(MSGTR_Cancel, hbuttonbox3);
 
     gtk_signal_connect(GTK_OBJECT(FileSelector), "destroy", GTK_SIGNAL_FUNC(fs_Destroy), NULL);
-    gtk_signal_connect(GTK_OBJECT(FileSelector), "key_release_event", GTK_SIGNAL_FUNC(on_FileSelect_key_release_event), NULL);
+    gtk_signal_connect(GTK_OBJECT(fsFNameListWindow), "key-release-event", GTK_SIGNAL_FUNC(fs_key_release_event), NULL);
 
     gtk_signal_connect(GTK_OBJECT(fsFilterCombo), "changed", GTK_SIGNAL_FUNC(fs_fsFilterCombo_changed), fsFilterCombo);
-    gtk_signal_connect(GTK_OBJECT(fsFilterCombo), "activate", GTK_SIGNAL_FUNC(fs_fsFilterCombo_activate), fsFilterCombo);
+    gtk_signal_connect(GTK_OBJECT(fsFilterCombo), "key-release-event", GTK_SIGNAL_FUNC(fs_key_release_event), NULL);
     gtk_signal_connect(GTK_OBJECT(fsPathCombo), "changed", GTK_SIGNAL_FUNC(fs_fsPathCombo_changed), fsPathCombo);
-    gtk_signal_connect(GTK_OBJECT(fsPathCombo), "activate", GTK_SIGNAL_FUNC(fs_fsPathCombo_activate), fsPathCombo);
+    gtk_signal_connect(GTK_OBJECT(fsPathCombo), "key-release-event", GTK_SIGNAL_FUNC(fs_key_release_event), NULL);
     gtk_signal_connect(GTK_OBJECT(fsUp), "released", GTK_SIGNAL_FUNC(fs_Up_released), fsFNameList);
-    gtk_signal_connect(GTK_OBJECT(fsUp), "key_release_event", GTK_SIGNAL_FUNC(on_FileSelect_key_release_event), NULL);
+    gtk_signal_connect(GTK_OBJECT(fsUp), "key-release-event", GTK_SIGNAL_FUNC(fs_key_release_event), NULL);
     gtk_signal_connect(GTK_OBJECT(fsOk), "released", GTK_SIGNAL_FUNC(fs_Ok_released), fsCombo4);
-    gtk_signal_connect(GTK_OBJECT(fsOk), "key_release_event", GTK_SIGNAL_FUNC(on_FileSelect_key_release_event), NULL);
+    gtk_signal_connect(GTK_OBJECT(fsOk), "key-release-event", GTK_SIGNAL_FUNC(fs_key_release_event), NULL);
     gtk_signal_connect(GTK_OBJECT(fsCancel), "released", GTK_SIGNAL_FUNC(fs_Cancel_released), NULL);
-    gtk_signal_connect(GTK_OBJECT(fsCancel), "key_release_event", GTK_SIGNAL_FUNC(on_FileSelect_key_release_event), NULL);
-    gtk_signal_connect(GTK_OBJECT(fsFNameList), "select_row", (GtkSignalFunc)fs_fsFNameList_select_row, NULL);
+    gtk_signal_connect(GTK_OBJECT(fsCancel), "key-release-event", GTK_SIGNAL_FUNC(fs_key_release_event), NULL);
+    gtk_signal_connect(GTK_OBJECT(fsFNameList), "select-row", (GtkSignalFunc)fs_fsFNameList_select_row, NULL);
     gtk_signal_connect(GTK_OBJECT(fsFNameList), "event", (GtkSignalFunc)fs_fsFNameList_event, NULL);
 
     return FileSelector;

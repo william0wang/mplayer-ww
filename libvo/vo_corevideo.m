@@ -160,7 +160,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_
 		image_page = 0;
 
 		//config OpenGL View
-		[mpGLView config:d_width:d_height:flags];
+		[mpGLView configWidth:d_width height:d_height flags:flags];
 		[mpGLView reshape];
 		[[mpGLView window] setTitle:[NSString stringWithUTF8String:vo_wintitle ? vo_wintitle : title]];
 	}
@@ -390,9 +390,6 @@ static int control(uint32_t request, void *data)
 	switch (request)
 	{
 		case VOCTRL_DRAW_IMAGE: return draw_image(data);
-		case VOCTRL_PAUSE:
-		case VOCTRL_RESUME:
-			return VO_TRUE;
 		case VOCTRL_QUERY_FORMAT: return query_format(*(uint32_t*)data);
 		case VOCTRL_GET_IMAGE: return get_image(data);
 		case VOCTRL_ONTOP: vo_ontop = !vo_ontop; if(!shared_buffer){ [mpGLView ontop]; } else { [mplayerosxProto ontop]; } return VO_TRUE;
@@ -443,11 +440,11 @@ static int control(uint32_t request, void *data)
 	[super dealloc];
 }
 
-- (void) config:(uint32_t)width:(uint32_t)height:(uint32_t)flags
+- (void) configWidth:(uint32_t)width height:(uint32_t)height flags:(uint32_t)flags
 {
 	CVReturn error = kCVReturnSuccess;
 
-	[super config:width:height:flags];
+	[super configWidth:width height:height flags:flags];
 
 	[self releaseVideoSpecific];
 	error = CVPixelBufferCreateWithBytes(NULL, image_width, image_height, pixelFormat, image_datas[0], image_stride, NULL, NULL, NULL, &frameBuffers[0]);

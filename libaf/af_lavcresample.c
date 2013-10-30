@@ -66,7 +66,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
     af->data->format = AF_FORMAT_S16_NE;
     af->data->bps    = 2;
     af->mul = (double)af->data->rate / data->rate;
-    af->delay = af->data->nch * s->filter_length / min(af->mul, 1); // *bps*.5
+    af->delay = af->data->nch * s->filter_length / FFMIN(af->mul, 1); // *bps*.5
 
     if (s->ctx_out_rate != af->data->rate || s->ctx_in_rate != data->rate || s->ctx_filter_size != s->filter_length ||
         s->ctx_phase_shift != s->phase_shift || s->ctx_linear != s->linear || s->ctx_cutoff != s->cutoff) {
@@ -89,7 +89,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
   case AF_CONTROL_COMMAND_LINE:{
     s->cutoff= 0.0;
     sscanf((char*)arg,"%d:%d:%d:%d:%lf", &af->data->rate, &s->filter_length, &s->linear, &s->phase_shift, &s->cutoff);
-    if(s->cutoff <= 0.0) s->cutoff= max(1.0 - 6.5/(s->filter_length+8), 0.80);
+    if(s->cutoff <= 0.0) s->cutoff= FFMAX(1.0 - 6.5/(s->filter_length+8), 0.80);
     return AF_OK;
   }
   case AF_CONTROL_RESAMPLE_RATE | AF_CONTROL_SET:
@@ -132,7 +132,7 @@ static af_data_t* play(struct af_instance_s* af, af_data_t* data)
 
   out= (int16_t*)af->data->audio;
 
-  out_len= min(out_len, af->data->len/(2*chans));
+  out_len= FFMIN(out_len, af->data->len/(2*chans));
 
   if(s->in_alloc < in_len + s->index){
       s->in_alloc= in_len + s->index;
@@ -196,7 +196,7 @@ static int af_open(af_instance_t* af){
   af->mul=1;
   af->data=calloc(1,sizeof(af_data_t));
   s->filter_length= 16;
-  s->cutoff= max(1.0 - 6.5/(s->filter_length+8), 0.80);
+  s->cutoff= FFMAX(1.0 - 6.5/(s->filter_length+8), 0.80);
   s->phase_shift= 10;
 //  s->setup = RSMP_INT | FREQ_SLOPPY;
   af->setup=s;
