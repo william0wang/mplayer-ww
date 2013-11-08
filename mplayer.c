@@ -2746,7 +2746,7 @@ static int seek(MPContext *mpctx, double amount, int style)
     }
 
 #ifdef CONFIG_ASS
-    if (ass_enabled && mpctx->d_sub->sh && ((sh_sub_t *)mpctx->d_sub->sh)->ass_track)
+    if (ass_enabled && mpctx->d_sub && mpctx->d_sub->sh && ((sh_sub_t *)mpctx->d_sub->sh)->ass_track)
         ass_flush_events(((sh_sub_t *)mpctx->d_sub->sh)->ass_track);
 #endif
 
