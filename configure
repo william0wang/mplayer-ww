@@ -360,7 +360,7 @@ Optional features:
   --disable-bluray       disable Blu-ray support [autodetect]
   --disable-dvdnav       disable libdvdnav [autodetect]
   --disable-dvdread      disable libdvdread [autodetect]
-  --disable-dvdread-internal  disable internal libdvdread [autodetect]
+  --disable-dvdread-internal  disable internal libdvdread and libdvdnav [autodetect]
   --disable-libdvdcss-internal  disable internal libdvdcss [autodetect]
   --disable-cdparanoia   disable cdparanoia [autodetect]
   --disable-cddb         disable cddb [autodetect]
@@ -602,8 +602,8 @@ Use these options if autodetection fails:
   --with-glib-config=PATH     path to glib*-config
   --with-gtk-config=PATH      path to gtk*-config
   --with-sdl-config=PATH      path to sdl*-config
-  --with-dvdnav-config=PATH   path to dvdnav-config
-  --with-dvdread-config=PATH  path to dvdread-config
+  --with-dvdnav-config=PATH   path to dvdnav-config, also disables internal dvdread and dvdnav
+  --with-dvdread-config=PATH  path to dvdread-config, also disables internal dvdread and dvdnav
 
 This configure script is NOT autoconf-based, even though its output is similar.
 It will try to autodetect all configuration options. If you --enable an option
@@ -916,9 +916,11 @@ for ac_option do
     ;;
   --with-dvdnav-config=*)
     _dvdnavconfig=$(option_value $ac_option)
+    _dvdread_internal=no
     ;;
   --with-dvdread-config=*)
     _dvdreadconfig=$(option_value $ac_option)
+    _dvdread_internal=no
     ;;
 
   --extra-cflags=*)
