@@ -297,7 +297,9 @@ static void set_format_params(struct AVCodecContext *avctx,
         avctx->get_buffer      = get_buffer;
         avctx->release_buffer  = release_buffer;
         avctx->reget_buffer    = get_buffer;
-        mp_msg(MSGT_DECVIDEO, MSGL_INFO, MSGTR_MPCODECS_XVMCAcceleratedMPEG2);
+        mp_msg(MSGT_DECVIDEO, MSGL_INFO, IMGFMT_IS_XVMC(imgfmt) ?
+               MSGTR_MPCODECS_XVMCAcceleratedMPEG2 :
+               "[VD_FFMPEG] VDPAU accelerated decoding\n");
         if (ctx->use_hwaccel) {
             avctx->draw_horiz_band = NULL;
             avctx->slice_flags = 0;
