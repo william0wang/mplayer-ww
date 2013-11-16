@@ -297,7 +297,7 @@ static void set_format_params(struct AVCodecContext *avctx,
         avctx->get_buffer      = get_buffer;
         avctx->release_buffer  = release_buffer;
         avctx->reget_buffer    = get_buffer;
-        mp_msg(MSGT_DECVIDEO, MSGL_INFO, IMGFMT_IS_XVMC(imgfmt) ?
+        mp_msg(MSGT_DECVIDEO, MSGL_V, IMGFMT_IS_XVMC(imgfmt) ?
                MSGTR_MPCODECS_XVMCAcceleratedMPEG2 :
                "[VD_FFMPEG] VDPAU accelerated decoding\n");
         if (ctx->use_hwaccel) {
@@ -1103,7 +1103,7 @@ static enum AVPixelFormat get_format(struct AVCodecContext *avctx,
             continue;
         imgfmt = pixfmt2imgfmt2(fmt[i], avctx->codec_id);
         if(!IMGFMT_IS_HWACCEL(imgfmt)) continue;
-        mp_msg(MSGT_DECVIDEO, MSGL_INFO, MSGTR_MPCODECS_TryingPixfmt, i);
+        mp_msg(MSGT_DECVIDEO, MSGL_V, MSGTR_MPCODECS_TryingPixfmt, i);
         if(init_vo(sh, fmt[i]) >= 0) {
             break;
         }
