@@ -605,6 +605,15 @@ static int init_vo(sh_video_t *sh, enum AVPixelFormat pix_fmt)
     vd_ffmpeg_ctx *ctx = sh->context;
     const AVCodecContext *avctx = ctx->avctx;
     int width, height;
+    int i;
+
+    // avoid initialization for formats not on the supported
+    // list in the codecs.conf entry.
+    for (i = 0; i < CODECS_MAX_OUTFMT; i++)
+        if (sh->codec->outfmt[i] == pixfmt2imgfmt2(pix_fmt, avctx->codec_id))
+            break;
+    if (i == CODECS_MAX_OUTFMT)
+        return -1;
 
     width = avctx->width;
     height = avctx->height;
@@ -622,14 +631,6 @@ static int init_vo(sh_video_t *sh, enum AVPixelFormat pix_fmt)
     update_configuration(sh, pix_fmt);
     if (!ctx->vo_initialized)
     {
-        int i;
-        // avoid initialization for formats not on the supported
-        // list in the codecs.conf entry.
-        for (i = 0; i < CODECS_MAX_OUTFMT; i++)
-            if (sh->codec->outfmt[i] == ctx->best_csp)
-                break;
-        if (i == CODECS_MAX_OUTFMT)
-            return -1;
         sh->disp_w = width;
         sh->disp_h = height;
         if (!mpcodecs_config_vo(sh, sh->disp_w, sh->disp_h, ctx->best_csp))
@@ -1094,7 +1095,13 @@ static enum AVPixelFormat get_format(struct AVCodecContext *avctx,
     enum AVPixelFormat selected_format;
     int imgfmt;
     sh_video_t *sh = avctx->opaque;
+    vd_ffmpeg_ctx *ctx = sh->context;
     int i;
+
+    // Try to select identical format to avoid reinitializations
+    if (ctx->vo_initialized && ctx->pix_fmt != AV_PIX_FMT_NONE)
+        for (i = 0; fmt[i] != AV_PIX_FMT_NONE; i++)
+            if (fmt[i] == ctx->pix_fmt) return ctx->pix_fmt;
 
     for(i=0;fmt[i]!=PIX_FMT_NONE;i++){
         // it is incorrect of FFmpeg to even offer these, filter them out
