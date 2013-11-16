@@ -622,6 +622,14 @@ static int init_vo(sh_video_t *sh, enum AVPixelFormat pix_fmt)
     update_configuration(sh, pix_fmt);
     if (!ctx->vo_initialized)
     {
+        int i;
+        // avoid initialization for formats not on the supported
+        // list in the codecs.conf entry.
+        for (i = 0; i < CODECS_MAX_OUTFMT; i++)
+            if (sh->codec->outfmt[i] == ctx->best_csp)
+                break;
+        if (i == CODECS_MAX_OUTFMT)
+            return -1;
         sh->disp_w = width;
         sh->disp_h = height;
         if (!mpcodecs_config_vo(sh, sh->disp_w, sh->disp_h, ctx->best_csp))
