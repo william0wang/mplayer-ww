@@ -424,6 +424,8 @@ void *decode_video(sh_video_t *sh_video, unsigned char *start, int in_size,
             sh_video->num_buffered_pts++;
         }
     }
+    if (correct_pts && mpi && drop_frame && sh_video->num_buffered_pts > 0)
+        sh_video->num_buffered_pts--;
 
     // some codecs are broken, and doesn't restore MMX state :(
     // it happens usually with broken/damaged files.
