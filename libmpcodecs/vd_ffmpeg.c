@@ -272,7 +272,7 @@ static void set_dr_slice_settings(struct AVCodecContext *avctx, const AVCodec *l
         avctx->  reget_buffer =
         avctx->    get_buffer =     get_buffer;
         avctx->release_buffer = release_buffer;
-    } else {
+    } else if (lavc_codec->capabilities & CODEC_CAP_DR1) {
         avctx->flags &= ~CODEC_FLAG_EMU_EDGE;
         avctx->  reget_buffer = avcodec_default_reget_buffer;
         avctx->    get_buffer = avcodec_default_get_buffer;
