@@ -269,8 +269,7 @@ static void set_dr_slice_settings(struct AVCodecContext *avctx, const AVCodec *l
     ctx->do_dr1 = (lavc_codec->capabilities & CODEC_CAP_DR1) &&
         lavc_codec->id != AV_CODEC_ID_INTERPLAY_VIDEO &&
         lavc_codec->id != AV_CODEC_ID_H264 &&
-        lavc_codec->id != AV_CODEC_ID_HEVC &&
-        lavc_codec->id != AV_CODEC_ID_VP8;
+        lavc_codec->id != AV_CODEC_ID_HEVC;
     ctx->nonref_dr = 0;
     // TODO: fix and enable again. This currently causes issues when using filters
     // and seeking, usually failing with the "Ran out of numbered images" message,
@@ -287,7 +286,7 @@ static void set_dr_slice_settings(struct AVCodecContext *avctx, const AVCodec *l
         avctx->  reget_buffer =
         avctx->    get_buffer =     get_buffer;
         avctx->release_buffer = release_buffer;
-    } else {
+    } else if (lavc_codec->capabilities & CODEC_CAP_DR1) {
         avctx->flags &= ~CODEC_FLAG_EMU_EDGE;
         avctx->  reget_buffer = avcodec_default_reget_buffer;
         avctx->    get_buffer = avcodec_default_get_buffer;
@@ -312,7 +311,9 @@ static void set_format_params(struct AVCodecContext *avctx,
         avctx->get_buffer      = get_buffer;
         avctx->release_buffer  = release_buffer;
         avctx->reget_buffer    = get_buffer;
-        mp_msg(MSGT_DECVIDEO, MSGL_INFO, MSGTR_MPCODECS_XVMCAcceleratedMPEG2);
+        mp_msg(MSGT_DECVIDEO, MSGL_V, IMGFMT_IS_XVMC(imgfmt) ?
+               MSGTR_MPCODECS_XVMCAcceleratedMPEG2 :
+               "[VD_FFMPEG] VDPAU accelerated decoding\n");
         if (ctx->use_hwaccel) {
             avctx->draw_horiz_band = NULL;
             avctx->slice_flags = 0;
@@ -659,6 +660,15 @@ static int init_vo(sh_video_t *sh, enum AVPixelFormat pix_fmt)
     vd_ffmpeg_ctx *ctx = sh->context;
     const AVCodecContext *avctx = ctx->avctx;
     int width, height;
+    int i;
+
+    // avoid initialization for formats not on the supported
+    // list in the codecs.conf entry.
+    for (i = 0; i < CODECS_MAX_OUTFMT; i++)
+        if (sh->codec->outfmt[i] == pixfmt2imgfmt2(pix_fmt, avctx->codec_id))
+            break;
+    if (i == CODECS_MAX_OUTFMT)
+        return -1;
 
     width = avctx->width;
     height = avctx->height;
@@ -1140,7 +1150,13 @@ static enum AVPixelFormat get_format(struct AVCodecContext *avctx,
     enum AVPixelFormat selected_format;
     int imgfmt;
     sh_video_t *sh = avctx->opaque;
+    vd_ffmpeg_ctx *ctx = sh->context;
     int i;
+
+    // Try to select identical format to avoid reinitializations
+    if (ctx->vo_initialized && ctx->pix_fmt != AV_PIX_FMT_NONE)
+        for (i = 0; fmt[i] != AV_PIX_FMT_NONE; i++)
+            if (fmt[i] == ctx->pix_fmt) return ctx->pix_fmt;
 
     for(i=0;fmt[i]!=PIX_FMT_NONE;i++){
         // it is incorrect of FFmpeg to even offer these, filter them out
@@ -1149,7 +1165,7 @@ static enum AVPixelFormat get_format(struct AVCodecContext *avctx,
             continue;
         imgfmt = pixfmt2imgfmt2(fmt[i], avctx->codec_id);
         if(!IMGFMT_IS_HWACCEL(imgfmt)) continue;
-        mp_msg(MSGT_DECVIDEO, MSGL_INFO, MSGTR_MPCODECS_TryingPixfmt, i);
+        mp_msg(MSGT_DECVIDEO, MSGL_V, MSGTR_MPCODECS_TryingPixfmt, i);
         if(init_vo(sh, fmt[i]) >= 0) {
             break;
         }

@@ -2923,7 +2923,7 @@ static int seek(MPContext *mpctx, double amount, int style)
     }
 
 #ifdef CONFIG_ASS
-    if (ass_enabled && mpctx->d_sub->sh && ((sh_sub_t *)mpctx->d_sub->sh)->ass_track)
+    if (ass_enabled && mpctx->d_sub && mpctx->d_sub->sh && ((sh_sub_t *)mpctx->d_sub->sh)->ass_track)
         ass_flush_events(((sh_sub_t *)mpctx->d_sub->sh)->ass_track);
 #endif
 
@@ -3864,7 +3864,7 @@ goto_enable_cache:
             if (mpctx->sh_audio && mpctx->sh_audio->codec)
                 mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_AUDIO_CODEC=%s\n", mpctx->sh_audio->codec->name);
             if (mpctx->audio_out)
-                mpctx->audio_out->control(AOCONTROL_FILENAME, (void *)mp_basename(filename));
+                mpctx->audio_out->control(AOCONTROL_FILENAME, (void *)(vo_wintitle ? vo_wintitle : mp_basename(filename)));
         }
 
         current_module = "av_init";

@@ -125,6 +125,27 @@ static av_always_inline void s16_inner_loop(int16_t *data, int len, int offset, 
 static av_always_inline void float_inner_loop(float *data, int len, int offset, int step, float level, int softclip)
 {
   int i;
+#if HAVE_NEON
+  if (offset == 0 && step == 1 && !softclip && len >= 8)
+  {
+    __asm__(
+      "vmov.32 d2[0], %2\n\t"
+      "vdup.32 q8, %3\n\t"
+      "vneg.f32 q9, q8\n\t"
+"0:\n\t"
+      "vld1.32 {q0}, [%0]\n\t"
+      "vmul.f32 q0, q0, d2[0]\n\t"
+      "cmp %0, %1\n\t"
+      "vmin.f32 q0, q0, q8\n\t"
+      "vmax.f32 q0, q0, q9\n\t"
+      "vst1.32 {q0}, [%0]!\n\t"
+      "blo 0b\n\t"
+    : "+&r"(data)
+    : "r"(data + len - 7), "r"(level), "r"(0x3f800000)
+    : "cc", "q0", "d2", "q8", "q9", "memory");
+    len &= 3;
+  }
+#endif
   for (i = offset; i < len; i += step)
   {
     register float x = data[i];

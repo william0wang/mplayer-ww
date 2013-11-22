@@ -842,9 +842,7 @@ static int prepare_charset_unicode(FT_Face face, FT_ULong *charset, FT_ULong *ch
 
 static font_desc_t* init_font_desc(void)
 {
-    font_desc_t *desc;
-
-    desc = calloc(1, sizeof(*desc));
+    font_desc_t *desc = calloc(1, sizeof(*desc));
     if(!desc) return NULL;
 
     desc->dynamic = 1;
@@ -992,12 +990,7 @@ font_desc_t* read_font_desc_ft(const char *fname, int face_index, int movie_widt
     if (subtitle_font_ppem > 128) subtitle_font_ppem = 128;
     if (osd_font_ppem > 128) osd_font_ppem = 128;
 
-    if ((subtitle_font_encoding == NULL)
-	|| (strcasecmp(subtitle_font_encoding, "unicode") == 0)) {
-	unicode = 1;
-    } else {
-	unicode = 0;
-    }
+    unicode = !subtitle_font_encoding || strcasecmp(subtitle_font_encoding, "unicode") == 0;
 
     desc = init_font_desc();
     if(!desc) goto err_out;
