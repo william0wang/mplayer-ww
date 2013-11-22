@@ -26,6 +26,7 @@
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/QuartzCore.h>
 #import <Carbon/Carbon.h>
+#import <OpenGL/gl.h>
 #import "osx_objc_common.h"
 
 // MPlayer OS X VO Protocol

@@ -871,7 +871,12 @@ do{
           mp_msg(MSGT_DEMUX,MSGL_ERR,MSGTR_DoesntContainSelectedStream);
           return 0;
         }
-      if(demux->synced==3) demux->synced=(ret==1)?2:0; // PES detect
+      if(demux->synced == 3) { // PES detect
+         update_stats(head);
+         if (ret < 0) demux->synced = 0;
+         else if (ret == 1 && num_elementary_packetsPES > 1 && !mpeg_pts_error) demux->synced = 2;
+         else ret = 0;
+      }
   } else {
     update_stats(head);
     if(head>=0x100 && head<0x1B0)
@@ -1072,7 +1077,7 @@ static int demux_mpg_control(demuxer_t *demuxer, int cmd, void *arg)
 
 static int demux_mpg_pes_probe(demuxer_t *demuxer) {
    demuxer->synced = 3;
-   return (demux_mpg_probe(demuxer) == DEMUXER_TYPE_MPEG_PS) ? DEMUXER_TYPE_MPEG_PES : 0;
+   return (demux_mpg_probe(demuxer) == DEMUXER_TYPE_MPEG_PS) ? DEMUXER_TYPE_MPEG_PES : DEMUXER_TYPE_UNKNOWN;
 }
 
 
