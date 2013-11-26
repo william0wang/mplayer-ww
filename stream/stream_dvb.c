@@ -51,9 +51,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "dvbin.h"
 
 
-#define MAX_CHANNELS 8
 #define CHANNEL_LINE_LEN 256
-#define min(a, b) ((a) <= (b) ? (a) : (b))
 
 
 //TODO: CAMBIARE list_ptr e da globale a per_priv
