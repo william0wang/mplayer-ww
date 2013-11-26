@@ -80,11 +80,6 @@ void mplayer_put_key(int code) {
   static unsigned last_key_time[2];
   static int last_key[2];
   unsigned now = GetTimerMS();
-  // ignore system-doubleclick if we generate these events ourselves
-  if (doubleclick_time &&
-      (code & ~MP_KEY_DOWN) >= MOUSE_BTN0_DBL &&
-      (code & ~MP_KEY_DOWN) <= MOUSE_BTN_LAST_DBL)
-    return;
   mplayer_put_key_internal(code);
   if (code & MP_KEY_DOWN) {
     code &= ~MP_KEY_DOWN;
