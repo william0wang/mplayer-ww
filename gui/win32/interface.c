@@ -664,9 +664,8 @@ int gui(int what, void *data)
                     stream_control(stream, STREAM_CTRL_GET_NUM_CHAPTERS, &guiInfo.Chapters);
                     guiInfo.Angles = 0;
                     stream_control(stream, STREAM_CTRL_GET_NUM_ANGLES, &guiInfo.Angles);
-                    guiInfo.Track = 0;
-                    stream_control(stream, STREAM_CTRL_GET_CURRENT_TITLE, &guiInfo.Track);
-                    guiInfo.Track++;
+                    if (stream_control(stream, STREAM_CTRL_GET_CURRENT_TITLE, &guiInfo.Track) == STREAM_OK)
+                        guiInfo.Track++;
                     // guiInfo.Chapter will be set by mplayer
                     guiInfo.Angle = 1;
                     stream_control(stream, STREAM_CTRL_GET_ANGLE, &guiInfo.Angle);
