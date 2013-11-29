@@ -795,6 +795,7 @@ symbols (and thus require a different font).
   <row><entry><keycap>v</keycap></entry><entry>stream is a Video CD</entry></row>
   <row><entry><keycap>d</keycap></entry><entry>stream is a DVD</entry></row>
   <row><entry><keycap>u</keycap></entry><entry>stream is a URL</entry></row>
+  <row><entry><keycap>b</keycap></entry><entry>stream is a TV/DVB broadcast</entry></row>
 </tbody>
 </tgroup>
 </informaltable>
@@ -927,6 +928,13 @@ menu entries.
   <term><emphasis role="bold">evLoadURL</emphasis></term>
   <listitem><para>
   Displays the URL dialog window.
+  </para></listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><emphasis role="bold">evPlayTV</emphasis></term>
+  <listitem><para>
+  Tries to start TV/DVB broadcast.
   </para></listitem>
 </varlistentry>
 

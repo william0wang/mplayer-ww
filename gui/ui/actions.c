@@ -76,6 +76,8 @@ static void MediumPrepare(int type)
 
     case STREAMTYPE_CDDA:
     case STREAMTYPE_VCD:
+    case STREAMTYPE_TV:
+    case STREAMTYPE_DVB:
         listMgr(PLAYLIST_DELETE, 0);
     case STREAMTYPE_FILE:
     case STREAMTYPE_STREAM:
@@ -175,6 +177,12 @@ void uiEvent(int ev, float param)
         goto play;
 
 #endif
+#ifdef CONFIG_TV
+    case evPlayTV:
+        guiInfo.StreamType = guiTV[gui_tv_digital].StreamType;
+        goto play;
+
+#endif
     case evPlay:
     case evPlaySwitchToPause:
 play:
@@ -198,6 +206,8 @@ play:
             case STREAMTYPE_CDDA:
             case STREAMTYPE_VCD:
             case STREAMTYPE_DVD:
+            case STREAMTYPE_TV:
+            case STREAMTYPE_DVB:
 
                 if (!guiInfo.Track)
                     guiInfo.Track = (guiInfo.StreamType == STREAMTYPE_VCD ? 2 : 1);
@@ -507,6 +517,8 @@ void uiPlay(void)
     if (guiInfo.StreamType != STREAMTYPE_CDDA &&
         guiInfo.StreamType != STREAMTYPE_VCD &&
         guiInfo.StreamType != STREAMTYPE_DVD &&
+        guiInfo.StreamType != STREAMTYPE_TV &&
+        guiInfo.StreamType != STREAMTYPE_DVB &&
         (!guiInfo.Filename || (guiInfo.Filename[0] == 0)))
         return;
 
@@ -721,6 +733,8 @@ void uiCurr(void)
     case STREAMTYPE_CDDA:
     case STREAMTYPE_VCD:
     case STREAMTYPE_DVD:
+    case STREAMTYPE_TV:
+    case STREAMTYPE_DVB:
 
         break;
 
@@ -786,6 +800,14 @@ void uiPrev(void)
 
         break;
 
+    case STREAMTYPE_TV:
+    case STREAMTYPE_DVB:
+
+        if (guiInfo.Playing == GUI_PLAY)
+            mp_input_queue_cmd(mp_input_parse_cmd("tv_step_channel -1"));
+
+        return;
+
     default:
 
         prev = listMgr(PLAYLIST_ITEM_GET_PREV, 0);
@@ -845,6 +867,14 @@ void uiNext(void)
             unset = False;
 
         break;
+
+    case STREAMTYPE_TV:
+    case STREAMTYPE_DVB:
+
+        if (guiInfo.Playing == GUI_PLAY)
+            mp_input_queue_cmd(mp_input_parse_cmd("tv_step_channel 1"));
+
+        return;
 
     default:
 

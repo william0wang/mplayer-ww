@@ -150,6 +150,7 @@ enum
   evPlayVCD,
   evPlayDVD,
   evLoadURL,
+  evPlayTV,
   evPlaySwitchToPause,
   evPauseSwitchToPlay,
   evBackward10sec,
