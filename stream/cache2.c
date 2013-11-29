@@ -94,6 +94,7 @@ typedef struct {
   volatile int control;
   volatile uint64_t control_uint_arg;
   volatile double control_double_arg;
+  volatile char *control_char_p_arg;
   volatile struct stream_lang_req control_lang_arg;
   volatile int control_res;
   volatile double stream_time_length;
@@ -326,6 +327,9 @@ static int cache_execute_control(cache_vars_t *s) {
       break;
     case STREAM_CTRL_GET_LANG:
       s->control_res = s->stream->control(s->stream, s->control, (void *)&s->control_lang_arg);
+      break;
+    case STREAM_CTRL_GET_CURRENT_CHANNEL:
+      s->control_res = s->stream->control(s->stream, s->control, &s->control_char_p_arg);
       break;
     default:
       s->control_res = STREAM_UNSUPPORTED;
@@ -654,6 +658,10 @@ int cache_do_control(stream_t *stream, int cmd, void *arg) {
     case -2:
       s->control = cmd;
       break;
+    case STREAM_CTRL_GET_CURRENT_CHANNEL:
+      s->control_char_p_arg = *(char **)arg;
+      s->control = cmd;
+      break;
     default:
       return STREAM_UNSUPPORTED;
   }
@@ -698,6 +706,9 @@ int cache_do_control(stream_t *stream, int cmd, void *arg) {
       break;
     case STREAM_CTRL_GET_LANG:
       *(struct stream_lang_req *)arg = s->control_lang_arg;
+      break;
+    case STREAM_CTRL_GET_CURRENT_CHANNEL:
+      *(char **)arg = (char *)s->control_char_p_arg;
       break;
   }
   return s->control_res;
