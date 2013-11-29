@@ -185,7 +185,7 @@ static const char help_text[]=
 #define MSGTR_DvdnavNavVTSChange "DVDNAV-Ereignis: Nav VTS-Änderung\n"
 #define MSGTR_DvdnavNavCellChange "DVDNAV-Ereignis: Nav Cell-Änderung\n"
 #define MSGTR_DvdnavNavSpuClutChange "DVDNAV-Ereignis: Nav SPU CLUT-Änderung\n"
-#define MSGTR_DvdnavNavSeekDone "DVDNAV-Ereignis: Nav Suche beendet.\n"
+#define MSGTR_DvdnavNavSeekDone "DVDNAV-Ereignis: Nav Positionieren beendet.\n"
 #define MSGTR_MenuCall "Menü-Aufruf\n"
 #define MSGTR_MasterQuit "Option -udp-slave: Ende, weil Master endete\n"
 #define MSGTR_InvalidIP "Option -udp-ip: ungültige IP-Adresse\n"
@@ -654,8 +654,8 @@ static const char help_text[]=
 
 #define MSGTR_UsingNINI "Verwende defektes NICHT-INTERLEAVED AVI-Dateiformat.\n"
 #define MSGTR_CouldntDetFNo "Konnte die Anzahl der Frames (für absolute Suche) nicht feststellen.\n"
-#define MSGTR_CantSeekRawAVI "Suche in reinen AVI-Streams nicht durchführbar (Index erforderlich, probiere die '-idx'-Option.).\n"
-#define MSGTR_CantSeekFile "Kann diese Datei nicht durchsuchen.\n"
+#define MSGTR_CantSeekRawAVI "Positionieren in reinen AVI-Streams nicht möglich (Index erforderlich, probiere die '-idx'-Option.).\n"
+#define MSGTR_CantSeekFile "Positionieren in dieser Datei nicht möglich.\n"
 
 #define MSGTR_MOVcomprhdr "MOV: komprimierte Header benötigen ZLIB-Unterstützung.\n"
 #define MSGTR_MOVvariableFourCC "MOV: Warnung: Variabler FourCC erkannt!?\n"
@@ -666,7 +666,7 @@ static const char help_text[]=
 #define MSGTR_CannotOpenSubtitlesStream "Kann Untertitelstream nicht öffnen: %s\n"
 #define MSGTR_OpeningAudioDemuxerFailed "Öffnen des Audio-Demuxers fehlgeschlagen: %s\n"
 #define MSGTR_OpeningSubtitlesDemuxerFailed "Öffnen des Untertitel-Demuxers fehlgeschlagen: %s\n"
-#define MSGTR_TVInputNotSeekable "TV-Input ist nicht durchsuchbar! (Ist Senderwechsel gemeint?)\n"
+#define MSGTR_TVInputNotSeekable "Positionieren bei TV-Empfang nicht möglich! (Ist Senderwechsel gemeint?)\n"
 #define MSGTR_DemuxerInfoChanged "Demuxerinfo %s geändert zu %s.\n"
 #define MSGTR_ClipInfo "Clip-Info:\n"
 
