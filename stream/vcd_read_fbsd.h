@@ -67,6 +67,7 @@ typedef struct mp_vcd_priv_st {
   cdsector_t buf;
 #endif
   struct ioc_toc_header tochdr;
+  unsigned int track;
 } mp_vcd_priv_t;
 
 static inline void

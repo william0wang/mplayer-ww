@@ -39,6 +39,7 @@ typedef struct {
     int        iLastTrack;
     struct msf msfLeadOut;
     BYTE       abVCDSector[VCD_SECTOR_SIZE];
+    unsigned int track;
 } mp_vcd_priv_t;
 
 static inline void vcd_set_msf(mp_vcd_priv_t *vcd, unsigned sect)
