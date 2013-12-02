@@ -614,11 +614,15 @@ int gui(int what, void *data)
         case STREAMTYPE_CDDA:
             guiInfo.Tracks = 0;
             stream_control(stream, STREAM_CTRL_GET_NUM_TITLES, &guiInfo.Tracks);
+            if (stream_control(stream, STREAM_CTRL_GET_CURRENT_TITLE, &guiInfo.Track) == STREAM_OK)
+                guiInfo.Track++;
             break;
 
         case STREAMTYPE_VCD:
             guiInfo.Tracks = 0;
             stream_control(stream, STREAM_CTRL_GET_NUM_TITLES, &guiInfo.Tracks);
+            if (stream_control(stream, STREAM_CTRL_GET_CURRENT_TITLE, &guiInfo.Track) == STREAM_OK)
+                guiInfo.Track++;
             break;
 
         case STREAMTYPE_DVD:
@@ -644,7 +648,7 @@ int gui(int what, void *data)
 
         case STREAMTYPE_TV:
         case STREAMTYPE_DVB:
-            guiInfo.Tracks = 1;
+            guiInfo.Tracks = guiInfo.Track = 1;
             break;
         }
 
