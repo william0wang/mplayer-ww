@@ -113,6 +113,7 @@ static int control(stream_t *stream, int cmd, void *arg) {
       }
       break;
     }
+    case STREAM_CTRL_GET_CURRENT_TITLE:
     case STREAM_CTRL_GET_CURRENT_CHAPTER:
     {
       *(unsigned int *)arg = vcd->track - 1;
