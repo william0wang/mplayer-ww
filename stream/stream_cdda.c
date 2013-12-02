@@ -279,6 +279,13 @@ static int control(stream_t *stream, int cmd, void *arg) {
         return STREAM_OK;
       break;
     }
+    case STREAM_CTRL_GET_CURRENT_TITLE:
+    {
+      int cur_track = get_track_by_sector(p, p->sector);
+      if (cur_track == -1) return STREAM_ERROR;
+      *(unsigned int *)arg = cur_track;
+      return STREAM_OK;
+    }
     case STREAM_CTRL_GET_CURRENT_CHAPTER:
     {
       int start_track = get_track_by_sector(p, p->start_sector);
