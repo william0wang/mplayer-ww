@@ -374,7 +374,7 @@ static int open_cdda(stream_t *st,int m, void* opts, int* file_format) {
   }
 
   cd_info = cd_info_new();
-  mp_msg(MSGT_OPEN,MSGL_INFO,MSGTR_MPDEMUX_CDDA_AudioCDFoundWithNTracks,cdda_tracks(cdd));
+  mp_msg(MSGT_OPEN,MSGL_INFO,MSGTR_MPDEMUX_CDDA_AudioCDFoundWithNTracks,(int)cdda_tracks(cdd));
   for(i=0;i<cdd->tracks;i++) {
 	  char track_name[80];
 	  long sec=cdda_track_firstsector(cdd,i+1);
