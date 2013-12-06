@@ -165,7 +165,7 @@ static int demux_avs_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
     if (ds == demuxer->video)
     {
         sh_video_t *sh_video = demuxer->video->sh;
-        char *dst;
+        unsigned char *dst;
         int w, h;
         if (AVS->video_info->num_frames <= AVS->frameno) return 0; // EOF
 
