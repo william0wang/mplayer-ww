@@ -216,6 +216,11 @@ calclengthmmmmss:
                     av_strlcat(trbuf, "d", sizeof(trbuf));
                     break;
 
+                case STREAMTYPE_TV:
+                case STREAMTYPE_DVB:
+                    av_strlcat(trbuf, "b", sizeof(trbuf));
+                    break;
+
                 default:
                     av_strlcat(trbuf, " ", sizeof(trbuf));
                     break;

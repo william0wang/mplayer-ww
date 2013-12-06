@@ -55,6 +55,7 @@ typedef struct mp_vcd_priv_st
 	dk_cd_read_track_info_t entry;
 	struct CDDiscInfo hdr;
 	CDMSF msf;
+	unsigned int track;
 } mp_vcd_priv_t;
 
 static inline void vcd_set_msf(mp_vcd_priv_t* vcd, unsigned int sect)

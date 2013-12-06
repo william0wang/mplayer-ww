@@ -86,6 +86,9 @@
 #include "pixmaps/audiolang.xpm"
 #include "pixmaps/sublang.xpm"
 #endif
+#ifdef CONFIG_TV
+#include "pixmaps/tv.xpm"
+#endif
 #include "pixmaps/empty1px.xpm"
 
 int gtkPopupMenu;
@@ -561,6 +564,9 @@ GtkWidget * CreatePopUpMenu( void )
        }
 #endif
     AddMenuItem( window1, (const char*)url_xpm, SubMenu,MSGTR_MENU_PlayURL, evLoadURL );
+#ifdef CONFIG_TV
+    AddMenuItem( window1, (const char*)tv_xpm, SubMenu,MSGTR_MENU_PlayTV, evPlayTV );
+#endif
     AddMenuItem( window1, (const char*)sub_xpm, SubMenu,MSGTR_MENU_LoadSubtitle"   ", evLoadSubtitle );
     AddMenuItem( window1, (const char*)nosub_xpm, SubMenu,MSGTR_MENU_DropSubtitle,evDropSubtitle );
     AddMenuItem( window1, (const char*)loadeaf_xpm, SubMenu,MSGTR_MENU_LoadExternAudioFile, evLoadAudioFile );

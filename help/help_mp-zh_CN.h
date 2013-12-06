@@ -1,4 +1,4 @@
-// Synced with help_mp-en.h rev. 36470
+// Synced with help_mp-en.h rev. 36525
 //
 // Translated by JRaSH <jrash06@gmail.com>
 
@@ -557,6 +557,7 @@ static const char help_text[]=
 #define MSGTR_Title "标题 %d"
 #define MSGTR_NoChapter "无章节"
 #define MSGTR_Chapter "章节 %d"
+#define MSGTR_NoChannelName "无频道名"
 #define MSGTR_NoFileLoaded "未载入文件"
 #define MSGTR_Filter_UTF8Subtitles "UTF-8 编码的字幕（*.utf, *.utf-8, *.utf8）"
 #define MSGTR_Filter_AllSubtitles "所有字幕文件"
@@ -641,6 +642,7 @@ static const char help_text[]=
 #define MSGTR_MENU_PlayVCD "播放 VCD..."
 #define MSGTR_MENU_PlayDVD "播放 DVD..."
 #define MSGTR_MENU_PlayURL "播放网络链接..."
+#define MSGTR_MENU_PlayTV "播放电视..."
 #define MSGTR_MENU_LoadSubtitle "加载字幕..."
 #define MSGTR_MENU_DropSubtitle "丢弃字幕..."
 #define MSGTR_MENU_LoadExternAudioFile "加载外部音频文件..."
@@ -808,6 +810,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SaveWinPos "保存窗口位置"
 #define MSGTR_PREFERENCES_XSCREENSAVER "停用 XScreenSaver 屏保"
 #define MSGTR_PREFERENCES_PlayBar "启用播放条"
+#define MSGTR_PREFERENCES_TV_Digital "数字电视接收功能"
 #define MSGTR_PREFERENCES_NoIdle "播放后退出"
 #define MSGTR_PREFERENCES_AutoSync "启用/禁用自动同步"
 #define MSGTR_PREFERENCES_AutoSyncValue "自动同步："

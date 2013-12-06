@@ -108,6 +108,7 @@ static GtkWidget * CBSaveWinPos;
 static GtkWidget * CBStopXScreenSaver;
 static GtkWidget * CBPlayBar;
 static GtkWidget * CBNoIdle;
+static GtkWidget * CBTVDigital;
 
 static GtkWidget * SBCache;
 static GtkAdjustment * SBCacheadj;
@@ -333,6 +334,7 @@ static void prButton( GtkButton * button, gpointer user_data )
 	gtkShowVideoWindow=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBShowVideoWindow ) );
 	stop_xscreensaver=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBStopXScreenSaver ) );
 	gtkEnablePlayBar=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBPlayBar ) );
+	gui_tv_digital=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBTVDigital ) );
 	player_idle_mode=!gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBNoIdle ) );
 	mplayer( MPLAYER_SET_AUTO_QUALITY,HSPPQualityadj->value,0 );
 
@@ -967,6 +969,7 @@ static GtkWidget * CreatePreferences( void )
   CBSaveWinPos=gtkAddCheckButton( MSGTR_PREFERENCES_SaveWinPos,vbox602 );
   CBStopXScreenSaver=gtkAddCheckButton( MSGTR_PREFERENCES_XSCREENSAVER,vbox602 );
   CBPlayBar=gtkAddCheckButton( MSGTR_PREFERENCES_PlayBar,vbox602 );
+  CBTVDigital=gtkAddCheckButton( MSGTR_PREFERENCES_TV_Digital,vbox602 );
   CBNoIdle=gtkAddCheckButton( MSGTR_PREFERENCES_NoIdle,vbox602 );
 
   gtkAddHSeparator( vbox602 );
@@ -1272,6 +1275,10 @@ void ShowPreferences( void )
    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBPlayBar ),0 );
    gtk_widget_set_sensitive( CBPlayBar,FALSE );
   }
+ gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBTVDigital ),gui_tv_digital );
+#ifndef CONFIG_TV
+   gtk_widget_set_sensitive( CBTVDigital,FALSE );
+#endif
  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBNoIdle ),!player_idle_mode );
 
  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBCache ),0 );

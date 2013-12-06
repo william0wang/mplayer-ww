@@ -325,6 +325,17 @@ char *TranslateFilename(int how, char *fname, size_t maxlen)
 
         break;
 
+    case STREAMTYPE_TV:
+    case STREAMTYPE_DVB:
+
+        p = MSGTR_NoChannelName;
+
+        if (guiInfo.mpcontext->stream)
+            stream_control(guiInfo.mpcontext->stream, STREAM_CTRL_GET_CURRENT_CHANNEL, &p);
+
+        av_strlcpy(fname, p, maxlen);
+        break;
+
     default:
 
         av_strlcpy(fname, MSGTR_NoMediaOpened, maxlen);

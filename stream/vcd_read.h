@@ -44,6 +44,7 @@ struct mp_vcd_priv_st {
   struct cdrom_tocentry entry;
   char buf[VCD_SECTOR_SIZE];
   struct cdrom_tochdr tochdr;
+  unsigned int track;
 };
 
 static inline void vcd_set_msf(mp_vcd_priv_t* vcd, unsigned int sect){

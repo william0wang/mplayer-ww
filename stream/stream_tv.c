@@ -106,12 +106,17 @@ tv_stream_close (stream_t *stream)
     m_struct_free(&stream_opts,stream->priv);
   stream->priv=NULL;
 }
+static int tv_stream_control(stream_t *stream, int cmd, void *arg)
+{
+    return STREAM_UNSUPPORTED;
+}
 static int
 tv_stream_open (stream_t *stream, int mode, void *opts, int *file_format)
 {
 
   stream->type = STREAMTYPE_TV;
   stream->priv = opts;
+  stream->control = tv_stream_control;
   stream->close=tv_stream_close;
   *file_format =  DEMUXER_TYPE_TV;
 
