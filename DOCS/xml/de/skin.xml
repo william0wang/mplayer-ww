@@ -926,6 +926,7 @@ image = font.png
             <row><entry><keycap>v</keycap></entry><entry>Stream ist eine Video-CD</entry></row>
             <row><entry><keycap>d</keycap></entry><entry>Stream ist eine DVD</entry></row>
             <row><entry><keycap>u</keycap></entry><entry>Stream ist eine URL</entry></row>
+            <row><entry><keycap>b</keycap></entry><entry>Stream ist eine TV/DVB-Übertragung</entry></row>
           </tbody>
         </tgroup>
       </informaltable>
@@ -1081,6 +1082,15 @@ image = font.png
         <listitem>
           <para>
             Zeigt das URL-Dialog-Fenster.
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><emphasis role="bold">evPlayTV</emphasis></term>
+        <listitem>
+          <para>
+            Versucht die TV/DVB-Wiedergabe zu beginnen.
           </para>
         </listitem>
       </varlistentry>

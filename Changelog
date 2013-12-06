@@ -30,6 +30,9 @@ MPlayer
     * Android: -wid is supported. This should allow using MPlayer in slave
       mode, a native window pointer needs to be passed as -wid. Untested.
 
+    GUI:
+    * Support for TV/DVB
+
   1.1: "We gave up on 1.0"
 
     Decoders:

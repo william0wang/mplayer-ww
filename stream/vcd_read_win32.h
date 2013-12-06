@@ -38,6 +38,7 @@ struct mp_vcd_priv_st {
     CDROM_TOC toc;
     unsigned sect;
     char buf[VCD_SECTOR_SIZE];
+    unsigned int track;
 };
 
 static inline void vcd_set_msf(mp_vcd_priv_t* vcd, unsigned sect)

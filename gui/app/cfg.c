@@ -45,6 +45,11 @@
 #include "sub/font_load.h"
 #include "sub/sub.h"
 
+guiTV_t guiTV[2] = {
+    { STREAMTYPE_TV,  "tv"  },
+    { STREAMTYPE_DVB, "dvb" }
+};
+
 m_config_t *gui_conf;
 
 int gtkCacheOn;
@@ -92,6 +97,8 @@ int gui_main_pos_x  = -3;
 int gui_main_pos_y  = -3;
 int gui_video_pos_x = -3;
 int gui_video_pos_y = -3;
+
+int gui_tv_digital = True;
 
 int guiWinID = -1;
 
@@ -173,6 +180,10 @@ static const m_option_t gui_opts[] = {
     { "gui_video_out_pos_y",         &gui_video_pos_y,         CONF_TYPE_INT,         0,           0,     0,          NULL },
 
     { "idle",                        &player_idle_mode,        CONF_TYPE_FLAG,        CONF_GLOBAL, 0,     1,          NULL },
+
+#ifdef CONFIG_TV
+    { "gui_tv_digital",              &gui_tv_digital,          CONF_TYPE_FLAG,        0,           0,     1,          NULL },
+#endif
 
     // NOTE TO MYSELF: Do we really need all/any non-gtkOptions, i.e. override mplayer options?
 

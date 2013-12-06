@@ -23,6 +23,7 @@
 
 #include "interface.h"
 #include "app/app.h"
+#include "app/cfg.h"
 #include "app/gui.h"
 #include "dialog/dialog.h"
 #include "skin/skin.h"
@@ -437,6 +438,15 @@ int gui(int what, void *data)
             dvd_angle   = guiInfo.Angle;
 #endif
             break;
+
+        case STREAMTYPE_TV:
+        case STREAMTYPE_DVB:
+        {
+            char tmp[512];
+
+            sprintf(tmp, "%s://", guiTV[gui_tv_digital].SchemeName);
+            uiSetFile(NULL, tmp, SAME_STREAMTYPE);
+        }
         }
 
         /* video opts */
@@ -604,11 +614,15 @@ int gui(int what, void *data)
         case STREAMTYPE_CDDA:
             guiInfo.Tracks = 0;
             stream_control(stream, STREAM_CTRL_GET_NUM_TITLES, &guiInfo.Tracks);
+            if (stream_control(stream, STREAM_CTRL_GET_CURRENT_TITLE, &guiInfo.Track) == STREAM_OK)
+                guiInfo.Track++;
             break;
 
         case STREAMTYPE_VCD:
             guiInfo.Tracks = 0;
             stream_control(stream, STREAM_CTRL_GET_NUM_TITLES, &guiInfo.Tracks);
+            if (stream_control(stream, STREAM_CTRL_GET_CURRENT_TITLE, &guiInfo.Track) == STREAM_OK)
+                guiInfo.Track++;
             break;
 
         case STREAMTYPE_DVD:
@@ -618,9 +632,8 @@ int gui(int what, void *data)
             stream_control(stream, STREAM_CTRL_GET_NUM_CHAPTERS, &guiInfo.Chapters);
             guiInfo.Angles = 0;
             stream_control(stream, STREAM_CTRL_GET_NUM_ANGLES, &guiInfo.Angles);
-            guiInfo.Track = 0;
-            stream_control(stream, STREAM_CTRL_GET_CURRENT_TITLE, &guiInfo.Track);
-            guiInfo.Track++;
+            if (stream_control(stream, STREAM_CTRL_GET_CURRENT_TITLE, &guiInfo.Track) == STREAM_OK)
+                guiInfo.Track++;
             // guiInfo.Chapter will be set by mplayer
             guiInfo.Angle = 1;
             stream_control(stream, STREAM_CTRL_GET_ANGLE, &guiInfo.Angle);
@@ -631,6 +644,11 @@ int gui(int what, void *data)
             guiInfo.Subtitles = dvd->nr_of_subtitles;
             memcpy(guiInfo.Subtitle, dvd->subtitles, sizeof(dvd->subtitles));
 #endif
+            break;
+
+        case STREAMTYPE_TV:
+        case STREAMTYPE_DVB:
+            guiInfo.Tracks = guiInfo.Track = 1;
             break;
         }
 
@@ -652,7 +670,7 @@ int gui(int what, void *data)
         if (guiInfo.sh_video)
             guiInfo.CodecName = strdup(guiInfo.sh_video->codec->name);
 
-        state = (guiInfo.StreamType == STREAMTYPE_STREAM ? btnDisabled : btnReleased);
+        state = (isSeekableStreamtype ? btnReleased : btnDisabled);
         btnSet(evForward10sec, state);
         btnSet(evBackward10sec, state);
         btnSet(evForward1min, state);

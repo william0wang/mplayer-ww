@@ -22,6 +22,13 @@
 #include "m_config.h"
 #include "m_option.h"
 
+typedef struct {
+    int StreamType;
+    char *SchemeName;
+} guiTV_t;
+
+extern guiTV_t guiTV[2];
+
 extern m_config_t *gui_conf;
 
 extern int gtkCacheOn;
@@ -82,6 +89,7 @@ extern int gui_main_pos_x;
 extern int gui_main_pos_y;
 extern int gui_video_pos_x;
 extern int gui_video_pos_y;
+extern int gui_tv_digital;
 
 extern int guiWinID;
 
