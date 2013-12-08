@@ -1031,12 +1031,6 @@ static int draw_slice(uint8_t *image[], int stride[], int w, int h,
         return VO_FALSE;
 
     vdp_st = vdp_decoder_render(decoder, rndr->render_state->surface, rndr->info, rndr->bitstream_buffers_used, rndr->bitstream_buffers);
-    if (vdp_st == VDP_STATUS_INVALID_SIZE) {
-        // reinit to work around a NVidia bug on aspect change
-        if (!create_vdp_decoder(image_format, vid_width, vid_height, max_refs))
-            return VO_FALSE;
-        vdp_st = vdp_decoder_render(decoder, rndr->render_state->surface, rndr->info, rndr->bitstream_buffers_used, rndr->bitstream_buffers);
-    }
     CHECK_ST_WARNING("Failed VDPAU decoder rendering");
     return VO_TRUE;
 }
