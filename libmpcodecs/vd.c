@@ -194,21 +194,21 @@ int mpcodecs_config_vo(sh_video_t *sh, int w, int h,
         out_fmt = sh->codec->outfmt[i];
         if (out_fmt == (unsigned int) 0xFFFFFFFF)
             continue;
+        // check (query) if codec really support this outfmt...
+        sh->outfmtidx = j;  // pass index to the control() function this way
+        if (mpvdec->control(sh, VDCTRL_QUERY_FORMAT, &out_fmt) ==
+            CONTROL_FALSE) {
+            mp_msg(MSGT_CPLAYER, MSGL_DBG2,
+                   "vo_debug: codec query_format(%s) returned FALSE\n",
+                   vo_format_name(out_fmt));
+            continue;
+        }
         flags = vf->query_format(vf, out_fmt);
         mp_msg(MSGT_CPLAYER, MSGL_DBG2,
                "vo_debug: query(%s) returned 0x%X (i=%d) \n",
                vo_format_name(out_fmt), flags, i);
         if ((flags & VFCAP_CSP_SUPPORTED_BY_HW)
             || (flags & VFCAP_CSP_SUPPORTED && j < 0)) {
-            // check (query) if codec really support this outfmt...
-            sh->outfmtidx = j;  // pass index to the control() function this way
-            if (mpvdec->control(sh, VDCTRL_QUERY_FORMAT, &out_fmt) ==
-                CONTROL_FALSE) {
-                mp_msg(MSGT_CPLAYER, MSGL_DBG2,
-                       "vo_debug: codec query_format(%s) returned FALSE\n",
-                       vo_format_name(out_fmt));
-                continue;
-            }
             j = i;
             vo_flags = flags;
             if (flags & VFCAP_CSP_SUPPORTED_BY_HW)
@@ -217,10 +217,7 @@ int mpcodecs_config_vo(sh_video_t *sh, int w, int h,
                    && !(flags &
                         (VFCAP_CSP_SUPPORTED_BY_HW | VFCAP_CSP_SUPPORTED))
                    && (out_fmt == IMGFMT_RGB8 || out_fmt == IMGFMT_BGR8)) {
-            sh->outfmtidx = j;  // pass index to the control() function this way
-            if (mpvdec->control(sh, VDCTRL_QUERY_FORMAT, &out_fmt) !=
-                CONTROL_FALSE)
-                palette = 1;
+            palette = 1;
         }
     }
     if (j < 0 && !IMGFMT_IS_HWACCEL(preferred_outfmt)) {
