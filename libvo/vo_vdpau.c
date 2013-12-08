@@ -690,6 +690,12 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 #endif
     flip = flags & VOFLAG_FLIPPING;
 
+    if (IMGFMT_IS_VDPAU(image_format) && decoder == VDP_INVALID_HANDLE) {
+        mp_msg(MSGT_VO, MSGL_WARN, "[vdpau] Unexpected reinit, query_format called too often?\n");
+        // force a full reinit, otherwise we might run into issues with
+        // some implementations
+        image_format = 0;
+    }
     if (image_format == format &&
         vid_width    == width  &&
         vid_height   == height) {
@@ -1147,8 +1153,15 @@ static int query_format(uint32_t format)
     case IMGFMT_VDPAU_WMV3:
     case IMGFMT_VDPAU_VC1:
     case IMGFMT_VDPAU_MPEG4:
-        if (create_vdp_decoder(format, 48, 48, 2))
+        // Note: this will break the current decoder
+        // Not all implementations support safely instantiating
+        // a second decoder, so this is the "lesser evil"
+        if (create_vdp_decoder(format, 48, 48, 2)) {
+            vdp_decoder_destroy(decoder);
+            decoder = VDP_INVALID_HANDLE;
+            decoder_max_refs = -1;
             return default_flags;
+        }
     }
     return 0;
 }
