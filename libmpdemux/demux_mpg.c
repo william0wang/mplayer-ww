@@ -191,7 +191,8 @@ static demuxer_t* demux_mpg_open(demuxer_t* demuxer) {
   stream_t *s = demuxer->stream;
   mpg_demuxer_t* mpg_d;
 
-  if (!ds_fill_buffer(demuxer->video)) return 0;
+  while (demuxer->video->packs + demuxer->audio->packs < 2)
+    if (!ds_fill_buffer(demuxer->video)) return 0;
   mpg_d = calloc(1,sizeof(mpg_demuxer_t));
   if(mpg_d)
   {
