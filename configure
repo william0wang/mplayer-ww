@@ -3921,6 +3921,11 @@ test "$_os2threads" = yes && def_threads='#define HAVE_THREADS 1' && def_os2thre
 echores "$_os2threads"
 fi #if os2
 
+if test "$_os2threads" = yes || test "$_w32threads" = yes || test "$_pthreads" = yes ; then
+    _threads=yes
+else
+    _threads=no
+fi
 
 echocheck "windows.h"
 windows_h=no
@@ -8618,6 +8623,7 @@ HAVE_OS2THREADS = $_os2threads
 HAVE_PTHREADS   = $_pthreads
 HAVE_SHM        = $_shm
 HAVE_W32THREADS = $_w32threads
+HAVE_THREADS    = $_threads
 HAVE_YASM       = $have_yasm
 
 CONFIG_LIBXVID = $_xvid_lavc
