@@ -9160,6 +9160,7 @@ $def_truncf
 #define HAVE_INLINE_ASM 1
 #define HAVE_ISATTY 0
 #define HAVE_LDBRX 0
+#define HAVE_LIBC_MSVCRT 0
 #define HAVE_LOCALTIME_R 0
 #define HAVE_MAPVIEWOFFILE 0
 #define HAVE_MIPSDSPR1 0
