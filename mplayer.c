@@ -375,6 +375,11 @@ int mpctx_get_osd_function(MPContext *mpctx)
     return mpctx->osd_function;
 }
 
+void *mpctx_get_stream(MPContext *mpctx)
+{
+    return mpctx->stream;
+}
+
 static int is_valid_metadata_type(metadata_t type)
 {
     switch (type) {

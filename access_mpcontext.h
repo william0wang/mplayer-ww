@@ -28,5 +28,6 @@ void *mpctx_get_mixer(struct MPContext *mpctx);
 int mpctx_get_global_sub_size(struct MPContext *mpctx);
 int mpctx_get_global_sub_pos(struct MPContext *mpctx);
 int mpctx_get_osd_function(struct MPContext *mpctx);
+void *mpctx_get_stream(struct MPContext *mpctx);
 
 #endif /* MPLAYER_ACCESS_MPCONTEXT_H */
