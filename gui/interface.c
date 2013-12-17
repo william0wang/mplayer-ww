@@ -305,11 +305,11 @@ static void add_vf(char *str)
  */
 int gui(int what, void *data)
 {
-    stream_t *stream;
 #ifdef CONFIG_DVDREAD
     dvd_priv_t *dvd;
 #endif
     int msg, state;
+    stream_t *stream = NULL;
     sh_audio_t *sh_audio;
     mixer_t *mixer;
     plItem *next   = NULL;
@@ -602,9 +602,10 @@ int gui(int what, void *data)
 
         if (guiInfo.StreamType == STREAMTYPE_PLAYLIST)
             guiInfo.mpcontext->file_format = DEMUXER_TYPE_PLAYLIST;
-
+        else {
         stream = data;
         guiInfo.StreamType = stream->type;
+        }
 
         switch (guiInfo.StreamType) {
         case STREAMTYPE_FILE:
