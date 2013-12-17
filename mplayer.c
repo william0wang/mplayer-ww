@@ -365,6 +365,11 @@ int mpctx_get_global_sub_size(MPContext *mpctx)
     return mpctx->global_sub_size;
 }
 
+int mpctx_get_global_sub_pos(MPContext *mpctx)
+{
+    return mpctx->global_sub_pos;
+}
+
 int mpctx_get_osd_function(MPContext *mpctx)
 {
     return mpctx->osd_function;
