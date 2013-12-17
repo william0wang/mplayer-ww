@@ -4572,6 +4572,7 @@ if test "$_xvmc" = yes ; then
   test -n "$_xvmclib" && libs_mplayer="$libs_mplayer -l$_xvmclib"
   vomodules="xvmc $vomodules"
   res_comment="using $_xvmclib"
+  libavhwaccels="$libavhwaccels MPEG1_XVMC_HWACCEL MPEG2_XVMC_HWACCEL"
 else
   def_xvmc='#define CONFIG_XVMC 0'
   novomodules="xvmc $novomodules"
