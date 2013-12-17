@@ -4588,7 +4588,7 @@ fi
 if test "$_vda" = yes ; then
   def_vda='#define CONFIG_VDA 1'
   extra_ldflags="$extra_ldflags -framework CoreFoundation -framework VideoDecodeAcceleration -framework QuartzCore"
-  libavhwaccels="H264_VDA_HWACCEL"
+  libavhwaccels="$libavhwaccels H264_VDA_HWACCEL"
 else
   def_vda='#define CONFIG_VDA 0'
   libavdecoders=$(filter_out_component decoder '[A-Z0-9]*_VDA')
@@ -4607,7 +4607,7 @@ if test "$_vdpau" = yes ; then
   def_vdpau='#define CONFIG_VDPAU 1'
   libs_mplayer="$libs_mplayer -lvdpau"
   vomodules="vdpau $vomodules"
-  libavhwaccels="H263_VDPAU_HWACCEL H264_VDPAU_HWACCEL MPEG1_VDPAU_HWACCEL MPEG2_VDPAU_HWACCEL MPEG4_VDPAU_HWACCEL VC1_VDPAU_HWACCEL WMV3_VDPAU_HWACCEL"
+  libavhwaccels="$libavhwaccels H263_VDPAU_HWACCEL H264_VDPAU_HWACCEL MPEG1_VDPAU_HWACCEL MPEG2_VDPAU_HWACCEL MPEG4_VDPAU_HWACCEL VC1_VDPAU_HWACCEL WMV3_VDPAU_HWACCEL"
 else
   def_vdpau='#define CONFIG_VDPAU 0'
   novomodules="vdpau $novomodules"
