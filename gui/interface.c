@@ -310,6 +310,7 @@ int gui(int what, void *data)
     dvd_priv_t *dvd;
 #endif
     int msg, state;
+    sh_audio_t *sh_audio;
     mixer_t *mixer;
     plItem *next   = NULL;
 
@@ -688,9 +689,11 @@ int gui(int what, void *data)
 
     case GUI_SET_AUDIO:
 
-        guiInfo.AudioChannels = data ? ((sh_audio_t *)data)->channels : 0;
+        sh_audio = data;
 
-        if (data && !guiInfo.sh_video) {
+        guiInfo.AudioChannels = sh_audio ? sh_audio->channels : 0;
+
+        if (sh_audio && !guiInfo.sh_video) {
             guiInfo.VideoWindow = False;
             guiInfo.VideoWidth  = 0;
             guiInfo.VideoHeight = 0;
