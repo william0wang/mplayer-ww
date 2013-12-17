@@ -330,7 +330,7 @@ char *TranslateFilename(int how, char *fname, size_t maxlen)
     case STREAMTYPE_TV:
     case STREAMTYPE_DVB:
 
-        p = MSGTR_NoChannelName;
+        p      = MSGTR_NoChannelName;
         stream = mpctx_get_stream(guiInfo.mpcontext);
 
         if (stream)
