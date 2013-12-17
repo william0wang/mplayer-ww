@@ -310,7 +310,7 @@ int gui(int what, void *data)
     dvd_priv_t *dvd;
 #endif
     int msg, state;
-    mixer_t *mixer = NULL;
+    mixer_t *mixer;
     plItem *next   = NULL;
 
     switch (what) {
@@ -696,7 +696,7 @@ int gui(int what, void *data)
             guiInfo.VideoHeight = 0;
         }
 
-        gui(GUI_SET_MIXER, 0);
+        gui(GUI_SET_MIXER, mpctx_get_mixer(guiInfo.mpcontext));
 
         if (gtkEnableAudioEqualizer) {
             equalizer_t eq;
@@ -730,8 +730,7 @@ int gui(int what, void *data)
 
     case GUI_SET_MIXER:
 
-        if (guiInfo.mpcontext)
-            mixer = mpctx_get_mixer(guiInfo.mpcontext);
+        mixer = data;
 
         if (mixer) {
             float l, r, b;

@@ -4021,7 +4021,7 @@ goto_enable_cache:
                 else if (mpctx->sh_audio)
                     guiInfo.ElapsedTime = playing_audio_pts(mpctx->sh_audio, mpctx->d_audio, mpctx->audio_out);
                 guiInfo.RunningTime = demuxer_get_time_length(mpctx->demuxer);
-                gui(GUI_SET_MIXER, 0);
+                gui(GUI_SET_MIXER, &mpctx->mixer);
                 gui(GUI_REDRAW, 0);
                 if (guiInfo.Playing == GUI_STOP)
                     break;                  // STOP
