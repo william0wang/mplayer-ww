@@ -312,7 +312,7 @@ int gui(int what, void *data)
     stream_t *stream = NULL;
     sh_audio_t *sh_audio;
     mixer_t *mixer;
-    plItem *next   = NULL;
+    plItem *next = NULL;
 
     switch (what) {
     case GUI_SET_CONTEXT:
@@ -603,8 +603,8 @@ int gui(int what, void *data)
         if (guiInfo.StreamType == STREAMTYPE_PLAYLIST)
             guiInfo.mpcontext->file_format = DEMUXER_TYPE_PLAYLIST;
         else {
-        stream = data;
-        guiInfo.StreamType = stream->type;
+            stream = data;
+            guiInfo.StreamType = stream->type;
         }
 
         switch (guiInfo.StreamType) {
