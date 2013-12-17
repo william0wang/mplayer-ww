@@ -656,11 +656,6 @@ int gui(int what, void *data)
 
         break;
 
-    case GUI_SET_AFILTER:
-
-        guiInfo.afilter = data;
-        break;
-
     case GUI_SET_VIDEO:
 
         /* video */
@@ -947,6 +942,7 @@ int guiPlaylist(int what, play_tree_t *playtree, m_config_t *config, int enqueue
 
 void mplayer(int what, float value, void *data)
 {
+    af_stream_t *afilter;
     equalizer_t *eq = (equalizer_t *)data;
 
     switch (what) {
@@ -995,8 +991,9 @@ void mplayer(int what, float value, void *data)
 
     case MPLAYER_SET_EXTRA_STEREO:
         gtkAOExtraStereoMul = value;
-        if (guiInfo.afilter)
-            af_control_any_rev(guiInfo.afilter, AF_CONTROL_ES_MUL | AF_CONTROL_SET, &gtkAOExtraStereoMul);
+        afilter = mpctx_get_afilter(guiInfo.mpcontext);
+        if (afilter)
+            af_control_any_rev(afilter, AF_CONTROL_ES_MUL | AF_CONTROL_SET, &gtkAOExtraStereoMul);
         break;
 
     case MPLAYER_SET_PANSCAN:
@@ -1042,23 +1039,25 @@ void mplayer(int what, float value, void *data)
     {
         af_control_ext_t tmp;
 
+        afilter = mpctx_get_afilter(guiInfo.mpcontext);
+
         if (eq) {
             gtkEquChannels[eq->channel][eq->band] = eq->gain;
             tmp.ch  = eq->channel;
             tmp.arg = gtkEquChannels[eq->channel];
 
-            if (guiInfo.afilter)
-                af_control_any_rev(guiInfo.afilter, AF_CONTROL_EQUALIZER_GAIN | AF_CONTROL_SET, &tmp);
+            if (afilter)
+                af_control_any_rev(afilter, AF_CONTROL_EQUALIZER_GAIN | AF_CONTROL_SET, &tmp);
         } else {
             unsigned int i;
 
             memset(gtkEquChannels, 0, sizeof(gtkEquChannels));
 
-            if (guiInfo.afilter) {
+            if (afilter) {
                 for (i = 0; i < FF_ARRAY_ELEMS(gtkEquChannels); i++) {
                     tmp.ch  = i;
                     tmp.arg = gtkEquChannels[i];
-                    af_control_any_rev(guiInfo.afilter, AF_CONTROL_EQUALIZER_GAIN | AF_CONTROL_SET, &tmp);
+                    af_control_any_rev(afilter, AF_CONTROL_EQUALIZER_GAIN | AF_CONTROL_SET, &tmp);
                 }
             }
         }

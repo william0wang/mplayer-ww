@@ -380,6 +380,11 @@ void *mpctx_get_stream(MPContext *mpctx)
     return mpctx->stream;
 }
 
+void *mpctx_get_afilter(MPContext *mpctx)
+{
+    return mpctx->sh_audio ? mpctx->sh_audio->afilter : NULL;
+}
+
 static int is_valid_metadata_type(metadata_t type)
 {
     switch (type) {
@@ -578,10 +583,6 @@ void uninit_player(unsigned int mask)
         current_module     = "uninit_acodec";
         if (mpctx->sh_audio)
             uninit_audio(mpctx->sh_audio);
-#ifdef CONFIG_GUI
-        if (use_gui)
-            gui(GUI_SET_AFILTER, NULL);
-#endif
         mpctx->sh_audio      = NULL;
         mpctx->mixer.afilter = NULL;
     }
@@ -1337,10 +1338,6 @@ static int build_afilter_chain(sh_audio_t *sh_audio, ao_data_t *ao_data)
     int new_srate;
     int result;
     if (!sh_audio) {
-#ifdef CONFIG_GUI
-        if (use_gui)
-            gui(GUI_SET_AFILTER, NULL);
-#endif
         mpctx->mixer.afilter = NULL;
         return 0;
     }
@@ -1362,10 +1359,6 @@ static int build_afilter_chain(sh_audio_t *sh_audio, ao_data_t *ao_data)
     result = init_audio_filters(sh_audio, new_srate,
                                 &ao_data->samplerate, &ao_data->channels, &ao_data->format);
     mpctx->mixer.afilter = sh_audio->afilter;
-#ifdef CONFIG_GUI
-    if (use_gui)
-        gui(GUI_SET_AFILTER, sh_audio->afilter);
-#endif
     return result;
 }
 
