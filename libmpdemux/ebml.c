@@ -28,7 +28,7 @@
 #include "ebml.h"
 #include "libavutil/common.h"
 #include "mpbswap.h"
-#include "libavutil/intfloat_readwrite.h"
+#include "libavutil/intfloat.h"
 
 
 #ifndef SIZE_MAX
@@ -185,11 +185,11 @@ long double ebml_read_float(stream_t *s, uint64_t *length)
     len = ebml_read_length(s, &l);
     switch (len) {
     case 4:
-        value = av_int2flt(stream_read_dword(s));
+        value = av_int2float(stream_read_dword(s));
         break;
 
     case 8:
-        value = av_int2dbl(stream_read_qword(s));
+        value = av_int2double(stream_read_qword(s));
         break;
 
     default:
