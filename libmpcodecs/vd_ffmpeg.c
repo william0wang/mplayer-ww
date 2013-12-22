@@ -570,13 +570,14 @@ static void draw_slice(struct AVCodecContext *s,
 static void update_configuration(sh_video_t *sh, enum AVPixelFormat pix_fmt) {
     vd_ffmpeg_ctx *ctx = sh->context;
     AVCodecContext *avctx = ctx->avctx;
+    int aspect_change = av_cmp_q(avctx->sample_aspect_ratio, ctx->last_sample_aspect_ratio);
     if (!avctx->sample_aspect_ratio.den) {
         mp_msg(MSGT_DECVIDEO, MSGL_WARN, "FFmpeg bug: Invalid aspect\n");
         avctx->sample_aspect_ratio.den = 1;
     }
      // it is possible another vo buffers to be used after vo config()
      // lavc reset its buffers on width/heigh change but not on aspect change!!!
-    if (av_cmp_q(avctx->sample_aspect_ratio, ctx->last_sample_aspect_ratio) ||
+    if (aspect_change ||
         pix_fmt != ctx->pix_fmt ||
         !ctx->vo_initialized)
     {
@@ -592,7 +593,7 @@ static void update_configuration(sh_video_t *sh, enum AVPixelFormat pix_fmt) {
         // But set it even if the sample aspect did not change, since a
         // resolution change can cause an aspect change even if the
         // _sample_ aspect is unchanged.
-        if (sh->original_aspect == 0 || ctx->last_sample_aspect_ratio.den)
+        if (sh->original_aspect == 0 || (aspect_change && ctx->last_sample_aspect_ratio.den))
             sh->original_aspect = aspect;
         ctx->last_sample_aspect_ratio = avctx->sample_aspect_ratio;
         ctx->pix_fmt = pix_fmt;
