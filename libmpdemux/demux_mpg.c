@@ -84,6 +84,8 @@ static int parse_psm(demuxer_t *demux, int len) {
   es_map_len = stream_read_word(demux->stream);		//length of elementary streams map
   es_map_len = FFMIN(es_map_len, len - prog_len - 8);	//sanity check
   while(es_map_len > 0) {
+    if (demux->stream->eof)
+      return 0;
     type = stream_read_char(demux->stream);
     id = stream_read_char(demux->stream);
     if(id >= 0xB0 && id <= 0xEF && priv) {
@@ -189,7 +191,8 @@ static demuxer_t* demux_mpg_open(demuxer_t* demuxer) {
   stream_t *s = demuxer->stream;
   mpg_demuxer_t* mpg_d;
 
-  if (!ds_fill_buffer(demuxer->video)) return 0;
+  while (demuxer->video->packs + demuxer->audio->packs < 2)
+    if (!ds_fill_buffer(demuxer->video)) return 0;
   mpg_d = calloc(1,sizeof(mpg_demuxer_t));
   if(mpg_d)
   {

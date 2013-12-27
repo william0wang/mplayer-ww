@@ -28,6 +28,7 @@
 #include "gui/interface.h"
 #include "gui/app/gui.h"
 
+#include "access_mpcontext.h"
 #include "config.h"
 #include "help_mp.h"
 #include "libavutil/avstring.h"
@@ -271,6 +272,7 @@ char *TranslateFilename(int how, char *fname, size_t maxlen)
 {
     char *p;
     size_t len;
+    stream_t *stream;
 
     switch (guiInfo.StreamType) {
     case STREAMTYPE_FILE:
@@ -328,10 +330,11 @@ char *TranslateFilename(int how, char *fname, size_t maxlen)
     case STREAMTYPE_TV:
     case STREAMTYPE_DVB:
 
-        p = MSGTR_NoChannelName;
+        p      = MSGTR_NoChannelName;
+        stream = mpctx_get_stream(guiInfo.mpcontext);
 
-        if (guiInfo.mpcontext->stream)
-            stream_control(guiInfo.mpcontext->stream, STREAM_CTRL_GET_CURRENT_CHANNEL, &p);
+        if (stream)
+            stream_control(stream, STREAM_CTRL_GET_CURRENT_CHANNEL, &p);
 
         av_strlcpy(fname, p, maxlen);
         break;

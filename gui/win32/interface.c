@@ -683,9 +683,6 @@ int gui(int what, void *data)
         case GUI_REDRAW:
             mygui->updatedisplay(mygui, mygui->mainwindow);
             break;
-        case GUI_SET_AFILTER:
-            guiInfo.afilter = data;
-            break;
         case GUI_SET_STATE:
         {
             guiInfo.Playing = (int) data;

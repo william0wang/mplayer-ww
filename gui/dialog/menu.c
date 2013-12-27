@@ -654,14 +654,15 @@ GtkWidget * CreatePopUpMenu( void )
   /* cheap subtitle switching for non-DVD streams */
   if ( global_sub_size && guiInfo.StreamType != STREAMTYPE_DVD )
    {
-    int i;
+    int pos, i;
+    pos = mpctx_get_global_sub_pos(guiInfo.mpcontext);
     SubMenu=AddSubMenu( window1, (const char*)subtitle_xpm, Menu, MSGTR_MENU_Subtitles );
-    AddMenuCheckItem( window1, (const char*)empty1px_xpm, SubMenu, MSGTR_MENU_None, guiInfo.mpcontext->global_sub_pos == -1, (-1 << 16) + ivSetSubtitle );
+    AddMenuCheckItem( window1, (const char*)empty1px_xpm, SubMenu, MSGTR_MENU_None, pos == -1, (-1 << 16) + ivSetSubtitle );
     for ( i=0;i < global_sub_size;i++ )
      {
       char tmp[32];
       snprintf( tmp, 32, MSGTR_MENU_Track, i );
-      AddMenuCheckItem( window1,(const char*)empty1px_xpm,SubMenu,tmp,guiInfo.mpcontext->global_sub_pos == i,( i << 16 ) + ivSetSubtitle );
+      AddMenuCheckItem( window1,(const char*)empty1px_xpm,SubMenu,tmp,pos == i,( i << 16 ) + ivSetSubtitle );
      }
    }
 

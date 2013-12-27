@@ -305,13 +305,14 @@ static void add_vf(char *str)
  */
 int gui(int what, void *data)
 {
-    stream_t *stream;
 #ifdef CONFIG_DVDREAD
     dvd_priv_t *dvd;
 #endif
     int msg, state;
-    mixer_t *mixer = NULL;
-    plItem *next   = NULL;
+    stream_t *stream = NULL;
+    sh_audio_t *sh_audio;
+    mixer_t *mixer;
+    plItem *next = NULL;
 
     switch (what) {
     case GUI_SET_CONTEXT:
@@ -601,9 +602,10 @@ int gui(int what, void *data)
 
         if (guiInfo.StreamType == STREAMTYPE_PLAYLIST)
             guiInfo.mpcontext->file_format = DEMUXER_TYPE_PLAYLIST;
-
-        stream = data;
-        guiInfo.StreamType = stream->type;
+        else {
+            stream = data;
+            guiInfo.StreamType = stream->type;
+        }
 
         switch (guiInfo.StreamType) {
         case STREAMTYPE_FILE:
@@ -654,11 +656,6 @@ int gui(int what, void *data)
 
         break;
 
-    case GUI_SET_AFILTER:
-
-        guiInfo.afilter = data;
-        break;
-
     case GUI_SET_VIDEO:
 
         /* video */
@@ -688,15 +685,17 @@ int gui(int what, void *data)
 
     case GUI_SET_AUDIO:
 
-        guiInfo.AudioChannels = data ? ((sh_audio_t *)data)->channels : 0;
+        sh_audio = data;
 
-        if (data && !guiInfo.sh_video) {
+        guiInfo.AudioChannels = sh_audio ? sh_audio->channels : 0;
+
+        if (sh_audio && !guiInfo.sh_video) {
             guiInfo.VideoWindow = False;
             guiInfo.VideoWidth  = 0;
             guiInfo.VideoHeight = 0;
         }
 
-        gui(GUI_SET_MIXER, 0);
+        gui(GUI_SET_MIXER, mpctx_get_mixer(guiInfo.mpcontext));
 
         if (gtkEnableAudioEqualizer) {
             equalizer_t eq;
@@ -730,8 +729,7 @@ int gui(int what, void *data)
 
     case GUI_SET_MIXER:
 
-        if (guiInfo.mpcontext)
-            mixer = mpctx_get_mixer(guiInfo.mpcontext);
+        mixer = data;
 
         if (mixer) {
             float l, r, b;
@@ -944,6 +942,7 @@ int guiPlaylist(int what, play_tree_t *playtree, m_config_t *config, int enqueue
 
 void mplayer(int what, float value, void *data)
 {
+    af_stream_t *afilter;
     equalizer_t *eq = (equalizer_t *)data;
 
     switch (what) {
@@ -992,8 +991,9 @@ void mplayer(int what, float value, void *data)
 
     case MPLAYER_SET_EXTRA_STEREO:
         gtkAOExtraStereoMul = value;
-        if (guiInfo.afilter)
-            af_control_any_rev(guiInfo.afilter, AF_CONTROL_ES_MUL | AF_CONTROL_SET, &gtkAOExtraStereoMul);
+        afilter = mpctx_get_afilter(guiInfo.mpcontext);
+        if (afilter)
+            af_control_any_rev(afilter, AF_CONTROL_ES_MUL | AF_CONTROL_SET, &gtkAOExtraStereoMul);
         break;
 
     case MPLAYER_SET_PANSCAN:
@@ -1039,23 +1039,25 @@ void mplayer(int what, float value, void *data)
     {
         af_control_ext_t tmp;
 
+        afilter = mpctx_get_afilter(guiInfo.mpcontext);
+
         if (eq) {
             gtkEquChannels[eq->channel][eq->band] = eq->gain;
             tmp.ch  = eq->channel;
             tmp.arg = gtkEquChannels[eq->channel];
 
-            if (guiInfo.afilter)
-                af_control_any_rev(guiInfo.afilter, AF_CONTROL_EQUALIZER_GAIN | AF_CONTROL_SET, &tmp);
+            if (afilter)
+                af_control_any_rev(afilter, AF_CONTROL_EQUALIZER_GAIN | AF_CONTROL_SET, &tmp);
         } else {
             unsigned int i;
 
             memset(gtkEquChannels, 0, sizeof(gtkEquChannels));
 
-            if (guiInfo.afilter) {
+            if (afilter) {
                 for (i = 0; i < FF_ARRAY_ELEMS(gtkEquChannels); i++) {
                     tmp.ch  = i;
                     tmp.arg = gtkEquChannels[i];
-                    af_control_any_rev(guiInfo.afilter, AF_CONTROL_EQUALIZER_GAIN | AF_CONTROL_SET, &tmp);
+                    af_control_any_rev(afilter, AF_CONTROL_EQUALIZER_GAIN | AF_CONTROL_SET, &tmp);
                 }
             }
         }

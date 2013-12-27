@@ -383,9 +383,24 @@ int mpctx_get_global_sub_size(MPContext *mpctx)
     return mpctx->global_sub_size;
 }
 
+int mpctx_get_global_sub_pos(MPContext *mpctx)
+{
+    return mpctx->global_sub_pos;
+}
+
 int mpctx_get_osd_function(MPContext *mpctx)
 {
     return mpctx->osd_function;
+}
+
+void *mpctx_get_stream(MPContext *mpctx)
+{
+    return mpctx->stream;
+}
+
+void *mpctx_get_afilter(MPContext *mpctx)
+{
+    return mpctx->sh_audio ? mpctx->sh_audio->afilter : NULL;
 }
 
 static int is_valid_metadata_type(metadata_t type)
@@ -596,10 +611,6 @@ void uninit_player(unsigned int mask)
         current_module     = "uninit_acodec";
         if (mpctx->sh_audio)
             uninit_audio(mpctx->sh_audio);
-#ifdef CONFIG_GUI
-        if (use_gui)
-            gui(GUI_SET_AFILTER, NULL);
-#endif
         mpctx->sh_audio      = NULL;
         mpctx->mixer.afilter = NULL;
     }
@@ -1376,10 +1387,6 @@ static int build_afilter_chain(sh_audio_t *sh_audio, ao_data_t *ao_data)
     int new_srate;
     int result;
     if (!sh_audio) {
-#ifdef CONFIG_GUI
-        if (use_gui)
-            gui(GUI_SET_AFILTER, NULL);
-#endif
         mpctx->mixer.afilter = NULL;
         return 0;
     }
@@ -1401,10 +1408,6 @@ static int build_afilter_chain(sh_audio_t *sh_audio, ao_data_t *ao_data)
     result = init_audio_filters(sh_audio, new_srate,
                                 &ao_data->samplerate, &ao_data->channels, &ao_data->format);
     mpctx->mixer.afilter = sh_audio->afilter;
-#ifdef CONFIG_GUI
-    if (use_gui)
-        gui(GUI_SET_AFILTER, sh_audio->afilter);
-#endif
     return result;
 }
 
@@ -4238,7 +4241,7 @@ goto_enable_cache:
                 else if (mpctx->sh_audio)
                     guiInfo.ElapsedTime = playing_audio_pts(mpctx->sh_audio, mpctx->d_audio, mpctx->audio_out);
                 guiInfo.RunningTime = demuxer_get_time_length(mpctx->demuxer);
-                gui(GUI_SET_MIXER, 0);
+                gui(GUI_SET_MIXER, &mpctx->mixer);
                 gui(GUI_REDRAW, 0);
                 if (guiInfo.Playing == GUI_STOP)
                     break;                  // STOP
