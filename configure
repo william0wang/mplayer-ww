@@ -1712,6 +1712,7 @@ if test -z "$_target" ; then
       s390) host_arch=s390 ;;
       s390x) host_arch=s390x ;;
       *mips*) host_arch=mips ;;
+      nios2) host_arch=nios2 ;;
       vax) host_arch=vax ;;
       xtensa*) host_arch=xtensa ;;
       *) host_arch=UNKNOWN ;;
@@ -2569,6 +2570,11 @@ EOF
     test $_fast_clz = "auto" && _fast_clz=yes
 
     _optimizing="$proc"
+    ;;
+
+  nios2)
+    arch='nios2'
+    iproc='nios2'
     ;;
 
   mips*)
@@ -3924,6 +3930,11 @@ test "$_os2threads" = yes && def_threads='#define HAVE_THREADS 1' && def_os2thre
 echores "$_os2threads"
 fi #if os2
 
+if test "$_os2threads" = yes || test "$_w32threads" = yes || test "$_pthreads" = yes ; then
+    _threads=yes
+else
+    _threads=no
+fi
 
 echocheck "windows.h"
 windows_h=no
@@ -4570,6 +4581,7 @@ if test "$_xvmc" = yes ; then
   test -n "$_xvmclib" && libs_mplayer="$libs_mplayer -l$_xvmclib"
   vomodules="xvmc $vomodules"
   res_comment="using $_xvmclib"
+  libavhwaccels="$libavhwaccels MPEG1_XVMC_HWACCEL MPEG2_XVMC_HWACCEL"
 else
   def_xvmc='#define CONFIG_XVMC 0'
   novomodules="xvmc $novomodules"
@@ -4586,7 +4598,7 @@ fi
 if test "$_vda" = yes ; then
   def_vda='#define CONFIG_VDA 1'
   extra_ldflags="$extra_ldflags -framework CoreFoundation -framework VideoDecodeAcceleration -framework QuartzCore"
-  libavhwaccels="H264_VDA_HWACCEL"
+  libavhwaccels="$libavhwaccels H264_VDA_HWACCEL"
 else
   def_vda='#define CONFIG_VDA 0'
   libavdecoders=$(filter_out_component decoder '[A-Z0-9]*_VDA')
@@ -4605,7 +4617,7 @@ if test "$_vdpau" = yes ; then
   def_vdpau='#define CONFIG_VDPAU 1'
   libs_mplayer="$libs_mplayer -lvdpau"
   vomodules="vdpau $vomodules"
-  libavhwaccels="H263_VDPAU_HWACCEL H264_VDPAU_HWACCEL MPEG1_VDPAU_HWACCEL MPEG2_VDPAU_HWACCEL MPEG4_VDPAU_HWACCEL VC1_VDPAU_HWACCEL WMV3_VDPAU_HWACCEL"
+  libavhwaccels="$libavhwaccels H263_VDPAU_HWACCEL H264_VDPAU_HWACCEL MPEG1_VDPAU_HWACCEL MPEG2_VDPAU_HWACCEL MPEG4_VDPAU_HWACCEL VC1_VDPAU_HWACCEL WMV3_VDPAU_HWACCEL"
 else
   def_vdpau='#define CONFIG_VDPAU 0'
   novomodules="vdpau $novomodules"
@@ -8663,6 +8675,7 @@ HAVE_OS2THREADS = $_os2threads
 HAVE_PTHREADS   = $_pthreads
 HAVE_SHM        = $_shm
 HAVE_W32THREADS = $_w32threads
+HAVE_THREADS    = $_threads
 HAVE_YASM       = $have_yasm
 
 CONFIG_LIBXVID = $_xvid_lavc
@@ -9202,6 +9215,7 @@ $def_truncf
 #define HAVE_INLINE_ASM 1
 #define HAVE_ISATTY 0
 #define HAVE_LDBRX 0
+#define HAVE_LIBC_MSVCRT 0
 #define HAVE_LOCALTIME_R 0
 #define HAVE_MAPVIEWOFFILE 0
 #define HAVE_MIPSDSPR1 0

@@ -46,7 +46,6 @@ enum {
     GUI_RUN_COMMAND,
     GUI_RUN_MESSAGE,
     GUI_SETUP_VIDEO_WINDOW,
-    GUI_SET_AFILTER,
     GUI_SET_AUDIO,
     GUI_SET_CONTEXT,
     GUI_SET_MIXER,
@@ -98,7 +97,6 @@ enum {
 typedef struct {
     MPContext *mpcontext;
     sh_video_t *sh_video;
-    af_stream_t *afilter;
 
     int VideoWindow;
     int VideoWidth;
