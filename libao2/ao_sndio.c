@@ -112,20 +112,20 @@ static int init(int rate, int channels, int format, int flags)
     par.round = par.rate * 10 / 1000;        /*  10ms block size */
     if (!sio_setpar(hdl, &par)) {
         mp_msg(MSGT_AO, MSGL_ERR, "ao2: couldn't set params\n");
-        goto bad_close;
+        goto err_out;
     }
     if (!sio_getpar(hdl, &par)) {
         mp_msg(MSGT_AO, MSGL_ERR, "ao2: couldn't get params\n");
-        goto bad_close;
+        goto err_out;
     }
     if (par.bps != SIO_BPS(par.bits)) {
         mp_msg(MSGT_AO, MSGL_ERR, "ao2: unsupported format\n");
-        goto bad_close;
+        goto err_out;
     }
     pfds = calloc(sio_nfds(hdl), sizeof(*pfds));
     if (pfds == NULL) {
         mp_msg(MSGT_AO, MSGL_ERR, "ao2: couldn't allocate poll fds\n");
-        goto bad_close;
+        goto err_out;
     }
     bpf = par.bps * par.pchan;
     ao_data.format = af_bits2fmt(8 * par.bps);
@@ -147,13 +147,12 @@ static int init(int rate, int channels, int format, int flags)
     delay = 0;
     if (!sio_start(hdl)) {
         mp_msg(MSGT_AO, MSGL_ERR, "ao2: init: couldn't start\n");
-        goto bad_free;
+        goto err_out;
     }
     return 1;
-bad_free:
+err_out:
     free(pfds);
     pfds = NULL;
-bad_close:
     sio_close(hdl);
     hdl = NULL;
     return 0;
@@ -166,8 +165,9 @@ static void uninit(int immed)
 {
     if (hdl)
         sio_close(hdl);
-    if (pfds)
-        free(pfds);
+    hdl = NULL;
+    free(pfds);
+    pfds = NULL;
 }
 
 /*
