@@ -572,6 +572,7 @@ SRCS_MPLAYER-$(SDL)           += libao2/ao_sdl.c                        \
                                  libvo/vo_sdl.c                         \
                                  libvo/sdl_common.c
 SRCS_MPLAYER-$(SGIAUDIO)      += libao2/ao_sgi.c
+SRCS_MPLAYER-$(SNDIO)         += libao2/ao_sndio.c
 SRCS_MPLAYER-$(SUNAUDIO)      += libao2/ao_sun.c
 SRCS_MPLAYER-$(SVGA)          += libvo/vo_svga.c
 SRCS_MPLAYER-$(TDFXFB)        += libvo/vo_tdfxfb.c

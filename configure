@@ -522,6 +522,7 @@ Audio output:
   --disable-openal       disable OpenAL audio output [autodetect]
   --disable-nas          disable NAS audio output [autodetect]
   --disable-sgiaudio     disable SGI audio output [autodetect]
+  --disable-sndio        disable sndio audio output [autodetect]
   --disable-sunaudio     disable Sun audio output [autodetect]
   --disable-kai          disable KAI audio output [autodetect]
   --disable-dart         disable DART audio output [autodetect]
@@ -755,6 +756,7 @@ _vm=auto
 _xf86keysym=auto
 _mlib=no #broken, thus disabled
 _sgiaudio=auto
+_sndio=auto
 _sunaudio=auto
 _alsa=auto
 _fastmemcpy=yes
@@ -1197,6 +1199,8 @@ for ac_option do
   --disable-sunaudio)   _sunaudio=no    ;;
   --enable-sgiaudio)    _sgiaudio=yes   ;;
   --disable-sgiaudio)   _sgiaudio=no    ;;
+  --enable-sndio)       _sndio=yes      ;;
+  --disable-sndio)      _sndio=no       ;;
   --enable-alsa)        _alsa=yes       ;;
   --disable-alsa)       _alsa=no        ;;
   --enable-tv)          _tv=yes         ;;
@@ -5876,6 +5880,22 @@ echores "$_sgiaudio"
 fi #if irix
 
 
+echocheck "sndio audio"
+if test "$_sndio" = auto ; then
+  _sndio=no
+  statement_check sndio.h 'sio_open(SIO_DEVANY, SIO_PLAY, 0)' -lsndio && _sndio=yes
+fi
+if test "$_sndio" = yes ; then
+  def_sndio='#define CONFIG_SNDIO_AUDIO 1'
+  aomodules="sndio $aomodules"
+  extra_ldflags="$extra_ldflags -lsndio"
+else
+  def_sndio='#undef CONFIG_SNDIO_AUDIO'
+  noaomodules="sndio $noaomodules"
+fi
+echores "$_sndio"
+
+
 if os2 ; then
 echocheck "KAI (UNIAUD/DART)"
 if test "$_kai" = auto; then
@@ -8458,6 +8478,7 @@ SDL_IMAGE = $sdl_image
 SPEEX = $_speex
 STREAM_CACHE = $_stream_cache
 SGIAUDIO = $_sgiaudio
+SNDIO = $_sndio
 SUNAUDIO = $_sunaudio
 SVGA = $_svga
 TDFXFB = $_tdfxfb
@@ -8895,6 +8916,7 @@ $def_ossaudio_devdsp
 $def_ossaudio_devmixer
 $def_pulse
 $def_sgiaudio
+$def_sndio
 $def_sunaudio
 $def_win32waveout
 
