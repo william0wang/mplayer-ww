@@ -43,7 +43,7 @@ static ao_info_t info = {
 LIBAO_EXTERN(sndio)
 
 static struct sio_hdl *hdl = NULL;
-struct pollfd *pfds = NULL;
+static struct pollfd *pfds = NULL;
 static struct sio_par par;
 static int delay, vol, havevol;
 static int prepause_delay;
