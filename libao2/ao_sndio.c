@@ -188,9 +188,7 @@ static void reset(void)
  */
 static void refresh(void)
 {
-    int n;
-
-    n = sio_pollfd(hdl, pfds, POLLOUT);
+    int n = sio_pollfd(hdl, pfds, POLLOUT);
     while (poll(pfds, n, 0) < 0 && errno == EINTR)
         ; /* nothing */
     sio_revents(hdl, pfds);
@@ -219,9 +217,7 @@ static float get_delay(void)
  */
 static int play(void *data, int len, int flags)
 {
-    int n;
-
-    n = sio_write(hdl, data, len);
+    int n = sio_write(hdl, data, len);
     delay += n;
     return n;
 }
