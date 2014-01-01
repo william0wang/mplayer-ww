@@ -295,6 +295,7 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
             codec->codec_tag = mp_codec_id2tag(codec->codec_id, codec->codec_tag, 1);
             wf->wFormatTag= codec->codec_tag;
             wf->nChannels= codec->channels;
+            sh_audio->channel_layout = codec->channel_layout;
             wf->nSamplesPerSec= codec->sample_rate;
             wf->nAvgBytesPerSec= codec->bit_rate/8;
             wf->nBlockAlign= codec->block_align ? codec->block_align : 1;
