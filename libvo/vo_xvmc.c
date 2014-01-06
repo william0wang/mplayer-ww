@@ -199,6 +199,8 @@ static int allocate_xvimage(int xvimage_width,int xvimage_height,int xv_format)
                              NULL, xvimage_width, xvimage_height, &Shminfo);
         if (!xvimage)
             goto noshmimage;
+        if (!xvimage->data_size)
+            goto shmgetfail;
 
         Shminfo.shmid    = shmget(IPC_PRIVATE, xvimage->data_size, IPC_CREAT | 0777);
         if (Shminfo.shmid == -1)
