@@ -181,11 +181,10 @@ static int in_use(struct xvmc_render *cur_render)
     return cur_render->state || (cur_render->mpi && cur_render->mpi->usage_count);
 }
 
-static void allocate_xvimage(int xvimage_width,int xvimage_height,int xv_format)
+static int allocate_xvimage(int xvimage_width,int xvimage_height,int xv_format)
 {
  /*
   * allocate XvImages.
-  * FIXME: no error checking
   */
 #ifdef HAVE_SHM
     if ( mLocalDisplay && XShmQueryExtension( mDisplay ) ) Shmem_Flag = 1;
@@ -198,23 +197,48 @@ static void allocate_xvimage(int xvimage_width,int xvimage_height,int xv_format)
     {
         xvimage = (XvImage *) XvShmCreateImage(mDisplay, xv_port, xv_format,
                              NULL, xvimage_width, xvimage_height, &Shminfo);
+        if (!xvimage)
+            goto noshmimage;
 
         Shminfo.shmid    = shmget(IPC_PRIVATE, xvimage->data_size, IPC_CREAT | 0777);
+        if (Shminfo.shmid == -1)
+            goto shmgetfail;
         Shminfo.shmaddr  = (char *) shmat(Shminfo.shmid, 0, 0);
+        if (Shminfo.shmaddr == (void *)-1)
+            goto shmatfail;
         Shminfo.readOnly = False;
 
         xvimage->data = Shminfo.shmaddr;
-        XShmAttach(mDisplay, &Shminfo);
+        if (!XShmAttach(mDisplay, &Shminfo))
+            goto shmattachfail;
         XSync(mDisplay, False);
         shmctl(Shminfo.shmid, IPC_RMID, 0);
-        return;
+        return 0;
+shmattachfail:
+        shmdt(Shminfo.shmaddr);
+shmatfail:
+        shmctl(Shminfo.shmid, IPC_RMID, 0);
+shmgetfail:
+        XFree(xvimage);
+noshmimage:
+        Shmem_Flag = 0;
     }
 #endif
+
     xvimage = (XvImage *) XvCreateImage(mDisplay, xv_port, xv_format, NULL, xvimage_width, xvimage_height);
+    if (!xvimage) return -1;
+    if (!xvimage->data_size)
+    {
+        mp_msg(MSGT_VO, MSGL_WARN,
+                "XServer's XvCreateImage implementation is buggy (returned 0-sized image)\n" );
+        XFree(xvimage);
+        xvimage = NULL;
+        return -1;
+    }
     xvimage->data = malloc(xvimage->data_size);
     XSync(mDisplay,False);
 // memset(xvimage->data,128,xvimage->data_size);
-    return;
+    return 0;
 }
 
 static void deallocate_xvimage(void)
@@ -813,7 +837,12 @@ static void OSD_init(void) {
     mp_msg(MSGT_VO,MSGL_DBG4,"vo_xvmc: clearing subpicture\n");
     clear_osd_fnc(0, 0, subpicture.width, subpicture.height);
 
-    allocate_xvimage(subpicture.width, subpicture.height, subpicture_info.id);
+    if (allocate_xvimage(subpicture.width, subpicture.height, subpicture_info.id))
+    {
+        subpicture_mode = NO_SUBPICTURE;
+        mp_msg(MSGT_VO,MSGL_WARN, "vo_xvmc: OSD disabled\n");
+        return;
+    }
     subpicture_alloc = 1;
 }
 
