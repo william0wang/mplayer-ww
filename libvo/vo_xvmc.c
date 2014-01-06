@@ -184,8 +184,8 @@ static int in_use(struct xvmc_render *cur_render)
 static void allocate_xvimage(int xvimage_width,int xvimage_height,int xv_format)
 {
  /*
-  * allocate XvImages.  FIXME: no error checking, without
-  * mit-shm this will bomb... trzing to fix ::atmos
+  * allocate XvImages.
+  * FIXME: no error checking
   */
 #ifdef HAVE_SHM
     if ( mLocalDisplay && XShmQueryExtension( mDisplay ) ) Shmem_Flag = 1;
@@ -207,14 +207,12 @@ static void allocate_xvimage(int xvimage_width,int xvimage_height,int xv_format)
         XShmAttach(mDisplay, &Shminfo);
         XSync(mDisplay, False);
         shmctl(Shminfo.shmid, IPC_RMID, 0);
+        return;
     }
-    else
 #endif
-    {
-        xvimage = (XvImage *) XvCreateImage(mDisplay, xv_port, xv_format, NULL, xvimage_width, xvimage_height);
-        xvimage->data = malloc(xvimage->data_size);
-        XSync(mDisplay,False);
-    }
+    xvimage = (XvImage *) XvCreateImage(mDisplay, xv_port, xv_format, NULL, xvimage_width, xvimage_height);
+    xvimage->data = malloc(xvimage->data_size);
+    XSync(mDisplay,False);
 // memset(xvimage->data,128,xvimage->data_size);
     return;
 }
