@@ -660,7 +660,6 @@ found_subpic:
             break;
         case BACKEND_SUBPICTURE:
             mp_msg(MSGT_VO,MSGL_INFO,"vo_xvmc: OSD support by backend rendering (fast)\n");
-            mp_msg(MSGT_VO,MSGL_INFO,"vo_xvmc: Please send feedback to confirm that it works,otherwise send bugreport!\n");
             break;
     }
 
