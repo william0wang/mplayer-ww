@@ -156,29 +156,29 @@ static struct
  char * comment;
 } lEncoding[] =
  {
-  { "UNICODE",     MSGTR_PREFERENCES_FontEncoding1 },
   { "ISO-8859-1",  MSGTR_PREFERENCES_FontEncoding2 },
-  { "ISO-8859-15", MSGTR_PREFERENCES_FontEncoding3 },
   { "ISO-8859-2",  MSGTR_PREFERENCES_FontEncoding4 },
-  { "CP1250",      MSGTR_PREFERENCES_FontEncoding22},
   { "ISO-8859-3",  MSGTR_PREFERENCES_FontEncoding5 },
   { "ISO-8859-4",  MSGTR_PREFERENCES_FontEncoding6 },
   { "ISO-8859-5",  MSGTR_PREFERENCES_FontEncoding7 },
-  { "CP1251",      MSGTR_PREFERENCES_FontEncoding21},
   { "ISO-8859-6",  MSGTR_PREFERENCES_FontEncoding8 },
-  { "CP1256",      MSGTR_PREFERENCES_FontEncoding23 },
   { "ISO-8859-7",  MSGTR_PREFERENCES_FontEncoding9 },
+  { "ISO-8859-8",  MSGTR_PREFERENCES_FontEncoding13 },
   { "ISO-8859-9",  MSGTR_PREFERENCES_FontEncoding10 },
   { "ISO-8859-13", MSGTR_PREFERENCES_FontEncoding11 },
   { "ISO-8859-14", MSGTR_PREFERENCES_FontEncoding12 },
-  { "ISO-8859-8",  MSGTR_PREFERENCES_FontEncoding13 },
+  { "ISO-8859-15", MSGTR_PREFERENCES_FontEncoding3 },
   { "KOI8-R",      MSGTR_PREFERENCES_FontEncoding14 },
   { "KOI8-U/RU",   MSGTR_PREFERENCES_FontEncoding15 },
-  { "CP936",       MSGTR_PREFERENCES_FontEncoding16 },
   { "BIG5",        MSGTR_PREFERENCES_FontEncoding17 },
   { "SHIFT-JIS",   MSGTR_PREFERENCES_FontEncoding18 },
-  { "CP949",       MSGTR_PREFERENCES_FontEncoding19 },
+  { "CP1250",      MSGTR_PREFERENCES_FontEncoding22},
+  { "CP1251",      MSGTR_PREFERENCES_FontEncoding21},
+  { "CP1256",      MSGTR_PREFERENCES_FontEncoding23 },
   { "CP874",       MSGTR_PREFERENCES_FontEncoding20 },
+  { "CP936",       MSGTR_PREFERENCES_FontEncoding16 },
+  { "CP949",       MSGTR_PREFERENCES_FontEncoding19 },
+  { "UNICODE",     MSGTR_PREFERENCES_FontEncoding1 },
   { NULL,NULL }
  };
 #endif
