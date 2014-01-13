@@ -1002,6 +1002,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FontEncoding21 "Kyrillisch (CP1251)"
 #define MSGTR_PREFERENCES_FontEncoding22 "Mitteleuropäisch (CP1250)"
 #define MSGTR_PREFERENCES_FontEncoding23 "Arabisch (CP1256)"
+#define MSGTR_PREFERENCES_FontEncoding24 "UTF-8"
 #define MSGTR_PREFERENCES_FontNoAutoScale "Keine automatische Skalierung"
 #define MSGTR_PREFERENCES_FontPropWidth "Proportional zur Breite des Films"
 #define MSGTR_PREFERENCES_FontPropHeight "Proportional zur Höhe des Films"

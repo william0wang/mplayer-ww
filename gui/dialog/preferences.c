@@ -156,6 +156,7 @@ static struct
  char * comment;
 } lEncoding[] =
  {
+  { "UTF-8",       MSGTR_PREFERENCES_FontEncoding24 },
   { "ISO-8859-1",  MSGTR_PREFERENCES_FontEncoding2 },
   { "ISO-8859-2",  MSGTR_PREFERENCES_FontEncoding4 },
   { "ISO-8859-3",  MSGTR_PREFERENCES_FontEncoding5 },

@@ -795,6 +795,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FontEncoding21 "Cyrillic (CP1251)"
 #define MSGTR_PREFERENCES_FontEncoding22 "Central European (CP1250)"
 #define MSGTR_PREFERENCES_FontEncoding23 "Arabic (CP1256)"
+#define MSGTR_PREFERENCES_FontEncoding24 "UTF-8"
 #define MSGTR_PREFERENCES_FontNoAutoScale "No autoscale"
 #define MSGTR_PREFERENCES_FontPropWidth "Proportional to movie width"
 #define MSGTR_PREFERENCES_FontPropHeight "Proportional to movie height"
