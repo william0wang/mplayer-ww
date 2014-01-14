@@ -1223,11 +1223,11 @@ void ShowPreferences( void )
  gtk_adjustment_set_value( HSFontOutLineadj,subtitle_font_thickness / 8.0 * 100.0);   // transform 0..8 to 0..100
  gtk_adjustment_set_value( HSFontTextScaleadj,text_font_scale_factor );
  gtk_adjustment_set_value( HSFontOSDScaleadj,osd_font_scale_factor );
- if ( subtitle_font_encoding )
   {
    int i;
+   const char *s = (subtitle_font_encoding ? subtitle_font_encoding : "UNICODE");
    for ( i=0;lEncoding[i].name;i++ )
-    if ( !strcasecmp( subtitle_font_encoding,lEncoding[i].name ) ) break;
+    if ( !strcasecmp( s,lEncoding[i].name ) ) break;
    if ( lEncoding[i].name ) gtk_entry_set_text( GTK_ENTRY( EFontEncoding ),lEncoding[i].comment );
   }
  switch ( subtitle_autoscale )
