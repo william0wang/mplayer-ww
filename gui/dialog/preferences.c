@@ -179,10 +179,18 @@ static struct
   { "SHIFT-JIS",   MSGTR_PREFERENCES_FontEncoding18 },
   { "CP1250",      MSGTR_PREFERENCES_FontEncoding22},
   { "CP1251",      MSGTR_PREFERENCES_FontEncoding21},
+  { "CP1252",      MSGTR_PREFERENCES_FontEncoding31 },
+  { "CP1253",      MSGTR_PREFERENCES_FontEncoding32 },
+  { "CP1254",      MSGTR_PREFERENCES_FontEncoding33 },
+  { "CP1255",      MSGTR_PREFERENCES_FontEncoding34 },
   { "CP1256",      MSGTR_PREFERENCES_FontEncoding23 },
+  { "CP1257",      MSGTR_PREFERENCES_FontEncoding35 },
+  { "CP1258",      MSGTR_PREFERENCES_FontEncoding36 },
   { "CP874",       MSGTR_PREFERENCES_FontEncoding20 },
+  { "CP932",       MSGTR_PREFERENCES_FontEncoding29 },
   { "CP936",       MSGTR_PREFERENCES_FontEncoding16 },
   { "CP949",       MSGTR_PREFERENCES_FontEncoding19 },
+  { "CP950",       MSGTR_PREFERENCES_FontEncoding30 },
   { "UNICODE",     MSGTR_PREFERENCES_FontEncoding1 },
   { NULL,NULL }
  };
