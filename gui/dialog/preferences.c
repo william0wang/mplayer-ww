@@ -553,9 +553,9 @@ static GtkWidget * CreatePreferences( void )
   GtkWidget * vbox6;
   GtkWidget * vbox600;
   GSList    * OSD_group = NULL;
-#ifdef CONFIG_ICONV
   GSList    * Font_group = NULL;
   GList     * CBFontEncoding_items = NULL;
+#ifdef CONFIG_ICONV
   GList	    * CBSubEncoding_items = NULL;
 #endif
   GtkWidget * vbox7;
