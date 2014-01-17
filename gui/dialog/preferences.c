@@ -1782,7 +1782,7 @@ GtkWidget * CreateDXR3Config( void )
  gtkAddHSeparator( vbox2 );
  vbox3=gtkAddVBox( vbox2,0 );
  gtkAddLabel( MSGTR_PREFERENCES_DXR3_VENC,vbox3 );
- RBVNone=gtkAddRadioButton( MSGTR_PREFERENCES_None,&VEncoder_group,vbox3 );
+ RBVNone=gtkAddRadioButton( MSGTR_PREFERENCES_DXR3_NoEnc,&VEncoder_group,vbox3 );
  RBVLavc=gtkAddRadioButton( MSGTR_PREFERENCES_DXR3_LAVC,&VEncoder_group,vbox3 );
 
  gtkAddHSeparator( vbox1 );
