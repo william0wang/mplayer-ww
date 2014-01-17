@@ -718,7 +718,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_Codecs "Codecs & demuxer"
 // Note: If you change MSGTR_PREFERENCES_Misc see if it still fits MSGTR_PREFERENCES_FRAME_Misc
 #define MSGTR_PREFERENCES_Misc "Misc"
-#define MSGTR_PREFERENCES_None "None"
+#define MSGTR_PREFERENCES_None "(none)"
 #define MSGTR_PREFERENCES_DriverDefault "driver default"
 #define MSGTR_PREFERENCES_AvailableDrivers "Available drivers:"
 #define MSGTR_PREFERENCES_DoNotPlaySound "Do not play sound"

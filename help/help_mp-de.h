@@ -925,7 +925,7 @@ static const char help_text[]=
 // Beachte: Wenn du MSGTR_PREFERENCES_Misc änderst, überprüfe bitte, ob der Eintrag noch zu MSGTR_PREFERENCES_FRAME_Misc passt.
 #define MSGTR_PREFERENCES_Misc "Sonstiges"
 
-#define MSGTR_PREFERENCES_None "Nichts"
+#define MSGTR_PREFERENCES_None "(keine)"
 #define MSGTR_PREFERENCES_DriverDefault "Treiber-Standardeinstellung"
 #define MSGTR_PREFERENCES_AvailableDrivers "Verfügbare Treiber:"
 #define MSGTR_PREFERENCES_DoNotPlaySound "Spiele keinen Ton"
