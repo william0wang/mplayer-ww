@@ -2221,6 +2221,9 @@ static int fill_audio_out_buffers(void)
     }
     if (format_change) {
         uninit_player(INITIALIZED_AO);
+        af_uninit(sh_audio->afilter);
+        free(sh_audio->afilter);
+        sh_audio->afilter = NULL;
         reinit_audio_chain();
     }
     return 1;
