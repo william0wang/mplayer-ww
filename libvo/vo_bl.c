@@ -212,13 +212,13 @@ static void udp_close(bl_host_t *h) {
 #define NO_BLS 3
 
 static bl_properties_t bls[NO_BLS] = {
-	{ "hdl", IMGFMT_YV12, 1, 18, 8, 8,
+	{ "hdl", IMGFMT_Y8, 1, 18, 8, 8,
 	&bml_init, &bml_write_frame, &bml_close,
 	&udp_init, &udp_send, &udp_close },
-	{ "arcade", IMGFMT_YV12, 1, 26, 20, 8,
+	{ "arcade", IMGFMT_Y8, 1, 26, 20, 8,
 	&bml_init, &bml_write_frame, &bml_close,
 	&udp_init, &udp_send, &udp_close },
-	{ "grayscale", IMGFMT_YV12, 1, -1, -1, 8, /* use width and height of movie */
+	{ "grayscale", IMGFMT_Y8, 1, -1, -1, 8, /* use width and height of movie */
 	&bml_init, &bml_write_frame, &bml_close,
 	&udp_init, &udp_send, &udp_close } };
 
@@ -263,7 +263,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 	}
 
 	framenum = 0;
-	if (format != IMGFMT_YV12) {
+	if (format != IMGFMT_Y8) {
 		mp_msg(MSGT_VO, MSGL_ERR, "vo_bl called with wrong format");
 		return 1;
 	}
