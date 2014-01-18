@@ -237,11 +237,9 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 	if (reset_width || reset_height) {
 		if (reset_width) { /* use width of movie */
 			bl->width = width;
-			bl_packet->width = htons(bl->width);
 		}
 		if (reset_height) { /* use height of movie */
 			bl->height = height;
-			bl_packet->height = htons(bl->height);
 		}
 		/* check for maximum size of UDP packet */
 		if (12 + bl->width*bl->height*bl->channels > 65507) {
@@ -249,7 +247,9 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 					bl->width, bl->height, bl->channels);
 			goto err_out;
 		}
-		/* resize frame and tmp buffers */
+	}
+
+		/* resize or allocate frame and tmp buffers */
 		bl_size = 12 + bl->width*bl->height*bl->channels;
 		ptr = realloc(bl_packet, 12 + bl->width*bl->height*3); /* space for header and image data */
 		if (ptr)
@@ -266,7 +266,12 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 			mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
 			goto err_out;
 		}
-	}
+
+	bl_packet->magic = htonl(0x23542666);
+	bl_packet->width = htons(bl->width);
+	bl_packet->height = htons(bl->height);
+	bl_packet->channels = htons(bl->channels);
+	bl_packet->maxval = htons((1 << bl->bpc) - 1);
 
 	framenum = 0;
 	if (format != IMGFMT_Y8) {
@@ -435,29 +440,6 @@ static int preinit(const char *arg) {
 		}
 		p = ++q;
 	}
-
-	if (bl->width >= 0 && bl->height >= 0) { /* size already known */
-		bl_size = 12 + bl->width*bl->height*bl->channels;
-		bl_packet = malloc(12 + bl->width*bl->height*3); /* space for header and image data */
-		image = ((unsigned char*)bl_packet + 12); /* pointer to image data */
-		tmp = malloc(bl->width*bl->height*3); /* space for image data only */
-	}
-	else { /* size unknown yet */
-		bl_size = 12;
-		bl_packet = malloc(12 + 3); /* space for header and a pixel */
-		image = ((unsigned char*)bl_packet + 12); /* pointer to image data */
-		tmp = malloc(3); /* space for a pixel only */
-	}
-
-	if (!bl_packet || !tmp) {
-		mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
-		return 1;
-	}
-	bl_packet->magic = htonl(0x23542666);
-	bl_packet->width = htons(bl->width);
-	bl_packet->height = htons(bl->height);
-	bl_packet->channels = htons(bl->channels);
-	bl_packet->maxval = htons((1 << bl->bpc) - 1);
 
 	/* open all files */
 	for (i = 0; i < no_bl_files; i++)
