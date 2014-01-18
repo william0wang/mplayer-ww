@@ -247,14 +247,14 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 	}
 
 	/* resize or allocate frame and tmp buffers */
-	ptr = realloc(bl_packet, bl_size); /* space for header and image data */
-	if (!ptr) {
+	free(bl_packet);
+	bl_packet = calloc(bl_size, 1); /* space for header and image data */
+	if (!bl_packet) {
 		mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
 		goto err_out;
 	}
-	bl_packet = ptr;
-
 	image = ((unsigned char*)bl_packet + 12); /* pointer to image data */
+
 	ptr = realloc(tmp, bl_size); /* space for image data only, could be slightly smaller */
 	if (!ptr) {
 		mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
@@ -281,11 +281,6 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 		mp_msg(MSGT_VO, MSGL_ERR, "bl: height of movie too large %d > %d\n", height, bl->height);
 		goto err_out;
 	}
-	if (!image) {
-		mp_msg(MSGT_VO, MSGL_ERR, "bl: image should be initialized, internal error\n");
-		goto err_out;
-	}
-	memset(image, 0, bl_size - 12); /* blank the image */
 	mp_msg(MSGT_VO, MSGL_V, "vo_config bl called\n");
 	return 0;
 err_out:
