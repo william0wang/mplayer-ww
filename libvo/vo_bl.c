@@ -398,7 +398,7 @@ static int preinit(const char *arg) {
 				mp_msg(MSGT_VO, MSGL_ERR, "bl: maximum number of files reached (%d)\n", BL_MAX_FILES);
 				return 1;
 			}
-			p += 5;
+			p = q;
 			q += strcspn(q, ",");
 			if (*q == '\0') end = 1;
 			*q = '\0';
@@ -411,21 +411,19 @@ static int preinit(const char *arg) {
 				mp_msg(MSGT_VO, MSGL_ERR, "bl: maximum number of hosts reached (%d)\n", BL_MAX_HOSTS);
 				return 1;
 			}
-			p += 5;
+			p = q;
 			q += strcspn(q, ",:");
+
+			bl_hosts[no_bl_hosts].port = 2323; // default port
 			if (*q == ':') {
 				*q++ = '\0';
-				bl_hosts[no_bl_hosts].name = p;
 				bl_hosts[no_bl_hosts].port = atoi(q);
 				q += strcspn(q, ",");
-				if (*q == '\0') end = 1;
-			} else {
-				/* use default port */
-				if (*q == '\0') end = 1;
-				*q = '\0';
-				bl_hosts[no_bl_hosts].name = p;
-				bl_hosts[no_bl_hosts].port = 2323;
 			}
+
+			if (*q == '\0') end = 1;
+			*q = '\0';
+			bl_hosts[no_bl_hosts].name = p;
 			mp_msg(MSGT_VO, MSGL_V,
 					"blhost[%d]: %s:%d\n",
 					no_bl_hosts, p,
