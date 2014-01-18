@@ -237,30 +237,29 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 	if (reset_width) bl->width = width; /* use width of movie */
 	if (reset_height) bl->height = height; /* use height of movie */
 
-		/* check for maximum size of UDP packet */
-		if (12 + bl->width*bl->height*bl->channels > 65507) {
-			mp_msg(MSGT_VO, MSGL_ERR, "bl: %dx%d-%d does not fit into an UDP packet\n",
-					bl->width, bl->height, bl->channels);
-			goto err_out;
-		}
+	/* check for maximum size of UDP packet */
+	if (12 + bl->width*bl->height*bl->channels > 65507) {
+		mp_msg(MSGT_VO, MSGL_ERR, "bl: %dx%d-%d does not fit into an UDP packet\n",
+				bl->width, bl->height, bl->channels);
+		goto err_out;
+	}
 
-		/* resize or allocate frame and tmp buffers */
-		bl_size = 12 + bl->width*bl->height*bl->channels;
-		ptr = realloc(bl_packet, 12 + bl->width*bl->height*3); /* space for header and image data */
-		if (ptr)
-			bl_packet = ptr;
-		else {
-			mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
-			goto err_out;
-		}
-		image = ((unsigned char*)bl_packet + 12); /* pointer to image data */
-		ptr = realloc(tmp, bl->width*bl->height*3); /* space for image data only */
-		if (ptr)
-			tmp = ptr;
-		else {
-			mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
-			goto err_out;
-		}
+	/* resize or allocate frame and tmp buffers */
+	bl_size = 12 + bl->width*bl->height*bl->channels;
+	ptr = realloc(bl_packet, 12 + bl->width*bl->height*3); /* space for header and image data */
+	if (!ptr) {
+		mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
+		goto err_out;
+	}
+	bl_packet = ptr;
+
+	image = ((unsigned char*)bl_packet + 12); /* pointer to image data */
+	ptr = realloc(tmp, bl->width*bl->height*3); /* space for image data only */
+	if (!ptr) {
+		mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
+		goto err_out;
+	}
+	tmp = ptr;
 
 	bl_packet->magic = htonl(0x23542666);
 	bl_packet->width = htons(bl->width);
