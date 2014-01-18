@@ -326,7 +326,7 @@ static void check_events(void) {
 }
 
 static uint32_t draw_image(mp_image_t *mpi) {
-    memcpy_pic(image, mpi->planes[0], bl->width, bl->height, bl->width, mpi->stride[0]);
+    memcpy_pic(image, mpi->planes[0], mpi->w, mpi->h, bl->width, mpi->stride[0]);
     return VO_TRUE;
 }
 
