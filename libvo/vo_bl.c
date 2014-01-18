@@ -399,7 +399,7 @@ static int preinit(const char *arg) {
 				return 1;
 			}
 			p += 5;
-			while (*q != ',' && *q != '\0') q++;
+			q += strcspn(q, ",");
 			if (*q == '\0') end = 1;
 			*q = '\0';
 			bl_files[no_bl_files].name = p;
@@ -412,12 +412,12 @@ static int preinit(const char *arg) {
 				return 1;
 			}
 			p += 5;
-			while (*q != ',' && *q != '\0' && *q != ':') q++;
+			q += strcspn(q, ",:");
 			if (*q == ':') {
 				*q++ = '\0';
 				bl_hosts[no_bl_hosts].name = p;
 				bl_hosts[no_bl_hosts].port = atoi(q);
-				while (*q != ',' && *q != '\0') q++;
+				q += strcspn(q, ",");
 				if (*q == '\0') end = 1;
 			} else {
 				/* use default port */
