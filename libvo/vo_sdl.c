@@ -1231,11 +1231,13 @@ query_format(uint32_t format)
 // it seems buggy (not hw accelerated), so just use YV12 instead!
 //    case IMGFMT_I420:
 //    case IMGFMT_IYUV:
+        return VFCAP_CSP_SUPPORTED | VFCAP_CSP_SUPPORTED_BY_HW | VFCAP_OSD |
+            VFCAP_HWSCALE_UP | VFCAP_HWSCALE_DOWN;
     case IMGFMT_YUY2:
     case IMGFMT_UYVY:
     case IMGFMT_YVYU:
         return VFCAP_CSP_SUPPORTED | VFCAP_CSP_SUPPORTED_BY_HW | VFCAP_OSD |
-            VFCAP_HWSCALE_UP | VFCAP_HWSCALE_DOWN;
+            VFCAP_HWSCALE_UP | VFCAP_HWSCALE_DOWN | VFCAP_FLIP;
     case IMGFMT_RGB15:
     case IMGFMT_BGR15:
     case IMGFMT_RGB16:
