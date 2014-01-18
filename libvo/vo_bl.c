@@ -350,13 +350,12 @@ static int preinit(const char *arg) {
 		return 1;
 	}
 
-	bl_subdevice = malloc(strlen(arg) + 1);
+	bl_subdevice = strdup(arg);
 	if (!bl_subdevice) {
 		mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
 		return 1;
 	}
 	p = bl_subdevice;
-	strcpy(p, arg);
 	mp_msg(MSGT_VO, MSGL_V, "bl: preinit called with %s\n", arg);
 	for (i = 0; i < NO_BLS; i++) {
 		if (!strncmp(p, bls[i].name, strlen(bls[i].name)))
