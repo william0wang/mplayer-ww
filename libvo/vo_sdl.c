@@ -826,8 +826,8 @@ static int draw_frame(uint8_t *src[])
 {
 	struct sdl_priv_s *priv = &sdl_priv;
 	uint8_t *dst;
-	int i;
 	uint8_t *mysrc = src[0];
+	int srcstride = priv->stridePlaneRGB;
 
     switch(priv->format){
         case IMGFMT_YUY2:
@@ -835,15 +835,13 @@ static int draw_frame(uint8_t *src[])
         case IMGFMT_YVYU:
         SDL_OVR_LOCK(-1)
         dst = (uint8_t *) *(priv->overlay->pixels) + priv->overlay->pitches[0]*priv->y;
-	    if(priv->flip) {
-	    	mysrc+=priv->framePlaneYUY;
-		for(i = 0; i < priv->height; i++) {
-			mysrc-=priv->stridePlaneYUY;
-			fast_memcpy (dst, mysrc, priv->stridePlaneYUY);
-                dst+=priv->overlay->pitches[0];
-		}
-	    }
-	    else fast_memcpy (dst, src[0], priv->framePlaneYUY);
+        srcstride = priv->stridePlaneYUY;
+        if (priv->flip) {
+            mysrc += (priv->height - 1) * srcstride;
+            srcstride = -srcstride;
+        }
+        memcpy_pic(dst, mysrc, priv->stridePlaneYUY, priv->height,
+                   priv->overlay->pitches[0], srcstride);
 	    SDL_OVR_UNLOCK
             break;
 
@@ -858,28 +856,22 @@ static int draw_frame(uint8_t *src[])
 		if(priv->dblit) {
 			SDL_SRF_LOCK(priv->surface, -1)
 			dst = (uint8_t *) priv->surface->pixels + priv->y*priv->surface->pitch;
-			if(priv->flip) {
-				mysrc+=priv->framePlaneRGB;
-				for(i = 0; i < priv->height; i++) {
-					mysrc-=priv->stridePlaneRGB;
-					fast_memcpy (dst, mysrc, priv->stridePlaneRGB);
-					dst += priv->surface->pitch;
-				}
+			if (priv->flip) {
+				mysrc += (priv->height - 1) * srcstride;
+				srcstride = -srcstride;
 			}
-			else fast_memcpy (dst, src[0], priv->framePlaneRGB);
+			memcpy_pic(dst, mysrc, priv->stridePlaneRGB, priv->height,
+			           priv->surface->pitch, srcstride);
 			SDL_SRF_UNLOCK(priv->surface)
 		} else {
 			SDL_SRF_LOCK(priv->rgbsurface, -1)
 			dst = (uint8_t *) priv->rgbsurface->pixels + priv->y*priv->rgbsurface->pitch;
-			if(priv->flip) {
-				mysrc+=priv->framePlaneRGB;
-				for(i = 0; i < priv->height; i++) {
-					mysrc-=priv->stridePlaneRGB;
-					fast_memcpy (dst, mysrc, priv->stridePlaneRGB);
-					dst += priv->rgbsurface->pitch;
-				}
+			if (priv->flip) {
+				mysrc += (priv->height - 1) * srcstride;
+				srcstride = -srcstride;
 			}
-			else fast_memcpy (dst, src[0], priv->framePlaneRGB);
+			memcpy_pic(dst, mysrc, priv->stridePlaneRGB, priv->height,
+			           priv->rgbsurface->pitch, srcstride);
 			SDL_SRF_UNLOCK(priv->rgbsurface)
 		}
 		break;
