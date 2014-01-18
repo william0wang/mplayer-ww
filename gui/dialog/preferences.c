@@ -210,9 +210,6 @@ static GtkWidget *DXR3Config;
 static gboolean prHScaler( GtkWidget * widget,GdkEvent * event,gpointer user_data );
 static void prToggled( GtkToggleButton * togglebutton,gpointer user_data );
 static void prCListRow( GtkCList * clist,gint row,gint column,GdkEvent * event,gpointer user_data );
-#if defined(CONFIG_FREETYPE) || defined(CONFIG_ICONV)
-static void prEntry( GtkEditable * editable,gpointer user_data );
-#endif
 
 #if defined(CONFIG_FREETYPE) || defined(CONFIG_ICONV)
 static void prEntry( GtkEditable * editable,gpointer user_data )
