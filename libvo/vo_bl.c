@@ -172,6 +172,7 @@ static int udp_init(bl_host_t *h) {
 	struct sockaddr_in addr;
 	struct hostent *dest;
 
+	h->fd = -1;
 	dest = gethostbyname(h->name);
 	if (!dest) {
 		mp_msg(MSGT_VO, MSGL_ERR,
@@ -179,7 +180,6 @@ static int udp_init(bl_host_t *h) {
 		return 1;
 	}
 
-	h->fd = -1;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(h->port);
