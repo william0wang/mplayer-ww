@@ -155,8 +155,8 @@ static void bml_write_frame(bl_file_t *f, unsigned char *i, int duration) {
 	fprintf(f->fp, "    <frame duration=\"%d\">\n", duration);
 	for (j = 0; j < bl->height; j++) {
 		fprintf(f->fp, "        <row>");
-		for (k = 0; k < bl->width; k++)
-			fprintf(f->fp, "%02x", *(i + j * bl->width + k));
+		for (k = 0; k < bl->width * bl->channels; k++)
+			fprintf(f->fp, "%02x", *(i + j * bl->width * bl->channels + k));
 		fprintf(f->fp, "</row>\n");
 	}
 	fprintf(f->fp, "    </frame>\n");
@@ -335,7 +335,8 @@ static void check_events(void) {
 }
 
 static uint32_t draw_image(mp_image_t *mpi) {
-    memcpy_pic(image, mpi->planes[0], mpi->w, mpi->h, bl->width, mpi->stride[0]);
+    memcpy_pic(image, mpi->planes[0], mpi->w * bl->channels, mpi->h,
+               bl->width * bl->channels, mpi->stride[0]);
     return VO_TRUE;
 }
 
