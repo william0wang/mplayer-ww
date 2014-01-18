@@ -366,10 +366,11 @@ static int preinit(const char *arg) {
 	}
 	if (i >= NO_BLS) {
 		txt[0] = 0;
-		for (i = 0; i < NO_BLS; i++)
-			if (strlen( txt ) + 4 + strlen( bls[i].name ) + 1 < sizeof(txt))
-				sprintf( txt + strlen( txt ), "%s%s",
+		for (i = 0; i < NO_BLS; i++) {
+			int pos = strlen(txt);
+			snprintf(txt + pos, sizeof(txt) - pos, "%s%s",
 					 txt[0] == 0 ? "" : i == NO_BLS - 1 ? " or " : ", ", bls[i].name );
+		}
 		mp_msg(MSGT_VO, MSGL_ERR, "bl: subdevice must start with %s\nbl: i.e. -vo bl:arcade:host=localhost:2323\n", txt);
 		return 1;
 	}
