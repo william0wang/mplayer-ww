@@ -253,7 +253,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 		bl_size = 12 + bl->width*bl->height*bl->channels;
 		ptr = realloc(bl_packet, 12 + bl->width*bl->height*3); /* space for header and image data */
 		if (ptr)
-			bl_packet = (bl_packet_t*)ptr;
+			bl_packet = ptr;
 		else {
 			mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
 			goto err_out;
@@ -261,7 +261,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 		image = ((unsigned char*)bl_packet + 12); /* pointer to image data */
 		ptr = realloc(tmp, bl->width*bl->height*3); /* space for image data only */
 		if (ptr)
-			tmp = (unsigned char*)ptr;
+			tmp = ptr;
 		else {
 			mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
 			goto err_out;
