@@ -322,6 +322,8 @@ static void uninit(void) {
 	mp_msg(MSGT_VO, MSGL_V, "bl: uninit called\n");
 	free(bl_packet);
 	bl_packet = NULL;
+	free(tmp);
+	tmp = NULL;
 	free(bl_subdevice);
 	bl_subdevice = NULL;
 	for (i = 0; i < no_bl_files; i++) bl->close_file(&bl_files[i]);
