@@ -1293,12 +1293,10 @@ static int preinit(const char *arg)
     }
 
     /* does the user want SDL to try and force Xv */
-    if(sdl_forcexv)	setenv("SDL_VIDEO_X11_NODIRECTCOLOR", "1", 1);
-    else setenv("SDL_VIDEO_X11_NODIRECTCOLOR", "0", 1);
+    setenv("SDL_VIDEO_X11_NODIRECTCOLOR", sdl_forcexv ? "1" : "0", 1);
 
     /* does the user want to disable Xv and use software scaling instead */
-    if(sdl_hwaccel) setenv("SDL_VIDEO_YUV_HWACCEL", "1", 1);
-    else setenv("SDL_VIDEO_YUV_HWACCEL", "0", 1);
+    setenv("SDL_VIDEO_YUV_HWACCEL", sdl_hwaccel ? "1" : "0", 1);
 
     /* default to no fullscreen mode, we'll set this as soon we have the avail. modes */
     priv->fullmode = -2;
