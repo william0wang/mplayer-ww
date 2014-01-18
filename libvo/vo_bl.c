@@ -156,7 +156,7 @@ static void bml_write_frame(bl_file_t *f, unsigned char *i, int duration) {
 	for (j = 0; j < bl->height; j++) {
 		fprintf(f->fp, "        <row>");
 		for (k = 0; k < bl->width * bl->channels; k++)
-			fprintf(f->fp, "%02x", *(i + j * bl->width * bl->channels + k));
+			fprintf(f->fp, "%02x", i[j * bl->width * bl->channels + k]);
 		fprintf(f->fp, "</row>\n");
 	}
 	fprintf(f->fp, "    </frame>\n");
