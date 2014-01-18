@@ -98,11 +98,9 @@ const LIBVO_EXTERN(sdl)
 	    		    }
 #define SDL_OVR_UNLOCK      SDL_UnlockYUVOverlay (priv->overlay);
 
-#define SDL_SRF_LOCK(srf, x)   if(SDL_MUSTLOCK(srf)) { \
-				if(SDL_LockSurface (srf)) { \
+#define SDL_SRF_LOCK(srf, x)   if(SDL_MUSTLOCK(srf) && SDL_LockSurface (srf)) { \
  					mp_msg(MSGT_VO,MSGL_V, "SDL: Couldn't lock RGB surface\n"); \
 					return x; \
-				} \
 			    }
 
 #define SDL_SRF_UNLOCK(srf) if(SDL_MUSTLOCK(srf)) \
@@ -241,25 +239,18 @@ static void draw_alpha(int x0,int y0, int w,int h, unsigned char* src, unsigned 
         /* OSD did change. Store a bounding box of everything drawn into the OSD */
         if(priv->y >= y0) {
             /* Make sure we don't mark part of the frame area dirty */
-            if(h + y0 > priv->y)
-                expand_rect(&priv->dirty_off_frame[0], x0, y0, w, priv->y - y0);
-            else
-                expand_rect(&priv->dirty_off_frame[0], x0, y0, w, h);
+            expand_rect(&priv->dirty_off_frame[0], x0, y0, w, FFMIN(priv->y - y0, h));
         }
         else if(priv->y + priv->height <= y0 + h) {
             /* Make sure we don't mark part of the frame area dirty */
-            if(y0 < priv->y + priv->height)
-                expand_rect(&priv->dirty_off_frame[1], x0,
-                            priv->y + priv->height,
-                            w, h - ((priv->y + priv->height) - y0));
-            else
-                expand_rect(&priv->dirty_off_frame[1], x0, y0, w, h);
+            int offset = FFMAX(0, priv->y + priv->height - y0);
+            expand_rect(&priv->dirty_off_frame[1], x0, y0 + offset, w, h - offset);
         }
     }
     else { /* OSD contents didn't change only draw parts that was erased by the frame */
         if(priv->y >= y0) {
-           src = src + (priv->y - y0) * stride;
-           srca = srca + (priv->y - y0) * stride;
+           src += (priv->y - y0) * stride;
+           srca += (priv->y - y0) * stride;
            h -= priv->y - y0;
            y0 = priv->y;
         }
@@ -283,11 +274,9 @@ static void draw_alpha(int x0,int y0, int w,int h, unsigned char* src, unsigned 
 		break;
 
 		default:
-        if(priv->dblit) {
-            draw(w,h,src,srca,stride,((uint8_t *) priv->surface->pixels)+y0*priv->surface->pitch+x0,priv->surface->pitch);
-        }
-		else {
-            draw(w,h,src,srca,stride,((uint8_t *) priv->rgbsurface->pixels)+y0*priv->rgbsurface->pitch+x0,priv->rgbsurface->pitch);
+		{
+            SDL_Surface *sf = priv->dblit ? priv->surface : priv->rgbsurface;
+            draw(w,h,src,srca,stride,((uint8_t *)sf->pixels)+y0*sf->pitch+x0,sf->pitch);
 		}
         }
 }
@@ -520,10 +509,8 @@ static void set_fullmode (int mode) {
 	aspect_save_screenres(screen_surface_w, screen_surface_h);
 
 	/* calculate new video size/aspect */
-	if(priv->mode == YUV) {
-        if(priv->fulltype&VOFLAG_FULLSCREEN)
+	if(priv->mode == YUV && priv->fulltype&VOFLAG_FULLSCREEN)
         aspect(&priv->dstwidth, &priv->dstheight, A_ZOOM);
-	}
 
 	/* try to change to given fullscreenmode */
         vo_dwidth  = priv->dstwidth;
@@ -853,26 +840,17 @@ static int draw_frame(uint8_t *src[])
 	case IMGFMT_BGR24:
 	case IMGFMT_RGB32:
 	case IMGFMT_BGR32:
-		if(priv->dblit) {
-			SDL_SRF_LOCK(priv->surface, -1)
-			dst = (uint8_t *) priv->surface->pixels + priv->y*priv->surface->pitch;
+		{
+			SDL_Surface *sf = priv->dblit ? priv->surface : priv->rgbsurface;
+			SDL_SRF_LOCK(sf, -1)
+			dst = (uint8_t *)sf->pixels + priv->y*sf->pitch;
 			if (priv->flip) {
 				mysrc += (priv->height - 1) * srcstride;
 				srcstride = -srcstride;
 			}
 			memcpy_pic(dst, mysrc, priv->stridePlaneRGB, priv->height,
-			           priv->surface->pitch, srcstride);
-			SDL_SRF_UNLOCK(priv->surface)
-		} else {
-			SDL_SRF_LOCK(priv->rgbsurface, -1)
-			dst = (uint8_t *) priv->rgbsurface->pixels + priv->y*priv->rgbsurface->pitch;
-			if (priv->flip) {
-				mysrc += (priv->height - 1) * srcstride;
-				srcstride = -srcstride;
-			}
-			memcpy_pic(dst, mysrc, priv->stridePlaneRGB, priv->height,
-			           priv->rgbsurface->pitch, srcstride);
-			SDL_SRF_UNLOCK(priv->rgbsurface)
+			           sf->pitch, srcstride);
+			SDL_SRF_UNLOCK(sf)
 		}
 		break;
 
@@ -1081,20 +1059,14 @@ static void erase_rectangle(int x, int y, int w, int h)
         case IMGFMT_RGB32:
         case IMGFMT_BGR32:
         {
+            SDL_Surface *sf = priv->dblit ? priv->surface : priv->rgbsurface;
             SDL_Rect rect;
             rect.w = w; rect.h = h;
             rect.x = x; rect.y = y;
 
-            if(priv->dblit) {
-                SDL_SRF_LOCK(priv->surface, (void) 0)
-                    SDL_FillRect(priv->surface, &rect, 0);
-                SDL_SRF_UNLOCK(priv->surface)
-                    }
-            else {
-                SDL_SRF_LOCK(priv->rgbsurface, (void) 0)
-                    SDL_FillRect(priv->rgbsurface, &rect, 0);
-                SDL_SRF_UNLOCK(priv->rgbsurface)
-                    }
+                SDL_SRF_LOCK(sf, (void) 0)
+                    SDL_FillRect(sf, &rect, 0);
+                SDL_SRF_UNLOCK(sf)
             break;
         }
     }
@@ -1125,10 +1097,8 @@ static void draw_osd(void)
     if(priv->mode == YUV)
         vo_draw_text(priv->overlay->w, priv->overlay->h, draw_alpha);
     else {
-        if(priv->dblit)
-            vo_draw_text(priv->surface->w, priv->surface->h, draw_alpha);
-        else
-            vo_draw_text(priv->rgbsurface->w, priv->rgbsurface->h, draw_alpha);
+        SDL_Surface *sf = priv->dblit ? priv->surface : priv->rgbsurface;
+        vo_draw_text(sf->w, sf->h, draw_alpha);
     }
 }
 
@@ -1338,17 +1308,12 @@ static uint32_t get_image(mp_image_t *mpi)
 	    }
         }
         else if(IMGFMT_IS_RGB(priv->format) || IMGFMT_IS_BGR(priv->format)) {
-            if(priv->dblit) {
-                if(mpi->type == MP_IMGTYPE_STATIC && (priv->surface->flags & SDL_DOUBLEBUF))
+            SDL_Surface *sf = priv->dblit ? priv->surface : priv->rgbsurface;
+            if(priv->dblit && mpi->type == MP_IMGTYPE_STATIC && (priv->surface->flags & SDL_DOUBLEBUF))
                     return VO_FALSE;
 
-                mpi->planes[0] = (uint8_t *)priv->surface->pixels + priv->y*priv->surface->pitch;
-                mpi->stride[0] = priv->surface->pitch;
-            }
-            else {
-                mpi->planes[0] = (uint8_t *)priv->rgbsurface->pixels + priv->y*priv->rgbsurface->pitch;
-                mpi->stride[0] = priv->rgbsurface->pitch;
-            }
+            mpi->planes[0] = (uint8_t *)sf->pixels + priv->y*sf->pitch;
+            mpi->stride[0] = sf->pitch;
         }
         else {
             mpi->planes[0] = priv->overlay->pixels[0] + priv->y*priv->overlay->pitches[0];
