@@ -1189,7 +1189,6 @@ static void flip_page (void)
 		}
 
 		/* update screen */
-		//SDL_UpdateRect(priv->surface, 0, 0, priv->surface->clip_rect.w, priv->surface->clip_rect.h);
         if(priv->osd_has_changed) {
             priv->osd_has_changed = 0;
 		SDL_UpdateRects(priv->surface, 1, &priv->surface->clip_rect);
@@ -1198,21 +1197,14 @@ static void flip_page (void)
             SDL_UpdateRect(priv->surface, 0, priv->y_screen_top,
                            priv->surface->clip_rect.w, priv->y_screen_bottom);
 
-		/* check if we have a double buffered surface and flip() if we do. */
-		if ( priv->surface->flags & SDL_DOUBLEBUF )
-			SDL_Flip(priv->surface);
-
 	    break;
 	    default:
 		/* blit to the YUV overlay */
 		SDL_DisplayYUVOverlay (priv->overlay, &priv->surface->clip_rect);
-
-		/* check if we have a double buffered surface and flip() if we do. */
-		if ( priv->surface->flags & SDL_DOUBLEBUF )
-			SDL_Flip(priv->surface);
-
-		//SDL_LockYUVOverlay (priv->overlay); // removed because unused!?
 	}
+	/* check if we have a double buffered surface and flip() if we do. */
+	if ( priv->surface->flags & SDL_DOUBLEBUF )
+		SDL_Flip(priv->surface);
 }
 
 static int
