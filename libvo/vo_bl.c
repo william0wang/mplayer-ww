@@ -345,9 +345,8 @@ static uint32_t draw_image(mp_image_t *mpi) {
 }
 
 static int preinit(const char *arg) {
-	char *p, *q;
+	char *p;
 	int end = 0, i;
-	char txt[256];
 	if (!arg || strlen(arg) == 0) {
 		mp_msg(MSGT_VO, MSGL_ERR, "bl: subdevice must be given, example: -vo bl:arcade:host=localhost:2323\n");
 		return 1;
@@ -365,6 +364,7 @@ static int preinit(const char *arg) {
 			break;
 	}
 	if (i >= NO_BLS) {
+		char txt[256];
 		txt[0] = 0;
 		for (i = 0; i < NO_BLS; i++) {
 			int pos = strlen(txt);
@@ -392,7 +392,7 @@ static int preinit(const char *arg) {
 	p++;
 
 	while (!end) {
-		q = p + 5;
+		char *q = p + 5;
 		if (!strncmp(p, "file=", 5)) {
 			if (no_bl_files == BL_MAX_FILES) {
 				mp_msg(MSGT_VO, MSGL_ERR, "bl: maximum number of files reached (%d)\n", BL_MAX_FILES);
