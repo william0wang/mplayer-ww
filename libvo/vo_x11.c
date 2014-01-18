@@ -22,6 +22,7 @@
 
 #include "config.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "libmpcodecs/vf.h"
 #include "aspect.h"
@@ -493,11 +494,6 @@ static int draw_slice(uint8_t * src[], int stride[], int w, int h,
     }
     sws_scale(swsContext, src, stride, y, h, dst, dstStride);
     return 0;
-}
-
-static int draw_frame(uint8_t * src[])
-{
-    return VO_ERROR;
 }
 
 static uint32_t get_image(mp_image_t * mpi)

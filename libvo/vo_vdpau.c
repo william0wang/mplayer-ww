@@ -39,6 +39,7 @@
 #include "sub/ass_mp.h"
 #include "mp_msg.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "libmpcodecs/vf.h"
 #include "x11_common.h"
@@ -1041,11 +1042,6 @@ static int draw_slice(uint8_t *image[], int stride[], int w, int h,
     return VO_TRUE;
 }
 
-
-static int draw_frame(uint8_t *src[])
-{
-    return VO_ERROR;
-}
 
 static struct vdpau_render_state *get_surface(int number)
 {

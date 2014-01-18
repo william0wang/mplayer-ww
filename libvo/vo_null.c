@@ -28,6 +28,7 @@
 #include "mp_msg.h"
 #include "help_mp.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 
 static const vo_info_t info =
@@ -56,12 +57,6 @@ static void draw_osd(void)
 static void
 flip_page(void)
 {
-}
-
-static int
-draw_frame(uint8_t *src[])
-{
-	return 0;
 }
 
 static int

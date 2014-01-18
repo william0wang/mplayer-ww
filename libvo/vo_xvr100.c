@@ -44,6 +44,7 @@
 
 #include "config.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "aspect.h"
 #include "geometry.h"
@@ -367,12 +368,6 @@ static uint32_t get_image(mp_image_t *mpi){
     mpi->flags|=MP_IMGFLAG_DIRECT;
 
     return VO_TRUE;
-}
-
-static int draw_frame(uint8_t *src[])
-{
-    mp_msg(MSGT_VO,MSGL_WARN,"!!! vo_xvr100::draw_frame() called !!!\n");
-    return 0;
 }
 
 

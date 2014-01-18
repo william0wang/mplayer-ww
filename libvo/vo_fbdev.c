@@ -41,6 +41,7 @@
 
 #include "config.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "fastmemcpy.h"
 #include "sub/sub.h"
@@ -1052,11 +1053,6 @@ static void draw_alpha(int x0, int y0, int w, int h, unsigned char *src,
     dst = center + fb_line_len * y0 + fb_pixel_size * x0;
 
     (*draw_alpha_p)(w, h, src, srca, stride, dst, fb_line_len);
-}
-
-static int draw_frame(uint8_t *src[])
-{
-    return 1;
 }
 
 static int draw_slice(uint8_t *src[], int stride[], int w, int h, int x, int y)

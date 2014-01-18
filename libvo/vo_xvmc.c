@@ -24,6 +24,7 @@
 #include "config.h"
 #include "mp_msg.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "osdep/timer.h"
 #include "libmpcodecs/vf.h"
@@ -727,10 +728,6 @@ skip_surface_allocation:
 
     image_format=format;
     return 0;
-}
-
-static int draw_frame(uint8_t *srcp[]){
-    assert(0);
 }
 
 static void init_osd_yuv_pal(void) {
