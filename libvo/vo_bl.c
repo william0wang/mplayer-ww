@@ -165,6 +165,7 @@ static void bml_write_frame(bl_file_t *f, unsigned char *i, int duration) {
 static void bml_close(bl_file_t *f) {
 	fprintf(f->fp, "</blm>\n");
 	fclose(f->fp);
+	f->fp = NULL;
 }
 
 /* Blinkenlights UDP protocol */
@@ -196,6 +197,7 @@ static int udp_init(bl_host_t *h) {
 		mp_msg(MSGT_VO, MSGL_ERR, "couldn't connect socket for %s\n",
 				h->name);
 		close(h->fd);
+		h->fd = -1;
 		return 1;
 	}
 	return 0;
@@ -208,6 +210,7 @@ static void udp_send(bl_host_t *h) {
 
 static void udp_close(bl_host_t *h) {
 	close(h->fd);
+	h->fd = -1;
 }
 
 #define NO_BLS 3
