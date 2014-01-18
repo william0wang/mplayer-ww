@@ -1327,16 +1327,14 @@ static uint32_t get_image(mp_image_t *mpi)
         if(mpi->flags&MP_IMGFLAG_PLANAR) {
 	    mpi->planes[0] = priv->overlay->pixels[0] + priv->y*priv->overlay->pitches[0];
 	    mpi->stride[0] = priv->overlay->pitches[0];
-	    if(mpi->flags&MP_IMGFLAG_SWAPPED) {
-		mpi->planes[1] = priv->overlay->pixels[1] + priv->y*priv->overlay->pitches[1]/2;
-		mpi->stride[1] = priv->overlay->pitches[1];
-		mpi->planes[2] = priv->overlay->pixels[2] + priv->y*priv->overlay->pitches[2]/2;
-		mpi->stride[2] = priv->overlay->pitches[2];
-	    } else {
-		mpi->planes[2] = priv->overlay->pixels[1] + priv->y*priv->overlay->pitches[1]/2;
-		mpi->stride[2] = priv->overlay->pitches[1];
-		mpi->planes[1] = priv->overlay->pixels[2] + priv->y*priv->overlay->pitches[2]/2;
-		mpi->stride[1] = priv->overlay->pitches[2];
+	    mpi->planes[1] = priv->overlay->pixels[1] + priv->y*priv->overlay->pitches[1]/2;
+	    mpi->stride[1] = priv->overlay->pitches[1];
+	    mpi->planes[2] = priv->overlay->pixels[2] + priv->y*priv->overlay->pitches[2]/2;
+	    mpi->stride[2] = priv->overlay->pitches[2];
+	    // SDL order is considered swapped by MPlayer
+	    if(!(mpi->flags&MP_IMGFLAG_SWAPPED)) {
+		    FFSWAP(void *, mpi->planes[1], mpi->planes[2]);
+		    FFSWAP(int, mpi->stride[1], mpi->stride[2]);
 	    }
         }
         else if(IMGFMT_IS_RGB(priv->format) || IMGFMT_IS_BGR(priv->format)) {
