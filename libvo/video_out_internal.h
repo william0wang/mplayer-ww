@@ -32,8 +32,16 @@ static int control(uint32_t request, void *data);
 static int config(uint32_t width, uint32_t height, uint32_t d_width,
 		     uint32_t d_height, uint32_t fullscreen, char *title,
 		     uint32_t format);
+#ifdef NO_DRAW_FRAME
+#define draw_frame NULL
+#else
 static int draw_frame(uint8_t *src[]);
+#endif
+#ifdef NO_DRAW_SLICE
+#define draw_slice NULL
+#else
 static int draw_slice(uint8_t *image[], int stride[], int w,int h,int x,int y);
+#endif
 static void draw_osd(void);
 static void flip_page(void);
 static void check_events(void);

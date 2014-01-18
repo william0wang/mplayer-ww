@@ -48,6 +48,8 @@
 #include <netinet/in.h>
 
 #include "video_out.h"
+#define NO_DRAW_FRAME
+#define NO_DRAW_SLICE
 #include "video_out_internal.h"
 #include "mp_msg.h"
 #include "m_option.h"
@@ -300,13 +302,9 @@ static void flip_page (void) {
 	return;
 }
 
-static int draw_frame(uint8_t * src[]) {
-	return 0;
-}
-
 static int query_format(uint32_t format) {
 	if (format == bl->img_format)
-		return VFCAP_CSP_SUPPORTED|VFCAP_CSP_SUPPORTED_BY_HW;
+		return VFCAP_CSP_SUPPORTED|VFCAP_CSP_SUPPORTED_BY_HW|VFCAP_ACCEPT_STRIDE|VOCAP_NOSLICES;
 	return 0;
 }
 
@@ -327,12 +325,9 @@ static void uninit(void) {
 static void check_events(void) {
 }
 
-static int draw_slice(uint8_t *srcimg[], int stride[],
-		int w, int h, int x, int y) {
-	uint8_t *dst = image + y * bl->width + x;
-	// copy Y:
-	memcpy_pic(dst, srcimg[0], w, h, bl->width, stride[0]);
- 	return 0;
+static uint32_t draw_image(mp_image_t *mpi) {
+    memcpy_pic(image, mpi->planes[0], bl->width, bl->height, bl->width, mpi->stride[0]);
+    return VO_TRUE;
 }
 
 static int preinit(const char *arg) {
@@ -465,6 +460,8 @@ static int control(uint32_t request, void *data) {
 	switch (request) {
 		case VOCTRL_QUERY_FORMAT:
 			return query_format(*((uint32_t*)data));
+		case VOCTRL_DRAW_IMAGE:
+			return draw_image(data);
   		}
   	return VO_NOTIMPL;
 }
