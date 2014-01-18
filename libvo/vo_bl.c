@@ -329,16 +329,9 @@ static void check_events(void) {
 
 static int draw_slice(uint8_t *srcimg[], int stride[],
 		int w, int h, int x, int y) {
-	int i;
 	uint8_t *dst = image + y * bl->width + x;
-	uint8_t *src=srcimg[0];
 	// copy Y:
-	for (i = 0; i < h; i++) {
-		fast_memcpy(dst,src,w);
-		dst+=bl->width;
-		src+=stride[0];
-
-	}
+	memcpy_pic(dst, srcimg[0], w, h, bl->width, stride[0]);
  	return 0;
 }
 
