@@ -105,7 +105,8 @@ typedef struct {
 	void (*close_connection)(bl_host_t *host);
 } bl_properties_t;
 
-static bl_properties_t *bl = NULL;
+static bl_properties_t *bl;
+static bl_properties_t cur_bl;
 
 /* arbitrary limit because I am too lazy to do proper memory management */
 #define BL_MAX_FILES 16
@@ -211,7 +212,7 @@ static void udp_close(bl_host_t *h) {
 
 #define NO_BLS 3
 
-static bl_properties_t bls[NO_BLS] = {
+static const bl_properties_t bls[NO_BLS] = {
 	{ "hdl", IMGFMT_Y8, 1, 18, 8, 8,
 	&bml_init, &bml_write_frame, &bml_close,
 	&udp_init, &udp_send, &udp_close },
@@ -226,14 +227,16 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 	uint32_t d_height, uint32_t flags, char *title, uint32_t format)
 {
 	void * ptr;
+	int reset_width = bl->width < 0;
+	int reset_height = bl->height < 0;
 
 	/* adapt size of Blinkenlights UDP stream to size of movie */
-	if (bl->width < 0 || bl->height < 0) {
-		if (bl->width < 0) { /* use width of movie */
+	if (reset_width || reset_height) {
+		if (reset_width) { /* use width of movie */
 			bl->width = width;
 			bl_packet->width = htons(bl->width);
 		}
-		if (bl->height < 0) { /* use height of movie */
+		if (reset_height) { /* use height of movie */
 			bl->height = height;
 			bl_packet->height = htons(bl->height);
 		}
@@ -241,7 +244,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 		if (12 + bl->width*bl->height*bl->channels > 65507) {
 			mp_msg(MSGT_VO, MSGL_ERR, "bl: %dx%d-%d does not fit into an UDP packet\n",
 					bl->width, bl->height, bl->channels);
-			return 1;
+			goto err_out;
 		}
 		/* resize frame and tmp buffers */
 		bl_size = 12 + bl->width*bl->height*bl->channels;
@@ -250,7 +253,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 			bl_packet = (bl_packet_t*)ptr;
 		else {
 			mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
-			return 1;
+			goto err_out;
 		}
 		image = ((unsigned char*)bl_packet + 12); /* pointer to image data */
 		ptr = realloc(tmp, bl->width*bl->height*3); /* space for image data only */
@@ -258,30 +261,36 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 			tmp = (unsigned char*)ptr;
 		else {
 			mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
-			return 1;
+			goto err_out;
 		}
 	}
 
 	framenum = 0;
 	if (format != IMGFMT_Y8) {
 		mp_msg(MSGT_VO, MSGL_ERR, "vo_bl called with wrong format");
-		return 1;
+		goto err_out;
 	}
 	if (width > bl->width) {
 		mp_msg(MSGT_VO, MSGL_ERR, "bl: width of movie too large %d > %d\n", width, bl->width);
-		return 1;
+		goto err_out;
 	}
 	if (height > bl->height) {
 		mp_msg(MSGT_VO, MSGL_ERR, "bl: height of movie too large %d > %d\n", height, bl->height);
-		return 1;
+		goto err_out;
 	}
 	if (!image) {
 		mp_msg(MSGT_VO, MSGL_ERR, "bl: image should be initialized, internal error\n");
-		return 1;
+		goto err_out;
 	}
 	memset(image, 0, bl->width*bl->height*3); /* blank the image */
 	mp_msg(MSGT_VO, MSGL_V, "vo_config bl called\n");
 	return 0;
+err_out:
+	// undo changes that might make variables mismatch
+	// our actual allocations
+	if (reset_width) bl->width = -1;
+	if (reset_height) bl->height = -1;
+	return 1;
 }
 
 static void draw_osd(void) {
@@ -360,7 +369,10 @@ static int preinit(const char *arg) {
 		mp_msg(MSGT_VO, MSGL_ERR, "bl: subdevice must start with %s\nbl: i.e. -vo bl:arcade:host=localhost:2323\n", txt);
 		return 1;
 	}
-	bl = &bls[i];
+	// Global data arrays should not be modified, otherwise behaviour
+	// becomes too confusing.
+	cur_bl = bls[i];
+	bl = &cur_bl;
 	p += strlen(bls[i].name);
 	if (*p == '\0') {
 		no_bl_hosts = 1;
