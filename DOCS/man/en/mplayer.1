@@ -31,7 +31,7 @@
 .\" Title
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "2013-11-19" "The MPlayer Project" "The Movie Player"
+.TH MPlayer 1 "2014-01-18" "The MPlayer Project" "The Movie Player"
 .
 .SH NAME
 mplayer  \- movie player
@@ -2805,7 +2805,8 @@ CC subtitles have not been spotted on DVDs from other regions so far.
 .TP
 .B \-subcp <codepage> (iconv only)
 If your system supports iconv(3), you can use this option to
-specify the subtitle codepage.
+specify the subtitle codepage. It takes priority over both -utf8 and
+-unicode.
 .sp 1
 .I EXAMPLE:
 .PD 0
@@ -2950,7 +2951,8 @@ used for the OSD and clear it (default: ^[[A\\r^[[K).
 .
 .TP
 .B \-unicode
-Tells MPlayer to handle the subtitle file as unicode.
+Tells MPlayer to handle the subtitle file as unicode. (It will only take
+effect if neither -subcp nor -utf8 is given.)
 .
 .TP
 .B \-unrarexec <path to unrar executable> (not supported on MingW)
@@ -2960,7 +2962,8 @@ The path must include the executable's filename, i.e.\& /usr/local/bin/unrar.
 .
 .TP
 .B "\-utf8 \ \ "
-Tells MPlayer to handle the subtitle file as UTF-8.
+Tells MPlayer to handle the subtitle file as UTF-8. (It will only take effect
+if -subcp isn't given, and it takes priority over -unicode.)
 .
 .TP
 .B \-vobsub <VOBsub file without extension>

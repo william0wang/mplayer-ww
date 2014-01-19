@@ -33,7 +33,7 @@
 .\" Titel
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "11.09.2013" "Das MPlayer Projekt"
+.TH MPlayer 1 "18.01.2014" "Das MPlayer Projekt"
 .
 .SH NAME
 mplayer  \- Movie Player
@@ -2731,7 +2731,8 @@ CC-Untertitel wurden bisher auf keinen DVDs für andere Regionen entdeckt.
 .TP
 .B \-subcp <Codepage> (nur bei iconv)
 Wenn dein System iconv(3) unterstützt, kannst du mit dieser Option
-die Codepage für die Untertitel angeben.
+die Codepage für die Untertitel angeben. Sie hat Vorrang sowohl vor -utf8
+wie auch vor -unicode.
 .sp 1
 .I BEISPIEL:
 .PD 0
@@ -2856,7 +2857,8 @@ bewegen und die Zeile löschen (Standard: ^[[A\\r^[[K).
 .
 .TP
 .B \-unicode
-Weist MPlayer an, die Untertiteldatei als Unicode zu behandeln.
+Weist MPlayer an, die Untertiteldatei als Unicode zu behandeln. (Diese Option
+ist nur wirksam, wenn weder -subcp noch -utf8 verwendet werden.)
 .
 .TP
 .B \-unrarexec <Pfad zum unrar-Programm> (unter MingW nicht unterstützt)
@@ -2868,7 +2870,9 @@ Der Pfad muss den Dateinamen des Programms beinhalten, z.B.\&
 .
 .TP
 .B "\-utf8 \ \ "
-Weist MPlayer an, die Untertiteldatei als UTF-8 zu behandeln.
+Weist MPlayer an, die Untertiteldatei als UTF-8 zu behandeln. (Diese Option
+ist nur wirksam, wenn -subcp nicht verwendet wird, und sie hat Vorrang vor
+-unicode.)
 .
 .TP
 .B \-vobsub <VOBsub-Datei ohne Erweiterung>
