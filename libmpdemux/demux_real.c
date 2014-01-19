@@ -1,7 +1,7 @@
 /*
  * Real parser & demuxer
  * copyright (C) 2001 Alex Beregszaszi
- * copyright (C) 2005, 2006 Roberto Togni
+ * copyright (C) 2005, 2006, 2014 Roberto Togni
  * based on FFmpeg's libav/rm.c
  *
  * audio codecs: (supported by RealPlayer8 for Linux)
@@ -54,6 +54,7 @@
 //#define mp_dbg(mod,lev, args... ) mp_msg_c((mod<<8)|lev, ## args )
 
 #define MAX_STREAMS 32
+#define MAX_MLTIIDX 16
 
 static unsigned char sipr_swaps[38][2]={
     {0,63},{1,22},{2,44},{3,90},{5,81},{7,31},{8,86},{9,58},{10,36},{12,68},
@@ -81,6 +82,7 @@ typedef struct {
     int		data_chunk_offset;
     int		num_of_packets;
     int		current_packet;
+    int		streams_in_file;
 
 // need for seek
     int		audio_need_keyframe;
@@ -114,6 +116,13 @@ typedef struct {
     int a_bitrate; ///< Audio bitrate
     int v_bitrate; ///< Video bitrate
     int stream_switch; ///< Flag used to switch audio/video demuxing
+
+   /**
+    * Used to demux MLTI files
+    */
+    int is_mlti; ///< != 0 for MLTI files
+    unsigned int mp2rm_streamid[MAX_STREAMS]; ///< Convert Mplayer stream_id to rm stream id
+    unsigned int rm2mp[MAX_STREAMS][MAX_MLTIIDX]; ///< Convert rm stream id and mlti index to Mplayer stream_id
 
    /**
     * Used to reorder audio data
@@ -572,13 +581,13 @@ static int demux_real_fill_buffer(demuxer_t *demuxer, demux_stream_t *dsds)
     demux_stream_t *ds = NULL;
     int len;
     unsigned int timestamp;
-    int stream_id;
+    int rm_stream_id, mp_stream_id;
 #ifdef CRACK_MATRIX
     int i;
 #endif
     int flags;
     int version;
-    int reserved;
+    int pk_group;;
     demux_packet_t *dp;
     int x, sps, cfs, sph, spc, w;
     int audioreorder_getnextpk = 0;
@@ -630,23 +639,26 @@ static int demux_real_fill_buffer(demuxer_t *demuxer, demux_stream_t *dsds)
 	return 0;
     }
     if (len < 12){
+    	unsigned int idx_streamid;
 	mp_msg(MSGT_DEMUX, MSGL_V,"%08X: packet v%d len=%d  \n",(int)demuxer->filepos,(int)version,(int)len);
 	mp_msg(MSGT_DEMUX, MSGL_WARN,"bad packet len (%d)\n", len);
 	if ((unsigned)demuxer->video->id < MAX_STREAMS) {
-	    if (priv->current_vpacket + 1 < priv->index_table_size[demuxer->video->id]) {
-		stream_seek(demuxer->stream, priv->index_table[demuxer->video->id][++priv->current_vpacket].offset);
+	    idx_streamid = priv->is_mlti ? priv->mp2rm_streamid[demuxer->video->id] : demuxer->video->id;
+	    if (priv->current_vpacket + 1 < priv->index_table_size[idx_streamid]) {
+		stream_seek(demuxer->stream, priv->index_table[idx_streamid][++priv->current_vpacket].offset);
 	    }
 	} else if ((unsigned)demuxer->audio->id < MAX_STREAMS) {
-	    if (priv->current_apacket + 1 < priv->index_table_size[demuxer->audio->id]) {
-		stream_seek(demuxer->stream, priv->index_table[demuxer->audio->id][++priv->current_apacket].offset);
+	    idx_streamid = priv->is_mlti ? priv->mp2rm_streamid[demuxer->audio->id] : demuxer->video->id;
+	    if (priv->current_apacket + 1 < priv->index_table_size[idx_streamid]) {
+		stream_seek(demuxer->stream, priv->index_table[idx_streamid][++priv->current_apacket].offset);
 	    }
 	}
 	continue; //goto loop;
     }
 
-    stream_id = stream_read_word(demuxer->stream);
+    rm_stream_id = stream_read_word(demuxer->stream);
     timestamp = stream_read_dword(demuxer->stream);
-    reserved = stream_read_char(demuxer->stream);
+    pk_group = stream_read_char(demuxer->stream);
     flags = stream_read_char(demuxer->stream);
     /* flags:		*/
     /*  0x1 - reliable  */
@@ -657,31 +669,39 @@ static int demux_real_fill_buffer(demuxer_t *demuxer, demux_stream_t *dsds)
         tmp = stream_read_char(demuxer->stream);
         mp_msg(MSGT_DEMUX, MSGL_DBG2,"Version: %d, skipped byte is %d\n", version, tmp);
         len--;
+        if (priv->is_mlti)
+            mp_msg(MSGT_DEMUX, MSGL_WARN,"MLTI file with v1 DATA, expect problems! Please contact Mplayer developers.\n");
     }
 
     if (flags & 2)
-      add_index_item(demuxer, stream_id, timestamp, demuxer->filepos);
+      add_index_item(demuxer, rm_stream_id, timestamp, demuxer->filepos);
 
 //    printf("%08X: packet v%d len=%4d  id=%d  pts=%6d  rvd=%d  flags=%d  \n",
 //	(int)demuxer->filepos,(int)version,(int)len, stream_id,
 //	(int) timestamp, reserved, flags);
 
-    mp_dbg(MSGT_DEMUX,MSGL_DBG2,  "\npacket#%d: pos: 0x%0x, len: %d, id: %d, pts: %u, flags: %x rvd:%d\n",
-	priv->current_packet, (int)demuxer->filepos, len, stream_id, timestamp, flags, reserved);
+    mp_dbg(MSGT_DEMUX,MSGL_DBG2,  "\npacket#%d: pos: 0x%0x, len: %d, rm_id: %d, pts: %u, flags: %x grp:%d\n",
+	priv->current_packet, (int)demuxer->filepos, len, rm_stream_id, timestamp, flags, pk_group);
 
     priv->current_packet++;
     len -= 12;
 
 //    printf("s_id=%d  aid=%d  vid=%d  \n",stream_id,demuxer->audio->id,demuxer->video->id);
 
+    // Map rm stream id and packet group to MPlayer stream aid or vid if file is MLTI
+    if (priv->is_mlti && rm_stream_id < MAX_STREAMS && (pk_group>>1) < MAX_MLTIIDX)
+        mp_stream_id = priv->rm2mp[rm_stream_id][(pk_group>>1)-1];
+    else
+        mp_stream_id = rm_stream_id;
+
     /* check stream_id: */
 
-    if(demuxer->audio->id==stream_id){
+    if(demuxer->audio->id==mp_stream_id){
     	if (priv->audio_need_keyframe == 1&& flags != 0x2)
 		goto discard;
 got_audio:
 	ds=demuxer->audio;
-	mp_dbg(MSGT_DEMUX,MSGL_DBG2, "packet is audio (id: %d)\n", stream_id);
+	mp_dbg(MSGT_DEMUX,MSGL_DBG2, "packet is audio (mp_id: %d)\n", mp_stream_id);
 
         if (flags & 2) {
     	    priv->sub_packet_cnt = 0;
@@ -721,15 +741,15 @@ got_audio:
 		}
 		return 1;
 	    }
-        if ((priv->intl_id[stream_id] == mmioFOURCC('I', 'n', 't', '4')) ||
-            (priv->intl_id[stream_id] == mmioFOURCC('g', 'e', 'n', 'r')) ||
-            (priv->intl_id[stream_id] == mmioFOURCC('s', 'i', 'p', 'r'))) {
-            sps = priv->sub_packet_size[stream_id];
-            sph = priv->sub_packet_h[stream_id];
-            cfs = priv->coded_framesize[stream_id];
-            w = priv->audiopk_size[stream_id];
+        if ((priv->intl_id[demuxer->audio->id] == mmioFOURCC('I', 'n', 't', '4')) ||
+            (priv->intl_id[demuxer->audio->id] == mmioFOURCC('g', 'e', 'n', 'r')) ||
+            (priv->intl_id[demuxer->audio->id] == mmioFOURCC('s', 'i', 'p', 'r'))) {
+            sps = priv->sub_packet_size[demuxer->audio->id];
+            sph = priv->sub_packet_h[demuxer->audio->id];
+            cfs = priv->coded_framesize[demuxer->audio->id];
+            w = priv->audiopk_size[demuxer->audio->id];
             spc = priv->sub_packet_cnt;
-            switch (priv->intl_id[stream_id]) {
+            switch (priv->intl_id[demuxer->audio->id]) {
                 case mmioFOURCC('I', 'n', 't', '4'):
                     if (len < cfs * sph/2)
                         goto discard;
@@ -844,8 +864,8 @@ got_audio:
 	}
 // we will not use audio index if we use -idx and have a video
 	if(((!demuxer->video->sh && index_mode == 2) || priv->is_multirate) && (unsigned)demuxer->audio->id < MAX_STREAMS) {
-		while (priv->current_apacket + 1 < priv->index_table_size[demuxer->audio->id] &&
-		       timestamp > priv->index_table[demuxer->audio->id][priv->current_apacket].timestamp) {
+		while (priv->current_apacket + 1 < priv->index_table_size[rm_stream_id] &&
+		       timestamp > priv->index_table[rm_stream_id][priv->current_apacket].timestamp) {
 			priv->current_apacket += 1;
 			priv->stream_switch = 1;
 		}
@@ -860,10 +880,10 @@ got_audio:
 	return 1;
     }
 
-    if(demuxer->video->id==stream_id){
+    if(demuxer->video->id==mp_stream_id){
 got_video:
 	ds=demuxer->video;
-	mp_dbg(MSGT_DEMUX,MSGL_DBG2, "packet is video (id: %d)\n", stream_id);
+	mp_dbg(MSGT_DEMUX,MSGL_DBG2, "packet is video (mp_id: %d)\n", mp_stream_id);
 
 	// parse video chunk:
 	{
@@ -1041,8 +1061,8 @@ got_video:
 	    }
 	}
 	if ((unsigned)demuxer->video->id < MAX_STREAMS) {
-		while (priv->current_vpacket + 1 < priv->index_table_size[demuxer->video->id] &&
-		       timestamp > priv->index_table[demuxer->video->id][priv->current_vpacket + 1].timestamp) {
+		while (priv->current_vpacket + 1 < priv->index_table_size[rm_stream_id] &&
+		       timestamp > priv->index_table[rm_stream_id][priv->current_vpacket + 1].timestamp) {
 			priv->current_vpacket += 1;
 			priv->stream_switch = 1;
 		}
@@ -1053,31 +1073,30 @@ got_video:
 	return 1;
     }
 
-if((unsigned)stream_id<MAX_STREAMS){
-
-    if(demuxer->audio->id==-1 && demuxer->a_streams[stream_id]){
-	sh_audio_t *sh = demuxer->a_streams[stream_id];
-	demuxer->audio->id=stream_id;
+if((unsigned)rm_stream_id<MAX_STREAMS){
+    if(demuxer->audio->id==-1 && demuxer->a_streams[mp_stream_id]){
+	sh_audio_t *sh = demuxer->a_streams[mp_stream_id];
+	demuxer->audio->id=mp_stream_id;
 	sh->ds=demuxer->audio;
 	demuxer->audio->sh=sh;
 	priv->audio_buf = calloc(priv->sub_packet_h[demuxer->audio->id], priv->audiopk_size[demuxer->audio->id]);
 	priv->audio_timestamp = calloc(priv->sub_packet_h[demuxer->audio->id], sizeof(double));
-        mp_msg(MSGT_DEMUX,MSGL_V,"Auto-selected RM audio ID = %d\n",stream_id);
+        mp_msg(MSGT_DEMUX,MSGL_V,"Auto-selected RM audio ID = %d (rm id %d)\n",mp_stream_id, rm_stream_id);
 	goto got_audio;
     }
 
-    if(demuxer->video->id==-1 && demuxer->v_streams[stream_id]){
-	sh_video_t *sh = demuxer->v_streams[stream_id];
-	demuxer->video->id=stream_id;
+    if(demuxer->video->id==-1 && demuxer->v_streams[mp_stream_id]){
+	sh_video_t *sh = demuxer->v_streams[mp_stream_id];
+	demuxer->video->id=mp_stream_id;
 	sh->ds=demuxer->video;
 	demuxer->video->sh=sh;
-        mp_msg(MSGT_DEMUX,MSGL_V,"Auto-selected RM video ID = %d\n",stream_id);
+        mp_msg(MSGT_DEMUX,MSGL_V,"Auto-selected RM video ID = %d (rm id %d)\n",mp_stream_id, rm_stream_id);
 	goto got_video;
     }
 
 }
 
-    mp_msg(MSGT_DEMUX,MSGL_DBG2, "unknown stream id (%d)\n", stream_id);
+    mp_msg(MSGT_DEMUX,MSGL_DBG2, "unknown stream id (%d)\n", rm_stream_id);
 discard:
     stream_skip(demuxer->stream, len);
   }//    goto loop;
@@ -1140,7 +1159,8 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		mp_msg(MSGT_DEMUX,MSGL_V,"First index chunk offset: 0x%x\n", priv->index_chunk_offset);
 		priv->data_chunk_offset = stream_read_dword(demuxer->stream)+10;
 		mp_msg(MSGT_DEMUX,MSGL_V,"First data chunk offset: 0x%x\n", priv->data_chunk_offset);
-		stream_skip(demuxer->stream, 2); /* nb streams */
+		priv->streams_in_file = stream_read_word(demuxer->stream);
+		mp_msg(MSGT_DEMUX,MSGL_V,"Number of streams in file: %d\n", priv->streams_in_file);
 #if 0
 		stream_skip(demuxer->stream, 2); /* flags */
 #else
@@ -1218,7 +1238,6 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		int tmp;
 		int len;
 		char *descr, *mimet = NULL;
-
 		stream_id = stream_read_word(demuxer->stream);
 		mp_msg(MSGT_DEMUX,MSGL_V,"Found new stream (id: %d)\n", stream_id);
 
@@ -1254,13 +1273,44 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 
 	if (!strncmp(mimet,"audio/",6)) {
 	  if (strstr(mimet,"x-pn-realaudio") || strstr(mimet,"x-pn-multirate-realaudio")) {
+		int num_mlti, mlti_cnt, ra_size;
 		tmp = stream_read_dword(demuxer->stream);
+		if (tmp == MKTAG('I', 'T', 'L', 'M')) // MLTI chunk in audio
+		{
+		    int num_streams, stream_cnt;
+		    mp_msg(MSGT_DEMUX,MSGL_V,"MLTI chunk in audio.\n");
+		    num_streams = stream_read_word(demuxer->stream);
+		    for (stream_cnt = 0; stream_cnt < num_streams; stream_cnt++)
+		        stream_skip(demuxer->stream, 2); // MDPR index, one per stream
+		    num_mlti = stream_read_word(demuxer->stream);
+		    if (num_mlti != 1) {
+		        mp_msg(MSGT_DEMUX,MSGL_V,"Found MLTI in audio with %d substreams.\n", num_mlti);
+		        priv->is_mlti = 1;
+		    } else
+		        mp_msg(MSGT_DEMUX,MSGL_V,"Found MLTI in audio with 1 substreams. Ingnoring\n", num_mlti);
+		    if (num_mlti > MAX_MLTIIDX) {
+		        mp_msg(MSGT_DEMUX,MSGL_ERR,"Too many (%d) MLTI audio, truncating; expect problems. Please report to Mplayer developers.\n", num_mlti);
+		        num_mlti = MAX_MLTIIDX - 1; // Limit to max MLTI
+		    }
+		    ra_size = stream_read_dword(demuxer->stream); // Size of the following .ra chunk
+		    tmp = stream_read_dword(demuxer->stream);
+		} else {
+		    num_mlti = 1;
+		    ra_size = codec_data_size;
+		}
+		for (mlti_cnt = 0; mlti_cnt < num_mlti; mlti_cnt++) {
+		if (mlti_cnt) {
+		    ra_size = stream_read_dword(demuxer->stream); // Size of the following .ra chunk
+		    tmp = stream_read_dword(demuxer->stream);
+		}
 		if (tmp != MKTAG(0xfd, 'a', 'r', '.'))
 		{
 		    mp_msg(MSGT_DEMUX,MSGL_V,"Audio: can't find .ra in codec data\n");
+		    stream_skip(demuxer->stream, ra_size - 4);
 		} else {
 		    /* audio header */
-		    sh_audio_t *sh = new_sh_audio(demuxer, stream_id, NULL);
+		    int aid = priv->is_mlti ? priv->streams_in_file + a_streams + v_streams : stream_id;
+		    sh_audio_t *sh = new_sh_audio(demuxer, aid, NULL);
 		    char buf[128]; /* for codec name */
 		    int frame_size;
 		    int sub_packet_size;
@@ -1272,7 +1322,10 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    int i;
 		    char *buft;
 		    int hdr_size;
-		    mp_msg(MSGT_DEMUX, MSGL_INFO, MSGTR_AudioID, "real", stream_id);
+		    mp_msg(MSGT_DEMUX, MSGL_INFO, MSGTR_AudioID, "real", aid);
+		    priv->mp2rm_streamid[aid] = stream_id;
+		    priv->rm2mp[stream_id][mlti_cnt] = aid;
+		    mp_msg(MSGT_DEMUX,MSGL_V,"Mplayer aid %d is rm stream %d with MDPR index %d\n", aid, stream_id, mlti_cnt);
 		    mp_msg(MSGT_DEMUX,MSGL_V,"Found audio stream!\n");
 		    version = stream_read_word(demuxer->stream);
 		    mp_msg(MSGT_DEMUX,MSGL_V,"version: %d\n", version);
@@ -1355,7 +1408,7 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    if (version == 5)
 		    {
 			stream_read(demuxer->stream, buf, 4);  // interleaver id
-			priv->intl_id[stream_id] = MKTAG(buf[0], buf[1], buf[2], buf[3]);
+			priv->intl_id[aid] = MKTAG(buf[0], buf[1], buf[2], buf[3]);
 			stream_read(demuxer->stream, buf, 4); // fourcc
 			buf[4] = 0;
 		    }
@@ -1363,7 +1416,7 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    {
 			/* Interleaver id */
 			get_str(1, demuxer, buf, sizeof(buf));
-			priv->intl_id[stream_id] = MKTAG(buf[0], buf[1], buf[2], buf[3]);
+			priv->intl_id[aid] = MKTAG(buf[0], buf[1], buf[2], buf[3]);
 			/* Codec FourCC */
 			get_str(1, demuxer, buf, sizeof(buf));
 		    }
@@ -1409,7 +1462,7 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 			    sh->wf->cbSize = codecdata_length;
 			    sh->wf = realloc(sh->wf, sizeof(*sh->wf)+sh->wf->cbSize);
 			    stream_read(demuxer->stream, ((char*)(sh->wf+1)), codecdata_length); // extras
-                if (priv->intl_id[stream_id] == MKTAG('g', 'e', 'n', 'r'))
+                if (priv->intl_id[aid] == MKTAG('g', 'e', 'n', 'r'))
     			    sh->wf->nBlockAlign = sub_packet_size;
     			else
     			    sh->wf->nBlockAlign = coded_frame_size;
@@ -1438,10 +1491,10 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    }
 
 		    // Interleaver setup
-		    priv->sub_packet_size[stream_id] = sub_packet_size;
-		    priv->sub_packet_h[stream_id] = sub_packet_h;
-		    priv->coded_framesize[stream_id] = coded_frame_size;
-		    priv->audiopk_size[stream_id] = frame_size;
+		    priv->sub_packet_size[aid] = sub_packet_size;
+		    priv->sub_packet_h[aid] = sub_packet_h;
+		    priv->coded_framesize[aid] = coded_frame_size;
+		    priv->audiopk_size[aid] = frame_size;
 
 		    sh->wf->wFormatTag = sh->format;
 
@@ -1469,7 +1522,8 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 #ifdef stream_skip
 #undef stream_skip
 #endif
-		}
+		} // .ra
+		} // MLTI
 	  } else if (strstr(mimet,"X-MP3-draft-00")) {
 		    sh_audio_t *sh = new_sh_audio(demuxer, stream_id, NULL);
     		    mp_msg(MSGT_DEMUX, MSGL_INFO, MSGTR_AudioID, "real", stream_id);
@@ -1518,15 +1572,56 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		}
 	} else if (!strncmp(mimet,"video/",6)) {
 	  if (strstr(mimet,"x-pn-realvideo") || strstr(mimet,"x-pn-multirate-realvideo")) {
-		stream_skip(demuxer->stream, 4);  // VIDO length, same as codec_data_size
+		int num_mlti, mlti_cnt, vido_size, vido_pos;
 		tmp = stream_read_dword(demuxer->stream);
+		if (tmp == MKTAG('I', 'T', 'L', 'M')) // MLTI chunk in video
+		{
+		    int num_streams, stream_cnt;
+		    mp_msg(MSGT_DEMUX,MSGL_V,"MLTI chunk in video.\n");
+		    num_streams = stream_read_word(demuxer->stream);
+		    for (stream_cnt = 0; stream_cnt < num_streams; stream_cnt++)
+		        stream_skip(demuxer->stream, 2); // MDPR index, one per stream
+		    num_mlti = stream_read_word(demuxer->stream);
+		    if (num_mlti != 1) {
+		        mp_msg(MSGT_DEMUX,MSGL_V,"Found MLTI in video with %d substreams.\n", num_mlti);
+		         priv->is_mlti = 1;
+		    } else
+		        mp_msg(MSGT_DEMUX,MSGL_V,"Found MLTI in audio with 1 substreams. Ingnoring\n", num_mlti);
+		    if (num_mlti > MAX_MLTIIDX) {
+		        mp_msg(MSGT_DEMUX,MSGL_ERR,"Too many (%d) MLTI video, truncating; expect problems. Please report to Mplayer developers.\n", num_mlti);
+		        num_mlti = MAX_MLTIIDX - 1; // Limit to max MLTI
+		    }
+		    vido_size = stream_read_dword(demuxer->stream); // Size of the following .vido chunk
+		    vido_pos = stream_tell(demuxer->stream);;
+		    stream_skip(demuxer->stream, 4);
+		    tmp = stream_read_dword(demuxer->stream);
+		    priv->is_mlti = 1;
+		} else {
+		    num_mlti = 1;
+		    vido_size = codec_data_size;
+		    vido_pos = codec_pos;
+		    tmp = stream_read_dword(demuxer->stream);
+		}
+		for (mlti_cnt = 0; mlti_cnt < num_mlti; mlti_cnt++) {
+		if (mlti_cnt) {
+		    vido_size = stream_read_dword(demuxer->stream); // Size of the following vido chunk
+		    mp_msg(MSGT_DEMUX,MSGL_V,"VIDO size: %x\n", vido_size);
+		    vido_pos = stream_tell(demuxer->stream);;
+		    stream_skip(demuxer->stream, 4);
+		    tmp = stream_read_dword(demuxer->stream);
+		}
 		if(tmp != MKTAG('O', 'D', 'I', 'V'))
 		{
 		    mp_msg(MSGT_DEMUX,MSGL_V,"Video: can't find VIDO in codec data\n");
+		    stream_skip(demuxer->stream, vido_size - 4);
 		} else {
 		    /* video header */
-		    sh_video_t *sh = new_sh_video(demuxer, stream_id);
-		    mp_msg(MSGT_DEMUX, MSGL_INFO, MSGTR_VideoID, "real", stream_id);
+		    int vid = priv->is_mlti ? priv->streams_in_file + a_streams + v_streams : stream_id;
+		    sh_video_t *sh = new_sh_video(demuxer, vid);
+		    mp_msg(MSGT_DEMUX, MSGL_INFO, MSGTR_VideoID, "real", vid);
+		    priv->mp2rm_streamid[vid] = stream_id;
+		    priv->rm2mp[stream_id][mlti_cnt] = vid;
+		    mp_msg(MSGT_DEMUX,MSGL_V,"Mplayer vid %d is rm stream %d with MDPR index %d\n", vid, stream_id, mlti_cnt);
 
 		    sh->format = stream_read_dword_le(demuxer->stream); /* fourcc */
 		    mp_msg(MSGT_DEMUX,MSGL_V,"video fourcc: %.4s (%x)\n", (char *)&sh->format, sh->format);
@@ -1569,7 +1664,7 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 
 		    {
 			    // read and store codec extradata
-			    unsigned int cnt = codec_data_size - (stream_tell(demuxer->stream) - codec_pos);
+			    unsigned int cnt = vido_size - (stream_tell(demuxer->stream) - vido_pos);
 			    if (cnt > 0x7fffffff - sizeof(*sh->bih)) {
 			        mp_msg(MSGT_DEMUX, MSGL_ERR,"Extradata too big (%u)\n", cnt);
 			    } else  {
@@ -1596,7 +1691,8 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 
 		    ++v_streams;
 
-		}
+		} // VIDO
+		} // MLTI
 	  } else {
 		 mp_msg(MSGT_DEMUX,MSGL_V,"Unknown video stream format\n");
 	  }
@@ -1661,6 +1757,9 @@ skip_this_chunk:
     }
 
 header_end:
+    if(priv->is_multirate && priv->is_mlti)
+        mp_msg(MSGT_DEMUX,MSGL_ERR,"Multirate and MLTI in the same file is bad. Please contact Mplayer developers.\n");
+
     if(priv->is_multirate) {
         mp_msg(MSGT_DEMUX,MSGL_V,"Selected video id %d audio id %d\n", demuxer->video->id, demuxer->audio->id);
         /* Perform some sanity checks to avoid checking streams id all over the code*/
@@ -1806,6 +1905,11 @@ static void demux_seek_real(demuxer_t *demuxer, float rel_seek_secs, float audio
     int streams = 0;
     int retried = 0;
 
+
+    if (priv->is_mlti && (unsigned)vid < MAX_STREAMS)
+	vid = priv->mp2rm_streamid[d_video->id];
+    if (priv->is_mlti && (unsigned)aid < MAX_STREAMS)
+	aid = priv->mp2rm_streamid[d_audio->id];
 
     if (sh_video && (unsigned)vid < MAX_STREAMS && priv->index_table_size[vid])
 	streams |= 1;
