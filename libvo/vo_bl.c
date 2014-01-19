@@ -7,7 +7,8 @@
  * 	Sven Neumann <sven@gimp.org>
  * 	Michael Natterer <mitch@gimp.org>
  * 	Daniel Mack <daniel@yoobay.net>
- * copyright (C) 2004 Stefan Schuermans <1stein@schuermans.info>
+ * some patches: copyright (C) 2004,2014 Stefan Schuermans
+ *                                       <stefan@blinkenarea.org>
  * other stuff: copyright (C) 2002 Rik Snel
  *
  * This file is part of MPlayer.
