@@ -550,8 +550,12 @@ static GtkWidget * CreatePreferences( void )
   GtkWidget * vbox6;
   GtkWidget * vbox600;
   GSList    * OSD_group = NULL;
+#ifdef CONFIG_FREETYPE
   GSList    * Font_group = NULL;
   GList     * CBFontEncoding_items = NULL;
+#else
+  GtkWidget * hbox7;
+#endif
 #ifdef CONFIG_ICONV
   GList	    * CBSubEncoding_items = NULL;
 #endif
@@ -562,9 +566,6 @@ static GtkWidget * CreatePreferences( void )
   GtkWidget * vbox603;
   GtkWidget * hbox6;
   GtkWidget * hbuttonbox5;
-#ifndef CONFIG_FREETYPE
-  GtkWidget * hbox7;
-#endif
   GtkWidget * vbox601;
   GtkWidget * vbox602;
   GtkWidget * hbox5;
