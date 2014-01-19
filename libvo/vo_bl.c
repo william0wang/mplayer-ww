@@ -92,7 +92,7 @@ typedef struct {
 	int channels;
 	int width;
 	int height;
-	int bpc; /* bits per component: bpc = 3, channels = 3 => bpp = 24*/
+	int bpc; /* bits per component: bpc = 8, channels = 3 => bpp = 24*/
 
 	/* file output functions */
 	int (*init_file)(bl_file_t *file);
