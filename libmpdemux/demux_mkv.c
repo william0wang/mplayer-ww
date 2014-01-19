@@ -788,7 +788,7 @@ static int demux_mkv_read_trackentry(demuxer_t *demuxer)
         {
             uint64_t num = ebml_read_uint(s, &l);
             if (num == EBML_UINT_INVALID)
-                return 0;
+                goto err_out;
             track->type = num;
             mp_msg(MSGT_DEMUX, MSGL_V, "[mkv] |  + Track type: ");
             switch (track->type) {
