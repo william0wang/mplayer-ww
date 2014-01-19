@@ -313,12 +313,12 @@ static int preinit(sh_audio_t *sh){
       result = raOpenCodec2(&sh->context, path);
     } else
       result=raOpenCodec(&sh->context);
+    free(path); /* after this it isn't used anymore */
     if(result){
       mp_msg(MSGT_DECAUDIO,MSGL_WARN,"Decoder open failed, error code: 0x%X\n",result);
       return 0;
     }
 //    printf("opencodec ok (result: %x)\n", result);
-  free(path); /* after this it isn't used anymore */
 
   sh->samplerate=sh->wf->nSamplesPerSec;
   sh->samplesize=sh->wf->wBitsPerSample/8;
