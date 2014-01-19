@@ -213,7 +213,7 @@ static void udp_close(bl_host_t *h) {
 	h->fd = -1;
 }
 
-#define NO_BLS 3
+#define NO_BLS 4
 
 static const bl_properties_t bls[NO_BLS] = {
 	{ "hdl", IMGFMT_Y8, 1, 18, 8, 8,
@@ -223,6 +223,9 @@ static const bl_properties_t bls[NO_BLS] = {
 	&bml_init, &bml_write_frame, &bml_close,
 	&udp_init, &udp_send, &udp_close },
 	{ "grayscale", IMGFMT_Y8, 1, -1, -1, 8, /* use width and height of movie */
+	&bml_init, &bml_write_frame, &bml_close,
+	&udp_init, &udp_send, &udp_close },
+	{ "rgb", IMGFMT_RGB24, 3, -1, -1, 8, /* use width and height of movie */
 	&bml_init, &bml_write_frame, &bml_close,
 	&udp_init, &udp_send, &udp_close } };
 
@@ -269,7 +272,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 	bl_packet->maxval = htons((1 << bl->bpc) - 1);
 
 	framenum = 0;
-	if (format != IMGFMT_Y8) {
+	if (format != bl->img_format) {
 		mp_msg(MSGT_VO, MSGL_ERR, "vo_bl called with wrong format");
 		goto err_out;
 	}
