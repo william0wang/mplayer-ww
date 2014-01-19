@@ -108,7 +108,7 @@ static int demux_film_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
   film_data_t *film_data = (film_data_t *)demuxer->priv;
   film_chunk_t film_chunk;
   int length_fix_bytes;
-  demux_packet_t* dp;
+  demux_packet_t* dp = NULL;
 
   // see if the end has been reached
   if (film_data->current_chunk >= film_data->total_chunks)
@@ -128,7 +128,7 @@ static int demux_film_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
     dp = new_demux_packet(film_chunk.chunk_size);
     if (stream_read(demuxer->stream, dp->buffer, film_chunk.chunk_size) !=
       film_chunk.chunk_size)
-      return 0;
+      goto err_out;
     dp->pts = film_chunk.pts;
     dp->pos = film_chunk.chunk_offset;
     dp->flags = 0;
@@ -171,6 +171,7 @@ static int demux_film_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
 
     // append packet to DS stream
     ds_add_packet(demuxer->audio, dp);
+    dp = NULL;
    }
   }
   else
@@ -188,13 +189,13 @@ static int demux_film_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
 
       // these CVID data chunks have a few extra bytes; skip them
       if (stream_read(demuxer->stream, dp->buffer, 10) != 10)
-        return 0;
+        goto err_out;
       stream_skip(demuxer->stream, length_fix_bytes);
 
       if (stream_read(demuxer->stream, dp->buffer + 10,
         film_chunk.chunk_size - (10 + length_fix_bytes)) !=
         (film_chunk.chunk_size - (10 + length_fix_bytes)))
-        return 0;
+        goto err_out;
 
       dp->pts = film_chunk.pts;
       dp->pos = film_chunk.chunk_offset;
@@ -208,6 +209,7 @@ static int demux_film_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
 
       // append packet to DS stream
       ds_add_packet(demuxer->video, dp);
+      dp = NULL;
     }
     else
     {
@@ -219,6 +221,10 @@ static int demux_film_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
   film_data->current_chunk++;
 
   return 1;
+
+err_out:
+  if (dp) free_demux_packet(dp);
+  return NULL;
 }
 
 static demuxer_t* demux_open_film(demuxer_t* demuxer)
