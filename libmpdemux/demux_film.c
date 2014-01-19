@@ -63,7 +63,7 @@ typedef struct film_data_t
 
 static void demux_seek_film(demuxer_t *demuxer, float rel_seek_secs, float audio_delay, int flags)
 {
-  film_data_t *film_data = (film_data_t *)demuxer->priv;
+  film_data_t *film_data = demuxer->priv;
   int new_current_chunk=(flags&SEEK_ABSOLUTE)?0:film_data->current_chunk;
 
   if(flags&SEEK_FACTOR)
@@ -100,14 +100,10 @@ mp_msg(MSGT_DECVIDEO, MSGL_INFO,"  (flags = %X)  actual new chunk = %d (syncinfo
 //     1 = successfully read a packet
 static int demux_film_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
 {
-  int i;
-  unsigned char byte_swap;
-  int cvid_size;
   sh_video_t *sh_video = demuxer->video->sh;
   sh_audio_t *sh_audio = demuxer->audio->sh;
-  film_data_t *film_data = (film_data_t *)demuxer->priv;
+  film_data_t *film_data = demuxer->priv;
   film_chunk_t film_chunk;
-  int length_fix_bytes;
   demux_packet_t* dp = NULL;
 
   // see if the end has been reached
@@ -124,6 +120,7 @@ static int demux_film_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
   // (all ones in syncinfo1 indicates an audio chunk)
   if (film_chunk.syncinfo1 == 0xFFFFFFFF)
   {
+   int i;
    if(demuxer->audio->id>=-1){   // audio not disabled
     dp = new_demux_packet(film_chunk.chunk_size);
     if (stream_read(demuxer->stream, dp->buffer, film_chunk.chunk_size) !=
@@ -142,7 +139,7 @@ static int demux_film_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
     else
       for (i = 0; i < film_chunk.chunk_size; i += 2)
       {
-        byte_swap = dp->buffer[i];
+        unsigned char byte_swap = dp->buffer[i];
         dp->buffer[i] = dp->buffer[i + 1];
         dp->buffer[i + 1] = byte_swap;
       }
@@ -174,18 +171,14 @@ static int demux_film_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
     dp = NULL;
    }
   }
-  else
-  {
     // if the demuxer is dealing with CVID data, deal with it a special way
-    if (sh_video->format == mmioFOURCC('c', 'v', 'i', 'd'))
+  else if (sh_video->format == mmioFOURCC('c', 'v', 'i', 'd'))
     {
-      if (film_data->film_version)
-        length_fix_bytes = 2;
-      else
-        length_fix_bytes = 6;
+      int length_fix_bytes = film_data->film_version ? 2 : 6;
+      int cvid_size = film_chunk.chunk_size - length_fix_bytes;
 
       // account for the fix bytes when allocating the buffer
-      dp = new_demux_packet(film_chunk.chunk_size - length_fix_bytes);
+      dp = new_demux_packet(cvid_size);
 
       // these CVID data chunks have a few extra bytes; skip them
       if (stream_read(demuxer->stream, dp->buffer, 10) != 10)
@@ -193,8 +186,7 @@ static int demux_film_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
       stream_skip(demuxer->stream, length_fix_bytes);
 
       if (stream_read(demuxer->stream, dp->buffer + 10,
-        film_chunk.chunk_size - (10 + length_fix_bytes)) !=
-        (film_chunk.chunk_size - (10 + length_fix_bytes)))
+        cvid_size - 10) != cvid_size - 10)
         goto err_out;
 
       dp->pts = film_chunk.pts;
@@ -202,7 +194,6 @@ static int demux_film_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
       dp->flags = (film_chunk.syncinfo1 & 0x80000000) ? 1 : 0;
 
       // fix the CVID chunk size
-      cvid_size = film_chunk.chunk_size - length_fix_bytes;
       dp->buffer[1] = (cvid_size >> 16) & 0xFF;
       dp->buffer[2] = (cvid_size >>  8) & 0xFF;
       dp->buffer[3] = (cvid_size >>  0) & 0xFF;
@@ -217,21 +208,19 @@ static int demux_film_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
         film_chunk.pts,
         film_chunk.chunk_offset, (film_chunk.syncinfo1 & 0x80000000) ? 1 : 0);
     }
-  }
   film_data->current_chunk++;
 
   return 1;
 
 err_out:
   if (dp) free_demux_packet(dp);
-  return NULL;
+  return 0;
 }
 
 static demuxer_t* demux_open_film(demuxer_t* demuxer)
 {
   sh_video_t *sh_video = NULL;
   sh_audio_t *sh_audio = NULL;
-  film_data_t *film_data;
   film_chunk_t film_chunk;
   int header_size;
   unsigned int chunk_type;
@@ -242,11 +231,7 @@ static demuxer_t* demux_open_film(demuxer_t* demuxer)
   int counting_chunks;
   unsigned int total_audio_bytes = 0;
 
-  film_data = malloc(sizeof(film_data_t));
-  film_data->total_chunks = 0;
-  film_data->current_chunk = 0;
-  film_data->chunks = NULL;
-  film_data->chunks_per_second = 0;
+  film_data_t *film_data = calloc(1, sizeof(*film_data));
 
   // go back to the beginning
   stream_reset(demuxer->stream);
