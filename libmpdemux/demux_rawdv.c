@@ -50,7 +50,7 @@ typedef struct
 
 static void demux_seek_rawdv(demuxer_t *demuxer,float rel_seek_secs,float audio_delay,int flags)
 {
-   rawdv_frames_t *frames = (rawdv_frames_t *)demuxer->priv;
+   rawdv_frames_t *frames = demuxer->priv;
    sh_video_t *sh_video = demuxer->video->sh;
    off_t newpos=(flags&SEEK_ABSOLUTE)?0:frames->current_frame;
    if(flags&SEEK_FACTOR)
@@ -109,7 +109,7 @@ static int rawdv_check_file(demuxer_t *demuxer)
 //     1 = successfully read a packet
 static int demux_rawdv_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
 {
-   rawdv_frames_t *frames = (rawdv_frames_t *)demuxer->priv;
+   rawdv_frames_t *frames = demuxer->priv;
    demux_packet_t* dp_video=NULL;
    sh_video_t *sh_video = demuxer->video->sh;
    int bytes_read=0;
@@ -237,7 +237,7 @@ static demuxer_t* demux_open_rawdv(demuxer_t* demuxer)
 
 static void demux_close_rawdv(demuxer_t* demuxer)
 {
-   rawdv_frames_t *frames = (rawdv_frames_t *)demuxer->priv;
+   rawdv_frames_t *frames = demuxer->priv;
 
    if(frames==0)
       return;
@@ -245,7 +245,7 @@ static void demux_close_rawdv(demuxer_t* demuxer)
 }
 
 static int demux_rawdv_control(demuxer_t *demuxer,int cmd, void *arg) {
-    rawdv_frames_t *frames = (rawdv_frames_t *)demuxer->priv;
+    rawdv_frames_t *frames = demuxer->priv;
     sh_video_t *sh_video=demuxer->video->sh;
 
     switch(cmd) {
