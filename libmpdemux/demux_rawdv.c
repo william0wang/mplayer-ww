@@ -121,8 +121,10 @@ static int demux_rawdv_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
 
    dp_video=new_demux_packet(frames->frame_size);
    bytes_read=stream_read(demuxer->stream,dp_video->buffer,frames->frame_size);
-   if (bytes_read<frames->frame_size)
+   if (bytes_read<frames->frame_size) {
+      free_demux_packet(dp_video);
       return 0;
+   }
    dp_video->pts=frames->current_frame/sh_video->fps;
    dp_video->pos=frames->current_filepos;
    dp_video->flags=0;
