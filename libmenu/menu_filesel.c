@@ -316,6 +316,7 @@ bailout:
 
   if (n < 0) {
     mp_msg(MSGT_GLOBAL,MSGL_ERR,MSGTR_LIBMENU_ReaddirError,strerror(errno));
+    free(namelist);
     return 0;
   }
   qsort(namelist, n, sizeof(char *), compare);
