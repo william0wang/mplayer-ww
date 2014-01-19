@@ -563,6 +563,7 @@ static GtkWidget * CreatePreferences( void )
   GtkWidget * vbox8;
   GtkWidget * table1;
   GtkWidget * vbox9;
+  GtkWidget * vbox10;
   GtkWidget * vbox603;
   GtkWidget * hbox6;
   GtkWidget * hbuttonbox5;
@@ -774,10 +775,13 @@ static GtkWidget * CreatePreferences( void )
     gtk_spin_button_set_numeric( GTK_SPIN_BUTTON( HSSubFPS ),TRUE );
     gtk_table_attach( GTK_TABLE( table1 ),HSSubFPS,1,2,2,3,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
+  vbox10=gtkAddVBox( NULL,0 );
+  gtk_table_attach( GTK_TABLE( table1 ),vbox10,1,2,3,4,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
+
 #ifdef CONFIG_ICONV
   CBSubEncoding=gtk_combo_new();
   gtk_widget_show( CBSubEncoding );
-  gtk_table_attach( GTK_TABLE( table1 ),CBSubEncoding,1,2,3,4,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
+  gtk_box_pack_start( GTK_BOX( vbox10 ),CBSubEncoding,TRUE,FALSE,0 );
   CBSubEncoding_items=g_list_append( CBSubEncoding_items,MSGTR_PREFERENCES_None );
   {
    int i;
