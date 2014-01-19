@@ -93,6 +93,7 @@ static GtkWidget * CBNonInterlaved;
 static GtkWidget * CBIndex;
 static GtkWidget * CBFlip;
 static GtkWidget * CBNoAutoSub;
+static GtkWidget * CBSubUtf8;
 static GtkWidget * CBSubUnicode;
 static GtkWidget * CBSubOverlap;
 static GtkWidget * CBDumpMPSub;
@@ -285,6 +286,7 @@ static void prButton( GtkButton * button, gpointer user_data )
 	sub_auto=!gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBNoAutoSub ) );
 	gtkSubDumpMPSub=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBDumpMPSub ) );
 	gtkSubDumpSrt=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBDumpSrt ) );
+	sub_utf8=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBSubUtf8 ) );
 	sub_unicode=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBSubUnicode ) );
 #ifdef CONFIG_ASS
 	gtkASS.enabled=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBUseASS ) );
@@ -796,12 +798,14 @@ static GtkWidget * CreatePreferences( void )
 #endif
 
   hbox3=gtkAddHBox( NULL,0 );
+  gtk_box_set_spacing( GTK_BOX( hbox3 ), 24 );
   gtk_box_pack_start( GTK_BOX( vbox10 ),hbox3,TRUE,FALSE,0 );
 
   vbox9=gtkAddVBox( vbox8,0 );
 
   CBSubOverlap=gtkAddCheckButton( MSGTR_PREFERENCES_SUB_Overlap,vbox9 );
   CBNoAutoSub=gtkAddCheckButton( MSGTR_PREFERENCES_SUB_AutoLoad,vbox9 );
+  CBSubUtf8=gtkAddCheckButton( MSGTR_PREFERENCES_FontEncoding24,hbox3 );
   CBSubUnicode=gtkAddCheckButton( MSGTR_PREFERENCES_FontEncoding1,hbox3 );
   CBDumpMPSub=gtkAddCheckButton( MSGTR_PREFERENCES_SUB_MPSUB,vbox9 );
   CBDumpSrt=gtkAddCheckButton( MSGTR_PREFERENCES_SUB_SRT,vbox9 );
@@ -1179,6 +1183,7 @@ void ShowPreferences( void )
  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBNoAutoSub ),!sub_auto );
  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBDumpMPSub ),gtkSubDumpMPSub );
  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBDumpSrt ),gtkSubDumpSrt );
+ gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBSubUtf8 ),sub_utf8 );
  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBSubUnicode ),sub_unicode );
 #ifdef CONFIG_ASS
  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBUseASS ),gtkASS.enabled );
