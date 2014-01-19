@@ -1232,17 +1232,25 @@ static int demux_mkv_read_attachments(demuxer_t *demuxer)
 
                 switch (ebml_read_id(s, &il)) {
                 case MATROSKA_ID_FILENAME:
+                    free(name);
                     name = ebml_read_utf8(s, &l);
-                    if (name == NULL)
+                    if (name == NULL) {
+                        free(mime);
+                        free(data);
                         return 0;
+                    }
                     mp_msg(MSGT_DEMUX, MSGL_V, "[mkv] |  + FileName: %s\n",
                            name);
                     break;
 
                 case MATROSKA_ID_FILEMIMETYPE:
+                    free(mime);
                     mime = ebml_read_ascii(s, &l);
-                    if (mime == NULL)
+                    if (mime == NULL) {
+                        free(name);
+                        free(data);
                         return 0;
+                    }
                     mp_msg(MSGT_DEMUX, MSGL_V,
                            "[mkv] |  + FileMimeType: %s\n", mime);
                     break;
@@ -1253,10 +1261,15 @@ static int demux_mkv_read_attachments(demuxer_t *demuxer)
                     uint64_t num = ebml_read_length(s, &x);
                     l = x + num;
                     free(data);
-                    if (num > SIZE_MAX)
+                    if (num > SIZE_MAX) {
+                        free(name);
+                        free(mime);
                         return 0;
+                    }
                     data = malloc(num);
-                    if (stream_read(s, data, num) != (int) num) {
+                    if (!data || stream_read(s, data, num) != (int) num) {
+                        free(name);
+                        free(mime);
                         free(data);
                         return 0;
                     }
@@ -1278,6 +1291,9 @@ static int demux_mkv_read_attachments(demuxer_t *demuxer)
             mp_msg(MSGT_DEMUX, MSGL_V,
                    "[mkv] Attachment: %s, %s, %u bytes\n", name, mime,
                    data_size);
+            free(name);
+            free(mime);
+            free(data);
             break;
         }
 
