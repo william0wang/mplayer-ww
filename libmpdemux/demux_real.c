@@ -1287,7 +1287,7 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		        mp_msg(MSGT_DEMUX,MSGL_V,"Found MLTI in audio with %d substreams.\n", num_mlti);
 		        priv->is_mlti = 1;
 		    } else
-		        mp_msg(MSGT_DEMUX,MSGL_V,"Found MLTI in audio with 1 substreams. Ingnoring\n", num_mlti);
+		        mp_msg(MSGT_DEMUX,MSGL_V,"Found MLTI in audio with 1 substreams. Ingnoring\n");
 		    if (num_mlti > MAX_MLTIIDX) {
 		        mp_msg(MSGT_DEMUX,MSGL_ERR,"Too many (%d) MLTI audio, truncating; expect problems. Please report to Mplayer developers.\n", num_mlti);
 		        num_mlti = MAX_MLTIIDX - 1; // Limit to max MLTI
@@ -1586,7 +1586,7 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		        mp_msg(MSGT_DEMUX,MSGL_V,"Found MLTI in video with %d substreams.\n", num_mlti);
 		         priv->is_mlti = 1;
 		    } else
-		        mp_msg(MSGT_DEMUX,MSGL_V,"Found MLTI in audio with 1 substreams. Ingnoring\n", num_mlti);
+		        mp_msg(MSGT_DEMUX,MSGL_V,"Found MLTI in audio with 1 substreams. Ingnoring\n");
 		    if (num_mlti > MAX_MLTIIDX) {
 		        mp_msg(MSGT_DEMUX,MSGL_ERR,"Too many (%d) MLTI video, truncating; expect problems. Please report to Mplayer developers.\n", num_mlti);
 		        num_mlti = MAX_MLTIIDX - 1; // Limit to max MLTI
