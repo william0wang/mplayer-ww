@@ -666,7 +666,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "Positie: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Geen automatisch laden van ondertiteling"
-#define MSGTR_PREFERENCES_SUB_Unicode "Unicode ondertiteling"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Converteer de gegeven ondertiteling naar MPlayer's ondertitelingsformaat"
 #define MSGTR_PREFERENCES_SUB_SRT "Converteer de gegeven ondertiteling naar het tijdsgebaseerde SubViewer(SRT) formaat"
 #define MSGTR_PREFERENCES_SUB_Overlap "Activeer/deactiveer ondertitel overlapping"

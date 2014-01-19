@@ -403,7 +403,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "Pozitie: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Fãrã auto-încãrcarea subtitrãrii"
-#define MSGTR_PREFERENCES_SUB_Unicode "Subtitrare Unicode"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Converteºte subtitrarea datã la formatul MPlayer"
 #define MSGTR_PREFERENCES_SUB_SRT "Converteºte subtitrarea la formatul time based SubViewer (SRT)"
 #define MSGTR_PREFERENCES_SUB_Overlap "Alege suprapunerea subtitrarilor"

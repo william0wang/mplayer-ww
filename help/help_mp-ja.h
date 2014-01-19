@@ -376,7 +376,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "位置: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "subtitle 自動読み込み無効"
-#define MSGTR_PREFERENCES_SUB_Unicode "Unicode サブタイトル"
 #define MSGTR_PREFERENCES_SUB_MPSUB "与えられたサブタイトルをMPLayerのサブタイトルフォーマットに変換"
 #define MSGTR_PREFERENCES_Font "フォント:"
 #define MSGTR_PREFERENCES_PostProcess "postprocessing 有効"

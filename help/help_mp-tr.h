@@ -844,7 +844,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "Konum: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Altyazı otomatik yüklemesini kapat"
-#define MSGTR_PREFERENCES_SUB_Unicode "Unicode altyazı"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Mevcut altyazıyı MPlayer'ın altyazı biçimine çevir"
 #define MSGTR_PREFERENCES_SUB_SRT "Mevcut altyazıyı zaman tabanlı SubViewer (SRT) biçimine çevir"
 #define MSGTR_PREFERENCES_SUB_Overlap "Altyazı bindirmesini sabitle"

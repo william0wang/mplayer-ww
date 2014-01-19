@@ -455,7 +455,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS (Фрејмови Во Секунда):"
 #define MSGTR_PREFERENCES_SUB_POS "Позиција: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Оневозможи го автоматското вчитување на преводот"
-#define MSGTR_PREFERENCES_SUB_Unicode "Повеќе-коден превод"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Конвертирај ги дадените преводи во форматот за преводи на MPlayer"
 #define MSGTR_PREFERENCES_SUB_SRT "Конвертирај ги дадените преводи во форматот базиран на време SubViewer (SRT)"
 #define MSGTR_PREFERENCES_SUB_Overlap "Преместувај го преклопувањето на преводот"

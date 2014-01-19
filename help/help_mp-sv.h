@@ -681,7 +681,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "Position: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Deaktivera automatisk laddning av textning"
-#define MSGTR_PREFERENCES_SUB_Unicode "Unicodetextning"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Konvertera given text till MPlayers egna textningsformat"
 #define MSGTR_PREFERENCES_SUB_SRT "Konvertera given text till det tidbaserade SubViewer (SRT) formatet"
 #define MSGTR_PREFERENCES_SUB_Overlap "Aktivera textningsöverlappning"

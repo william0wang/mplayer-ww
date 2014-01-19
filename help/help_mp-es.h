@@ -693,7 +693,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "Posición: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Desactivar carga automática de subtítulos"
-#define MSGTR_PREFERENCES_SUB_Unicode "Subtítulo unicode"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Convertir el subtítulo dado al formato de subtítulos de MPlayer"
 #define MSGTR_PREFERENCES_SUB_SRT "Convertir el subtítulo dado al formato basado en tiempo SubViewer (SRT)"
 #define MSGTR_PREFERENCES_SUB_Overlap "Superposición de subtitulos"

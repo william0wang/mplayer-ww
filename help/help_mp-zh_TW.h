@@ -817,7 +817,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "幀率:"
 #define MSGTR_PREFERENCES_SUB_POS "位置: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "停用字幕自動裝載"
-#define MSGTR_PREFERENCES_SUB_Unicode "Unicode 字幕"
 #define MSGTR_PREFERENCES_SUB_MPSUB "轉換給定的字幕成為 MPlayer 的字幕文件"
 #define MSGTR_PREFERENCES_SUB_SRT "轉換給定的字幕成為基于時間的 SubViewer (SRT) 格式"
 #define MSGTR_PREFERENCES_SUB_Overlap "啟/停用字幕重疊"

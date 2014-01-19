@@ -668,7 +668,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "Кадр/сек:"
 #define MSGTR_PREFERENCES_SUB_POS "Позиция: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Выключить автозагрузку субтитров"
-#define MSGTR_PREFERENCES_SUB_Unicode "Уникодовые субтитры"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Конвертировать данные субтитры в MPlayer'овский формат субтитров"
 #define MSGTR_PREFERENCES_SUB_SRT "Конвертировать данные субтитры в основанный на времени SubViewer (SRT) формат"
 #define MSGTR_PREFERENCES_SUB_Overlap "Изменить перекрывание субтитров"

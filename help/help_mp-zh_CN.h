@@ -743,7 +743,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "帧率："
 #define MSGTR_PREFERENCES_SUB_POS "位置："
 #define MSGTR_PREFERENCES_SUB_AutoLoad "禁止自动装载字幕"
-#define MSGTR_PREFERENCES_SUB_Unicode "Unicode 字幕"
 #define MSGTR_PREFERENCES_SUB_MPSUB "转换给定的字幕为 MPlayer 字幕格式"
 #define MSGTR_PREFERENCES_SUB_SRT "转换给定的字幕为基于时间戳的 SubViewer (SRT) 格式"
 #define MSGTR_PREFERENCES_SUB_Overlap "开关字幕重叠模式"

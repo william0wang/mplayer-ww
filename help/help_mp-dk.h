@@ -457,7 +457,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "Billedfrekvens:"
 #define MSGTR_PREFERENCES_SUB_POS "Position: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Deaktiver automatisk undertekster"
-#define MSGTR_PREFERENCES_SUB_Unicode "Unicode undertekst"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Konverter en given undertekst til MPlayer's undertekst format"
 #define MSGTR_PREFERENCES_SUB_SRT "Konverter den angivne undertekst til et tidsbaseret SubViewer (SRT) format"
 #define MSGTR_PREFERENCES_SUB_Overlap "slå (til/fra) undertekst overlapning"

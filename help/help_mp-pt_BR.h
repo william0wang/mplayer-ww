@@ -460,7 +460,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "Posição: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Desabilitar auto carregamento de legendas"
-#define MSGTR_PREFERENCES_SUB_Unicode "Legenda unicode"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Converter a legenda dada para o formato de legenda do MPlayer"
 #define MSGTR_PREFERENCES_SUB_SRT "Converter a legenda dada para o formato baseado em tempo SubViewer (SRT)"
 #define MSGTR_PREFERENCES_SUB_Overlap "Sobreposição da legenda"

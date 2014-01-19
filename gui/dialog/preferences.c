@@ -802,7 +802,7 @@ static GtkWidget * CreatePreferences( void )
 
   CBSubOverlap=gtkAddCheckButton( MSGTR_PREFERENCES_SUB_Overlap,vbox9 );
   CBNoAutoSub=gtkAddCheckButton( MSGTR_PREFERENCES_SUB_AutoLoad,vbox9 );
-  CBSubUnicode=gtkAddCheckButton( MSGTR_PREFERENCES_SUB_Unicode,hbox3 );
+  CBSubUnicode=gtkAddCheckButton( MSGTR_PREFERENCES_FontEncoding1,hbox3 );
   CBDumpMPSub=gtkAddCheckButton( MSGTR_PREFERENCES_SUB_MPSUB,vbox9 );
   CBDumpSrt=gtkAddCheckButton( MSGTR_PREFERENCES_SUB_SRT,vbox9 );
 

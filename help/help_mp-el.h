@@ -464,7 +464,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "Θέση:"
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Απενεργοποίηση αυτόματου φορτώματος υποτίτλων"
-#define MSGTR_PREFERENCES_SUB_Unicode "Unicode υπότιτλος"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Μετατροπή εισαγόμενου υπότιτλου σε υπότιτλο τύπου MPlayer"
 #define MSGTR_PREFERENCES_SUB_SRT "Μετατροπή εισαγόμενου υπότιτλου σε υπότιτλο τύπο SubViewer(SRT)"
 #define MSGTR_PREFERENCES_SUB_Overlap "Εναλλαγή του overlapping υποτίτλου"

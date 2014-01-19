@@ -457,7 +457,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "위치: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "자동으로 자막 열지 않기"
-#define MSGTR_PREFERENCES_SUB_Unicode "유니코드 자막"
 #define MSGTR_PREFERENCES_SUB_MPSUB "주어진 자막을 MPlayer용 자막 형식으로 바꿈"
 #define MSGTR_PREFERENCES_SUB_SRT "주어진 자막을 SRT 형식으로 바꿈"
 #define MSGTR_PREFERENCES_SUB_Overlap "자막 겹침 켜기"

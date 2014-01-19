@@ -661,7 +661,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "к/c:"
 #define MSGTR_PREFERENCES_SUB_POS "Положення: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Заборонити автозавантаження субтитрів"
-#define MSGTR_PREFERENCES_SUB_Unicode "Unicode субтитри"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Перетворити вказані субтитри до формату MPlayer"
 #define MSGTR_PREFERENCES_SUB_SRT "Перетворити вказані субтитри до формату SubViewer (SRT)"
 #define MSGTR_PREFERENCES_SUB_Overlap "Дозволити/заборонити перекриття субтитрів"

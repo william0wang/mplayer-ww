@@ -679,7 +679,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "Pozíciója: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Felirat automatikus betöltésének tiltása"
-#define MSGTR_PREFERENCES_SUB_Unicode "Unicode felirat"
 #define MSGTR_PREFERENCES_SUB_MPSUB "A film feliratának konvertálása MPlayer felirat formátumba"
 #define MSGTR_PREFERENCES_SUB_SRT "A film feliratának konvertálása SubViewer (SRT) formátumba"
 #define MSGTR_PREFERENCES_SUB_Overlap "Felirat átlapolás"

@@ -783,7 +783,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "Pozícia: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Zakázať automatické nahrávanie titulkov"
-#define MSGTR_PREFERENCES_SUB_Unicode "Titulky v Unicode"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Konvertovať dané titulky do MPlayer formátu"
 #define MSGTR_PREFERENCES_SUB_SRT "Konvertovať dané titulky do časovo-určeného SubViewer (SRT) formátu"
 #define MSGTR_PREFERENCES_SUB_Overlap "Zapnúť prekrývanie titulkov"

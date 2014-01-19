@@ -799,7 +799,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "Pozycja: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Wyłącz automatycznie wczytywanie napisów"
-#define MSGTR_PREFERENCES_SUB_Unicode "Napisy w Unicode"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Konwertuj wybrane napisy na format MPlayer"
 #define MSGTR_PREFERENCES_SUB_SRT "Konwertuj wybrane napisy na oparty na czasie format SubViewer (SRT)"
 #define MSGTR_PREFERENCES_SUB_Overlap "Włącz nakładanie się napisów"
