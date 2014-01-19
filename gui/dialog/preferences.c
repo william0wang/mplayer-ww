@@ -543,6 +543,7 @@ static GtkWidget * CreatePreferences( void )
   GtkWidget * vbox3;
   GtkWidget * hbox8;
   GtkWidget * hbox2;
+  GtkWidget * hbox3;
   GtkWidget * vbox4;
   GtkWidget * scrolledwindow2;
   GtkWidget * hbuttonbox3;
@@ -755,10 +756,8 @@ static GtkWidget * CreatePreferences( void )
   label=gtkAddLabel( MSGTR_PREFERENCES_SUB_FPS,NULL );
     gtk_table_attach( GTK_TABLE( table1 ),label,0,1,2,3,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
-#ifdef CONFIG_ICONV
   label=gtkAddLabel( MSGTR_PREFERENCES_FontEncoding,NULL );
-    gtk_table_attach( GTK_TABLE( table1 ),label,0,1,3,4,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
-#endif
+    gtk_table_attach( GTK_TABLE( table1 ),label,0,1,3,4,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( GTK_FILL ),0,0 );
 
   HSSubDelayadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,-10.0,10,0.01,0,0 ) );
   HSSubDelay=gtkAddHScale( HSSubDelayadj,NULL,1 );
@@ -779,6 +778,7 @@ static GtkWidget * CreatePreferences( void )
   gtk_table_attach( GTK_TABLE( table1 ),vbox10,1,2,3,4,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
 #ifdef CONFIG_ICONV
+  gtk_misc_set_alignment( GTK_MISC( label ),0,0 );
   CBSubEncoding=gtk_combo_new();
   gtk_widget_show( CBSubEncoding );
   gtk_box_pack_start( GTK_BOX( vbox10 ),CBSubEncoding,TRUE,FALSE,0 );
@@ -795,11 +795,14 @@ static GtkWidget * CreatePreferences( void )
   gtk_widget_show( ESubEncoding );
 #endif
 
+  hbox3=gtkAddHBox( NULL,0 );
+  gtk_box_pack_start( GTK_BOX( vbox10 ),hbox3,TRUE,FALSE,0 );
+
   vbox9=gtkAddVBox( vbox8,0 );
 
   CBSubOverlap=gtkAddCheckButton( MSGTR_PREFERENCES_SUB_Overlap,vbox9 );
   CBNoAutoSub=gtkAddCheckButton( MSGTR_PREFERENCES_SUB_AutoLoad,vbox9 );
-  CBSubUnicode=gtkAddCheckButton( MSGTR_PREFERENCES_SUB_Unicode,vbox9 );
+  CBSubUnicode=gtkAddCheckButton( MSGTR_PREFERENCES_SUB_Unicode,hbox3 );
   CBDumpMPSub=gtkAddCheckButton( MSGTR_PREFERENCES_SUB_MPSUB,vbox9 );
   CBDumpSrt=gtkAddCheckButton( MSGTR_PREFERENCES_SUB_SRT,vbox9 );
 
