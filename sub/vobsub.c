@@ -1229,12 +1229,13 @@ void *vobsub_out_open(const char *basename, const unsigned int *palette,
                       unsigned int orig_width, unsigned int orig_height,
                       const char *id, unsigned int index)
 {
-    vobsub_out_t *result = NULL;
-    char *filename;
-    filename = malloc(strlen(basename) + 5);
-    if (filename) {
-        result = malloc(sizeof(vobsub_out_t));
-        if (result) {
+    vobsub_out_t *result = calloc(1, sizeof(*result));
+    char *filename = malloc(strlen(basename) + 5);
+    if (!filename || !result) {
+        free(filename);
+        free(result);
+        return NULL;
+    }
             result->aid = index;
             strcpy(filename, basename);
             strcat(filename, ".sub");
@@ -1256,8 +1257,6 @@ void *vobsub_out_open(const char *basename, const unsigned int *palette,
             } else
                 perror("Error: vobsub_out_open index file open failed");
             free(filename);
-        }
-    }
     return result;
 }
 
