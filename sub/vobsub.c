@@ -1236,27 +1236,27 @@ void *vobsub_out_open(const char *basename, const unsigned int *palette,
         free(result);
         return NULL;
     }
-            result->aid = index;
-            strcpy(filename, basename);
-            strcat(filename, ".sub");
-            result->fsub = fopen(filename, "ab");
-            if (result->fsub == NULL)
-                perror("Error: vobsub_out_open subtitle file open failed");
-            strcpy(filename, basename);
-            strcat(filename, ".idx");
-            result->fidx = fopen(filename, "ab");
-            if (result->fidx) {
-                if (ftell(result->fidx) == 0) {
-                    create_idx(result, palette, orig_width, orig_height);
-                    /* Make the selected language the default language */
-                    fprintf(result->fidx, "\n# Language index in use\nlangidx: %u\n", index);
-                }
-                fprintf(result->fidx, "\nid: %s, index: %u\n", id ? id : "xx", index);
-                /* So that we can check the file now */
-                fflush(result->fidx);
-            } else
-                perror("Error: vobsub_out_open index file open failed");
-            free(filename);
+    result->aid = index;
+    strcpy(filename, basename);
+    strcat(filename, ".sub");
+    result->fsub = fopen(filename, "ab");
+    if (result->fsub == NULL)
+        perror("Error: vobsub_out_open subtitle file open failed");
+    strcpy(filename, basename);
+    strcat(filename, ".idx");
+    result->fidx = fopen(filename, "ab");
+    if (result->fidx) {
+        if (ftell(result->fidx) == 0) {
+            create_idx(result, palette, orig_width, orig_height);
+            /* Make the selected language the default language */
+            fprintf(result->fidx, "\n# Language index in use\nlangidx: %u\n", index);
+        }
+        fprintf(result->fidx, "\nid: %s, index: %u\n", id ? id : "xx", index);
+        /* So that we can check the file now */
+        fflush(result->fidx);
+    } else
+        perror("Error: vobsub_out_open index file open failed");
+    free(filename);
     return result;
 }
 
