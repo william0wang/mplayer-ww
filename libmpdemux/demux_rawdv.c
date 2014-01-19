@@ -98,10 +98,7 @@ static int rawdv_check_file(demuxer_t *demuxer)
        && ((td->height==576) || (td->height==480)))
       result=1;
    dv_decoder_free(td);
-   if (result)
-      return DEMUXER_TYPE_RAWDV;
-   else
-      return 0;
+   return result ? DEMUXER_TYPE_RAWDV : 0;
 }
 
 // return value:
@@ -146,7 +143,7 @@ static demuxer_t* demux_open_rawdv(demuxer_t* demuxer)
 {
    unsigned char dv_frame[DV_PAL_FRAME_SIZE];
    sh_video_t *sh_video = NULL;
-   rawdv_frames_t *frames = malloc(sizeof(rawdv_frames_t));
+   rawdv_frames_t *frames = calloc(1, sizeof(*frames));
    dv_decoder_t *dv_decoder=NULL;
 
    mp_msg(MSGT_DEMUXER,MSGL_V,"demux_open_rawdv() end_pos %"PRId64"\n",(int64_t)demuxer->stream->end_pos);
@@ -237,11 +234,8 @@ static demuxer_t* demux_open_rawdv(demuxer_t* demuxer)
 
 static void demux_close_rawdv(demuxer_t* demuxer)
 {
-   rawdv_frames_t *frames = demuxer->priv;
-
-   if(frames==0)
-      return;
-  free(frames);
+    free(demuxer->priv);
+    demuxer->priv = NULL;
 }
 
 static int demux_rawdv_control(demuxer_t *demuxer,int cmd, void *arg) {
@@ -250,11 +244,11 @@ static int demux_rawdv_control(demuxer_t *demuxer,int cmd, void *arg) {
 
     switch(cmd) {
         case DEMUXER_CTRL_GET_TIME_LENGTH:
-            *((double *)arg)=(double)frames->frame_number / sh_video->fps;
+            *(double *)arg=(double)frames->frame_number / sh_video->fps;
             return DEMUXER_CTRL_OK;
 
         case DEMUXER_CTRL_GET_PERCENT_POS:
-            *((int *)arg)=(int)(frames->current_frame * 100. / frames->frame_number);
+            *(int *)arg=(int)(frames->current_frame * 100. / frames->frame_number);
             return DEMUXER_CTRL_OK;
 
         default:
