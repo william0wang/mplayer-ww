@@ -587,7 +587,7 @@ static int demux_real_fill_buffer(demuxer_t *demuxer, demux_stream_t *dsds)
 #endif
     int flags;
     int version;
-    int pk_group;;
+    int pk_group;
     demux_packet_t *dp;
     int x, sps, cfs, sph, spc, w;
     int audioreorder_getnextpk = 0;
