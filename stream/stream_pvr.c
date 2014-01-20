@@ -1588,8 +1588,7 @@ pvr_stream_open (stream_t *stream, int mode, void *opts, int *file_format)
   {
     mp_msg (MSGT_OPEN, MSGL_ERR,
             "%s error opening device %s\n", LOG_LEVEL_PVR, pvr->video_dev);
-    pvr_uninit (pvr);
-    return STREAM_ERROR;
+    goto err_out;
   }
 
   /* query capabilities (i.e test V4L2 support) */
@@ -1598,8 +1597,7 @@ pvr_stream_open (stream_t *stream, int mode, void *opts, int *file_format)
     mp_msg (MSGT_OPEN, MSGL_ERR,
             "%s device is not V4L2 compliant (%s).\n",
             LOG_LEVEL_PVR, strerror (errno));
-    pvr_uninit (pvr);
-    return STREAM_ERROR;
+    goto err_out;
   }
   else
     mp_msg (MSGT_OPEN, MSGL_INFO,
@@ -1611,8 +1609,7 @@ pvr_stream_open (stream_t *stream, int mode, void *opts, int *file_format)
     mp_msg (MSGT_OPEN, MSGL_ERR,
             "%s device is not a valid V4L2 capture device.\n",
             LOG_LEVEL_PVR);
-    pvr_uninit (pvr);
-    return STREAM_ERROR;
+    goto err_out;
   }
 
   /* check for device hardware MPEG encoding capability */
@@ -1624,7 +1621,7 @@ pvr_stream_open (stream_t *stream, int mode, void *opts, int *file_format)
   {
     mp_msg (MSGT_OPEN, MSGL_ERR,
             "%s device do not support MPEG input.\n", LOG_LEVEL_ENCODER);
-    return STREAM_ERROR;
+    goto err_out;
   }
 
   /* list V4L2 capabilities */
@@ -1632,8 +1629,7 @@ pvr_stream_open (stream_t *stream, int mode, void *opts, int *file_format)
   {
     mp_msg (MSGT_OPEN, MSGL_ERR,
             "%s can't get v4l2 capabilities\n", LOG_LEVEL_PVR);
-    pvr_uninit (pvr);
-    return STREAM_ERROR;
+    goto err_out;
   }
 
   /* apply V4L2 settings */
@@ -1641,8 +1637,7 @@ pvr_stream_open (stream_t *stream, int mode, void *opts, int *file_format)
   {
     mp_msg (MSGT_OPEN, MSGL_ERR,
             "%s can't set v4l2 settings\n", LOG_LEVEL_PVR);
-    pvr_uninit (pvr);
-    return STREAM_ERROR;
+    goto err_out;
   }
 
   /* apply encoder settings */
@@ -1650,8 +1645,7 @@ pvr_stream_open (stream_t *stream, int mode, void *opts, int *file_format)
   {
     mp_msg (MSGT_OPEN, MSGL_ERR,
             "%s can't set encoder settings\n", LOG_LEVEL_PVR);
-    pvr_uninit (pvr);
-    return STREAM_ERROR;
+    goto err_out;
   }
 
   /* display current V4L2 settings */
@@ -1659,8 +1653,7 @@ pvr_stream_open (stream_t *stream, int mode, void *opts, int *file_format)
   {
     mp_msg (MSGT_OPEN, MSGL_ERR,
             "%s can't get v4l2 settings\n", LOG_LEVEL_PVR);
-    pvr_uninit (pvr);
-    return STREAM_ERROR;
+    goto err_out;
   }
 
   stream->priv = pvr;
@@ -1669,6 +1662,10 @@ pvr_stream_open (stream_t *stream, int mode, void *opts, int *file_format)
   stream->close = pvr_stream_close;
 
   return STREAM_OK;
+
+err_out:
+  pvr_uninit (pvr);
+  return STREAM_ERROR;
 }
 
 /* PVR Public API access */
