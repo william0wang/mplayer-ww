@@ -245,6 +245,7 @@ static void prEntry( GtkEditable * editable,gpointer user_data )
 	 if ( strcmp( comment,MSGTR_PREFERENCES_DefaultEnc ) == 0 ) comment=NULL;
 	 mplayer( MPLAYER_SET_SUB_ENCODING,0,(char *)comment );
 	}
+	if ( !comment) gtk_widget_set_sensitive( CBSubEncoding,(!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(CBSubUtf8)) && !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(CBSubUnicode))) );
 	gtk_widget_set_sensitive( CBSubUtf8,(comment == NULL) );
 	gtk_widget_set_sensitive( CBSubUnicode,((comment == NULL) && !gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(CBSubUtf8) )) );
 	break;
@@ -262,9 +263,13 @@ static void prEntry( GtkEditable * editable,gpointer user_data )
 
 static void button_toggled( GtkToggleButton *button, gpointer user_data )
 {
+ (void) button;
  (void) user_data;
 
- gtk_widget_set_sensitive( CBSubUnicode,!gtk_toggle_button_get_active(button) );
+#ifdef CONFIG_ICONV
+ if ( !sub_cp ) gtk_widget_set_sensitive( CBSubEncoding,(!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(CBSubUtf8)) && !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(CBSubUnicode))) );
+#endif
+ gtk_widget_set_sensitive( CBSubUnicode,!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(CBSubUtf8)) );
 }
 
 static void prButton( GtkButton * button, gpointer user_data )
@@ -1083,6 +1088,7 @@ static GtkWidget * CreatePreferences( void )
   gtk_signal_connect( GTK_OBJECT( BLoadFont ),"clicked",GTK_SIGNAL_FUNC( prButton ),(void*)bLFont );
 
   gtk_signal_connect( GTK_OBJECT( CBSubUtf8 ),"toggled",GTK_SIGNAL_FUNC( button_toggled ),NULL );
+  gtk_signal_connect( GTK_OBJECT( CBSubUnicode ),"toggled",GTK_SIGNAL_FUNC( button_toggled ),NULL );
 #if 0
   gtk_signal_connect( GTK_OBJECT( CBNormalize ),"toggled",GTK_SIGNAL_FUNC( on_CBNormalize_toggled ),NULL );
   gtk_signal_connect( GTK_OBJECT( CBSoftwareMixer ),"toggled",GTK_SIGNAL_FUNC( on_CBSoftwareMixer_toggled ),NULL );
@@ -1097,7 +1103,6 @@ static GtkWidget * CreatePreferences( void )
   gtk_signal_connect( GTK_OBJECT( CBFlip ),"toggled",GTK_SIGNAL_FUNC( on_CBFlip_toggled ),NULL );
   gtk_signal_connect( GTK_OBJECT( CBPostprocess ),"toggled",GTK_SIGNAL_FUNC( on_CBPostprocess_toggled ),NULL );
   gtk_signal_connect( GTK_OBJECT( CBNoAutoSub ),"toggled",GTK_SIGNAL_FUNC( on_CBNoAutoSub_toggled ),NULL );
-  gtk_signal_connect( GTK_OBJECT( CBSubUnicode ),"toggled",GTK_SIGNAL_FUNC( on_CNSubUnicode_toggled ),NULL );
   gtk_signal_connect( GTK_OBJECT( CBDumpMPSub ),"toggled",GTK_SIGNAL_FUNC( on_CBDumpMPSub_toggled ),NULL );
   gtk_signal_connect( GTK_OBJECT( CBDumpSrt ),"toggled",GTK_SIGNAL_FUNC( on_CBDumpSrt_toggled ),NULL );
 #endif
@@ -1256,6 +1261,7 @@ void ShowPreferences( void )
    gtk_widget_set_sensitive( CBSubUtf8,FALSE );
    gtk_widget_set_sensitive( CBSubUnicode,FALSE );
   }
+  else gtk_widget_set_sensitive( CBSubEncoding,(!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(CBSubUtf8)) && !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(CBSubUnicode))) );
 #endif
 
 /* 4th page */
