@@ -245,6 +245,8 @@ static void prEntry( GtkEditable * editable,gpointer user_data )
 	 if ( strcmp( comment,MSGTR_PREFERENCES_DefaultEnc ) == 0 ) comment=NULL;
 	 mplayer( MPLAYER_SET_SUB_ENCODING,0,(char *)comment );
 	}
+	gtk_widget_set_sensitive( CBSubUtf8,(comment == NULL) );
+	gtk_widget_set_sensitive( CBSubUnicode,(comment == NULL) );
 	break;
 #endif
   }
@@ -1243,6 +1245,8 @@ void ShowPreferences( void )
     if ( !strcasecmp( sub_cp,lEncoding[i].name ) ) break;
    if ( lEncoding[i].name ) gtk_entry_set_text( GTK_ENTRY( ESubEncoding ),lEncoding[i].comment );
    else gtk_entry_set_text( GTK_ENTRY( ESubEncoding ),sub_cp );
+   gtk_widget_set_sensitive( CBSubUtf8,FALSE );
+   gtk_widget_set_sensitive( CBSubUnicode,FALSE );
   }
 #endif
 
