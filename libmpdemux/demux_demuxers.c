@@ -51,7 +51,7 @@ demuxer_t*  new_demuxers_demuxer(demuxer_t* vd, demuxer_t* ad, demuxer_t* sd) {
   ret->video = vd->video;
   ret->audio = ad->audio;
   ret->sub = sd->sub;
-  if (sd && sd != vd && sd != ad) sd->sub->non_interleaved = 1;
+  if (sd->sub && sd != vd && sd != ad) sd->sub->non_interleaved = 1;
 
   // without these, demux_demuxers_fill_buffer will never be called,
   // but they break the demuxer-specific code in video.c
