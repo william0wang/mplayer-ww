@@ -37,9 +37,7 @@ extern const demuxer_desc_t demuxer_desc_demuxers;
 demuxer_t*  new_demuxers_demuxer(demuxer_t* vd, demuxer_t* ad, demuxer_t* sd) {
   // Video is the most important :-)
   demuxer_t* ret = alloc_demuxer(vd->stream, DEMUXER_TYPE_DEMUXERS, vd->filename);
-  dd_priv_t* priv;
-
-  priv = malloc(sizeof(dd_priv_t));
+  dd_priv_t* priv = malloc(sizeof(*priv));
   priv->vd = vd;
   priv->ad = ad;
   priv->sd = sd;
