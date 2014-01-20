@@ -240,7 +240,11 @@ static void prEntry( GtkEditable * editable,gpointer user_data )
         for ( i=0;lEncoding[i].name;i++ )
 	  if ( !gstrcmp( lEncoding[i].comment,comment ) ) break;
 	if ( lEncoding[i].comment ) mplayer( MPLAYER_SET_SUB_ENCODING,0,lEncoding[i].name );
-	 else mplayer( MPLAYER_SET_SUB_ENCODING,0,NULL );
+	else
+	{
+	 if ( strcmp( comment,MSGTR_PREFERENCES_DefaultEnc ) == 0 ) comment=NULL;
+	 mplayer( MPLAYER_SET_SUB_ENCODING,0,(char *)comment );
+	}
 	break;
 #endif
   }
@@ -790,7 +794,7 @@ static GtkWidget * CreatePreferences( void )
   gtk_box_pack_start( GTK_BOX( vbox10 ),CBSubEncoding,TRUE,FALSE,0 );
   CBSubEncoding_items=g_list_append( CBSubEncoding_items,MSGTR_PREFERENCES_DefaultEnc );
   {
-   int i;
+   int i, listed=(sub_cp == NULL);
    iconv_t cd;
    for ( i=0;lEncoding[i].name;i++ )
    {
@@ -800,8 +804,12 @@ static GtkWidget * CreatePreferences( void )
     {
      iconv_close(cd);
      CBSubEncoding_items=g_list_append( CBSubEncoding_items,lEncoding[i].comment );
+
+     if ( !listed )
+      if ( strcasecmp ( lEncoding[i].name, sub_cp ) == 0 ) listed=True;
     }
    }
+   if ( !listed ) CBSubEncoding_items=g_list_insert( CBSubEncoding_items,sub_cp,1 );
   }
   gtk_combo_set_popdown_strings( GTK_COMBO( CBSubEncoding ),CBSubEncoding_items );
   g_list_free( CBSubEncoding_items );
@@ -1234,6 +1242,7 @@ void ShowPreferences( void )
    for ( i=0;lEncoding[i].name;i++ )
     if ( !strcasecmp( sub_cp,lEncoding[i].name ) ) break;
    if ( lEncoding[i].name ) gtk_entry_set_text( GTK_ENTRY( ESubEncoding ),lEncoding[i].comment );
+   else gtk_entry_set_text( GTK_ENTRY( ESubEncoding ),sub_cp );
   }
 #endif
 
