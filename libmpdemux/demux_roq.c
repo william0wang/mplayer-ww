@@ -109,9 +109,6 @@ static demuxer_t* demux_open_roq(demuxer_t* demuxer)
   sh_audio_t *sh_audio = NULL;
 
   roq_data_t *roq_data = calloc(1, sizeof(*roq_data));
-  int chunk_id;
-  int chunk_size;
-  int chunk_arg;
   int last_chunk_id = 0;
   int largest_audio_chunk = 0;
   int fps;
@@ -121,9 +118,9 @@ static demuxer_t* demux_open_roq(demuxer_t* demuxer)
   fps = stream_read_word_le(demuxer->stream);
   while (!stream_eof(demuxer->stream))
   {
-    chunk_id = stream_read_word_le(demuxer->stream);
-    chunk_size = stream_read_dword_le(demuxer->stream);
-    chunk_arg = stream_read_word_le(demuxer->stream);
+    int chunk_id = stream_read_word_le(demuxer->stream);
+    int chunk_size = stream_read_dword_le(demuxer->stream);
+    int chunk_arg = stream_read_word_le(demuxer->stream);
 
     // this is the only useful header info in the file
     if (chunk_id == RoQ_INFO)
