@@ -246,7 +246,7 @@ static void prEntry( GtkEditable * editable,gpointer user_data )
 	 mplayer( MPLAYER_SET_SUB_ENCODING,0,(char *)comment );
 	}
 	gtk_widget_set_sensitive( CBSubUtf8,(comment == NULL) );
-	gtk_widget_set_sensitive( CBSubUnicode,(comment == NULL) );
+	gtk_widget_set_sensitive( CBSubUnicode,((comment == NULL) && !gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(CBSubUtf8) )) );
 	break;
 #endif
   }
@@ -259,6 +259,13 @@ static void prEntry( GtkEditable * editable,gpointer user_data )
 #define bCancel    3
 #define bLSubtitle 4
 #define bLFont     5
+
+static void button_toggled( GtkToggleButton *button, gpointer user_data )
+{
+ (void) user_data;
+
+ gtk_widget_set_sensitive( CBSubUnicode,!gtk_toggle_button_get_active(button) );
+}
 
 static void prButton( GtkButton * button, gpointer user_data )
 {
@@ -1075,6 +1082,7 @@ static GtkWidget * CreatePreferences( void )
 #endif
   gtk_signal_connect( GTK_OBJECT( BLoadFont ),"clicked",GTK_SIGNAL_FUNC( prButton ),(void*)bLFont );
 
+  gtk_signal_connect( GTK_OBJECT( CBSubUtf8 ),"toggled",GTK_SIGNAL_FUNC( button_toggled ),NULL );
 #if 0
   gtk_signal_connect( GTK_OBJECT( CBNormalize ),"toggled",GTK_SIGNAL_FUNC( on_CBNormalize_toggled ),NULL );
   gtk_signal_connect( GTK_OBJECT( CBSoftwareMixer ),"toggled",GTK_SIGNAL_FUNC( on_CBSoftwareMixer_toggled ),NULL );
