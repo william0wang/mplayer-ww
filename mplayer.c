@@ -4121,13 +4121,12 @@ goto_next_file:  // don't jump here after ao/vo/getch initialization!
 
     while (mpctx->playtree_iter != NULL) {
         filename = play_tree_iter_get_file(mpctx->playtree_iter, mpctx->eof);
-        if (filename == NULL) {
-            if (play_tree_iter_step(mpctx->playtree_iter, mpctx->eof, 0) != PLAY_TREE_ITER_ENTRY) {
-                play_tree_iter_free(mpctx->playtree_iter);
-                mpctx->playtree_iter = NULL;
-            }
-        } else
+        if (filename)
             break;
+        if (play_tree_iter_step(mpctx->playtree_iter, mpctx->eof, 0) != PLAY_TREE_ITER_ENTRY) {
+            play_tree_iter_free(mpctx->playtree_iter);
+            mpctx->playtree_iter = NULL;
+        }
     }
 
 #ifdef CONFIG_GUI
