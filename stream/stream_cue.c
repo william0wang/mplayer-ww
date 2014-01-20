@@ -580,18 +580,14 @@ static int control(stream_t *stream, int cmd, void *arg) {
 
 static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
   struct stream_priv_s* p = (struct stream_priv_s*)opts;
-  int ret,f,track = 0;
+  int ret,f = -1,track = 0;
   char *filename = NULL, *colon = NULL;
 
-  if(mode != STREAM_READ || !p->filename) {
-    m_struct_free(&stream_opts,opts);
-    return STREAM_UNSUPPORTED;
-  }
+  if(mode != STREAM_READ || !p->filename)
+    goto err_out;
   filename = strdup(p->filename);
-  if(!filename) {
-    m_struct_free(&stream_opts,opts);
-    return STREAM_UNSUPPORTED;
-  }
+  if(!filename)
+    goto err_out;
   colon = strstr(filename, ":");
   if(colon) {
     if(strlen(colon)>1)
@@ -602,15 +598,13 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
     track = 1;
 
   f = cue_read_cue(filename);
-  if(f < 0) {
-    m_struct_free(&stream_opts,opts);
-    return STREAM_UNSUPPORTED;
-  }
+  if(f < 0)
+    goto err_out;
   cue_vcd_read_toc();
   ret=cue_vcd_seek_to_track(stream, track);
   if(ret<0){
     mp_msg(MSGT_OPEN,MSGL_ERR,MSGTR_ErrTrackSelect " (seek)\n");
-    return STREAM_UNSUPPORTED;
+    goto err_out;
   }
   mp_msg(MSGT_OPEN,MSGL_INFO,MSGTR_MPDEMUX_CUEREAD_CueStreamInfo_FilenameTrackTracksavail,
          filename, track, ret, (int)stream->end_pos);
@@ -626,6 +620,12 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
   free(filename);
   m_struct_free(&stream_opts,opts);
   return STREAM_OK;
+
+err_out:
+  if (f >= 0) close(f);
+  free(filename);
+  m_struct_free(&stream_opts,opts);
+  return STREAM_UNSUPPORTED;
 }
 
 const stream_info_t stream_info_cue = {
