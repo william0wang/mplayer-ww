@@ -979,6 +979,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_DXR3_VENC "Videoencoder:"
 #define MSGTR_PREFERENCES_DXR3_NoEnc "Keinen"
 #define MSGTR_PREFERENCES_DXR3_LAVC "Verwende LAVC (FFmpeg)"
+#define MSGTR_PREFERENCES_DefaultEnc "(Standard)"
 #define MSGTR_PREFERENCES_FontEncoding1 "Unicode"
 #define MSGTR_PREFERENCES_FontEncoding2 "Westeuropäisch (ISO-8859-1)"
 #define MSGTR_PREFERENCES_FontEncoding3 "Westeuropäisch, erweitert (ISO-8859-15)"

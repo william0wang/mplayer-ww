@@ -788,7 +788,7 @@ static GtkWidget * CreatePreferences( void )
   CBSubEncoding=gtk_combo_new();
   gtk_widget_show( CBSubEncoding );
   gtk_box_pack_start( GTK_BOX( vbox10 ),CBSubEncoding,TRUE,FALSE,0 );
-  CBSubEncoding_items=g_list_append( CBSubEncoding_items,MSGTR_PREFERENCES_None );
+  CBSubEncoding_items=g_list_append( CBSubEncoding_items,MSGTR_PREFERENCES_DefaultEnc );
   {
    int i;
    iconv_t cd;
