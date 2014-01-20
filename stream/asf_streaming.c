@@ -43,6 +43,7 @@
 #include "network.h"
 #include "tcp.h"
 
+#include "libavutil/attributes.h"
 #include "libavutil/intreadwrite.h"
 
 #include "libmpdemux/asfguid.h"
@@ -454,12 +455,8 @@ static int asf_http_streaming_read( int fd, char *buffer, int size, streaming_ct
   return read;
 }
 
-static int asf_http_streaming_seek( int fd, int64_t pos, streaming_ctrl_t *streaming_ctrl ) {
+static int asf_http_streaming_seek( int av_unused fd, int64_t av_unused pos, streaming_ctrl_t * av_unused streaming_ctrl ) {
 	return -1;
-	// to shut up gcc warning
-	fd++;
-	pos++;
-	streaming_ctrl=NULL;
 }
 
 static int asf_header_check( HTTP_header_t *http_hdr ) {
