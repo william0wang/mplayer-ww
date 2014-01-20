@@ -1287,7 +1287,7 @@ static int demux_mkv_read_attachments(demuxer_t *demuxer)
                 len -= l + il;
             }
 
-            demuxer_add_attachment(demuxer, name, mime, data, data_size);
+            demuxer_add_attachment(demuxer, name, mime ? mime : "application/octet-stream", data, data_size);
             mp_msg(MSGT_DEMUX, MSGL_V,
                    "[mkv] Attachment: %s, %s, %u bytes\n", name, mime,
                    data_size);
