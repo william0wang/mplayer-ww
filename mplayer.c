@@ -2814,20 +2814,18 @@ int main(int argc, char *argv[])
 
     mpctx->playtree = m_config_parse_mp_command_line(mconfig, argc, argv);
     if (mpctx->playtree == NULL) {
+        // parse error
         opt_exit = 1;
-    } else {
+    } else
         mpctx->playtree = play_tree_cleanup(mpctx->playtree);
-        if (mpctx->playtree) {
-            mpctx->playtree_iter = play_tree_iter_new(mpctx->playtree, mconfig);
-            if (mpctx->playtree_iter) {
-                if (play_tree_iter_step(mpctx->playtree_iter, 0, 0) != PLAY_TREE_ITER_ENTRY) {
-                    play_tree_iter_free(mpctx->playtree_iter);
-                    mpctx->playtree_iter = NULL;
-                }
-                filename = play_tree_iter_get_file(mpctx->playtree_iter, 1);
-            }
-        }
+
+    mpctx->playtree_iter = mpctx->playtree ? play_tree_iter_new(mpctx->playtree, mconfig) : NULL;
+    if (mpctx->playtree_iter && play_tree_iter_step(mpctx->playtree_iter, 0, 0) != PLAY_TREE_ITER_ENTRY) {
+        play_tree_iter_free(mpctx->playtree_iter);
+        mpctx->playtree_iter = NULL;
     }
+
+    filename = mpctx->playtree_iter ? play_tree_iter_get_file(mpctx->playtree_iter, 1) : NULL;
 
     print_version("MPlayer");
 #if (defined(__MINGW32__) || defined(__CYGWIN__)) && defined(CONFIG_GUI)
