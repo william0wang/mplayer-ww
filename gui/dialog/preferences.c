@@ -58,6 +58,10 @@
 #include "libmpcodecs/vd.h"
 #include "libmpcodecs/ad.h"
 
+#ifdef CONFIG_ICONV
+#include <iconv.h>
+#endif
+
        GtkWidget * Preferences = NULL;
 static GtkWidget * AConfig;
 static GtkWidget * VConfig;
@@ -787,7 +791,17 @@ static GtkWidget * CreatePreferences( void )
   CBSubEncoding_items=g_list_append( CBSubEncoding_items,MSGTR_PREFERENCES_None );
   {
    int i;
-   for ( i=0;lEncoding[i].name;i++ ) CBSubEncoding_items=g_list_append( CBSubEncoding_items,lEncoding[i].comment );
+   iconv_t cd;
+   for ( i=0;lEncoding[i].name;i++ )
+   {
+    cd=iconv_open( lEncoding[i].name,"UTF-8" );
+
+    if (cd != (iconv_t) -1)
+    {
+     iconv_close(cd);
+     CBSubEncoding_items=g_list_append( CBSubEncoding_items,lEncoding[i].comment );
+    }
+   }
   }
   gtk_combo_set_popdown_strings( GTK_COMBO( CBSubEncoding ),CBSubEncoding_items );
   g_list_free( CBSubEncoding_items );
