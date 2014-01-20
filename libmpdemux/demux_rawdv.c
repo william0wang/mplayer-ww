@@ -160,12 +160,12 @@ static demuxer_t* demux_open_rawdv(demuxer_t* demuxer)
    dv_decoder->quality=DV_QUALITY_BEST;
 
    if (dv_parse_header(dv_decoder, dv_frame) == -1)
-	   return NULL;
+	   goto err_out;
 
    // create a new video stream header
    sh_video = new_sh_video(demuxer, 0);
    if (!sh_video)
-	   return NULL;
+	   goto err_out;
 
    // make sure the demuxer knows about the new video stream header
    // (even though new_sh_video() ought to take care of it)
@@ -230,6 +230,11 @@ static demuxer_t* demux_open_rawdv(demuxer_t* demuxer)
    dv_decoder_free(dv_decoder);  //we keep this in the context of both stream headers
    demuxer->priv=frames;
    return demuxer;
+
+err_out:
+   if (dv_decoder) dv_decoder_free(dv_decoder);
+   free(frames);
+   return NULL;
 }
 
 static void demux_close_rawdv(demuxer_t* demuxer)
