@@ -514,7 +514,7 @@ static void print_file_properties(const MPContext *mpctx, const char *filename)
     double video_start_pts = MP_NOPTS_VALUE;
     mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_FILENAME=%s\n",
            filename_recode(filename));
-    mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_DEMUXER=%s\n", mpctx->demuxer->desc->name);
+    mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_DEMUXER=%s\n", mpctx->demuxer ? mpctx->demuxer->desc->name : "none");
     if (mpctx->sh_video) {
         /* Assume FOURCC if all bytes >= 0x20 (' ') */
         if (mpctx->sh_video->format >= 0x20202020)
