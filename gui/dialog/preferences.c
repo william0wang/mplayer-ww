@@ -813,7 +813,7 @@ static GtkWidget * CreatePreferences( void )
    iconv_t cd;
    for ( i=0;lEncoding[i].name;i++ )
    {
-    cd=iconv_open( lEncoding[i].name,"UTF-8" );
+    cd=iconv_open( "UTF-8",lEncoding[i].name );
 
     if (cd != (iconv_t) -1)
     {
