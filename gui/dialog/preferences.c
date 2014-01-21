@@ -139,15 +139,15 @@ static GtkWidget * HSFPS;
 static GtkAdjustment * HSExtraStereoMuladj, * HSAudioDelayadj, * HSPanscanadj, * HSSubDelayadj;
 static GtkAdjustment * HSSubPositionadj, * HSSubFPSadj, * HSPPQualityadj, * HSFPSadj;
 
-#ifndef CONFIG_FREETYPE
-static GtkWidget     * HSFontFactor;
-static GtkAdjustment * HSFontFactoradj;
-#else
+#ifdef CONFIG_FREETYPE
 static GtkWidget     * HSFontBlur, * HSFontOutLine, * HSFontTextScale, * HSFontOSDScale;
 static GtkAdjustment * HSFontBluradj, * HSFontOutLineadj, * HSFontTextScaleadj, * HSFontOSDScaleadj;
 static GtkWidget     * CBFontEncoding, * EFontEncoding;
 static GtkWidget     * RBFontNoAutoScale, * RBFontAutoScaleWidth, * RBFontAutoScaleHeight, * RBFontAutoScaleDiagonal;
 //static GtkWidget     * AutoScale;
+#else
+static GtkWidget     * HSFontFactor;
+static GtkAdjustment * HSFontFactoradj;
 #endif
 
 #ifdef CONFIG_ICONV
@@ -327,9 +327,7 @@ static void prButton( GtkButton * button, gpointer user_data )
 
         /* 4th page */
 	setdup( &font_name,gtk_entry_get_text( GTK_ENTRY( prEFontName ) ) );
-#ifndef CONFIG_FREETYPE
-	mplayer( MPLAYER_SET_FONT_FACTOR,HSFontFactoradj->value,0 );
-#else
+#ifdef CONFIG_FREETYPE
 	mplayer( MPLAYER_SET_FONT_BLUR,HSFontBluradj->value,0 );
 	mplayer( MPLAYER_SET_FONT_OUTLINE,HSFontOutLineadj->value,0 );
 	mplayer( MPLAYER_SET_FONT_TEXTSCALE,HSFontTextScaleadj->value,0 );
@@ -338,6 +336,8 @@ static void prButton( GtkButton * button, gpointer user_data )
 	if ( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( RBFontAutoScaleHeight ) ) ) mplayer( MPLAYER_SET_FONT_AUTOSCALE,1,0 );
 	if ( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( RBFontAutoScaleWidth ) ) ) mplayer( MPLAYER_SET_FONT_AUTOSCALE,2,0 );
 	if ( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( RBFontAutoScaleDiagonal ) ) ) mplayer( MPLAYER_SET_FONT_AUTOSCALE,3,0 );
+#else
+	mplayer( MPLAYER_SET_FONT_FACTOR,HSFontFactoradj->value,0 );
 #endif
 
 	/* -- 5th page */
@@ -440,11 +440,7 @@ static gboolean prHScaler( GtkWidget * widget,GdkEvent * event,gpointer user_dat
    case 4: // sub position
         sub_pos=(int)HSSubPositionadj->value;
 	break;
-#ifndef CONFIG_FREETYPE
-   case 5: // font factor
-        mplayer( MPLAYER_SET_FONT_FACTOR,HSFontFactoradj->value,0 );
-	break;
-#else
+#ifdef CONFIG_FREETYPE
    case 6: // font blur
 	mplayer( MPLAYER_SET_FONT_BLUR,HSFontBluradj->value,0 );
         break;
@@ -456,6 +452,10 @@ static gboolean prHScaler( GtkWidget * widget,GdkEvent * event,gpointer user_dat
 	break;
    case 9: // osd scale
         mplayer( MPLAYER_SET_FONT_OSDSCALE,HSFontOSDScaleadj->value,0 );
+	break;
+#else
+   case 5: // font factor
+        mplayer( MPLAYER_SET_FONT_FACTOR,HSFontFactoradj->value,0 );
 	break;
 #endif
    case 10: // auto quality
@@ -882,12 +882,7 @@ static GtkWidget * CreatePreferences( void )
     gtk_container_set_border_width( GTK_CONTAINER( hbuttonbox5 ),3 );
   BLoadFont=gtkAddButton( MSGTR_Browse,hbuttonbox5 );
 
-#ifndef CONFIG_FREETYPE
-  hbox7=gtkAddHBox( vbox603,1 );
-  gtkAddLabel( MSGTR_PREFERENCES_FontFactor,hbox7 );
-  HSFontFactoradj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,10,0.05,0,0 ) );
-  HSFontFactor=gtkAddHScale( HSFontFactoradj,hbox7,2 );
-#else
+#ifdef CONFIG_FREETYPE
 
   RBFontNoAutoScale=gtkAddRadioButton( MSGTR_PREFERENCES_FontNoAutoScale,&Font_group,vbox603 );
   RBFontAutoScaleHeight=gtkAddRadioButton( MSGTR_PREFERENCES_FontPropHeight,&Font_group,vbox603 );
@@ -942,6 +937,11 @@ static GtkWidget * CreatePreferences( void )
   HSFontOSDScaleadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,100,0.1,0,0 ) );
   HSFontOSDScale=gtkAddHScale( HSFontOSDScaleadj,NULL,2 );
     gtk_table_attach( GTK_TABLE( table1 ),HSFontOSDScale,1,2,4,5,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
+#else
+  hbox7=gtkAddHBox( vbox603,1 );
+  gtkAddLabel( MSGTR_PREFERENCES_FontFactor,hbox7 );
+  HSFontFactoradj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,10,0.05,0,0 ) );
+  HSFontFactor=gtkAddHScale( HSFontFactoradj,hbox7,2 );
 #endif
 
   label=gtkAddLabel( MSGTR_PREFERENCES_FRAME_Font,NULL );
@@ -1267,9 +1267,7 @@ void ShowPreferences( void )
 /* 4th page */
  /* font ... */
  if ( font_name ) gtk_entry_set_text( GTK_ENTRY( prEFontName ),font_name );
-#ifndef CONFIG_FREETYPE
- gtk_adjustment_set_value( HSFontFactoradj,font_factor );
-#else
+#ifdef CONFIG_FREETYPE
  gtk_adjustment_set_value( HSFontBluradj,subtitle_font_radius / 8.0 * 100.0);         // transform 0..8 to 0..100
  gtk_adjustment_set_value( HSFontOutLineadj,subtitle_font_thickness / 8.0 * 100.0);   // transform 0..8 to 0..100
  gtk_adjustment_set_value( HSFontTextScaleadj,text_font_scale_factor );
@@ -1288,6 +1286,8 @@ void ShowPreferences( void )
    case 2: gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( RBFontAutoScaleWidth ),TRUE ); break;
    case 3: gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( RBFontAutoScaleDiagonal ),TRUE ); break;
   }
+#else
+ gtk_adjustment_set_value( HSFontFactoradj,font_factor );
 #endif
 
 /* 5th page */
@@ -1391,14 +1391,14 @@ void ShowPreferences( void )
  gtk_signal_connect( GTK_OBJECT( HSPanscan ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)2 );
  gtk_signal_connect( GTK_OBJECT( HSSubDelay ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)3 );
  gtk_signal_connect( GTK_OBJECT( HSSubPosition ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)4 );
-#ifndef CONFIG_FREETYPE
- gtk_signal_connect( GTK_OBJECT( HSFontFactor ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)5 );
-#else
+#ifdef CONFIG_FREETYPE
  gtk_signal_connect( GTK_OBJECT( HSFontBlur ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)6 );
  gtk_signal_connect( GTK_OBJECT( HSFontOutLine ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)7 );
  gtk_signal_connect( GTK_OBJECT( HSFontTextScale ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)8 );
  gtk_signal_connect( GTK_OBJECT( HSFontOSDScale ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)9 );
  gtk_signal_connect( GTK_OBJECT( EFontEncoding ),"changed",GTK_SIGNAL_FUNC( prEntry ),(void *)0 );
+#else
+ gtk_signal_connect( GTK_OBJECT( HSFontFactor ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)5 );
 #endif
 #ifdef CONFIG_ICONV
  gtk_signal_connect( GTK_OBJECT( ESubEncoding ),"changed",GTK_SIGNAL_FUNC( prEntry ),(void *)1 );
