@@ -1021,6 +1021,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FontPropHeight "Proportional zur Höhe des Films"
 #define MSGTR_PREFERENCES_FontPropDiagonal "Proportional zur Diagonale des Films"
 #define MSGTR_PREFERENCES_FontEncoding "Codierung:"
+#define MSGTR_PREFERENCES_FontAutoScaleMode "Skalierung:"
 #define MSGTR_PREFERENCES_FontBlur "Unschärfe:"
 #define MSGTR_PREFERENCES_FontOutLine "Konturstärke:"
 #define MSGTR_PREFERENCES_FontTextScale "Textskalierung:"
