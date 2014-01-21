@@ -711,7 +711,7 @@ static GtkWidget * CreatePreferences( void )
   CBHFramedrop=gtkAddCheckButton( MSGTR_PREFERENCES_HFrameDrop,vbox5 );
   CBFlip=gtkAddCheckButton( MSGTR_PREFERENCES_Flip,vbox5 );
 
-  table1=gtk_table_new( 3,2,FALSE );
+  table1=gtk_table_new( 2,2,FALSE );
   gtk_widget_show( table1 );
   gtk_box_pack_start( GTK_BOX( vbox5 ),table1,FALSE,FALSE,0 );
 
@@ -767,7 +767,7 @@ static GtkWidget * CreatePreferences( void )
 
   vbox8=gtkAddVBox( vbox7,0 );
 
-  table1=gtk_table_new( 3,2,FALSE );
+  table1=gtk_table_new( 4,2,FALSE );
   gtk_widget_show( table1 );
   gtk_box_pack_start( GTK_BOX( vbox8 ),table1,FALSE,FALSE,0 );
 
@@ -889,7 +889,7 @@ static GtkWidget * CreatePreferences( void )
   RBFontAutoScaleWidth=gtkAddRadioButton( MSGTR_PREFERENCES_FontPropWidth,&Font_group,vbox603 );
   RBFontAutoScaleDiagonal=gtkAddRadioButton( MSGTR_PREFERENCES_FontPropDiagonal,&Font_group,vbox603 );
 
-  table1=gtk_table_new( 3,2,FALSE );
+  table1=gtk_table_new( 5,2,FALSE );
   gtk_widget_show( table1 );
   gtk_box_pack_start( GTK_BOX( vbox603 ),table1,FALSE,FALSE,0 );
 
@@ -1620,7 +1620,7 @@ static GtkWidget *CreateAudioConfig( void ) {
 
   vbox = gtkAddVBox(gtkAddDialogFrame(AudioConfig), 0);
 
-  table = gtk_table_new(2, 3, FALSE);
+  table = gtk_table_new(3, 2, FALSE);
   gtk_widget_show(table);
   gtk_box_pack_start(GTK_BOX(vbox), table, TRUE, TRUE, 0);
 
