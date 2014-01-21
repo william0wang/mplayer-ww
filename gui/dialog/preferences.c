@@ -576,6 +576,7 @@ static GtkWidget * CreatePreferences( void )
   GtkWidget * vbox600;
   GSList    * OSD_group = NULL;
 #ifdef CONFIG_FREETYPE
+  GtkWidget * vbox11;
   GSList    * Font_group = NULL;
   GList     * CBFontEncoding_items = NULL;
 #else
@@ -883,15 +884,21 @@ static GtkWidget * CreatePreferences( void )
   BLoadFont=gtkAddButton( MSGTR_Browse,hbuttonbox5 );
 
 #ifdef CONFIG_FREETYPE
-
-  RBFontNoAutoScale=gtkAddRadioButton( MSGTR_PREFERENCES_FontNoAutoScale,&Font_group,vbox603 );
-  RBFontAutoScaleHeight=gtkAddRadioButton( MSGTR_PREFERENCES_FontPropHeight,&Font_group,vbox603 );
-  RBFontAutoScaleWidth=gtkAddRadioButton( MSGTR_PREFERENCES_FontPropWidth,&Font_group,vbox603 );
-  RBFontAutoScaleDiagonal=gtkAddRadioButton( MSGTR_PREFERENCES_FontPropDiagonal,&Font_group,vbox603 );
-
-  table1=gtk_table_new( 5,2,FALSE );
+  table1=gtk_table_new( 6,2,FALSE );
   gtk_widget_show( table1 );
   gtk_box_pack_start( GTK_BOX( vbox603 ),table1,FALSE,FALSE,0 );
+
+  label=gtkAddLabel( MSGTR_PREFERENCES_FontAutoScaleMode,NULL );
+  gtk_misc_set_alignment( GTK_MISC( label ),0,0 );
+  gtk_table_attach( GTK_TABLE( table1 ),label,0,1,1,2,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( GTK_FILL ),0,0 );
+
+  vbox11=gtkAddVBox( NULL,0 );
+  gtk_table_attach( GTK_TABLE( table1 ),vbox11,1,2,1,2,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
+
+  RBFontNoAutoScale=gtkAddRadioButton( MSGTR_PREFERENCES_FontNoAutoScale,&Font_group,vbox11 );
+  RBFontAutoScaleHeight=gtkAddRadioButton( MSGTR_PREFERENCES_FontPropHeight,&Font_group,vbox11 );
+  RBFontAutoScaleWidth=gtkAddRadioButton( MSGTR_PREFERENCES_FontPropWidth,&Font_group,vbox11 );
+  RBFontAutoScaleDiagonal=gtkAddRadioButton( MSGTR_PREFERENCES_FontPropDiagonal,&Font_group,vbox11 );
 
   label=gtkAddLabel( MSGTR_PREFERENCES_FontEncoding,NULL );
     gtk_table_attach( GTK_TABLE( table1 ),label,0,1,0,1,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
@@ -911,32 +918,32 @@ static GtkWidget * CreatePreferences( void )
   gtk_widget_show( EFontEncoding );
 
   label=gtkAddLabel( MSGTR_PREFERENCES_FontBlur,NULL );
-    gtk_table_attach( GTK_TABLE( table1 ),label,0,1,1,2,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
+    gtk_table_attach( GTK_TABLE( table1 ),label,0,1,2,3,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   HSFontBluradj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,100,0.1,0,0 ) );
   HSFontBlur=gtkAddHScale( HSFontBluradj,NULL,2 );
-    gtk_table_attach( GTK_TABLE( table1 ),HSFontBlur,1,2,1,2,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
+    gtk_table_attach( GTK_TABLE( table1 ),HSFontBlur,1,2,2,3,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   label=gtkAddLabel( MSGTR_PREFERENCES_FontOutLine,NULL );
-    gtk_table_attach( GTK_TABLE( table1 ),label,0,1,2,3,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
+    gtk_table_attach( GTK_TABLE( table1 ),label,0,1,3,4,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   HSFontOutLineadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,100,0.1,0,0 ) );
   HSFontOutLine=gtkAddHScale( HSFontOutLineadj,NULL,2 );
-    gtk_table_attach( GTK_TABLE( table1 ),HSFontOutLine,1,2,2,3,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
+    gtk_table_attach( GTK_TABLE( table1 ),HSFontOutLine,1,2,3,4,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   label=gtkAddLabel( MSGTR_PREFERENCES_FontTextScale,NULL );
-    gtk_table_attach( GTK_TABLE( table1 ),label,0,1,3,4,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
+    gtk_table_attach( GTK_TABLE( table1 ),label,0,1,4,5,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   HSFontTextScaleadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,100,0.1,0,0 ) );
   HSFontTextScale=gtkAddHScale( HSFontTextScaleadj,NULL,2 );
-    gtk_table_attach( GTK_TABLE( table1 ),HSFontTextScale,1,2,3,4,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
+    gtk_table_attach( GTK_TABLE( table1 ),HSFontTextScale,1,2,4,5,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   label=gtkAddLabel( MSGTR_PREFERENCES_FontOSDScale,NULL );
-    gtk_table_attach( GTK_TABLE( table1 ),label,0,1,4,5,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
+    gtk_table_attach( GTK_TABLE( table1 ),label,0,1,5,6,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   HSFontOSDScaleadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,100,0.1,0,0 ) );
   HSFontOSDScale=gtkAddHScale( HSFontOSDScaleadj,NULL,2 );
-    gtk_table_attach( GTK_TABLE( table1 ),HSFontOSDScale,1,2,4,5,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
+    gtk_table_attach( GTK_TABLE( table1 ),HSFontOSDScale,1,2,5,6,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 #else
   hbox7=gtkAddHBox( vbox603,1 );
   gtkAddLabel( MSGTR_PREFERENCES_FontFactor,hbox7 );
