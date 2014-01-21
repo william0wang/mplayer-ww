@@ -99,7 +99,7 @@ static const char help_text[]=
 "  - Versuche einen anderen -vo Treiber (-vo help für eine Liste)\n"\
 "    oder probiere -framedrop!\n"\
 "- Langsame CPU\n"\
-"  - Versuche nicht, DVDs/große DivX-Filme auf langsamen CPUs abzuspielen.\n"\
+"  - Versuche nicht, DVDs/große DivX-Videos auf langsamen CPUs abzuspielen.\n"\
 "    Probiere Optionen von lavdopts, z.B.\n"\
 "    -vfm ffmpeg -lavdopts lowres=1:fast:skiploopfilter=all.\n"\
 "- Defekte Datei\n"\
@@ -725,8 +725,8 @@ static const char help_text[]=
 // vd.c
 #define MSGTR_CodecDidNotSet "VDec: Codec hat sh->disp_w und sh->disp_h nicht gesetzt!\nVersuche Problem zu umgehen..\n"
 #define MSGTR_CouldNotFindColorspace "Konnte keinen passenden Farbraum finden - neuer Versuch mit '-vf scale'...\n"
-#define MSGTR_MovieAspectIsSet "Film-Aspekt ist %.2f:1 - Vorskalierung zur Korrektur der Seitenverhältnisse.\n"
-#define MSGTR_MovieAspectUndefined "Film-Aspekt ist undefiniert - keine Vorskalierung durchgeführt.\n"
+#define MSGTR_MovieAspectIsSet "Video-Aspekt ist %.2f:1 - Vorskalierung zur Korrektur der Seitenverhältnisse.\n"
+#define MSGTR_MovieAspectUndefined "Video-Aspekt ist undefiniert - keine Vorskalierung durchgeführt.\n"
 
 // vd_dshow.c, vd_dmo.c
 #define MSGTR_DownloadCodecPackage "Du musst das Binärcodec-Paket aktualisieren/installieren.\nGehe dazu auf http://www.mplayerhq.hu/dload.html\n"
@@ -1017,9 +1017,9 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FontEncoding35 "Baltisch (CP1257)"
 #define MSGTR_PREFERENCES_FontEncoding36 "Vietnamesisch (CP1258)"
 #define MSGTR_PREFERENCES_FontNoAutoScale "Keine automatische Skalierung"
-#define MSGTR_PREFERENCES_FontPropWidth "Proportional zur Breite des Films"
-#define MSGTR_PREFERENCES_FontPropHeight "Proportional zur Höhe des Films"
-#define MSGTR_PREFERENCES_FontPropDiagonal "Proportional zur Diagonale des Films"
+#define MSGTR_PREFERENCES_FontPropWidth "Proportional zur Breite des Videos"
+#define MSGTR_PREFERENCES_FontPropHeight "Proportional zur Höhe des Videos"
+#define MSGTR_PREFERENCES_FontPropDiagonal "Proportional zur Diagonale des Videos"
 #define MSGTR_PREFERENCES_FontEncoding "Codierung:"
 #define MSGTR_PREFERENCES_FontAutoScaleMode "Skalierung:"
 #define MSGTR_PREFERENCES_FontBlur "Unschärfe:"
@@ -1038,7 +1038,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_AutoSyncValue "Autosyncwert: "
 #define MSGTR_PREFERENCES_CDROMDevice "CD-ROM-Gerät:"
 #define MSGTR_PREFERENCES_DVDDevice "DVD-Gerät:"
-#define MSGTR_PREFERENCES_FPS "FPS des Films:"
+#define MSGTR_PREFERENCES_FPS "FPS des Videos:"
 #define MSGTR_PREFERENCES_ShowVideoWindow "Zeige Videofenster, wenn inaktiv"
 #define MSGTR_PREFERENCES_ArtsBroken \
 "Neuere Versionen von aRts sind mit GTK 1.x nicht kompatibel und bringen \n"\
@@ -1923,7 +1923,7 @@ static const char help_text[]=
 "[VO_TDFXFB] Ausgabe mit %d bpp wird nicht unterstützt \n" \
 "            (Dies sollte niemals passiert sein).\n"
 #define MSGTR_LIBVO_TDFXFB_SomethingIsWrongWithControl "[VO_TDFXFB] Ächz! Etwas läuft falsch mit control().\n"
-#define MSGTR_LIBVO_TDFXFB_NotEnoughVideoMemoryToPlay "[VO_TDFXFB] Nicht genug Speicher, um diesen Film abzuspielen. Probiere eine geringere Auflösung.\n"
+#define MSGTR_LIBVO_TDFXFB_NotEnoughVideoMemoryToPlay "[VO_TDFXFB] Nicht genug Speicher, um dieses Video abzuspielen. Probiere eine geringere Auflösung.\n"
 #define MSGTR_LIBVO_TDFXFB_ScreenIs "[VO_TDFXFB] Bildschirm ist %dx%d bei %d bpp, Input ist %dx%d bei %d bpp, Norm ist %dx%d.\n"
 
 // libvo/vo_tdfx_vid.c
