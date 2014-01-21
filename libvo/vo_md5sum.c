@@ -240,7 +240,7 @@ static int query_format(uint32_t format)
     switch (format) {
         case IMGFMT_RGB24:
         case IMGFMT_YV12:
-            return VFCAP_CSP_SUPPORTED|VFCAP_CSP_SUPPORTED_BY_HW;
+            return VFCAP_CSP_SUPPORTED|VFCAP_CSP_SUPPORTED_BY_HW|VOCAP_NOSLICES;
         default:
             return 0;
     }
