@@ -648,7 +648,7 @@ static int demux_real_fill_buffer(demuxer_t *demuxer, demux_stream_t *dsds)
 		stream_seek(demuxer->stream, priv->index_table[idx_streamid][++priv->current_vpacket].offset);
 	    }
 	} else if ((unsigned)demuxer->audio->id < MAX_STREAMS) {
-	    idx_streamid = priv->is_mlti ? priv->mp2rm_streamid[demuxer->audio->id] : demuxer->video->id;
+	    idx_streamid = priv->is_mlti ? priv->mp2rm_streamid[demuxer->audio->id] : demuxer->audio->id;
 	    if (priv->current_apacket + 1 < priv->index_table_size[idx_streamid]) {
 		stream_seek(demuxer->stream, priv->index_table[idx_streamid][++priv->current_apacket].offset);
 	    }
