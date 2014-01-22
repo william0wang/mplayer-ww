@@ -674,7 +674,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_ASS_TOP_MARGIN "Horní: "
 #define MSGTR_PREFERENCES_SUB_ASS_BOTTOM_MARGIN "Dolní: "
 #define MSGTR_PREFERENCES_Font "Font:"
-#define MSGTR_PREFERENCES_FontFactor "Zvětšení Fontu:"
 #define MSGTR_PREFERENCES_PostProcess "Aktivovat postprocessing"
 #define MSGTR_PREFERENCES_AutoQuality "Automatické řízení kvality:"
 #define MSGTR_PREFERENCES_NI "Použít parser pro neprokládaný AVI formát"

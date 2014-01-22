@@ -946,7 +946,7 @@ static GtkWidget * CreatePreferences( void )
     gtk_table_attach( GTK_TABLE( table1 ),HSFontOSDScale,1,2,5,6,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 #else
   hbox7=gtkAddHBox( vbox603,1 );
-  gtkAddLabel( MSGTR_PREFERENCES_FontFactor,hbox7 );
+  gtkAddLabel( MSGTR_PREFERENCES_FontOutLine,hbox7 );
   HSFontFactoradj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,10,0.05,0,0 ) );
   HSFontFactor=gtkAddHScale( HSFontFactoradj,hbox7,2 );
 #endif

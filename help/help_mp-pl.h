@@ -807,7 +807,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_ASS_TOP_MARGIN "Górny: "
 #define MSGTR_PREFERENCES_SUB_ASS_BOTTOM_MARGIN "Dolny: "
 #define MSGTR_PREFERENCES_Font "Czcionka:"
-#define MSGTR_PREFERENCES_FontFactor "Skala czcionki:"
 #define MSGTR_PREFERENCES_PostProcess "Włącz postprocessing"
 #define MSGTR_PREFERENCES_AutoQuality "Jakość automatyczna: "
 #define MSGTR_PREFERENCES_NI "Użyj parsera dla pliku AVI bez przeplotu"

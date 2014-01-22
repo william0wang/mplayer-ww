@@ -825,7 +825,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_ASS_TOP_MARGIN "上: "
 #define MSGTR_PREFERENCES_SUB_ASS_BOTTOM_MARGIN "下: "
 #define MSGTR_PREFERENCES_Font "字體:"
-#define MSGTR_PREFERENCES_FontFactor "字體效果:"
 #define MSGTR_PREFERENCES_PostProcess "啟用後期處理"
 #define MSGTR_PREFERENCES_AutoQuality "自動品質控製: "
 #define MSGTR_PREFERENCES_NI "使用非交錯的 AVI 解析器"

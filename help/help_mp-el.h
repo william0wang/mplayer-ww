@@ -468,7 +468,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_SRT "Μετατροπή εισαγόμενου υπότιτλου σε υπότιτλο τύπο SubViewer(SRT)"
 #define MSGTR_PREFERENCES_SUB_Overlap "Εναλλαγή του overlapping υποτίτλου"
 #define MSGTR_PREFERENCES_Font "Γραμματοσειρά:"
-#define MSGTR_PREFERENCES_FontFactor "Παράγοντας της γραμματοσειράς:"
 #define MSGTR_PREFERENCES_PostProcess "Ενεργοποίηση προεπεξεργασίας"
 #define MSGTR_PREFERENCES_AutoQuality "Αυτόματη ποιότητα: "
 #define MSGTR_PREFERENCES_NI "Χρήση του non-interleaved AVI parser"

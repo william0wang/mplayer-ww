@@ -685,7 +685,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_SRT "Konvertera given text till det tidbaserade SubViewer (SRT) formatet"
 #define MSGTR_PREFERENCES_SUB_Overlap "Aktivera textningsöverlappning"
 #define MSGTR_PREFERENCES_Font "Font:"
-#define MSGTR_PREFERENCES_FontFactor "Fontfaktor:"
 #define MSGTR_PREFERENCES_PostProcess "Aktivera postprocessing"
 #define MSGTR_PREFERENCES_AutoQuality "Autokvalité: "
 #define MSGTR_PREFERENCES_NI "Använd non-interleaved AVI tolk"

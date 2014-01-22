@@ -459,7 +459,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_SRT "Конвертирај ги дадените преводи во форматот базиран на време SubViewer (SRT)"
 #define MSGTR_PREFERENCES_SUB_Overlap "Преместувај го преклопувањето на преводот"
 #define MSGTR_PREFERENCES_Font "Фонт:"
-#define MSGTR_PREFERENCES_FontFactor "Фонт фактор:"
 #define MSGTR_PREFERENCES_PostProcess "Овозможи ПостПроцесирање"
 #define MSGTR_PREFERENCES_AutoQuality "Авто квалитет: "
 #define MSGTR_PREFERENCES_NI "Користи не-преклопувачки AVI расчленувач"

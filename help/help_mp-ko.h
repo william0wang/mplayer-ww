@@ -461,7 +461,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_SRT "주어진 자막을 SRT 형식으로 바꿈"
 #define MSGTR_PREFERENCES_SUB_Overlap "자막 겹침 켜기"
 #define MSGTR_PREFERENCES_Font "글꼴:"
-#define MSGTR_PREFERENCES_FontFactor "글꼴 팩터:"
 #define MSGTR_PREFERENCES_PostProcess "후행처리 사용"
 #define MSGTR_PREFERENCES_AutoQuality "자동 품질조정: "
 #define MSGTR_PREFERENCES_NI "non-interleaved AVI 파서 사용"

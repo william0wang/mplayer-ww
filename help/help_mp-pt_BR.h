@@ -464,7 +464,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_SRT "Converter a legenda dada para o formato baseado em tempo SubViewer (SRT)"
 #define MSGTR_PREFERENCES_SUB_Overlap "Sobreposição da legenda"
 #define MSGTR_PREFERENCES_Font "Fonte"
-#define MSGTR_PREFERENCES_FontFactor "Fator da fonte:"
 #define MSGTR_PREFERENCES_PostProcess "Habilitar pós-processamento"
 #define MSGTR_PREFERENCES_AutoQuality "Qualidade do audio: "
 #define MSGTR_PREFERENCES_NI "Usar leitor de AVI não-entrelaçado"

@@ -852,7 +852,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_ASS_TOP_MARGIN "Tepe: "
 #define MSGTR_PREFERENCES_SUB_ASS_BOTTOM_MARGIN "Dip: "
 #define MSGTR_PREFERENCES_Font "Yazıtipi:"
-#define MSGTR_PREFERENCES_FontFactor "Yazıtipi çarpanı:"
 #define MSGTR_PREFERENCES_PostProcess "postprocessing filtresini etkinleştir"
 #define MSGTR_PREFERENCES_AutoQuality "Otomatik kalite: "
 #define MSGTR_PREFERENCES_NI "Boşluksuz AVI dosyası kullan"

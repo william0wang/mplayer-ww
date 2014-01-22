@@ -751,7 +751,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_ASS_TOP_MARGIN "Top: "
 #define MSGTR_PREFERENCES_SUB_ASS_BOTTOM_MARGIN "Bottom: "
 #define MSGTR_PREFERENCES_Font "Font:"
-#define MSGTR_PREFERENCES_FontFactor "Font factor:"
 #define MSGTR_PREFERENCES_PostProcess "Enable postprocessing"
 #define MSGTR_PREFERENCES_AutoQuality "Auto quality: "
 #define MSGTR_PREFERENCES_NI "Use non-interleaved AVI parser"

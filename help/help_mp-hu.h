@@ -687,7 +687,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_ASS_TOP_MARGIN "Fent: "
 #define MSGTR_PREFERENCES_SUB_ASS_BOTTOM_MARGIN "Lent: "
 #define MSGTR_PREFERENCES_Font "Betűk:"
-#define MSGTR_PREFERENCES_FontFactor "Betű együttható:"
 #define MSGTR_PREFERENCES_PostProcess "Képjavítás"
 #define MSGTR_PREFERENCES_AutoQuality "Autómatikus minőség állítás: "
 #define MSGTR_PREFERENCES_NI "non-interleaved  AVI  feltételezése (hibás AVI-knál segíthet"

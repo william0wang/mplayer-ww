@@ -691,7 +691,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_SRT "Преобразуване на субтитрите в SubViewer (SRT) формат"
 #define MSGTR_PREFERENCES_SUB_Overlap "Препокриване на субтитрите"
 #define MSGTR_PREFERENCES_Font "Шрифт:"
-#define MSGTR_PREFERENCES_FontFactor "Дебелина на сянката на шрифта:"
 #define MSGTR_PREFERENCES_PostProcess "Разрешаване на допълнителна обработка"
 #define MSGTR_PREFERENCES_AutoQuality "Автоматичен контрол на качеството: "
 #define MSGTR_PREFERENCES_NI "Разчитане на non-interleaved AVI формат"

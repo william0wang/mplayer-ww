@@ -787,7 +787,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_SRT "Konvertovať dané titulky do časovo-určeného SubViewer (SRT) formátu"
 #define MSGTR_PREFERENCES_SUB_Overlap "Zapnúť prekrývanie titulkov"
 #define MSGTR_PREFERENCES_Font "Font:"
-#define MSGTR_PREFERENCES_FontFactor "Font faktor:"
 #define MSGTR_PREFERENCES_PostProcess "Zapnúť postprocess"
 #define MSGTR_PREFERENCES_AutoQuality "Automatická qualita: "
 #define MSGTR_PREFERENCES_NI "Použiť neprekladaný AVI parser"

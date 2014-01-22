@@ -670,7 +670,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_SRT "Converteer de gegeven ondertiteling naar het tijdsgebaseerde SubViewer(SRT) formaat"
 #define MSGTR_PREFERENCES_SUB_Overlap "Activeer/deactiveer ondertitel overlapping"
 #define MSGTR_PREFERENCES_Font "Lettertype:"
-#define MSGTR_PREFERENCES_FontFactor "Lettertype factor:"
 #define MSGTR_PREFERENCES_PostProcess "Gebruik postprocess"
 #define MSGTR_PREFERENCES_AutoQuality "Auto kwaliteit: "
 #define MSGTR_PREFERENCES_NI "Gebruik non-interleaved AVI parser"

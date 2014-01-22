@@ -669,7 +669,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_ASS_TOP_MARGIN "Угорі: "
 #define MSGTR_PREFERENCES_SUB_ASS_BOTTOM_MARGIN "Знизу: "
 #define MSGTR_PREFERENCES_Font "Шрифт:"
-#define MSGTR_PREFERENCES_FontFactor "Фактор шрифту:"
 #define MSGTR_PREFERENCES_PostProcess "Дозволити postprocessing"
 #define MSGTR_PREFERENCES_AutoQuality "Авто якість: "
 #define MSGTR_PREFERENCES_NI "Використовувати неперемежений AVI парсер"
