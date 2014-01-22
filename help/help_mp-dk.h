@@ -471,7 +471,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Undertekst"
 #define MSGTR_PREFERENCES_FRAME_Font "Skriftype"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Efterprocesseringsfilter"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Codec & demuxer"
 #define MSGTR_PREFERENCES_FRAME_Cache "Cache"
 // TODO: Why is this different from MSGTR_PREFERENCES_Misc?
 #define MSGTR_PREFERENCES_FRAME_Misc "Misc"

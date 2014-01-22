@@ -595,6 +595,7 @@ static GtkWidget * CreatePreferences( void )
   GtkWidget * hbuttonbox5;
   GtkWidget * vbox601;
   GtkWidget * vbox602;
+  GtkWidget * vbox604;
   GtkWidget * hbox5;
   GtkWidget * hbuttonbox1;
   GtkAccelGroup * accel_group;
@@ -960,12 +961,16 @@ static GtkWidget * CreatePreferences( void )
 
   vbox602=gtkAddVBox(
     gtkAddFrame( NULL,GTK_SHADOW_NONE,
-      gtkAddFrame( MSGTR_PREFERENCES_FRAME_CodecDemuxer,GTK_SHADOW_ETCHED_OUT,vbox601,0 ),1 ),0 );
+      gtkAddFrame( MSGTR_PREFERENCES_FRAME_Demuxer,GTK_SHADOW_ETCHED_OUT,vbox601,0 ),1 ),0 );
 
   CBNonInterlaved=gtkAddCheckButton( MSGTR_PREFERENCES_NI,vbox602 );
   CBIndex=gtkAddCheckButton( MSGTR_PREFERENCES_IDX,vbox602 );
 
-  hbox5=gtkAddHBox( vbox602,1 );
+  vbox604=gtkAddVBox(
+    gtkAddFrame( NULL,GTK_SHADOW_NONE,
+      gtkAddFrame( MSGTR_PREFERENCES_FRAME_Codecs,GTK_SHADOW_ETCHED_OUT,vbox601,0 ),1 ),0 );
+
+  hbox5=gtkAddHBox( vbox604,1 );
 
   gtkAddLabel( MSGTR_PREFERENCES_VideoCodecFamily,hbox5 );
 
@@ -977,7 +982,7 @@ static GtkWidget * CreatePreferences( void )
   gtk_entry_set_editable( GTK_ENTRY( EVFM ),FALSE );
   gtk_widget_show( EVFM );
 
-  hbox5=gtkAddHBox( vbox602,1 );
+  hbox5=gtkAddHBox( vbox604,1 );
 
   gtkAddLabel( MSGTR_PREFERENCES_AudioCodecFamily,hbox5 );
 

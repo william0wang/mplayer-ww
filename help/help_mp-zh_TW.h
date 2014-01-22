@@ -835,7 +835,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "字幕"
 #define MSGTR_PREFERENCES_FRAME_Font "字體"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "後期處理"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "編解碼器和分路器"
 #define MSGTR_PREFERENCES_FRAME_Cache "緩存"
 #define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
 #define MSGTR_PREFERENCES_Audio_Device "設備:"

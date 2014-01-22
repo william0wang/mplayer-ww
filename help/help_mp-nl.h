@@ -680,7 +680,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Ondertiteling"
 #define MSGTR_PREFERENCES_FRAME_Font "Lettertype"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocess"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Codec & demuxer"
 #define MSGTR_PREFERENCES_FRAME_Cache "Cache"
 #define MSGTR_PREFERENCES_Audio_Device "Apparaat:"
 #define MSGTR_PREFERENCES_Audio_Mixer "Mixer:"

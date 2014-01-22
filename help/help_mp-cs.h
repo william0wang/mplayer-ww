@@ -684,7 +684,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Titulky"
 #define MSGTR_PREFERENCES_FRAME_Font "Font"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocessing"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Kodek & demuxer"
 #define MSGTR_PREFERENCES_FRAME_Cache "Vyrovnávací paměť"
 #define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
 #define MSGTR_PREFERENCES_Audio_Device "Zařízení:"

@@ -686,7 +686,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Субтитры"
 #define MSGTR_PREFERENCES_FRAME_Font "Шрифт"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Постобработка"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Кодек и демультиплексор"
 #define MSGTR_PREFERENCES_FRAME_Cache "Кэш"
 #define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
 #define MSGTR_PREFERENCES_Audio_Device "Устройство:"

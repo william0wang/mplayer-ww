@@ -697,7 +697,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Felirat"
 #define MSGTR_PREFERENCES_FRAME_Font "Betű"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Képjavítás"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Codec & demuxer"
 #define MSGTR_PREFERENCES_FRAME_Cache "Gyorsítótár"
 #define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
 #define MSGTR_PREFERENCES_Audio_Device "Eszköz:"

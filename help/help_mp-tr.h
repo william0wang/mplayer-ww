@@ -862,7 +862,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Altyazı"
 #define MSGTR_PREFERENCES_FRAME_Font "Yazıtipi"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocessing Filtre"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Kodek & Ayrıştırıcı"
 #define MSGTR_PREFERENCES_FRAME_Cache "Önbellek"
 #define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
 #define MSGTR_PREFERENCES_Audio_Device "Aygıt:"

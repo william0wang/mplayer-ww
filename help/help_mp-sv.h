@@ -695,7 +695,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Textning"
 #define MSGTR_PREFERENCES_FRAME_Font "Font"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocessing"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Codec & demuxer"
 #define MSGTR_PREFERENCES_FRAME_Cache "Cache"
 #define MSGTR_PREFERENCES_Audio_Device "Enhet:"
 #define MSGTR_PREFERENCES_Audio_Mixer "Mixer:"

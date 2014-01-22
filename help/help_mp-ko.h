@@ -471,7 +471,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "자막"
 #define MSGTR_PREFERENCES_FRAME_Font "글꼴"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "후행처리"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "코덱 & 해석기"
 #define MSGTR_PREFERENCES_FRAME_Cache "캐시"
 #define MSGTR_PREFERENCES_Message "선택사항들을 적용하려면 재생기를 다시 시작해야 합니다!"
 #define MSGTR_PREFERENCES_DXR3_VENC "비디오 인코더:"

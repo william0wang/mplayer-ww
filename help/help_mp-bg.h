@@ -701,7 +701,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Субтитри"
 #define MSGTR_PREFERENCES_FRAME_Font "Шрифт"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Допълнителна обработка"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Кодек & разпределител"
 #define MSGTR_PREFERENCES_FRAME_Cache "Кеширане"
 #define MSGTR_PREFERENCES_Audio_Device "Устройство:"
 #define MSGTR_PREFERENCES_Audio_Mixer "Смесител:"

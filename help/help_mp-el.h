@@ -478,7 +478,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Υπότιτλος"
 #define MSGTR_PREFERENCES_FRAME_Font "Γραμματοσειρά"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Προεπεξεργασία"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Codec και demuxer"
 #define MSGTR_PREFERENCES_FRAME_Cache "Cache"
 #define MSGTR_PREFERENCES_Message "Προσοχή, μερικές λειτουργίες χρειάζονται επανεκκίνιση αναπαραγωγής."
 #define MSGTR_PREFERENCES_DXR3_VENC "Κωδικοποιητής βίντεο:"

@@ -474,7 +474,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Legenda"
 #define MSGTR_PREFERENCES_FRAME_Font "Fonte"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Pós-processamento"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Codec & demuxer"
 #define MSGTR_PREFERENCES_FRAME_Cache "Cache"
 #define MSGTR_PREFERENCES_Message "Por favor lembre que você precisa reiniciar a reprodução para algumas opções fazerem efeito!"
 #define MSGTR_PREFERENCES_DXR3_VENC "Codificador de video:"

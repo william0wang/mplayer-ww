@@ -417,7 +417,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Subtitrare"
 #define MSGTR_PREFERENCES_FRAME_Font "Font"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocesare"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Codec & demuxer"
 #define MSGTR_PREFERENCES_FRAME_Cache "Cache"
 #define MSGTR_PREFERENCES_Message "Nu uita cã rularea trebuie repornitã pentru ca unele opþiuni sã-ºi facã efectul!"
 #define MSGTR_PREFERENCES_DXR3_VENC "Encoder video:"

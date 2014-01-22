@@ -386,7 +386,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_OSD_Level "OSD レベル"
 #define MSGTR_PREFERENCES_FRAME_Subtitle "サブタイトル"
 #define MSGTR_PREFERENCES_FRAME_Font "フォント"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "コーデック& demuxer"
 #define MSGTR_PREFERENCES_FRAME_Cache "キャッシュ"
 #define MSGTR_PREFERENCES_DXR3_VENC "Video エンコーダ:"
 #define MSGTR_PREFERENCES_DXR3_LAVC "LAVC (FFmpeg)使用"

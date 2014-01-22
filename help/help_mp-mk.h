@@ -469,7 +469,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Превод"
 #define MSGTR_PREFERENCES_FRAME_Font "Фонт"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "ПостПроцесирање"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Кодек и демуксер"
 #define MSGTR_PREFERENCES_FRAME_Cache "Кеш"
 #define MSGTR_PREFERENCES_Message "Ве молиме запомтете дека треба да го рестартирате плејбекот за да можат некои опции да проработат!"
 #define MSGTR_PREFERENCES_DXR3_VENC "Видео енкодер:"
