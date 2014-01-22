@@ -6664,7 +6664,7 @@ echocheck "libdca support"
 if test "$_libdca" = auto ; then
   _libdca=no
   for ld_dca in -ldca -ldts ; do
-    statement_check_broken stdint.h dts.h 'dts_init(0)' $ld_dca &&
+    statement_check_broken stdint.h dca.h 'dca_init(0)' $ld_dca &&
       extra_ldflags="$extra_ldflags $ld_dca" && _libdca=yes && break
   done
 fi
