@@ -35,6 +35,8 @@
 #include "config.h"
 #include "fastmemcpy.h"
 #include "video_out.h"
+#define NO_DRAW_SLICE
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "aspect.h"
 #include "mp_msg.h"
@@ -242,17 +244,6 @@ static void flip_page(void)
 			image_data = image_datas[image_page];
 		}
 	}
-}
-
-static int draw_slice(uint8_t *src[], int stride[], int w,int h,int x,int y)
-{
-	return 0;
-}
-
-
-static int draw_frame(uint8_t *src[])
-{
-	return 0;
 }
 
 static uint32_t draw_image(mp_image_t *mpi)
