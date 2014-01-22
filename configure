@@ -4272,9 +4272,12 @@ if test "$_smb" = yes; then
 fi
 if test "$_smb" = auto; then
   _smb=no
+  pkg_inc=$($_pkg_config --cflags smbclient)
   for ld_tmp in "-lsmbclient" "-lsmbclient $ld_dl" "-lsmbclient $ld_dl -lnsl" "-lsmbclient $ld_dl -lssl -lnsl" ; do
     statement_check libsmbclient.h 'smbc_opendir("smb://")' $ld_tmp &&
       extra_ldflags="$extra_ldflags $ld_tmp" && _smb=yes && break
+    statement_check libsmbclient.h 'smbc_opendir("smb://")' $ld_tmp $pkg_inc &&
+      extra_ldflags="$extra_ldflags $ld_tmp" && extra_cflags="$extra_cflags $pkg_inc" && _smb=yes && break
   done
 fi
 
