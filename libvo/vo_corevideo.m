@@ -260,7 +260,7 @@ static uint32_t draw_image(mp_image_t *mpi)
 	if (!(mpi->flags & MP_IMGFLAG_DIRECT))
 	memcpy_pic(image_data, mpi->planes[0], image_width*image_bytes, image_height, image_stride, mpi->stride[0]);
 
-	return 0;
+	return VO_TRUE;
 }
 
 static int query_format(uint32_t format)
