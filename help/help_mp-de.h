@@ -920,7 +920,7 @@ static const char help_text[]=
 // --- preferences
 #define MSGTR_PREFERENCES_Audio MSGTR_EQU_Audio
 #define MSGTR_PREFERENCES_Video MSGTR_EQU_Video
-#define MSGTR_PREFERENCES_SubtitleOSD "Untertitel & OSD"
+#define MSGTR_PREFERENCES_SubtitleOSD "OSD / Untertitel"
 #define MSGTR_PREFERENCES_Codecs "Codecs & Demuxer"
 // Beachte: Wenn du MSGTR_PREFERENCES_Misc änderst, überprüfe bitte, ob der Eintrag noch zu MSGTR_PREFERENCES_FRAME_Misc passt.
 #define MSGTR_PREFERENCES_Misc "Sonstiges"
@@ -965,7 +965,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_IDX "Indextabelle neu erstellen, falls benötigt"
 #define MSGTR_PREFERENCES_VideoCodecFamily "Videocodec-Familie:"
 #define MSGTR_PREFERENCES_AudioCodecFamily "Audiocodec-Familie:"
-#define MSGTR_PREFERENCES_FRAME_OSD_Level "OSD-Modus"
+#define MSGTR_PREFERENCES_FRAME_OSD_Level "OSD-Anzeige"
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Untertitel"
 #define MSGTR_PREFERENCES_FRAME_Font "Schrift"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocessing"
