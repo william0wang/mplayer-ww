@@ -33,7 +33,7 @@
 .\" Titel
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "19.01.2014" "Das MPlayer Projekt"
+.TH MPlayer 1 "22.01.2014" "Das MPlayer Projekt"
 .
 .SH NAME
 mplayer  \- Movie Player
@@ -2810,7 +2810,9 @@ Setzt den Verwischradius für die Schriften (Standard: 2).
 .B \-subfont\-encoding <Wert> (nur bei FreeType)
 Setzt die Schriftcodierung.
 Wenn 'unicode' angegeben wird, so werden alle Zeichen der Schriftdatei
-gerendert, und unicode wird benutzt werden (Standard: unicode).
+gerendert, und Unicode wird benutzt werden (Standard: unicode). (Für andere
+Werte als 'unicode' muss dein System iconv(3) unterstützen, um zu
+funktionieren.)
 .
 .TP
 .B \-subfont\-osd\-scale <0\-100> (nur bei FreeType)

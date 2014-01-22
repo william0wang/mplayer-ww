@@ -31,7 +31,7 @@
 .\" Title
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "2014-01-19" "The MPlayer Project" "The Movie Player"
+.TH MPlayer 1 "2014-01-22" "The MPlayer Project" "The Movie Player"
 .
 .SH NAME
 mplayer  \- movie player
@@ -2904,7 +2904,8 @@ Sets the font blur radius (default: 2).
 .B \-subfont\-encoding <value> (FreeType only)
 Sets the font encoding.
 When set to 'unicode', all the glyphs from the font file will be rendered and
-unicode will be used (default: unicode).
+unicode will be used (default: unicode). (For other values than 'unicode'
+your system has to support iconv(3) in order for this to work.)
 .
 .TP
 .B \-subfont\-osd\-scale <0\-100> (FreeType only)
