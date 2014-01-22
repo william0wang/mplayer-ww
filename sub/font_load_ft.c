@@ -1004,15 +1004,10 @@ font_desc_t* read_font_desc_ft(const char *fname, int face_index, int movie_widt
     desc->face_cnt++;
 
 #ifdef CONFIG_ICONV
-    if (unicode) {
+    if (unicode)
 	charset_size = prepare_charset_unicode(face, my_charset, my_charcodes);
-    } else {
-	if (subtitle_font_encoding) {
-	    charset_size = prepare_charset(charmap, subtitle_font_encoding, my_charset, my_charcodes);
-	} else {
-	    charset_size = prepare_charset(charmap, "iso-8859-1", my_charset, my_charcodes);
-	}
-    }
+    else
+	charset_size = prepare_charset(charmap, subtitle_font_encoding, my_charset, my_charcodes);
 
     if (charset_size < 0) {
 	mp_msg(MSGT_OSD, MSGL_ERR, MSGTR_LIBVO_FONT_LOAD_FT_SubFontCharsetFailed);
