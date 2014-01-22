@@ -872,7 +872,7 @@ static GtkWidget * CreatePreferences( void )
 
   vbox603=gtkAddVBox(
     gtkAddFrame( NULL,GTK_SHADOW_NONE,
-      gtkAddFrame( MSGTR_PREFERENCES_FRAME_Font,GTK_SHADOW_ETCHED_OUT,vbox601,0 ),1 ),0 );
+      gtkAddFrame( NULL,GTK_SHADOW_ETCHED_OUT,vbox601,0 ),1 ),0 );
 
   hbox6=gtkAddHBox( vbox603,1 );
   gtkAddLabel( MSGTR_PREFERENCES_Font,hbox6 );
