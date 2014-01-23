@@ -583,6 +583,7 @@ static GtkWidget * CreatePreferences( void )
   GtkWidget * hbox7;
 #endif
 #ifdef CONFIG_ICONV
+  iconv_t     cd;
   GList	    * CBSubEncoding_items = NULL;
 #endif
   GtkWidget * vbox7;
@@ -811,7 +812,7 @@ static GtkWidget * CreatePreferences( void )
   CBSubEncoding_items=g_list_append( CBSubEncoding_items,MSGTR_PREFERENCES_DefaultEnc );
   {
    int i, listed=(sub_cp == NULL);
-   iconv_t cd;
+
    for ( i=0;lEncoding[i].name;i++ )
    {
     cd=iconv_open( "UTF-8",lEncoding[i].name );
@@ -908,8 +909,21 @@ static GtkWidget * CreatePreferences( void )
   gtk_widget_show( CBFontEncoding );
   gtk_table_attach( GTK_TABLE( table1 ),CBFontEncoding,1,2,0,1,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
   {
-   int i;
-   for ( i=0;lEncoding[i].name;i++ ) CBFontEncoding_items=g_list_append( CBFontEncoding_items,lEncoding[i].comment );
+   int i, append;
+   for ( i=0;lEncoding[i].name;i++ )
+   {
+    append=(strcasecmp( lEncoding[i].name,"UNICODE" ) == 0);
+#ifdef CONFIG_ICONV
+    cd=iconv_open( "ucs-4",lEncoding[i].name );
+
+    if (cd != (iconv_t) -1)
+    {
+     iconv_close(cd);
+     append=True;
+    }
+#endif
+    if ( append ) CBFontEncoding_items=g_list_append( CBFontEncoding_items,lEncoding[i].comment );
+   }
   }
   gtk_combo_set_popdown_strings( GTK_COMBO( CBFontEncoding ),CBFontEncoding_items );
   g_list_free( CBFontEncoding_items );
