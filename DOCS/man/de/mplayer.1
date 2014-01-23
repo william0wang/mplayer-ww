@@ -2515,8 +2515,10 @@ Bei Fontconfig gibt diese Option das Fontconfig-Schriftmuster an.
 Ermöglicht die Benutzung von Schriften, die von fontconfig verwaltet werden.
 .br
 .I ANMERKUNG:
-\-ass schaltet dies automatisch ein, wenn dies nicht explizit mit
-\-nofontconfig überschrieben wird.
+Standardmäßig wird fontconfig für durch libass gerenderte Untertitel
+verwendet, nicht jedoch für das OSD. Mit \-nofontconfig wird es überhaupt
+nicht verwendet, d. h. nur dann funktionieren \-font und \-subfont mit einem
+angegebenen Dateinamen.
 .
 .TP
 .B \-forcedsubsonly
