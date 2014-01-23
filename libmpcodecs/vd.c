@@ -195,7 +195,7 @@ int mpcodecs_config_vo(sh_video_t *sh, int w, int h,
         if (out_fmt == (unsigned int) 0xFFFFFFFF)
             continue;
         // check (query) if codec really support this outfmt...
-        sh->outfmtidx = j;  // pass index to the control() function this way
+        sh->outfmtidx = i;  // pass index to the control() function this way
         if (mpvdec->control(sh, VDCTRL_QUERY_FORMAT, &out_fmt) ==
             CONTROL_FALSE) {
             mp_msg(MSGT_CPLAYER, MSGL_DBG2,
