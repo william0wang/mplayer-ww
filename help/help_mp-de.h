@@ -113,7 +113,7 @@ static const char help_text[]=
 "Wenn dies nicht hilft, lies DOCS/HTML/de/bugreports.html!\n\n"
 
 #define MSGTR_NoGui "MPlayer wurde OHNE GUI-Unterstützung kompiliert.\n"
-#define MSGTR_GuiNeedsX "MPlayer GUI erfordert X11.\n"
+#define MSGTR_GuiNeedsX "MPlayer-GUI setzt X11 voraus.\n"
 #define MSGTR_Playing "\nSpiele %s.\n"
 #define MSGTR_NoSound "Audio: kein Ton!\n"
 #define MSGTR_FPSforced "FPS von %5.3f erzwungen (ftime: %5.3f).\n"
