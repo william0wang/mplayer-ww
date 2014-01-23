@@ -33,7 +33,7 @@
 .\" Titel
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "22.01.2014" "Das MPlayer Projekt"
+.TH MPlayer 1 "23.01.2014" "Das MPlayer Projekt"
 .
 .SH NAME
 mplayer  \- Movie Player
@@ -2490,11 +2490,12 @@ Ende angezeigt werden.
 .B \-font <Pfad zur font.desc-Datei>
 Sucht nach den OSD-/\:Untertitelschriften in einem anderen Verzeichnis
 (Standard für normale Schriften: ~/\:.mplayer/\:font/\:font.desc,
-Standard für FreeType-Schriften: ~/.mplayer/\:subfont.ttf).
+Standard für FreeType-Schriften: ~/.mplayer/\:subfont.ttf,
+Standard für Fontconfig: "sans-serif").
 .br
 .I ANMERKUNG:
-Bei FreeType gibt diese Option den Pfad zur Textschriftdatei an.
-Bei fontconfig gibt diese Option den fontconfig-Schriftnamen an.
+Bei FreeType gibt diese Option den Pfad zur Schriftdatei an.
+Bei Fontconfig gibt diese Option das Fontconfig-Schriftmuster an.
 .sp 1
 .I BEISPIEL:
 .PD 0
@@ -2504,6 +2505,8 @@ Bei fontconfig gibt diese Option den fontconfig-Schriftnamen an.
 \-font ~/\:.mplayer/\:arialuni.ttf
 .br
 \-font 'Bitstream Vera Sans'
+.br
+\-font 'Bitstream Vera Sans:style=Bold'
 .RE
 .PD 1
 .
