@@ -232,6 +232,7 @@ static void prEntry( GtkEditable * editable,gpointer user_data )
         for ( i=0;lEncoding[i].name;i++ )
 	  if ( !gstrcmp( lEncoding[i].comment,comment ) ) break;
 	if ( lEncoding[i].comment ) mplayer( MPLAYER_SET_FONT_ENCODING,0,lEncoding[i].name );
+	else mplayer( MPLAYER_SET_FONT_ENCODING,0,(char *)comment );
 	break;
 #endif
 #ifdef CONFIG_ICONV
@@ -909,7 +910,7 @@ static GtkWidget * CreatePreferences( void )
   gtk_widget_show( CBFontEncoding );
   gtk_table_attach( GTK_TABLE( table1 ),CBFontEncoding,1,2,0,1,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
   {
-   int i, append;
+   int i, append, listed=(subtitle_font_encoding == NULL);
    for ( i=0;lEncoding[i].name;i++ )
    {
     append=(strcasecmp( lEncoding[i].name,"UNICODE" ) == 0);
@@ -922,8 +923,15 @@ static GtkWidget * CreatePreferences( void )
      append=True;
     }
 #endif
-    if ( append ) CBFontEncoding_items=g_list_append( CBFontEncoding_items,lEncoding[i].comment );
+    if ( append )
+    {
+     CBFontEncoding_items=g_list_append( CBFontEncoding_items,lEncoding[i].comment );
+
+     if ( !listed )
+      if ( strcasecmp ( lEncoding[i].name, subtitle_font_encoding ) == 0 ) listed=True;
+    }
    }
+   if ( !listed ) CBFontEncoding_items=g_list_insert( CBFontEncoding_items,subtitle_font_encoding,1 );
   }
   gtk_combo_set_popdown_strings( GTK_COMBO( CBFontEncoding ),CBFontEncoding_items );
   g_list_free( CBFontEncoding_items );
@@ -1304,6 +1312,7 @@ void ShowPreferences( void )
   for ( i=0;lEncoding[i].name;i++ )
    if ( !strcasecmp( s,lEncoding[i].name ) ) break;
   if ( lEncoding[i].name ) gtk_entry_set_text( GTK_ENTRY( EFontEncoding ),lEncoding[i].comment );
+  else gtk_entry_set_text( GTK_ENTRY( EFontEncoding ),s );
  }
  switch ( subtitle_autoscale )
   {
