@@ -152,6 +152,7 @@ int mpcodecs_config_vo(sh_video_t *sh, int w, int h,
                        unsigned int preferred_outfmt)
 {
     int i, j;
+    int only_preferred = 1;
     unsigned int out_fmt = 0;
     int screen_size_x = 0;      //SCREEN_SIZE_X;
     int screen_size_y = 0;      //SCREEN_SIZE_Y;
@@ -189,9 +190,15 @@ int mpcodecs_config_vo(sh_video_t *sh, int w, int h,
     }
 
     j = -1;
-    for (i = 0; i < CODECS_MAX_OUTFMT; i++) {
+    for (i = 0; only_preferred || i < CODECS_MAX_OUTFMT; i++) {
         int flags;
+        if (i == CODECS_MAX_OUTFMT) {
+            i = 0;
+            only_preferred = 0;
+        }
         out_fmt = sh->codec->outfmt[i];
+        if (only_preferred && out_fmt != preferred_outfmt)
+            continue;
         if (out_fmt == (unsigned int) 0xFFFFFFFF)
             continue;
         // check (query) if codec really support this outfmt...
