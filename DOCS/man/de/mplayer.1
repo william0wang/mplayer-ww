@@ -33,7 +33,7 @@
 .\" Titel
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "23.01.2014" "Das MPlayer Projekt"
+.TH MPlayer 1 "24.01.2014" "Das MPlayer Projekt"
 .
 .SH NAME
 mplayer  \- Movie Player
@@ -2323,8 +2323,8 @@ Matroska-Spuren verwendet.
 Du möchtest vielleicht auch \-embeddedfonts verwenden.
 .br
 .I ANMERKUNG:
-Wenn fontconfig eincompiliert wurde, schaltet \-ass automatisch \-fontconfig
-ein, wenn dies nicht mit \-nofontconfig anders angegeben wurde.
+Im Gegensatz zum normalen OSD verwendet libass fontconfig automatisch. Um
+dies auszuschalten, verwende \-nofontconfig.
 .
 .TP
 .B \-ass\-border\-color <Wert>
@@ -2512,12 +2512,14 @@ Bei Fontconfig gibt diese Option das Fontconfig-Schriftmuster an.
 .
 .TP
 .B \-fontconfig (nur bei fontconfig)
-Ermöglicht die Benutzung von Schriften, die von fontconfig verwaltet werden.
+Ermöglicht die Benutzung von Schriften, die von fontconfig verwaltet werden
+(Standard: automatische Erkennung).
 .br
 .I ANMERKUNG:
-Standardmäßig wird fontconfig für durch libass gerenderte Untertitel
-verwendet, nicht jedoch für das OSD. Mit \-nofontconfig wird es überhaupt
-nicht verwendet, d. h. nur dann funktionieren \-font und \-subfont mit einem
+Für durch libass gerenderte Untertitel wird fontconfig automatisch
+verwendet, nicht jedoch für das OSD. Mit \-fontconfig wird es sowohl für
+libass als auch das OSD verwendet, mit \-nofontconfig dagegen überhaupt
+nicht, d. h. nur dann funktionieren \-font und \-subfont mit einem
 angegebenen Dateinamen.
 .
 .TP
