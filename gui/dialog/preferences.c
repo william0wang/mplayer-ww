@@ -155,13 +155,15 @@ static GtkWidget     * CBSubEncoding, * ESubEncoding;
 #endif
 
 #if defined(CONFIG_FREETYPE) || defined(CONFIG_ICONV)
+#define ENC_UTF8 "UTF-8"
+#define ENC_UNICODE "UNICODE"
 static struct
 {
  char * name;
  char * comment;
 } lEncoding[] =
  {
-  { "UTF-8",       MSGTR_PREFERENCES_FontEncoding24 },
+  { ENC_UTF8,      MSGTR_PREFERENCES_FontEncoding24 },
   { "ISO-8859-1",  MSGTR_PREFERENCES_FontEncoding2 },
   { "ISO-8859-2",  MSGTR_PREFERENCES_FontEncoding4 },
   { "ISO-8859-3",  MSGTR_PREFERENCES_FontEncoding5 },
@@ -196,7 +198,7 @@ static struct
   { "CP936",       MSGTR_PREFERENCES_FontEncoding16 },
   { "CP949",       MSGTR_PREFERENCES_FontEncoding19 },
   { "CP950",       MSGTR_PREFERENCES_FontEncoding30 },
-  { "UNICODE",     MSGTR_PREFERENCES_FontEncoding1 },
+  { ENC_UNICODE,   MSGTR_PREFERENCES_FontEncoding1 },
   { NULL,NULL }
  };
 #endif
@@ -816,7 +818,7 @@ static GtkWidget * CreatePreferences( void )
 
    for ( i=0;lEncoding[i].name;i++ )
    {
-    cd=iconv_open( "UTF-8",lEncoding[i].name );
+    cd=iconv_open( ENC_UTF8,lEncoding[i].name );
 
     if (cd != (iconv_t) -1)
     {
@@ -913,7 +915,7 @@ static GtkWidget * CreatePreferences( void )
    int i, append, listed=(subtitle_font_encoding == NULL);
    for ( i=0;lEncoding[i].name;i++ )
    {
-    append=(strcasecmp( lEncoding[i].name,"UNICODE" ) == 0);
+    append=(strcasecmp( lEncoding[i].name,ENC_UNICODE ) == 0);
 #ifdef CONFIG_ICONV
     cd=iconv_open( "ucs-4",lEncoding[i].name );
 
@@ -1308,7 +1310,7 @@ void ShowPreferences( void )
  gtk_adjustment_set_value( HSFontOSDScaleadj,osd_font_scale_factor );
  {
   int i;
-  const char *s = (subtitle_font_encoding ? subtitle_font_encoding : "UNICODE");
+  const char *s = (subtitle_font_encoding ? subtitle_font_encoding : ENC_UNICODE);
   for ( i=0;lEncoding[i].name;i++ )
    if ( !strcasecmp( s,lEncoding[i].name ) ) break;
   if ( lEncoding[i].name ) gtk_entry_set_text( GTK_ENTRY( EFontEncoding ),lEncoding[i].comment );
