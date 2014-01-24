@@ -666,14 +666,6 @@ GtkWidget * CreatePopUpMenu( void )
      }
    }
 
-  AddSeparator( Menu );
-  MenuItem=AddMenuCheckItem( window1, (const char*)sound_xpm, Menu,MSGTR_MENU_Mute,mixer->muted,evMute );
-  if ( !guiInfo.AudioChannels ) gtk_widget_set_sensitive( MenuItem,FALSE );
-  AddMenuItem( window1, (const char*)playlist_xpm, Menu,MSGTR_MENU_PlayList, evPlaylist );
-  AddMenuItem( window1, (const char*)skin_xpm, Menu,MSGTR_MENU_SkinBrowser, evSkinBrowser );
-  AddMenuItem( window1, (const char*)equalizer_xpm, Menu,MSGTR_Equalizer, evEqualizer );
-  AddMenuItem( window1, (const char*)prefs_xpm, Menu,MSGTR_MENU_Preferences, evPreferences );
-
   if ( guiInfo.VideoWindow )
    {
     int b1 = False, b2 = False, b_half = False;
@@ -698,6 +690,14 @@ GtkWidget * CreatePopUpMenu( void )
     gtk_widget_set_sensitive( F,FALSE );
    }
    }
+
+  AddSeparator( Menu );
+  MenuItem=AddMenuCheckItem( window1, (const char*)sound_xpm, Menu,MSGTR_MENU_Mute,mixer->muted,evMute );
+  if ( !guiInfo.AudioChannels ) gtk_widget_set_sensitive( MenuItem,FALSE );
+  AddMenuItem( window1, (const char*)playlist_xpm, Menu,MSGTR_MENU_PlayList, evPlaylist );
+  AddMenuItem( window1, (const char*)skin_xpm, Menu,MSGTR_MENU_SkinBrowser, evSkinBrowser );
+  AddMenuItem( window1, (const char*)equalizer_xpm, Menu,MSGTR_Equalizer, evEqualizer );
+  AddMenuItem( window1, (const char*)prefs_xpm, Menu,MSGTR_MENU_Preferences, evPreferences );
 
   AddSeparator( Menu );
   AddMenuItem( window1, (const char*)exit_xpm, Menu,MSGTR_MENU_Exit, evExit );
