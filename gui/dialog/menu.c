@@ -651,7 +651,7 @@ GtkWidget * CreatePopUpMenu( void )
 
     if ( c > 1 )
      {
-      SubMenu=AddSubMenu( window1, (const char*)empty_xpm, Menu,MSGTR_MENU_AudioTrack );
+      SubMenu=AddSubMenu( window1, (const char*)audiolang_xpm, Menu,MSGTR_MENU_AudioTrack );
       for ( i=0;i < MAX_A_STREAMS;i++ )
        if ( demuxer->a_streams[i] )
         {
