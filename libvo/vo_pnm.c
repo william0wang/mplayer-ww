@@ -38,6 +38,8 @@
 #include "subopt-helper.h"
 #include "mp_msg.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
+#define NO_DRAW_SLICE
 #include "video_out_internal.h"
 #include "mp_core.h"			/* for exit_player() */
 #include "help_mp.h"
@@ -500,22 +502,6 @@ static uint32_t draw_image(mp_image_t *mpi)
     }
 
     return VO_FALSE;
-}
-
-/* ------------------------------------------------------------------------- */
-
-static int draw_frame(uint8_t *src[])
-{
-    mp_msg(MSGT_VO, MSGL_V, "%s: draw_frame() is called!\n", info.short_name);
-    return -1;
-}
-
-/* ------------------------------------------------------------------------- */
-
-static int draw_slice(uint8_t *src[], int stride[], int w, int h,
-                           int x, int y)
-{
-    return 0;
 }
 
 /* ------------------------------------------------------------------------- */

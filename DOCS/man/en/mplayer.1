@@ -1,5 +1,5 @@
 .\" $Revision$
-.\" MPlayer (C) 2000-2013 MPlayer Team
+.\" MPlayer (C) 2000-2014 MPlayer Team
 .\" This man page was/is done by Gabucino, Diego Biurrun, Jonas Jermann
 .
 .\" --------------------------------------------------------------------------
@@ -31,7 +31,7 @@
 .\" Title
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "2013-11-19" "The MPlayer Project" "The Movie Player"
+.TH MPlayer 1 "2014-01-23" "The MPlayer Project" "The Movie Player"
 .
 .SH NAME
 mplayer  \- movie player
@@ -651,6 +651,8 @@ font_text_scale
 .RB ( subfont-text-scale ") (FreeType only),"
 gui_skin
 .RB ( skin ),
+idle
+.RB ( idle ),
 osd_level
 .RB ( osdlevel ),
 softvol
@@ -667,6 +669,8 @@ sub_pos
 .RB ( subpos ),
 sub_unicode
 .RB ( unicode ),
+sub_utf8
+.RB ( utf8 ),
 v_flip
 .RB ( flip ),
 v_framedrop
@@ -2558,12 +2562,12 @@ instead of at the end.
 .
 .TP
 .B \-font <path to font.desc file, path to font (FreeType), font pattern (Fontconfig)>
-Search for the OSD/\:SUB fonts in an alternative directory (default for normal
+Search for the OSD/\:subtitle fonts in an alternative directory (default for normal
 fonts: ~/\:.mplayer/\:font/\:font.desc, default for FreeType fonts:
-~/.mplayer/\:subfont.ttf).
+~/.mplayer/\:subfont.ttf, default for Fontconfig: "sans-serif").
 .br
 .I NOTE:
-With FreeType, this option determines the path to the text font file.
+With FreeType, this option determines the path to the font file.
 With Fontconfig, this option determines the Fontconfig font pattern.
 .sp 1
 .I EXAMPLE:
@@ -2586,7 +2590,8 @@ Enables the usage of fontconfig managed fonts.
 .I NOTE:
 By default fontconfig is used for libass-rendered subtitles and not used for
 OSD. With \-fontconfig it is used for both libass and OSD, with \-nofontconfig
-it is not used at all.
+it is not used at all, i.e. only then \-font and \-subfont will work with a
+given path to font.
 .
 .TP
 .B \-forcedsubsonly
@@ -2803,7 +2808,8 @@ CC subtitles have not been spotted on DVDs from other regions so far.
 .TP
 .B \-subcp <codepage> (iconv only)
 If your system supports iconv(3), you can use this option to
-specify the subtitle codepage.
+specify the subtitle codepage. It takes priority over both -utf8 and
+-unicode.
 .sp 1
 .I EXAMPLE:
 .PD 0
@@ -2899,7 +2905,8 @@ Sets the font blur radius (default: 2).
 .B \-subfont\-encoding <value> (FreeType only)
 Sets the font encoding.
 When set to 'unicode', all the glyphs from the font file will be rendered and
-unicode will be used (default: unicode).
+unicode will be used (default: unicode). (For other values than 'unicode'
+your system has to support iconv(3) in order for this to work.)
 .
 .TP
 .B \-subfont\-osd\-scale <0\-100> (FreeType only)
@@ -2948,7 +2955,8 @@ used for the OSD and clear it (default: ^[[A\\r^[[K).
 .
 .TP
 .B \-unicode
-Tells MPlayer to handle the subtitle file as unicode.
+Tells MPlayer to handle the subtitle file as unicode. (It will only take
+effect if neither -subcp nor -utf8 is given.)
 .
 .TP
 .B \-unrarexec <path to unrar executable> (not supported on MingW)
@@ -2958,7 +2966,8 @@ The path must include the executable's filename, i.e.\& /usr/local/bin/unrar.
 .
 .TP
 .B "\-utf8 \ \ "
-Tells MPlayer to handle the subtitle file as UTF-8.
+Tells MPlayer to handle the subtitle file as UTF-8. (It will only take effect
+if -subcp isn't given, and it takes priority over -unicode.)
 .
 .TP
 .B \-vobsub <VOBsub file without extension>
@@ -12394,7 +12403,7 @@ explains how to create useful bug reports.
 MPlayer was initially written by Arpad Gereoffy.
 See the AUTHORS file for a list of some of the many other contributors.
 .PP
-MPlayer is (C) 2000\-2013 The MPlayer Team
+MPlayer is (C) 2000\-2014 The MPlayer Team
 .PP
 This man page was written mainly by Gabucino, Jonas Jermann and Diego Biurrun.
 It is maintained by Diego Biurrun.

@@ -679,7 +679,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "Pozíciója: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Felirat automatikus betöltésének tiltása"
-#define MSGTR_PREFERENCES_SUB_Unicode "Unicode felirat"
 #define MSGTR_PREFERENCES_SUB_MPSUB "A film feliratának konvertálása MPlayer felirat formátumba"
 #define MSGTR_PREFERENCES_SUB_SRT "A film feliratának konvertálása SubViewer (SRT) formátumba"
 #define MSGTR_PREFERENCES_SUB_Overlap "Felirat átlapolás"
@@ -688,7 +687,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_ASS_TOP_MARGIN "Fent: "
 #define MSGTR_PREFERENCES_SUB_ASS_BOTTOM_MARGIN "Lent: "
 #define MSGTR_PREFERENCES_Font "Betűk:"
-#define MSGTR_PREFERENCES_FontFactor "Betű együttható:"
 #define MSGTR_PREFERENCES_PostProcess "Képjavítás"
 #define MSGTR_PREFERENCES_AutoQuality "Autómatikus minőség állítás: "
 #define MSGTR_PREFERENCES_NI "non-interleaved  AVI  feltételezése (hibás AVI-knál segíthet"
@@ -699,7 +697,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Felirat"
 #define MSGTR_PREFERENCES_FRAME_Font "Betű"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Képjavítás"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Codec & demuxer"
 #define MSGTR_PREFERENCES_FRAME_Cache "Gyorsítótár"
 #define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
 #define MSGTR_PREFERENCES_Audio_Device "Eszköz:"

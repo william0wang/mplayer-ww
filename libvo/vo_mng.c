@@ -38,6 +38,7 @@
 #include <libmng.h>
 
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "mp_msg.h"
 #include "subopt-helper.h"
@@ -511,18 +512,6 @@ static void flip_page(void)
         vomng.frame_last->next = frame;
         vomng.frame_last       = frame;
     }
-}
-
-/**
- * @brief put frame data onto canvas (not supported)
- * @return always 1 to indicate error
- */
-static int draw_frame(uint8_t *src[])
-{
-    /* draw_frame() not supported
-     * VFCAP_ACCEPT_STRIDE is set for format
-     * so draw_slice() will be called instead of this function */
-    return 1;
 }
 
 /**

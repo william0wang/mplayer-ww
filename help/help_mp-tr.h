@@ -844,7 +844,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "Konum: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Altyazı otomatik yüklemesini kapat"
-#define MSGTR_PREFERENCES_SUB_Unicode "Unicode altyazı"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Mevcut altyazıyı MPlayer'ın altyazı biçimine çevir"
 #define MSGTR_PREFERENCES_SUB_SRT "Mevcut altyazıyı zaman tabanlı SubViewer (SRT) biçimine çevir"
 #define MSGTR_PREFERENCES_SUB_Overlap "Altyazı bindirmesini sabitle"
@@ -853,7 +852,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_ASS_TOP_MARGIN "Tepe: "
 #define MSGTR_PREFERENCES_SUB_ASS_BOTTOM_MARGIN "Dip: "
 #define MSGTR_PREFERENCES_Font "Yazıtipi:"
-#define MSGTR_PREFERENCES_FontFactor "Yazıtipi çarpanı:"
 #define MSGTR_PREFERENCES_PostProcess "postprocessing filtresini etkinleştir"
 #define MSGTR_PREFERENCES_AutoQuality "Otomatik kalite: "
 #define MSGTR_PREFERENCES_NI "Boşluksuz AVI dosyası kullan"
@@ -864,7 +862,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Altyazı"
 #define MSGTR_PREFERENCES_FRAME_Font "Yazıtipi"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocessing Filtre"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Kodek & Ayrıştırıcı"
 #define MSGTR_PREFERENCES_FRAME_Cache "Önbellek"
 #define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
 #define MSGTR_PREFERENCES_Audio_Device "Aygıt:"

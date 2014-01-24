@@ -40,6 +40,7 @@ extern const ao_functions_t audio_out_jack;
 extern const ao_functions_t audio_out_openal;
 extern const ao_functions_t audio_out_null;
 extern const ao_functions_t audio_out_alsa;
+extern const ao_functions_t audio_out_sndio;
 extern const ao_functions_t audio_out_nas;
 extern const ao_functions_t audio_out_sdl;
 extern const ao_functions_t audio_out_sun;
@@ -72,6 +73,9 @@ const ao_functions_t* const audio_out_drivers[] =
 #endif
 #ifdef CONFIG_COREAUDIO
         &audio_out_coreaudio,
+#endif
+#ifdef CONFIG_SNDIO_AUDIO
+        &audio_out_sndio,
 #endif
 #ifdef CONFIG_OSS_AUDIO
         &audio_out_oss,

@@ -39,6 +39,7 @@
 #include "mp_msg.h"
 #include "help_mp.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "libmpcodecs/vf.h"
 #include "aspect.h"
@@ -1002,11 +1003,6 @@ static int control(uint32_t request, void *data)
     }
 
     return VO_NOTIMPL;
-}
-
-static int draw_frame(uint8_t *src[])
-{
-    return VO_ERROR;
 }
 
 static int draw_slice(uint8_t *src[], int stride[], int w, int h, int x, int y)

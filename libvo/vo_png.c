@@ -36,6 +36,8 @@
 #include "mp_msg.h"
 #include "help_mp.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
+#define NO_DRAW_SLICE
 #include "video_out_internal.h"
 #include "subopt-helper.h"
 #include "libavcodec/avcodec.h"
@@ -190,16 +192,6 @@ static uint32_t draw_image(mp_image_t* mpi){
 static void draw_osd(void){}
 
 static void flip_page (void){}
-
-static int draw_frame(uint8_t * src[])
-{
-    return -1;
-}
-
-static int draw_slice( uint8_t *src[],int stride[],int w,int h,int x,int y )
-{
-    return -1;
-}
 
 static int
 query_format(uint32_t format)

@@ -42,6 +42,7 @@ Buffer allocation:
 #include "mp_msg.h"
 #include "help_mp.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "libmpcodecs/vf.h"
 
@@ -415,11 +416,6 @@ static int draw_slice(uint8_t * image[], int stride[], int w, int h,
                    stride[2]);
 
     return 0;
-}
-
-static int draw_frame(uint8_t * src[])
-{
-    return VO_ERROR;
 }
 
 static uint32_t draw_image(mp_image_t * mpi)

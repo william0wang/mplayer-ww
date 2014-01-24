@@ -589,7 +589,7 @@ GtkWidget * CreatePopUpMenu( void )
   if ( guiInfo.VideoWindow )
    {
     int a11 = False, a169 = False, a43 = False, a235 = False;
-
+    AddSeparator( Menu );
     if (movie_aspect == -1.0f) a11 = True;
     else
      {
@@ -613,6 +613,35 @@ GtkWidget * CreatePopUpMenu( void )
    }
    }
 
+  if ( guiInfo.VideoWindow )
+   {
+    int b1 = False, b2 = False, b_half = False;
+
+    if ( !guiApp.videoWindow.isFullScreen && guiInfo.Playing )
+     {
+      if ( ( guiApp.videoWindow.Width == guiInfo.VideoWidth * 2 )&&
+           ( guiApp.videoWindow.Height == guiInfo.VideoHeight * 2 ) ) b2=True;
+      else if ( ( guiApp.videoWindow.Width == guiInfo.VideoWidth / 2 ) &&
+                ( guiApp.videoWindow.Height == guiInfo.VideoHeight / 2 ) ) b_half=True;
+      else b1=( guiApp.videoWindow.Width == guiInfo.VideoWidth && guiApp.videoWindow.Height == guiInfo.VideoHeight );
+     } else b1=!guiApp.videoWindow.isFullScreen;
+    F=AddMenuCheckItem( window1, (const char*)full_xpm, Menu,MSGTR_MENU_FullScreen,guiApp.videoWindow.isFullScreen,evFullScreen + ( True << 16 ) );
+    D=AddMenuCheckItem( window1, (const char*)double_xpm, Menu,MSGTR_MENU_DoubleSize,b2,evDoubleSize );
+    N=AddMenuCheckItem( window1, (const char*)normal_xpm, Menu,MSGTR_MENU_NormalSize"      ",b1,evNormalSize );
+    H=AddMenuCheckItem( window1, (const char*)half_xpm, Menu,MSGTR_MENU_HalfSize,b_half,evHalfSize );
+  if ( !guiInfo.Playing )
+   {
+    gtk_widget_set_sensitive( H,FALSE );
+    gtk_widget_set_sensitive( N,FALSE );
+    gtk_widget_set_sensitive( D,FALSE );
+    gtk_widget_set_sensitive( F,FALSE );
+   }
+   }
+
+  AddSeparator( Menu );
+  MenuItem=AddMenuCheckItem( window1, (const char*)sound_xpm, Menu,MSGTR_MENU_Mute,mixer->muted,evMute );
+  if ( !guiInfo.AudioChannels ) gtk_widget_set_sensitive( MenuItem,FALSE );
+
   if ( guiInfo.Playing && demuxer && guiInfo.StreamType != STREAMTYPE_DVD )
    {
     int i,c = 0;
@@ -622,7 +651,7 @@ GtkWidget * CreatePopUpMenu( void )
 
     if ( c > 1 )
      {
-      SubMenu=AddSubMenu( window1, (const char*)empty_xpm, Menu,MSGTR_MENU_AudioTrack );
+      SubMenu=AddSubMenu( window1, (const char*)audiolang_xpm, Menu,MSGTR_MENU_AudioTrack );
       for ( i=0;i < MAX_A_STREAMS;i++ )
        if ( demuxer->a_streams[i] )
         {
@@ -667,37 +696,10 @@ GtkWidget * CreatePopUpMenu( void )
    }
 
   AddSeparator( Menu );
-  MenuItem=AddMenuCheckItem( window1, (const char*)sound_xpm, Menu,MSGTR_MENU_Mute,mixer->muted,evMute );
-  if ( !guiInfo.AudioChannels ) gtk_widget_set_sensitive( MenuItem,FALSE );
+  AddMenuItem( window1, (const char*)equalizer_xpm, Menu,MSGTR_Equalizer, evEqualizer );
   AddMenuItem( window1, (const char*)playlist_xpm, Menu,MSGTR_MENU_PlayList, evPlaylist );
   AddMenuItem( window1, (const char*)skin_xpm, Menu,MSGTR_MENU_SkinBrowser, evSkinBrowser );
   AddMenuItem( window1, (const char*)prefs_xpm, Menu,MSGTR_MENU_Preferences, evPreferences );
-  AddMenuItem( window1, (const char*)equalizer_xpm, Menu,MSGTR_Equalizer, evEqualizer );
-
-  if ( guiInfo.VideoWindow )
-   {
-    int b1 = False, b2 = False, b_half = False;
-    AddSeparator( Menu );
-    if ( !guiApp.videoWindow.isFullScreen && guiInfo.Playing )
-     {
-      if ( ( guiApp.videoWindow.Width == guiInfo.VideoWidth * 2 )&&
-           ( guiApp.videoWindow.Height == guiInfo.VideoHeight * 2 ) ) b2=True;
-      else if ( ( guiApp.videoWindow.Width == guiInfo.VideoWidth / 2 ) &&
-                ( guiApp.videoWindow.Height == guiInfo.VideoHeight / 2 ) ) b_half=True;
-      else b1=( guiApp.videoWindow.Width == guiInfo.VideoWidth && guiApp.videoWindow.Height == guiInfo.VideoHeight );
-     } else b1=!guiApp.videoWindow.isFullScreen;
-    H=AddMenuCheckItem( window1, (const char*)half_xpm, Menu,MSGTR_MENU_HalfSize,b_half,evHalfSize );
-    N=AddMenuCheckItem( window1, (const char*)normal_xpm, Menu,MSGTR_MENU_NormalSize"      ",b1,evNormalSize );
-    D=AddMenuCheckItem( window1, (const char*)double_xpm, Menu,MSGTR_MENU_DoubleSize,b2,evDoubleSize );
-    F=AddMenuCheckItem( window1, (const char*)full_xpm, Menu,MSGTR_MENU_FullScreen,guiApp.videoWindow.isFullScreen,evFullScreen + ( True << 16 ) );
-  if ( !guiInfo.Playing )
-   {
-    gtk_widget_set_sensitive( H,FALSE );
-    gtk_widget_set_sensitive( N,FALSE );
-    gtk_widget_set_sensitive( D,FALSE );
-    gtk_widget_set_sensitive( F,FALSE );
-   }
-   }
 
   AddSeparator( Menu );
   AddMenuItem( window1, (const char*)exit_xpm, Menu,MSGTR_MENU_Exit, evExit );

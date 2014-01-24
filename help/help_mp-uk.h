@@ -661,7 +661,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "к/c:"
 #define MSGTR_PREFERENCES_SUB_POS "Положення: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Заборонити автозавантаження субтитрів"
-#define MSGTR_PREFERENCES_SUB_Unicode "Unicode субтитри"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Перетворити вказані субтитри до формату MPlayer"
 #define MSGTR_PREFERENCES_SUB_SRT "Перетворити вказані субтитри до формату SubViewer (SRT)"
 #define MSGTR_PREFERENCES_SUB_Overlap "Дозволити/заборонити перекриття субтитрів"
@@ -670,7 +669,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_ASS_TOP_MARGIN "Угорі: "
 #define MSGTR_PREFERENCES_SUB_ASS_BOTTOM_MARGIN "Знизу: "
 #define MSGTR_PREFERENCES_Font "Шрифт:"
-#define MSGTR_PREFERENCES_FontFactor "Фактор шрифту:"
 #define MSGTR_PREFERENCES_PostProcess "Дозволити postprocessing"
 #define MSGTR_PREFERENCES_AutoQuality "Авто якість: "
 #define MSGTR_PREFERENCES_NI "Використовувати неперемежений AVI парсер"
@@ -681,7 +679,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Субтитри"
 #define MSGTR_PREFERENCES_FRAME_Font "Шрифт"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocessing"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Кодек й demuxer"
 #define MSGTR_PREFERENCES_FRAME_Cache "Кеш"
 #define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
 #define MSGTR_PREFERENCES_Audio_Device "Пристрій:"

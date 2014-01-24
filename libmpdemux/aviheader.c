@@ -629,10 +629,10 @@ if (index_file_load) {
       goto gen_index;
     }
   }
-  fclose(fp);
   mp_msg(MSGT_HEADER,MSGL_INFO, MSGTR_MPDEMUX_AVIHDR_IdxFileLoaded, index_file_load);
-}
 gen_index:
+  if (fp) fclose(fp);
+}
 if(index_mode>=2 || (priv->idx_size==0 && index_mode==1)){
   int idx_pos = 0;
   // build index for file:

@@ -799,7 +799,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "Pozycja: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Wyłącz automatycznie wczytywanie napisów"
-#define MSGTR_PREFERENCES_SUB_Unicode "Napisy w Unicode"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Konwertuj wybrane napisy na format MPlayer"
 #define MSGTR_PREFERENCES_SUB_SRT "Konwertuj wybrane napisy na oparty na czasie format SubViewer (SRT)"
 #define MSGTR_PREFERENCES_SUB_Overlap "Włącz nakładanie się napisów"
@@ -808,7 +807,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_ASS_TOP_MARGIN "Górny: "
 #define MSGTR_PREFERENCES_SUB_ASS_BOTTOM_MARGIN "Dolny: "
 #define MSGTR_PREFERENCES_Font "Czcionka:"
-#define MSGTR_PREFERENCES_FontFactor "Skala czcionki:"
 #define MSGTR_PREFERENCES_PostProcess "Włącz postprocessing"
 #define MSGTR_PREFERENCES_AutoQuality "Jakość automatyczna: "
 #define MSGTR_PREFERENCES_NI "Użyj parsera dla pliku AVI bez przeplotu"
@@ -819,7 +817,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Napisy"
 #define MSGTR_PREFERENCES_FRAME_Font "Czcionka"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocessing"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Kodek & demuxer"
 #define MSGTR_PREFERENCES_FRAME_Cache "Pamięć podręczna"
 #define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
 #define MSGTR_PREFERENCES_Audio_Device "Urządzenie:"

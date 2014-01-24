@@ -7,7 +7,8 @@
  * 	Sven Neumann <sven@gimp.org>
  * 	Michael Natterer <mitch@gimp.org>
  * 	Daniel Mack <daniel@yoobay.net>
- * copyright (C) 2004 Stefan Schuermans <1stein@schuermans.info>
+ * some patches: copyright (C) 2004,2014 Stefan Schuermans
+ *                                       <stefan@blinkenarea.org>
  * other stuff: copyright (C) 2002 Rik Snel
  *
  * This file is part of MPlayer.
@@ -48,6 +49,8 @@
 #include <netinet/in.h>
 
 #include "video_out.h"
+#define NO_DRAW_FRAME
+#define NO_DRAW_SLICE
 #include "video_out_internal.h"
 #include "mp_msg.h"
 #include "m_option.h"
@@ -90,7 +93,7 @@ typedef struct {
 	int channels;
 	int width;
 	int height;
-	int bpc; /* bits per component: bpc = 3, channels = 3 => bpp = 24*/
+	int bpc; /* bits per component: bpc = 8, channels = 3 => bpp = 24*/
 
 	/* file output functions */
 	int (*init_file)(bl_file_t *file);
@@ -103,7 +106,8 @@ typedef struct {
 	void (*close_connection)(bl_host_t *host);
 } bl_properties_t;
 
-static bl_properties_t *bl = NULL;
+static bl_properties_t *bl;
+static bl_properties_t cur_bl;
 
 /* arbitrary limit because I am too lazy to do proper memory management */
 #define BL_MAX_FILES 16
@@ -152,8 +156,8 @@ static void bml_write_frame(bl_file_t *f, unsigned char *i, int duration) {
 	fprintf(f->fp, "    <frame duration=\"%d\">\n", duration);
 	for (j = 0; j < bl->height; j++) {
 		fprintf(f->fp, "        <row>");
-		for (k = 0; k < bl->width; k++)
-			fprintf(f->fp, "%02x", *(i + j * bl->width + k));
+		for (k = 0; k < bl->width * bl->channels; k++)
+			fprintf(f->fp, "%02x", i[j * bl->width * bl->channels + k]);
 		fprintf(f->fp, "</row>\n");
 	}
 	fprintf(f->fp, "    </frame>\n");
@@ -162,6 +166,7 @@ static void bml_write_frame(bl_file_t *f, unsigned char *i, int duration) {
 static void bml_close(bl_file_t *f) {
 	fprintf(f->fp, "</blm>\n");
 	fclose(f->fp);
+	f->fp = NULL;
 }
 
 /* Blinkenlights UDP protocol */
@@ -169,6 +174,7 @@ static int udp_init(bl_host_t *h) {
 	struct sockaddr_in addr;
 	struct hostent *dest;
 
+	h->fd = -1;
 	dest = gethostbyname(h->name);
 	if (!dest) {
 		mp_msg(MSGT_VO, MSGL_ERR,
@@ -176,7 +182,6 @@ static int udp_init(bl_host_t *h) {
 		return 1;
 	}
 
-	h->fd = -1;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(h->port);
@@ -193,6 +198,7 @@ static int udp_init(bl_host_t *h) {
 		mp_msg(MSGT_VO, MSGL_ERR, "couldn't connect socket for %s\n",
 				h->name);
 		close(h->fd);
+		h->fd = -1;
 		return 1;
 	}
 	return 0;
@@ -205,18 +211,22 @@ static void udp_send(bl_host_t *h) {
 
 static void udp_close(bl_host_t *h) {
 	close(h->fd);
+	h->fd = -1;
 }
 
-#define NO_BLS 3
+#define NO_BLS 4
 
-static bl_properties_t bls[NO_BLS] = {
-	{ "hdl", IMGFMT_YV12, 1, 18, 8, 8,
+static const bl_properties_t bls[NO_BLS] = {
+	{ "hdl", IMGFMT_Y8, 1, 18, 8, 8,
 	&bml_init, &bml_write_frame, &bml_close,
 	&udp_init, &udp_send, &udp_close },
-	{ "arcade", IMGFMT_YV12, 1, 26, 20, 8,
+	{ "arcade", IMGFMT_Y8, 1, 26, 20, 8,
 	&bml_init, &bml_write_frame, &bml_close,
 	&udp_init, &udp_send, &udp_close },
-	{ "grayscale", IMGFMT_YV12, 1, -1, -1, 8, /* use width and height of movie */
+	{ "grayscale", IMGFMT_Y8, 1, -1, -1, 8, /* use width and height of movie */
+	&bml_init, &bml_write_frame, &bml_close,
+	&udp_init, &udp_send, &udp_close },
+	{ "rgb", IMGFMT_RGB24, 3, -1, -1, 8, /* use width and height of movie */
 	&bml_init, &bml_write_frame, &bml_close,
 	&udp_init, &udp_send, &udp_close } };
 
@@ -224,62 +234,65 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 	uint32_t d_height, uint32_t flags, char *title, uint32_t format)
 {
 	void * ptr;
+	int reset_width = bl->width < 0;
+	int reset_height = bl->height < 0;
 
 	/* adapt size of Blinkenlights UDP stream to size of movie */
-	if (bl->width < 0 || bl->height < 0) {
-		if (bl->width < 0) { /* use width of movie */
-			bl->width = width;
-			bl_packet->width = htons(bl->width);
-		}
-		if (bl->height < 0) { /* use height of movie */
-			bl->height = height;
-			bl_packet->height = htons(bl->height);
-		}
-		/* check for maximum size of UDP packet */
-		if (12 + bl->width*bl->height*bl->channels > 65507) {
-			mp_msg(MSGT_VO, MSGL_ERR, "bl: %dx%d-%d does not fit into an UDP packet\n",
-					bl->width, bl->height, bl->channels);
-			return 1;
-		}
-		/* resize frame and tmp buffers */
-		bl_size = 12 + bl->width*bl->height*bl->channels;
-		ptr = realloc(bl_packet, 12 + bl->width*bl->height*3); /* space for header and image data */
-		if (ptr)
-			bl_packet = (bl_packet_t*)ptr;
-		else {
-			mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
-			return 1;
-		}
-		image = ((unsigned char*)bl_packet + 12); /* pointer to image data */
-		ptr = realloc(tmp, bl->width*bl->height*3); /* space for image data only */
-		if (ptr)
-			tmp = (unsigned char*)ptr;
-		else {
-			mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
-			return 1;
-		}
+	if (reset_width) bl->width = width; /* use width of movie */
+	if (reset_height) bl->height = height; /* use height of movie */
+
+	bl_size = 12 + bl->width*bl->height*bl->channels;
+
+	/* check for maximum size of UDP packet */
+	if (bl_size > 65507) {
+		mp_msg(MSGT_VO, MSGL_ERR, "bl: %dx%d-%d does not fit into an UDP packet\n",
+				bl->width, bl->height, bl->channels);
+		goto err_out;
 	}
 
+	/* resize or allocate frame and tmp buffers */
+	free(bl_packet);
+	bl_packet = calloc(bl_size, 1); /* space for header and image data */
+	if (!bl_packet) {
+		mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
+		goto err_out;
+	}
+	image = ((unsigned char*)bl_packet + 12); /* pointer to image data */
+
+	ptr = realloc(tmp, bl_size); /* space for image data only, could be slightly smaller */
+	if (!ptr) {
+		mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
+		goto err_out;
+	}
+	tmp = ptr;
+
+	bl_packet->magic = htonl(0x23542666);
+	bl_packet->width = htons(bl->width);
+	bl_packet->height = htons(bl->height);
+	bl_packet->channels = htons(bl->channels);
+	bl_packet->maxval = htons((1 << bl->bpc) - 1);
+
 	framenum = 0;
-	if (format != IMGFMT_YV12) {
+	if (format != bl->img_format) {
 		mp_msg(MSGT_VO, MSGL_ERR, "vo_bl called with wrong format");
-		return 1;
+		goto err_out;
 	}
 	if (width > bl->width) {
 		mp_msg(MSGT_VO, MSGL_ERR, "bl: width of movie too large %d > %d\n", width, bl->width);
-		return 1;
+		goto err_out;
 	}
 	if (height > bl->height) {
 		mp_msg(MSGT_VO, MSGL_ERR, "bl: height of movie too large %d > %d\n", height, bl->height);
-		return 1;
+		goto err_out;
 	}
-	if (!image) {
-		mp_msg(MSGT_VO, MSGL_ERR, "bl: image should be initialized, internal error\n");
-		return 1;
-	}
-	memset(image, 0, bl->width*bl->height*3); /* blank the image */
 	mp_msg(MSGT_VO, MSGL_V, "vo_config bl called\n");
 	return 0;
+err_out:
+	// undo changes that might make variables mismatch
+	// our actual allocations
+	if (reset_width) bl->width = -1;
+	if (reset_height) bl->height = -1;
+	return 1;
 }
 
 static void draw_osd(void) {
@@ -300,13 +313,9 @@ static void flip_page (void) {
 	return;
 }
 
-static int draw_frame(uint8_t * src[]) {
-	return 0;
-}
-
 static int query_format(uint32_t format) {
 	if (format == bl->img_format)
-		return VFCAP_CSP_SUPPORTED|VFCAP_CSP_SUPPORTED_BY_HW;
+		return VFCAP_CSP_SUPPORTED|VFCAP_CSP_SUPPORTED_BY_HW|VFCAP_ACCEPT_STRIDE|VOCAP_NOSLICES;
 	return 0;
 }
 
@@ -315,6 +324,8 @@ static void uninit(void) {
 	mp_msg(MSGT_VO, MSGL_V, "bl: uninit called\n");
 	free(bl_packet);
 	bl_packet = NULL;
+	free(tmp);
+	tmp = NULL;
 	free(bl_subdevice);
 	bl_subdevice = NULL;
 	for (i = 0; i < no_bl_files; i++) bl->close_file(&bl_files[i]);
@@ -327,52 +338,46 @@ static void uninit(void) {
 static void check_events(void) {
 }
 
-static int draw_slice(uint8_t *srcimg[], int stride[],
-		int w, int h, int x, int y) {
-	int i;
-	uint8_t *dst = image + y * bl->width + x;
-	uint8_t *src=srcimg[0];
-	// copy Y:
-	for (i = 0; i < h; i++) {
-		fast_memcpy(dst,src,w);
-		dst+=bl->width;
-		src+=stride[0];
-
-	}
- 	return 0;
+static uint32_t draw_image(mp_image_t *mpi) {
+    memcpy_pic(image, mpi->planes[0], mpi->w * bl->channels, mpi->h,
+               bl->width * bl->channels, mpi->stride[0]);
+    return VO_TRUE;
 }
 
 static int preinit(const char *arg) {
-	char *p, *q;
+	char *p;
 	int end = 0, i;
-	char txt[256];
 	if (!arg || strlen(arg) == 0) {
 		mp_msg(MSGT_VO, MSGL_ERR, "bl: subdevice must be given, example: -vo bl:arcade:host=localhost:2323\n");
 		return 1;
 	}
 
-	bl_subdevice = malloc(strlen(arg) + 1);
+	bl_subdevice = strdup(arg);
 	if (!bl_subdevice) {
 		mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
 		return 1;
 	}
 	p = bl_subdevice;
-	strcpy(p, arg);
 	mp_msg(MSGT_VO, MSGL_V, "bl: preinit called with %s\n", arg);
 	for (i = 0; i < NO_BLS; i++) {
 		if (!strncmp(p, bls[i].name, strlen(bls[i].name)))
 			break;
 	}
 	if (i >= NO_BLS) {
+		char txt[256];
 		txt[0] = 0;
-		for (i = 0; i < NO_BLS; i++)
-			if (strlen( txt ) + 4 + strlen( bls[i].name ) + 1 < sizeof(txt))
-				sprintf( txt + strlen( txt ), "%s%s",
+		for (i = 0; i < NO_BLS; i++) {
+			int pos = strlen(txt);
+			snprintf(txt + pos, sizeof(txt) - pos, "%s%s",
 					 txt[0] == 0 ? "" : i == NO_BLS - 1 ? " or " : ", ", bls[i].name );
+		}
 		mp_msg(MSGT_VO, MSGL_ERR, "bl: subdevice must start with %s\nbl: i.e. -vo bl:arcade:host=localhost:2323\n", txt);
 		return 1;
 	}
-	bl = &bls[i];
+	// Global data arrays should not be modified, otherwise behaviour
+	// becomes too confusing.
+	cur_bl = bls[i];
+	bl = &cur_bl;
 	p += strlen(bls[i].name);
 	if (*p == '\0') {
 		no_bl_hosts = 1;
@@ -387,14 +392,14 @@ static int preinit(const char *arg) {
 	p++;
 
 	while (!end) {
-		q = p + 5;
+		char *q = p + 5;
 		if (!strncmp(p, "file=", 5)) {
 			if (no_bl_files == BL_MAX_FILES) {
 				mp_msg(MSGT_VO, MSGL_ERR, "bl: maximum number of files reached (%d)\n", BL_MAX_FILES);
 				return 1;
 			}
-			p += 5;
-			while (*q != ',' && *q != '\0') q++;
+			p = q;
+			q += strcspn(q, ",");
 			if (*q == '\0') end = 1;
 			*q = '\0';
 			bl_files[no_bl_files].name = p;
@@ -406,21 +411,19 @@ static int preinit(const char *arg) {
 				mp_msg(MSGT_VO, MSGL_ERR, "bl: maximum number of hosts reached (%d)\n", BL_MAX_HOSTS);
 				return 1;
 			}
-			p += 5;
-			while (*q != ',' && *q != '\0' && *q != ':') q++;
+			p = q;
+			q += strcspn(q, ",:");
+
+			bl_hosts[no_bl_hosts].port = 2323; // default port
 			if (*q == ':') {
 				*q++ = '\0';
-				bl_hosts[no_bl_hosts].name = p;
 				bl_hosts[no_bl_hosts].port = atoi(q);
-				while (*q != ',' && *q != '\0') q++;
-				if (*q == '\0') end = 1;
-			} else {
-				/* use default port */
-				if (*q == '\0') end = 1;
-				*q = '\0';
-				bl_hosts[no_bl_hosts].name = p;
-				bl_hosts[no_bl_hosts].port = 2323;
+				q += strcspn(q, ",");
 			}
+
+			if (*q == '\0') end = 1;
+			*q = '\0';
+			bl_hosts[no_bl_hosts].name = p;
 			mp_msg(MSGT_VO, MSGL_V,
 					"blhost[%d]: %s:%d\n",
 					no_bl_hosts, p,
@@ -432,29 +435,6 @@ static int preinit(const char *arg) {
 		}
 		p = ++q;
 	}
-
-	if (bl->width >= 0 && bl->height >= 0) { /* size already known */
-		bl_size = 12 + bl->width*bl->height*bl->channels;
-		bl_packet = malloc(12 + bl->width*bl->height*3); /* space for header and image data */
-		image = ((unsigned char*)bl_packet + 12); /* pointer to image data */
-		tmp = malloc(bl->width*bl->height*3); /* space for image data only */
-	}
-	else { /* size unknown yet */
-		bl_size = 12;
-		bl_packet = malloc(12 + 3); /* space for header and a pixel */
-		image = ((unsigned char*)bl_packet + 12); /* pointer to image data */
-		tmp = malloc(3); /* space for a pixel only */
-	}
-
-	if (!bl_packet || !tmp) {
-		mp_msg(MSGT_VO, MSGL_ERR, "bl: out of memory error\n");
-		return 1;
-	}
-	bl_packet->magic = htonl(0x23542666);
-	bl_packet->width = htons(bl->width);
-	bl_packet->height = htons(bl->height);
-	bl_packet->channels = htons(bl->channels);
-	bl_packet->maxval = htons((1 << bl->bpc) - 1);
 
 	/* open all files */
 	for (i = 0; i < no_bl_files; i++)
@@ -472,6 +452,8 @@ static int control(uint32_t request, void *data) {
 	switch (request) {
 		case VOCTRL_QUERY_FORMAT:
 			return query_format(*((uint32_t*)data));
+		case VOCTRL_DRAW_IMAGE:
+			return draw_image(data);
   		}
   	return VO_NOTIMPL;
 }

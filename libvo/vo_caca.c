@@ -35,6 +35,7 @@
 
 #include "config.h"
 #include "video_out.h"
+#define NO_DRAW_SLICE
 #include "video_out_internal.h"
 #include "sub/sub.h"
 
@@ -175,11 +176,6 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 static int draw_frame(uint8_t *src[])
 {
     caca_dither_bitmap(canvas, 0, 0, screen_w, screen_h, dither, src[0]);
-    return 0;
-}
-
-static int draw_slice(uint8_t *src[], int stride[], int w, int h, int x, int y)
-{
     return 0;
 }
 

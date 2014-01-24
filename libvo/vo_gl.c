@@ -31,6 +31,7 @@
 #include "mp_msg.h"
 #include "subopt-helper.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "libmpcodecs/vf.h"
 #include "sub/font_load.h"
@@ -1132,12 +1133,6 @@ static uint32_t draw_image(mp_image_t *mpi) {
 skip_upload:
   if (vo_doublebuffering) do_render();
   return VO_TRUE;
-}
-
-static int
-draw_frame(uint8_t *src[])
-{
-  return VO_ERROR;
 }
 
 static int

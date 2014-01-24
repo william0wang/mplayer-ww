@@ -28,6 +28,7 @@
 
 #include "config.h"
 #include "video_out.h"
+#define NO_DRAW_SLICE
 #include "video_out_internal.h"
 #include "aspect.h"
 #include "x11_common.h"
@@ -343,14 +344,6 @@ static void flip_page(void)
         switch_video_buffers();
     }
 }
-
-//---------------------------------------------------------
-
-static int draw_slice(uint8_t * src[], int stride[],
-                           int w, int h, int x, int y)
-{
-    return 0;
-};
 
 //---------------------------------------------------------
 

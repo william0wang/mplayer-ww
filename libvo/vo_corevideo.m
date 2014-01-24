@@ -35,6 +35,8 @@
 #include "config.h"
 #include "fastmemcpy.h"
 #include "video_out.h"
+#define NO_DRAW_SLICE
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "aspect.h"
 #include "mp_msg.h"
@@ -244,28 +246,17 @@ static void flip_page(void)
 	}
 }
 
-static int draw_slice(uint8_t *src[], int stride[], int w,int h,int x,int y)
-{
-	return 0;
-}
-
-
-static int draw_frame(uint8_t *src[])
-{
-	return 0;
-}
-
 static uint32_t draw_image(mp_image_t *mpi)
 {
 	if (!(mpi->flags & MP_IMGFLAG_DIRECT))
 	memcpy_pic(image_data, mpi->planes[0], image_width*image_bytes, image_height, image_stride, mpi->stride[0]);
 
-	return 0;
+	return VO_TRUE;
 }
 
 static int query_format(uint32_t format)
 {
-    const int supportflags = VFCAP_CSP_SUPPORTED | VFCAP_CSP_SUPPORTED_BY_HW | VFCAP_OSD | VFCAP_HWSCALE_UP | VFCAP_HWSCALE_DOWN;
+    const int supportflags = VFCAP_CSP_SUPPORTED | VFCAP_CSP_SUPPORTED_BY_HW | VFCAP_OSD | VFCAP_HWSCALE_UP | VFCAP_HWSCALE_DOWN | VFCAP_ACCEPT_STRIDE | VOCAP_NOSLICES;
 	image_format = format;
 
     switch(format)

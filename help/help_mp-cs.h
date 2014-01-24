@@ -666,7 +666,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "Pozice: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Vypnout automatické načtení titulků"
-#define MSGTR_PREFERENCES_SUB_Unicode "Titulky v UNICODE"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Převést dané titulky do vlastního formátu MPlayeru"
 #define MSGTR_PREFERENCES_SUB_SRT "Převést dané titulky do časově orientovaného formátu SubViewer (SRT)"
 #define MSGTR_PREFERENCES_SUB_Overlap "Zapnout překrývání titulků"
@@ -675,7 +674,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_ASS_TOP_MARGIN "Horní: "
 #define MSGTR_PREFERENCES_SUB_ASS_BOTTOM_MARGIN "Dolní: "
 #define MSGTR_PREFERENCES_Font "Font:"
-#define MSGTR_PREFERENCES_FontFactor "Zvětšení Fontu:"
 #define MSGTR_PREFERENCES_PostProcess "Aktivovat postprocessing"
 #define MSGTR_PREFERENCES_AutoQuality "Automatické řízení kvality:"
 #define MSGTR_PREFERENCES_NI "Použít parser pro neprokládaný AVI formát"
@@ -686,7 +684,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Titulky"
 #define MSGTR_PREFERENCES_FRAME_Font "Font"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocessing"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Kodek & demuxer"
 #define MSGTR_PREFERENCES_FRAME_Cache "Vyrovnávací paměť"
 #define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
 #define MSGTR_PREFERENCES_Audio_Device "Zařízení:"

@@ -36,6 +36,7 @@
 #include "mp_global.h"
 #include "stream/url.h"
 #include "libavutil/avstring.h"
+#include "libavutil/attributes.h"
 
 // Don't free for 'production' atm
 #ifndef MP_DEBUG
@@ -155,10 +156,9 @@ const m_option_type_t m_option_type_flag = {
 
 // Integer
 
-static int parse_int(const m_option_t* opt,const char *name, const char *param, void* dst, int src) {
+static int parse_int(const m_option_t* opt,const char *name, const char *param, void* dst, int av_unused src) {
   long long tmp_int;
   char *endptr;
-  src = 0;
 
   if (param == NULL)
     return M_OPT_MISSING_PARAM;
@@ -228,10 +228,9 @@ const m_option_type_t m_option_type_int64 = {
 #undef VAL
 #define VAL(x) (*(double*)(x))
 
-static int parse_double(const m_option_t* opt,const char *name, const char *param, void* dst, int src) {
+static int parse_double(const m_option_t* opt,const char *name, const char *param, void* dst, int av_unused src) {
   double tmp_float;
   char* endptr;
-  src = 0;
 
   if (param == NULL)
     return M_OPT_MISSING_PARAM;
@@ -277,8 +276,7 @@ static int parse_double(const m_option_t* opt,const char *name, const char *para
   return 1;
 }
 
-static char* print_double(const m_option_t* opt,  const void* val) {
-  opt = NULL;
+static char* print_double(const m_option_t* av_unused opt,  const void* val) {
   return dup_printf("%f",VAL(val));
 }
 
@@ -305,8 +303,7 @@ static int parse_float(const m_option_t* opt,const char *name, const char *param
     return r;
 }
 
-static char* print_float(const m_option_t* opt,  const void* val) {
-  opt = NULL;
+static char* print_float(const m_option_t* av_unused opt,  const void* val) {
   return dup_printf("%f",VAL(val));
 }
 

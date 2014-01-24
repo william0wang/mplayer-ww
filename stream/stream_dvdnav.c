@@ -107,14 +107,10 @@ static dvdnav_priv_t * new_dvdnav_stream(char * filename) {
 
   dvd_set_speed(priv->filename, dvd_speed);
 
-  if(dvdnav_open(&(priv->dvdnav),priv->filename)!=DVDNAV_STATUS_OK)
+  if(dvdnav_open(&(priv->dvdnav),priv->filename)!=DVDNAV_STATUS_OK || !priv->dvdnav)
   {
+    dvd_set_speed(priv->filename, -1);
     free(priv->filename);
-    free(priv);
-    return NULL;
-  }
-
-  if (!priv->dvdnav) {
     free(priv);
     return NULL;
   }
@@ -622,6 +618,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
     priv->title = p->track;
     if(dvdnav_title_play(priv->dvdnav, p->track) != DVDNAV_STATUS_OK) {
       mp_msg(MSGT_OPEN,MSGL_FATAL,"dvdnav_stream, couldn't select title %d, error '%s'\n", p->track, dvdnav_err_to_string(priv->dvdnav));
+      stream_dvdnav_close(stream);
       return STREAM_UNSUPPORTED;
     }
     mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_DVD_CURRENT_TITLE=%d\n", p->track);

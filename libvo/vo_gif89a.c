@@ -54,6 +54,7 @@
 #include "config.h"
 #include "subopt-helper.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "mp_msg.h"
 
@@ -320,11 +321,6 @@ static void flip_page(void)
 	EGifPutImageDesc(new_gif, 0, 0, img_width, img_height, 0, reduce_cmap);
 	// put the image itself
 	EGifPutLine(new_gif, reduce_data, img_width * img_height);
-}
-
-static int draw_frame(uint8_t *src[])
-{
-	return 1;
 }
 
 static int draw_slice(uint8_t *src[], int stride[], int w, int h, int x, int y)

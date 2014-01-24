@@ -31,7 +31,7 @@
 #include "ad_internal.h"
 #include "dec_audio.h"
 
-#include <dts.h>
+#include <dca.h>
 
 static const ad_info_t info =
 {
@@ -51,12 +51,12 @@ LIBAD_EXTERN(libdca)
 #define CONVERT_BIAS 0
 
 static const char ch2flags[6] = {
-    DTS_MONO,
-    DTS_STEREO,
-    DTS_3F,
-    DTS_2F2R,
-    DTS_3F2R,
-    DTS_3F2R | DTS_LFE
+    DCA_MONO,
+    DCA_STEREO,
+    DCA_3F,
+    DCA_2F2R,
+    DCA_3F2R,
+    DCA_3F2R | DCA_LFE
 };
 
 static inline int16_t convert(sample_t s)
@@ -70,8 +70,8 @@ static void convert2s16_multi(sample_t *f, int16_t *s16, int flags, int ch_out)
 {
     int i;
 
-    switch(flags & (DTS_CHANNEL_MASK | DTS_LFE)){
-    case DTS_MONO:
+    switch(flags & (DCA_CHANNEL_MASK | DCA_LFE)){
+    case DCA_MONO:
         if (ch_out == 1)
             for(i = 0; i < 256; i++)
                 s16[i] = convert(f[i]);
@@ -81,22 +81,22 @@ static void convert2s16_multi(sample_t *f, int16_t *s16, int flags, int ch_out)
                 s16[5*i+4] = convert(f[i]);
             }
         break;
-    case DTS_CHANNEL:
-    case DTS_STEREO:
-    case DTS_DOLBY:
+    case DCA_CHANNEL:
+    case DCA_STEREO:
+    case DCA_DOLBY:
         for(i = 0; i < 256; i++){
             s16[2*i] = convert(f[i]);
             s16[2*i+1] = convert(f[i+256]);
         }
         break;
-    case DTS_3F:
+    case DCA_3F:
         for(i = 0; i < 256; i++){
             s16[3*i] = convert(f[i+256]);
             s16[3*i+1] = convert(f[i+512]);
             s16[3*i+2] = convert(f[i]);
         }
         break;
-    case DTS_2F2R:
+    case DCA_2F2R:
         for(i = 0; i < 256; i++){
             s16[4*i] = convert(f[i]);
             s16[4*i+1] = convert(f[i+256]);
@@ -104,7 +104,7 @@ static void convert2s16_multi(sample_t *f, int16_t *s16, int flags, int ch_out)
             s16[4*i+3] = convert(f[i+768]);
         }
         break;
-    case DTS_3F2R:
+    case DCA_3F2R:
         for(i = 0; i < 256; i++){
             s16[5*i] = convert(f[i+256]);
             s16[5*i+1] = convert(f[i+512]);
@@ -113,16 +113,16 @@ static void convert2s16_multi(sample_t *f, int16_t *s16, int flags, int ch_out)
             s16[5*i+4] = convert(f[i]);
         }
         break;
-    case DTS_MONO | DTS_LFE:
+    case DCA_MONO | DCA_LFE:
         for(i = 0; i < 256; i++){
             s16[6*i] = s16[6*i+1] = s16[6*i+2] = s16[6*i+3] = 0;
             s16[6*i+4] = convert(f[i]);
             s16[6*i+5] = convert(f[i+256]);
         }
         break;
-    case DTS_CHANNEL | DTS_LFE:
-    case DTS_STEREO | DTS_LFE:
-    case DTS_DOLBY | DTS_LFE:
+    case DCA_CHANNEL | DCA_LFE:
+    case DCA_STEREO | DCA_LFE:
+    case DCA_DOLBY | DCA_LFE:
         for(i = 0; i < 256; i++){
             s16[6*i] = convert(f[i]);
             s16[6*i+1] = convert(f[i+256]);
@@ -130,7 +130,7 @@ static void convert2s16_multi(sample_t *f, int16_t *s16, int flags, int ch_out)
             s16[6*i+5] = convert(f[i+512]);
         }
         break;
-    case DTS_3F | DTS_LFE:
+    case DCA_3F | DCA_LFE:
         for(i = 0; i < 256; i++){
             s16[6*i] = convert(f[i+256]);
             s16[6*i+1] = convert(f[i+512]);
@@ -139,7 +139,7 @@ static void convert2s16_multi(sample_t *f, int16_t *s16, int flags, int ch_out)
             s16[6*i+5] = convert(f[i+768]);
         }
         break;
-    case DTS_2F2R | DTS_LFE:
+    case DCA_2F2R | DCA_LFE:
         for(i = 0; i < 256; i++){
             s16[6*i] = convert(f[i]);
             s16[6*i+1] = convert(f[i+256]);
@@ -149,7 +149,7 @@ static void convert2s16_multi(sample_t *f, int16_t *s16, int flags, int ch_out)
             s16[6*i+5] = convert(f[1024]);
         }
         break;
-    case DTS_3F2R | DTS_LFE:
+    case DCA_3F2R | DCA_LFE:
         for(i = 0; i < 256; i++){
             s16[6*i] = convert(f[i+256]);
             s16[6*i+1] = convert(f[i+512]);
@@ -167,28 +167,28 @@ static void channels_info(int flags)
     int lfe = 0;
     char lfestr[5] = "";
 
-    if (flags & DTS_LFE) {
+    if (flags & DCA_LFE) {
         lfe = 1;
         strcpy(lfestr, "+lfe");
     }
     mp_msg(MSGT_DECAUDIO, MSGL_V, "DTS: ");
-    switch(flags & DTS_CHANNEL_MASK){
-    case DTS_MONO:
+    switch(flags & DCA_CHANNEL_MASK){
+    case DCA_MONO:
         mp_msg(MSGT_DECAUDIO, MSGL_V, "1.%d (mono%s)", lfe, lfestr);
         break;
-    case DTS_CHANNEL:
+    case DCA_CHANNEL:
         mp_msg(MSGT_DECAUDIO, MSGL_V, "2.%d (channel%s)", lfe, lfestr);
         break;
-    case DTS_STEREO:
+    case DCA_STEREO:
         mp_msg(MSGT_DECAUDIO, MSGL_V, "2.%d (stereo%s)", lfe, lfestr);
         break;
-    case DTS_3F:
+    case DCA_3F:
         mp_msg(MSGT_DECAUDIO, MSGL_V, "3.%d (3f%s)", lfe, lfestr);
         break;
-    case DTS_2F2R:
+    case DCA_2F2R:
         mp_msg(MSGT_DECAUDIO, MSGL_V, "4.%d (2f+2r%s)", lfe, lfestr);
         break;
-    case DTS_3F2R:
+    case DCA_3F2R:
         mp_msg(MSGT_DECAUDIO, MSGL_V, "5.%d (3f+2r%s)", lfe, lfestr);
         break;
     default:
@@ -199,7 +199,7 @@ static void channels_info(int flags)
 
 static int dts_sync(sh_audio_t *sh, int *flags)
 {
-    dts_state_t *s = sh->context;
+    dca_state_t *s = sh->context;
     int length;
     int sample_rate;
     int frame_length;
@@ -216,7 +216,7 @@ static int dts_sync(sh_audio_t *sh, int *flags)
             sh->a_in_buffer[sh->a_in_buffer_len++] = c;
         }
 
-        length = dts_syncinfo(s, sh->a_in_buffer, flags, &sample_rate,
+        length = dca_syncinfo(s, sh->a_in_buffer, flags, &sample_rate,
                               &bit_rate, &frame_length);
 
         if(length >= HEADER_SIZE)
@@ -237,7 +237,7 @@ static int dts_sync(sh_audio_t *sh, int *flags)
 
 static int decode_audio(sh_audio_t *sh, unsigned char *buf, int minlen, int maxlen)
 {
-    dts_state_t *s = sh->context;
+    dca_state_t *s = sh->context;
     int16_t *out_samples = (int16_t*)buf;
     int flags;
     level_t level;
@@ -250,26 +250,26 @@ static int decode_audio(sh_audio_t *sh, unsigned char *buf, int minlen, int maxl
         if(dts_sync(sh, &flags) < 0) return -1; /* EOF */
     sh->a_in_buffer_len=0;
 
-    flags &= ~(DTS_CHANNEL_MASK | DTS_LFE);
+    flags &= ~(DCA_CHANNEL_MASK | DCA_LFE);
     flags |= ch2flags[sh->channels - 1];
 
     level = CONVERT_LEVEL;
     bias = CONVERT_BIAS;
-    flags |= DTS_ADJUST_LEVEL;
-    if(dts_frame(s, sh->a_in_buffer, &flags, &level, bias)) {
-        mp_msg(MSGT_DECAUDIO, MSGL_ERR, "dts_frame() failed\n");
+    flags |= DCA_ADJUST_LEVEL;
+    if(dca_frame(s, sh->a_in_buffer, &flags, &level, bias)) {
+        mp_msg(MSGT_DECAUDIO, MSGL_ERR, "dca_frame() failed\n");
         goto end;
     }
 
-    nblocks = dts_blocks_num(s);
+    nblocks = dca_blocks_num(s);
 
     for(i = 0; i < nblocks; i++) {
-        if(dts_block(s)) {
-            mp_msg(MSGT_DECAUDIO, MSGL_ERR, "dts_block() failed\n");
+        if(dca_block(s)) {
+            mp_msg(MSGT_DECAUDIO, MSGL_ERR, "dca_block() failed\n");
             goto end;
         }
 
-        convert2s16_multi(dts_samples(s), out_samples, flags, sh->channels);
+        convert2s16_multi(dca_samples(s), out_samples, flags, sh->channels);
 
         out_samples += 256 * sh->channels;
         data_size += 256 * sizeof(int16_t) * sh->channels;
@@ -291,20 +291,20 @@ static int preinit(sh_audio_t *sh)
 
 static int init(sh_audio_t *sh)
 {
-    dts_state_t *s;
+    dca_state_t *s;
     int flags;
     int decoded_bytes;
 
-    s = dts_init(0);
+    s = dca_init(0);
     if(s == NULL) {
-        mp_msg(MSGT_DECAUDIO, MSGL_ERR, "dts_init() failed\n");
+        mp_msg(MSGT_DECAUDIO, MSGL_ERR, "dca_init() failed\n");
         return 0;
     }
     sh->context = s;
 
     if(dts_sync(sh, &flags) < 0) {
-        mp_msg(MSGT_DECAUDIO, MSGL_ERR, "dts sync failed\n");
-        dts_free(s);
+        mp_msg(MSGT_DECAUDIO, MSGL_ERR, "dca sync failed\n");
+        dca_free(s);
         return 0;
     }
     channels_info(flags);
@@ -317,7 +317,7 @@ static int init(sh_audio_t *sh)
         sh->a_buffer_len = decoded_bytes;
     else {
         mp_msg(MSGT_DECAUDIO, MSGL_ERR, "dts decode failed on first frame (up/downmix problem?)\n");
-        dts_free(s);
+        dca_free(s);
         return 0;
     }
 
@@ -326,9 +326,9 @@ static int init(sh_audio_t *sh)
 
 static void uninit(sh_audio_t *sh)
 {
-    dts_state_t *s = sh->context;
+    dca_state_t *s = sh->context;
 
-    dts_free(s);
+    dca_free(s);
 }
 
 static int control(sh_audio_t *sh,int cmd,void* arg, ...)

@@ -541,7 +541,7 @@ static void print_file_properties(const MPContext *mpctx, const char *filename)
     double video_start_pts = MP_NOPTS_VALUE;
     mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_FILENAME=%s\n",
            filename_recode(filename));
-    mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_DEMUXER=%s\n", mpctx->demuxer->desc->name);
+    mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_DEMUXER=%s\n", mpctx->demuxer ? mpctx->demuxer->desc->name : "none");
     if (mpctx->sh_video) {
         /* Assume FOURCC if all bytes >= 0x20 (' ') */
         if (mpctx->sh_video->format >= 0x20202020)
@@ -2382,6 +2382,9 @@ static int fill_audio_out_buffers(void)
     }
     if (format_change) {
         uninit_player(INITIALIZED_AO);
+        af_uninit(sh_audio->afilter);
+        free(sh_audio->afilter);
+        sh_audio->afilter = NULL;
         reinit_audio_chain();
     }
     return 1;
@@ -3013,20 +3016,18 @@ int main(int argc, char *argv[])
 
     mpctx->playtree = m_config_parse_mp_command_line(mconfig, argc, argv);
     if (mpctx->playtree == NULL) {
+        // parse error
         opt_exit = 1;
-    } else {
+    } else
         mpctx->playtree = play_tree_cleanup(mpctx->playtree);
-        if (mpctx->playtree) {
-            mpctx->playtree_iter = play_tree_iter_new(mpctx->playtree, mconfig);
-            if (mpctx->playtree_iter) {
-                if (play_tree_iter_step(mpctx->playtree_iter, 0, 0) != PLAY_TREE_ITER_ENTRY) {
-                    play_tree_iter_free(mpctx->playtree_iter);
-                    mpctx->playtree_iter = NULL;
-                }
-                filename = play_tree_iter_get_file(mpctx->playtree_iter, 1);
-            }
-        }
+
+    mpctx->playtree_iter = mpctx->playtree ? play_tree_iter_new(mpctx->playtree, mconfig) : NULL;
+    if (mpctx->playtree_iter && play_tree_iter_step(mpctx->playtree_iter, 0, 0) != PLAY_TREE_ITER_ENTRY) {
+        play_tree_iter_free(mpctx->playtree_iter);
+        mpctx->playtree_iter = NULL;
     }
+
+    filename = mpctx->playtree_iter ? play_tree_iter_get_file(mpctx->playtree_iter, 1) : NULL;
 
     print_version("MPlayer");
 #if (defined(__MINGW32__) || defined(__CYGWIN__)) && defined(CONFIG_GUI)
@@ -4335,13 +4336,12 @@ goto_next_file:  // don't jump here after ao/vo/getch initialization!
 
     while (mpctx->playtree_iter != NULL) {
         filename = play_tree_iter_get_file(mpctx->playtree_iter, mpctx->eof);
-        if (filename == NULL) {
-            if (play_tree_iter_step(mpctx->playtree_iter, mpctx->eof, 0) != PLAY_TREE_ITER_ENTRY) {
-                play_tree_iter_free(mpctx->playtree_iter);
-                mpctx->playtree_iter = NULL;
-            }
-        } else
+        if (filename)
             break;
+        if (play_tree_iter_step(mpctx->playtree_iter, mpctx->eof, 0) != PLAY_TREE_ITER_ENTRY) {
+            play_tree_iter_free(mpctx->playtree_iter);
+            mpctx->playtree_iter = NULL;
+        }
     }
 
 #ifdef CONFIG_GUI

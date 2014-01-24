@@ -221,6 +221,7 @@ static const m_option_t gui_opts[] = {
     { "sub_overlap",                 &suboverlap_enabled,      CONF_TYPE_FLAG,        0,           0,     0,          NULL },
     { "sub_pos",                     &sub_pos,                 CONF_TYPE_INT,         CONF_RANGE,  0,     200,        NULL },
     { "sub_unicode",                 &sub_unicode,             CONF_TYPE_FLAG,        0,           0,     1,          NULL },
+    { "sub_utf8",                    &sub_utf8,                CONF_TYPE_FLAG,        0,           0,     1,          NULL },
 
     { "font_factor",                 &font_factor,             CONF_TYPE_FLOAT,       CONF_RANGE,  0.0,   10.0,       NULL },
     { "font_name",                   &font_name,               CONF_TYPE_STRING,      0,           0,     0,          NULL },

@@ -31,6 +31,7 @@
 
 #include "config.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "libmpcodecs/vf.h"
 #include "fastmemcpy.h"
@@ -1394,15 +1395,6 @@ static int control(uint32_t request, void *data)
   };
   return VO_NOTIMPL;
 }
-
-// unused function
-
-static int draw_frame(uint8_t *src[])
-{
-	return -1;
-}
-
-// hopefully will be removed soon
 
 static void draw_alpha(int x0, int y0, int w, int h, unsigned char *src,
 		unsigned char *srca, int stride)

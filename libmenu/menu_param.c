@@ -238,6 +238,7 @@ static void read_cmd(menu_t* menu,int cmd) {
       char* txt = malloc(10 + strlen(e->menu) + 1);
       sprintf(txt,"set_menu %s",e->menu);
       c = mp_input_parse_cmd(txt);
+      free(txt);
       if(c) mp_input_queue_cmd(c);
       return;
     }
