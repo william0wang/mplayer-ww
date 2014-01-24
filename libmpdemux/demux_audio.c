@@ -533,6 +533,8 @@ static int demux_audio_open(demuxer_t* demuxer) {
       }
       stream_read(s,(char*)(w + 1),w->cbSize);
       l -= w->cbSize;
+      if (w->cbSize >= 22)
+          sh_audio->channel_layout = av_le2ne16(((WAVEFORMATEXTENSIBLE *)w)->dwChannelMask);
       if (w->wFormatTag == 0xfffe && w->cbSize >= 22)
           sh_audio->format = av_le2ne16(((WAVEFORMATEXTENSIBLE *)w)->SubFormat);
     }

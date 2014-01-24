@@ -32,6 +32,7 @@ static int
 mf_stream_open (stream_t *stream, int mode, void *opts, int *file_format)
 {
   stream->type = STREAMTYPE_MF;
+  stream->flags = STREAM_NON_CACHEABLE;
   *file_format = DEMUXER_TYPE_MF;
 
   return STREAM_OK;

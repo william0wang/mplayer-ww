@@ -30,6 +30,7 @@
 #include "mp_msg.h"
 #include "subopt-helper.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "libmpcodecs/vf.h"
 #include "gl_common.h"
@@ -169,12 +170,6 @@ static void flip_page(void)
 static int draw_slice(uint8_t *src[], int stride[], int w, int h, int x, int y)
 {
     sws_scale(sws, src, stride, y, h, map_image, map_stride);
-    return 0;
-}
-
-
-static int draw_frame(uint8_t *src[])
-{
     return 0;
 }
 

@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "libavutil/attributes.h"
+
 #include "config.h"
 
 #include "m_struct.h"
@@ -156,10 +158,8 @@ static void close_cs (menu_t* menu)
   menu_list_uninit (menu, NULL);
 }
 
-static int open_cs (menu_t* menu, char* args)
+static int open_cs (menu_t* menu, char* av_unused args)
 {
-  args = NULL;
-
   menu->draw = menu_list_draw;
   menu->read_cmd = read_cmd;
   menu->close = close_cs;

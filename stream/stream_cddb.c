@@ -376,9 +376,9 @@ static int cddb_http_request(char *command,
                       cddb_data_t *cddb_data)
 {
     char request[4096];
-    int fd, ret = 0;
-    URL_t *url;
-    HTTP_header_t *http_hdr;
+    int fd = -1, ret = -1;
+    URL_t *url = NULL;
+    HTTP_header_t *http_hdr = NULL;
 
     if (reply_parser == NULL || command == NULL || cddb_data == NULL)
         return -1;
@@ -391,26 +391,27 @@ static int cddb_http_request(char *command,
     url = url_new(request);
     if (url == NULL) {
         mp_msg(MSGT_DEMUX, MSGL_ERR, MSGTR_MPDEMUX_CDDB_NotAValidURL);
-        return -1;
+        goto out;
     }
 
     fd = http_send_request(url,0);
     if (fd < 0) {
         mp_msg(MSGT_DEMUX, MSGL_ERR,
                MSGTR_MPDEMUX_CDDB_FailedToSendHTTPRequest);
-        return -1;
+        goto out;
     }
 
     http_hdr = http_read_response(fd);
     if (http_hdr == NULL) {
         mp_msg(MSGT_DEMUX, MSGL_ERR,
                MSGTR_MPDEMUX_CDDB_FailedToReadHTTPResponse);
-        return -1;
+        goto out;
     }
 
     http_debug_hdr(http_hdr);
     mp_msg(MSGT_OPEN, MSGL_INFO,"body=[%s]\n", http_hdr->body);
 
+    ret = 0;
     switch (http_hdr->status_code) {
     case 200:
         ret = reply_parser(http_hdr, cddb_data);
@@ -422,8 +423,10 @@ static int cddb_http_request(char *command,
         mp_msg(MSGT_DEMUX, MSGL_ERR, MSGTR_MPDEMUX_CDDB_HTTPErrorUnknown);
     }
 
-    http_free(http_hdr);
-    url_free(url);
+out:
+    if (fd >= 0) closesocket(fd);
+    if (http_hdr) http_free(http_hdr);
+    if (url) url_free(url);
 
     return ret;
 }

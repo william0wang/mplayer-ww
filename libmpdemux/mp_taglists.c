@@ -99,6 +99,9 @@ static const struct AVCodecTag mp_codecid_override_tags[] = {
     { AV_CODEC_ID_ADPCM_IMA_EA_SEAD, MKTAG('S', 'E', 'A', 'D') },
     { AV_CODEC_ID_ADPCM_IMA_AMV,     MKTAG('A', 'M', 'V', 'A') },
     { AV_CODEC_ID_DIRAC,             MKTAG('d', 'r', 'a', 'c')},
+#if LIBAVUTIL_VERSION_MICRO >= 100
+    { AV_CODEC_ID_ATRAC3P,           0xE923AABF},
+#endif
     { AV_CODEC_ID_DTS,               0x2001 },
     { AV_CODEC_ID_DVVIDEO,           MKTAG('d', 'v', 's', 'd') },
     { AV_CODEC_ID_EAC3,              MKTAG('E', 'A', 'C', '3') },

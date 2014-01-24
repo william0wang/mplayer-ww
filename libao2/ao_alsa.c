@@ -258,7 +258,8 @@ static int try_open_device(const char *device, int open_mode, int try_ac3)
   char *ac3_device, *args;
 
   if (try_ac3) {
-    /* to set the non-audio bit, use AES0=6 */
+    /* to set the non-audio bit, use AES0=6
+     * 6 == IEC958_AES0_NONAUDIO | IEC958_AES0_PRO_EMPHASIS_NONE */
     len = strlen(device);
     ac3_device = malloc(len + 7 + 1);
     if (!ac3_device)

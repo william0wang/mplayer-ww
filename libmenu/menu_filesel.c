@@ -29,6 +29,7 @@
 #include <unistd.h>
 #include <limits.h>
 
+#include "libavutil/attributes.h"
 
 #include "config.h"
 #include "mp_msg.h"
@@ -316,6 +317,7 @@ bailout:
 
   if (n < 0) {
     mp_msg(MSGT_GLOBAL,MSGL_ERR,MSGTR_LIBMENU_ReaddirError,strerror(errno));
+    free(namelist);
     return 0;
   }
   qsort(namelist, n, sizeof(char *), compare);
@@ -415,11 +417,10 @@ static void clos(menu_t* menu) {
   free(mpriv->dir);
 }
 
-static int open_fs(menu_t* menu, char* args) {
+static int open_fs(menu_t* menu, char* av_unused args) {
   char *path = mpriv->path;
   int r = 0;
   char wd[PATH_MAX+1], b[PATH_MAX+1];
-  args = NULL; // Warning kill
 
   menu->draw = menu_list_draw;
   menu->read_cmd = read_cmd;

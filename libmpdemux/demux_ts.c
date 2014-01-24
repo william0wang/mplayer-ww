@@ -299,7 +299,7 @@ static int IS_SUB(es_stream_type_t type)
 	return 0;
 }
 
-static int ts_parse(demuxer_t *demuxer, ES_stream_t *es, unsigned char *packet, int probe);
+static int ts_parse(demuxer_t *demuxer, ES_stream_t *es, int probe);
 
 static uint8_t get_packet_size(const unsigned char *buf, int size)
 {
@@ -672,7 +672,6 @@ static off_t ts_detect_streams(demuxer_t *demuxer, tsdemux_init_t *param)
 	int32_t p, chosen_pid = 0;
 	off_t pos=0, ret = 0, init_pos, end_pos;
 	ES_stream_t es;
-	unsigned char tmp[TS_FEC_PACKET_SIZE];
 	ts_priv_t *priv = (ts_priv_t*) demuxer->priv;
 	struct {
 		char *buf;
@@ -697,7 +696,7 @@ static off_t ts_detect_streams(demuxer_t *demuxer, tsdemux_init_t *param)
 		if(pos > end_pos || demuxer->stream->eof)
 			break;
 
-		if(ts_parse(demuxer, &es, tmp, 1))
+		if(ts_parse(demuxer, &es, 1))
 		{
 			//Non PES-aligned A52 audio may escape detection if PMT is not present;
 			//in this case we try to find at least 3 A52 syncwords
@@ -2779,12 +2778,13 @@ static int fill_extradata(mp4_decoder_config_t * mp4_dec, ES_stream_t *tss)
 
 // 0 = EOF or no stream found
 // else = [-] number of bytes written to the packet
-static int ts_parse(demuxer_t *demuxer , ES_stream_t *es, unsigned char *packet, int probe)
+static int ts_parse(demuxer_t *demuxer , ES_stream_t *es, int probe)
 {
 	ES_stream_t *tss;
 	int buf_size, is_start, pid, base;
 	int len, cc, cc_ok, afc, retv = 0, is_video, is_audio, is_sub;
 	ts_priv_t * priv = (ts_priv_t*) demuxer->priv;
+	unsigned char *packet = priv->packet;
 	stream_t *stream = demuxer->stream;
 	char *p;
 	demux_stream_t *ds = NULL;
@@ -3351,9 +3351,8 @@ static void demux_seek_ts(demuxer_t *demuxer, float rel_seek_secs, float audio_d
 static int demux_ts_fill_buffer(demuxer_t * demuxer, demux_stream_t *ds)
 {
 	ES_stream_t es;
-	ts_priv_t *priv = (ts_priv_t *)demuxer->priv;
 
-	return -ts_parse(demuxer, &es, priv->packet, 0);
+	return -ts_parse(demuxer, &es, 0);
 }
 
 

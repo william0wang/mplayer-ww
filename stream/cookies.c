@@ -89,7 +89,7 @@ static int left_hand_strcmp(const char *cookie_path, const char *url_path)
 }
 
 /* Finds the start of all the columns */
-static int parse_line(char **ptr, char *cols[6])
+static int parse_line(char **ptr, char *cols[7])
 {
     int col;
     cols[0] = *ptr;

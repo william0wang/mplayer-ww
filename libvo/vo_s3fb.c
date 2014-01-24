@@ -42,6 +42,7 @@
 #include "mp_msg.h"
 #include "fastmemcpy.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "aspect.h"
 #include "sub/sub.h"
@@ -491,11 +492,6 @@ static int draw_frame(uint8_t *src[])
 {
   mem2agpcpy(inpage, src[0], in_width * in_depth * in_height);
   return 0;
-}
-
-static int draw_slice(uint8_t *i[], int s[], int w, int h, int x, int y)
-{
-  return 1;
 }
 
 /* Attempt to start doing DR */

@@ -47,6 +47,7 @@
 #include "config.h"
 #include "subopt-helper.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 
 #include "mp_msg.h"
@@ -219,12 +220,6 @@ static int draw_slice(uint8_t *srcimg[], int stride[], int w,int h,int x,int y)
 			}
 		}
 	return 0;
-}
-
-static int draw_frame(uint8_t * src[])
-{
-			// gets done in draw_slice
-    return 0;
 }
 
 static int query_format(uint32_t format)

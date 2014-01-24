@@ -45,6 +45,7 @@
 #include "mp_msg.h"
 #include "subopt-helper.h"
 #include "video_out.h"
+#define NO_DRAW_SLICE
 #include "video_out_internal.h"
 #include "vo_ivtv.h"
 #include "libmpdemux/mpeg_packetizer.h"
@@ -248,12 +249,6 @@ flip_page (void)
 
   /* ensure flip_page() won't be called twice */
   pes = NULL;
-}
-
-static int
-draw_slice (uint8_t *image[], int stride[], int w, int h, int x, int y)
-{
-  return 0;
 }
 
 static void

@@ -98,13 +98,14 @@ asx_parser_free(ASX_Parser_t* parser) {
 
 int
 asx_parse_attribs(ASX_Parser_t* parser,char* buffer,char*** _attribs) {
-  char *ptr1, *ptr2, *ptr3;
+  char *ptr1;
   int n_attrib = 0;
   char **attribs = NULL;
-  char *attrib, *val;
 
   ptr1 = buffer;
   while(1) {
+    char *ptr2, *ptr3;
+    char *attrib, *val;
     for( ; strchr(SPACE,*ptr1) != NULL; ptr1++) { // Skip space
       if(*ptr1 == '\0') break;
     }
@@ -481,14 +482,14 @@ asx_parse_entryref(ASX_Parser_t* parser,char* buffer,char** _attribs) {
 
 static play_tree_t*
 asx_parse_entry(ASX_Parser_t* parser,char* buffer,char** _attribs) {
-  char *element,*body,**attribs;
-  int r,nref=0;
+  int nref=0;
   play_tree_t *ref;
 
   ref = play_tree_new();
 
   while(buffer && buffer[0] != '\0') {
-    r = asx_get_element(parser,&buffer,&element,&body,&attribs);
+    char *element,*body,**attribs;
+    int r = asx_get_element(parser,&buffer,&element,&body,&attribs);
     if(r < 0) {
       asx_warning_body_parse_error(parser,"ENTRY");
       return NULL;
@@ -516,10 +517,8 @@ asx_parse_entry(ASX_Parser_t* parser,char* buffer,char** _attribs) {
 
 static play_tree_t*
 asx_parse_repeat(ASX_Parser_t* parser,char* buffer,char** _attribs) {
-  char *element,*body,**attribs;
   play_tree_t *repeat, *list=NULL, *entry;
   char* count;
-  int r;
 
   repeat = play_tree_new();
 
@@ -535,7 +534,8 @@ asx_parse_repeat(ASX_Parser_t* parser,char* buffer,char** _attribs) {
   }
 
   while(buffer && buffer[0] != '\0') {
-    r = asx_get_element(parser,&buffer,&element,&body,&attribs);
+    char *element,*body,**attribs;
+    int r = asx_get_element(parser,&buffer,&element,&body,&attribs);
     if(r < 0) {
       asx_warning_body_parse_error(parser,"REPEAT");
       return NULL;

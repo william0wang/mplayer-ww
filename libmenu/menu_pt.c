@@ -21,6 +21,8 @@
 #include <string.h>
 //#include <libgen.h>
 
+#include "libavutil/attributes.h"
+
 #include "config.h"
 #include "mp_msg.h"
 #include "help_mp.h"
@@ -127,12 +129,10 @@ static void close_menu(menu_t* menu) {
   menu_list_uninit(menu,NULL);
 }
 
-static int op(menu_t* menu, char* args) {
+static int op(menu_t* menu, char* av_unused args) {
   play_tree_t* i;
   list_entry_t* e;
   play_tree_iter_t* playtree_iter = mpctx_get_playtree_iter(menu->ctx);
-
-  args = NULL; // Warning kill
 
   menu->draw = menu_list_draw;
   menu->read_cmd = read_cmd;

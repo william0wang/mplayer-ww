@@ -79,7 +79,8 @@ static const char *af2String(int af) {
 
 static int
 connect2Server_with_af(char *host, int port, int af,int verb) {
-	int socket_server_fd;
+	int err_res = TCP_ERROR_FATAL;
+	int socket_server_fd = -1;
 	int err;
         socklen_t err_len;
 	int ret,count = 0;
@@ -107,7 +108,7 @@ connect2Server_with_af(char *host, int port, int af,int verb) {
 	// our winsock name resolution code can not handle IPv6
 	if (af == AF_INET6) {
 		mp_msg(MSGT_NETWORK, MSGL_WARN, "IPv6 not supported for winsock2\n");
-		return TCP_ERROR_FATAL;
+		goto err_out;
 	}
 #endif
 
@@ -116,7 +117,7 @@ connect2Server_with_af(char *host, int port, int af,int verb) {
 
 	if( socket_server_fd==-1 ) {
 //		mp_msg(MSGT_NETWORK,MSGL_ERR,"Failed to create %s socket:\n", af2String(af));
-		return TCP_ERROR_FATAL;
+		goto err_out;
 	}
 
 #if defined(SO_RCVTIMEO) && defined(SO_SNDTIMEO)
@@ -138,7 +139,7 @@ connect2Server_with_af(char *host, int port, int af,int verb) {
 #endif
 		default:
 			mp_msg(MSGT_NETWORK,MSGL_ERR, MSGTR_MPDEMUX_NW_UnknownAF, af);
-			return TCP_ERROR_FATAL;
+			goto err_out;
 	}
 
 
@@ -161,10 +162,10 @@ connect2Server_with_af(char *host, int port, int af,int verb) {
 #endif
 		if( hp==NULL ) {
 			if(verb) mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_NW_CantResolv, af2String(af), host);
-			return TCP_ERROR_FATAL;
+			goto err_out;
 		}
 
-		if (af != hp->h_addrtype) return TCP_ERROR_FATAL;
+		if (af != hp->h_addrtype) goto err_out;
 
 		memcpy( our_s_addr, hp->h_addr_list[0], hp->h_length );
 	}
@@ -190,7 +191,7 @@ connect2Server_with_af(char *host, int port, int af,int verb) {
 #endif
 		default:
 			mp_msg(MSGT_NETWORK,MSGL_ERR, MSGTR_MPDEMUX_NW_UnknownAF, af);
-			return TCP_ERROR_FATAL;
+			goto err_out;
 	}
 
 #if HAVE_INET_PTON
@@ -214,8 +215,8 @@ connect2Server_with_af(char *host, int port, int af,int verb) {
 		if( (WSAGetLastError() != WSAEINPROGRESS) && (WSAGetLastError() != WSAEWOULDBLOCK) ) {
 #endif
 			if(verb) mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_NW_CantConnect2Server, af2String(af));
-			closesocket(socket_server_fd);
-			return TCP_ERROR_PORT;
+			err_res = TCP_ERROR_PORT;
+			goto err_out;
 		}
 	}
 	tv.tv_sec = 0;
@@ -231,7 +232,8 @@ connect2Server_with_af(char *host, int port, int af,int verb) {
 		  mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_NW_ConnTimeout);
 		else
 		  mp_msg(MSGT_NETWORK,MSGL_V,"Connection interrupted by user\n");
-		return TCP_ERROR_TIMEOUT;
+		err_res = TCP_ERROR_TIMEOUT;
+		goto err_out;
 	      }
 	      count++;
 	      FD_ZERO( &set );
@@ -252,14 +254,19 @@ connect2Server_with_af(char *host, int port, int af,int verb) {
 	ret =  getsockopt(socket_server_fd,SOL_SOCKET,SO_ERROR,&err,&err_len);
 	if(ret < 0) {
 		mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_NW_GetSockOptFailed,strerror(errno));
-		return TCP_ERROR_FATAL;
+		goto err_out;
 	}
 	if(err > 0) {
 		mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_NW_ConnectError,strerror(err));
-		return TCP_ERROR_PORT;
+		err_res = TCP_ERROR_PORT;
+		goto err_out;
 	}
 
 	return socket_server_fd;
+
+err_out:
+	if (socket_server_fd >= 0) closesocket(socket_server_fd);
+	return err_res;
 }
 
 // Connect to a server using a TCP connection

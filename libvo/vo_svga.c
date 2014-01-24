@@ -52,6 +52,8 @@ TODO:
 
 #include "config.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
+#define NO_DRAW_SLICE
 #include "video_out_internal.h"
 #include "fastmemcpy.h"
 #include "osdep/getch2.h"
@@ -551,17 +553,6 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 
     vga_setdisplaystart(0);
     return 0;
-}
-
-static int draw_slice(uint8_t *image[],int stride[],
-               int w, int h, int x, int y) {
-    assert(0);
-    return VO_ERROR;//this is yv12 only -> vf_scale should do all transforms
-}
-
-static int draw_frame(uint8_t *src[]) {
-    assert(0);
-    return VO_ERROR;//this one should not be called
 }
 
 static void draw_osd(void)

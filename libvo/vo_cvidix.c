@@ -30,6 +30,7 @@
 
 #include "config.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "aspect.h"
 #include "geometry.h"
@@ -121,7 +122,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,uint32_t d_h
 static void check_events(void){
 }
 
-/* draw_osd, flip_page, draw_slice, draw_frame should be
+/* draw_osd, flip_page, draw_slice should be
    overwritten with vidix functions (vosub_vidix.c) */
 static void draw_osd(void){
   mp_msg(MSGT_VO, MSGL_FATAL, "vo_cvidix: error: didn't use vidix draw_osd!\n");
@@ -135,11 +136,6 @@ static void flip_page(void){
 
 static int draw_slice(uint8_t *src[], int stride[],int w, int h, int x, int y){
   mp_msg(MSGT_VO, MSGL_FATAL, "vo_cvidix: error: didn't use vidix draw_slice!\n");
-  return -1;
-}
-
-static int draw_frame(uint8_t *src[]){
-  mp_msg(MSGT_VO, MSGL_FATAL, "vo_cvidix: error: didn't use vidix draw_frame!\n");
   return -1;
 }
 

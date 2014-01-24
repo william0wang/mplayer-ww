@@ -817,7 +817,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "幀率:"
 #define MSGTR_PREFERENCES_SUB_POS "位置: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "停用字幕自動裝載"
-#define MSGTR_PREFERENCES_SUB_Unicode "Unicode 字幕"
 #define MSGTR_PREFERENCES_SUB_MPSUB "轉換給定的字幕成為 MPlayer 的字幕文件"
 #define MSGTR_PREFERENCES_SUB_SRT "轉換給定的字幕成為基于時間的 SubViewer (SRT) 格式"
 #define MSGTR_PREFERENCES_SUB_Overlap "啟/停用字幕重疊"
@@ -826,7 +825,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_ASS_TOP_MARGIN "上: "
 #define MSGTR_PREFERENCES_SUB_ASS_BOTTOM_MARGIN "下: "
 #define MSGTR_PREFERENCES_Font "字體:"
-#define MSGTR_PREFERENCES_FontFactor "字體效果:"
 #define MSGTR_PREFERENCES_PostProcess "啟用後期處理"
 #define MSGTR_PREFERENCES_AutoQuality "自動品質控製: "
 #define MSGTR_PREFERENCES_NI "使用非交錯的 AVI 解析器"
@@ -837,7 +835,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "字幕"
 #define MSGTR_PREFERENCES_FRAME_Font "字體"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "後期處理"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "編解碼器和分路器"
 #define MSGTR_PREFERENCES_FRAME_Cache "緩存"
 #define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
 #define MSGTR_PREFERENCES_Audio_Device "設備:"

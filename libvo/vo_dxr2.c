@@ -33,6 +33,7 @@
 #include "config.h"
 #include "aspect.h"
 #include "video_out.h"
+#define NO_DRAW_SLICE
 #include "video_out_internal.h"
 #include "mp_msg.h"
 #include "m_option.h"
@@ -759,11 +760,6 @@ static void flip_page (void)
 {
   if(sub_vo && ol_osd && vo_osd_changed_flag)
     sub_vo->flip_page();
-}
-
-static int draw_slice( uint8_t *srcimg[], int stride[], int w, int h, int x0, int y0 )
-{
-  return 0;
 }
 
 

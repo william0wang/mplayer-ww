@@ -676,7 +676,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_FPS "FPS:"
 #define MSGTR_PREFERENCES_SUB_POS "Posizione: "
 #define MSGTR_PREFERENCES_SUB_AutoLoad "Disattiva il caricamento automatico dei sottotitoli"
-#define MSGTR_PREFERENCES_SUB_Unicode "Sottotitoli unicode"
 #define MSGTR_PREFERENCES_SUB_MPSUB "Converti i sottotitoli nel formato sottotitolo di MPlayer"
 #define MSGTR_PREFERENCES_SUB_SRT "Converti i sottotitoli nel formato SubViewer (SRT) basato sul tempo"
 #define MSGTR_PREFERENCES_SUB_Overlap "Attiva/disattiva sovrapposizione sottotitoli"
@@ -685,7 +684,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_SUB_ASS_TOP_MARGIN "Sopra: "
 #define MSGTR_PREFERENCES_SUB_ASS_BOTTOM_MARGIN "Sotto: "
 #define MSGTR_PREFERENCES_Font "Tipo Carattere:"
-#define MSGTR_PREFERENCES_FontFactor "Fattore Carattere:"
 #define MSGTR_PREFERENCES_PostProcess "Abilita postprocessing"
 #define MSGTR_PREFERENCES_AutoQuality "Qualità automatica: "
 #define MSGTR_PREFERENCES_NI "Utilizza un analizzatore non-interleaved per i file AVI"
@@ -696,7 +694,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Subtitle "Sottotitoli"
 #define MSGTR_PREFERENCES_FRAME_Font "Carattere"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocessing"
-#define MSGTR_PREFERENCES_FRAME_CodecDemuxer "Codec e demuxer"
 #define MSGTR_PREFERENCES_FRAME_Cache "Cache"
 #define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
 #define MSGTR_PREFERENCES_Audio_Device "Dispositivo:"

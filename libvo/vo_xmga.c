@@ -27,6 +27,7 @@
 #include "config.h"
 #include "mp_msg.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 
 

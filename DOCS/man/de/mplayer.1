@@ -1,4 +1,4 @@
-.\" MPlayer (C) 2000-2013 MPlayer Team
+.\" MPlayer (C) 2000-2014 MPlayer Team
 .\" Diese Man-Page wurde/wird von Moritz Bunkus, Sebastian Krämer,
 .\" Tobias Diedrich gepflegt.
 .\"
@@ -33,7 +33,7 @@
 .\" Titel
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "11.09.2013" "Das MPlayer Projekt"
+.TH MPlayer 1 "23.01.2014" "Das MPlayer Projekt"
 .
 .SH NAME
 mplayer  \- Movie Player
@@ -667,6 +667,8 @@ font_text_scale
 .RB ( subfont-text-scale ") (nur mit FreeType),"
 gui_skin
 .RB ( skin ),
+idle
+.RB ( idle ),
 osd_level
 .RB ( osdlevel ),
 softvol
@@ -683,6 +685,8 @@ sub_pos
 .RB ( subpos ),
 sub_unicode
 .RB ( unicode ),
+sub_utf8
+.RB ( utf8 ),
 v_flip
 .RB ( flip ),
 v_framedrop
@@ -2483,14 +2487,15 @@ Untertiteln.
 Benutze dies, falls Kommata in Untertiteln am Anfang eines Satzes anstatt am
 Ende angezeigt werden.
 .TP
-.B \-font <Pfad zur font.desc-Datei>
+.B \-font <Pfad zur font.desc-Datei, Pfad zur Schriftdatei (FreeType), Schriftmuster (Fontconfig)>
 Sucht nach den OSD-/\:Untertitelschriften in einem anderen Verzeichnis
 (Standard für normale Schriften: ~/\:.mplayer/\:font/\:font.desc,
-Standard für FreeType-Schriften: ~/.mplayer/\:subfont.ttf).
+Standard für FreeType-Schriften: ~/.mplayer/\:subfont.ttf,
+Standard für Fontconfig: "sans-serif").
 .br
 .I ANMERKUNG:
-Bei FreeType gibt diese Option den Pfad zur Textschriftdatei an.
-Bei fontconfig gibt diese Option den fontconfig-Schriftnamen an.
+Bei FreeType gibt diese Option den Pfad zur Schriftdatei an.
+Bei Fontconfig gibt diese Option das Fontconfig-Schriftmuster an.
 .sp 1
 .I BEISPIEL:
 .PD 0
@@ -2500,6 +2505,8 @@ Bei fontconfig gibt diese Option den fontconfig-Schriftnamen an.
 \-font ~/\:.mplayer/\:arialuni.ttf
 .br
 \-font 'Bitstream Vera Sans'
+.br
+\-font 'Bitstream Vera Sans:style=Bold'
 .RE
 .PD 1
 .
@@ -2508,8 +2515,10 @@ Bei fontconfig gibt diese Option den fontconfig-Schriftnamen an.
 Ermöglicht die Benutzung von Schriften, die von fontconfig verwaltet werden.
 .br
 .I ANMERKUNG:
-\-ass schaltet dies automatisch ein, wenn dies nicht explizit mit
-\-nofontconfig überschrieben wird.
+Standardmäßig wird fontconfig für durch libass gerenderte Untertitel
+verwendet, nicht jedoch für das OSD. Mit \-nofontconfig wird es überhaupt
+nicht verwendet, d. h. nur dann funktionieren \-font und \-subfont mit einem
+angegebenen Dateinamen.
 .
 .TP
 .B \-forcedsubsonly
@@ -2729,7 +2738,8 @@ CC-Untertitel wurden bisher auf keinen DVDs für andere Regionen entdeckt.
 .TP
 .B \-subcp <Codepage> (nur bei iconv)
 Wenn dein System iconv(3) unterstützt, kannst du mit dieser Option
-die Codepage für die Untertitel angeben.
+die Codepage für die Untertitel angeben. Sie hat Vorrang sowohl vor -utf8
+wie auch vor -unicode.
 .sp 1
 .I BEISPIEL:
 .PD 0
@@ -2771,7 +2781,7 @@ Zur Zeit unbrauchbar.
 Das gleiche wie \-audiofile, jedoch für Untertitel-Streams (OggDS?).
 .
 .TP
-.B \-subfont <Dateiname> (nur bei FreeType)
+.B \-subfont <Pfad zur Schriftdatei (FreeType), Schriftmuster (Fontconfig)> (nur bei FreeType)
 Setzt die Schriftart für Untertitel.
 Wenn kein \-subfont gegeben ist, wird \-font verwendet.
 .
@@ -2805,7 +2815,9 @@ Setzt den Verwischradius für die Schriften (Standard: 2).
 .B \-subfont\-encoding <Wert> (nur bei FreeType)
 Setzt die Schriftcodierung.
 Wenn 'unicode' angegeben wird, so werden alle Zeichen der Schriftdatei
-gerendert, und unicode wird benutzt werden (Standard: unicode).
+gerendert, und Unicode wird benutzt werden (Standard: unicode). (Für andere
+Werte als 'unicode' muss dein System iconv(3) unterstützen, um zu
+funktionieren.)
 .
 .TP
 .B \-subfont\-osd\-scale <0\-100> (nur bei FreeType)
@@ -2854,7 +2866,8 @@ bewegen und die Zeile löschen (Standard: ^[[A\\r^[[K).
 .
 .TP
 .B \-unicode
-Weist MPlayer an, die Untertiteldatei als Unicode zu behandeln.
+Weist MPlayer an, die Untertiteldatei als Unicode zu behandeln. (Diese Option
+ist nur wirksam, wenn weder -subcp noch -utf8 verwendet werden.)
 .
 .TP
 .B \-unrarexec <Pfad zum unrar-Programm> (unter MingW nicht unterstützt)
@@ -2866,7 +2879,9 @@ Der Pfad muss den Dateinamen des Programms beinhalten, z.B.\&
 .
 .TP
 .B "\-utf8 \ \ "
-Weist MPlayer an, die Untertiteldatei als UTF-8 zu behandeln.
+Weist MPlayer an, die Untertiteldatei als UTF-8 zu behandeln. (Diese Option
+ist nur wirksam, wenn -subcp nicht verwendet wird, und sie hat Vorrang vor
+-unicode.)
 .
 .TP
 .B \-vobsub <VOBsub-Datei ohne Erweiterung>
@@ -11980,7 +11995,7 @@ erstellt.
 MPlayer wurde ursprünglich von Arpad Gereöffy geschrieben.
 Siehe Datei AUTHORS für eine Liste einiger der vielen anderen Beitragenden.
 .PP
-MPlayer is (C) 2000\-2013 The MPlayer Team
+MPlayer is (C) 2000\-2014 The MPlayer Team
 .PP
 Diese Manpage wurde zum größten Teil von Gabucino, Diego Biurrun und
 Jonas Jermann geschrieben und von Moritz Bunkus und Sebastian Krämer

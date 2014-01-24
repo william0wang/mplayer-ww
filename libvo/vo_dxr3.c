@@ -41,6 +41,7 @@
 #include "fastmemcpy.h"
 
 #include "video_out.h"
+#define NO_DRAW_SLICE
 #include "video_out_internal.h"
 #include "libmpcodecs/vf.h"
 #include "aspect.h"
@@ -673,11 +674,6 @@ static void flip_page(void)
 		ioctl(fd_spu, EM8300_IOCTL_SPU_SETPTS, &vo_pts);
 		ioctl(fd_video, EM8300_IOCTL_VIDEO_SETPTS, &vo_pts);
 	}
-}
-
-static int draw_slice(uint8_t *srcimg[], int stride[], int w, int h, int x0, int y0)
-{
-	return -1;
 }
 
 static void uninit(void)

@@ -30,6 +30,7 @@
 
 #include "config.h"
 #include "video_out.h"
+#define NO_DRAW_FRAME
 #include "video_out_internal.h"
 #include "libmpcodecs/vf.h"
 #include "fastmemcpy.h"
@@ -1044,12 +1045,6 @@ draw_alpha( int x0, int y0,
      }
 
      subframe->Unlock( subframe );
-}
-
-static int
-draw_frame( uint8_t * src[] )
-{
-     return -1;
 }
 
 static int

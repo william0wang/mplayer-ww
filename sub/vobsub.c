@@ -1343,35 +1343,34 @@ void *vobsub_out_open(const char *basename, const unsigned int *palette,
                       unsigned int orig_width, unsigned int orig_height,
                       const char *id, unsigned int index)
 {
-    vobsub_out_t *result = NULL;
-    char *filename;
-    filename = malloc(strlen(basename) + 5);
-    if (filename) {
-        result = malloc(sizeof(vobsub_out_t));
-        if (result) {
-            result->aid = index;
-            strcpy(filename, basename);
-            strcat(filename, ".sub");
-            result->fsub = fopen(filename, "ab");
-            if (result->fsub == NULL)
-                perror("Error: vobsub_out_open subtitle file open failed");
-            strcpy(filename, basename);
-            strcat(filename, ".idx");
-            result->fidx = fopen(filename, "ab");
-            if (result->fidx) {
-                if (ftell(result->fidx) == 0) {
-                    create_idx(result, palette, orig_width, orig_height);
-                    /* Make the selected language the default language */
-                    fprintf(result->fidx, "\n# Language index in use\nlangidx: %u\n", index);
-                }
-                fprintf(result->fidx, "\nid: %s, index: %u\n", id ? id : "xx", index);
-                /* So that we can check the file now */
-                fflush(result->fidx);
-            } else
-                perror("Error: vobsub_out_open index file open failed");
-            free(filename);
-        }
+    vobsub_out_t *result = calloc(1, sizeof(*result));
+    char *filename = malloc(strlen(basename) + 5);
+    if (!filename || !result) {
+        free(filename);
+        free(result);
+        return NULL;
     }
+    result->aid = index;
+    strcpy(filename, basename);
+    strcat(filename, ".sub");
+    result->fsub = fopen(filename, "ab");
+    if (result->fsub == NULL)
+        perror("Error: vobsub_out_open subtitle file open failed");
+    strcpy(filename, basename);
+    strcat(filename, ".idx");
+    result->fidx = fopen(filename, "ab");
+    if (result->fidx) {
+        if (ftell(result->fidx) == 0) {
+            create_idx(result, palette, orig_width, orig_height);
+            /* Make the selected language the default language */
+            fprintf(result->fidx, "\n# Language index in use\nlangidx: %u\n", index);
+        }
+        fprintf(result->fidx, "\nid: %s, index: %u\n", id ? id : "xx", index);
+        /* So that we can check the file now */
+        fflush(result->fidx);
+    } else
+        perror("Error: vobsub_out_open index file open failed");
+    free(filename);
     return result;
 }
 
