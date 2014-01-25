@@ -2651,21 +2651,18 @@ static int radeon_vid_init_video( vidix_playback_t *config )
 			  break;
     }
     besr.load_prg_start=0;
-    besr.swap_uv=0;
+    besr.swap_uv=IMGFMT_IS_RGB(config->fourcc);
     switch(config->fourcc)
     {
 	case IMGFMT_RGB15:
-			   besr.swap_uv=1;
 	case IMGFMT_BGR15: besr.surf_id = SCALER_SOURCE_15BPP>>8;
 			   besr.load_prg_start = 1;
 			   break;
 	case IMGFMT_RGB16:
-			   besr.swap_uv=1;
 	case IMGFMT_BGR16: besr.surf_id = SCALER_SOURCE_16BPP>>8;
 			   besr.load_prg_start = 1;
 			   break;
 	case IMGFMT_RGB32:
-			   besr.swap_uv=1;
 	case IMGFMT_BGR32: besr.surf_id = SCALER_SOURCE_32BPP>>8;
 			   besr.load_prg_start = 1;
 			   break;
