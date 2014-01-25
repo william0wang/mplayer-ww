@@ -169,9 +169,7 @@ static mp_net_stream_packet_t* send_net_stream_cmd(stream_t *s,uint16_t cmd,char
 
 static int fill_buffer(stream_t *s, char* buffer, int max_len){
   uint16_t len = le2me_16(max_len);
-  mp_net_stream_packet_t* pack;
-
-  pack = send_net_stream_cmd(s,NET_STREAM_FILL_BUFFER,(char*)&len,2);
+  mp_net_stream_packet_t *pack = send_net_stream_cmd(s,NET_STREAM_FILL_BUFFER,(char*)&len,2);
   if(!pack) {
     return -1;
   }
@@ -190,9 +188,7 @@ static int fill_buffer(stream_t *s, char* buffer, int max_len){
 
 static int seek(stream_t *s, int64_t newpos) {
   uint64_t pos = le2me_64(newpos);
-  mp_net_stream_packet_t* pack;
-
-  pack = send_net_stream_cmd(s,NET_STREAM_SEEK,(char*)&pos,8);
+  mp_net_stream_packet_t *pack = send_net_stream_cmd(s,NET_STREAM_SEEK,(char*)&pos,8);
   if(!pack) {
     return 0;
   }
@@ -202,9 +198,7 @@ static int seek(stream_t *s, int64_t newpos) {
 }
 
 static int net_stream_reset(struct stream *s) {
-  mp_net_stream_packet_t* pack;
-
-  pack = send_net_stream_cmd(s,NET_STREAM_RESET,NULL,0);
+  mp_net_stream_packet_t *pack = send_net_stream_cmd(s,NET_STREAM_RESET,NULL,0);
   if(!pack) {
     return 0;
   }
@@ -221,9 +215,7 @@ static int control(struct stream *s,int cmd,void* arg) {
 }
 
 static void close_s(struct stream *s) {
-  mp_net_stream_packet_t* pack;
-
-  pack = send_net_stream_cmd(s,NET_STREAM_CLOSE,NULL,0);
+  mp_net_stream_packet_t *pack = send_net_stream_cmd(s,NET_STREAM_CLOSE,NULL,0);
   free(pack);
 }
 
