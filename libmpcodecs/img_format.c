@@ -224,7 +224,10 @@ int mp_get_chroma_shift(int format, int *x_shift, int *y_shift, int *component_b
     case IMGFMT_NV21:
         xs = 1;
         ys = 1;
+        // TODO: allowing this though currently breaks
+        // things all over the place.
         err = 1;
+        break;
     default:
         err = 1;
         break;
