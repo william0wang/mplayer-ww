@@ -1067,6 +1067,7 @@ static int mp_property_fullscreen(m_option_t *prop, int action, void *arg,
         M_PROPERTY_CLAMP(prop, *(int *) arg);
         if (vo_fs == !!*(int *) arg)
             return M_PROPERTY_OK;
+        /* Fallthrough to toggle */
     case M_PROPERTY_STEP_UP:
     case M_PROPERTY_STEP_DOWN:
 #ifdef CONFIG_GUI
@@ -1211,6 +1212,7 @@ static int mp_property_vo_flag(m_option_t *prop, int action, void *arg,
         M_PROPERTY_CLAMP(prop, *(int *) arg);
         if (*vo_var == !!*(int *) arg)
             return M_PROPERTY_OK;
+        /* Fallthrough to toggle */
     case M_PROPERTY_STEP_UP:
     case M_PROPERTY_STEP_DOWN:
         if (vo_config_count)
@@ -3442,6 +3444,7 @@ int run_command(MPContext *mpctx, mp_cmd_t *cmd)
             af_uninit(mpctx->mixer.afilter);
             af_init(mpctx->mixer.afilter);
         }
+        /* Fallthrough to add filters like for af_add */
     case MP_CMD_AF_ADD:
     case MP_CMD_AF_DEL:
         if (!sh_audio)

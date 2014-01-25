@@ -264,6 +264,7 @@ static int demux_lmlm4_fill_buffer(demuxer_t *demux, demux_stream_t *ds)
             video = 1;
             mp_dbg(MSGT_DEMUX, MSGL_DBG2, "First Video Packet\n");
         }
+        /* Fallthrough to common handling */
     case FRAMETYPE_P:
 	frames=(frames+1)&(1024*1024-1); // wrap around at 4 hrs to avoid inaccurate float calculations
         if (!video)

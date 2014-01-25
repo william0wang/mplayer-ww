@@ -787,6 +787,7 @@ unichrome_config_playback (vidix_playback_t * info)
     {
     case IMGFMT_YV12:
       swap_uv = 1;
+      /* Fallthrough, same as the following otherwise */
     case IMGFMT_I420:
     case IMGFMT_UYVY:
     case IMGFMT_YVYU:

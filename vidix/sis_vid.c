@@ -276,12 +276,14 @@ static int sis_probe(int verbose, int force)
 		case DEVICE_SIS_300:
 		case DEVICE_SIS_630_VGA:
 		    sis_has_two_overlays = 1;
+                    /* Fallthrough, same as next otherwise */
 		case DEVICE_SIS_540_VGA:
 		    sis_vga_engine = SIS_300_VGA;
 		    break;
 		case DEVICE_SIS_330:
 		case DEVICE_SIS_550_VGA:
 		    sis_has_two_overlays = 1;
+                    /* Fallthrough, same as next otherwise */
 		case DEVICE_SIS_315H:
 		case DEVICE_SIS_315:
 		case DEVICE_SIS_315PRO:

@@ -894,6 +894,7 @@ static int handle_x11_event(Display *mydisplay, XEvent *event)
                 return VO_EVENT_MOUSE;
             case ButtonPress:
                 key = MP_KEY_DOWN;
+                /* Fallthrough, treat like release otherwise */
             case ButtonRelease:
 #ifdef CONFIG_GUI
                 // Ignore mouse button 1-3 under GUI.

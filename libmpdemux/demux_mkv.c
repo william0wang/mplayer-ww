@@ -2095,6 +2095,7 @@ static int demux_mkv_open(demuxer_t *demuxer)
 
         default:
             cont = 1;
+            /* Fallthrough to skip data */
         case EBML_ID_VOID:
             ebml_read_skip(s, NULL);
             break;

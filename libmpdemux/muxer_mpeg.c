@@ -2077,6 +2077,7 @@ static int parse_audio(muxer_stream_t *s, int finalize, unsigned int *nf, double
 		{
 		default:
 			mp_msg(MSGT_MUXER, MSGL_ERR, "Unknown audio format, assuming MP2/3, use -fafmttag!\n");
+			/* Fallthrough to treat like MP2/3 */
 		case AUDIO_MP2:
 		case AUDIO_MP3:
 			{

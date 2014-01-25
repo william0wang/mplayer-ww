@@ -396,6 +396,7 @@ static int control(uint32_t request, void *data)
             return VO_TRUE;
         case VOCTRL_FULLSCREEN:
             vo_x11_fullscreen();
+            /* Fallthrough to reconfigure panscan */
         case VOCTRL_SET_PANSCAN:
             if (vo_fs && (vo_panscan != vo_panscan_amount))
             {

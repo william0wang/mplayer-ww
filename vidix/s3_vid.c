@@ -667,6 +667,7 @@ static int s3_init (void)
     if ((VGAIN8 (vgaCRReg) & 0xC0) == (0x01 << 6))
       RamSavage4[1] = 8;
 
+    /* Otherwise the same, so fallthrough */
   case S3_SAVAGE2000:
     videoRam = RamSavage4[(cr36 & 0xE0) >> 5] * 1024;
     break;
