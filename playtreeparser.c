@@ -219,7 +219,7 @@ parse_asx(play_tree_parser_t* p) {
 
   // We have an asx : load it in memory and parse
 
-  while((line = play_tree_parser_get_line(p)) != NULL)
+  while(play_tree_parser_get_line(p) != NULL)
     /* NOTHING */;
 
  mp_msg(MSGT_PLAYTREE,MSGL_DBG3,"Parsing asx file: [%s]\n",p->buffer);
