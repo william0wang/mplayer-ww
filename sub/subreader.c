@@ -1252,6 +1252,8 @@ int do_fribid_log2vis(int charset, const char *in, FriBidiChar *logical, FriBidi
   len = fribidi_remove_bidi_marks(visual, len, NULL, NULL, NULL);
   return len;
 }
+#endif
+
 
 /**
  * Do conversion necessary for right-to-left language support via fribidi.
@@ -1259,8 +1261,9 @@ int do_fribid_log2vis(int charset, const char *in, FriBidiChar *logical, FriBidi
  * @param sub_utf8 whether the subtitle is encoded in UTF-8
  * @param from first new subtitle, all lines before this are assumed to be already converted
  */
-static subtitle* sub_fribidi (subtitle *sub, int sub_utf8, int from)
+static subtitle* sub_fribidi (subtitle *sub, int av_unused sub_utf8, int av_unused from)
 {
+#ifdef CONFIG_FRIBIDI
   FriBidiChar logical[LINE_LEN+1], visual[LINE_LEN+1]; // Hopefully these two won't smash the stack
   char        *ip      = NULL, *op     = NULL;
   size_t len,orig_len;
@@ -1304,10 +1307,9 @@ static subtitle* sub_fribidi (subtitle *sub, int sub_utf8, int from)
     sub->lines = 0;
     return ERR;
   }
+#endif
   return sub;
 }
-
-#endif
 
 static void adjust_subs_time(subtitle* sub, float subtime, float fps, int block,
                              int sub_num, int sub_uses_time) {
@@ -1526,9 +1528,7 @@ sub_data* sub_read_file (const char *filename, float fps) {
 #ifdef CONFIG_ICONV
 	if ((sub!=ERR) && sub_utf8 == 2 && utf16 == 0) sub=subcp_recode(sub);
 #endif
-#ifdef CONFIG_FRIBIDI
 	if (sub!=ERR) sub=sub_fribidi(sub,sub_utf8,0);
-#endif
 	if ( sub == ERR )
 	 {
 #ifdef CONFIG_ICONV
@@ -2583,10 +2583,8 @@ void sub_add_text(subtitle *sub, const char *txt, int len, double endpts, int st
             sub->endpts[sub->lines]);
     free(sub->text[sub->lines]);
   }
-#ifdef CONFIG_FRIBIDI
   if (strip_markup)
   sub = sub_fribidi(sub, sub_utf8, orig_lines);
-#endif
 }
 
 #define MP_NOPTS_VALUE (-1LL<<63)
