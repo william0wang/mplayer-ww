@@ -154,7 +154,7 @@ static mp_net_stream_packet_t* send_net_stream_cmd(stream_t *s,uint16_t cmd,char
   case NET_STREAM_OK:
     return pack;
   case NET_STREAM_ERROR:
-    if(pack->len > sizeof(mp_net_stream_packet_t))
+    if(pack->len > 0)
       mp_msg(MSGT_STREAM,MSGL_ERR, "Fill buffer failed: %s\n",pack->data);
     else
       mp_msg(MSGT_STREAM,MSGL_ERR, "Fill buffer failed\n");
@@ -173,16 +173,18 @@ static int fill_buffer(stream_t *s, char* buffer, int max_len){
   if(!pack) {
     return -1;
   }
-  len = pack->len - sizeof(mp_net_stream_packet_t);
+  len = pack->len;
   if(len > max_len) {
     mp_msg(MSGT_STREAM,MSGL_ERR, "Got a too big a packet %d / %d\n",len,max_len);
-    free(pack);
-    return 0;
+    goto err_out;
   }
   if(len > 0)
     memcpy(buffer,pack->data,len);
   free(pack);
   return len;
+err_out:
+  free(pack);
+  return 0;
 }
 
 
@@ -252,8 +254,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
     goto error;
   }
 
-  if(pack->len != sizeof(mp_net_stream_packet_t) +
-     sizeof(mp_net_stream_opened_t)) {
+  if(pack->len != sizeof(mp_net_stream_opened_t)) {
     mp_msg(MSGT_OPEN,MSGL_ERR, "Invalid open response packet len (%d bytes)\n",pack->len);
     free(pack);
     goto error;
