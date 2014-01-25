@@ -643,12 +643,12 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
   }
   free(hdr);
   hdr = NULL;
+  free(streams);
+  streams = NULL;
   start = stream_tell(demuxer->stream); // start of first data chunk
   stream_read(demuxer->stream, guid_buffer, 16);
   if (memcmp(guid_buffer, asf_data_chunk_guid, 16) != 0) {
     mp_msg(MSGT_HEADER, MSGL_FATAL, MSGTR_MPDEMUX_ASFHDR_NoDataChunkAfterHeader);
-    free(streams);
-    streams = NULL;
     return 0;
   }
   // read length of chunk
@@ -658,45 +658,17 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
   mp_msg(MSGT_HEADER, MSGL_V, "Found movie at 0x%X - 0x%X\n",
           (int)demuxer->movi_start, (int)demuxer->movi_end);
 
-if(streams) {
+mp_msg(MSGT_HEADER,MSGL_V,"ASF: %d audio and %d video streams found\n",audio_streams,video_streams);
   // stream selection is done in the network code, it shouldn't be done here
   // as the servers often do not care about what we requested.
-#if 0
-  uint32_t vr = 0, ar = 0,i;
-#ifdef CONFIG_NETWORKING
-  if( demuxer->stream->streaming_ctrl!=NULL ) {
-	  if( demuxer->stream->streaming_ctrl->bandwidth!=0 && demuxer->stream->streaming_ctrl->data!=NULL ) {
-		  best_audio = ((asf_http_streaming_ctrl_t*)demuxer->stream->streaming_ctrl->data)->audio_id;
-		  best_video = ((asf_http_streaming_ctrl_t*)demuxer->stream->streaming_ctrl->data)->video_id;
-	  }
-  } else
-#endif
-  for(i = 0; i < stream_count; i++) {
-    uint32_t id = streams[2*i];
-    uint32_t rate = streams[2*i+1];
-    if(demuxer->v_streams[id] && rate > vr) {
-      vr = rate;
-      best_video = id;
-    } else if(demuxer->a_streams[id] && rate > ar) {
-      ar = rate;
-      best_audio = id;
-    }
-  }
-#endif
-  free(streams);
-  streams = NULL;
-}
-
-mp_msg(MSGT_HEADER,MSGL_V,"ASF: %d audio and %d video streams found\n",audio_streams,video_streams);
 if(!audio_streams) demuxer->audio->id=-2;  // nosound
-else if(best_audio > 0 && demuxer->audio->id == -1) demuxer->audio->id=best_audio;
 if(!video_streams){
     if(!audio_streams){
 	mp_msg(MSGT_HEADER,MSGL_ERR,MSGTR_MPDEMUX_ASFHDR_AudioVideoHeaderNotFound);
 	return 0;
     }
     demuxer->video->id=-2; // audio-only
-} else if (best_video > 0 && demuxer->video->id == -1) demuxer->video->id = best_video;
+}
 
 #if 0
 if( mp_msg_test(MSGT_HEADER,MSGL_V) ){
