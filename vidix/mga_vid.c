@@ -1302,7 +1302,6 @@ static int mga_query_fourcc(vidix_fourcc_t *to)
 	case IMGFMT_UYVY:
 	    break;
 	default:
-	    to->depth = to->flags = 0;
 	    return ENOTSUP;
     }
 

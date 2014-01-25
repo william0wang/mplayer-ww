@@ -411,13 +411,11 @@ int ivtv_query_fourcc(vidix_fourcc_t *to)
 	}
 
 	if(!supports) {
-		to->depth = to->flags = 0;
 		return ENOTSUP;
 	}
 	to->depth = VID_DEPTH_12BPP |
 		VID_DEPTH_15BPP | VID_DEPTH_16BPP |
 		VID_DEPTH_24BPP | VID_DEPTH_32BPP;
-	to->flags = 0;
 	return 0;
 }
 

@@ -430,8 +430,7 @@ static int sis_query_fourcc(vidix_fourcc_t * to)
 	to->depth = VID_DEPTH_8BPP | VID_DEPTH_16BPP | VID_DEPTH_32BPP;
 	to->flags = VID_CAP_EXPAND | VID_CAP_SHRINK | VID_CAP_COLORKEY;
 	return 0;
-    } else
-	to->depth = to->flags = 0;
+    }
     return ENOSYS;
 }
 

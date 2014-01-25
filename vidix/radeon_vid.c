@@ -1454,7 +1454,6 @@ static int radeon_query_fourcc(vidix_fourcc_t *to)
 		    VID_CAP_BLEND;
 	return 0;
     }
-    else  to->depth = to->flags = 0;
     return ENOSYS;
 }
 

@@ -543,7 +543,6 @@ static int sh_veu_query_fourcc(vidix_fourcc_t *to)
         to->flags = VID_CAP_EXPAND | VID_CAP_SHRINK;
         return 0;
     }
-    to->depth = to->flags = 0;
     return ENOSYS;
 }
 

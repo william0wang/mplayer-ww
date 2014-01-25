@@ -119,6 +119,8 @@ static uint32_t normalize_fourcc (uint32_t fourcc)
 int vdlQueryFourcc (VDXContext *ctx, vidix_fourcc_t *f)
 {
   f->fourcc = normalize_fourcc(f->fourcc);
+  f->depth  = VID_DEPTH_NONE;
+  f->flags  = VID_CAP_NONE;
   return ctx->drv->query_fourcc (f);
 }
 
