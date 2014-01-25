@@ -1297,8 +1297,11 @@ static subtitle* sub_fribidi (subtitle *sub, int sub_utf8, int from)
     }
   }
   if (!from && l){
-    for (l = sub->lines; l;)
-      free (sub->text[--l]);
+    for (l = sub->lines; l; --l) {
+      free (sub->text[l]);
+      sub->text[l] = NULL;
+    }
+    sub->lines = 0;
     return ERR;
   }
   return sub;
