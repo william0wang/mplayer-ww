@@ -1020,24 +1020,24 @@ static int parse_subconf(const m_option_t* opt,const char *name, const char *par
         goto out;
       }
 
-	  for(i = 0 ; subopts[i].name ; i++) {
-	    if(!strcmp(subopts[i].name,subopt)) break;
-	  }
-	  if(!subopts[i].name) {
-	    mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Unknown suboption %s\n",name,subopt);
-	    r = M_OPT_UNKNOWN;
-	    goto out;
-	  }
-	  r = m_option_parse(&subopts[i],subopt,
-			     subparam[0] == 0 ? NULL : subparam,NULL,src);
-	  if(r < 0) goto out;
-	  if(dst) {
-	    lst = realloc(lst,2 * (nr+2) * sizeof(char*));
-	    lst[2*nr] = strdup(subopt);
-	    lst[2*nr+1] = subparam[0] == 0 ? NULL : strdup(subparam);
-	    memset(&lst[2*(nr+1)],0,2*sizeof(char*));
-	    nr++;
-	  }
+      for(i = 0 ; subopts[i].name ; i++) {
+        if(!strcmp(subopts[i].name,subopt)) break;
+      }
+      if(!subopts[i].name) {
+        mp_msg(MSGT_CFGPARSER, MSGL_ERR, "Option %s: Unknown suboption %s\n",name,subopt);
+        r = M_OPT_UNKNOWN;
+        goto out;
+      }
+      r = m_option_parse(&subopts[i],subopt,
+                         subparam[0] == 0 ? NULL : subparam,NULL,src);
+      if(r < 0) goto out;
+      if(dst) {
+        lst = realloc(lst,2 * (nr+2) * sizeof(char*));
+        lst[2*nr] = strdup(subopt);
+        lst[2*nr+1] = subparam[0] == 0 ? NULL : strdup(subparam);
+        memset(&lst[2*(nr+1)],0,2*sizeof(char*));
+        nr++;
+      }
     }
 
   if(dst)
