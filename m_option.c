@@ -977,14 +977,12 @@ static int parse_subconf(const m_option_t* opt,const char *name, const char *par
 
   while(p[0])
     {
-      int sscanf_ret = 1;
       int optlen = strcspn(p, ":=");
       /* clear out */
       subopt[0] = subparam[0] = 0;
       av_strlcpy(subopt, p, optlen + 1);
       p = &p[optlen];
       if (p[0] == '=') {
-        sscanf_ret = 2;
         p = &p[1];
         if (p[0] == '"') {
           p = &p[1];
@@ -1022,11 +1020,6 @@ static int parse_subconf(const m_option_t* opt,const char *name, const char *par
         goto out;
       }
 
-      switch(sscanf_ret)
-	{
-	case 1:
-	  subparam[0] = 0;
-	case 2:
 	  for(i = 0 ; subopts[i].name ; i++) {
 	    if(!strcmp(subopts[i].name,subopt)) break;
 	  }
@@ -1045,8 +1038,6 @@ static int parse_subconf(const m_option_t* opt,const char *name, const char *par
 	    memset(&lst[2*(nr+1)],0,2*sizeof(char*));
 	    nr++;
 	  }
-	  break;
-	}
     }
 
   if(dst)
