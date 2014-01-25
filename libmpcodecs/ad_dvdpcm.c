@@ -51,6 +51,7 @@ static int init(sh_audio_t *sh)
 	case 3: sh->samplerate=32000;break;
 	}
 	switch ((h >> 6) & 3) {
+	  default:
 	  case 0:
 	    sh->sample_format = AF_FORMAT_S16_BE;
 	    sh->samplesize = 2;
@@ -58,13 +59,11 @@ static int init(sh_audio_t *sh)
 	  case 1:
 	    mp_msg(MSGT_DECAUDIO, MSGL_INFO, MSGTR_SamplesWanted);
 	    sh->i_bps = sh->channels * sh->samplerate * 5 / 2;
+	    /* Fallthrough, 20 bit will be output as 24 bit */
 	  case 2:
 	    sh->sample_format = AF_FORMAT_S24_BE;
 	    sh->samplesize = 3;
 	    break;
-	  default:
-	    sh->sample_format = AF_FORMAT_S16_BE;
-	    sh->samplesize = 2;
 	}
     } else {
 	// use defaults:
