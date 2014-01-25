@@ -571,8 +571,6 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
 
     switch(format){
         case IMGFMT_I420:
-            mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_SDL_MappingI420ToIYUV);
-            format = SDL_IYUV_OVERLAY;
 		case IMGFMT_YV12:
 		case IMGFMT_IYUV:
 		case IMGFMT_YUY2:
