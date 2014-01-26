@@ -1099,7 +1099,7 @@ void mplayerLoadFont(void)
 
         setdup(&font_name, fname);
         free(fname);
-        vo_font   = read_font_desc(font_name, font_factor, 0);
+        vo_font = read_font_desc(font_name, font_factor, 0);
 
         if (!vo_font) {
             nfree(font_name);
