@@ -519,6 +519,9 @@ static void fs_Ok_released(GtkButton *button, gpointer user_data)
 
     fs_Cancel_released(NULL, NULL);
 
+    if (fsType == FILESELECT_FONT)
+        return;
+
     if (uiLoadPlay) {
         uiLoadPlay = False;
         uiEvent(evPlay, 0);
