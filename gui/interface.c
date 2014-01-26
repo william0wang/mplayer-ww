@@ -71,6 +71,15 @@ guiInterface_t guiInfo = {
 };
 
 static int guiInitialized;
+static int orig_fontconfig;
+
+/**
+ * @brief Set option 'fontconfig' depending on #font_name.
+ */
+static void set_fontconfig(void)
+{
+    font_fontconfig = (font_name && strchr(font_name, '/') ? -1 : orig_fontconfig);
+}
 
 /* MPlayer -> GUI */
 
@@ -207,6 +216,9 @@ void guiInit(void)
 
     if (subdata)
         setdup(&guiInfo.SubtitleFilename, subdata->filename);
+
+    orig_fontconfig = font_fontconfig;
+    set_fontconfig();
 
     guiInitialized = True;
 }
@@ -1071,6 +1083,8 @@ void mplayer(int what, float value, void *data)
 void mplayerLoadFont(void)
 {
 #ifdef CONFIG_FREETYPE
+    set_fontconfig();
+
     load_font_ft(vo_image_width, vo_image_height, &vo_font, font_name, osd_font_scale_factor);
 #else
     if (vo_font) {
