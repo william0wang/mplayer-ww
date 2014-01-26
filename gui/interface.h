@@ -76,6 +76,7 @@ enum {
 /// mplayer() instructions
 enum {
     MPLAYER_EXIT_GUI,
+    MPLAYER_LOAD_FONT,
     MPLAYER_SET_AUTO_QUALITY,
     MPLAYER_SET_BRIGHTNESS,
     MPLAYER_SET_CONTRAST,
@@ -150,7 +151,6 @@ int guiPlaylist(int what, play_tree_t *playtree, m_config_t *config, int enqueue
 /// @name GUI -> MPlayer
 //@{
 void mplayer(int what, float value, void *data);
-void mplayerLoadFont(void);
 void mplayerLoadSubtitle(const char *name);
 void gmp_msg(int mod, int lev, const char *format, ...);
 //@}

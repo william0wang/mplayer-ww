@@ -507,7 +507,7 @@ static void fs_Ok_released(GtkButton *button, gpointer user_data)
 
     case FILESELECT_FONT:
         setddup(&font_name, fsSelectedDirectory, fsSelectedFile);
-        mplayerLoadFont();
+        mplayer(MPLAYER_LOAD_FONT, 0, 0);
 
         if (Preferences)
             gtk_entry_set_text(GTK_ENTRY(prEFontName), font_name);

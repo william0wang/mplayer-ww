@@ -959,38 +959,66 @@ void mplayer(int what, float value, void *data)
 
     case MPLAYER_SET_FONT_FACTOR:
         font_factor = value;
-        mplayerLoadFont();
+        mplayer(MPLAYER_LOAD_FONT, 0, 0);
         break;
 
     case MPLAYER_SET_FONT_OUTLINE:
         subtitle_font_thickness = 8.0 * value / 100.0;   // transform 0..100 to 0..8
-        mplayerLoadFont();
+        mplayer(MPLAYER_LOAD_FONT, 0, 0);
         break;
 
     case MPLAYER_SET_FONT_BLUR:
         subtitle_font_radius = 8.0 * value / 100.0;      // transform 0..100 to 0..8
-        mplayerLoadFont();
+        mplayer(MPLAYER_LOAD_FONT, 0, 0);
         break;
 
     case MPLAYER_SET_FONT_TEXTSCALE:
         text_font_scale_factor = value;
-        mplayerLoadFont();
+        mplayer(MPLAYER_LOAD_FONT, 0, 0);
         break;
 
     case MPLAYER_SET_FONT_OSDSCALE:
         osd_font_scale_factor = value;
-        mplayerLoadFont();
+        mplayer(MPLAYER_LOAD_FONT, 0, 0);
         break;
 
     case MPLAYER_SET_FONT_ENCODING:
         nfree(subtitle_font_encoding);
         subtitle_font_encoding = gstrdup((char *)data);
-        mplayerLoadFont();
+        mplayer(MPLAYER_LOAD_FONT, 0, 0);
         break;
 
     case MPLAYER_SET_FONT_AUTOSCALE:
         subtitle_autoscale = (int)value;
-        mplayerLoadFont();
+        mplayer(MPLAYER_LOAD_FONT, 0, 0);
+        break;
+
+    case MPLAYER_LOAD_FONT:
+#ifdef CONFIG_FREETYPE
+        set_fontconfig();
+
+        force_load_font = 1;
+#else
+        free_font_desc(vo_font);
+
+        if (font_name) {
+            vo_font = read_font_desc(font_name, font_factor, 0);
+
+            if (!vo_font)
+                gmp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_CantLoadFont, font_name);
+        } else {
+            char *fname = get_path("font/font.desc");
+
+            setdup(&font_name, fname);
+            free(fname);
+            vo_font = read_font_desc(font_name, font_factor, 0);
+
+            if (!vo_font) {
+                setdup(&font_name, MPLAYER_DATADIR "/font/font.desc");
+                vo_font = read_font_desc(font_name, font_factor, 0);
+            }
+        }
+#endif
         break;
 
     case MPLAYER_SET_SUB_ENCODING:
@@ -1078,35 +1106,6 @@ void mplayer(int what, float value, void *data)
         exit_player_with_rc((enum exit_reason)value, (enum exit_reason)value >= EXIT_ERROR);
         break;
     }
-}
-
-void mplayerLoadFont(void)
-{
-#ifdef CONFIG_FREETYPE
-    set_fontconfig();
-
-    force_load_font = 1;
-#else
-    free_font_desc(vo_font);
-
-    if (font_name) {
-        vo_font = read_font_desc(font_name, font_factor, 0);
-
-        if (!vo_font)
-            gmp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_CantLoadFont, font_name);
-    } else {
-        char *fname = get_path("font/font.desc");
-
-        setdup(&font_name, fname);
-        free(fname);
-        vo_font = read_font_desc(font_name, font_factor, 0);
-
-        if (!vo_font) {
-            setdup(&font_name, MPLAYER_DATADIR "/font/font.desc");
-            vo_font = read_font_desc(font_name, font_factor, 0);
-        }
-    }
-#endif
 }
 
 void mplayerLoadSubtitle(const char *name)
