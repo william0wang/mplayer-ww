@@ -2,6 +2,8 @@ MPlayer
 
     Decoders:
     * Hardware accelerated decoding on OS X via VDA.
+    * Internal libmpeg2 disabled by default, on the assumption
+      that nobody really needs it anymore.
 
     Other:
     * "run" slave/keybinding command now supports expanding properties
