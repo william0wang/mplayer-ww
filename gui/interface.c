@@ -1183,7 +1183,7 @@ void gmp_msg(int mod, int lev, const char *format, ...)
     vsnprintf(msg, sizeof(msg), format, va);
     va_end(va);
 
-    mp_msg(mod, lev, msg);
+    mp_msg(mod, lev, "%s", msg);
 
     if (mp_msg_test(mod, lev))
         gtkMessageBox(MSGBOX_FATAL, msg);
