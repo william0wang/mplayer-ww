@@ -103,11 +103,6 @@ char *fsSubtitleFilterNames[][2] = {
 };
 int fsLastSubtitleFilterSelected = -1;
 
-char *fsOtherFilterNames[][2] = {
-    { MSGTR_Filter_AllFiles, "*"  },
-    { NULL,                  NULL }
-};
-
 char *fsAudioFileNames[][2] = {
     { MSGTR_Filter_DDRawAudio,    "*.ac3,*.pcm"                                                                          },
     { MSGTR_Filter_MPEGAudio,     "*.aac,*.f4a,*.m4a,*.mp2,*.mp3,*.mpga"                                                 },
@@ -332,11 +327,6 @@ static void fs_fsFilterCombo_changed(GtkEditable *editable,
 
         break;
 
-/*   case fsOtherSelector:
- *        for( i=0;fsOtherFilterNames[i][0];i++ )
- *         if( !strcmp( str,fsOtherFilterNames[i][0] ) )
- *          { fsFilter=fsOtherFilterNames[i][1]; break; }
- *        break;*/
     case FILESELECT_AUDIO:
 
         for (i = 0; fsAudioFileNames[i][0]; i++)
@@ -498,9 +488,6 @@ static void fs_Ok_released(GtkButton *button, gpointer user_data)
         mplayerLoadSubtitle(guiInfo.SubtitleFilename);
         break;
 
-/*   case fsOtherSelector:
- *        setddup( &guiInfo.Othername,fsSelectedDirectory,fsSelectedFile );
- *        break;*/
     case FILESELECT_AUDIO:
         setddup(&guiInfo.AudioFilename, fsSelectedDirectory, fsSelectedFile);
         break;
@@ -747,16 +734,6 @@ void ShowFileSelector(int type)
         tmp = guiInfo.SubtitleFilename;
         break;
 
-/*   case fsOtherSelector:
- *      gtk_window_set_title( GTK_WINDOW( FileSelector ),MSGTR_OtherSelect );
- *      fsList_items=NULL;
- *      for( i=0;fsOtherFilterNames[i][0];i++ )
- *        fsList_items=g_list_append( fsList_items,fsOtherFilterNames[i][0] );
- *      gtk_combo_set_popdown_strings( GTK_COMBO( List ),fsList_items );
- *      g_list_free( fsList_items );
- *      gtk_entry_set_text( GTK_ENTRY( fsFilterCombo ),fsOtherFilterNames[0][0] );
- *      tmp=guiInfo.Othername;
- *      break;*/
     case FILESELECT_AUDIO:
         gtk_window_set_title(GTK_WINDOW(FileSelector), MSGTR_AudioFileSelect);
         fsList_items = NULL;
