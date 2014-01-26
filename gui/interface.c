@@ -1095,7 +1095,10 @@ void mplayerLoadFont(void)
         if (!vo_font)
             gmp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_CantLoadFont, font_name);
     } else {
-        font_name = gstrdup(get_path("font/font.desc"));
+        char *fname = get_path("font/font.desc");
+
+        setdup(&font_name, fname);
+        free(fname);
         vo_font   = read_font_desc(font_name, font_factor, 0);
 
         if (!vo_font) {
