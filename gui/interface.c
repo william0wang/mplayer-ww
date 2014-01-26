@@ -1102,8 +1102,7 @@ void mplayerLoadFont(void)
         vo_font = read_font_desc(font_name, font_factor, 0);
 
         if (!vo_font) {
-            nfree(font_name);
-            font_name = gstrdup(MPLAYER_DATADIR "/font/font.desc");
+            setdup(&font_name, MPLAYER_DATADIR "/font/font.desc");
             vo_font   = read_font_desc(font_name, font_factor, 0);
         }
     }
