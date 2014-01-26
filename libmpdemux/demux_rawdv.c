@@ -183,7 +183,7 @@ static demuxer_t* demux_open_rawdv(demuxer_t* demuxer)
 
    sh_video->disp_w = dv_decoder->width;
    sh_video->disp_h = dv_decoder->height;
-   mp_msg(MSGT_DEMUXER,MSGL_V,"demux_open_rawdv() frame_size: %d w: %d h: %d dif_seq: %d system: %d\n",dv_decoder->frame_size,dv_decoder->width, dv_decoder->height,dv_decoder->num_dif_seqs,dv_decoder->system);
+   mp_msg(MSGT_DEMUXER,MSGL_V,"demux_open_rawdv() frame_size: %d w: %d h: %d dif_seq: %d system: %d\n",(int)dv_decoder->frame_size,dv_decoder->width, dv_decoder->height,dv_decoder->num_dif_seqs,dv_decoder->system);
 
    sh_video->fps= (dv_decoder->system==e_dv_system_525_60?29.97:25);
    sh_video->frametime = 1.0/sh_video->fps;
@@ -204,7 +204,7 @@ static demuxer_t* demux_open_rawdv(demuxer_t* demuxer)
    frames->frame_size=dv_decoder->frame_size;
    frames->frame_number=demuxer->stream->end_pos/frames->frame_size;
 
-   mp_msg(MSGT_DEMUXER,MSGL_V,"demux_open_rawdv() seek to %llu, size: %d, dv_dec->frame_size: %d\n",frames->current_filepos,frames->frame_size, dv_decoder->frame_size);
+   mp_msg(MSGT_DEMUXER,MSGL_V,"demux_open_rawdv() seek to %llu, size: %d, dv_dec->frame_size: %d\n",(long long unsigned)frames->current_filepos,frames->frame_size, (int)dv_decoder->frame_size);
     if (dv_decoder->audio != NULL && demuxer->audio->id>=-1){
        sh_audio_t *sh_audio =  new_sh_audio(demuxer, 0, NULL);
        demuxer->audio->id = 0;

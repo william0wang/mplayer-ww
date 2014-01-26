@@ -94,7 +94,7 @@ static int bind_lame(audio_encoder_t *encoder, muxer_stream_t *mux_a)
     mux_a->h.dwSampleSize=0; // VBR
     mux_a->h.dwRate=encoder->params.sample_rate;
     mux_a->h.dwScale=encoder->params.samples_per_frame; // samples/frame
-    if(sizeof(MPEGLAYER3WAVEFORMAT)!=30) mp_msg(MSGT_MENCODER,MSGL_WARN,MSGTR_MP3WaveFormatSizeNot30,sizeof(MPEGLAYER3WAVEFORMAT));
+    if(sizeof(MPEGLAYER3WAVEFORMAT)!=30) mp_msg(MSGT_MENCODER,MSGL_WARN,MSGTR_MP3WaveFormatSizeNot30,(int)sizeof(MPEGLAYER3WAVEFORMAT));
     mux_a->wf=malloc(sizeof(MPEGLAYER3WAVEFORMAT)); // should be 30
     mux_a->wf->wFormatTag=0x55; // MP3
     mux_a->wf->nChannels= (lame_param_mode<0) ? encoder->params.channels : ((lame_param_mode==3) ? 1 : 2);

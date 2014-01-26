@@ -103,7 +103,7 @@ static int decode_audio(sh_audio_t *audio, unsigned char *buf, int minlen, int m
 
    if(xx!=decoder->frame_size)
        mp_msg(MSGT_GLOBAL,MSGL_WARN,MSGTR_MPCODECS_AudioFramesizeDiffers,
-           xx, decoder->frame_size);
+           xx, (int)decoder->frame_size);
 
    if (dv_decode_full_audio(decoder, dv_audio_frame,(int16_t**) audioBuffers))
    {
