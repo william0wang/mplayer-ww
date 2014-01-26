@@ -123,14 +123,14 @@ int fsLastAudioFilterSelected = -1;
 
 char *fsFontFileNames[][2] = {
 #ifdef CONFIG_FREETYPE
-    { MSGTR_Filter_TTF,       "*.ttf"              },
-    { MSGTR_Filter_Type1,     "*.pfb"              },
+    { MSGTR_Filter_TTF,       "*.ttf"       },
+    { MSGTR_Filter_Type1,     "*.pfb"       },
     { MSGTR_Filter_AllFonts,  "*.pfb,*.ttf" },
 #else
-    { MSGTR_Filter_FontFiles, "*.desc"             },
+    { MSGTR_Filter_FontFiles, "*.desc"      },
 #endif
-    { MSGTR_Filter_AllFiles,  "*"                  },
-    { NULL,                   NULL                 }
+    { MSGTR_Filter_AllFiles,  "*"           },
+    { NULL,                   NULL          }
 };
 int fsLastFontFilterSelected = -1;
 
