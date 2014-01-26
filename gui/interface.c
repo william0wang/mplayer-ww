@@ -1087,29 +1087,7 @@ void mplayerLoadFont(void)
 
     force_load_font = 1;
 #else
-    if (vo_font) {
-        int i;
-
-        free(vo_font->name);
-        free(vo_font->fpath);
-
-        for (i = 0; i < 16; i++) {
-            if (vo_font->pic_a[i]) {
-                free(vo_font->pic_a[i]->bmp);
-                free(vo_font->pic_a[i]->pal);
-            }
-        }
-
-        for (i = 0; i < 16; i++) {
-            if (vo_font->pic_b[i]) {
-                free(vo_font->pic_b[i]->bmp);
-                free(vo_font->pic_b[i]->pal);
-            }
-        }
-
-        free(vo_font);
-        vo_font = NULL;
-    }
+    free_font_desc(vo_font);
 
     if (font_name) {
         vo_font = read_font_desc(font_name, font_factor, 0);
