@@ -1924,7 +1924,6 @@ static const char help_text[]=
 #define MSGTR_URLParsingFailed "URL %s 解析失败\n"
 #define MSGTR_FailedSetStreamOption "未能设置媒体流选项 %s=%s\n"
 #define MSGTR_StreamNeedType "媒体流需有类型！\n"
-#define MSGTR_StreamProtocolNULL "媒体流类型 %s 的 protocols == NULL，这是软件缺陷\n"
 #define MSGTR_StreamCantHandleURL "未找到媒体流以处理 URL %s\n"
 #define MSGTR_StreamNULLFilename "open_output_stream()，文件名为 NULL，请报告该缺陷\n"
 #define MSGTR_StreamErrorWritingCapture "写入流捕获文件错误：%s\n"

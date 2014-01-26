@@ -567,7 +567,6 @@ static const char help_text[]=
 #define MSGTR_URLParsingFailed "Fehler bei der Analyse der URL %s\n"
 #define MSGTR_FailedSetStreamOption "Datenstrom-Option %s=%s konnte nicht gesetzt werden.\n"
 #define MSGTR_StreamNeedType "Datenströme benötigen einen Typ!\n"
-#define MSGTR_StreamProtocolNULL "Datenstromtyp %s hat protcols == NULL, das ist ein Fehler\n"
 #define MSGTR_StreamCantHandleURL "Kein Datenstrom zur Verarbeitung der URL %s gefunden.\n"
 #define MSGTR_StreamNULLFilename "open_output_stream(), Dateiname NULL, Fehler bitte melden\n"
 #define MSGTR_StreamErrorWritingCapture "Fehler beim Schreiben der Capture-Datei: %s\n"

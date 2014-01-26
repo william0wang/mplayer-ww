@@ -226,10 +226,6 @@ stream_t* open_stream_full(const char* filename,int mode, char** options, int* f
 
   for(i = 0 ; auto_open_streams[i] ; i++) {
     sinfo = auto_open_streams[i];
-    if(!sinfo->protocols) {
-      mp_msg(MSGT_OPEN,MSGL_WARN, MSGTR_StreamProtocolNULL, sinfo->name);
-      continue;
-    }
     for(j = 0 ; sinfo->protocols[j] ; j++) {
       l = strlen(sinfo->protocols[j]);
       // l == 0 => Don't do protocol matching (ie network and filenames)
