@@ -208,8 +208,6 @@ void guiInit(void)
     if (subdata)
         setdup(&guiInfo.SubtitleFilename, subdata->filename);
 
-    mplayerLoadFont();
-
     guiInitialized = True;
 }
 
@@ -572,7 +570,6 @@ int gui(int what, void *data)
             stream_dump_type = 6;
 
         gtkSubDumpMPSub = gtkSubDumpSrt = False;
-        mplayerLoadFont();
 
         /* misc */
 
