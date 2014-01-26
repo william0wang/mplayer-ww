@@ -1085,7 +1085,7 @@ void mplayerLoadFont(void)
 #ifdef CONFIG_FREETYPE
     set_fontconfig();
 
-    load_font_ft(vo_image_width, vo_image_height, &vo_font, font_name, osd_font_scale_factor);
+    force_load_font = 1;
 #else
     if (vo_font) {
         int i;
