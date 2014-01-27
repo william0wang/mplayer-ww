@@ -83,7 +83,7 @@
 #include "pixmaps/playdvd.xpm"
 #include "pixmaps/chapter.xpm"
 #include "pixmaps/dolby.xpm"
-#include "pixmaps/audiolang.xpm"
+#include "pixmaps/audio.xpm"
 #endif
 #ifdef CONFIG_TV
 #include "pixmaps/tv.xpm"
@@ -523,7 +523,7 @@ GtkWidget * CreatePopUpMenu( void )
         MenuItem=AddMenuItem( window1, (const char*)empty1px_xpm, DVDChapterMenu,MSGTR_MENU_None,evNone );
         gtk_widget_set_sensitive( MenuItem,FALSE );
        }
-    DVDAudioLanguageMenu=AddSubMenu( window1, (const char*)audiolang_xpm, DVDSubMenu,MSGTR_MENU_AudioLanguages );
+    DVDAudioLanguageMenu=AddSubMenu( window1, (const char*)audio_xpm, DVDSubMenu,MSGTR_MENU_AudioLanguages );
      if ( guiInfo.AudioStreams && ( guiInfo.StreamType == STREAMTYPE_DVD ) )
       {
        char tmp[64]; int i, id = demuxer ? demuxer->audio->id : audio_id;
@@ -651,7 +651,7 @@ GtkWidget * CreatePopUpMenu( void )
 
     if ( c > 1 )
      {
-      SubMenu=AddSubMenu( window1, (const char*)audiolang_xpm, Menu,MSGTR_MENU_AudioTrack );
+      SubMenu=AddSubMenu( window1, (const char*)audio_xpm, Menu,MSGTR_MENU_AudioTrack );
       for ( i=0;i < MAX_A_STREAMS;i++ )
        if ( demuxer->a_streams[i] )
         {
