@@ -84,7 +84,6 @@
 #include "pixmaps/chapter.xpm"
 #include "pixmaps/dolby.xpm"
 #include "pixmaps/audiolang.xpm"
-#include "pixmaps/sublang.xpm"
 #endif
 #ifdef CONFIG_TV
 #include "pixmaps/tv.xpm"
@@ -544,7 +543,7 @@ GtkWidget * CreatePopUpMenu( void )
         MenuItem=AddMenuItem( window1, (const char*)empty1px_xpm, DVDAudioLanguageMenu,MSGTR_MENU_None,evNone );
         gtk_widget_set_sensitive( MenuItem,FALSE );
        }
-    DVDSubtitleLanguageMenu=AddSubMenu( window1, (const char*)sublang_xpm, DVDSubMenu,MSGTR_MENU_SubtitleLanguages );
+    DVDSubtitleLanguageMenu=AddSubMenu( window1, (const char*)subtitle_xpm, DVDSubMenu,MSGTR_MENU_SubtitleLanguages );
      if ( guiInfo.Subtitles && ( guiInfo.StreamType == STREAMTYPE_DVD ) )
       {
        char tmp[64]; int i;
