@@ -84,6 +84,7 @@
 #include "pixmaps/chapter.xpm"
 #include "pixmaps/dolby.xpm"
 #include "pixmaps/audio.xpm"
+#include "pixmaps/video.xpm"
 #endif
 #ifdef CONFIG_TV
 #include "pixmaps/tv.xpm"
@@ -668,7 +669,7 @@ GtkWidget * CreatePopUpMenu( void )
 
     if ( c > 1 )
      {
-      SubMenu=AddSubMenu( window1, (const char*)empty_xpm, Menu,MSGTR_MENU_VideoTrack );
+      SubMenu=AddSubMenu( window1, (const char*)video_xpm, Menu,MSGTR_MENU_VideoTrack );
       for ( i=0;i < MAX_V_STREAMS;i++ )
        if ( demuxer->v_streams[i] )
         {
