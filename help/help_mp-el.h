@@ -320,13 +320,11 @@ static const char help_text[]=
 #define MSGTR_EwmhFullscreenStateFailed "\nX11: Αδύνατη η αποστολή του γεγονότος EWMH fullscreen!\n"
 
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "Περί"
 #define MSGTR_FileSelect "Επιλογή αρχείου..."
 #define MSGTR_SubtitleSelect "Επιλογή υποτίτλου..."
-#define MSGTR_OtherSelect "Επιλογή..."
 #define MSGTR_AudioFileSelect "Επιλογή εξωτερικού αρχείου ήχου..."
 #define MSGTR_FontSelect "Επιλογή γραμματοσειράς..."
 #define MSGTR_PlayList "Λίστα Αναπαραγωγής"
@@ -351,7 +349,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "Λυπάμαι, δεν υπάρχει αρκετή μνήμη για εγγραφή  στον buffer."
-#define MSGTR_NEMFMR "Λυπάμαι, δεν υπάρχει αρκετή μνήμη για την εμφάνιση του μενού."
 #define MSGTR_IDFGCVD "Λυπάμαι, δεν βρέθηκε οδηγός εξόδου βίντεο που να είναι συμβατός με το GUI."
 #define MSGTR_NEEDLAVC "Λυπάμαι, δεν μπορείτε να αναπαράγετε αρχεία που δεν είναι mpeg με τη συσκευή DXR3/H+ χωρίς επανακωδικοποίηση.\n Παρακαλώ ενεργοποιήστε lavc στο DXR3/H+ κουτί-διαλόγου."
 
@@ -387,14 +384,12 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Σταμάτημα"
 #define MSGTR_MENU_NextStream "Επόμενο κανάλι"
 #define MSGTR_MENU_PrevStream "Προηγούμενο κανάλι"
-#define MSGTR_MENU_Size "Μέγεθος"
 #define MSGTR_MENU_NormalSize "Κανονικό μέγεθος"
 #define MSGTR_MENU_DoubleSize "Διπλάσιο μέγεθος"
 #define MSGTR_MENU_FullScreen "Πλήρης οθόνη"
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Αναπαραγωγή δίσκου..."
-#define MSGTR_MENU_ShowDVDMenu "Εμφάνιση του μενού του DVD"
 #define MSGTR_MENU_Titles "Τίτλοι"
 #define MSGTR_MENU_Title "Τίτλος %2d"
 #define MSGTR_MENU_None "(τίποτα)"
@@ -403,8 +398,7 @@ static const char help_text[]=
 #define MSGTR_MENU_AudioLanguages "Γλώσσες ήχου"
 #define MSGTR_MENU_SubtitleLanguages "Γλώσσες υποτίτλων"
 #define MSGTR_MENU_SkinBrowser "Λίστα skins"
-// TODO: Why is this different from MSGTR_Preferences?
-#define MSGTR_MENU_Preferences "Ρυθμίσεις"
+#define MSGTR_MENU_Preferences "Ιδιότητες"
 #define MSGTR_MENU_Exit "Έξοδος"
 #define MSGTR_MENU_Mute "Απενεργοποίηση ήχου"
 #define MSGTR_MENU_Original "Αρχικό"
@@ -447,7 +441,6 @@ static const char help_text[]=
 
 #define MSGTR_PREFERENCES_None "Τίποτα"
 #define MSGTR_PREFERENCES_AvailableDrivers "Διαθέσιμοι οδηγοί:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Μη-αναπαραγωγή ήχου"
 #define MSGTR_PREFERENCES_NormalizeSound "Κανονικοποίηση ήχου"
 #define MSGTR_PREFERENCES_EnableEqualizer "Ενεργοποίηση του equalizer"
 #define MSGTR_PREFERENCES_ExtraStereo "Ενεργοποίηση του extra stereo"

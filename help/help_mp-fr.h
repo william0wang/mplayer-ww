@@ -675,13 +675,11 @@ static const char help_text[]=
 #define MSGTR_NoVolume "[Mixer] Aucun contrôle de volume disponible.\n"
 #define MSGTR_NoBalance "[Mixer] Aucun contrôle de balance disponible.\n"
 
-// ====================== messages/boutons GUI ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "À propos..."
 #define MSGTR_FileSelect "Choisir un fichier..."
 #define MSGTR_SubtitleSelect "Choisir un sous-titre..."
-#define MSGTR_OtherSelect "Choisir..."
 #define MSGTR_AudioFileSelect "Choisir une source audio extérieure..."
 #define MSGTR_FontSelect "Choisir une police..."
 #define MSGTR_PlayList "Liste de lecture"
@@ -708,7 +706,6 @@ static const char help_text[]=
 
 // --- messages d'erreur ---
 #define MSGTR_NEMDB "Désolé, pas assez de mémoire pour le tampon de dessin."
-#define MSGTR_NEMFMR "Désolé, pas assez de mémoire pour le rendu des menus."
 #define MSGTR_IDFGCVD "Désolé, aucun pilote de sortie vidéo compatible avec la GUI."
 #define MSGTR_NEEDLAVC "Désolé, vous ne pouvez pas lire de fichiers non-MPEG avec le périphérique DXR3/H+ sans réencoder.\nActivez plutôt lavc dans la boîte de configuration DXR3/H+."
 
@@ -747,7 +744,6 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Arrêt"
 #define MSGTR_MENU_NextStream "Flux suivant"
 #define MSGTR_MENU_PrevStream "Flux précédent"
-#define MSGTR_MENU_Size "Taille"
 #define MSGTR_MENU_HalfSize   "Demi taille"
 #define MSGTR_MENU_NormalSize "Taille normale"
 #define MSGTR_MENU_DoubleSize "Taille double"
@@ -755,7 +751,6 @@ static const char help_text[]=
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Ouvrir un disque..."
-#define MSGTR_MENU_ShowDVDMenu "Afficher le menu DVD"
 #define MSGTR_MENU_Titles "Titres"
 #define MSGTR_MENU_Title "Titre %2d"
 #define MSGTR_MENU_None "(aucun)"
@@ -763,9 +758,9 @@ static const char help_text[]=
 #define MSGTR_MENU_Chapter "Chapitre %2d"
 #define MSGTR_MENU_AudioLanguages "Langues audio"
 #define MSGTR_MENU_SubtitleLanguages "Langues des sous-titres"
-#define MSGTR_MENU_PlayList MSGTR_PlayList
+#define MSGTR_MENU_PlayList "Liste de lecture"
 #define MSGTR_MENU_SkinBrowser "Navigateur de peaux"
-#define MSGTR_MENU_Preferences MSGTR_Preferences
+#define MSGTR_MENU_Preferences "Préférences"
 #define MSGTR_MENU_Exit "Quitter"
 #define MSGTR_MENU_Mute "Silence"
 #define MSGTR_MENU_Original "Original"
@@ -803,8 +798,8 @@ static const char help_text[]=
 #define MSGTR_PLAYLIST_DirectoryTree "Hiérarchie des dossiers"
 
 // --- preferences
-#define MSGTR_PREFERENCES_Audio MSGTR_EQU_Audio
-#define MSGTR_PREFERENCES_Video MSGTR_EQU_Video
+#define MSGTR_PREFERENCES_Audio "Audio"
+#define MSGTR_PREFERENCES_Video "Vidéo"
 #define MSGTR_PREFERENCES_SubtitleOSD "Sous-titres & OSD"
 #define MSGTR_PREFERENCES_Codecs "Codecs & demuxeur"
 #define MSGTR_PREFERENCES_Misc "Divers"
@@ -812,7 +807,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_None "Aucun"
 #define MSGTR_PREFERENCES_DriverDefault "Pilote par défaut"
 #define MSGTR_PREFERENCES_AvailableDrivers "Pilotes disponibles :"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Ne pas jouer le son"
 #define MSGTR_PREFERENCES_NormalizeSound "Normaliser le son"
 #define MSGTR_PREFERENCES_EnableEqualizer "Egaliseur (Equalizer) activé"
 #define MSGTR_PREFERENCES_SoftwareMixer "Activer mixeur logiciel"
@@ -849,7 +843,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Font "Police"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "post-traitement"
 #define MSGTR_PREFERENCES_FRAME_Cache "Cache"
-#define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
+#define MSGTR_PREFERENCES_FRAME_Misc "Divers"
 #define MSGTR_PREFERENCES_Audio_Device "Périférique :"
 #define MSGTR_PREFERENCES_Audio_Mixer "Mixeur :"
 #define MSGTR_PREFERENCES_Audio_MixerChannel "Canal de mixeur :"
@@ -937,8 +931,6 @@ static const char help_text[]=
 #define MSGTR_WS_TooManyOpenWindows "Trop de fenêtres ouvertes.\n"
 #define MSGTR_WS_ShmError "Erreur d'extension de mémoire partagée\n"
 #define MSGTR_WS_NotEnoughMemoryDrawBuffer "Désolé, mémoire insuffisante pour tampon de dessin.\n"
-#define MSGTR_WS_DpmsUnavailable "DPMS non disponible ?\n"
-#define MSGTR_WS_DpmsNotEnabled "Imposssible d'activer DPMS.\n"
 
 // wsxdnd.c
 

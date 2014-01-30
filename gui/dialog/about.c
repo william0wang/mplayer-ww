@@ -62,7 +62,7 @@ static GtkWidget * CreateAbout( void )
 
   About=gtk_window_new( GTK_WINDOW_TOPLEVEL );
   gtk_widget_set_usize( About,340,415 );
-  gtk_window_set_title( GTK_WINDOW( About ),MSGTR_About );
+  gtk_window_set_title( GTK_WINDOW( About ),MSGTR_MENU_AboutMPlayer );
   gtk_window_set_position( GTK_WINDOW( About ),GTK_WIN_POS_CENTER );
   gtk_window_set_policy( GTK_WINDOW( About ),FALSE,FALSE,TRUE );
   gtk_window_set_wmclass( GTK_WINDOW( About ),"About",MPlayer );
@@ -109,7 +109,7 @@ static GtkWidget * CreateAbout( void )
 #endif
   	"\n"
 	MSGTR_ABOUT_UHU
-	"       (http://www.uhulinux.hu/)\n"
+	"       http://www.uhulinux.hu/\n"
 	"\n"
 	MSGTR_ABOUT_Contributors
 	"\n"

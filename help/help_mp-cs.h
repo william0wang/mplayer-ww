@@ -507,22 +507,18 @@ static const char help_text[]=
 #define MSGTR_LOADER_DYLD_Warning "VAROVÁNÍ: Pokouším se použít DLL kodeky, ale proměnná prostředí\n        DYLD_BIND_AT_LAUNCH není nastavena. Nejspíš havaruji.\n"
 
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "O aplikaci"
 #define MSGTR_FileSelect "Vybrat soubor..."
 #define MSGTR_SubtitleSelect "Vybrat titulky..."
-#define MSGTR_OtherSelect "Vybrat..."
 #define MSGTR_AudioFileSelect "Vybrat externí zvukový kanál..."
 #define MSGTR_FontSelect "Vybrat font..."
-// Poznámka: Pokud změníte MSGTR_PlayList, ujistěte se prosím, že vyhovuje i pro  MSGTR_MENU_PlayList
 #define MSGTR_PlayList "Playlist"
 #define MSGTR_Equalizer "Ekvalizér"
 #define MSGTR_ConfigureEqualizer "Konfigurace ekvalizéru"
 #define MSGTR_SkinBrowser "Prohlížeč témat"
 #define MSGTR_Network "Síťové vysílání..."
-// Poznámka: Pokud změníte MSGTR_Preferences, ujistěte se prosím, že vyhovuje i pro  MSGTR_MENU_Preferences
 #define MSGTR_Preferences "Nastavení" // Předvolby?
 #define MSGTR_AudioPreferences "Konfigurace ovladače zvuku"
 #define MSGTR_NoMediaOpened "Nic není otevřeno."
@@ -542,7 +538,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "Bohužel není dostatek paměti pro vykreslovací mezipaměť."
-#define MSGTR_NEMFMR "Bohužel není dostatek paměti pro vykreslení menu."
 #define MSGTR_IDFGCVD "Bohužel nebyl nalezen video ovladač kompatibilní s GUI."
 #define MSGTR_NEEDLAVC "Bohužel nelze přehrávat ne-MPEG s kartou DXR3/H+ bez přeenkódování.\nProsím, zapněte lavc v konfiguraci DXR3/H+."
 
@@ -581,7 +576,6 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Stop"
 #define MSGTR_MENU_NextStream "Další proud"
 #define MSGTR_MENU_PrevStream "Předchozí proud"
-#define MSGTR_MENU_Size "Velikost"
 #define MSGTR_MENU_HalfSize   "Poloviční velikost"
 #define MSGTR_MENU_NormalSize "Normální velikost"
 #define MSGTR_MENU_DoubleSize "Dvojnásobná velikost"
@@ -589,7 +583,6 @@ static const char help_text[]=
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Přehrát disk..."
-#define MSGTR_MENU_ShowDVDMenu "Zobrazit DVD menu"
 #define MSGTR_MENU_Titles "Tituly"
 #define MSGTR_MENU_Title "Titul %2d"
 #define MSGTR_MENU_None "(žádné)"
@@ -597,9 +590,9 @@ static const char help_text[]=
 #define MSGTR_MENU_Chapter "Kapitola %2d"
 #define MSGTR_MENU_AudioLanguages "Jazyk zvuku"
 #define MSGTR_MENU_SubtitleLanguages "Jazyk titulků"
-#define MSGTR_MENU_PlayList MSGTR_PlayList
+#define MSGTR_MENU_PlayList "Playlist"
 #define MSGTR_MENU_SkinBrowser "Prohlížeč témat"
-#define MSGTR_MENU_Preferences MSGTR_Preferences
+#define MSGTR_MENU_Preferences "Nastavení"
 #define MSGTR_MENU_Exit "Konec"
 #define MSGTR_MENU_Mute "Ztlumit"
 #define MSGTR_MENU_Original "Původní"
@@ -610,9 +603,7 @@ static const char help_text[]=
 #define MSGTR_MENU_Subtitles "Titulky"
 
 // --- equalizer
-// Poznámka: Pokud změníte MSGTR_EQU_Audio, ujistěte se prosím, že vyhovuje i pro MSGTR_PREFERENCES_Audio
 #define MSGTR_EQU_Audio "Zvuk"
-// Poznámka: Pokud změníte MSGTR_EQU_Video, ujistěte se prosím, že vyhovuje i pro MSGTR_PREFERENCES_Video
 #define MSGTR_EQU_Video "Obraz"
 #define MSGTR_EQU_Contrast "Kontrast: "
 #define MSGTR_EQU_Brightness "Jas: "
@@ -639,16 +630,14 @@ static const char help_text[]=
 #define MSGTR_PLAYLIST_DirectoryTree "Adresáře"
 
 // --- preferences
-#define MSGTR_PREFERENCES_Audio MSGTR_EQU_Audio
-#define MSGTR_PREFERENCES_Video MSGTR_EQU_Video
+#define MSGTR_PREFERENCES_Audio "Zvuk"
+#define MSGTR_PREFERENCES_Video "Obraz"
 #define MSGTR_PREFERENCES_SubtitleOSD "Titulky & OSD"
 #define MSGTR_PREFERENCES_Codecs "Kodeky & demuxer"
-// Poznámka: Pokud změníte MSGTR_PREFERENCES_Misc, ujistěte se prosím, že vyhovuje i pro MSGTR_PREFERENCES_FRAME_Misc
 #define MSGTR_PREFERENCES_Misc "Ostatní"
 #define MSGTR_PREFERENCES_None "Nic"
 #define MSGTR_PREFERENCES_DriverDefault "výchozí nastavení"
 #define MSGTR_PREFERENCES_AvailableDrivers "Dostupné ovladače:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Nepřehrávat zvuk"
 #define MSGTR_PREFERENCES_NormalizeSound "Normalizovat zvuk"
 #define MSGTR_PREFERENCES_EnableEqualizer "Aktivovat ekvalizér"
 #define MSGTR_PREFERENCES_SoftwareMixer "Aktivovat softwarový směšovač"
@@ -685,7 +674,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Font "Font"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocessing"
 #define MSGTR_PREFERENCES_FRAME_Cache "Vyrovnávací paměť"
-#define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
+#define MSGTR_PREFERENCES_FRAME_Misc "Ostatní"
 #define MSGTR_PREFERENCES_Audio_Device "Zařízení:"
 #define MSGTR_PREFERENCES_Audio_Mixer "Mixér:"
 #define MSGTR_PREFERENCES_Audio_MixerChannel "Kanál mixéru:"
@@ -770,8 +759,6 @@ static const char help_text[]=
 #define MSGTR_WS_TooManyOpenWindows "Příliš mnoho otevřených oken.\n"
 #define MSGTR_WS_ShmError "chyba rozšíření shared memory\n"
 #define MSGTR_WS_NotEnoughMemoryDrawBuffer "Promiňte, nedostatek paměti pro vykreslení bufferu.\n"
-#define MSGTR_WS_DpmsUnavailable "DPMS není k dispozici?\n"
-#define MSGTR_WS_DpmsNotEnabled "Nelze zapnout DPMS.\n"
 
 // wsxdnd.c
 #define MSGTR_WS_NotAFile "Toto nevypadá jako soubor...\n"

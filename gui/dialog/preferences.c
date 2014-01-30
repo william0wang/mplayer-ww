@@ -245,7 +245,7 @@ static void prEntry( GtkEditable * editable,gpointer user_data )
 	if ( lEncoding[i].comment ) mplayer( MPLAYER_SET_SUB_ENCODING,0,lEncoding[i].name );
 	else
 	{
-	 if ( strcmp( comment,MSGTR_PREFERENCES_DefaultEnc ) == 0 ) comment=NULL;
+	 if ( strcmp( comment,MSGTR_PREFERENCES_Default ) == 0 ) comment=NULL;
 	 mplayer( MPLAYER_SET_SUB_ENCODING,0,(char *)comment );
 	}
 	if ( !comment) gtk_widget_set_sensitive( CBSubEncoding,(!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(CBSubUtf8)) && !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(CBSubUnicode))) );
@@ -308,7 +308,7 @@ static void prButton( GtkButton * button, gpointer user_data )
 
 	/* 3rd page */
 	suboverlap_enabled=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBSubOverlap ) );
-	sub_auto=!gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBNoAutoSub ) );
+	sub_auto=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBNoAutoSub ) );
 	gtkSubDumpMPSub=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBDumpMPSub ) );
 	gtkSubDumpSrt=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBDumpSrt ) );
 	sub_utf8=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBSubUtf8 ) );
@@ -368,7 +368,7 @@ static void prButton( GtkButton * button, gpointer user_data )
 	gtkVfPP=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBPostprocess ) );
 	gtkLoadFullscreen=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBLoadFullscreen ) );
 	gui_save_pos=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBSaveWinPos ) );
-	gtkShowVideoWindow=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBShowVideoWindow ) );
+	gtkShowVideoWindow=!gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBShowVideoWindow ) );
 	stop_xscreensaver=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBStopXScreenSaver ) );
 	gtkEnablePlayBar=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBPlayBar ) );
 	gui_tv_digital=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBTVDigital ) );
@@ -485,7 +485,7 @@ static void prToggled( GtkToggleButton * togglebutton,gpointer user_data )
 //	if ( guiInfo.Playing ) gtkMessageBox( MSGBOX_WARNING,"Please remember, this function need restart the playing." );
 //	break;
    case 3:
-	if ( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBShowVideoWindow ) ) )
+	if ( !gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBShowVideoWindow ) ) )
 	 {
 	  window=wsShowWindow;
 	  gtkRaise( Preferences );
@@ -812,7 +812,7 @@ static GtkWidget * CreatePreferences( void )
   CBSubEncoding=gtk_combo_new();
   gtk_widget_show( CBSubEncoding );
   gtk_box_pack_start( GTK_BOX( vbox10 ),CBSubEncoding,TRUE,FALSE,0 );
-  CBSubEncoding_items=g_list_append( CBSubEncoding_items,MSGTR_PREFERENCES_DefaultEnc );
+  CBSubEncoding_items=g_list_append( CBSubEncoding_items,MSGTR_PREFERENCES_Default );
   {
    int i, listed=(sub_cp == NULL);
 
@@ -1253,7 +1253,7 @@ void ShowPreferences( void )
 
 /* 3rd page */
  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBSubOverlap ),suboverlap_enabled );
- gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBNoAutoSub ),!sub_auto );
+ gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBNoAutoSub ),sub_auto );
  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBDumpMPSub ),gtkSubDumpMPSub );
  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBDumpSrt ),gtkSubDumpSrt );
  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBSubUtf8 ),sub_utf8 );
@@ -1335,7 +1335,7 @@ void ShowPreferences( void )
   GList * Items = NULL;
   char  * name = NULL;
 
-  Items=g_list_append( Items,MSGTR_PREFERENCES_None );
+  Items=g_list_append( Items,MSGTR_PREFERENCES_Default );
   for( i=0;mpcodecs_vd_drivers[i];i++ )
    {
     Items=g_list_append( Items,(char *)mpcodecs_vd_drivers[i]->info->name );
@@ -1351,7 +1351,7 @@ void ShowPreferences( void )
   GList * Items = NULL;
   char  * name = NULL;
 
-  Items=g_list_append( Items,MSGTR_PREFERENCES_None );
+  Items=g_list_append( Items,MSGTR_PREFERENCES_Default );
   for( i=0;mpcodecs_ad_drivers[i];i++ )
    {
     Items=g_list_append( Items,(char *)mpcodecs_ad_drivers[i]->info->name );
@@ -1366,7 +1366,7 @@ void ShowPreferences( void )
  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBPostprocess ),gtkVfPP );
  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBLoadFullscreen ),gtkLoadFullscreen );
  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBSaveWinPos ),gui_save_pos );
- gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBShowVideoWindow ),gtkShowVideoWindow );
+ gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBShowVideoWindow ),!gtkShowVideoWindow );
  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( CBStopXScreenSaver ),stop_xscreensaver );
  gtk_adjustment_set_value( HSPPQualityadj,auto_quality );
 

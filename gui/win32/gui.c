@@ -187,7 +187,7 @@ static void display_about_box(HWND hWnd)
 {
     char about_msg[512];
     snprintf(about_msg, sizeof(about_msg), MP_TITLE "\n" COPYRIGHT, MPlayer);
-    MessageBox(hWnd, about_msg, acp(MSGTR_About), MB_OK);
+    MessageBox(hWnd, about_msg, acp(MSGTR_MENU_AboutMPlayer), MB_OK);
 }
 
 static image *get_drawground(HWND hwnd)

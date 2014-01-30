@@ -313,13 +313,11 @@ static const char help_text[]=
 #define MSGTR_MovieAspectIsSet "Аспектот на Филмот е %.2f:1 - се преместува на точниот аспект на филмот.\n"
 #define MSGTR_MovieAspectUndefined "Аспектот на филмот не е дефиниран - не е применето преместување.\n"
 
-// ====================== GUI пораки/копчиња ========================
+// ================================ GUI ================================
 
 // --- лабели ---
-#define MSGTR_About "За"
 #define MSGTR_FileSelect "Изберете датотека ..."
 #define MSGTR_SubtitleSelect "Изберете превод ..."
-#define MSGTR_OtherSelect "Изберете ..."
 #define MSGTR_AudioFileSelect "Изберете надворешен аудио канал ..."
 #define MSGTR_FontSelect "Изберете фонт ..."
 #define MSGTR_PlayList "Плејлиста"
@@ -344,7 +342,6 @@ static const char help_text[]=
 
 // --- пораки со грешки ---
 #define MSGTR_NEMDB "Се извинуваме, немате доволно меморија за графичкиот бафер."
-#define MSGTR_NEMFMR "Се извинуваме, немате доволно меморија за обојување на менито."
 #define MSGTR_IDFGCVD "Се извинуваме, не е пронајден компитабилен драјвер на излезното видео за графички интерфејс."
 #define MSGTR_NEEDLAVC "Се извинуваме, не можете да пуштате датотеки кои што не се MPEG со вашиот DXR3/H+ уред без реенкодирање.\nВе молиме овозможете lavc во DXR3/H+ кутијата за конфигурирање."
 
@@ -380,14 +377,12 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Стоп"
 #define MSGTR_MENU_NextStream "Нареден стрим"
 #define MSGTR_MENU_PrevStream "Претходен стрим"
-#define MSGTR_MENU_Size "Големина"
 #define MSGTR_MENU_NormalSize "Нормална големина"
 #define MSGTR_MENU_DoubleSize "Двојна големина"
 #define MSGTR_MENU_FullScreen "На Цел Екран"
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Отвори диск ..."
-#define MSGTR_MENU_ShowDVDMenu "Прикажи го DVD менито"
 #define MSGTR_MENU_Titles "Наслови"
 #define MSGTR_MENU_Title "Наслов %2d"
 #define MSGTR_MENU_None "(ниеден)"
@@ -438,7 +433,6 @@ static const char help_text[]=
 
 #define MSGTR_PREFERENCES_None "Ниеден"
 #define MSGTR_PREFERENCES_AvailableDrivers "Достапни драјвери:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Не го пуштај звукот"
 #define MSGTR_PREFERENCES_NormalizeSound "Нормализирај го звукот"
 #define MSGTR_PREFERENCES_EnableEqualizer "Овозможи еквилајзер"
 #define MSGTR_PREFERENCES_ExtraStereo "Овозможи екстра стерео"

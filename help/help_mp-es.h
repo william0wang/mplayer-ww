@@ -539,13 +539,11 @@ static const char help_text[]=
 // loader/ldt_keeper.c
 #define MSGTR_LOADER_DYLD_Warning "AVISO: Se está intentando usar los codecs DLL pero la variable de entorno\n         DYLD_BIND_AT_LAUNCH no está establecida. Probablemente falle.\n"
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "Acerca de"
 #define MSGTR_FileSelect "Seleccionar archivo..."
 #define MSGTR_SubtitleSelect "Seleccionar subtítulos..."
-#define MSGTR_OtherSelect "Seleccionar..."
 #define MSGTR_AudioFileSelect "Seleccionar canal de audio externo..."
 #define MSGTR_FontSelect "Seleccionar fuente..."
 #define MSGTR_PlayList "Lista de reproducción"
@@ -572,7 +570,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "No hay suficiente memoria para dibujar el búfer."
-#define MSGTR_NEMFMR "No hay suficiente memoria para dibujar el menú."
 #define MSGTR_IDFGCVD "No se encuentra driver -vo compatible con la interfaz gráfica."
 #define MSGTR_NEEDLAVC "No puede reproducir archivos no MPEG con su DXR3/H+ sin recodificación. Activa lavc en la configuración del DXR3/H+."
 
@@ -611,7 +608,6 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Parar"
 #define MSGTR_MENU_NextStream "Siguiente stream"
 #define MSGTR_MENU_PrevStream "Anterior stream"
-#define MSGTR_MENU_Size "Tamaño"
 #define MSGTR_MENU_HalfSize   "Mitad del Tamaño"
 #define MSGTR_MENU_NormalSize "Tamaño normal"
 #define MSGTR_MENU_DoubleSize "Tamaño doble"
@@ -619,7 +615,6 @@ static const char help_text[]=
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Reproducir disco..."
-#define MSGTR_MENU_ShowDVDMenu "Mostrar menú DVD"
 #define MSGTR_MENU_Titles "Títulos"
 #define MSGTR_MENU_Title "Título %2d"
 #define MSGTR_MENU_None "(ninguno)"
@@ -627,9 +622,9 @@ static const char help_text[]=
 #define MSGTR_MENU_Chapter "Capítulo %2d"
 #define MSGTR_MENU_AudioLanguages "Idiomas de audio"
 #define MSGTR_MENU_SubtitleLanguages "Idiomas de subtítulos"
-#define MSGTR_MENU_PlayList MSGTR_PlayList
+#define MSGTR_MENU_PlayList "Lista de reproducción"
 #define MSGTR_MENU_SkinBrowser "Navegador de skins"
-#define MSGTR_MENU_Preferences MSGTR_Preferences
+#define MSGTR_MENU_Preferences "Preferencias"
 #define MSGTR_MENU_Exit "Salir"
 #define MSGTR_MENU_Mute "Mudo"
 #define MSGTR_MENU_Original "Original"
@@ -667,15 +662,14 @@ static const char help_text[]=
 #define MSGTR_PLAYLIST_DirectoryTree "Árbol de directorios"
 
 // --- preferences
-#define MSGTR_PREFERENCES_Audio MSGTR_EQU_Audio
-#define MSGTR_PREFERENCES_Video MSGTR_EQU_Video
+#define MSGTR_PREFERENCES_Audio "Audio"
+#define MSGTR_PREFERENCES_Video "Video"
 #define MSGTR_PREFERENCES_SubtitleOSD "Subtítulos y OSD"
 #define MSGTR_PREFERENCES_Codecs "Codecs y demuxer"
 #define MSGTR_PREFERENCES_Misc "Misc"
 #define MSGTR_PREFERENCES_None "Ninguno"
 #define MSGTR_PREFERENCES_DriverDefault "controlador por omisión"
 #define MSGTR_PREFERENCES_AvailableDrivers "Controladores disponibles:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "No reproducir sonido"
 #define MSGTR_PREFERENCES_NormalizeSound "Normalizar sonido"
 #define MSGTR_PREFERENCES_EnableEqualizer "Activar equalizer"
 #define MSGTR_PREFERENCES_SoftwareMixer "Activar mezclador por software"
@@ -712,7 +706,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Font "Fuente"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocesado"
 #define MSGTR_PREFERENCES_FRAME_Cache "Cache"
-#define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
+#define MSGTR_PREFERENCES_FRAME_Misc "Misc"
 #define MSGTR_PREFERENCES_Audio_Device "Dispositivo:"
 #define MSGTR_PREFERENCES_Audio_Mixer "Mezclador:"
 #define MSGTR_PREFERENCES_Audio_MixerChannel "Canal del Mezclador:"
@@ -797,8 +791,6 @@ static const char help_text[]=
 #define MSGTR_WS_TooManyOpenWindows "Hay demasiadas ventanas abiertas.\n"
 #define MSGTR_WS_ShmError "Error en la extensión de memoria compartida\n"
 #define MSGTR_WS_NotEnoughMemoryDrawBuffer "Lo lamento, no hay suficiente memoria para el buffer de dibujo.\n"
-#define MSGTR_WS_DpmsUnavailable "¿DPMS no disponible?\n"
-#define MSGTR_WS_DpmsNotEnabled "No se pudo activar DPMS.\n"
 
 // wsxdnd.c
 #define MSGTR_WS_NotAFile "Esto no parece ser un archivo...\n"

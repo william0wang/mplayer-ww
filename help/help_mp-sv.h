@@ -532,21 +532,17 @@ static const char help_text[]=
 #define MSGTR_NoVolume "[Mixer] Ingen volymkontroll tillgänglig.\n"
 
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "Om"
 #define MSGTR_FileSelect "Välj fil..."
 #define MSGTR_SubtitleSelect "Välj textning..."
-#define MSGTR_OtherSelect "Välj..."
 #define MSGTR_AudioFileSelect "Välj extern audiokanal..."
 #define MSGTR_FontSelect "Välj font..."
-// NOTE: If you change MSGTR_PlayList pleace see if it still fits MSGTR_MENU_PlayList
 #define MSGTR_PlayList "Spellista"
 #define MSGTR_Equalizer "Equalizer"
 #define MSGTR_SkinBrowser "Skinläsare"
 #define MSGTR_Network "Nätverksströmning..."
-// NOTE: If you change MSGTR_Preferences pleace see if it still fits MSGTR_MENU_Preferences
 #define MSGTR_Preferences "Inställningar"
 #define MSGTR_AudioPreferences "Audiodirvrutinskonfiguration"
 #define MSGTR_NoMediaOpened "Inget media öppnad"
@@ -566,7 +562,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "Tyvärr, inte tillräckligt minne för ritbuffert."
-#define MSGTR_NEMFMR "Tyvärr, inte tillräckligt minne för menyrendering."
 #define MSGTR_IDFGCVD "Tyvärr, jag hittade inte en GUI-kompatibel video-ut-drivrutin."
 #define MSGTR_NEEDLAVC "Tyvärr, du kan inte spela icke-MPEG-filer med ditt DXR3/H+-enhet utan omkodning.\nVar god aktivera lavc i 'DXR3/H+'-konfigurationsboxen."
 
@@ -602,14 +597,12 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Stopp"
 #define MSGTR_MENU_NextStream "Nästa ström"
 #define MSGTR_MENU_PrevStream "Föregående ström"
-#define MSGTR_MENU_Size "Storlek"
 #define MSGTR_MENU_NormalSize "Normal storlek"
 #define MSGTR_MENU_DoubleSize "Dubbel storlek"
 #define MSGTR_MENU_FullScreen "Fullskärm"
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Öppnar disk..." // FIXME to open or is opening?
-#define MSGTR_MENU_ShowDVDMenu "Visa DVD-meny"
 #define MSGTR_MENU_Titles "Titlar"
 #define MSGTR_MENU_Title "Titel %2d"
 #define MSGTR_MENU_None "(ingen)"
@@ -627,9 +620,7 @@ static const char help_text[]=
 #define MSGTR_MENU_VideoTrack "Videospår"
 
 // --- equalizer
-// Note: If you change MSGTR_EQU_Audio please see if it still fits MSGTR_PREFERENCES_Audio
 #define MSGTR_EQU_Audio "Audio"
-// Note: If you change MSGTR_EQU_Video please see if it still fits MSGTR_PREFERENCES_Video
 #define MSGTR_EQU_Video "Video"
 #define MSGTR_EQU_Contrast "Kontrast: "
 #define MSGTR_EQU_Brightness "Ljusstyrka: "
@@ -658,13 +649,11 @@ static const char help_text[]=
 // --- preferences
 #define MSGTR_PREFERENCES_SubtitleOSD "Textning & OSD"
 #define MSGTR_PREFERENCES_Codecs "Codecs & demuxer"
-// NOTE: If you change MSGTR_PREFERENCES_Misc see if it still fits MSGTR_PREFERENCES_FRAME_Misc
 #define MSGTR_PREFERENCES_Misc "Diverse"
 
 #define MSGTR_PREFERENCES_None "Inget"
 #define MSGTR_PREFERENCES_DriverDefault "standarddrivrutin"
 #define MSGTR_PREFERENCES_AvailableDrivers "Tillgängliga drivrutioner:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Spela inte upp ljud"
 #define MSGTR_PREFERENCES_NormalizeSound "Normalizera ljud"
 #define MSGTR_PREFERENCES_EnableEqualizer "AKtivera equalizer"
 #define MSGTR_PREFERENCES_ExtraStereo "Aktivera extra stereo"

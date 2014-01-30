@@ -318,13 +318,11 @@ static const char help_text[]=
 #define MSGTR_MovieAspectIsSet "Aspecto do filme é  %.2f:1 - pré-redimensionando para corrigir o aspecto do filme.\n"
 #define MSGTR_MovieAspectUndefined "Aspecto do filme é indefinido - nenhum pré-redimensionamento aplicado.\n"
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "Sobre"
 #define MSGTR_FileSelect "Selecionar arquivo..."
 #define MSGTR_SubtitleSelect "Selecionar legenda..."
-#define MSGTR_OtherSelect "Selecionar..."
 #define MSGTR_AudioFileSelect "Selecionar canal de audio externo..."
 #define MSGTR_FontSelect "Selecionar fonte..."
 #define MSGTR_PlayList "Lista de reprodução"
@@ -349,7 +347,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "Desculpe, sem memória suficiente para desenhar o buffer."
-#define MSGTR_NEMFMR "Desculpe, sem memória suficiente para rendenizar o menu."
 #define MSGTR_IDFGCVD "Desculpe, eu não encontrei um driver saída de vídeo compatível com GUI."
 #define MSGTR_NEEDLAVC "Desculpe, você não pode reproduzir arquivos não-MPEG com o seu dispositivo DXR3/H+ sem recodificar.\nPor favor habilite lavc na configuração do DXR3/H+."
 
@@ -385,14 +382,12 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Parar"
 #define MSGTR_MENU_NextStream "Próxima faixa"
 #define MSGTR_MENU_PrevStream "Faixa anterior"
-#define MSGTR_MENU_Size "Tamanho"
 #define MSGTR_MENU_NormalSize "Tamanho normal"
 #define MSGTR_MENU_DoubleSize "Tamanho dobrado"
 #define MSGTR_MENU_FullScreen "Tela cheia"
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Abrir disco..."
-#define MSGTR_MENU_ShowDVDMenu "Mostrar menu do DVD"
 #define MSGTR_MENU_Titles "Títulos"
 #define MSGTR_MENU_Title "Título %2d"
 #define MSGTR_MENU_None "(nenhum)"
@@ -443,7 +438,6 @@ static const char help_text[]=
 
 #define MSGTR_PREFERENCES_None "Nenhum"
 #define MSGTR_PREFERENCES_AvailableDrivers "Drivers disponíveis:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Não reproduzir som"
 #define MSGTR_PREFERENCES_NormalizeSound "Normalizar som"
 #define MSGTR_PREFERENCES_EnableEqualizer "Habilitar equalizador"
 #define MSGTR_PREFERENCES_ExtraStereo "Habilitar extra estéreo"

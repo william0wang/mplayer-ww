@@ -313,13 +313,11 @@ static const char help_text[]=
 #define MSGTR_MovieAspectIsSet "Størrelsesforhold er %.2f:1 - præskalerer for at rette størrelsesforholdet.\n"
 #define MSGTR_MovieAspectUndefined "Størrelsesforholdet er ikke defineret - ingen præskalering benyttet.\n"
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "Om"
 #define MSGTR_FileSelect "Vælg fil..."
 #define MSGTR_SubtitleSelect "Vælg undertekst-fil..."
-#define MSGTR_OtherSelect "Vælg..."
 #define MSGTR_AudioFileSelect "Vælg ekstern lydkanal..."
 #define MSGTR_FontSelect "Vælg font..."
 #define MSGTR_PlayList "Afspilningsliste"
@@ -344,7 +342,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "Desværre, ikke nok ram til at vise bufferen."
-#define MSGTR_NEMFMR "Desværre, ikke nok ram til at vise menuen."
 #define MSGTR_IDFGCVD "Desværre, kunne ikke finde GUI kompabitel video driver."
 #define MSGTR_NEEDLAVC "For at afspille ikke-mpeg filer med dit DXR3/H+ skal du kode filmen igen.\nVenligst aktiver lavc i DXR3/H+ configboxen."
 
@@ -380,14 +377,12 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Stop"
 #define MSGTR_MENU_NextStream "Næste stream"
 #define MSGTR_MENU_PrevStream "Forrige stream"
-#define MSGTR_MENU_Size "Størrelse"
 #define MSGTR_MENU_NormalSize "Normal størrelse"
 #define MSGTR_MENU_DoubleSize "Dobbelt størrelse"
 #define MSGTR_MENU_FullScreen "Fuld skærm"
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Afspil disk..."
-#define MSGTR_MENU_ShowDVDMenu "Vis DVD menu"
 #define MSGTR_MENU_Titles "Titler"
 #define MSGTR_MENU_Title "Titel %2d"
 #define MSGTR_MENU_None "(ingen)"
@@ -395,8 +390,7 @@ static const char help_text[]=
 #define MSGTR_MENU_Chapter "Kapitel %2d"
 #define MSGTR_MENU_AudioLanguages "Lyd sprog"
 #define MSGTR_MENU_SubtitleLanguages "Undertekst sprog"
-// TODO: Why is this different from MSGTR_PlayList?
-#define MSGTR_MENU_PlayList "Afspilningslisten"
+#define MSGTR_MENU_PlayList "Afspilningsliste"
 #define MSGTR_MENU_SkinBrowser "Vælg udseende"
 #define MSGTR_MENU_Exit "Forlad"
 #define MSGTR_MENU_Mute "Mute"
@@ -440,7 +434,6 @@ static const char help_text[]=
 
 #define MSGTR_PREFERENCES_None "Ingen"
 #define MSGTR_PREFERENCES_AvailableDrivers "Tilgængelige drivere:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Afspil ikke lyd"
 #define MSGTR_PREFERENCES_NormalizeSound "Normaliser lydstyrke"
 #define MSGTR_PREFERENCES_EnableEqualizer "Anvend equalizer"
 #define MSGTR_PREFERENCES_ExtraStereo "Anvend extra stereo"
@@ -472,8 +465,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Font "Skriftype"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Efterprocesseringsfilter"
 #define MSGTR_PREFERENCES_FRAME_Cache "Cache"
-// TODO: Why is this different from MSGTR_PREFERENCES_Misc?
-#define MSGTR_PREFERENCES_FRAME_Misc "Misc"
+#define MSGTR_PREFERENCES_FRAME_Misc "Forskelligt"
 #define MSGTR_PREFERENCES_Message "Husk, nogle funktioner kræver at MPlayer bliver genstartet for at de virker."
 #define MSGTR_PREFERENCES_DXR3_VENC "Video enkoder:"
 #define MSGTR_PREFERENCES_DXR3_LAVC "Brug LAVC (FFmpeg)"

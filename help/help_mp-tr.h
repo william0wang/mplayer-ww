@@ -684,22 +684,18 @@ static const char help_text[]=
 #define MSGTR_NoVolume "[Karıştırıcı] Kullanılabilir ses kontrolü yok.\n"
 #define MSGTR_NoBalance "[Karıştırıcı] Kullanılabilir denge kontrolü yok.\n"
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "Hakkında"
 #define MSGTR_FileSelect "Dosya Seç..."
 #define MSGTR_SubtitleSelect "Altyazı Seç..."
-#define MSGTR_OtherSelect "Seç..."
 #define MSGTR_AudioFileSelect "Ek ses kanalı seç..."
 #define MSGTR_FontSelect "Yazıtipi Seç..."
-// Note: If you change MSGTR_PlayList please see if it still fits MSGTR_MENU_PlayList
 #define MSGTR_PlayList "Çalma listesi"
 #define MSGTR_Equalizer "Sentezleyici"
 #define MSGTR_ConfigureEqualizer "Sentezleyici Ayarları"
 #define MSGTR_SkinBrowser "Arayüz Seçici"
 #define MSGTR_Network "Ağ Yayın İşlemi..."
-// Note: If you change MSGTR_Preferences please see if it still fits MSGTR_MENU_Preferences
 #define MSGTR_Preferences "Tercihler"
 #define MSGTR_AudioPreferences "Ses sürücüsü ayarları"
 #define MSGTR_NoMediaOpened "Medya yok"
@@ -719,7 +715,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "Üzgünüm, tampon için yeterli hafıza yok."
-#define MSGTR_NEMFMR "Üzgünüm, menü oluşturmak için yeterli hafıza yok."
 #define MSGTR_IDFGCVD "Üzgünüm, KGA ile uyumlu video çıkış sürücüsü bulunamadı."
 #define MSGTR_NEEDLAVC "Üzgünüm, MPEG olmayan dosyaları DXR3/H+ aygıtınızla oynatamazsınız. \nLütfen DXR3/H+ ayarlarından lavc seçeneğini etkinleştirin."
 
@@ -758,7 +753,6 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Durdur"
 #define MSGTR_MENU_NextStream "Sonraki yayın"
 #define MSGTR_MENU_PrevStream "Önceki yayın"
-#define MSGTR_MENU_Size "Boyut"
 #define MSGTR_MENU_HalfSize   "Küçük boyut"
 #define MSGTR_MENU_NormalSize "Normal boyut"
 #define MSGTR_MENU_DoubleSize "Büyük boyut"
@@ -766,7 +760,6 @@ static const char help_text[]=
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "CD'yi aç..."
-#define MSGTR_MENU_ShowDVDMenu "DVD menüsünü göster"
 #define MSGTR_MENU_Titles "Başlıklar"
 #define MSGTR_MENU_Title "Başlık %2d"
 #define MSGTR_MENU_None "(yok)"
@@ -774,9 +767,9 @@ static const char help_text[]=
 #define MSGTR_MENU_Chapter "Bölüm %2d"
 #define MSGTR_MENU_AudioLanguages "Seslendirme dili"
 #define MSGTR_MENU_SubtitleLanguages "Altyazı dili"
-#define MSGTR_MENU_PlayList MSGTR_PlayList
+#define MSGTR_MENU_PlayList "Çalma listesi"
 #define MSGTR_MENU_SkinBrowser "Arayüz seçici"
-#define MSGTR_MENU_Preferences MSGTR_Preferences
+#define MSGTR_MENU_Preferences "Tercihler"
 #define MSGTR_MENU_Exit "Çık"
 #define MSGTR_MENU_Mute "Sessiz"
 #define MSGTR_MENU_Original "Normal"
@@ -787,9 +780,7 @@ static const char help_text[]=
 #define MSGTR_MENU_Subtitles "Altyazılar"
 
 // --- equalizer
-// Note: If you change MSGTR_EQU_Audio please see if it still fits MSGTR_PREFERENCES_Audio
 #define MSGTR_EQU_Audio "Ses"
-// Note: If you change MSGTR_EQU_Video please see if it still fits MSGTR_PREFERENCES_Video
 #define MSGTR_EQU_Video "Video"
 #define MSGTR_EQU_Contrast "Karşıtlık: "
 #define MSGTR_EQU_Brightness "Parlaklık: "
@@ -816,17 +807,15 @@ static const char help_text[]=
 #define MSGTR_PLAYLIST_DirectoryTree "Dizin Ağacı"
 
 // --- preferences
-#define MSGTR_PREFERENCES_Audio MSGTR_EQU_Audio
-#define MSGTR_PREFERENCES_Video MSGTR_EQU_Video
+#define MSGTR_PREFERENCES_Audio "Ses"
+#define MSGTR_PREFERENCES_Video "Video"
 #define MSGTR_PREFERENCES_SubtitleOSD "Altyazı & OSD"
 #define MSGTR_PREFERENCES_Codecs "Kodekler & Ayrıştırıcı"
-// Note: If you change MSGTR_PREFERENCES_Misc see if it still fits MSGTR_PREFERENCES_FRAME_Misc
 #define MSGTR_PREFERENCES_Misc "Çeşitli"
 
 #define MSGTR_PREFERENCES_None "Yok"
 #define MSGTR_PREFERENCES_DriverDefault "varsayılan sürücü"
 #define MSGTR_PREFERENCES_AvailableDrivers "Kullanılabilir sürücüler:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Sesleri çalma"
 #define MSGTR_PREFERENCES_NormalizeSound "Sesi öntanımla"
 #define MSGTR_PREFERENCES_EnableEqualizer "Sentezleyiciyi etkinleştir"
 #define MSGTR_PREFERENCES_SoftwareMixer "Karıştırıcıyı etkinleştir"
@@ -863,7 +852,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Font "Yazıtipi"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocessing Filtre"
 #define MSGTR_PREFERENCES_FRAME_Cache "Önbellek"
-#define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
+#define MSGTR_PREFERENCES_FRAME_Misc "Çeşitli"
 #define MSGTR_PREFERENCES_Audio_Device "Aygıt:"
 #define MSGTR_PREFERENCES_Audio_Mixer "Karıştırıcı:"
 #define MSGTR_PREFERENCES_Audio_MixerChannel "Karıştırıcı kanalı:"
@@ -951,8 +940,6 @@ static const char help_text[]=
 #define MSGTR_WS_TooManyOpenWindows "Çok sayıda açık pencere var.\n"
 #define MSGTR_WS_ShmError "paylaşımlı bellek genişletme hatası\n"
 #define MSGTR_WS_NotEnoughMemoryDrawBuffer "Üzgünüm, ilerleme tamponu için yeterli bellek yok.\n"
-#define MSGTR_WS_DpmsUnavailable "DPMS kullanılamıyor?\n"
-#define MSGTR_WS_DpmsNotEnabled "DPMS etkinleştirilimedi.\n"
 
 // wsxdnd.c
 

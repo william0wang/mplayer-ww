@@ -277,13 +277,11 @@ static const char help_text[]=
 
 // vd.c
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "Despre MPlayer"
 #define MSGTR_FileSelect "Alege fiºierul..."
 #define MSGTR_SubtitleSelect "Alege subtitrarea..."
-#define MSGTR_OtherSelect "Alege..."
 #define MSGTR_AudioFileSelect "Alege canalul audio extern..."
 #define MSGTR_FontSelect "Alege fontul..."
 #define MSGTR_PlayList "Playlist"
@@ -306,7 +304,6 @@ static const char help_text[]=
 #define MSGTR_ConfigDriver "Configurare driver"
 
 // --- error messages ---
-#define MSGTR_NEMFMR "Scuze, nu am memorie destulã pentru afiºarea meniului."
 #define MSGTR_IDFGCVD "Scuze, nu am gãsit un driver video compatibil cu GUI."
 #define MSGTR_NEEDLAVC "Scuze, nu poþi afiºa fiºiere ne-MPEG cu dispozitivul DXR3/H+ fãrã recodare.\n"\
 "Activeazã 'lavc' în cãsuþa de configurare pentru DXR3/H+."
@@ -329,14 +326,12 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Stop"
 #define MSGTR_MENU_NextStream "Pista urmãtoare"
 #define MSGTR_MENU_PrevStream "Pista precedentã"
-#define MSGTR_MENU_Size "Dimensiune"
 #define MSGTR_MENU_NormalSize "Dimensiune normalã"
 #define MSGTR_MENU_DoubleSize "Dimensiune dublã"
 #define MSGTR_MENU_FullScreen "Întreg ecranul"
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Deschide discul..."
-#define MSGTR_MENU_ShowDVDMenu "Afiºeazã meniul DVD"
 #define MSGTR_MENU_Titles "Titluri"
 #define MSGTR_MENU_Title "Titlu %2d"
 #define MSGTR_MENU_None "(nimic)"
@@ -387,7 +382,6 @@ static const char help_text[]=
 
 #define MSGTR_PREFERENCES_None "Nimic"
 #define MSGTR_PREFERENCES_AvailableDrivers "Drivere disponibile:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Nu reda sunetul"
 #define MSGTR_PREFERENCES_NormalizeSound "Normalizeazã sunetul"
 #define MSGTR_PREFERENCES_EnableEqualizer "Activeazã egalizatorul"
 #define MSGTR_PREFERENCES_ExtraStereo "Activeazã extra stereo"

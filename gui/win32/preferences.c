@@ -149,7 +149,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
             /* checkboxes */
             btn = CreateWindow("button", acp(MSGTR_PREFERENCES_DoubleBuffer),
                                WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-                               10, 35, 160, 25,
+                               10, 35, 205, 25,
                                hwnd, (HMENU) ID_DOUBLE,
                                ((LPCREATESTRUCT) lParam) -> hInstance,
                                NULL);
@@ -157,7 +157,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
 
             btn = CreateWindow("button", acp(MSGTR_PREFERENCES_DirectRender),
                                WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-                               10, 57, 160, 25,
+                               10, 57, 205, 25,
                                hwnd, (HMENU) ID_DIRECT,
                                ((LPCREATESTRUCT) lParam) -> hInstance,
                                NULL);
@@ -165,7 +165,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
 
             btn = CreateWindow("button", acp(MSGTR_PREFERENCES_FrameDrop),
                                WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-                               10, 79, 160, 25,
+                               10, 79, 205, 25,
                                hwnd, (HMENU) ID_FRAMEDROP,
                                ((LPCREATESTRUCT) lParam) -> hInstance,
                                NULL);
@@ -181,7 +181,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
 
             btn = CreateWindow("button", acp(MSGTR_PREFERENCES_NormalizeSound),
                                WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-                               220, 35, 160, 25,
+                               220, 35, 190, 25,
                                hwnd, (HMENU) ID_NORMALIZE,
                                ((LPCREATESTRUCT) lParam) -> hInstance,
                                NULL);
@@ -189,7 +189,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
 
             btn = CreateWindow("button", acp(MSGTR_PREFERENCES_SoftwareMixer),
                                WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-                               220, 57, 160, 25,
+                               220, 57, 190, 25,
                                hwnd, (HMENU) ID_SOFTMIX,
                                ((LPCREATESTRUCT) lParam) -> hInstance,
                                NULL);
@@ -197,7 +197,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
 
             btn = CreateWindow("button", acp(MSGTR_PREFERENCES_ExtraStereo),
                                WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-                               220, 79, 160, 25,
+                               220, 79, 190, 25,
                                hwnd, (HMENU) ID_EXTRASTEREO,
                                ((LPCREATESTRUCT) lParam) -> hInstance,
                                NULL);
@@ -205,7 +205,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
 
             btn = CreateWindow("button", acp(MSGTR_PREFERENCES_Cache),
                                WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-                               10, 222, 90, 25,
+                               10, 222, 100, 25,
                                hwnd, (HMENU) ID_CACHE,
                                ((LPCREATESTRUCT) lParam) -> hInstance,
                                NULL);
@@ -213,7 +213,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
 
             btn = CreateWindow("button", acp(MSGTR_PREFERENCES_AutoSync),
                                WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-                               240, 222, 110, 25, hwnd,
+                               225, 222, 185, 25, hwnd,
                                (HMENU) ID_AUTOSYNC,
                                ((LPCREATESTRUCT) lParam) -> hInstance,
                                NULL);
@@ -310,7 +310,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
             edit1 = CreateWindowEx(WS_EX_CLIENTEDGE, "edit", "cache",
                                    WS_CHILD | WS_VISIBLE | WS_DISABLED |
                                    ES_LEFT | ES_AUTOHSCROLL,
-                                   105, 225, 60, 20, hwnd,
+                                   115, 225, 60, 20, hwnd,
                                    (HMENU) ID_EDIT1,
                                    ((LPCREATESTRUCT) lParam) -> hInstance,
                                    NULL);
@@ -329,7 +329,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
             edit2 = CreateWindowEx(WS_EX_CLIENTEDGE, "edit", "autosync",
                                    WS_CHILD | WS_VISIBLE | WS_DISABLED |
                                    ES_LEFT | ES_AUTOHSCROLL,
-                                   355, 225, 40, 20, hwnd,
+                                   355, 247, 40, 20, hwnd,
                                    (HMENU) ID_EDIT2,
                                    ((LPCREATESTRUCT) lParam) -> hInstance,
                                    NULL);
@@ -338,7 +338,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
             updown2 = CreateUpDownControl(WS_CHILD | WS_VISIBLE |
                                           WS_DISABLED | UDS_SETBUDDYINT |
                                           UDS_ARROWKEYS | UDS_NOTHOUSANDS,
-                                          395, 225, 20, 20, hwnd,
+                                          395, 247, 20, 20, hwnd,
                                           ID_UPDOWN2,
                                           ((LPCREATESTRUCT) lParam) -> hInstance,
                                           (HWND)edit2, 0, 0, 0);

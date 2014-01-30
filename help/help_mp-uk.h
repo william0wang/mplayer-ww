@@ -503,22 +503,18 @@ static const char help_text[]=
 #define MSGTR_LOADER_DYLD_Warning "ПОПЕРЕДЖЕННЯ: Намагаюсь використати DLL кодеки але змінна середовища\n         DYLD_BIND_AT_LAUNCH не встановлена. Це здається поламка.\n"
 
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "Про"
 #define MSGTR_FileSelect "Вибрати файл..."
 #define MSGTR_SubtitleSelect "Вибрати субтитри..."
-#define MSGTR_OtherSelect "Вибрати..."
 #define MSGTR_AudioFileSelect "Вибрати іншу аудіо доріжку..."
 #define MSGTR_FontSelect "Вибрати шрифт..."
-// Note: If you change MSGTR_PlayList please see if it still fits MSGTR_MENU_PlayList
 #define MSGTR_PlayList "Список програвання"
 #define MSGTR_Equalizer "Аквалайзер"
 #define MSGTR_ConfigureEqualizer "Налаштувати Аквалайзер"
 #define MSGTR_SkinBrowser "Переглядач скінів"
 #define MSGTR_Network "Передача потоку..."
-// Note: If you change MSGTR_Preferences please see if it still fits MSGTR_MENU_Preferences
 #define MSGTR_Preferences "Шалаштування"
 #define MSGTR_AudioPreferences "Налаштування аудіо драйверу"
 #define MSGTR_NoMediaOpened "Носій не відкритий."
@@ -538,7 +534,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "Вибачте, не достатньо пам'яті для прорисовки буферу."
-#define MSGTR_NEMFMR "Вибачте, не достатньо пам'яті для рендерення меню."
 #define MSGTR_IDFGCVD "Вибачте, не знаходжу відео драйвер для підтримки GUI."
 #define MSGTR_NEEDLAVC "Вибачте, ви не можете програвати не MPEG файли з вашим DXR3/H+ пристроєм без перекодування.\nВключіть lavc у нашалтунки DXR3/H+."
 
@@ -577,7 +572,6 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Зупинити"
 #define MSGTR_MENU_NextStream "Наступний потік"
 #define MSGTR_MENU_PrevStream "Попередній потік"
-#define MSGTR_MENU_Size "Розмір"
 #define MSGTR_MENU_HalfSize   "Half size"
 #define MSGTR_MENU_NormalSize "Нормальний розмір"
 #define MSGTR_MENU_DoubleSize "Подвійний розмір"
@@ -585,7 +579,6 @@ static const char help_text[]=
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Грати диск..."
-#define MSGTR_MENU_ShowDVDMenu "Показати DVD меню"
 #define MSGTR_MENU_Titles "Титри"
 #define MSGTR_MENU_Title "Титр %2d"
 #define MSGTR_MENU_None "(нема)"
@@ -593,9 +586,9 @@ static const char help_text[]=
 #define MSGTR_MENU_Chapter "Розділ %2d"
 #define MSGTR_MENU_AudioLanguages "Аудіо мови"
 #define MSGTR_MENU_SubtitleLanguages "Мови субтитрів"
-#define MSGTR_MENU_PlayList MSGTR_PlayList
+#define MSGTR_MENU_PlayList "Список програвання"
 #define MSGTR_MENU_SkinBrowser "Переглядач жупанів"
-#define MSGTR_MENU_Preferences MSGTR_Preferences
+#define MSGTR_MENU_Preferences "Шалаштування"
 #define MSGTR_MENU_Exit "Вихід"
 #define MSGTR_MENU_Mute "Тиша"
 #define MSGTR_MENU_Original "Вихідний"
@@ -606,9 +599,7 @@ static const char help_text[]=
 #define MSGTR_MENU_Subtitles "Субтитри"
 
 // --- equalizer
-// Note: If you change MSGTR_EQU_Audio please see if it still fits MSGTR_PREFERENCES_Audio
 #define MSGTR_EQU_Audio "Аудіо"
-// Note: If you change MSGTR_EQU_Video please see if it still fits MSGTR_PREFERENCES_Video
 #define MSGTR_EQU_Video "Відео"
 #define MSGTR_EQU_Contrast "Контраст: "
 #define MSGTR_EQU_Brightness "Яскравість: "
@@ -635,16 +626,14 @@ static const char help_text[]=
 #define MSGTR_PLAYLIST_DirectoryTree "Дерево каталогу"
 
 // --- preferences
-#define MSGTR_PREFERENCES_Audio MSGTR_EQU_Audio
-#define MSGTR_PREFERENCES_Video MSGTR_EQU_Video
+#define MSGTR_PREFERENCES_Audio "Аудіо"
+#define MSGTR_PREFERENCES_Video "Відео"
 #define MSGTR_PREFERENCES_SubtitleOSD "Субтитри й OSD"
 #define MSGTR_PREFERENCES_Codecs "Кодеки й demuxer"
-// Note: If you change MSGTR_PREFERENCES_Misc see if it still fits MSGTR_PREFERENCES_FRAME_Misc
 #define MSGTR_PREFERENCES_Misc "Різне"
 #define MSGTR_PREFERENCES_None "Немає"
 #define MSGTR_PREFERENCES_DriverDefault "звичайний драйвер"
 #define MSGTR_PREFERENCES_AvailableDrivers "Доступні драйвери:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Не грати звук"
 #define MSGTR_PREFERENCES_NormalizeSound "Нормалізувати звук"
 #define MSGTR_PREFERENCES_EnableEqualizer "Дозволити еквалайзер"
 #define MSGTR_PREFERENCES_ExtraStereo "Дозволити додаткове стерео"
@@ -680,7 +669,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Font "Шрифт"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocessing"
 #define MSGTR_PREFERENCES_FRAME_Cache "Кеш"
-#define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
+#define MSGTR_PREFERENCES_FRAME_Misc "Різне"
 #define MSGTR_PREFERENCES_Audio_Device "Пристрій:"
 #define MSGTR_PREFERENCES_Audio_Mixer "Мікшер:"
 #define MSGTR_PREFERENCES_Audio_MixerChannel "Канал мікшеру:"
@@ -765,8 +754,6 @@ static const char help_text[]=
 #define MSGTR_WS_TooManyOpenWindows "Забагато відкритих вікон.\n"
 #define MSGTR_WS_ShmError "помилка розширення загальної пам'яті\n"
 #define MSGTR_WS_NotEnoughMemoryDrawBuffer "Вибачте, не достатньо пам'яті для прорисування буферу.\n"
-#define MSGTR_WS_DpmsUnavailable "DPMS не доступний?\n"
-#define MSGTR_WS_DpmsNotEnabled "Не можу увімкнути DPMS.\n"
 
 // wsxdnd.c
 #define MSGTR_WS_NotAFile "Здається, це не файл...\n"

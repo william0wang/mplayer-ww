@@ -623,22 +623,18 @@ static const char help_text[]=
 #define MSGTR_InsertingAfVolume "[Mixer] Hardvérový mixér nie je k dispozicí, vkladám filter pre hlasitosť.\n"
 #define MSGTR_NoVolume "[Mixer] Ovládanie hlasitosti nie je dostupné.\n"
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "O aplikácii"
 #define MSGTR_FileSelect "Vybrať súbor..."
 #define MSGTR_SubtitleSelect "Vybrať titulky..."
-#define MSGTR_OtherSelect "Vybrať..."
 #define MSGTR_AudioFileSelect "Vybrať externý audio kanál..."
 #define MSGTR_FontSelect "Vybrať font..."
-// Note: If you change MSGTR_PlayList please see if it still fits MSGTR_MENU_PlayList
-#define MSGTR_PlayList "PlayList"
+#define MSGTR_PlayList "Playlist"
 #define MSGTR_Equalizer "Equalizer"
 #define MSGTR_ConfigureEqualizer "Konfigurovať Equalizer"
 #define MSGTR_SkinBrowser "Prehliadač tém"
 #define MSGTR_Network "Sieťové prehrávanie (streaming)..."
-// Note: If you change MSGTR_Preferences please see if it still fits MSGTR_MENU_Preferences
 #define MSGTR_Preferences "Preferencie"
 #define MSGTR_AudioPreferences "Konfiguracia ovladača zvuku"
 #define MSGTR_NoMediaOpened "Nič nie je otvorené"
@@ -658,7 +654,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "Žiaľ, nedostatok pamäte pre buffer na kreslenie."
-#define MSGTR_NEMFMR "Žiaľ, nedostatok pamäte pre vytváranie menu."
 #define MSGTR_IDFGCVD "Žiaľ, nemôžem nájsť gui kompatibilný ovládač video výstupu."
 #define MSGTR_NEEDLAVC "Žiaľ, nemôžete prehrávať nie mpeg súbory s DXR3/H+ zariadením bez prekódovania.\nProsím zapnite lavc v DXR3/H+ konfig. okne."
 
@@ -697,7 +692,6 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Zastaviť"
 #define MSGTR_MENU_NextStream "Ďalší prúd"
 #define MSGTR_MENU_PrevStream "Predchádzajúci prúd"
-#define MSGTR_MENU_Size "Veľkosť"
 #define MSGTR_MENU_HalfSize   "Polovičná velikosť"
 #define MSGTR_MENU_NormalSize "Normálna veľkosť"
 #define MSGTR_MENU_DoubleSize "Dvojnásobná veľkosť"
@@ -705,7 +699,6 @@ static const char help_text[]=
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Prehrať disk..."
-#define MSGTR_MENU_ShowDVDMenu "Zobraziť DVD menu"
 #define MSGTR_MENU_Titles "Tituly"
 #define MSGTR_MENU_Title "Titul %2d"
 #define MSGTR_MENU_None "(nič)"
@@ -715,7 +708,7 @@ static const char help_text[]=
 #define MSGTR_MENU_SubtitleLanguages "Jazyk titulkov"
 #define MSGTR_MENU_PlayList "Playlist"
 #define MSGTR_MENU_SkinBrowser "Prehliadač tém"
-#define MSGTR_MENU_Preferences MSGTR_Preferences
+#define MSGTR_MENU_Preferences "Preferencie"
 #define MSGTR_MENU_Exit "Koniec"
 #define MSGTR_MENU_Mute "Stlmiť zvuk"
 #define MSGTR_MENU_Original "Originál"
@@ -726,9 +719,7 @@ static const char help_text[]=
 #define MSGTR_MENU_Subtitles "Titulky"
 
 // --- equalizer
-// Note: If you change MSGTR_EQU_Audio please see if it still fits MSGTR_PREFERENCES_Audio
 #define MSGTR_EQU_Audio "Audio"
-// Note: If you change MSGTR_EQU_Video please see if it still fits MSGTR_PREFERENCES_Video
 #define MSGTR_EQU_Video "Video"
 #define MSGTR_EQU_Contrast "Kontrast: "
 #define MSGTR_EQU_Brightness "Jas: "
@@ -755,17 +746,15 @@ static const char help_text[]=
 #define MSGTR_PLAYLIST_DirectoryTree "Adresárový strom"
 
 // --- preferences
-#define MSGTR_PREFERENCES_Audio MSGTR_EQU_Audio
-#define MSGTR_PREFERENCES_Video MSGTR_EQU_Video
+#define MSGTR_PREFERENCES_Audio "Audio"
+#define MSGTR_PREFERENCES_Video "Video"
 #define MSGTR_PREFERENCES_SubtitleOSD "Titulky a OSD"
 #define MSGTR_PREFERENCES_Codecs "Kódeky a demuxer"
-// Poznámka: Pokiaľ zmeníte MSGTR_PREFERENCES_Misc, uistite sa prosím, že vyhovuje aj pre MSGTR_PREFERENCES_FRAME_Misc
 #define MSGTR_PREFERENCES_Misc "Rôzne"
 
 #define MSGTR_PREFERENCES_None "Nič"
 #define MSGTR_PREFERENCES_DriverDefault "východzie nastavenie"
 #define MSGTR_PREFERENCES_AvailableDrivers "Dostupné ovládače:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Nehrať zvuk"
 #define MSGTR_PREFERENCES_NormalizeSound "Normalizovať zvuk"
 #define MSGTR_PREFERENCES_EnableEqualizer "Zapnúť equalizer"
 #define MSGTR_PREFERENCES_SoftwareMixer "Aktivovať softvérový mixér"
@@ -798,7 +787,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Font "Font"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocess"
 #define MSGTR_PREFERENCES_FRAME_Cache "Vyrovnávacia pamäť"
-#define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
+#define MSGTR_PREFERENCES_FRAME_Misc "Rôzne"
 #define MSGTR_PREFERENCES_Audio_Device "Zariadenie:"
 #define MSGTR_PREFERENCES_Audio_Mixer "Mixér:"
 #define MSGTR_PREFERENCES_Audio_MixerChannel "Kanál mixéru:"

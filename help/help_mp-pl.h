@@ -639,22 +639,18 @@ static const char help_text[]=
 #define MSGTR_InsertingAfVolume "[Mixer] Brak sprzętowego mixowania, włączam filtr głośności.\n"
 #define MSGTR_NoVolume "[Mixer] Brak kontroli głośności.\n"
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "O programie"
 #define MSGTR_FileSelect "Wybierz plik..."
 #define MSGTR_SubtitleSelect "Wybierz napisy..."
-#define MSGTR_OtherSelect "Wybierz..."
 #define MSGTR_AudioFileSelect "Wybierz zewnętrzny kanał dźwięku..."
 #define MSGTR_FontSelect "Wybierz czcionkę..."
-// Note: If you change MSGTR_PlayList please see if it still fits MSGTR_MENU_PlayList
 #define MSGTR_PlayList "Lista Odtwarzania"
 #define MSGTR_Equalizer "Korektor"
 #define MSGTR_ConfigureEqualizer "Konfiguruj Korektor"
 #define MSGTR_SkinBrowser "Przeglądarka skórek"
 #define MSGTR_Network "Strumieniowanie sieciowe..."
-// Note: If you change MSGTR_Preferences please see if it still fits MSGTR_MENU_Preferences
 #define MSGTR_Preferences "Opcje"
 #define MSGTR_AudioPreferences "Konfiguracja sterownika audio"
 #define MSGTR_NoMediaOpened "Nie otwarto żadnego nośnika."
@@ -674,7 +670,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "Za mało pamięci by wyrysować bufor."
-#define MSGTR_NEMFMR "Za mało pamięci na renderowanie menu."
 #define MSGTR_IDFGCVD "Brak sterownika video zgodnego z GUI."
 #define MSGTR_NEEDLAVC "Niestety, nie można odtwarzać plików innych niż MPEG przy użyciu urządzenia DXR3/H+ bez kowersji.\nProszę włączyć lavc w polu sterowania DXR3/H+."
 
@@ -713,7 +708,6 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Stop"
 #define MSGTR_MENU_NextStream "Następny strumień"
 #define MSGTR_MENU_PrevStream "Poprzedni strumień"
-#define MSGTR_MENU_Size "Rozmiar"
 #define MSGTR_MENU_HalfSize   "połowa normalnego rozmiaru"
 #define MSGTR_MENU_NormalSize "normalny rozmiar"
 #define MSGTR_MENU_DoubleSize "podwójny rozmiar"
@@ -721,7 +715,6 @@ static const char help_text[]=
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Otwórz dysk..."
-#define MSGTR_MENU_ShowDVDMenu "Pokaż menu DVD"
 #define MSGTR_MENU_Titles "Tytuły"
 #define MSGTR_MENU_Title "Tytuł %2d"
 #define MSGTR_MENU_None "(brak)"
@@ -729,9 +722,9 @@ static const char help_text[]=
 #define MSGTR_MENU_Chapter "Rozdział %2d"
 #define MSGTR_MENU_AudioLanguages "Języki ścieżki dźwiękowej"
 #define MSGTR_MENU_SubtitleLanguages "Języki napisów"
-#define MSGTR_MENU_PlayList MSGTR_PlayList
+#define MSGTR_MENU_PlayList "Lista Odtwarzania"
 #define MSGTR_MENU_SkinBrowser "Przeglądarka skórek"
-#define MSGTR_MENU_Preferences MSGTR_Preferences
+#define MSGTR_MENU_Preferences "Opcje"
 #define MSGTR_MENU_Exit "Wyjście"
 #define MSGTR_MENU_Mute "Wycisz"
 #define MSGTR_MENU_Original "Oryginalnie"
@@ -742,9 +735,7 @@ static const char help_text[]=
 #define MSGTR_MENU_Subtitles "Napisy"
 
 // --- equalizer
-// Note: If you change MSGTR_EQU_Audio please see if it still fits MSGTR_PREFERENCES_Audio
 #define MSGTR_EQU_Audio "Audio"
-// Note: If you change MSGTR_EQU_Video please see if it still fits MSGTR_PREFERENCES_Video
 #define MSGTR_EQU_Video "Wideo"
 #define MSGTR_EQU_Contrast "Kontrast: "
 #define MSGTR_EQU_Brightness "Jasność: "
@@ -771,17 +762,15 @@ static const char help_text[]=
 #define MSGTR_PLAYLIST_DirectoryTree "Drzewo katalogów"
 
 // --- preferences
-#define MSGTR_PREFERENCES_Audio MSGTR_EQU_Audio
-#define MSGTR_PREFERENCES_Video MSGTR_EQU_Video
+#define MSGTR_PREFERENCES_Audio "Audio"
+#define MSGTR_PREFERENCES_Video "Wideo"
 #define MSGTR_PREFERENCES_SubtitleOSD "Napisy & OSD"
 #define MSGTR_PREFERENCES_Codecs "Kodeki & demuxer"
-// Note: If you change MSGTR_PREFERENCES_Misc see if it still fits MSGTR_PREFERENCES_FRAME_Misc
 #define MSGTR_PREFERENCES_Misc "Inne"
 
 #define MSGTR_PREFERENCES_None "Brak"
 #define MSGTR_PREFERENCES_DriverDefault "domyślne ustawienia sterownika"
 #define MSGTR_PREFERENCES_AvailableDrivers "Dostępne sterowniki:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Nie odtwarzaj dźwięku"
 #define MSGTR_PREFERENCES_NormalizeSound "Normalizuj dźwięk"
 #define MSGTR_PREFERENCES_EnableEqualizer "Włącz korektor"
 #define MSGTR_PREFERENCES_SoftwareMixer "Włącz mikser programowy"
@@ -818,7 +807,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Font "Czcionka"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocessing"
 #define MSGTR_PREFERENCES_FRAME_Cache "Pamięć podręczna"
-#define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
+#define MSGTR_PREFERENCES_FRAME_Misc "Inne"
 #define MSGTR_PREFERENCES_Audio_Device "Urządzenie:"
 #define MSGTR_PREFERENCES_Audio_Mixer "Mixer:"
 #define MSGTR_PREFERENCES_Audio_MixerChannel "Kanał Mixera:"
@@ -905,8 +894,6 @@ static const char help_text[]=
 #define MSGTR_WS_TooManyOpenWindows "Za dużo otwartych okien.\n"
 #define MSGTR_WS_ShmError "błąd rozszerzenia pamięci dzielonej\n"
 #define MSGTR_WS_NotEnoughMemoryDrawBuffer "Za mało pamięci do wyrysowania bufora.\n"
-#define MSGTR_WS_DpmsUnavailable "DPMS niedostępny?\n"
-#define MSGTR_WS_DpmsNotEnabled "Nie mogłem włączyć DPMS.\n"
 
 // wsxdnd.c
 

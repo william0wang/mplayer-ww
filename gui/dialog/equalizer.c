@@ -336,43 +336,43 @@ static GtkWidget * CreateEqualizer( void )
     gtk_table_attach( GTK_TABLE( table1 ),A16000,9,10,0,1,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),0,0 );
 
   gtk_table_attach( GTK_TABLE( table1 ),
-    gtkAddLabel( "31.25",NULL ),
+    gtkAddLabel( MSGTR_EQU_Frequency0,NULL ),
     0,1,1,2,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   gtk_table_attach( GTK_TABLE( table1 ),
-    gtkAddLabel( "62.50",NULL ),
+    gtkAddLabel( MSGTR_EQU_Frequency1,NULL ),
     1,2,1,2,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   gtk_table_attach( GTK_TABLE( table1 ),
-    gtkAddLabel( "125",NULL ),
+    gtkAddLabel( MSGTR_EQU_Frequency2,NULL ),
     2,3,1,2,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   gtk_table_attach( GTK_TABLE( table1 ),
-    gtkAddLabel( "250",NULL ),
+    gtkAddLabel( MSGTR_EQU_Frequency3,NULL ),
     3,4,1,2,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   gtk_table_attach( GTK_TABLE( table1 ),
-    gtkAddLabel( "500",NULL ),
+    gtkAddLabel( MSGTR_EQU_Frequency4,NULL ),
     4,5,1,2,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   gtk_table_attach( GTK_TABLE( table1 ),
-    gtkAddLabel( "1000",NULL ),
+    gtkAddLabel( MSGTR_EQU_Frequency5,NULL ),
     5,6,1,2,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   gtk_table_attach( GTK_TABLE( table1 ),
-    gtkAddLabel( "2000",NULL ),
+    gtkAddLabel( MSGTR_EQU_Frequency6,NULL ),
     6,7,1,2,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   gtk_table_attach( GTK_TABLE( table1 ),
-    gtkAddLabel( "4000",NULL ),
+    gtkAddLabel( MSGTR_EQU_Frequency7,NULL ),
     7,8,1,2,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   gtk_table_attach( GTK_TABLE( table1 ),
-    gtkAddLabel( "8000",NULL ),
+    gtkAddLabel( MSGTR_EQU_Frequency8,NULL ),
     8,9,1,2,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   gtk_table_attach( GTK_TABLE( table1 ),
-    gtkAddLabel( "16000",NULL ),
+    gtkAddLabel( MSGTR_EQU_Frequency9,NULL ),
     9,10,1,2,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   gtk_notebook_set_tab_label( GTK_NOTEBOOK( Notebook ),gtk_notebook_get_nth_page( GTK_NOTEBOOK( Notebook ),0 ),

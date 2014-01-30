@@ -657,22 +657,18 @@ static const char help_text[]=
 #define MSGTR_InsertingAfVolume "[混音器] 没有硬件混音, 插入音量過濾器。\n"
 #define MSGTR_NoVolume "[混音器] 没有可用的音量控製。\n"
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "關于"
 #define MSGTR_FileSelect "選擇文件..."
 #define MSGTR_SubtitleSelect "選擇字幕..."
-#define MSGTR_OtherSelect "選擇..."
 #define MSGTR_AudioFileSelect "選擇外部音頻通道..."
 #define MSGTR_FontSelect "選擇字體..."
-// Note: If you change MSGTR_PlayList please see if it still fits MSGTR_MENU_PlayList
 #define MSGTR_PlayList "播放列表"
 #define MSGTR_Equalizer "均衡器"
 #define MSGTR_ConfigureEqualizer "配置均衡器"
 #define MSGTR_SkinBrowser "皮膚瀏覽器"
 #define MSGTR_Network "網絡流媒體..."
-// Note: If you change MSGTR_Preferences please see if it still fits MSGTR_MENU_Preferences
 #define MSGTR_Preferences "首選項"
 #define MSGTR_AudioPreferences "音頻驅動配置"
 #define MSGTR_NoMediaOpened "没有打開媒體"
@@ -692,7 +688,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "抱歉, 没有足够的内存用于繪製緩衝。"
-#define MSGTR_NEMFMR "抱歉, 没有足够的内存用于菜單渲染。"
 #define MSGTR_IDFGCVD "抱歉, 未找到 GUI-兼容的視頻輸出驅動。"
 #define MSGTR_NEEDLAVC "抱歉, 不能用没有重編碼的 DXR3/H+ 設備播放 non-MPEG 文件\n請啟用 DXR3/H+ 配置盒中的 lavc。"
 
@@ -731,7 +726,6 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "停止"
 #define MSGTR_MENU_NextStream "下一個"
 #define MSGTR_MENU_PrevStream "上一個"
-#define MSGTR_MENU_Size "尺寸"
 #define MSGTR_MENU_HalfSize   "一半尺寸"
 #define MSGTR_MENU_NormalSize "正常尺寸"
 #define MSGTR_MENU_DoubleSize "雙倍尺寸"
@@ -739,7 +733,6 @@ static const char help_text[]=
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "打開盤..."
-#define MSGTR_MENU_ShowDVDMenu "顯示 DVD 菜單"
 #define MSGTR_MENU_Titles "標題"
 #define MSGTR_MENU_Title "標題 %2d"
 #define MSGTR_MENU_None "(none)"
@@ -747,9 +740,9 @@ static const char help_text[]=
 #define MSGTR_MENU_Chapter "章節 %2d"
 #define MSGTR_MENU_AudioLanguages "音頻語言"
 #define MSGTR_MENU_SubtitleLanguages "字幕語言"
-#define MSGTR_MENU_PlayList MSGTR_PlayList
+#define MSGTR_MENU_PlayList "播放列表"
 #define MSGTR_MENU_SkinBrowser "皮膚瀏覽器"
-#define MSGTR_MENU_Preferences MSGTR_Preferences
+#define MSGTR_MENU_Preferences "首選項"
 #define MSGTR_MENU_Exit "退出"
 #define MSGTR_MENU_Mute "靜音"
 #define MSGTR_MENU_Original "原始的"
@@ -760,9 +753,7 @@ static const char help_text[]=
 #define MSGTR_MENU_Subtitles "字幕"
 
 // --- equalizer
-// Note: If you change MSGTR_EQU_Audio please see if it still fits MSGTR_PREFERENCES_Audio
 #define MSGTR_EQU_Audio "音頻"
-// Note: If you change MSGTR_EQU_Video please see if it still fits MSGTR_PREFERENCES_Video
 #define MSGTR_EQU_Video "視頻"
 #define MSGTR_EQU_Contrast "對比度: "
 #define MSGTR_EQU_Brightness "亮度: "
@@ -789,17 +780,15 @@ static const char help_text[]=
 #define MSGTR_PLAYLIST_DirectoryTree "目録樹"
 
 // --- preferences
-#define MSGTR_PREFERENCES_Audio MSGTR_EQU_Audio
-#define MSGTR_PREFERENCES_Video MSGTR_EQU_Video
+#define MSGTR_PREFERENCES_Audio "音頻"
+#define MSGTR_PREFERENCES_Video "視頻"
 #define MSGTR_PREFERENCES_SubtitleOSD "字幕和 OSD "
 #define MSGTR_PREFERENCES_Codecs "編解碼器和分路器"
-// Note: If you change MSGTR_PREFERENCES_Misc see if it still fits MSGTR_PREFERENCES_FRAME_Misc
 #define MSGTR_PREFERENCES_Misc "其他"
 
 #define MSGTR_PREFERENCES_None "None"
 #define MSGTR_PREFERENCES_DriverDefault "默認驅動"
 #define MSGTR_PREFERENCES_AvailableDrivers "可用驅動:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "不播放聲音"
 #define MSGTR_PREFERENCES_NormalizeSound "聲音標凖化"
 #define MSGTR_PREFERENCES_EnableEqualizer "啟用均衡器"
 #define MSGTR_PREFERENCES_SoftwareMixer "啟用軟件混音器"
@@ -836,7 +825,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Font "字體"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "後期處理"
 #define MSGTR_PREFERENCES_FRAME_Cache "緩存"
-#define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
+#define MSGTR_PREFERENCES_FRAME_Misc "其他"
 #define MSGTR_PREFERENCES_Audio_Device "設備:"
 #define MSGTR_PREFERENCES_Audio_Mixer "混音器:"
 #define MSGTR_PREFERENCES_Audio_MixerChannel "混音通道:"
@@ -923,8 +912,6 @@ static const char help_text[]=
 #define MSGTR_WS_TooManyOpenWindows "打開窗口太多。\n"
 #define MSGTR_WS_ShmError "共享内存擴展錯誤\n"
 #define MSGTR_WS_NotEnoughMemoryDrawBuffer "抱歉, 内存不够繪製緩衝。\n"
-#define MSGTR_WS_DpmsUnavailable "DPMS 不可用?\n"
-#define MSGTR_WS_DpmsNotEnabled "不能啟用 DPMS。\n"
 
 // wsxdnd.c
 

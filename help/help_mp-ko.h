@@ -316,13 +316,11 @@ static const char help_text[]=
 #define MSGTR_EwmhFullscreenStateFailed "\nX11: EWMH 전체화면 이벤트를 보낼 수 없습니다!\n"
 
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "정보"
 #define MSGTR_FileSelect "파일 선택..."
 #define MSGTR_SubtitleSelect "자막 선택..."
-#define MSGTR_OtherSelect "선택..."
 #define MSGTR_AudioFileSelect "음악 파일 선택..."
 #define MSGTR_FontSelect "글꼴 선택..."
 #define MSGTR_PlayList "재생목록"
@@ -347,7 +345,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "죄송합니다. 그리기 버퍼를 위한 충분한 메모리가 없습니다."
-#define MSGTR_NEMFMR "죄송합니다. 메뉴 렌더링을 위한 충분한 메모리가 없습니다."
 #define MSGTR_IDFGCVD "죄송합니다. GUI 호환 비디오 출력 드라이버를 찾지 못했습니다."
 
 // --- skin loader error messages
@@ -382,14 +379,12 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "정지"
 #define MSGTR_MENU_NextStream "다음"
 #define MSGTR_MENU_PrevStream "이전"
-#define MSGTR_MENU_Size "크기"
 #define MSGTR_MENU_NormalSize "보통 크기"
 #define MSGTR_MENU_DoubleSize "두배 크기"
 #define MSGTR_MENU_FullScreen "전체 화면"
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "디스크 열기..."
-#define MSGTR_MENU_ShowDVDMenu "DVD 메뉴보기"
 #define MSGTR_MENU_Titles "타이틀"
 #define MSGTR_MENU_Title "타이틀 %2d"
 #define MSGTR_MENU_None "(없음)"
@@ -440,7 +435,6 @@ static const char help_text[]=
 
 #define MSGTR_PREFERENCES_None "없음"
 #define MSGTR_PREFERENCES_AvailableDrivers "가능한 드라이버:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "사운드 재생 안함"
 #define MSGTR_PREFERENCES_NormalizeSound "사운드 표준화"
 #define MSGTR_PREFERENCES_EnableEqualizer "이퀄라이저 사용"
 #define MSGTR_PREFERENCES_ExtraStereo "외부 스테레오 사용"

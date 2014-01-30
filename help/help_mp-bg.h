@@ -535,13 +535,11 @@ static const char help_text[]=
 #define MSGTR_InsertingAfVolume "[Смесител] Няма хардуерно смесване, вмъкване на филтър за силата на звука.\n"
 #define MSGTR_NoVolume "[Смесител] Не е достъпна настройка на звука.\n"
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "Информация"
 #define MSGTR_FileSelect "Избор на файл..."
 #define MSGTR_SubtitleSelect "Избор на субтитри..."
-#define MSGTR_OtherSelect "Избор..."
 #define MSGTR_AudioFileSelect "Избор на външен аудио канал..."
 #define MSGTR_FontSelect "Избор на шрифт..."
 #define MSGTR_PlayList "Списък за възпроизвеждане"
@@ -567,7 +565,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "За съжаление, няма достатъчно памет за draw buffer."
-#define MSGTR_NEMFMR "За съжаление, няма достатъчно памет за менюто."
 #define MSGTR_IDFGCVD "За съжаление, няма съвместим с GUI видео драйвер."
 #define MSGTR_NEEDLAVC "За съжаление, не можете да възпроизвеждате различни от MPEG\nфайлове с вашето DXR3/H+ устройство без прекодиране.\nМоля разрешете lavc в полето за конфигурация на DXR3/H+ ."
 
@@ -605,7 +602,6 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Стоп"
 #define MSGTR_MENU_NextStream "Следващ"
 #define MSGTR_MENU_PrevStream "Предишен"
-#define MSGTR_MENU_Size "Размер"
 #define MSGTR_MENU_HalfSize   "Половин размер"
 #define MSGTR_MENU_NormalSize "Нормален размер"
 #define MSGTR_MENU_DoubleSize "Двоен размер"
@@ -613,7 +609,6 @@ static const char help_text[]=
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Oтваряне на диск..."
-#define MSGTR_MENU_ShowDVDMenu "Показване на DVD меню"
 #define MSGTR_MENU_Titles "Заглавия"
 #define MSGTR_MENU_Title "Заглавие %2d"
 #define MSGTR_MENU_None "(няма)"
@@ -621,11 +616,9 @@ static const char help_text[]=
 #define MSGTR_MENU_Chapter "Раздел %2d"
 #define MSGTR_MENU_AudioLanguages "Език за аудио"
 #define MSGTR_MENU_SubtitleLanguages "Език на субтитрите"
-// TODO: Why is this different from MSGTR_PlayList?
-#define MSGTR_MENU_PlayList "Playlist"
+#define MSGTR_MENU_PlayList "Списък за възпроизвеждане"
 #define MSGTR_MENU_SkinBrowser "Избор на Skin"
-// TODO: Why is this different from MSGTR_Preferences?
-#define MSGTR_MENU_Preferences "Настройки"
+#define MSGTR_MENU_Preferences "Предпочитания"
 #define MSGTR_MENU_Exit "Изход"
 #define MSGTR_MENU_Mute "Без звук"
 #define MSGTR_MENU_Original "Без промяна"
@@ -669,7 +662,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_None "Без"
 #define MSGTR_PREFERENCES_DriverDefault "Подразбиращи се за драйвера"
 #define MSGTR_PREFERENCES_AvailableDrivers "Достъпни драйвери:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Без звук"
 #define MSGTR_PREFERENCES_NormalizeSound "Изравняване на звука"
 #define MSGTR_PREFERENCES_EnableEqualizer "Включване на еквалайзера"
 #define MSGTR_PREFERENCES_SoftwareMixer "Включва Софтуерен Смесител"
@@ -782,8 +774,6 @@ static const char help_text[]=
 #define MSGTR_WS_TooManyOpenWindows "Твърде много отворени прозорци.\n"
 #define MSGTR_WS_ShmError "грешка в разширението за споделена памет\n"
 #define MSGTR_WS_NotEnoughMemoryDrawBuffer "Няма достатъчно памет за draw buffer.\n"
-#define MSGTR_WS_DpmsUnavailable "DPMS не е достъпен?\n"
-#define MSGTR_WS_DpmsNotEnabled "DPMS не може да бъде включен.\n"
 
 // wsxdnd.c
 

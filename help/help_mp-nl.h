@@ -520,13 +520,11 @@ static const char help_text[]=
 #define MSGTR_InsertingAfVolume "[Mixer] Geen hardware mixing, een volume filter wordt gebruikt.\n"
 #define MSGTR_NoVolume "[Mixer] Geen geluidsvolume controle beschikbaar.\n"
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "Info over"
 #define MSGTR_FileSelect "Selecteer bestand..."
 #define MSGTR_SubtitleSelect "Selecteer ondertiteling..."
-#define MSGTR_OtherSelect "Selecteer..."
 #define MSGTR_AudioFileSelect "Selecteer extern audio kanaal..."
 #define MSGTR_FontSelect "Selecteer lettertype..."
 #define MSGTR_PlayList "AfspeelLijst"
@@ -552,7 +550,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "Sorry, niet genoeg geheugen voor tekenbuffer."
-#define MSGTR_NEMFMR "Sorry, niet genoeg geheugen voor menu rendering."
 #define MSGTR_IDFGCVD "Sorry, kon geen GUI compatibele video uitvoer driver vinden."
 #define MSGTR_NEEDLAVC "Sorry, je kan geen niet-MPEG bestanden met je DXR3/H+ apparaat aspelen zonder het bestand te herencoderen.\nActiveer lavc in het DXR3/H+ configuratiescherm."
 
@@ -588,14 +585,12 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Stop"
 #define MSGTR_MENU_NextStream "Volgende stream"
 #define MSGTR_MENU_PrevStream "Vorige stream"
-#define MSGTR_MENU_Size "Grootte"
 #define MSGTR_MENU_NormalSize "Normale grootte"
 #define MSGTR_MENU_DoubleSize "Dubbele grootte"
 #define MSGTR_MENU_FullScreen "Volledig scherm"
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Speel disc..."
-#define MSGTR_MENU_ShowDVDMenu "Toon DVD menu"
 #define MSGTR_MENU_Titles "Titels"
 #define MSGTR_MENU_Title "Titel %2d"
 #define MSGTR_MENU_None "(geen)"
@@ -603,8 +598,7 @@ static const char help_text[]=
 #define MSGTR_MENU_Chapter "Hoofdstuk %2d"
 #define MSGTR_MENU_AudioLanguages "Audio talen"
 #define MSGTR_MENU_SubtitleLanguages "Ondertiteling talen"
-// TODO: Why is this different from MSGTR_PlayList?
-#define MSGTR_MENU_PlayList "Playlist"
+#define MSGTR_MENU_PlayList "AfspeelLijst"
 #define MSGTR_MENU_SkinBrowser "Skin browser"
 #define MSGTR_MENU_Exit "Afsluiten"
 #define MSGTR_MENU_Mute "Mute"
@@ -649,7 +643,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_None "Geen"
 #define MSGTR_PREFERENCES_DriverDefault "standaard driver"
 #define MSGTR_PREFERENCES_AvailableDrivers "Beschikbare drivers:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Speel geen geluid af"
 #define MSGTR_PREFERENCES_NormalizeSound "Normalizeer het geluid"
 #define MSGTR_PREFERENCES_EnableEqualizer "Gebruik equalizer"
 #define MSGTR_PREFERENCES_ExtraStereo "Gebruik extra stereo"

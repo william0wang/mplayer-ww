@@ -254,13 +254,11 @@ static const char help_text[]=
 
 // vd.c
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "アバウト"
 #define MSGTR_FileSelect "ファイル選択 ..."
 #define MSGTR_SubtitleSelect "サブタイトル選択 ..."
-#define MSGTR_OtherSelect "選択 ..."
 #define MSGTR_FontSelect "フォント選択 ..."
 #define MSGTR_PlayList "プレイリスト"
 #define MSGTR_Equalizer "エコライザー"
@@ -283,7 +281,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "描画に必要なバッファを確保するためのメモリが足りません."
-#define MSGTR_NEMFMR "メニューを描画に必要なメモリが足りません."
 
 // --- skin loader error messages
 #define MSGTR_SKIN_ERRORMESSAGE "[skin] エラー: スキン設定ファイル %d 行: %s"
@@ -314,14 +311,12 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "停止"
 #define MSGTR_MENU_NextStream "次のストリーム"
 #define MSGTR_MENU_PrevStream "前のストリーム"
-#define MSGTR_MENU_Size "サイズ"
 #define MSGTR_MENU_NormalSize "通常サイズ"
 #define MSGTR_MENU_DoubleSize "2倍サイズ"
 #define MSGTR_MENU_FullScreen "フルスクリーン"
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "ディスク再生 ..."
-#define MSGTR_MENU_ShowDVDMenu "DVD メニューの表示"
 #define MSGTR_MENU_Titles "タイトル"
 #define MSGTR_MENU_Title "タイトル %2d"
 #define MSGTR_MENU_None "(無し)"

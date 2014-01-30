@@ -535,22 +535,18 @@ static const char help_text[]=
 #define MSGTR_LOADER_DYLD_Warning "警告：尝试使用 DLL 编解码器，但是环境变量\n         DYLD_BIND_AT_LAUNCH 未设定。 这很可能造成程序崩溃。\n"
 
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "关于"
 #define MSGTR_FileSelect "选择文件..."
 #define MSGTR_SubtitleSelect "选择字幕..."
-#define MSGTR_OtherSelect "选择..."
 #define MSGTR_AudioFileSelect "选择外部音频通道..."
 #define MSGTR_FontSelect "选择字体..."
-// Note: If you change MSGTR_PlayList please see if it still fits MSGTR_MENU_PlayList
 #define MSGTR_PlayList "播放列表"
 #define MSGTR_Equalizer "均衡器"
 #define MSGTR_ConfigureEqualizer "配置均衡器"
 #define MSGTR_SkinBrowser "界面外观配置浏览器"
 #define MSGTR_Network "正传送网络媒体流..."
-// Note: If you change MSGTR_Preferences please see if it still fits MSGTR_MENU_Preferences
 #define MSGTR_Preferences "首选项"
 #define MSGTR_AudioPreferences "音频驱动配置"
 #define MSGTR_NoMediaOpened "未打开媒体内容"
@@ -602,7 +598,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "抱歉，没有足够的内存用作绘图缓冲。\n"
-#define MSGTR_NEMFMR "抱歉，没有足够的内存用于菜单渲染。"
 #define MSGTR_IDFGCVD "抱歉，未找到与 GUI 兼容的视频输出驱动。\n"
 #define MSGTR_NEEDLAVC "抱歉，未重新编码前无法用你的 DXR3/H+ 设备播放非 MPEG 文件。\n请启用 DXR3/H+ 配置盒中的 lavc 编解码器。"
 #define MSGTR_ICONERROR "未找到图标‘%s’（大小为 %d）或格式不支持。\n"
@@ -652,7 +647,6 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "停止"
 #define MSGTR_MENU_NextStream "下一个"
 #define MSGTR_MENU_PrevStream "上一个"
-#define MSGTR_MENU_Size "尺寸"
 #define MSGTR_MENU_HalfSize   "一半尺寸"
 #define MSGTR_MENU_NormalSize "正常尺寸"
 #define MSGTR_MENU_DoubleSize "双倍尺寸"
@@ -661,7 +655,6 @@ static const char help_text[]=
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "打开光盘..."
-#define MSGTR_MENU_ShowDVDMenu "显示 DVD 菜单"
 #define MSGTR_MENU_Titles "所有标题"
 #define MSGTR_MENU_Title "标题 %2d"
 #define MSGTR_MENU_None "（无）"
@@ -669,9 +662,9 @@ static const char help_text[]=
 #define MSGTR_MENU_Chapter "章节 %2d"
 #define MSGTR_MENU_AudioLanguages "音频语言"
 #define MSGTR_MENU_SubtitleLanguages "字幕语言"
-#define MSGTR_MENU_PlayList MSGTR_PlayList
+#define MSGTR_MENU_PlayList "播放列表"
 #define MSGTR_MENU_SkinBrowser "界面外观配置浏览器"
-#define MSGTR_MENU_Preferences MSGTR_Preferences
+#define MSGTR_MENU_Preferences "首选项"
 #define MSGTR_MENU_Exit "退出"
 #define MSGTR_MENU_Mute "静音"
 #define MSGTR_MENU_Original "原始的"
@@ -683,9 +676,7 @@ static const char help_text[]=
 #define MSGTR_MENU_Subtitles "字幕"
 
 // --- equalizer
-// Note: If you change MSGTR_EQU_Audio please see if it still fits MSGTR_PREFERENCES_Audio
 #define MSGTR_EQU_Audio "音频"
-// Note: If you change MSGTR_EQU_Video please see if it still fits MSGTR_PREFERENCES_Video
 #define MSGTR_EQU_Video "视频"
 #define MSGTR_EQU_Contrast "对比度："
 #define MSGTR_EQU_Brightness "亮度："
@@ -712,16 +703,14 @@ static const char help_text[]=
 #define MSGTR_PLAYLIST_DirectoryTree "目录树"
 
 // --- preferences
-#define MSGTR_PREFERENCES_Audio MSGTR_EQU_Audio
-#define MSGTR_PREFERENCES_Video MSGTR_EQU_Video
+#define MSGTR_PREFERENCES_Audio "音频"
+#define MSGTR_PREFERENCES_Video "视频"
 #define MSGTR_PREFERENCES_SubtitleOSD "字幕和 OSD 菜单"
 #define MSGTR_PREFERENCES_Codecs "编解码器和流分离器"
-// Note: If you change MSGTR_PREFERENCES_Misc see if it still fits MSGTR_PREFERENCES_FRAME_Misc
 #define MSGTR_PREFERENCES_Misc "杂项"
 #define MSGTR_PREFERENCES_None "（无）"
 #define MSGTR_PREFERENCES_DriverDefault "驱动程序默认配置"
 #define MSGTR_PREFERENCES_AvailableDrivers "可用驱动："
-#define MSGTR_PREFERENCES_DoNotPlaySound "不播放声音"
 #define MSGTR_PREFERENCES_NormalizeSound "音量规格化"
 #define MSGTR_PREFERENCES_EnableEqualizer "启用均衡器"
 #define MSGTR_PREFERENCES_SoftwareMixer "启用软件混音器"
@@ -762,7 +751,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Font "字体"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "后期处理"
 #define MSGTR_PREFERENCES_FRAME_Cache "缓冲"
-#define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
+#define MSGTR_PREFERENCES_FRAME_Misc "杂项"
 #define MSGTR_PREFERENCES_Audio_Device "设备："
 #define MSGTR_PREFERENCES_Audio_Mixer "混音器："
 #define MSGTR_PREFERENCES_Audio_MixerChannel "混音器声道："
@@ -863,8 +852,6 @@ static const char help_text[]=
 #define MSGTR_WS_TooManyOpenWindows "打开窗口太多。\n"
 #define MSGTR_WS_ShmError "共享内存扩展组件错误\n"
 #define MSGTR_WS_NotEnoughMemoryDrawBuffer "抱歉，内存不足以用于绘制缓冲。\n"
-#define MSGTR_WS_DpmsUnavailable "DPMS 不可用？\n"
-#define MSGTR_WS_DpmsNotEnabled "无法启用 DPMS。\n"
 #define MSGTR_WS_XError "出现了一个 X11 的错误！\n"
 
 // wsxdnd.c
@@ -2003,7 +1990,6 @@ static const char help_text[]=
 // stream_bluray.c
 #define MSGTR_BlurayNoDevice "未指定蓝光 DVD 的设备/位置...\n"
 #define MSGTR_BlurayNoTitles "无法在此找到与蓝光 DVD 相兼容的标题内容。\n"
-#define MSGTR_BlurayOK "成功打开蓝光 DVD。\n"
 
 // stream_radio.c
 #define MSGTR_RADIO_ChannelNamesDetected "[radio] 已检测到无线电频道名。\n"

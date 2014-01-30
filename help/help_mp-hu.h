@@ -520,22 +520,18 @@ static const char help_text[]=
 #define MSGTR_LOADER_DYLD_Warning "FIGYELMEZTETÉS: DLL codec-ek használatának kísérlete, de a\n         DYLD_BIND_AT_LAUNCH környezeti változó nincs beállítva. Így ez összeomlást okoz.\n"
 
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "Az MPlayerről"
 #define MSGTR_FileSelect "Fájl kiválasztása..."
 #define MSGTR_SubtitleSelect "Felirat kiválasztása..."
-#define MSGTR_OtherSelect "Fájl kiválasztása..."
 #define MSGTR_AudioFileSelect "Külső audio csatorna választása..."
 #define MSGTR_FontSelect "Betűtípus kiválasztása..."
-// Megjegyzés: Ha megváltoztatod az MSGTR_PlayList-et, nézd meg, hogy megfelel-e az MSGTR_MENU_PlayList-nek is!
 #define MSGTR_PlayList "Lejátszási lista"
 #define MSGTR_Equalizer "Equalizer"
 #define MSGTR_ConfigureEqualizer "Equalizer beállítása"
 #define MSGTR_SkinBrowser "Skin böngésző"
 #define MSGTR_Network "Hálózati stream-elés..."
-// Megjegyzés: Ha megváltoztatod az MSGTR_Preferences-t, nézd meg, hogy megfelel-e az MSGTR_MENU_Preferences-nek is!
 #define MSGTR_Preferences "Beállítások"
 #define MSGTR_AudioPreferences "Audio vezérlő beállítása"
 #define MSGTR_NoMediaOpened "nincs megnyitva semmi"
@@ -555,7 +551,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "Nincs elég memória a rajzoló bufferhez."
-#define MSGTR_NEMFMR "Nincs elég memória a menü rendereléséhez."
 #define MSGTR_IDFGCVD "Nem találtam GUI-kompatibilis videó meghajtót."
 #define MSGTR_NEEDLAVC "Nem MPEG fájl lejátszása nem lehetséges a DXR3/H+ hardverrel újrakódolás nélkül.\nKapcsold be a lavc opciót a DXR3/H+ konfigurációs panelen."
 
@@ -594,7 +589,6 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Állj"
 #define MSGTR_MENU_NextStream "Következő fájl"
 #define MSGTR_MENU_PrevStream "Előző fájl"
-#define MSGTR_MENU_Size "Méret"
 #define MSGTR_MENU_HalfSize   "Fél méret"
 #define MSGTR_MENU_NormalSize "Normál méret"
 #define MSGTR_MENU_DoubleSize "Dupla méret"
@@ -602,7 +596,6 @@ static const char help_text[]=
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Lemez megnyitása..."
-#define MSGTR_MENU_ShowDVDMenu "DVD menű"
 #define MSGTR_MENU_Titles "Sávok"
 #define MSGTR_MENU_Title "%2d. sáv"
 #define MSGTR_MENU_None "(nincs)"
@@ -610,9 +603,9 @@ static const char help_text[]=
 #define MSGTR_MENU_Chapter "%2d. fejezet"
 #define MSGTR_MENU_AudioLanguages "Szinkron nyelvei"
 #define MSGTR_MENU_SubtitleLanguages "Feliratok nyelvei"
-#define MSGTR_MENU_PlayList MSGTR_PlayList
+#define MSGTR_MENU_PlayList "Lejátszási lista"
 #define MSGTR_MENU_SkinBrowser "Skin böngésző"
-#define MSGTR_MENU_Preferences MSGTR_Preferences
+#define MSGTR_MENU_Preferences "Beállítások"
 #define MSGTR_MENU_Exit "Kilépés"
 #define MSGTR_MENU_Mute "Néma"
 #define MSGTR_MENU_Original "Eredeti"
@@ -623,9 +616,7 @@ static const char help_text[]=
 #define MSGTR_MENU_Subtitles "Feliratok"
 
 // --- equalizer
-// Megjegyzés: Ha megváltoztatod az MSGTR_EQU_Audio-t, nézd meg, hogy megfelel-e az MSGTR_PREFERENCES_Audio-nak is!
 #define MSGTR_EQU_Audio "Audió"
-// Megjegyzés: Ha megváltoztatod az MSGTR_EQU_Video-t, nézd meg, hogy megfelel-e az MSGTR_PREFERENCES_Video-nak is!
 #define MSGTR_EQU_Video "Videó"
 #define MSGTR_EQU_Contrast "Kontraszt: "
 #define MSGTR_EQU_Brightness "Fényerő: "
@@ -652,16 +643,14 @@ static const char help_text[]=
 #define MSGTR_PLAYLIST_DirectoryTree "Könyvtár lista"
 
 // --- preferences
-#define MSGTR_PREFERENCES_Audio MSGTR_EQU_Audio
-#define MSGTR_PREFERENCES_Video MSGTR_EQU_Video
+#define MSGTR_PREFERENCES_Audio "Audió"
+#define MSGTR_PREFERENCES_Video "Videó"
 #define MSGTR_PREFERENCES_SubtitleOSD "Feliratok & OSD"
 #define MSGTR_PREFERENCES_Codecs "Kodekek és demuxerek"
-// Megjegyzés: Ha megváltoztatod az MSGTR_PREFERENCES_Misc-et, nézd meg, hogy megfelel-e az MSGTR_PREFERENCES_FRAME_Misc-nek is!
 #define MSGTR_PREFERENCES_Misc "Egyéb"
 #define MSGTR_PREFERENCES_None "Egyik sem"
 #define MSGTR_PREFERENCES_DriverDefault "alapértelmezett vezérlő"
 #define MSGTR_PREFERENCES_AvailableDrivers "Driverek:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Hang nélkül"
 #define MSGTR_PREFERENCES_NormalizeSound "Hang normalizálása"
 #define MSGTR_PREFERENCES_EnableEqualizer "Audio equalizer"
 #define MSGTR_PREFERENCES_SoftwareMixer "Szoftveres keverés"
@@ -698,7 +687,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Font "Betű"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Képjavítás"
 #define MSGTR_PREFERENCES_FRAME_Cache "Gyorsítótár"
-#define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
+#define MSGTR_PREFERENCES_FRAME_Misc "Egyéb"
 #define MSGTR_PREFERENCES_Audio_Device "Eszköz:"
 #define MSGTR_PREFERENCES_Audio_Mixer "Mixer:"
 #define MSGTR_PREFERENCES_Audio_MixerChannel "Mixer csatorna:"
@@ -783,8 +772,6 @@ static const char help_text[]=
 #define MSGTR_WS_TooManyOpenWindows "Túl sok nyitott ablak van.\n"
 #define MSGTR_WS_ShmError "osztott memória kiterjesztés hibája\n"
 #define MSGTR_WS_NotEnoughMemoryDrawBuffer "Bocs, nincs elég memória a rajz buffernek.\n"
-#define MSGTR_WS_DpmsUnavailable "A DPMS nem elérhető?\n"
-#define MSGTR_WS_DpmsNotEnabled "A DPMS nem engedélyezhető.\n"
 
 // wsxdnd.c
 #define MSGTR_WS_NotAFile "Úgy tűnik, hogy ez nem fájl...\n"
@@ -1878,7 +1865,6 @@ static const char help_text[]=
 // stream_bluray.c
 #define MSGTR_BlurayNoDevice "Nem lett megadva Blu-ray eszköz/hely ...\n"
 #define MSGTR_BlurayNoTitles "Itt nem található Blu-ray-kompatibilis sáv.\n"
-#define MSGTR_BlurayOK "Blu-ray sikeresen megnyitva.\n"
 
 // stream_radio.c
 #define MSGTR_RADIO_ChannelNamesDetected "[radio] Rádió csatornák neve megtalálva.\n"

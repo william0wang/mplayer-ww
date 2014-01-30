@@ -520,13 +520,11 @@ static const char help_text[]=
 #define MSGTR_LOADER_DYLD_Warning "ATTENZIONE: Tentativo di utilizzare codec DLL, senza la variabile d'ambiente\n           DYLD_BIND_AT_LAUNCH impostata. Ciò porterà probabilmente a un crash.\n"
 
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "Informazioni su"
 #define MSGTR_FileSelect "Seleziona il file..."
 #define MSGTR_SubtitleSelect "Seleziona il sottotitolo..."
-#define MSGTR_OtherSelect "Seleziona..."
 #define MSGTR_AudioFileSelect "Seleziona canale audio esterno..."
 #define MSGTR_FontSelect "Seleziona il carattere..."
 #define MSGTR_PlayList "PlayList"
@@ -553,7 +551,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "Mi dispiace, non c'è abbastanza memoria per tracciare il buffer."
-#define MSGTR_NEMFMR "Mi dispiace, non c'è abbastanza memoria per visualizzare il menu."
 #define MSGTR_IDFGCVD "Mi dispiace, non ho trovato un driver di output video compatibile con la GUI."
 #define MSGTR_NEEDLAVC "Mi dispiace, non puoi riprodurre file non-MPEG con il tuo dispositivo DXR3/H+\nsenza ricodificarli.\nAbilita lavc nella finestra di configurazione DXR3/H+."
 
@@ -592,7 +589,6 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Interrompi"
 #define MSGTR_MENU_NextStream "Flusso successivo"
 #define MSGTR_MENU_PrevStream "Flusso precedente"
-#define MSGTR_MENU_Size "Dimensione"
 #define MSGTR_MENU_HalfSize   "Dimensione dimezzata"
 #define MSGTR_MENU_NormalSize "Dimensione normale"
 #define MSGTR_MENU_DoubleSize "Dimensione doppia"
@@ -600,7 +596,6 @@ static const char help_text[]=
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Disco in riproduzione..."
-#define MSGTR_MENU_ShowDVDMenu "Mostra il menu del DVD"
 #define MSGTR_MENU_Titles "Titoli"
 #define MSGTR_MENU_Title "Titolo %2d"
 #define MSGTR_MENU_None "(niente)"
@@ -608,9 +603,9 @@ static const char help_text[]=
 #define MSGTR_MENU_Chapter "Capitolo %2d"
 #define MSGTR_MENU_AudioLanguages "Lingua dell'audio"
 #define MSGTR_MENU_SubtitleLanguages "Lingua dei sottotitoli"
-#define MSGTR_MENU_PlayList MSGTR_PlayList
+#define MSGTR_MENU_PlayList "PlayList"
 #define MSGTR_MENU_SkinBrowser "Ricerca skin"
-#define MSGTR_MENU_Preferences MSGTR_Preferences
+#define MSGTR_MENU_Preferences "Preferenze"
 #define MSGTR_MENU_Exit "Uscita"
 #define MSGTR_MENU_Mute "Muto"
 #define MSGTR_MENU_Original "Originale"
@@ -621,9 +616,7 @@ static const char help_text[]=
 #define MSGTR_MENU_Subtitles "Sottotitoli"
 
 // --- equalizer
-// Note: If you change MSGTR_EQU_Audio please see if it still fits MSGTR_PREFERENCES_Audio
 #define MSGTR_EQU_Audio "Audio"
-// Note: If you change MSGTR_EQU_Video please see if it still fits MSGTR_PREFERENCES_Video
 #define MSGTR_EQU_Video "Video"
 #define MSGTR_EQU_Contrast "Contrasto: "
 #define MSGTR_EQU_Brightness "Luminosità: "
@@ -650,15 +643,14 @@ static const char help_text[]=
 #define MSGTR_PLAYLIST_DirectoryTree "albero delle directory"
 
 // --- preferences
-#define MSGTR_PREFERENCES_Audio MSGTR_EQU_Audio
-#define MSGTR_PREFERENCES_Video MSGTR_EQU_Video
+#define MSGTR_PREFERENCES_Audio "Audio"
+#define MSGTR_PREFERENCES_Video "Video"
 #define MSGTR_PREFERENCES_SubtitleOSD "Sottotitoli & OSD"
 #define MSGTR_PREFERENCES_Codecs "Codec e demuxer"
 #define MSGTR_PREFERENCES_Misc "Varie"
 #define MSGTR_PREFERENCES_None "Nessuno"
 #define MSGTR_PREFERENCES_DriverDefault "Driver predefinito"
 #define MSGTR_PREFERENCES_AvailableDrivers "Driver disponibili:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Non riprodurre l'audio"
 #define MSGTR_PREFERENCES_NormalizeSound "Normalizza l'audio"
 #define MSGTR_PREFERENCES_EnableEqualizer "Abilita l'equalizzatore"
 #define MSGTR_PREFERENCES_SoftwareMixer "Abilita Mixer Software"
@@ -695,7 +687,7 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FRAME_Font "Carattere"
 #define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocessing"
 #define MSGTR_PREFERENCES_FRAME_Cache "Cache"
-#define MSGTR_PREFERENCES_FRAME_Misc MSGTR_PREFERENCES_Misc
+#define MSGTR_PREFERENCES_FRAME_Misc "Varie"
 #define MSGTR_PREFERENCES_Audio_Device "Dispositivo:"
 #define MSGTR_PREFERENCES_Audio_Mixer "Mixer:"
 #define MSGTR_PREFERENCES_Audio_MixerChannel "Canale mixer:"
@@ -780,8 +772,6 @@ static const char help_text[]=
 #define MSGTR_WS_TooManyOpenWindows "Ci sono troppe finestre aperte.\n"
 #define MSGTR_WS_ShmError "errore estensione 'shared memory'\n"
 #define MSGTR_WS_NotEnoughMemoryDrawBuffer "Spiacente, non abbastanza memoria per il tracciare il buffer.\n"
-#define MSGTR_WS_DpmsUnavailable "DPMS non disponibile?\n"
-#define MSGTR_WS_DpmsNotEnabled "Non posso abilitare DPMS.\n"
 
 // wsxdnd.c
 #define MSGTR_WS_NotAFile "Questo non sembra essere un file...\n"
@@ -1874,7 +1864,6 @@ static const char help_text[]=
 // stream_bluray.c
 #define MSGTR_BlurayNoDevice "Non è stato specificato alcun dispositivo/posizione Blu-ray...\n"
 #define MSGTR_BlurayNoTitles "Non è stato trovato alcun titolo compatibile Blu-ray.\n"
-#define MSGTR_BlurayOK "Blu-ray aperto con successo.\n"
 
 // stream_radio.c
 #define MSGTR_RADIO_ChannelNamesDetected "[radio] Rilevati i nomi dei canali radio.\n"

@@ -161,13 +161,11 @@ static const char help_text[]=
 #define MSGTR_LIRCcfgerr "Feil under lesing av lirc konfigurasjonsfil %s!\n"
 
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
 // --- labels ---
-#define MSGTR_About "Om"
 #define MSGTR_FileSelect "Åpne fil..."
 #define MSGTR_SubtitleSelect "Velg teksting..."
-#define MSGTR_OtherSelect "Velg..."
 #define MSGTR_PlayList "Spilleliste"
 #define MSGTR_SkinBrowser "Velg skin"
 
@@ -179,7 +177,6 @@ static const char help_text[]=
 
 // --- error messages ---
 #define MSGTR_NEMDB "Beklager, ikke nok minne til tegnebuffer."
-#define MSGTR_NEMFMR "Beklager, ikke nok minne til meny rendering."
 
 // --- skin loader error messages
 #define MSGTR_SKIN_ERRORMESSAGE "[skin] feil i skin konfigurasjonsfil linje %d: %s"
@@ -212,14 +209,12 @@ static const char help_text[]=
 #define MSGTR_MENU_Stop "Stopp"
 #define MSGTR_MENU_NextStream "Neste stream"
 #define MSGTR_MENU_PrevStream "Forrige stream"
-#define MSGTR_MENU_Size "Størrelse"
 #define MSGTR_MENU_NormalSize "Normal størrelse"
 #define MSGTR_MENU_DoubleSize "Dobbel størrelse"
 #define MSGTR_MENU_FullScreen "Fullskjerm"
 #define MSGTR_MENU_DVD "DVD"
 #define MSGTR_MENU_VCD "VCD"
 #define MSGTR_MENU_PlayDisc "Spill Plate..."
-#define MSGTR_MENU_ShowDVDMenu "Vis DVD meny"
 #define MSGTR_MENU_Titles "Titler"
 #define MSGTR_MENU_Title "Titel %2d"
 #define MSGTR_MENU_None "(ingen)"

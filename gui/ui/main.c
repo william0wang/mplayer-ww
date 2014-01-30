@@ -345,7 +345,7 @@ void uiMainInit (void)
 
   if (!mainDrawBuffer)
   {
-    gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_NEMDB);
+    gmp_msg(MSGT_GPLAYER, MSGL_FATAL, "[main] " MSGTR_NEMDB);
     mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
   }
 

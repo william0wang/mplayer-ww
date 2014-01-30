@@ -107,8 +107,8 @@ void uiMenuInit( void )
 
  if ( ( menuDrawBuffer = calloc( 1,guiApp.menu.Bitmap.ImageSize ) ) == NULL )
   {
-    mp_msg( MSGT_GPLAYER,MSGL_DBG2,MSGTR_NEMFMR );
-   gtkMessageBox( MSGBOX_FATAL,MSGTR_NEMFMR );
+    mp_msg( MSGT_GPLAYER,MSGL_DBG2,"[menu] " MSGTR_NEMDB );
+   gtkMessageBox( MSGBOX_FATAL,"[menu] " MSGTR_NEMDB );
    return;
   }
 
