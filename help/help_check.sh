@@ -16,7 +16,7 @@ for h in "$@"; do
 #include "$h"
 void $CHECK () {
 EOF
-  sed -n "s:^[ \t]*#define[ \t]\+\([0-9A-Za-z_]\+\)[ \t].*:strdup(\1);:p" "$h" >> ${CHECK}.c
+  sed -n "s:^[ \t]*#define[ \t]\+\([0-9A-Za-z_]\+\)\(.*\):strdup(\1);:p" "$h" >> ${CHECK}.c
   echo "}" >> ${CHECK}.c
   $CC -Werror -c -o ${CHECK}.o ${CHECK}.c || exit
 done
