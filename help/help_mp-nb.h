@@ -192,17 +192,17 @@ static const char help_text[]=
 #define MSGTR_SKIN_FONT_NonExistentFont "ikke-ekstisterende skrifttype identifikasjon (%s)\n"
 #define MSGTR_SKIN_UnknownParameter "ukjent parameter (%s)\n"
 #define MSGTR_SKIN_SKINCFG_SkinNotFound "Skin ikke funnet (%s).\n"
-#define MSGTR_SKIN_LABEL "Skins:"
+#define MSGTR_SKIN_LABEL "Skins"
 
 
 // --- gtk menus
 #define MSGTR_MENU_AboutMPlayer "Om MPlayer"
 #define MSGTR_MENU_Open "Åpne..."
-#define MSGTR_MENU_PlayFile "Spill file..."
+#define MSGTR_MENU_PlayFile "Spill file"
 #define MSGTR_MENU_PlayVCD "Spill VCD..."
 #define MSGTR_MENU_PlayDVD "Spill DVD..."
-#define MSGTR_MENU_PlayURL "Spill URL..."
-#define MSGTR_MENU_LoadSubtitle "Last tekst..."
+#define MSGTR_MENU_PlayURL "Spill URL"
+#define MSGTR_MENU_LoadSubtitle "Last tekst"
 #define MSGTR_MENU_Playing "Spiller"
 #define MSGTR_MENU_Play "Spill"
 #define MSGTR_MENU_Pause "Pause"

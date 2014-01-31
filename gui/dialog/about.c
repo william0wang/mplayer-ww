@@ -108,10 +108,10 @@ static GtkWidget * CreateAbout( void )
   gtk_text_insert( GTK_TEXT( AboutText ),NULL,NULL,NULL,
 #endif
   	"\n"
-	MSGTR_ABOUT_UHU
+	MSGTR_ABOUT_UHU":\n"
 	"       http://www.uhulinux.hu/\n"
 	"\n"
-	MSGTR_ABOUT_Contributors
+	MSGTR_ABOUT_Contributors":\n"
 	"\n"
 	"     * Andreas Ackermann\n"
 	"     * adland\n"
@@ -269,7 +269,7 @@ static GtkWidget * CreateAbout( void )
 	"     * Matan Ziv-Av\n"
 	"     * Márk Vicián Zoltán\n"
 	"\n"
-	MSGTR_ABOUT_Codecs_libs_contributions
+	MSGTR_ABOUT_Codecs_libs_contributions":\n"
 	"\n"
 	"     * Fabrice Bellard\n"
 	"     * Vivien Chappelier\n"
@@ -282,7 +282,7 @@ static GtkWidget * CreateAbout( void )
 	"     * Mark Podlipec\n"
 	"     * Damien Vincent\n"
 	"\n"
-	MSGTR_ABOUT_Translations
+	MSGTR_ABOUT_Translations":\n"
 	"\n"
 	"     * Marcin Biernat\n"
 	"     * Marc Fargas\n"
@@ -299,7 +299,7 @@ static GtkWidget * CreateAbout( void )
 	"     * Wacław Schiller\n"
 	"     * Andoni Zubimendi\n"
 	"\n"
-	MSGTR_ABOUT_Skins
+	MSGTR_ABOUT_Skins":\n"
 	"\n"
 	"     * Azrael\n"
 	"     * Viktor Bekesi\n"

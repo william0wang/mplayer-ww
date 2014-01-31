@@ -408,8 +408,8 @@ void display_openurlwindow(gui_t *gui, int add)
 static void create_playlistmenu(gui_t *gui)
 {
     gui->playlistmenu = CreatePopupMenu();
-    AppendMenu(gui->playlistmenu, MF_STRING, ID_ADDFILE, acp(MSGTR_PLAYLIST_AddFile));
-    AppendMenu(gui->playlistmenu, MF_STRING, ID_ADDURL, acp(MSGTR_PLAYLIST_AddURL));
+    AppendMenu(gui->playlistmenu, MF_STRING, ID_ADDFILE, acp(MSGTR_PLAYLIST_AddFile"..."));
+    AppendMenu(gui->playlistmenu, MF_STRING, ID_ADDURL, acp(MSGTR_PLAYLIST_AddURL"..."));
     AppendMenu(gui->playlistmenu, MF_SEPARATOR, 0, 0);
     AppendMenu(gui->playlistmenu, MF_STRING, ID_REMOVE, acp(MSGTR_Remove));
     AppendMenu(gui->playlistmenu, MF_STRING, ID_CLEAR, acp(MSGTR_Clear));
@@ -871,7 +871,7 @@ void display_chapterselwindow(gui_t *gui)
     int x, y;
 
     if (guiInfo.StreamType != STREAMTYPE_DVD) return;
-    if (FindWindow(NULL, acp(MSGTR_SelectTitleChapter))) return;
+    if (FindWindow(NULL, acp(MSGTR_SelectTitleChapter"..."))) return;
 
     wc.style         = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc   = TitleChapterWndProc;
@@ -881,13 +881,13 @@ void display_chapterselwindow(gui_t *gui)
     wc.hCursor       = LoadCursor(NULL,IDC_ARROW);
     wc.hIcon         = gui->icon;
     wc.hbrBackground = SOLID_GREY2;
-    wc.lpszClassName = acp(MSGTR_SelectTitleChapter);
+    wc.lpszClassName = acp(MSGTR_SelectTitleChapter"...");
     wc.lpszMenuName  = NULL;
     RegisterClass(&wc);
     x = (GetSystemMetrics(SM_CXSCREEN) / 2) - (180 / 2);
     y = (GetSystemMetrics(SM_CYSCREEN) / 2) - (100 / 2);
-    hWnd = CreateWindow(acp(MSGTR_SelectTitleChapter),
-                        acp(MSGTR_SelectTitleChapter),
+    hWnd = CreateWindow(acp(MSGTR_SelectTitleChapter"..."),
+                        acp(MSGTR_SelectTitleChapter"..."),
                         WS_POPUPWINDOW | WS_CAPTION,
                         x,
                         y,
@@ -926,7 +926,7 @@ static LRESULT CALLBACK EqWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
                                NULL);
             SendMessage(btn, WM_SETFONT, (WPARAM) GetStockObject(DEFAULT_GUI_FONT), 0);
 
-            label = CreateWindow("static", acp(MSGTR_EQU_Brightness),
+            label = CreateWindow("static", acp(MSGTR_EQU_Brightness":"),
                                  WS_CHILD | WS_VISIBLE,
                                  12, 122, 70, 15, hwnd,
                                  NULL,
@@ -934,7 +934,7 @@ static LRESULT CALLBACK EqWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
                                  NULL);
             SendMessage(label, WM_SETFONT, (WPARAM) GetStockObject(DEFAULT_GUI_FONT), 0);
 
-            label = CreateWindow("static", acp(MSGTR_EQU_Contrast),
+            label = CreateWindow("static", acp(MSGTR_EQU_Contrast":"),
                                  WS_CHILD | WS_VISIBLE,
                                  99, 122, 70, 15, hwnd,
                                  NULL,
@@ -942,14 +942,14 @@ static LRESULT CALLBACK EqWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
                                  NULL);
             SendMessage(label, WM_SETFONT, (WPARAM) GetStockObject(DEFAULT_GUI_FONT), 0);
 
-            label = CreateWindow("static", acp(MSGTR_EQU_Hue),
+            label = CreateWindow("static", acp(MSGTR_EQU_Hue":"),
                                  WS_CHILD | WS_VISIBLE,
                                  191, 122, 70, 15, hwnd,
                                  NULL,
                                  ((LPCREATESTRUCT) lParam) -> hInstance, NULL);
             SendMessage(label, WM_SETFONT, (WPARAM) GetStockObject(DEFAULT_GUI_FONT), 0);
 
-            label = CreateWindow("static", acp(MSGTR_EQU_Saturation),
+            label = CreateWindow("static", acp(MSGTR_EQU_Saturation":"),
                                  WS_CHILD | WS_VISIBLE,
                                  260, 122, 70, 15, hwnd,
                                  NULL,

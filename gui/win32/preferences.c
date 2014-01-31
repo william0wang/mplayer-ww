@@ -88,14 +88,14 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                                  NULL);
             SendMessage(label, WM_SETFONT, (WPARAM) GetStockObject(DEFAULT_GUI_FONT), 0);
 
-            label = CreateWindow("static", acp(MSGTR_PREFERENCES_Coefficient),
+            label = CreateWindow("static", acp(MSGTR_PREFERENCES_Coefficient":"),
                                  WS_CHILD | WS_VISIBLE | SS_RIGHT,
                                  10, 148, 140, 15, hwnd,
                                  NULL, ((LPCREATESTRUCT) lParam) -> hInstance,
                                  NULL);
             SendMessage(label, WM_SETFONT, (WPARAM) GetStockObject(DEFAULT_GUI_FONT), 0);
 
-            label = CreateWindow("static", acp(MSGTR_PREFERENCES_AudioDelay),
+            label = CreateWindow("static", acp(MSGTR_PREFERENCES_AudioDelay":"),
                                  WS_CHILD | WS_VISIBLE | SS_RIGHT,
                                  10, 187, 140, 15, hwnd,
                                  NULL, ((LPCREATESTRUCT) lParam) -> hInstance,

@@ -440,7 +440,7 @@ GtkWidget * CreatePopUpMenu( void )
   AddMenuItem( window1, (const char*)about_xpm, Menu,MSGTR_MENU_AboutMPlayer"     ", evAbout );
   AddSeparator( Menu );
    SubMenu=AddSubMenu( window1, (const char*)open_xpm, Menu,MSGTR_MENU_Open );
-    AddMenuItem( window1, (const char*)file2_xpm, SubMenu,MSGTR_MENU_PlayFile"    ", evLoadPlay );
+    AddMenuItem( window1, (const char*)file2_xpm, SubMenu,MSGTR_MENU_PlayFile"...    ", evLoadPlay );
 #ifdef CONFIG_CDDA
     AddMenuItem( window1, (const char*)playcd_xpm, SubMenu,MSGTR_MENU_PlayCD, evPlayCD );
     CDSubMenu=AddSubMenu( window1, (const char*)cd_xpm, Menu,MSGTR_MENU_CD );
@@ -563,13 +563,13 @@ GtkWidget * CreatePopUpMenu( void )
         gtk_widget_set_sensitive( MenuItem,FALSE );
        }
 #endif
-    AddMenuItem( window1, (const char*)url_xpm, SubMenu,MSGTR_MENU_PlayURL, evLoadURL );
+    AddMenuItem( window1, (const char*)url_xpm, SubMenu,MSGTR_MENU_PlayURL"...", evLoadURL );
 #ifdef CONFIG_TV
     AddMenuItem( window1, (const char*)tv_xpm, SubMenu,MSGTR_MENU_PlayTV, evPlayTV );
 #endif
     AddSeparator( SubMenu );
-    AddMenuItem( window1, (const char*)loadeaf_xpm, SubMenu,MSGTR_MENU_LoadExternAudioFile, evLoadAudioFile );
-    AddMenuItem( window1, (const char*)sub_xpm, SubMenu,MSGTR_MENU_LoadSubtitle"   ", evLoadSubtitle );
+    AddMenuItem( window1, (const char*)loadeaf_xpm, SubMenu,MSGTR_MENU_LoadExternAudioFile"...", evLoadAudioFile );
+    AddMenuItem( window1, (const char*)sub_xpm, SubMenu,MSGTR_MENU_LoadSubtitle"...   ", evLoadSubtitle );
     AddMenuItem( window1, (const char*)nosub_xpm, SubMenu,MSGTR_MENU_DropSubtitle,evDropSubtitle );
    SubMenu=AddSubMenu(window1, (const char*)play_xpm, Menu,MSGTR_MENU_Playing );
     AddMenuItem( window1, (const char*)play_xpm, SubMenu,MSGTR_MENU_Play"        ", evPlay );

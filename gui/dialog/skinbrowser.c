@@ -111,7 +111,7 @@ static GtkWidget * CreateSkinBrowser( void )
  gtkAddIcon( SkinBrowser );
 
  vbox5=gtkAddVBox( gtkAddDialogFrame( SkinBrowser ),0 );
- gtkAddLabel( MSGTR_SKIN_LABEL,vbox5 );
+ gtkAddLabel( MSGTR_SKIN_LABEL":",vbox5 );
  gtkAddHSeparator( vbox5 );
 
  scrolledwindow1=gtk_scrolled_window_new( NULL,NULL );
