@@ -111,8 +111,6 @@ static GtkWidget * CreateSkinBrowser( void )
  gtkAddIcon( SkinBrowser );
 
  vbox5=gtkAddVBox( gtkAddDialogFrame( SkinBrowser ),0 );
- gtkAddLabel( MSGTR_SKIN_LABEL":",vbox5 );
- gtkAddHSeparator( vbox5 );
 
  scrolledwindow1=gtk_scrolled_window_new( NULL,NULL );
  gtk_widget_ref( scrolledwindow1 );
@@ -129,8 +127,9 @@ static GtkWidget * CreateSkinBrowser( void )
  gtk_container_add( GTK_CONTAINER( scrolledwindow1 ),SkinList );
  gtk_clist_set_column_width( GTK_CLIST( SkinList ),0,80 );
  gtk_clist_set_selection_mode( GTK_CLIST( SkinList ),GTK_SELECTION_SINGLE );
- gtk_clist_column_titles_hide( GTK_CLIST( SkinList ) );
+ gtk_clist_column_titles_show( GTK_CLIST( SkinList ) );
  gtk_clist_set_shadow_type( GTK_CLIST( SkinList ),GTK_SHADOW_ETCHED_OUT );
+ gtk_clist_set_column_widget( GTK_CLIST( SkinList ),0, gtkAddLabel( MSGTR_SKIN_LABEL,NULL ) );
 
  gtkAddHSeparator( vbox5 );
 

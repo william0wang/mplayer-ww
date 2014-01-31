@@ -627,7 +627,7 @@ static const char help_text[]=
 #define MSGTR_SKIN_SKINCFG_SkinNotFound "Skin '%s' not found.\n"
 #define MSGTR_SKIN_SKINCFG_SelectedSkinNotFound "Selected skin '%s' not found, trying skin 'default'...\n"
 #define MSGTR_SKIN_SKINCFG_SkinCfgError "Config file processing error with skin '%s'\n"
-#define MSGTR_SKIN_LABEL "Skins"
+#define MSGTR_SKIN_LABEL "Available skins"
 
 // --- GTK menus
 #define MSGTR_MENU_AboutMPlayer "About MPlayer"
