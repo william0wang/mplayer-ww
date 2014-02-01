@@ -1,4 +1,4 @@
-.\" sync with en/mplayer.1 rev. 36588
+.\" sync with en/mplayer.1 rev. 36721
 .\" MPlayer (C) 2000-2014 MPlayer Team
 .\" This man page was/is translated by JRaSH<jrash06 at gmail.com>
 .
@@ -31,7 +31,7 @@
 .\" 标题
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "2013-11-19" "MPlayer 项目" "影视播放器"
+.TH MPlayer 1 "2014-01-24" "MPlayer 项目" "影视播放器"
 .
 .SH 名称
 mplayer  \- 影视播放器
@@ -669,6 +669,8 @@ sub_pos
 .RB ( subpos )，
 sub_unicode
 .RB ( unicode )，
+sub_utf8
+.RB ( utf8 ),
 v_flip
 .RB ( flip )，
 v_framedrop
@@ -2560,9 +2562,9 @@ SSA/ASS 渲染器能在那里放置字幕（与 \-ass\-use\-margins 组合使用
 .
 .TP
 .B \-font <font.desc 文件的路径，字体的路径（FreeType），字体样式（Fontconfig）>
-在别的目录中寻找 OSD/\:SUB 的字体\
-（普通字体的默认路径为：~/\:.mplayer/\:font/\:font.desc，\
-FreeType 字体的默认路径为：~/.mplayer/\:subfont.ttf)。
+在别的目录中寻找 OSD/\:字幕的字体\
+（普通字体的默认路径为：~/\:.mplayer/\:font/\:font.desc，FreeType 字体的默认\
+路径为：~/.mplayer/\:subfont.ttf，Fontconfig 的默认字体：“sans-serif”)。
 .br
 .I 注意：
 使用 FreeType 时，该选项决定了文本字体文件的路径。\
@@ -2583,12 +2585,13 @@ FreeType 字体的默认路径为：~/.mplayer/\:subfont.ttf)。
 .
 .TP
 .B \-fontconfig（仅用于 fontconfig）
-启用 fontconfig 管理字体。
+启用 fontconfig 管理字体（默认值：自动侦测）。
 .br
 .I 注意：
 默认情况下，fontconfig 用于 libass 渲染的字幕，而不用于 OSD 界面。\
 使用 \-fontconfig 后，则将 fontconfig 同时用于 libass 和 OSD；\
-使用 \-nofontconfig 后，则完全不使用 fontconfig。
+使用 \-nofontconfig 后，则完全不使用 fontconfig，也就是说只有这时，\
+\-font 与 \-subfont 选项中可以指定字体的路径。
 .
 .TP
 .B \-forcedsubsonly
@@ -2805,7 +2808,8 @@ DVD/\:VOBsub 的抗锯齿/\:缩放模式。\
 .TP
 .B \-subcp <编码页>（仅用于 iconv）
 如果系统支持 iconv(3)，可使用该选项指定字幕的\
-编码页。
+编码页。其优先级高于 -utf8 和 -unicode 选\
+项。
 .sp 1
 .I 示例：
 .PD 0
@@ -2901,7 +2905,8 @@ sub,subtitles,/tmp/subs，那么 MPlayer 将在这些目录下搜索\
 .B \-subfont\-encoding <参数值>（仅用于 FreeType）
 设置字幕编码方式。\
 当设为‘unicode’时，将渲染字体文件中的所有字形，\
-并使用 unicode 编码（默认值：unicode）。
+并使用 unicode 编码（默认值：unicode）。（使用‘unicode’以外的值时，\
+系统必须支持 iconv(3) 以使该选项能够生效。）
 .
 .TP
 .B \-subfont\-osd\-scale <0\-100>（仅用于 FreeType）
@@ -2950,7 +2955,8 @@ sub,subtitles,/tmp/subs，那么 MPlayer 将在这些目录下搜索\
 .
 .TP
 .B \-unicode
-告诉 MPlayer 将字幕文件作为 unicode 文本处理。
+告诉 MPlayer 将字幕文件作为 unicode 文本处理。（只有当 -subcp 和 -utf8 都未\
+使用时，该选项才可生效）
 .
 .TP
 .B \-unrarexec <unrar 可执行文件的路径>（MingW 平台上不支持。）
@@ -2960,7 +2966,8 @@ sub,subtitles,/tmp/subs，那么 MPlayer 将在这些目录下搜索\
 .
 .TP
 .B "\-utf8 \ \ "
-告诉 MPlayer 将字幕文件作为 UTF-8 文本来处理。
+告诉 MPlayer 将字幕文件作为 UTF-8 文本来处理。（只有当 -subcp 未指定时该选项才\
+生效，并且其优先级高于 -unicode。）
 .
 .TP
 .B \-vobsub <无后缀名的 VOBsub 文件名>
