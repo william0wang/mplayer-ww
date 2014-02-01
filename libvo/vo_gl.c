@@ -934,7 +934,7 @@ static int draw_slice(uint8_t *src[], int stride[], int w,int h,int x,int y)
 
 static int get_pbo_image(mp_image_t *mpi) {
   int needed_size;
-  if (!mpglGenBuffers || !mpglBindBuffer || !mpglBufferData || !mpglMapBuffer) {
+  if (!mpglGenBuffers || !mpglBindBuffer || !mpglBufferData || !mpglMapBufferRange) {
     if (!err_shown)
       mp_msg(MSGT_VO, MSGL_ERR, "[gl] extensions missing for dr\n"
                                 "Expect a _major_ speed penalty\n");
@@ -964,7 +964,7 @@ static int get_pbo_image(mp_image_t *mpi) {
                      NULL, GL_DYNAMIC_DRAW);
     }
     if (!gl_bufferptr)
-      gl_bufferptr = mpglMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
+      gl_bufferptr = mpglMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, needed_size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
     mpi->priv = gl_bufferptr;
     mpi->planes[0] = (uint8_t *)gl_bufferptr + (-(intptr_t)gl_bufferptr & 31);
     mpglBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
@@ -1002,9 +1002,9 @@ static int get_pbo_image(mp_image_t *mpi) {
       }
       if (!gl_bufferptr_uv[0]) {
         mpglBindBuffer(GL_PIXEL_UNPACK_BUFFER, gl_buffer_uv[0]);
-        gl_bufferptr_uv[0] = mpglMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
+        gl_bufferptr_uv[0] = mpglMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, mpi->stride[1] * mpi->height, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
         mpglBindBuffer(GL_PIXEL_UNPACK_BUFFER, gl_buffer_uv[1]);
-        gl_bufferptr_uv[1] = mpglMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
+        gl_bufferptr_uv[1] = mpglMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, mpi->stride[1] * mpi->height, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
       }
       mpi->planes[1] = gl_bufferptr_uv[0];
       mpi->planes[2] = gl_bufferptr_uv[1];
