@@ -745,7 +745,6 @@ static const char help_text[]=
 #define MSGTR_PREFERENCES_FontOutLine "Outline"
 #define MSGTR_PREFERENCES_FontTextScale "Escalado de texto"
 #define MSGTR_PREFERENCES_FontOSDScale "Escalado de OSD"
-#define MSGTR_PREFERENCES_SubtitleOSD "Subtítulos y OSD"
 #define MSGTR_PREFERENCES_Cache "Cache si/no"
 #define MSGTR_PREFERENCES_CacheSize "Tamaño de Cache"
 #define MSGTR_PREFERENCES_LoadFullscreen "Empezar en pantalla completa"
