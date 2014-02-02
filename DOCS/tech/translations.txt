@@ -101,9 +101,10 @@ to bottom once. Later it should suffice to just translate missing messages.
 Additionally, please make sure that your translated messages fit on an 80
 character wide display to avoid overflowing output.
 
-TOOLS/mphelp_check.py is a small tool to check translated files. It will report
-conflicting arguments, strings not present in the master file and (optionally)
-strings missing from the translation. Running it as
+You are strongly encouraged to use TOOLS/mphelp_check.py, a small tool to
+check translated files. It will report conflicting definitions, mismatching
+arguments, extra definitions not present in the master file and (optionally)
+definitions missing from the translation. Running it as
 
   TOOLS/mphelp_check.py help/help_mp-en.h help/help_mp-XX.h
 
