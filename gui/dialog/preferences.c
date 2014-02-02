@@ -1451,7 +1451,7 @@ void ShowPreferences( void )
   static int visible = True;
   if ( visible )
    {
-    gtkMessageBox( MSGBOX_WARNING,MSGTR_PREFERENCES_Message );
+    gtkMessageBox( MSGBOX_INFORMATION,MSGTR_PREFERENCES_Message );
     visible=False;
    }
  }
