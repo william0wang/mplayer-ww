@@ -22,6 +22,7 @@
 #include <gtk/gtk.h>
 
 extern GtkWidget * MessageBox;
+extern GtkWidget * InformationPixmap;
 extern GtkWidget * WarningPixmap;
 extern GtkWidget * ErrorPixmap;
 extern GtkWidget * gtkMessageBoxText;

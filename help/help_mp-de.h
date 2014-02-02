@@ -1050,6 +1050,7 @@ static const char help_text[]=
 #define MSGTR_MSGBOX_LABEL_FatalError "Fataler Fehler"
 #define MSGTR_MSGBOX_LABEL_Error "Fehler"
 #define MSGTR_MSGBOX_LABEL_Warning "Warnung"
+#define MSGTR_MSGBOX_LABEL_Information "Information"
 
 // cfg.c
 #define MSGTR_UnableToSaveOption "Die Option '%s' kann nicht gespeichert werden.\n"

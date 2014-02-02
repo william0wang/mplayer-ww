@@ -24,6 +24,7 @@
 
 #include "pixmaps/error.xpm"
 #include "pixmaps/warning.xpm"
+#include "pixmaps/information.xpm"
 
 #include "dialog.h"
 #include "msgbox.h"
@@ -31,6 +32,7 @@
 
 GtkWidget * gtkMessageBoxText;
 GtkWidget * MessageBox = NULL;
+GtkWidget * InformationPixmap;
 GtkWidget * WarningPixmap;
 GtkWidget * ErrorPixmap;
 
@@ -71,10 +73,16 @@ static GtkWidget * CreateMessageBox( void )
 
  pixmapstyle=gtk_widget_get_style( MessageBox );
 
+ pixmapwid=gdk_pixmap_colormap_create_from_xpm_d( MessageBox->window,gdk_colormap_get_system(),&mask,&pixmapstyle->bg[GTK_STATE_NORMAL],(gchar ** )information_xpm );
+ InformationPixmap=gtk_pixmap_new( pixmapwid,mask );
  pixmapwid=gdk_pixmap_colormap_create_from_xpm_d( MessageBox->window,gdk_colormap_get_system(),&mask,&pixmapstyle->bg[GTK_STATE_NORMAL],(gchar ** )warning_xpm );
  WarningPixmap=gtk_pixmap_new( pixmapwid,mask );
  pixmapwid=gdk_pixmap_colormap_create_from_xpm_d( MessageBox->window,gdk_colormap_get_system(),&mask,&pixmapstyle->bg[GTK_STATE_NORMAL],(gchar ** )error_xpm );
  ErrorPixmap=gtk_pixmap_new( pixmapwid,mask );
+
+ gtk_widget_hide( InformationPixmap );
+ gtk_box_pack_start( GTK_BOX( hbox1 ),InformationPixmap,FALSE,FALSE,0 );
+ gtk_widget_set_usize( InformationPixmap,55,-2 );
 
  gtk_widget_hide( WarningPixmap );
  gtk_box_pack_start( GTK_BOX( hbox1 ),WarningPixmap,FALSE,FALSE,0 );
