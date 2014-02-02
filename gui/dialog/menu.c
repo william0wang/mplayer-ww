@@ -675,8 +675,9 @@ GtkWidget * CreatePopUpMenu( void )
         {
          int vid = ((sh_video_t *)demuxer->v_streams[i])->vid;
          char tmp[32];
+         int selected_id = (video_id == vid || (video_id == -1 && vid == demuxer_default_video_track(mpctx_get_demuxer(guiInfo.mpcontext))));
          snprintf( tmp,32,MSGTR_MENU_Track,vid );
-         AddMenuCheckItem( window1, (const char*)empty1px_xpm, SubMenu,tmp,video_id == vid,( vid << 16 ) + ivSetVideo );
+         AddMenuCheckItem( window1, (const char*)empty1px_xpm, SubMenu,tmp,selected_id,( vid << 16 ) + ivSetVideo );
         }
      }
    }
