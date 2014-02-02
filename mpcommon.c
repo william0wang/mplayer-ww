@@ -416,6 +416,16 @@ int select_audio(demuxer_t* demuxer, int audio_id, char* audio_lang)
     return demuxer->audio->id;
 }
 
+int select_video(demuxer_t* demuxer, int video_id)
+{
+    if (video_id == -1)
+        video_id = demuxer_default_video_track(demuxer);
+    if (video_id != -1) // -1 (automatic) is the default behaviour of demuxers
+        demuxer_switch_video(demuxer, video_id);
+
+    return demuxer->video->id;
+}
+
 /* Parse -noconfig common to both programs */
 int disable_system_conf=0;
 int disable_user_conf=0;

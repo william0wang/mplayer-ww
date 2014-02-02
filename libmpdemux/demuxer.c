@@ -1916,6 +1916,22 @@ int demuxer_default_audio_track(demuxer_t *d)
     return -1;
 }
 
+int demuxer_default_video_track(demuxer_t *d)
+{
+    int i;
+    for (i = 0; i < MAX_V_STREAMS; ++i) {
+        sh_video_t *sh = d->v_streams[i];
+        if (sh && sh->default_track)
+            return sh->vid;
+    }
+    for (i = 0; i < MAX_V_STREAMS; ++i) {
+        sh_video_t *sh = d->v_streams[i];
+        if (sh)
+            return sh->vid;
+    }
+    return -1;
+}
+
 int demuxer_default_sub_track(demuxer_t *d)
 {
     int i;
