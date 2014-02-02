@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 # Tool to compare MPlayer translation files against a base file. Reports
-# conflicting arguments, extra strings not present in the base file and
-# (optionally) missing strings.
+# conflicting definitions, mismatching arguments, extra definitions
+# not present in the base file and (optionally) missing definitions.
 
 # Written by Uoti Urpala
 
