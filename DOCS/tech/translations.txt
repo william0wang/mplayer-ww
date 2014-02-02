@@ -119,8 +119,6 @@ messages in your translated file, just leave them out instead. The MPlayer
 build system automatically checks for missing messages and uses the English
 ones instead. This has the added advantage of providing the latest versions of
 the English messages, since English messages in translations may be outdated.
-Furthermore, running help_diff.sh on your translated file will immediately show
-missing messages, which eases further translation.
 
 If no messages are missing, please add a line similar to
 
