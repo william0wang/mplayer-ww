@@ -544,7 +544,6 @@ static const char help_text[]=
 #define MSGTR_FontSelect "选择字体"
 #define MSGTR_PlayList "播放列表"
 #define MSGTR_Equalizer "均衡器"
-#define MSGTR_ConfigureEqualizer "配置均衡器"
 #define MSGTR_ConfigureEqualizer "均衡器配置"
 #define MSGTR_SkinBrowser "播放器外观浏览器"
 #define MSGTR_Network "网络媒体流传输"
