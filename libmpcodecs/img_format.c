@@ -104,6 +104,7 @@ const char *vo_format_name(int format)
     case IMGFMT_422P: return "Planar 422P";
     case IMGFMT_422A: return "Planar 422P with alpha";
     case IMGFMT_411P: return "Planar 411P";
+    case IMGFMT_440P: return "Planar 440P";
     case IMGFMT_NV12: return "Planar NV12";
     case IMGFMT_NV21: return "Planar NV21";
     case IMGFMT_HM12: return "Planar NV12 Macroblock";
