@@ -48,9 +48,6 @@ static const char help_text[]=
 " * * *  詳細内容，更多的(高級)選項和控製鍵，請參見手册頁  * * *\n"
 "\n";
 
-// libmpcodecs/ad_dvdpcm.c:
-#define MSGTR_SamplesWanted "這個格式的采様需要更好的支持。請聯係開發者。\n"
-
 // ========================= MPlayer messages ===========================
 
 // mplayer.c:
@@ -1432,6 +1429,9 @@ static const char help_text[]=
 #define MSGTR_LIBMENU_FailedToOpenMenu "[MENU] 打開菜單失敗: '%s'。\n"
 
 // ========================== LIBMPCODECS ===================================
+
+// libmpcodecs/ad_dvdpcm.c:
+#define MSGTR_SamplesWanted "這個格式的采様需要更好的支持。請聯係開發者。\n"
 
 // libmpcodecs/ad_libdv.c
 #define MSGTR_MPCODECS_AudioFramesizeDiffers "[AD_LIBDV] 警告! 音頻幀大小不一致! read=%d  hdr=%d。\n"

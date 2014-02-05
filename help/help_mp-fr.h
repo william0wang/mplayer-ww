@@ -47,8 +47,6 @@ static const char help_text[]=
 " * * * VOIR PAGE MAN POUR DÉTAILS, AUTRES OPTIONS (AVANCÉES) ET TOUCHES * * *\n"
 "\n";
 
-#define MSGTR_SamplesWanted "Échantillons ce format demandés pour améliorer support. Contacter developpeurs.\n"
-
 // ========================= Messages MPlayer ===========================
 
 // mplayer.c:
@@ -1462,6 +1460,8 @@ static const char help_text[]=
 #define MSGTR_LIBMENU_FailedToOpenMenu "[MENU] Échec ouverture menu : '%s'.\n"
 
 // ========================== LIBMPCODECS ===================================
+
+#define MSGTR_SamplesWanted "Échantillons ce format demandés pour améliorer support. Contacter developpeurs.\n"
 
 // libmpcodecs/ad_libdv.c
 #define MSGTR_MPCODECS_AudioFramesizeDiffers "[AD_LIBDV] Alerte ! Différence grandeur trame audio ! lu=%d  hdr=%d.\n"

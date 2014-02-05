@@ -42,8 +42,6 @@ static const char help_text[]=
 " * * * ZIE MANPAGE VOOR DETAILS, OVERIGE (GEAVANCEERDE) OPTIES EN TOETSEN! * * *\n"
 "\n";
 
-#define MSGTR_SamplesWanted "Samples van dit formaat zijn gewenst om de ondersteuning ervan te verbetern. Gelieve de ontwikkelaars te contacteren."
-
 // ========================= MPlayer messages ===========================
 
 // mplayer.c:
@@ -812,3 +810,7 @@ static const char help_text[]=
 // ao_plugin.c
 
 #define MSGTR_AO_PLUGIN_InvalidPlugin "[AO PLUGIN] ongeldige plugin: %s\n"
+
+// ========================== LIBMPCODECS ===================================
+
+#define MSGTR_SamplesWanted "Samples van dit formaat zijn gewenst om de ondersteuning ervan te verbetern. Gelieve de ontwikkelaars te contacteren."

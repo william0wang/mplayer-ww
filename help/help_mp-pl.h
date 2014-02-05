@@ -45,9 +45,6 @@ static const char help_text[]=
 " * * * WIĘCEJ OPCJI DOSTĘPNYCH NA STRONIE PODRĘCZNIKA MAN * * *\n"
 "\n";
 
-// libmpcodecs/ad_dvdpcm.c:
-#define MSGTR_SamplesWanted "By poprawić obsługę tego formatu potrzebne są próbki. Proszę skontaktować się z twórcami.\n"
-
 // ========================= MPlayer messages ===========================
 
 // mplayer.c:
@@ -1342,6 +1339,9 @@ static const char help_text[]=
 #define MSGTR_LIBMENU_FailedToOpenMenu "[MENU] Nie udało się otworzyć menu: '%s'.\n"
 
 // ========================== LIBMPCODECS ===================================
+
+// libmpcodecs/ad_dvdpcm.c:
+#define MSGTR_SamplesWanted "By poprawić obsługę tego formatu potrzebne są próbki. Proszę skontaktować się z twórcami.\n"
 
 // libmpcodecs/ad_libdv.c
 #define MSGTR_MPCODECS_AudioFramesizeDiffers "[AD_LIBDV] Uwaga! Rozmiar ramek dźwieku różni się! wczytano=%d  hdr=%d.\n"

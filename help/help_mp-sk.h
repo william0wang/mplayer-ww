@@ -46,8 +46,6 @@ static const char help_text[]=
 " * * * * PREČÍTAJTE SI MAN STRÁNKU PRE DETAILY (ĎALŠIE VOĽBY A KLÁVESY)! * * * *\n"
 "\n";
 
-#define MSGTR_SamplesWanted "Potrebujeme vzorky tohto formátu, aby sme zlepšili podporu. Prosím kontaktujte vývojárov.\n"
-
 // ========================= MPlayer messages ===========================
 // mplayer.c:
 
@@ -814,3 +812,7 @@ static const char help_text[]=
 #define MSGTR_GUI_VideoEncoder "Video kóder"
 #define MSGTR_GUI_VideoTracks "Video stopa"
 #define MSGTR_GUI_Warning "Upozornenie!"
+
+// ========================== LIBMPCODECS ===================================
+
+#define MSGTR_SamplesWanted "Potrebujeme vzorky tohto formátu, aby sme zlepšili podporu. Prosím kontaktujte vývojárov.\n"

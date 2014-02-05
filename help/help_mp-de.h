@@ -53,10 +53,6 @@ static const char help_text[]=
 " * * * SIEHE MANPAGE FÜR DETAILS, WEITERE OPTIONEN UND TASTEN * * *\n"
 "\n";
 
-// libmpcodecs/ad_dvdpcm.c
-#define MSGTR_SamplesWanted "Beispiele für dieses Format werden gebraucht, um die Unterstützung zu verbessern. Bitte kontaktiere die Entwickler.\n"
-
-
 // ========================= MPlayer Ausgaben ===========================
 
 // mplayer.c
@@ -1637,6 +1633,9 @@ static const char help_text[]=
 
 
 // ========================== LIBMPCODECS ===================================
+
+// libmpcodecs/ad_dvdpcm.c
+#define MSGTR_SamplesWanted "Beispiele für dieses Format werden gebraucht, um die Unterstützung zu verbessern. Bitte kontaktiere die Entwickler.\n"
 
 // libmpcodecs/ad_libdv.c
 #define MSGTR_MPCODECS_AudioFramesizeDiffers "[AD_LIBDV] Warnung! Audio-Framegröße weicht ab! read=%d  hdr=%d.\n"

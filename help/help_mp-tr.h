@@ -46,9 +46,6 @@ static const char help_text[]=
 " * * AYRINTILAR, DAHA FAZLA (GELİŞMİŞ) SEÇENEKLER VE TUŞLAR İÇİN MAN SAYFALARINA BAKINIZ * *\n"
 "\n";
 
-// libmpcodecs/ad_dvdpcm.c:
-#define MSGTR_SamplesWanted "Bu şekildeki örnekler için geliştirme desteği gerekiyor. Lütfen geliştiricilerle bağlantı kurunuz.\n"
-
 // ========================= MPlayer messages ===========================
 
 // mplayer.c:
@@ -1466,6 +1463,9 @@ static const char help_text[]=
 #define MSGTR_LIBMENU_FailedToOpenMenu "[MENU] Menü açılamadı: '%s'.\n"
 
 // ========================== LIBMPCODECS ===================================
+
+// libmpcodecs/ad_dvdpcm.c:
+#define MSGTR_SamplesWanted "Bu şekildeki örnekler için geliştirme desteği gerekiyor. Lütfen geliştiricilerle bağlantı kurunuz.\n"
 
 // libmpcodecs/ad_libdv.c
 #define MSGTR_MPCODECS_AudioFramesizeDiffers "[AD_LIBDV] Uyarı! Ses veri boyutu farklılık gösteriyor.! okuma=%d  hdr=%d.\n"

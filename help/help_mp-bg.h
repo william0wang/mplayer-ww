@@ -46,8 +46,6 @@ static const char help_text[]=
 " * * * ЗА ПОДРОБНОСТИ, ДОПЪЛНИТЕЛНИ ОПЦИИ И КЛАВИШИ, ВИЖТЕ РЪКОВОДСТВОТО! * * *\n"
 "\n";
 
-#define MSGTR_SamplesWanted "Мостри от този формат са нужни за подобряване на поддръжката. Свържете се с нас!\n"
-
 // ========================= MPlayer messages ===========================
 
 // mplayer.c:
@@ -887,3 +885,7 @@ static const char help_text[]=
 #define MSGTR_AF_LADSPA_ErrNotEnoughControls "Не са указани достатъчно контроли от командния ред"
 #define MSGTR_AF_LADSPA_ErrControlBelow "%s: Input control #%d е под долната граница от %0.4f.\n"
 #define MSGTR_AF_LADSPA_ErrControlAbove "%s: Input control #%d е над горната граница от %0.4f.\n"
+
+// ========================== LIBMPCODECS ===================================
+
+#define MSGTR_SamplesWanted "Мостри от този формат са нужни за подобряване на поддръжката. Свържете се с нас!\n"

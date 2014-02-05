@@ -43,9 +43,6 @@ static const char help_text[]=
 " * * * LÄS MANUALEN FÖR FLER DETALJER, MER AVANCERADE ARGUMENT OCH KOMMANDON * * *\n"
 "\n";
 
-// libmpcodecs/ad_dvdpcm.c:
-#define MSGTR_SamplesWanted "Fler exempel på detta format behövs för att vidare öka support. Var vänlig kontakta utvecklarna.\n"
-
 // ========================= MPlayer messages ===========================
 
 // mplayer.c:
@@ -836,3 +833,8 @@ static const char help_text[]=
 // ao_plugin.c
 
 #define MSGTR_AO_PLUGIN_InvalidPlugin "[AO PLUGIN] icke godkänd plugin: %s\n" // FIXME plugin - translate?
+
+// ========================== LIBMPCODECS ===================================
+
+// libmpcodecs/ad_dvdpcm.c:
+#define MSGTR_SamplesWanted "Fler exempel på detta format behövs för att vidare öka support. Var vänlig kontakta utvecklarna.\n"
