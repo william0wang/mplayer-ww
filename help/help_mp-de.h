@@ -1347,7 +1347,7 @@ static const char help_text[]=
 // ========================== LIBMPDEMUX ===================================
 
 // url.c
-#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "Zeichenkette scheint bereits im URL-Format %c%c%c 'escaped' zu sein.\n"
+#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "Zeichenfolge %c%c%c scheint bereits prozentkodiert zu sein.\n"
 
 // ai_alsa.c
 #define MSGTR_MPDEMUX_AIALSA_CannotSetSamplerate "Konnte Samplingrate nicht setzen.\n"
