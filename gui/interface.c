@@ -139,7 +139,7 @@ void guiInit(void)
     ret = skinRead(skinName);
 
     if (ret == -1 && strcmp(skinName, "default") != 0) {
-        mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_SKIN_SKINCFG_SelectedSkinNotFound, skinName);
+        mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_GUI_MSG_SkinCfgSelectedNotFound, skinName);
 
         skinName = strdup("default");
         ret      = skinRead(skinName);
@@ -147,11 +147,11 @@ void guiInit(void)
 
     switch (ret) {
     case -1:
-        gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_SKIN_SKINCFG_SkinNotFound, skinName);
+        gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_GUI_MSG_SkinCfgNotFound, skinName);
         mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
 
     case -2:
-        gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_SKIN_SKINCFG_SkinCfgError, skinName);
+        gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_GUI_MSG_SkinCfgError, skinName);
         mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
     }
 
@@ -300,7 +300,7 @@ static void add_vf(char *str)
         vf_settings[1].name    = NULL;
     }
 
-    mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_AddingVideoFilter, str);
+    mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_AddingVideoFilter, str);
 }
 
 /**
@@ -474,7 +474,7 @@ int gui(int what, void *data)
         }
 
         if (!video_driver_list && !video_driver_list[0]) {
-            gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_IDFGCVD);
+            gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_GUI_MSG_VideoOutError);
             mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
         }
 
@@ -686,7 +686,7 @@ int gui(int what, void *data)
         btnSet(evSetMoviePosition, state);
 
         if (video_driver_list && !gstrcmp(video_driver_list[0], "dxr3") && (((demuxer_t *)mpctx_get_demuxer(guiInfo.mpcontext))->file_format != DEMUXER_TYPE_MPEG_PS) && !gtkVfLAVC) {
-            gtkMessageBox(MSGBOX_FATAL, MSGTR_NEEDLAVC);
+            gtkMessageBox(MSGBOX_FATAL, MSGTR_GUI_MSG_DXR3NeedsLavc);
             return False;
         }
 
@@ -1114,7 +1114,7 @@ void mplayerLoadSubtitle(const char *name)
         return;
 
     if (subdata) {
-        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_DeletingSubtitles);
+        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_RemovingSubtitle);
 
         sub_free(subdata);
         subdata = NULL;
@@ -1142,7 +1142,7 @@ void mplayerLoadSubtitle(const char *name)
     }
 
     if (name) {
-        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_LoadingSubtitles, name);
+        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_LoadingSubtitle, name);
 
         subdata = sub_read_file(name, (guiInfo.sh_video ? guiInfo.sh_video->fps : 0));
 

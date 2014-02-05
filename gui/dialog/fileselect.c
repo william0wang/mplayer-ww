@@ -64,25 +64,25 @@ int fsType;
 static gint fsCurrFNameListSelected, fsLastFNameListSelected;
 
 char *fsVideoAudioFilterNames[][2] = {
-    { MSGTR_Filter_AVIFiles,      "*.avi"                                                                                                                                                                                                                                                                                                                                                                                                                 },
-    { MSGTR_Filter_DivXFiles,     "*.divx"                                                                                                                                                                                                                                                                                                                                                                                                                },
-    { MSGTR_Filter_FlashVideo,    "*.flv"                                                                                                                                                                                                                                                                                                                                                                                                                 },
-    { MSGTR_Filter_MP3Files,      "*.mp3"                                                                                                                                                                                                                                                                                                                                                                                                                 },
-    { MSGTR_Filter_MP4Files,      "*.aac,*.f4a,*.f4b,*.f4v,*.m4a,*.m4b,*.m4v,*.mp4"                                                                                                                                                                                                                                                                                                                                                                       },
-    { MSGTR_Filter_MPEGFiles,     "*.m1v,*.m2v,*.mp2,*.mpe,*.mpeg,*.mpg,*.mpga,*.vdr,*.vob"                                                                                                                                                                                                                                                                                                                                                               },
-    { MSGTR_Filter_MP2TS,         "*.bdm,*.bdmv,*.clpi,*.cpi,*.m2t,*.m2ts,*.mpl,*.mpls,*.mts,*.rec,*.trp,*.ts,*.ty"                                                                                                                                                                                                                                                                                                                                       },
-    { MSGTR_Filter_MatroskaMedia, "*.mka,*.mkv"                                                                                                                                                                                                                                                                                                                                                                                                           },
-    { MSGTR_Filter_OGGMedia,      "*.oga,*.ogg,*.ogm,*.ogv,*.ogx,*.spx"                                                                                                                                                                                                                                                                                                                                                                                   },
-    { MSGTR_Filter_QTMedia,       "*.moov,*.mov,*.qt,*.qtvr"                                                                                                                                                                                                                                                                                                                                                                                              },
-    { MSGTR_Filter_RNMedia,       "*.ra,*.rm,*.rmvb,*.rv"                                                                                                                                                                                                                                                                                                                                                                                                 },
-    { MSGTR_Filter_VideoCDImages, "*.bin"                                                                                                                                                                                                                                                                                                                                                                                                                 },
-    { MSGTR_Filter_WAVFiles,      "*.wav"                                                                                                                                                                                                                                                                                                                                                                                                                 },
-    { MSGTR_Filter_WindowsMedia,  "*.asf,*.wma,*.wmv"                                                                                                                                                                                                                                                                                                                                                                                                     },
-    { MSGTR_Filter_Playlists,     "*.asx,*.m3u,*.m3u8,*.nsc,*.pls,*.ram,*.smi,*.smil,*.sml,*.vlc,*.wax,*.wmx,*.wvx"                                                                                                                                                                                                                                                                                                                                       },
-    { MSGTR_Filter_AllAudioFiles, "*.aac,*.ac3,*.aif,*.aifc,*.aiff,*.amr,*.ape,*.au,*.awb,*.cdg,*.f4a,*.f4b,*.flac,*.m4a,*.m4b,*.mka,*.mp+,*.mp2,*.mp3,*.mpc,*.mpga,*.mpp,*.nsa,*.oga,*.ogg,*.pcm,*.qcp,*.ra,*.snd,*.spx,*.tak,*.voc,*.vqf,*.w64,*.wav,*.wma,*.wv,*.wvp"                                                                                                                                                                                  },
-    { MSGTR_Filter_AllVideoFiles, "*.264,*.3g2,*.3ga,*.3gp,*.3gp2,*.3gpp,*.3gpp2,*.asf,*.avi,*.bdm,*.bdmv,*.bin,*.clpi,*.cpi,*.cpk,*.divx,*.dv,*.f4v,*.flc,*.fli,*.flv,*.m1v,*.m2t,*.m2ts,*.m2v,*.m4v,*.mjpg,*.mkv,*.moov,*.mov,*.mp2,*.mp4,*.mpe,*.mpeg,*.mpg,*.mpl,*.mpls,*.mts,*.mxf,*.nsv,*.nuv,*.ogg,*.ogm,*.ogv,*.ogx,*.pva,*.qt,*.qtvr,*.rec,*.rm,*.rmvb,*.roq,*.rv,*.spl,*.str,*.swf,*.trp,*.ts,*.ty,*.vdr,*.viv,*.vivo,*.vob,*.webm,*.wmv,*.y4m" },
-    { MSGTR_Filter_AllFiles,      "*"                                                                                                                                                                                                                                                                                                                                                                                                                     },
-    { NULL,                       NULL                                                                                                                                                                                                                                                                                                                                                                                                                    }
+    { MSGTR_GUI_FilterVideoAvi,           "*.avi"                                                                                                                                                                                                                                                                                                                                                                                                                 },
+    { MSGTR_GUI_FilterVideoDivX,          "*.divx"                                                                                                                                                                                                                                                                                                                                                                                                                },
+    { MSGTR_GUI_FilterVideoFlash,         "*.flv"                                                                                                                                                                                                                                                                                                                                                                                                                 },
+    { MSGTR_GUI_FilterFileMP3,            "*.mp3"                                                                                                                                                                                                                                                                                                                                                                                                                 },
+    { MSGTR_GUI_FilterFileMP4,            "*.aac,*.f4a,*.f4b,*.f4v,*.m4a,*.m4b,*.m4v,*.mp4"                                                                                                                                                                                                                                                                                                                                                                       },
+    { MSGTR_GUI_FilterFileMPEG,           "*.m1v,*.m2v,*.mp2,*.mpe,*.mpeg,*.mpg,*.mpga,*.vdr,*.vob"                                                                                                                                                                                                                                                                                                                                                               },
+    { MSGTR_GUI_FilterFileMP2TS,          "*.bdm,*.bdmv,*.clpi,*.cpi,*.m2t,*.m2ts,*.mpl,*.mpls,*.mts,*.rec,*.trp,*.ts,*.ty"                                                                                                                                                                                                                                                                                                                                       },
+    { MSGTR_GUI_FilterMediumMatroska,     "*.mka,*.mkv"                                                                                                                                                                                                                                                                                                                                                                                                           },
+    { MSGTR_GUI_FilterMediumOgg,          "*.oga,*.ogg,*.ogm,*.ogv,*.ogx,*.spx"                                                                                                                                                                                                                                                                                                                                                                                   },
+    { MSGTR_GUI_FilterMediumQuickTime,    "*.moov,*.mov,*.qt,*.qtvr"                                                                                                                                                                                                                                                                                                                                                                                              },
+    { MSGTR_GUI_FilterMediumRealNetworks, "*.ra,*.rm,*.rmvb,*.rv"                                                                                                                                                                                                                                                                                                                                                                                                 },
+    { MSGTR_GUI_FilterImageVCD,           "*.bin"                                                                                                                                                                                                                                                                                                                                                                                                                 },
+    { MSGTR_GUI_FilterFileWav,            "*.wav"                                                                                                                                                                                                                                                                                                                                                                                                                 },
+    { MSGTR_GUI_FilterMediumWindows,      "*.asf,*.wma,*.wmv"                                                                                                                                                                                                                                                                                                                                                                                                     },
+    { MSGTR_GUI_FilterFilePlaylist,       "*.asx,*.m3u,*.m3u8,*.nsc,*.pls,*.ram,*.smi,*.smil,*.sml,*.vlc,*.wax,*.wmx,*.wvx"                                                                                                                                                                                                                                                                                                                                       },
+    { MSGTR_GUI_FilterAudioAll,           "*.aac,*.ac3,*.aif,*.aifc,*.aiff,*.amr,*.ape,*.au,*.awb,*.cdg,*.f4a,*.f4b,*.flac,*.m4a,*.m4b,*.mka,*.mp+,*.mp2,*.mp3,*.mpc,*.mpga,*.mpp,*.nsa,*.oga,*.ogg,*.pcm,*.qcp,*.ra,*.snd,*.spx,*.tak,*.voc,*.vqf,*.w64,*.wav,*.wma,*.wv,*.wvp"                                                                                                                                                                                  },
+    { MSGTR_GUI_FilterVideoAll,           "*.264,*.3g2,*.3ga,*.3gp,*.3gp2,*.3gpp,*.3gpp2,*.asf,*.avi,*.bdm,*.bdmv,*.bin,*.clpi,*.cpi,*.cpk,*.divx,*.dv,*.f4v,*.flc,*.fli,*.flv,*.m1v,*.m2t,*.m2ts,*.m2v,*.m4v,*.mjpg,*.mkv,*.moov,*.mov,*.mp2,*.mp4,*.mpe,*.mpeg,*.mpg,*.mpl,*.mpls,*.mts,*.mxf,*.nsv,*.nuv,*.ogg,*.ogm,*.ogv,*.ogx,*.pva,*.qt,*.qtvr,*.rec,*.rm,*.rmvb,*.roq,*.rv,*.spl,*.str,*.swf,*.trp,*.ts,*.ty,*.vdr,*.viv,*.vivo,*.vob,*.webm,*.wmv,*.y4m" },
+    { MSGTR_GUI_FilterFileAll,            "*"                                                                                                                                                                                                                                                                                                                                                                                                                     },
+    { NULL,                               NULL                                                                                                                                                                                                                                                                                                                                                                                                                    }
 };
 int fsLastVideoAudioFilterSelected = -1;
 
@@ -96,36 +96,36 @@ char *fsSubtitleFilterNames[][2] = {
     { "SubStation Alpha (*.ssa)",          "*.ssa"                                                      },
     { "MicroDVD (*.sub)",                  "*.sub"                                                      },
     { "Text (*.txt)",                      "*.txt"                                                      },
-    { MSGTR_Filter_UTF8Subtitles,          "*.utf,*.utf-8,*.utf8"                                       },
-    { MSGTR_Filter_AllSubtitles,           "*.aqt,*.ass,*.jss,*.rt,*.smi,*.srt,*.ssa,*.sub,*.txt,*.utf" },
-    { MSGTR_Filter_AllFiles,               "*"                                                          },
+    { MSGTR_GUI_FilterSubtitleUTF8,        "*.utf,*.utf-8,*.utf8"                                       },
+    { MSGTR_GUI_FilterSubtitleAll,         "*.aqt,*.ass,*.jss,*.rt,*.smi,*.srt,*.ssa,*.sub,*.txt,*.utf" },
+    { MSGTR_GUI_FilterFileAll,             "*"                                                          },
     { NULL,                                NULL                                                         }
 };
 int fsLastSubtitleFilterSelected = -1;
 
 char *fsAudioFileNames[][2] = {
-    { MSGTR_Filter_DDRawAudio,    "*.ac3,*.pcm"                                                                          },
-    { MSGTR_Filter_MPEGAudio,     "*.aac,*.f4a,*.m4a,*.mp2,*.mp3,*.mpga"                                                 },
-    { MSGTR_Filter_MatroskaAudio, "*.mka"                                                                                },
-    { MSGTR_Filter_OGGAudio,      "*.oga,*.ogg,*.spx"                                                                    },
-    { MSGTR_Filter_WAVAudio,      "*.wav"                                                                                },
-    { MSGTR_Filter_WMAAudio,      "*.wma"                                                                                },
-    { MSGTR_Filter_AllAudioFiles, "*.aac,*.ac3,*.f4a,*.m4a,*.mka,*.mp2,*.mp3,*.mpga,*.oga,*.ogg,*.pcm,*.spx,*.wav,*.wma" },
-    { MSGTR_Filter_AllFiles,      "*"                                                                                    },
-    { NULL,                       NULL                                                                                   }
+    { MSGTR_GUI_FilterAudioDolbyPCM, "*.ac3,*.pcm"                                                                          },
+    { MSGTR_GUI_FilterAudioMPEG,     "*.aac,*.f4a,*.m4a,*.mp2,*.mp3,*.mpga"                                                 },
+    { MSGTR_GUI_FilterAudioMatroska, "*.mka"                                                                                },
+    { MSGTR_GUI_FilterAudioOgg,      "*.oga,*.ogg,*.spx"                                                                    },
+    { MSGTR_GUI_FilterAudioWav,      "*.wav"                                                                                },
+    { MSGTR_GUI_FilterAudioWma,      "*.wma"                                                                                },
+    { MSGTR_GUI_FilterAudioAll,      "*.aac,*.ac3,*.f4a,*.m4a,*.mka,*.mp2,*.mp3,*.mpga,*.oga,*.ogg,*.pcm,*.spx,*.wav,*.wma" },
+    { MSGTR_GUI_FilterFileAll,       "*"                                                                                    },
+    { NULL,                          NULL                                                                                   }
 };
 int fsLastAudioFilterSelected = -1;
 
 char *fsFontFileNames[][2] = {
 #ifdef CONFIG_FREETYPE
-    { MSGTR_Filter_TTF,       "*.ttf"       },
-    { MSGTR_Filter_Type1,     "*.pfb"       },
-    { MSGTR_Filter_AllFonts,  "*.pfb,*.ttf" },
+    { MSGTR_GUI_FilterFontTTF,    "*.ttf"       },
+    { MSGTR_GUI_FilterFontType1,  "*.pfb"       },
+    { MSGTR_GUI_FilterFontAll,    "*.pfb,*.ttf" },
 #else
-    { MSGTR_Filter_FontFiles, "*.desc"      },
+    { MSGTR_GUI_FilterFontBitmap, "*.desc"      },
 #endif
-    { MSGTR_Filter_AllFiles,  "*"           },
-    { NULL,                   NULL          }
+    { MSGTR_GUI_FilterFileAll,    "*"           },
+    { NULL,                       NULL          }
 };
 int fsLastFontFilterSelected = -1;
 
@@ -466,7 +466,7 @@ static void fs_Ok_released(GtkButton *button, gpointer user_data)
     case FILESELECT_VIDEO_AUDIO:
 
         for (l = 0; fsVideoAudioFilterNames[l][0]; l++)
-            if (strcmp(fsVideoAudioFilterNames[l][0], MSGTR_Filter_Playlists) == 0)
+            if (strcmp(fsVideoAudioFilterNames[l][0], MSGTR_GUI_FilterFilePlaylist) == 0)
                 break;
 
         uiSetFile(fsSelectedDirectory, fsSelectedFile, fsLastVideoAudioFilterSelected == l ? STREAMTYPE_PLAYLIST : STREAMTYPE_FILE);
@@ -591,7 +591,7 @@ static GtkWidget *CreateFileSelect(void)
     FileSelector = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_widget_set_usize(FileSelector, 512, 300);
     gtk_widget_set_events(FileSelector, GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_FOCUS_CHANGE_MASK | GDK_STRUCTURE_MASK | GDK_PROPERTY_CHANGE_MASK | GDK_VISIBILITY_NOTIFY_MASK);
-    gtk_window_set_title(GTK_WINDOW(FileSelector), MSGTR_FileSelect);
+    gtk_window_set_title(GTK_WINDOW(FileSelector), MSGTR_GUI_SelectFile);
     gtk_window_set_position(GTK_WINDOW(FileSelector), GTK_WIN_POS_CENTER);
     gtk_window_set_wmclass(GTK_WINDOW(FileSelector), "FileSelector", MPlayer);
     fsColorMap = gdk_colormap_get_system();
@@ -669,8 +669,8 @@ static GtkWidget *CreateFileSelect(void)
     gtk_button_box_set_layout(GTK_BUTTON_BOX(hbuttonbox3), GTK_BUTTONBOX_END);
     gtk_button_box_set_spacing(GTK_BUTTON_BOX(hbuttonbox3), 10);
 
-    fsOk     = gtkAddButton(MSGTR_Ok, hbuttonbox3);
-    fsCancel = gtkAddButton(MSGTR_Cancel, hbuttonbox3);
+    fsOk     = gtkAddButton(MSGTR_GUI_Ok, hbuttonbox3);
+    fsCancel = gtkAddButton(MSGTR_GUI_Cancel, hbuttonbox3);
 
     gtk_signal_connect(GTK_OBJECT(FileSelector), "destroy", GTK_SIGNAL_FUNC(fs_Destroy), NULL);
     gtk_signal_connect(GTK_OBJECT(fsFNameListWindow), "key-release-event", GTK_SIGNAL_FUNC(fs_key_release_event), NULL);
@@ -707,7 +707,7 @@ void ShowFileSelector(int type)
 
     switch (type) {
     case FILESELECT_VIDEO_AUDIO:
-        gtk_window_set_title(GTK_WINDOW(FileSelector), MSGTR_FileSelect);
+        gtk_window_set_title(GTK_WINDOW(FileSelector), MSGTR_GUI_SelectFile);
         fsList_items = NULL;
 
         for (i = 0; fsVideoAudioFilterNames[i][0]; i++)
@@ -721,7 +721,7 @@ void ShowFileSelector(int type)
         break;
 
     case FILESELECT_SUBTITLE:
-        gtk_window_set_title(GTK_WINDOW(FileSelector), MSGTR_SubtitleSelect);
+        gtk_window_set_title(GTK_WINDOW(FileSelector), MSGTR_GUI_SelectSubtitle);
         fsList_items = NULL;
 
         for (i = 0; fsSubtitleFilterNames[i][0]; i++)
@@ -735,7 +735,7 @@ void ShowFileSelector(int type)
         break;
 
     case FILESELECT_AUDIO:
-        gtk_window_set_title(GTK_WINDOW(FileSelector), MSGTR_AudioFileSelect);
+        gtk_window_set_title(GTK_WINDOW(FileSelector), MSGTR_GUI_SelectAudioFile);
         fsList_items = NULL;
 
         for (i = 0; fsAudioFileNames[i][0]; i++)
@@ -749,7 +749,7 @@ void ShowFileSelector(int type)
         break;
 
     case FILESELECT_FONT:
-        gtk_window_set_title(GTK_WINDOW(FileSelector), MSGTR_FontSelect);
+        gtk_window_set_title(GTK_WINDOW(FileSelector), MSGTR_GUI_SelectFont);
         fsList_items = NULL;
 
         for (i = 0; fsFontFileNames[i][0]; i++)

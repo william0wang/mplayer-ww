@@ -200,7 +200,7 @@ void wsInit(Display *display)
         mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[ws] display name: %s => %s display.\n", dispname, localdisp ? "local" : "REMOTE");
 
         if (!localdisp)
-            mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_WS_RemoteDisplay);
+            mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_RemoteDisplay);
     }
 
 #ifdef HAVE_SHM
@@ -209,7 +209,7 @@ void wsInit(Display *display)
     wsUseXShm = False;
 
     if (!wsUseXShm)
-        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_WS_NoXshm);
+        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_XSharedMemoryUnavailable);
 
 #ifdef CONFIG_XSHAPE
     if (!XShapeQueryExtension(wsDisplay, &eventbase, &errorbase))
@@ -217,7 +217,7 @@ void wsInit(Display *display)
     wsUseXShape = False;
 
     if (!wsUseXShape)
-        mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_WS_NoXshape);
+        mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_GUI_MSG_XShapeError);
 
     wsScreen  = DefaultScreen(wsDisplay);
     wsRootWin = RootWindow(wsDisplay, wsScreen);
@@ -312,7 +312,7 @@ static int wsErrorHandler(Display *display, XErrorEvent *event)
 
     XGetErrorText(display, event->error_code, type, sizeof(type));
 
-    mp_msg(MSGT_GPLAYER, MSGL_ERR, "[ws] " MSGTR_WS_XError);
+    mp_msg(MSGT_GPLAYER, MSGL_ERR, "[ws] " MSGTR_GUI_MSG_X11Error);
     mp_msg(MSGT_GPLAYER, MSGL_ERR, "[ws]  Error code: %d - %s\n", event->error_code, type);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[ws]  Request code: %d (minor code: %d)\n", event->request_code, event->minor_code);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[ws]  MPlayer module: %s\n", current_module ? current_module : "(none)");
@@ -770,7 +770,7 @@ void wsWindowCreate(wsWindow *win, int x, int y, int w, int h, int p, int c, cha
             break;
 
     if (i == wsWLCount) {
-        mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_WS_TooManyOpenWindows);
+        mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_GUI_MSG_TooManyWindows);
         mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
     }
 
@@ -801,7 +801,7 @@ void wsWindowCreate(wsWindow *win, int x, int y, int w, int h, int p, int c, cha
     depth = vo_find_depth_from_visuals(wsDisplay, wsScreen, NULL);
 
     if (depth < 15) {
-        mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_WS_ColorDepthTooLow);
+        mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_GUI_MSG_ColorDepthTooLow);
         mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
     }
 
@@ -1295,7 +1295,7 @@ void wsImageCreate(wsWindow *win, int w, int h)
                                       win->VisualInfo.depth, ZPixmap, NULL, &win->Shminfo, w, h);
 
         if (win->xImage == NULL) {
-            mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_WS_ShmError);
+            mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_GUI_MSG_XSharedMemoryError);
             mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
         }
 
@@ -1303,7 +1303,7 @@ void wsImageCreate(wsWindow *win, int w, int h)
 
         if (win->Shminfo.shmid < 0) {
             XDestroyImage(win->xImage);
-            mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_WS_ShmError);
+            mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_GUI_MSG_XSharedMemoryError);
             mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
         }
 
@@ -1315,7 +1315,7 @@ void wsImageCreate(wsWindow *win, int w, int h)
             if (win->Shminfo.shmaddr != ((char *)-1))
                 shmdt(win->Shminfo.shmaddr);
 
-            mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_WS_ShmError);
+            mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_GUI_MSG_XSharedMemoryError);
             mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
         }
 
@@ -1332,7 +1332,7 @@ void wsImageCreate(wsWindow *win, int w, int h)
                                    0);
 
         if ((win->xImage->data = malloc(win->xImage->bytes_per_line * win->xImage->height)) == NULL) {
-            mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_WS_NotEnoughMemoryDrawBuffer);
+            mp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_GUI_MSG_MemoryErrorImage);
             mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
         }
     }

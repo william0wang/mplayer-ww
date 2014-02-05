@@ -101,7 +101,7 @@ wsXDNDProcessSelection(wsWindow* win, XEvent *event)
     XSendEvent(wsDisplay, selowner, 0, 0, &xevent);
 
     if (!delme){
-      mp_msg( MSGT_GPLAYER,MSGL_WARN,MSGTR_WS_DDNothing );
+      mp_msg( MSGT_GPLAYER,MSGL_WARN,MSGTR_GUI_MSG_DragAndDropNothing );
       return False;
     }
 
@@ -171,7 +171,7 @@ wsXDNDProcessClientMessage(XClientMessageEvent *event)
 	}
       }
       if (atom_support == None) {
-	mp_msg( MSGT_GPLAYER,MSGL_WARN,MSGTR_WS_NotAFile );
+	mp_msg( MSGT_GPLAYER,MSGL_WARN,MSGTR_GUI_MSG_NotAFile0 );
       }
     } else {
       /* need to check the whole list here */

@@ -62,7 +62,7 @@ static GtkWidget * CreateAbout( void )
 
   About=gtk_window_new( GTK_WINDOW_TOPLEVEL );
   gtk_widget_set_usize( About,340,415 );
-  gtk_window_set_title( GTK_WINDOW( About ),MSGTR_MENU_AboutMPlayer );
+  gtk_window_set_title( GTK_WINDOW( About ),MSGTR_GUI_AboutMPlayer );
   gtk_window_set_position( GTK_WINDOW( About ),GTK_WIN_POS_CENTER );
   gtk_window_set_policy( GTK_WINDOW( About ),FALSE,FALSE,TRUE );
   gtk_window_set_wmclass( GTK_WINDOW( About ),"About",MPlayer );
@@ -108,10 +108,10 @@ static GtkWidget * CreateAbout( void )
   gtk_text_insert( GTK_TEXT( AboutText ),NULL,NULL,NULL,
 #endif
   	"\n"
-	MSGTR_ABOUT_UHU":\n"
+	MSGTR_GUI_Sponsored":\n"
 	"       http://www.uhulinux.hu/\n"
 	"\n"
-	MSGTR_ABOUT_Contributors":\n"
+	MSGTR_GUI_Contributors":\n"
 	"\n"
 	"     * Andreas Ackermann\n"
 	"     * adland\n"
@@ -269,7 +269,7 @@ static GtkWidget * CreateAbout( void )
 	"     * Matan Ziv-Av\n"
 	"     * Márk Vicián Zoltán\n"
 	"\n"
-	MSGTR_ABOUT_Codecs_libs_contributions":\n"
+	MSGTR_GUI_CodecsAndLibraries":\n"
 	"\n"
 	"     * Fabrice Bellard\n"
 	"     * Vivien Chappelier\n"
@@ -282,7 +282,7 @@ static GtkWidget * CreateAbout( void )
 	"     * Mark Podlipec\n"
 	"     * Damien Vincent\n"
 	"\n"
-	MSGTR_ABOUT_Translations":\n"
+	MSGTR_GUI_Translations":\n"
 	"\n"
 	"     * Marcin Biernat\n"
 	"     * Marc Fargas\n"
@@ -299,7 +299,7 @@ static GtkWidget * CreateAbout( void )
 	"     * Wacław Schiller\n"
 	"     * Andoni Zubimendi\n"
 	"\n"
-	MSGTR_ABOUT_Skins":\n"
+	MSGTR_GUI_Skins":\n"
 	"\n"
 	"     * Azrael\n"
 	"     * Viktor Bekesi\n"
@@ -334,7 +334,7 @@ static GtkWidget * CreateAbout( void )
 	"     * Michael Zeising", -1 );
 
   gtkAddHSeparator( vbox );
-  Ok=gtkAddButton( MSGTR_Ok,gtkAddHButtonBox( vbox ) );
+  Ok=gtkAddButton( MSGTR_GUI_Ok,gtkAddHButtonBox( vbox ) );
 
   gtk_signal_connect( GTK_OBJECT( About ),"destroy",GTK_SIGNAL_FUNC( gtk_widget_destroyed ),&About );
   gtk_signal_connect_object( GTK_OBJECT( Ok ),"clicked",GTK_SIGNAL_FUNC( abWidgetDestroy ),NULL );

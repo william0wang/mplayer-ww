@@ -101,7 +101,7 @@ static GtkWidget * CreateMessageBox( void )
 
  gtkAddHSeparator( vbox1 );
  hbuttonbox1=gtkAddHButtonBox( vbox1 );
- Ok=gtkAddButton( MSGTR_Ok,hbuttonbox1 );
+ Ok=gtkAddButton( MSGTR_GUI_Ok,hbuttonbox1 );
 
  gtk_widget_add_accelerator( Ok,"clicked",accel_group,GDK_Return,0,GTK_ACCEL_VISIBLE );
  gtk_widget_add_accelerator( Ok,"clicked",accel_group,GDK_Escape,0,GTK_ACCEL_VISIBLE );

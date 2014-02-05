@@ -322,7 +322,7 @@ static void uiMainDND(int num,char** files)
       }
       listMgr(PLAYLIST_ITEM_APPEND,item);
     } else {
-      mp_msg( MSGT_GPLAYER,MSGL_WARN,MSGTR_NotAFile,str );
+      mp_msg( MSGT_GPLAYER,MSGL_WARN,MSGTR_GUI_MSG_NotAFile1,str );
     }
     free( str );
   }
@@ -345,7 +345,7 @@ void uiMainInit (void)
 
   if (!mainDrawBuffer)
   {
-    gmp_msg(MSGT_GPLAYER, MSGL_FATAL, "[main] " MSGTR_NEMDB);
+    gmp_msg(MSGT_GPLAYER, MSGL_FATAL, "[main] " MSGTR_GUI_MSG_MemoryErrorWindow);
     mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
   }
 

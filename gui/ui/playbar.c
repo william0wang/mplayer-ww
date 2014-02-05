@@ -238,7 +238,7 @@ void uiPlaybarInit( void )
 
  if ( ( playbarDrawBuffer = malloc( guiApp.playbar.Bitmap.ImageSize ) ) == NULL )
   {
-   gmp_msg( MSGT_GPLAYER,MSGL_FATAL,"[playbar] " MSGTR_NEMDB );
+   gmp_msg( MSGT_GPLAYER,MSGL_FATAL,"[playbar] " MSGTR_GUI_MSG_MemoryErrorWindow );
    mplayer( MPLAYER_EXIT_GUI, EXIT_ERROR, 0 );
   }
 

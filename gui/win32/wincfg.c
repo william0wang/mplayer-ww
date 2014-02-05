@@ -123,7 +123,7 @@ void cfg_write(void)
         {
             char *v = m_option_print(&gui_opts[i], gui_opts[i].p);
             if(v == (char *)-1) {
-                mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_UnableToSaveOption, gui_opts[i].name);
+                mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_GUI_MSG_UnableToSaveOption, gui_opts[i].name);
                 v = NULL;
             }
             if(v)

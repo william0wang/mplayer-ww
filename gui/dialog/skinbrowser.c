@@ -102,7 +102,7 @@ static GtkWidget * CreateSkinBrowser( void )
  gtk_widget_set_usize( SkinBrowser,256,320 );
  gtk_container_set_border_width( GTK_CONTAINER( SkinBrowser ),1 );
  gtk_widget_set_events( SkinBrowser,GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_FOCUS_CHANGE_MASK | GDK_STRUCTURE_MASK | GDK_PROPERTY_CHANGE_MASK | GDK_VISIBILITY_NOTIFY_MASK );
- gtk_window_set_title( GTK_WINDOW( SkinBrowser ),MSGTR_SkinBrowser );
+ gtk_window_set_title( GTK_WINDOW( SkinBrowser ),MSGTR_GUI_SkinBrowser );
  gtk_window_set_position( GTK_WINDOW( SkinBrowser ),GTK_WIN_POS_CENTER );
  gtk_window_set_policy( GTK_WINDOW( SkinBrowser ),FALSE,FALSE,TRUE );
  gtk_window_set_wmclass( GTK_WINDOW( SkinBrowser ),"SkinBrowser",MPlayer );
@@ -129,7 +129,7 @@ static GtkWidget * CreateSkinBrowser( void )
  gtk_clist_set_selection_mode( GTK_CLIST( SkinList ),GTK_SELECTION_SINGLE );
  gtk_clist_column_titles_show( GTK_CLIST( SkinList ) );
  gtk_clist_set_shadow_type( GTK_CLIST( SkinList ),GTK_SHADOW_ETCHED_OUT );
- gtk_clist_set_column_widget( GTK_CLIST( SkinList ),0, gtkAddLabel( MSGTR_SKIN_LABEL,NULL ) );
+ gtk_clist_set_column_widget( GTK_CLIST( SkinList ),0, gtkAddLabel( MSGTR_GUI_AvailableSkins,NULL ) );
 
  gtkAddHSeparator( vbox5 );
 
@@ -137,8 +137,8 @@ static GtkWidget * CreateSkinBrowser( void )
   gtk_button_box_set_layout( GTK_BUTTON_BOX( hbuttonbox4 ),GTK_BUTTONBOX_SPREAD );
   gtk_button_box_set_spacing( GTK_BUTTON_BOX( hbuttonbox4 ),10 );
 
- Ok=gtkAddButton( MSGTR_Ok,hbuttonbox4 );
- Cancel=gtkAddButton( MSGTR_Cancel,hbuttonbox4 );
+ Ok=gtkAddButton( MSGTR_GUI_Ok,hbuttonbox4 );
+ Cancel=gtkAddButton( MSGTR_GUI_Cancel,hbuttonbox4 );
 
  gtk_widget_add_accelerator( Ok,"clicked",accel_group,GDK_Return,0,GTK_ACCEL_VISIBLE );
  gtk_widget_add_accelerator( Cancel,"clicked",accel_group,GDK_Escape,0,GTK_ACCEL_VISIBLE );

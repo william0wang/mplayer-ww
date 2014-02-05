@@ -379,7 +379,7 @@ void cfg_write(void)
             char *val = m_option_print(opts, opts->p);
 
             if (val == (char *)-1) {
-                gmp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_UnableToSaveOption, opts->name);
+                gmp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_GUI_MSG_UnableToSaveOption, opts->name);
                 val = NULL;
             }
 

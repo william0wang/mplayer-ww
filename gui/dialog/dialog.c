@@ -96,7 +96,7 @@ static int gtkLoadIcon(GtkIconTheme *theme, gint size, GdkPixmap **gdkIcon, GdkB
 
         g_object_unref(pixbuf);
     } else
-        mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_ICONERROR, guiIconName, size);
+        mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_GUI_MSG_IconError, guiIconName, size);
 
     /* start up GTK which realizes the pixmaps */
     gtk_main_iteration_do(FALSE);
@@ -135,7 +135,7 @@ void gtkInit(char *display_name)
     env = getenv("G_FILENAME_ENCODING");
 
     if ((!env && getenv("G_BROKEN_FILENAMES")) || (gstrncmp(env, "@locale", 7) == 0))
-        mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_LOCALE_ENCODING);
+        mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_GUI_MSG_LocaleEncoding);
 #endif
 
     gtk_init(&argc, &argv);
@@ -196,28 +196,28 @@ void gtkMessageBox(int type, const gchar *str)
 
     switch (type) {
     case MSGBOX_FATAL:
-        gtk_window_set_title(GTK_WINDOW(MessageBox), MSGTR_MSGBOX_LABEL_FatalError);
+        gtk_window_set_title(GTK_WINDOW(MessageBox), MSGTR_GUI_ErrorFatal);
         gtk_widget_hide(InformationPixmap);
         gtk_widget_hide(WarningPixmap);
         gtk_widget_show(ErrorPixmap);
         break;
 
     case MSGBOX_ERROR:
-        gtk_window_set_title(GTK_WINDOW(MessageBox), MSGTR_MSGBOX_LABEL_Error);
+        gtk_window_set_title(GTK_WINDOW(MessageBox), MSGTR_GUI_Error);
         gtk_widget_hide(InformationPixmap);
         gtk_widget_hide(WarningPixmap);
         gtk_widget_show(ErrorPixmap);
         break;
 
     case MSGBOX_WARNING:
-        gtk_window_set_title(GTK_WINDOW(MessageBox), MSGTR_MSGBOX_LABEL_Warning);
+        gtk_window_set_title(GTK_WINDOW(MessageBox), MSGTR_GUI_Warning);
         gtk_widget_hide(InformationPixmap);
         gtk_widget_show(WarningPixmap);
         gtk_widget_hide(ErrorPixmap);
         break;
 
     case MSGBOX_INFORMATION:
-        gtk_window_set_title(GTK_WINDOW(MessageBox), MSGTR_MSGBOX_LABEL_Information);
+        gtk_window_set_title(GTK_WINDOW(MessageBox), MSGTR_GUI_Information);
         gtk_widget_show(InformationPixmap);
         gtk_widget_hide(WarningPixmap);
         gtk_widget_hide(ErrorPixmap);

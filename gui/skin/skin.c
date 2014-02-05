@@ -71,7 +71,7 @@ static void skin_error(const char *format, ...)
     vsnprintf(p, sizeof(p), format, ap);
     va_end(ap);
 
-    gmp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_SKIN_ERRORMESSAGE, linenumber, p);
+    gmp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_GUI_MSG_SkinErrorMessage, linenumber, p);
 }
 
 /**
@@ -84,7 +84,7 @@ static void skin_error(const char *format, ...)
 static int section_item(char *item)
 {
     if (!skin) {
-        skin_error(MSGTR_SKIN_ERROR_SECTION, item);
+        skin_error(MSGTR_GUI_MSG_SkinErrorSection, item);
         return False;
     }
 
@@ -101,7 +101,7 @@ static int section_item(char *item)
 static int window_item(char *item)
 {
     if (!currWinName[0]) {
-        skin_error(MSGTR_SKIN_ERROR_WINDOW, item);
+        skin_error(MSGTR_GUI_MSG_SkinErrorWindow, item);
         return False;
     }
 
@@ -118,7 +118,7 @@ static int window_item(char *item)
 static int in_window(char *name)
 {
     if (strcmp(currWinName, name) == 0) {
-        skin_error(MSGTR_SKIN_ERROR_ITEM, name);
+        skin_error(MSGTR_GUI_MSG_SkinErrorItem, name);
         return 1;
     }
 
@@ -138,7 +138,7 @@ static guiItem *next_item(void)
         (*currWinItemIdx)++;
         item = &currWinItems[*currWinItemIdx];
     } else
-        skin_error(MSGTR_SKIN_TooManyItemsDeclared);
+        skin_error(MSGTR_GUI_MSG_SkinTooManyItems);
 
     return item;
 }
@@ -155,14 +155,14 @@ static guiItem *next_item(void)
 static int item_section(char *in)
 {
     if (skin) {
-        skin_error(MSGTR_SKIN_ERROR_ITEM, "section");
+        skin_error(MSGTR_GUI_MSG_SkinErrorItem, "section");
         return 1;
     }
 
     if (!strcmp(strlower(in), "movieplayer"))
         skin = &guiApp;
     else {
-        skin_error(MSGTR_SKIN_UNKNOWN_NAME, in);
+        skin_error(MSGTR_GUI_MSG_SkinUnknownName, in);
         return 1;
     }
 
@@ -225,7 +225,7 @@ static int item_window(char *in)
         return 1;
 
     if (currWinName[0]) {
-        skin_error(MSGTR_SKIN_ERROR_ITEM, "window");
+        skin_error(MSGTR_GUI_MSG_SkinErrorItem, "window");
         return 1;
     }
 
@@ -251,7 +251,7 @@ static int item_window(char *in)
         currWinItemIdx = &skin->IndexOfMenuItems;
         currWinItems   = skin->menuItems;
     } else {
-        skin_error(MSGTR_SKIN_UNKNOWN_NAME, in);
+        skin_error(MSGTR_GUI_MSG_SkinUnknownName, in);
         return 1;
     }
 
@@ -333,7 +333,7 @@ static int item_base(char *in)
 
     if (!is_video) {
         if (!bpRenderMask(&currWin->Bitmap, &currWin->Mask)) {
-            skin_error(MSGTR_SKIN_NotEnoughMemory);
+            skin_error(MSGTR_GUI_MSG_SkinMemoryError);
             return 1;
         }
         mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     mask: %lux%lu\n", currWin->Mask.Width, currWin->Mask.Height);
@@ -412,7 +412,7 @@ static int item_button(char *in)
     message = appFindMessage(msg);
 
     if (message == -1) {
-        skin_error(MSGTR_SKIN_UnknownMessage, msg);
+        skin_error(MSGTR_GUI_MSG_SkinUnknownMessage, msg);
         return 1;
     }
 
@@ -528,7 +528,7 @@ static int item_menu(char *in)
     message = appFindMessage(msg);
 
     if (message == -1) {
-        skin_error(MSGTR_SKIN_UnknownMessage, msg);
+        skin_error(MSGTR_GUI_MSG_SkinUnknownMessage, msg);
         return 1;
     }
 
@@ -592,7 +592,7 @@ static int item_hpotmeter(char *in)
     message = appFindMessage(buf);
 
     if (message == -1) {
-        skin_error(MSGTR_SKIN_UnknownMessage, buf);
+        skin_error(MSGTR_GUI_MSG_SkinUnknownMessage, buf);
         return 1;
     }
 
@@ -705,7 +705,7 @@ static int item_potmeter(char *in)
     message = appFindMessage(buf);
 
     if (message == -1) {
-        skin_error(MSGTR_SKIN_UnknownMessage, buf);
+        skin_error(MSGTR_GUI_MSG_SkinUnknownMessage, buf);
         return 1;
     }
 
@@ -767,19 +767,19 @@ static int item_font(char *in)
                                 // reasons with a meanwhile depreciated second parameter.
     switch (fntRead(path, fnt)) {
     case -1:
-        skin_error(MSGTR_SKIN_NotEnoughMemory);
+        skin_error(MSGTR_GUI_MSG_SkinMemoryError);
         return 1;
 
     case -2:
-        skin_error(MSGTR_SKIN_FONT_TooManyFontsDeclared);
+        skin_error(MSGTR_GUI_MSG_SkinTooManyFonts);
         return 1;
 
     case -3:
-        skin_error(MSGTR_SKIN_FONT_FontFileNotFound);
+        skin_error(MSGTR_GUI_MSG_SkinFontFileNotFound);
         return 1;
 
     case -4:
-        skin_error(MSGTR_SKIN_FONT_FontImageNotFound);
+        skin_error(MSGTR_GUI_MSG_SkinFontImageNotFound);
         return 1;
     }
 
@@ -824,7 +824,7 @@ static int item_slabel(char *in)
     id = fntFindID(fnt);
 
     if (id < 0) {
-        skin_error(MSGTR_SKIN_FONT_NonExistentFont, fnt);
+        skin_error(MSGTR_GUI_MSG_SkinFontNotFound, fnt);
         return 1;
     }
 
@@ -844,7 +844,7 @@ static int item_slabel(char *in)
     item->label  = strdup(txt);
 
     if (!item->label) {
-        skin_error(MSGTR_SKIN_NotEnoughMemory);
+        skin_error(MSGTR_GUI_MSG_SkinMemoryError);
         return 1;
     }
 
@@ -890,7 +890,7 @@ static int item_dlabel(char *in)
     id = fntFindID(fnt);
 
     if (id < 0) {
-        skin_error(MSGTR_SKIN_FONT_NonExistentFont, fnt);
+        skin_error(MSGTR_GUI_MSG_SkinFontNotFound, fnt);
         return 1;
     }
 
@@ -911,7 +911,7 @@ static int item_dlabel(char *in)
     item->label  = strdup(txt);
 
     if (!item->label) {
-        skin_error(MSGTR_SKIN_NotEnoughMemory);
+        skin_error(MSGTR_GUI_MSG_SkinMemoryError);
         return 1;
     }
 
@@ -942,7 +942,7 @@ static int item_decoration(char *in)
     strlower(in);
 
     if (strcmp(in, "enable") != 0 && strcmp(in, "disable") != 0) {
-        skin_error(MSGTR_SKIN_UnknownParameter, in);
+        skin_error(MSGTR_GUI_MSG_SkinUnknownParameter, in);
         return 1;
     }
 
@@ -988,19 +988,19 @@ int skinImageRead(char *fname, guiImage *img)
 
     switch (i) {
     case -1:
-        skin_error(MSGTR_SKIN_BITMAP_16bit, fname);
+        skin_error(MSGTR_GUI_MSG_SkinErrorBitmap16Bit, fname);
         break;
 
     case -2:
-        skin_error(MSGTR_SKIN_BITMAP_FileNotFound, fname);
+        skin_error(MSGTR_GUI_MSG_SkinBitmapNotFound, fname);
         break;
 
     case -5:
-        skin_error(MSGTR_SKIN_BITMAP_PNGReadError, fname);
+        skin_error(MSGTR_GUI_MSG_SkinBitmapPngReadError, fname);
         break;
 
     case -8:
-        skin_error(MSGTR_SKIN_BITMAP_ConversionError, fname);
+        skin_error(MSGTR_GUI_MSG_SkinBitmapConversionError, fname);
         break;
     }
 
@@ -1053,7 +1053,7 @@ int skinRead(char *sname)
         skinfname = setname(skinDirInData, sname);
 
         if ((skinfile = fopen(skinfname, "rt")) == NULL) {
-            mp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_SKIN_SkinFileNotFound, skinfname);
+            mp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_GUI_MSG_SkinFileNotFound, skinfname);
             return -1;
         }
     }
@@ -1091,7 +1091,7 @@ int skinRead(char *sname)
         }
 
         if (i == FF_ARRAY_ELEMS(skinItem)) {
-            skin_error(MSGTR_SKIN_UNKNOWN_ITEM, item);
+            skin_error(MSGTR_GUI_MSG_SkinUnknownItem, item);
             fclose(skinfile);
             return -2;
         }
@@ -1100,7 +1100,7 @@ int skinRead(char *sname)
     fclose(skinfile);
 
     if (linenumber == 0) {
-        mp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_SKIN_SkinFileNotReadable, skinfname);
+        mp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_GUI_MSG_SkinFileNotReadable, skinfname);
         return -1;
     }
 
