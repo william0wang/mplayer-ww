@@ -1484,7 +1484,7 @@ static const char help_text[]=
 
 
 // url.c
-#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "Al parecer el string ya ha sido escapado en url_scape %c%c1%c2\n"
+#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "Al parecer el string ya ha sido escapado en url_scape %c%c%c\n"
 
 // ai_alsa.c
 #define MSGTR_MPDEMUX_AIALSA_CannotSetSamplerate "No puedo setear el samplerate.\n"

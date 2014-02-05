@@ -2076,7 +2076,7 @@ static const char help_text[]=
 #define MSGTR_TVI_DS_GetActualMediatypeFailed "tvi_dshow: Unable to get actual mediatype (Error:0x%x). Assuming equal to requested.\n"
 
 // url.c
-#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "String appears to be already escaped in url_escape %c%c1%c2\n"
+#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "String appears to be already escaped in url_escape %c%c%c\n"
 
 // subtitles
 #define MSGTR_SUBTITLES_SubRip_UnknownFontColor "SubRip: unknown font color in subtitle: %s\n"

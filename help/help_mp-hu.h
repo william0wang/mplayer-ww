@@ -1940,7 +1940,7 @@ static const char help_text[]=
 #define MSGTR_TVI_DS_GetActualMediatypeFailed "tvi_dshow: Nem kérdezhető le az aktuális médiatípus (Hiba:0x%x). Feltételezhetően azonos a kérttel.\n"
 
 // url.c
-#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "A karakterlánc már escape-ltnek tűnik az url_escape-ben %c%c1%c2\n"
+#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "A karakterlánc már escape-ltnek tűnik az url_escape-ben %c%c%c\n"
 
 // feliratok
 #define MSGTR_SUBTITLES_SubRip_UnknownFontColor "SubRip: ismeretlen betű szín a feliratban: %s\n"

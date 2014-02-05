@@ -1067,7 +1067,7 @@ static const char help_text[]=
 
 // url.c
 
-#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "Łancuch wydaje się być już zakodowany w url_escape %c%c1%c2\n"
+#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "Łancuch wydaje się być już zakodowany w url_escape %c%c%c\n"
 
 // ai_alsa.c
 

@@ -2074,7 +2074,7 @@ static const char help_text[]=
 #define MSGTR_TVI_DS_GetActualMediatypeFailed "tvi_dshow：无法识别媒体的实际类型（错误代码：0x%x）。使用与所请求相同的类型。\n"
 
 // url.c
-#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "字符串似乎已经经过 url_escape %c%c1%c2 换码了。\n"
+#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "字符串似乎已经经过 url_escape %c%c%c 换码了。\n"
 
 // subtitles
 #define MSGTR_SUBTITLES_SubRip_UnknownFontColor "SubRip：字幕含有未知字体颜色：%s\n"

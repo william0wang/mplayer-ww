@@ -1167,7 +1167,7 @@ static const char help_text[]=
 
 // url.c
 
-#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "%c%c1%c2 url_atlamasında dizgi zaten atlatılmış görünüyor.\n"
+#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "%c%c%c url_atlamasında dizgi zaten atlatılmış görünüyor.\n"
 
 // ai_alsa.c
 
