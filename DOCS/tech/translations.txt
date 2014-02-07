@@ -15,8 +15,9 @@ translating.
 
 Furthermore, if you take over an unmaintained translation, bring the existing
 parts up-to-date before translating new ones.  Outdated information is worse
-than missing information. For console messages and the XML documentation,
-missing parts are automatically replaced by the English versions.
+than missing information. For console messages, GUI localization and the XML
+documentation, missing parts are automatically replaced by the English
+versions.
 
 Documentation related discussions happen on the MPlayer-DOCS mailing list,
 while documentation translation related discussions happen on the
@@ -35,7 +36,7 @@ Translations of MPlayer documentation consist of 3 parts in descending
 order of importance:
 
 0) homepage
-1) console messages (help/help_mp-XX.h)
+1) console messages and GUI localization (help/help_mp-XX.h)
 2) man page
 3) XML documentation
 
@@ -51,7 +52,7 @@ general:
 
 Please note that the help_mp files and the XML documentation are both encoded
 in UTF-8. Editing these files in a program which uses a different encoding
-will result in breaking console messages and HTML.
+will result in breaking console messages, GUI localization and HTML.
 
 Translations are for documentation what porting is for code. Many more eyes
 see it and get to find mistakes. If you stumble over mistakes, inaccuracies,
@@ -87,8 +88,8 @@ files to form the final HTML pages. To build the HTML pages, type 'make' in
 the root of the homepage source directory.
 
 
-console messages:
-~~~~~~~~~~~~~~~~~
+console messages / GUI localization:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can find the latest versions of the help_mp-XX.h files in Subversion or
 here:
