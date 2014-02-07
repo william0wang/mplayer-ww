@@ -26,8 +26,12 @@
 #include "mixer.h"
 #include "mpcommon.h"
 #include "mp_core.h"
+#include "path.h"
 #include "sub/sub.h"
 #include "sub/vobsub.h"
+#ifdef CONFIG_ASS
+#include "libass/ass_types.h"
+#endif
 
 #include "menu.h"
 #include "dialog.h"
@@ -673,9 +677,22 @@ GtkWidget * CreatePopUpMenu( void )
     for ( i=0;i < global_sub_size;i++ )
      {
       int ret = -1;
-      char lng[32], tmp[64], *lang;
+      char lng[32], tmp[64], *lang = NULL;
+      /* file */
+      if ( i < subs0 )
+       {
+        if ( guiInfo.mpcontext->set_of_subtitles[i] ) lang = guiInfo.mpcontext->set_of_subtitles[i]->filename;
+#ifdef CONFIG_ASS
+        if ( ass_track && ass_track->name ) lang = ass_track->name;
+#endif
+        if ( lang )
+         {
+          av_strlcpy( lng, mp_basename(lang), sizeof(lng) );
+          ret = 0;
+         }
+       }
       /* VOBsub */
-      if ( ( i >= subs0 && i < subs0 + subs1 ) && vo_vobsub )
+      else if ( ( i >= subs0 && i < subs0 + subs1 ) && vo_vobsub )
        {
         lang = vobsub_get_id( vo_vobsub, vobsub_get_id_by_index( vo_vobsub, i - subs0 ) );
 
