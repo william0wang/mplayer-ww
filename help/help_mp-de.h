@@ -825,6 +825,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_CpShiftJis "Japanisch (SHIFT-JIS)"
 #define MSGTR_GUI_CpUnicode "Unicode"
 #define MSGTR_GUI_CpUTF8 "UTF-8"
+#define MSGTR_GUI_DecimalMark ","
 #define MSGTR_GUI__Default_ "(Standard)"
 #define MSGTR_GUI_DefaultSetting "Standardeinstellung"
 #define MSGTR_GUI_Delay "Verzögerung"

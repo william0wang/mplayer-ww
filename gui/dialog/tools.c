@@ -22,6 +22,39 @@
 
 #include "tools.h"
 
+#include "help_mp.h"
+
+/**
+ * @brief Perform a localization of the decimal mark.
+ *
+ * @param scale object which received the signal
+ * @param value value to format
+ * @param user_data user data set when the signal handler was connected
+ *
+ * @return allocated string representing value
+ *
+ * @note This function is necessary, because we have to run in the "C" locale.
+ */
+static gchar *scale_format_value (GtkScale *scale, gdouble value, gpointer user_data)
+{
+  gchar *val, *p, *dm = MSGTR_GUI_DecimalMark;
+
+  (void) user_data;
+
+  val = g_strdup_printf("%0.*f", gtk_scale_get_digits(scale), value);
+
+  p = val;
+
+  while (p && *p && *dm)
+  {
+    if (*p == '.') *p = *dm;
+
+    p++;
+  }
+
+  return val;
+}
+
 GtkWidget * gtkAddDialogFrame( GtkWidget * parent )
 {
  GtkWidget * frame;
@@ -152,6 +185,7 @@ GtkWidget * gtkAddHScale( GtkAdjustment * adj,GtkWidget * parent,int digit )
  if ( parent ) gtk_box_pack_start( GTK_BOX( parent ),HS,TRUE,TRUE,0 );
  gtk_scale_set_value_pos( GTK_SCALE( HS ),GTK_POS_RIGHT );
  gtk_scale_set_digits( GTK_SCALE( HS ),digit );
+ if (digit > 0) gtk_signal_connect(GTK_OBJECT(HS), "format-value", GTK_SIGNAL_FUNC(scale_format_value), NULL);
  return HS;
 }
 
@@ -164,6 +198,7 @@ GtkWidget * gtkAddVScale( GtkAdjustment * adj,GtkWidget * parent,int digit )
 // gtk_scale_set_value_pos( GTK_SCALE( VS ),GTK_POS_RIGHT );
  if ( digit == -1 ) gtk_scale_set_draw_value( GTK_SCALE( VS ),FALSE );
   else gtk_scale_set_digits( GTK_SCALE( VS ),digit );
+ if (digit > 0) gtk_signal_connect(GTK_OBJECT(VS), "format-value", GTK_SIGNAL_FUNC(scale_format_value), NULL);
  return VS;
 }
 
