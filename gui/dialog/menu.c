@@ -405,7 +405,7 @@ static const char * GetLanguage( int language )
  unsigned int i;
  for ( i=0;i<sizeof( Languages ) / sizeof( Languages_t );i++ )
   if ( Languages[i].id == language ) return Languages[i].name;
- return "Unknown";
+ return MSGTR_GUI_Unknown;
 }
 #endif
 

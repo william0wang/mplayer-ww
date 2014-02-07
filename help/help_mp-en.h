@@ -819,6 +819,7 @@ static const char help_text[]=
 #define MSGTR_GUI_Translations "Translations"
 #define MSGTR_GUI_TurnOffXScreenSaver "Turn off XScreenSaver"
 #define MSGTR_GUI_TV "TV"
+#define MSGTR_GUI_Unknown "Unknown"
 #define MSGTR_GUI_URL "URL"
 #define MSGTR_GUI_VCD "VCD"
 #define MSGTR_GUI_Video "Video"
