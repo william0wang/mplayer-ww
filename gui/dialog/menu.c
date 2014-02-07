@@ -525,17 +525,16 @@ GtkWidget * CreatePopUpMenu( void )
         gtk_widget_set_sensitive( MenuItem,FALSE );
        }
     DVDAudioLanguageMenu=AddSubMenu( window1, (const char*)audio_xpm, DVDSubMenu,MSGTR_GUI_AudioTracks );
-     if ( guiInfo.AudioStreams && ( guiInfo.StreamType == STREAMTYPE_DVD ) )
+     if ( guiInfo.AudioStreams && demuxer && ( guiInfo.StreamType == STREAMTYPE_DVD ) )
       {
-       char tmp[64]; int i, id = demuxer ? demuxer->audio->id : audio_id;
+       char tmp[64]; int i;
        for ( i=0;i < guiInfo.AudioStreams;i++ )
         {
 	 snprintf( tmp,64,"%s - %s %s",GetLanguage( guiInfo.AudioStream[i].language ),
 	   ChannelTypes[ guiInfo.AudioStream[i].type ],
 	   ChannelNumbers[ guiInfo.AudioStream[i].channels ] );
-//	 if ( id == -1 ) id=audio_id; //guiInfo.AudioStream[i].id;
          AddMenuCheckItem( window1, (const char*)dolby_xpm, DVDAudioLanguageMenu,tmp,
-			   id == guiInfo.AudioStream[i].id,
+			   demuxer->audio->id == guiInfo.AudioStream[i].id,
 			   ( guiInfo.AudioStream[i].id << 16 ) + ivSetDVDAudio );
         }
       }
