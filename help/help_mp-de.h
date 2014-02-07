@@ -4,6 +4,8 @@
 // Alexander Strasser <eclipse7@gmx.net>
 // Sebastian Krämer <mail@kraymer.de>
 
+// Maintained by: Ingo Brückl (via mplayer-translations@mplayerhq.hu)
+
 // In sync with r28122
 // TODO: cosmetic commit 27072
 // FIXME: improve wording/meaning of periodsize|timer.. for ao_alsa.c strings

@@ -285,6 +285,7 @@ static GtkWidget * CreateAbout( void )
 	MSGTR_GUI_Translations":\n"
 	"\n"
 	"     * Marcin Biernat\n"
+	"     * Ingo Brückl\n"
 	"     * Marc Fargas\n"
 	"     * Jiri Heryan\n"
 	"     * Marek Jarycki\n"
