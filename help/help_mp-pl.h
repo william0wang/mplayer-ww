@@ -5,45 +5,55 @@
 
 // ========================= MPlayer help ===========================
 
-static const char help_text[]=
-"Użycie:   mplayer [opcje] [url|ścieżka/]plik\n"
-"\n"
-"Podstawowe opcje: (pełna lista dostępna na stronie man)\n"
-" -vo <drv>        podaj wyjściowy sterownik video (lista: '-vo help')\n"
-" -ao <drv>        podaj wyjściowy sterownik audio (lista: '-ao help')\n"
 #ifdef CONFIG_VCD
-" vcd://<numer_ścieżki>  odtwórz ścieżkę (S)VCD (Super Video CD) (bezpośrednio, bez montowania)\n"
+#define MSGTR_HelpVCD " vcd://<numer_ścieżki>  odtwórz ścieżkę (S)VCD (Super Video CD) (bezpośrednio, bez montowania)\n"
+#else
+#define MSGTR_HelpVCD
 #endif
+
 #ifdef CONFIG_DVDREAD
-" dvd://<tytuł>    odtwórz tytuł DVD z urządzenia zamiast pliku\n"
-" -alang/-slang    wybierz język napisów/ścieżki dźwiękowej (dwuliterowy kod kraju)\n"
+#define MSGTR_HelpDVD " dvd://<tytuł>    odtwórz tytuł DVD z urządzenia zamiast pliku\n"\
+                      " -alang/-slang    wybierz język napisów/ścieżki dźwiękowej (dwuliterowy kod kraju)\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -ss <position>   przejdź do pozycji (sekundy lub hh:mm:ss)\n"
-" -nosound         nie odtwarzaj dźwięku\n"
-" -fs              odtwarzaj pełnoekranowo (lub -vm, -zoom, szczegóły na stronie man)\n"
-" -x <x> -y <y>    ustaw rozdzielczość (użyj z -vm lub -zoom)\n"
-" -sub <plik>      podaj plik z napisami (zobacz też -subfps, -subdelay)\n"
-" -playlist <plik> podaj plik z listą odtwarzania\n"
-" -vid x -aid y    wybierz strumień video (x) oraz audio (y) do odtwarzania\n"
-" -fps x -srate y  zmień prędkość odtwarzania video (x fps) oraz audio (y Hz)\n"
-" -pp <quality>    włącz filtr 'postprocessing' (szczegóły na stronie man)\n"
-" -framedrop       włącz pomijanie ramek (dla słabszych komputerów)\n"
+
+#define MSGTR_Help \
+"Użycie:   mplayer [opcje] [url|ścieżka/]plik\n"\
+"\n"\
+"Podstawowe opcje: (pełna lista dostępna na stronie man)\n"\
+" -vo <drv>        podaj wyjściowy sterownik video (lista: '-vo help')\n"\
+" -ao <drv>        podaj wyjściowy sterownik audio (lista: '-ao help')\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -ss <position>   przejdź do pozycji (sekundy lub hh:mm:ss)\n"\
+" -nosound         nie odtwarzaj dźwięku\n"\
+" -fs              odtwarzaj pełnoekranowo (lub -vm, -zoom, szczegóły na stronie man)\n"\
+" -x <x> -y <y>    ustaw rozdzielczość (użyj z -vm lub -zoom)\n"\
+" -sub <plik>      podaj plik z napisami (zobacz też -subfps, -subdelay)\n"\
+" -playlist <plik> podaj plik z listą odtwarzania\n"\
+" -vid x -aid y    wybierz strumień video (x) oraz audio (y) do odtwarzania\n"\
+" -fps x -srate y  zmień prędkość odtwarzania video (x fps) oraz audio (y Hz)\n"\
+" -pp <quality>    włącz filtr 'postprocessing' (szczegóły na stronie man)\n"\
+" -framedrop       włącz pomijanie ramek (dla słabszych komputerów)\n"\
+"\n"\
+"Podstawowe klawisze: (pełna lista na stronie man, zobacz też input.conf)\n"\
+" <-  lub  ->       skocz o 10 sekund do tyłu/przodu\n"\
+" dół lub góra      skocz o minutę do tyłu/przodu\n"\
+" pgdown lub pgup   skocz o 10 minut do tyłu/przodu\n"\
+" < lub >           skocz do tyłu/przodu w liście odtwarzania\n"\
+" p lub SPACJA      pauza (wciśnij dowolny klawisz by kontynuować)\n"\
+" q lub ESC         zatrzymaj odtwarzanie i zamknij program\n"\
+" + lub -           dostosuj opóźnienie audio o +/- 0.1 sekundy\n"\
+" o                 przełącz tryb OSD:  brak / belka / belka + czas\n"\
+" * lub /           zwiększ lub zmniejsz głośność - PCM\n"\
+" x lub z           dostosuj opóźnienie napisów o +/- 0.1 sekundy\n"\
+" r lub t           dostosuj położenie napisów góra/dół, zobacz też -vf expand\n"\
+"\n"\
+" * * * WIĘCEJ OPCJI DOSTĘPNYCH NA STRONIE PODRĘCZNIKA MAN * * *\n"\
 "\n"
-"Podstawowe klawisze: (pełna lista na stronie man, zobacz też input.conf)\n"
-" <-  lub  ->       skocz o 10 sekund do tyłu/przodu\n"
-" dół lub góra      skocz o minutę do tyłu/przodu\n"
-" pgdown lub pgup   skocz o 10 minut do tyłu/przodu\n"
-" < lub >           skocz do tyłu/przodu w liście odtwarzania\n"
-" p lub SPACJA      pauza (wciśnij dowolny klawisz by kontynuować)\n"
-" q lub ESC         zatrzymaj odtwarzanie i zamknij program\n"
-" + lub -           dostosuj opóźnienie audio o +/- 0.1 sekundy\n"
-" o                 przełącz tryb OSD:  brak / belka / belka + czas\n"
-" * lub /           zwiększ lub zmniejsz głośność - PCM\n"
-" x lub z           dostosuj opóźnienie napisów o +/- 0.1 sekundy\n"
-" r lub t           dostosuj położenie napisów góra/dół, zobacz też -vf expand\n"
-"\n"
-" * * * WIĘCEJ OPCJI DOSTĘPNYCH NA STRONIE PODRĘCZNIKA MAN * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer messages ===========================
 

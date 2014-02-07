@@ -8,45 +8,55 @@
 
 // ========================= MPlayer help ===========================
 
-static const char help_text[]=
-"用法:   mplayer [選項] [URL|路徑/]文件名\n"
-"\n"
-"基本選項: (完整列表參見手册頁)\n"
-" -vo <drv>        選擇視頻輸出驅動 (查看驅動列表用“-vo help”)\n"
-" -ao <drv>        選擇音頻輸出驅動 (查看驅動列表用“-ao help”)\n"
 #ifdef CONFIG_VCD
-" vcd://<trackno>  播放 (S)VCD 軌迹號 (原始設備, 無需安挂)\n"
+#define MSGTR_HelpVCD " vcd://<trackno>  播放 (S)VCD 軌迹號 (原始設備, 無需安挂)\n"
+#else
+#define MSGTR_HelpVCD
 #endif
+
 #ifdef CONFIG_DVDREAD
-" dvd://<titleno>  從設備而不是普通文件上播放 DVD 標題號\n"
-" -alang/-slang    選擇 DVD 音軌/字幕的語言(使用兩字符的國家代號)\n"
+#define MSGTR_HelpDVD " dvd://<titleno>  從設備而不是普通文件上播放 DVD 標題號\n"\
+                      " -alang/-slang    選擇 DVD 音軌/字幕的語言(使用兩字符的國家代號)\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -ss <position>   尋找到給定(多少秒或時分秒 hh:mm:ss 的)位置\n"
-" -nosound         不播放聲音\n"
-" -fs              全屏播放 (或者用 -vm, -zoom, 詳見于手册頁)\n"
-" -x <x> -y <y>    設置顯示的分辨率(提供給 -vm 或者 -zoom 使用)\n"
-" -sub <file>      指定字幕文件 (參見 -subfps, -subdelay)\n"
-" -playlist <file> 指定播放列表文件\n"
-" -vid x -aid y    選擇用于播放的 x 視頻流和 y 音頻流通道號\n"
-" -fps x -srate y  改變視頻率為 x 幀秒(fps)和音頻率為 y 赫兹(Hz)\n"
-" -pp <quality>    使用後期處理過濾器/濾鏡 (詳見于手册頁)\n"
-" -framedrop       使用丢幀(用于慢機器)\n"
+
+#define MSGTR_Help \
+"用法:   mplayer [選項] [URL|路徑/]文件名\n"\
+"\n"\
+"基本選項: (完整列表參見手册頁)\n"\
+" -vo <drv>        選擇視頻輸出驅動 (查看驅動列表用“-vo help”)\n"\
+" -ao <drv>        選擇音頻輸出驅動 (查看驅動列表用“-ao help”)\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -ss <position>   尋找到給定(多少秒或時分秒 hh:mm:ss 的)位置\n"\
+" -nosound         不播放聲音\n"\
+" -fs              全屏播放 (或者用 -vm, -zoom, 詳見于手册頁)\n"\
+" -x <x> -y <y>    設置顯示的分辨率(提供給 -vm 或者 -zoom 使用)\n"\
+" -sub <file>      指定字幕文件 (參見 -subfps, -subdelay)\n"\
+" -playlist <file> 指定播放列表文件\n"\
+" -vid x -aid y    選擇用于播放的 x 視頻流和 y 音頻流通道號\n"\
+" -fps x -srate y  改變視頻率為 x 幀秒(fps)和音頻率為 y 赫兹(Hz)\n"\
+" -pp <quality>    使用後期處理過濾器/濾鏡 (詳見于手册頁)\n"\
+" -framedrop       使用丢幀(用于慢機器)\n"\
+"\n"\
+"基本控製鍵: (完整的列表參見于手册頁, 同時也請核查 input.conf)\n"\
+" <-  or  ->       後退/快進 10 秒\n"\
+" down or up       後退/快進 1 分鐘\n"\
+" pgdown or pgup   後退/快進 10 分鐘\n"\
+" < or >           跳到播放列表中的前一個/後一個\n"\
+" p or SPACE       暫停播放(按任意鍵繼續)\n"\
+" q or ESC         停止播放并退出程序\n"\
+" + or -           調整音頻延遲增加/减少 0.1 秒\n"\
+" o                循環 OSD 模式:  無/搜索條/搜索條加計時器\n"\
+" * or /           增加或减少 PCM 音量\n"\
+" x or z           調整字幕延遲增加/减少 0.1 秒\n"\
+" r or t           上/下調整字幕位置, 參見“-vf expand”\n"\
+"\n"\
+" * * *  詳細内容，更多的(高級)選項和控製鍵，請參見手册頁  * * *\n"\
 "\n"
-"基本控製鍵: (完整的列表參見于手册頁, 同時也請核查 input.conf)\n"
-" <-  or  ->       後退/快進 10 秒\n"
-" down or up       後退/快進 1 分鐘\n"
-" pgdown or pgup   後退/快進 10 分鐘\n"
-" < or >           跳到播放列表中的前一個/後一個\n"
-" p or SPACE       暫停播放(按任意鍵繼續)\n"
-" q or ESC         停止播放并退出程序\n"
-" + or -           調整音頻延遲增加/减少 0.1 秒\n"
-" o                循環 OSD 模式:  無/搜索條/搜索條加計時器\n"
-" * or /           增加或减少 PCM 音量\n"
-" x or z           調整字幕延遲增加/减少 0.1 秒\n"
-" r or t           上/下調整字幕位置, 參見“-vf expand”\n"
-"\n"
-" * * *  詳細内容，更多的(高級)選項和控製鍵，請參見手册頁  * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer messages ===========================
 

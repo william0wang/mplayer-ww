@@ -6,45 +6,55 @@
 
 // Preklad do slovenčiny
 
-static const char help_text[]=
-"Použitie:   mplayer [prepínače] [url|cesta/]menosúboru\n"
-"\n"
-"Základné prepínače: (Kompletný zoznam nájdete v man stránke)\n"
-" -vo <drv[:dev]> výber výstup. video ovládača&zariadenia (-vo help pre zoznam)\n"
-" -ao <drv[:dev]> výber výstup. audio ovládača&zariadenia (-ao help pre zoznam)\n"
 #ifdef CONFIG_VCD
-" vcd://<trackno>  prehrať VCD (video cd) stopu zo zariadenia namiesto zo súboru\n"
+#define MSGTR_HelpVCD " vcd://<trackno>  prehrať VCD (video cd) stopu zo zariadenia namiesto zo súboru\n"
+#else
+#define MSGTR_HelpVCD
 #endif
+
 #ifdef CONFIG_DVDREAD
-" dvd://<titleno>  prehrať DVD titul/stopu zo zariadenia (mechaniky) namiesto súboru\n"
-" -alang/-slang   vybrať jazyk DVD zvuku/titulkov(pomocou 2-miest. kódu krajiny)\n"
+#define MSGTR_HelpDVD " dvd://<titleno>  prehrať DVD titul/stopu zo zariadenia (mechaniky) namiesto súboru\n"\
+                      " -alang/-slang   vybrať jazyk DVD zvuku/titulkov(pomocou 2-miest. kódu krajiny)\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -ss <timepos>   posun na pozíciu (sekundy alebo hh:mm:ss)\n"
-" -nosound        prehrávať bez zvuku\n"
-" -fs             voľby pre celú obrazovku (alebo -vm -zoom, detaily viď. man stránku)\n"
-" -x <x> -y <y>   zväčšenie obrazu na rozmer <x>*<y> (pokiaľ to vie -vo ovládač!)\n"
-" -sub <file>     voľba súboru s titulkami (viď tiež -subfps, -subdelay)\n"
-" -playlist <file> určenie súboru so zoznamom prehrávaných súborov\n"
-" -vid x -aid y   výber čísla video (x) a audio (y) prúdu pre prehrávanie\n"
-" -fps x -srate y voľba pre zmenu video (x fps) a audio (y Hz) frekvencie\n"
-" -pp <quality>   aktivácia postprocesing filtra (0-4 pre DivX, 0-63 pre mpegy)\n"
-" -framedrop      povoliť zahadzovanie snímkov (pre pomalé stroje)\n"
+
+#define MSGTR_Help \
+"Použitie:   mplayer [prepínače] [url|cesta/]menosúboru\n"\
+"\n"\
+"Základné prepínače: (Kompletný zoznam nájdete v man stránke)\n"\
+" -vo <drv[:dev]> výber výstup. video ovládača&zariadenia (-vo help pre zoznam)\n"\
+" -ao <drv[:dev]> výber výstup. audio ovládača&zariadenia (-ao help pre zoznam)\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -ss <timepos>   posun na pozíciu (sekundy alebo hh:mm:ss)\n"\
+" -nosound        prehrávať bez zvuku\n"\
+" -fs             voľby pre celú obrazovku (alebo -vm -zoom, detaily viď. man stránku)\n"\
+" -x <x> -y <y>   zväčšenie obrazu na rozmer <x>*<y> (pokiaľ to vie -vo ovládač!)\n"\
+" -sub <file>     voľba súboru s titulkami (viď tiež -subfps, -subdelay)\n"\
+" -playlist <file> určenie súboru so zoznamom prehrávaných súborov\n"\
+" -vid x -aid y   výber čísla video (x) a audio (y) prúdu pre prehrávanie\n"\
+" -fps x -srate y voľba pre zmenu video (x fps) a audio (y Hz) frekvencie\n"\
+" -pp <quality>   aktivácia postprocesing filtra (0-4 pre DivX, 0-63 pre mpegy)\n"\
+" -framedrop      povoliť zahadzovanie snímkov (pre pomalé stroje)\n"\
+"\n"\
+"Zákl. klávesy:   (pre kompl. pozrite aj man stránku a input.conf)\n"\
+" <-  alebo  ->   posun vzad/vpred o 10 sekund\n"\
+" hore / dole     posun vzad/vpred o  1 minútu\n"\
+" pgup alebo pgdown  posun vzad/vpred o 10 minút\n"\
+" < alebo >       posun vzad/vpred v zozname prehrávaných súborov\n"\
+" p al. medzerník pauza (pokračovanie stlačením klávesy)\n"\
+" q alebo ESC     koniec prehrávania a ukončenie programu\n"\
+" + alebo -       upraviť spozdenie zvuku v krokoch +/- 0.1 sekundy\n"\
+" o               cyklická zmena režimu OSD:  nič / pozícia / pozícia+čas\n"\
+" * alebo /       pridať alebo ubrať hlasitosť (stlačením 'm' výber master/pcm)\n"\
+" z alebo x       upraviť spozdenie titulkov v krokoch +/- 0.1 sekundy\n"\
+" r alebo t       upraviť pozíciu titulkov hore/dole, pozrite tiež -vf!\n"\
+"\n"\
+" * * * * PREČÍTAJTE SI MAN STRÁNKU PRE DETAILY (ĎALŠIE VOĽBY A KLÁVESY)! * * * *\n"\
 "\n"
-"Zákl. klávesy:   (pre kompl. pozrite aj man stránku a input.conf)\n"
-" <-  alebo  ->   posun vzad/vpred o 10 sekund\n"
-" hore / dole     posun vzad/vpred o  1 minútu\n"
-" pgup alebo pgdown  posun vzad/vpred o 10 minút\n"
-" < alebo >       posun vzad/vpred v zozname prehrávaných súborov\n"
-" p al. medzerník pauza (pokračovanie stlačením klávesy)\n"
-" q alebo ESC     koniec prehrávania a ukončenie programu\n"
-" + alebo -       upraviť spozdenie zvuku v krokoch +/- 0.1 sekundy\n"
-" o               cyklická zmena režimu OSD:  nič / pozícia / pozícia+čas\n"
-" * alebo /       pridať alebo ubrať hlasitosť (stlačením 'm' výber master/pcm)\n"
-" z alebo x       upraviť spozdenie titulkov v krokoch +/- 0.1 sekundy\n"
-" r alebo t       upraviť pozíciu titulkov hore/dole, pozrite tiež -vf!\n"
-"\n"
-" * * * * PREČÍTAJTE SI MAN STRÁNKU PRE DETAILY (ĎALŠIE VOĽBY A KLÁVESY)! * * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer messages ===========================
 // mplayer.c:

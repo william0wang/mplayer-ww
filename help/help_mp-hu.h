@@ -8,45 +8,55 @@
 
 // ========================= MPlayer help ===========================
 
-static const char help_text[]=
-"Indítás:   mplayer [opciók] [url|útvonal/]fájlnév\n"
-"\n"
-"Alapvető opciók: (az összes opció listájához lásd a man lapot)\n"
-" -vo <drv>        kimeneti videó meghajtó kiválasztása (lista: '-vo help')\n"
-" -ao <drv>        kimeneti audió meghajtó kiválasztása (lista: '-ao help')\n"
 #ifdef CONFIG_VCD
-" vcd://<sávszám>  (S)VCD (Super Video CD) sáv lejátszás (nyers, nincs mount)\n"
+#define MSGTR_HelpVCD " vcd://<sávszám>  (S)VCD (Super Video CD) sáv lejátszás (nyers, nincs mount)\n"
+#else
+#define MSGTR_HelpVCD
 #endif
+
 #ifdef CONFIG_DVDREAD
-" dvd://<titleno>  a megadott DVD sáv lejátszása, fájl helyett\n"
+#define MSGTR_HelpDVD " dvd://<titleno>  a megadott DVD sáv lejátszása, fájl helyett\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -alang/-slang    DVD audio/felirat nyelv kiválasztása (2 betűs országkóddal)\n"
-" -ss <pozíció>    a megadott (másodperc v. óra:perc:mperc) pozícióra tekerés\n"
-" -nosound         hanglejátszás kikapcsolása\n"
-" -fs              teljesképernyős lejátszás (vagy -vm, -zoom, lásd man lapot)\n"
-" -x <x> -y <y>    felbontás beállítása (-vm vagy -zoom használata esetén)\n"
-" -sub <fájl>      használandó felirat-fájl megadása (lásd -subfps, -subdelay)\n"
-" -playlist <fájl> lejátszási lista fájl megadása\n"
-" -vid x -aid y    lejátszandó video- (x) és audio- (y) streamek kiválasztása\n"
-" -fps x -srate y  video (x képkocka/mp) és audio (y Hz) ráta megadása\n"
-" -pp <minőség>    képjavítás fokozatainak beállítása (lásd a man lapot)\n"
-" -framedrop       képkockák eldobásának engedélyezése (lassú gépekhez)\n"
+
+#define MSGTR_Help \
+"Indítás:   mplayer [opciók] [url|útvonal/]fájlnév\n"\
+"\n"\
+"Alapvető opciók: (az összes opció listájához lásd a man lapot)\n"\
+" -vo <drv>        kimeneti videó meghajtó kiválasztása (lista: '-vo help')\n"\
+" -ao <drv>        kimeneti audió meghajtó kiválasztása (lista: '-ao help')\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -alang/-slang    DVD audio/felirat nyelv kiválasztása (2 betűs országkóddal)\n"\
+" -ss <pozíció>    a megadott (másodperc v. óra:perc:mperc) pozícióra tekerés\n"\
+" -nosound         hanglejátszás kikapcsolása\n"\
+" -fs              teljesképernyős lejátszás (vagy -vm, -zoom, lásd man lapot)\n"\
+" -x <x> -y <y>    felbontás beállítása (-vm vagy -zoom használata esetén)\n"\
+" -sub <fájl>      használandó felirat-fájl megadása (lásd -subfps, -subdelay)\n"\
+" -playlist <fájl> lejátszási lista fájl megadása\n"\
+" -vid x -aid y    lejátszandó video- (x) és audio- (y) streamek kiválasztása\n"\
+" -fps x -srate y  video (x képkocka/mp) és audio (y Hz) ráta megadása\n"\
+" -pp <minőség>    képjavítás fokozatainak beállítása (lásd a man lapot)\n"\
+" -framedrop       képkockák eldobásának engedélyezése (lassú gépekhez)\n"\
+"\n"\
+"Fontosabb billentyűk: (teljes lista a man-ban és nézd meg az input.conf fájlt)\n"\
+" <-  vagy  ->     10 másodperces hátra/előre ugrás\n"\
+" le vagy fel      1 percnyi hátra/előre ugrás\n"\
+" pgdown v. pgup   10 percnyi hátra/előre ugrás\n"\
+" < vagy >         1 fájllal előre/hátra lépés a lejátszási listában\n"\
+" p vagy SPACE     pillanatállj (bármely billentyűre továbbmegy)\n"\
+" q vagy ESC       lejátszás vége és kilépés\n"\
+" + vagy -         audio késleltetése ± 0.1 másodperccel\n"\
+" o                OSD-mód váltása:  nincs / keresősáv / keresősáv + idő\n"\
+" * vagy /         hangerő fel/le\n"\
+" x vagy z         felirat késleltetése ± 0.1 másodperccel\n"\
+" r vagy t         felirat pozíciójának megváltoztatása, lásd -vf expand-ot is\n"\
+"\n"\
+" * * * A MANPAGE TOVÁBBI RÉSZLETEKET, OPCIÓKAT, BILLENTYŰKET TARTALMAZ! * * *\n"\
 "\n"
-"Fontosabb billentyűk: (teljes lista a man-ban és nézd meg az input.conf fájlt)\n"
-" <-  vagy  ->     10 másodperces hátra/előre ugrás\n"
-" le vagy fel      1 percnyi hátra/előre ugrás\n"
-" pgdown v. pgup   10 percnyi hátra/előre ugrás\n"
-" < vagy >         1 fájllal előre/hátra lépés a lejátszási listában\n"
-" p vagy SPACE     pillanatállj (bármely billentyűre továbbmegy)\n"
-" q vagy ESC       lejátszás vége és kilépés\n"
-" + vagy -         audio késleltetése ± 0.1 másodperccel\n"
-" o                OSD-mód váltása:  nincs / keresősáv / keresősáv + idő\n"
-" * vagy /         hangerő fel/le\n"
-" x vagy z         felirat késleltetése ± 0.1 másodperccel\n"
-" r vagy t         felirat pozíciójának megváltoztatása, lásd -vf expand-ot is\n"
-"\n"
-" * * * A MANPAGE TOVÁBBI RÉSZLETEKET, OPCIÓKAT, BILLENTYŰKET TARTALMAZ! * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer messages ===========================
 

@@ -3,45 +3,55 @@
 // Helped by: Jan Knutar <jknutar AT nic DOT fi>
 // ========================= MPlayer hjälp ===========================
 
-static const char help_text[]=
-"Användning:   mplayer [argument] [url|sökväg/]filnamn\n"
-"\n"
-"Grundläggande argument: (komplett lista återfinns i `man mplayer`)\n"
-" -vo <drv[:enhet]>   välj video-ut drivrutin & enhet ('-vo help' för lista)\n"
-" -ao <drv[:enhet]>   välj audio-ut drivrutin & enhet ('-ao help' för lista)\n"
 #ifdef CONFIG_VCD
-" vcd://<spårnr>      spela (S)VCD (Super Video CD) spår (rå enhet, ingen montering)\n"
+#define MSGTR_HelpVCD " vcd://<spårnr>      spela (S)VCD (Super Video CD) spår (rå enhet, ingen montering)\n"
+#else
+#define MSGTR_HelpVCD
 #endif
+
 #ifdef CONFIG_DVDREAD
-" dvd://<titlenr>     spela DVD titel från enhet istället för ifrån en enkel fil\n"
-" -alang/-slang       välj DVD audio/textningsspråk (m.h.a. ett 2-teckens landskod)\n"
+#define MSGTR_HelpDVD " dvd://<titlenr>     spela DVD titel från enhet istället för ifrån en enkel fil\n"\
+                      " -alang/-slang       välj DVD audio/textningsspråk (m.h.a. ett 2-teckens landskod)\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -ss <tidpos>        sök till given position (sekunder eller hh:mm:ss)\n"
-" -nosound            spela inte upp ljud\n"
-" -fs                 fullskärmsuppspelning (eller -vm, -zoom, detaljer på manualsidan)\n"
-" -x <x> -y <y>       sätt skärmupplösning (för användning med -vm eller -zoom)\n"
-" -sub <fil>          specifiera textningsfil att använda (se också -subfps, -subdelay)\n"
-" -playlist <fil>     specifiera spellistefil\n"
-" -vid x -aid y       välj video (x) och audio (y) ström att spela\n"
-" -fps x -srate y     ändra video (x fps) och audio (y Hz) frekvens\n"
-" -pp <kvalité>       aktivera postredigeringsfilter (detaljer på manualsidan)\n"
-" -framedrop          aktivera reducering av antalet bildrutor (för långsamma maskiner)\n"
+
+#define MSGTR_Help \
+"Användning:   mplayer [argument] [url|sökväg/]filnamn\n"\
+"\n"\
+"Grundläggande argument: (komplett lista återfinns i `man mplayer`)\n"\
+" -vo <drv[:enhet]>   välj video-ut drivrutin & enhet ('-vo help' för lista)\n"\
+" -ao <drv[:enhet]>   välj audio-ut drivrutin & enhet ('-ao help' för lista)\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -ss <tidpos>        sök till given position (sekunder eller hh:mm:ss)\n"\
+" -nosound            spela inte upp ljud\n"\
+" -fs                 fullskärmsuppspelning (eller -vm, -zoom, detaljer på manualsidan)\n"\
+" -x <x> -y <y>       sätt skärmupplösning (för användning med -vm eller -zoom)\n"\
+" -sub <fil>          specifiera textningsfil att använda (se också -subfps, -subdelay)\n"\
+" -playlist <fil>     specifiera spellistefil\n"\
+" -vid x -aid y       välj video (x) och audio (y) ström att spela\n"\
+" -fps x -srate y     ändra video (x fps) och audio (y Hz) frekvens\n"\
+" -pp <kvalité>       aktivera postredigeringsfilter (detaljer på manualsidan)\n"\
+" -framedrop          aktivera reducering av antalet bildrutor (för långsamma maskiner)\n"\
+"\n"\
+"Grundläggande navigering: (komplett lista återfinns på manualsidan, läs även input.conf)\n"\
+" <-  eller  ->       sök bakåt/framåt 10 sekunder\n"\
+" upp eller ner       sök bakåt/framåt 1 minut\n"\
+" pgup eller pgdown   sök bakåt/framåt 10 minuter\n"\
+" < eller >           stega bakåt/framåt i spellistan\n"\
+" p eller SPACE       pausa filmen (tryck på valfri tagent för att fortsätta)\n"\
+" q eller ESC         stanna spelningen och avsluta programmet\n"\
+" + eller -           ställ in audiofördröjning med ± 0.1 sekund\n"\
+" o                   växla OSD läge:  ingen / lägesindikator / lägesindikator + tidtagare\n"\
+" * eller /           öka eller sänk PCM-volym\n"\
+" z eller x           ställ in textningsfördröjning med ± 0.1 sekund\n"\
+" r or t              ställ in textningsposition upp/ner, se också '-vf expand'\n"\
+"\n"\
+" * * * LÄS MANUALEN FÖR FLER DETALJER, MER AVANCERADE ARGUMENT OCH KOMMANDON * * *\n"\
 "\n"
-"Grundläggande navigering: (komplett lista återfinns på manualsidan, läs även input.conf)\n"
-" <-  eller  ->       sök bakåt/framåt 10 sekunder\n"
-" upp eller ner       sök bakåt/framåt 1 minut\n"
-" pgup eller pgdown   sök bakåt/framåt 10 minuter\n"
-" < eller >           stega bakåt/framåt i spellistan\n"
-" p eller SPACE       pausa filmen (tryck på valfri tagent för att fortsätta)\n"
-" q eller ESC         stanna spelningen och avsluta programmet\n"
-" + eller -           ställ in audiofördröjning med ± 0.1 sekund\n"
-" o                   växla OSD läge:  ingen / lägesindikator / lägesindikator + tidtagare\n"
-" * eller /           öka eller sänk PCM-volym\n"
-" z eller x           ställ in textningsfördröjning med ± 0.1 sekund\n"
-" r or t              ställ in textningsposition upp/ner, se också '-vf expand'\n"
-"\n"
-" * * * LÄS MANUALEN FÖR FLER DETALJER, MER AVANCERADE ARGUMENT OCH KOMMANDON * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer messages ===========================
 

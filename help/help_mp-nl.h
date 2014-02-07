@@ -2,45 +2,55 @@
 //maintained by:   Philippe De Swert <philippedeswert@scarlet.be>
 //synced with help_mp-en.h revision 1.152
 
-static const char help_text[]=
-"Gebruik:   mplayer [opties] [url|pad/]bestandsnaam\n"
-"\n"
-"Basis-opties: (volledige lijst in de man-pagina's)\n"
-" -vo <drv[:dev]>  selecteer video uitvoer driver & device (zie '-vo help' voor lijst)\n"
-" -ao <drv[:dev]>  selecteer audio uitvoer driver & device (zie '-ao help' voor lijst)\n"
 #ifdef CONFIG_VCD
-" vcd://<trackno>   speel VCD (Video CD) track van cdrom in plaats van standaard bestand\n"
+#define MSGTR_HelpVCD " vcd://<trackno>   speel VCD (Video CD) track van cdrom in plaats van standaard bestand\n"
+#else
+#define MSGTR_HelpVCD
 #endif
+
 #ifdef CONFIG_DVDREAD
-" dvd://<titelnr>   speel DVD titel/track van device in plaats van gewoon bestand\n"
-" -alang/-slang    selecteer DVD audio/ondertitelingstaal (door middel van 2-karakter landcode)\n"
+#define MSGTR_HelpDVD " dvd://<titelnr>   speel DVD titel/track van device in plaats van gewoon bestand\n"\
+                      " -alang/-slang    selecteer DVD audio/ondertitelingstaal (door middel van 2-karakter landcode)\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -ss <timepos>    ga naar opgegeven (seconden of hh:mm:ss) positie\n"
-" -nosound         speel het geluid niet af\n"
-" -fs -vm -zoom    volledig scherm afspeel opties (fullscr,vidmode chg,softw.scale)\n"
-" -x <x> -y <y>    herschaal beeld naar <x> * <y> resolutie [als -vo driver het ondersteunt!]\n"
-" -sub <bestand>   specificeer het te gebruiken ondertitel bestand (zie ook -subfps, -subdelay)\n"
-" -playlist <file> specificeer het te gebruiken playlist bestand\n"
-" -vid x -aid y    opties om te spelen video (x) en audio (y) stream te selecteren\n"
-" -fps x -srate y  opties om video (x fps) en audio (y Hz) tempo te veranderen\n"
-" -pp <kwaliteit>  activeer postprocessing filter (Zie manpage/docs voor meer informatie)\n"
-" -framedrop       activeer frame-dropping (voor trage machines)\n"
+
+#define MSGTR_Help \
+"Gebruik:   mplayer [opties] [url|pad/]bestandsnaam\n"\
+"\n"\
+"Basis-opties: (volledige lijst in de man-pagina's)\n"\
+" -vo <drv[:dev]>  selecteer video uitvoer driver & device (zie '-vo help' voor lijst)\n"\
+" -ao <drv[:dev]>  selecteer audio uitvoer driver & device (zie '-ao help' voor lijst)\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -ss <timepos>    ga naar opgegeven (seconden of hh:mm:ss) positie\n"\
+" -nosound         speel het geluid niet af\n"\
+" -fs -vm -zoom    volledig scherm afspeel opties (fullscr,vidmode chg,softw.scale)\n"\
+" -x <x> -y <y>    herschaal beeld naar <x> * <y> resolutie [als -vo driver het ondersteunt!]\n"\
+" -sub <bestand>   specificeer het te gebruiken ondertitel bestand (zie ook -subfps, -subdelay)\n"\
+" -playlist <file> specificeer het te gebruiken playlist bestand\n"\
+" -vid x -aid y    opties om te spelen video (x) en audio (y) stream te selecteren\n"\
+" -fps x -srate y  opties om video (x fps) en audio (y Hz) tempo te veranderen\n"\
+" -pp <kwaliteit>  activeer postprocessing filter (Zie manpage/docs voor meer informatie)\n"\
+" -framedrop       activeer frame-dropping (voor trage machines)\n"\
+"\n"\
+"Toetsen: (Zie manpage voor de volledige lijst, kijk ook naar input.conf)\n"\
+" <-  of  ->       ga 10 seconden achterwaarts/voorwaarts\n"\
+" omhoog of omlaag ga 1 minuut achterwaarts/voorwaarts\n"\
+" PGUP of PGDOWN   ga 10 minuten achterwaarts/voorwaarts\n"\
+" < of >           ga naar vorige/volgende item in playlist\n"\
+" p of SPACE       pauzeer film (druk eender welke toets om verder te gaan)\n"\
+" q of ESC         stop afspelen en sluit programma af\n"\
+" + of -           pas audio vertraging aan met +/- 0.1 seconde\n"\
+" o                doorloop OSD modes: geen / enkel zoekbalk / zoekbalk en tijd\n"\
+" * of /           verhoog of verlaag volume (druk 'm' om master/pcm te selecteren)\n"\
+" z of x           pas ondertiteling vertraging aan met +/- 0.1 seconde\n"\
+" r or t           verticale positionering van de ondertiteling, zie ook -vf expand!\n"\
+"\n"\
+" * * * ZIE MANPAGE VOOR DETAILS, OVERIGE (GEAVANCEERDE) OPTIES EN TOETSEN! * * *\n"\
 "\n"
-"Toetsen: (Zie manpage voor de volledige lijst, kijk ook naar input.conf)\n"
-" <-  of  ->       ga 10 seconden achterwaarts/voorwaarts\n"
-" omhoog of omlaag ga 1 minuut achterwaarts/voorwaarts\n"
-" PGUP of PGDOWN   ga 10 minuten achterwaarts/voorwaarts\n"
-" < of >           ga naar vorige/volgende item in playlist\n"
-" p of SPACE       pauzeer film (druk eender welke toets om verder te gaan)\n"
-" q of ESC         stop afspelen en sluit programma af\n"
-" + of -           pas audio vertraging aan met +/- 0.1 seconde\n"
-" o                doorloop OSD modes: geen / enkel zoekbalk / zoekbalk en tijd\n"
-" * of /           verhoog of verlaag volume (druk 'm' om master/pcm te selecteren)\n"
-" z of x           pas ondertiteling vertraging aan met +/- 0.1 seconde\n"
-" r or t           verticale positionering van de ondertiteling, zie ook -vf expand!\n"
-"\n"
-" * * * ZIE MANPAGE VOOR DETAILS, OVERIGE (GEAVANCEERDE) OPTIES EN TOETSEN! * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer messages ===========================
 

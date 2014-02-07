@@ -8,51 +8,59 @@
 //
 // ========================= MPlayer help ===========================
 
-static const char help_text[]=
-"Folosire: mplayer [opþiuni] [url|cale/]numefiºier\n"
-"\n"
-"Opþiuni principale: (lista completã în pagina man)\n"
-" -vo <drv[:dev]>  alege driver-ul ºi device-ul de ieºire video\n"
-"                  ('-vo help' pentru listã)\n"
-" -ao <drv[:dev]>  alege driver-ul ºi device-ul de ieºire audio\n"
-"                  ('-ao help' pentru listã)\n"
-
 #ifdef CONFIG_VCD
-" vcd://<nrpistã>  ruleazã pista VCD (Video CD) de pe device în loc de fiºier\n"
+#define MSGTR_HelpVCD " vcd://<nrpistã>  ruleazã pista VCD (Video CD) de pe device în loc de fiºier\n"
+#else
+#define MSGTR_HelpVCD
 #endif
 
 #ifdef CONFIG_DVDREAD
-" dvd://<nrtitlu>  ruleazã titlul/pista de pe dispozitivul DVD în loc de fiºier\n"
-" -aLMB/-sLMB      alege limba pentru audio/subtitrãri DVD\n"
-"                  (cu codul de 2 caractere, ex. RO)\n"
+#define MSGTR_HelpDVD " dvd://<nrtitlu>  ruleazã titlul/pista de pe dispozitivul DVD în loc de fiºier\n"\
+                      " -aLMB/-sLMB      alege limba pentru audio/subtitrãri DVD\n"\
+                      "                  (cu codul de 2 caractere, ex. RO)\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -ss <timp>       deruleazã la poziþia datã (secunde sau hh:mm:ss)\n"
-" -nosound         rulare fãrã sunet\n"
-" -fs              afiºare pe tot ecranul (sau -vm, -zoom, detalii în pagina man)\n"
-" -x <x> -y <y>    alege rezoluþia (folosit pentru -vm sau -zoom)\n"
-" -sub <fiºier>    specificã fiºierul cu subtitrãri folosit\n"
-"                  (vezi ºi -subfps, -subdelay)\n"
-" -playlist <fiº>  specificã playlist-ul\n"
-" -vid x -aid y    alege pista video (x) ºi audio (y)\n"
-" -fps x -srate y  schimbã rata video (x fps) ºi audio (y Hz)\n"
-" -pp <calitate>   activeazã filtrul de postprocesare (detalii în pagina man)\n"
-" -framedrop       activeazã sãritul cadrelor (pentru calculatoare lente)\n"
+
+#define MSGTR_Help \
+"Folosire: mplayer [opþiuni] [url|cale/]numefiºier\n"\
+"\n"\
+"Opþiuni principale: (lista completã în pagina man)\n"\
+" -vo <drv[:dev]>  alege driver-ul ºi device-ul de ieºire video\n"\
+"                  ('-vo help' pentru listã)\n"\
+" -ao <drv[:dev]>  alege driver-ul ºi device-ul de ieºire audio\n"\
+"                  ('-ao help' pentru listã)\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -ss <timp>       deruleazã la poziþia datã (secunde sau hh:mm:ss)\n"\
+" -nosound         rulare fãrã sunet\n"\
+" -fs              afiºare pe tot ecranul (sau -vm, -zoom, detalii în pagina man)\n"\
+" -x <x> -y <y>    alege rezoluþia (folosit pentru -vm sau -zoom)\n"\
+" -sub <fiºier>    specificã fiºierul cu subtitrãri folosit\n"\
+"                  (vezi ºi -subfps, -subdelay)\n"\
+" -playlist <fiº>  specificã playlist-ul\n"\
+" -vid x -aid y    alege pista video (x) ºi audio (y)\n"\
+" -fps x -srate y  schimbã rata video (x fps) ºi audio (y Hz)\n"\
+" -pp <calitate>   activeazã filtrul de postprocesare (detalii în pagina man)\n"\
+" -framedrop       activeazã sãritul cadrelor (pentru calculatoare lente)\n"\
+"\n"\
+"Taste principale: (lista completã în pagina man, vezi ºi input.conf)\n"\
+" <-  sau  ->      deruleazã spate/faþã 10 secunde\n"\
+" sus sau jos      deruleazã spate/faþã un minut\n"\
+" pgup or pgdown   deruleazã spate/faþã 10 minute\n"\
+" < or >           salt spate/faþã în playlist\n"\
+" p or SPACE       pauzã (apãsaþi orice tastã pentru continuare)\n"\
+" q or ESC         opreºte filmul ºi iese din program\n"\
+" + or -           modificã decalajul audio cu +/- 0,1 secunde\n"\
+" o                schimbã modul OSD între: nimic / barã derulare / barã + ceas\n"\
+" * or /           creºte sau scade volumul PCM\n"\
+" z or x           modificã decalajul subtitrãrii cu +/- 0,1 secunde\n"\
+" r or t           modificã poziþia subtitrãrii sus/jos, vezi ºi -vf expand\n"\
+"\n"\
+" * * * VEZI PAGINA MAN PENTRU DETALII, ALTE OPÞIUNI (AVANSATE) ªI TASTE * * *\n"\
 "\n"
-"Taste principale: (lista completã în pagina man, vezi ºi input.conf)\n"
-" <-  sau  ->      deruleazã spate/faþã 10 secunde\n"
-" sus sau jos      deruleazã spate/faþã un minut\n"
-" pgup or pgdown   deruleazã spate/faþã 10 minute\n"
-" < or >           salt spate/faþã în playlist\n"
-" p or SPACE       pauzã (apãsaþi orice tastã pentru continuare)\n"
-" q or ESC         opreºte filmul ºi iese din program\n"
-" + or -           modificã decalajul audio cu +/- 0,1 secunde\n"
-" o                schimbã modul OSD între: nimic / barã derulare / barã + ceas\n"
-" * or /           creºte sau scade volumul PCM\n"
-" z or x           modificã decalajul subtitrãrii cu +/- 0,1 secunde\n"
-" r or t           modificã poziþia subtitrãrii sus/jos, vezi ºi -vf expand\n"
-"\n"
-" * * * VEZI PAGINA MAN PENTRU DETALII, ALTE OPÞIUNI (AVANSATE) ªI TASTE * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer messages ===========================
 

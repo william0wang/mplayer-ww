@@ -6,46 +6,56 @@
 
 // ========================= MPlayer help ===========================
 
-static const char help_text[]=
-"Použití:          mplayer [volby] [url|cesta/]jméno_souboru\n"
-"\n"
-"Základní volby: (úplný seznam najdete v manuálové stránce)\n"
-" -vo <rozhraní>   vybere výstupní video rozhraní (seznam: -vo help)\n"
-" -ao <rozhraní>   vybere výstupní audio rozhraní (seznam: -ao help)\n"
 #ifdef CONFIG_VCD
-" vcd://<č_stopy>  přehraje (S)VCD (Super Video CD) stopu (z nepřipojeného\n"
-"                  zařízení)\n"
+#define MSGTR_HelpVCD " vcd://<č_stopy>  přehraje (S)VCD (Super Video CD) stopu (z nepřipojeného\n"\
+                      "                  zařízení)\n"
+#else
+#define MSGTR_HelpVCD
 #endif
+
 #ifdef CONFIG_DVDREAD
-" dvd://<č_tit>    přehraje DVD titul ze zařízení (mechaniky), místo ze souboru\n"
-" -alang/-slang    zvolí jazyk zvuku/titulků na DVD (dvouznakový kód země)\n"
+#define MSGTR_HelpDVD " dvd://<č_tit>    přehraje DVD titul ze zařízení (mechaniky), místo ze souboru\n"\
+                      " -alang/-slang    zvolí jazyk zvuku/titulků na DVD (dvouznakový kód země)\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -ss <pozice>     převine na zadanou pozici (sekundy nebo hh:mm:ss)\n"
-" -nosound         přehrávání beze zvuku\n"
-" -fs              celoobrazovkové přehrávání (nebo -vm -zoom, viz manuál)\n"
-" -x <x> -y <y>    rozlišení obrazu (pro použití s -vm nebo -zoom)\n"
-" -sub <soubor>    zvolí soubor s titulky (viz také -subfps, -subdelay)\n"
-" -playlist <soubor> určí soubor s playlistem\n"
-" -vid x -aid y    vybere video (x) a audio (y) proud pro přehrání\n"
-" -fps x -srate y  změnit video (x fps) a audio (y Hz) frekvence\n"
-" -pp <kvalita>    aktivovat postprocessing (podrobnosti v manuálu)\n"
-" -framedrop       povolit zahazování snímků (pro pomalé stroje)\n"
+
+#define MSGTR_Help \
+"Použití:          mplayer [volby] [url|cesta/]jméno_souboru\n"\
+"\n"\
+"Základní volby: (úplný seznam najdete v manuálové stránce)\n"\
+" -vo <rozhraní>   vybere výstupní video rozhraní (seznam: -vo help)\n"\
+" -ao <rozhraní>   vybere výstupní audio rozhraní (seznam: -ao help)\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -ss <pozice>     převine na zadanou pozici (sekundy nebo hh:mm:ss)\n"\
+" -nosound         přehrávání beze zvuku\n"\
+" -fs              celoobrazovkové přehrávání (nebo -vm -zoom, viz manuál)\n"\
+" -x <x> -y <y>    rozlišení obrazu (pro použití s -vm nebo -zoom)\n"\
+" -sub <soubor>    zvolí soubor s titulky (viz také -subfps, -subdelay)\n"\
+" -playlist <soubor> určí soubor s playlistem\n"\
+" -vid x -aid y    vybere video (x) a audio (y) proud pro přehrání\n"\
+" -fps x -srate y  změnit video (x fps) a audio (y Hz) frekvence\n"\
+" -pp <kvalita>    aktivovat postprocessing (podrobnosti v manuálu)\n"\
+" -framedrop       povolit zahazování snímků (pro pomalé stroje)\n"\
+"\n"\
+"Základní klávesy: (úplný seznam je v manuálu, viz také input.conf)\n"\
+" <-  nebo  ->     převíjení vzad/vpřed o 10 sekund\n"\
+" dolů či nahoru   převíjení vzad/vpřed o  1 minutu\n"\
+" pgdown či pgup   převíjení vzad/vpřed o 10 minut\n"\
+" < nebo >         posun na předchozí/další soubor v playlistu\n"\
+" p nebo mezerník  pozastaví přehrávání (pokračuje po stisku jakékoliv klávesy)\n"\
+" q nebo ESC       konec přehrávání a ukončení programu\n"\
+" + nebo -         upraví zpoždění zvuku v krocích +/- 0,1 sekundy\n"\
+" o                cyklická změna režimu OSD: nic / pozice / pozice a čas\n"\
+" * nebo /         přidá nebo ubere PCM hlasitost\n"\
+" x nebo z         upraví zpoždění titulků v krocích +/- 0,1 sekundy\n"\
+" r nebo t         upraví polohu titulků nahoru/dolů, viz také -vf expand\n"\
+"\n"\
+" * * * V MAN STRÁNCE NAJDETE PODROBNOSTI, DALŠÍ VOLBY A KLÁVESY * * *\n"\
 "\n"
-"Základní klávesy: (úplný seznam je v manuálu, viz také input.conf)\n"
-" <-  nebo  ->     převíjení vzad/vpřed o 10 sekund\n"
-" dolů či nahoru   převíjení vzad/vpřed o  1 minutu\n"
-" pgdown či pgup   převíjení vzad/vpřed o 10 minut\n"
-" < nebo >         posun na předchozí/další soubor v playlistu\n"
-" p nebo mezerník  pozastaví přehrávání (pokračuje po stisku jakékoliv klávesy)\n"
-" q nebo ESC       konec přehrávání a ukončení programu\n"
-" + nebo -         upraví zpoždění zvuku v krocích +/- 0,1 sekundy\n"
-" o                cyklická změna režimu OSD: nic / pozice / pozice a čas\n"
-" * nebo /         přidá nebo ubere PCM hlasitost\n"
-" x nebo z         upraví zpoždění titulků v krocích +/- 0,1 sekundy\n"
-" r nebo t         upraví polohu titulků nahoru/dolů, viz také -vf expand\n"
-"\n"
-" * * * V MAN STRÁNCE NAJDETE PODROBNOSTI, DALŠÍ VOLBY A KLÁVESY * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer messages ===========================
 

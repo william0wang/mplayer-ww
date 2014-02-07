@@ -11,47 +11,57 @@
 
 // ========================= MPlayer help ===========================
 
-static const char help_text[]=
-"Verwendung:   mplayer [Optionen] [URL|Verzeichnis/]Dateiname\n"
-"\n"
-"Grundlegende Optionen: (vollständige Liste in der Manpage)\n"
-" -vo <treiber>     Videoausgabetreiber wählen ('-vo help' für eine Liste)\n"
-" -ao <treiber>     Audioausgabetreiber wählen ('-ao help' für eine Liste)\n"
 #ifdef CONFIG_VCD
-" vcd://<tracknr>   (S)VCD-Titel (Super Video CD) spielen\n"
-"                   (direkter Gerätezugriff, kein mount)\n"
+#define MSGTR_HelpVCD " vcd://<tracknr>   (S)VCD-Titel (Super Video CD) spielen\n"\
+                      "                   (direkter Gerätezugriff, kein mount)\n"
+#else
+#define MSGTR_HelpVCD
 #endif
+
 #ifdef CONFIG_DVDREAD
-" dvd://<titelnr>   DVD-Titel (statt einfach die ganze Datei) spielen\n"
+#define MSGTR_HelpDVD " dvd://<titelnr>   DVD-Titel (statt einfach die ganze Datei) spielen\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -alang/-slang     DVD-Audio/Untertitel-Sprache wählen (2-Zeichen-Ländercode)\n"
-" -ss <position>    zur Position (Sekunden oder HH:MM:SS) spulen\n"
-" -nosound          ohne Ton spielen\n"
-" -fs               im Vollbildmodus spielen (oder -vm, -zoom, siehe Manpage)\n"
-" -x <x> -y <y>     Bildschirmauflösung festlegen\n"
-"                   (bei Verwendung mit -vm oder -zoom)\n"
-" -sub <datei>      Untertitel-Datei verwenden (siehe auch -subfps, -subdelay)\n"
-" -playlist <datei> Playlist aus Datei verwenden\n"
-" -vid x -aid y     Videostream (x) und Audiostream (y) zum Abspielen wählen\n"
-" -fps x -srate y   Videoframerate (x fps) und Audiosamplingrate (y Hz) ändern\n"
-" -pp <qualität>    Nachbearbeitungsfilter aktivieren (siehe Manpage für Details)\n"
-" -framedrop        einzelne Frames verwerfen (bei langsamen Rechnern)\n"
+
+#define MSGTR_Help \
+"Verwendung:   mplayer [Optionen] [URL|Verzeichnis/]Dateiname\n"\
+"\n"\
+"Grundlegende Optionen: (vollständige Liste in der Manpage)\n"\
+" -vo <treiber>     Videoausgabetreiber wählen ('-vo help' für eine Liste)\n"\
+" -ao <treiber>     Audioausgabetreiber wählen ('-ao help' für eine Liste)\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -alang/-slang     DVD-Audio/Untertitel-Sprache wählen (2-Zeichen-Ländercode)\n"\
+" -ss <position>    zur Position (Sekunden oder HH:MM:SS) spulen\n"\
+" -nosound          ohne Ton spielen\n"\
+" -fs               im Vollbildmodus spielen (oder -vm, -zoom, siehe Manpage)\n"\
+" -x <x> -y <y>     Bildschirmauflösung festlegen\n"\
+"                   (bei Verwendung mit -vm oder -zoom)\n"\
+" -sub <datei>      Untertitel-Datei verwenden (siehe auch -subfps, -subdelay)\n"\
+" -playlist <datei> Playlist aus Datei verwenden\n"\
+" -vid x -aid y     Videostream (x) und Audiostream (y) zum Abspielen wählen\n"\
+" -fps x -srate y   Videoframerate (x fps) und Audiosamplingrate (y Hz) ändern\n"\
+" -pp <qualität>    Nachbearbeitungsfilter aktivieren (siehe Manpage für Details)\n"\
+" -framedrop        einzelne Frames verwerfen (bei langsamen Rechnern)\n"\
+"\n"\
+"Grundlegende Tasten: (vollständige Liste in der Manpage, siehe auch input.conf)\n"\
+" <- oder ->        10 Sekunden zurück-/vorspringen\n"\
+" runter/hoch       1 Minute zurück-/vorspringen\n"\
+" Bild runter/hoch  10 Minuten zurück-/vorspringen\n"\
+" < oder >          in der Playlist zurück-/vorspringen\n"\
+" p oder LEERTASTE  Pause (eine beliebige Taste zur Fortsetzung drücken)\n"\
+" q oder ESC        Abspielen stoppen und Programm beenden\n"\
+" + oder -          Audio-Verzögerung um +/- 0,1 Sekunde anpassen\n"\
+" o                 OSD-Modi (Aus, Suchleiste, Suchleiste+Zeitangabe) durchlaufen\n"\
+" * oder /          PCM-Lautstärke erhöhen oder vermindern\n"\
+" x oder z          Untertitel-Verzögerung um +/- 0,1 Sekunde anpassen\n"\
+" r oder t          Untertitel nach oben/unten schieben, siehe auch '-vf expand'\n"\
+"\n"\
+" * * * SIEHE MANPAGE FÜR DETAILS, WEITERE OPTIONEN UND TASTEN * * *\n"\
 "\n"
-"Grundlegende Tasten: (vollständige Liste in der Manpage, siehe auch input.conf)\n"
-" <- oder ->        10 Sekunden zurück-/vorspringen\n"
-" runter/hoch       1 Minute zurück-/vorspringen\n"
-" Bild runter/hoch  10 Minuten zurück-/vorspringen\n"
-" < oder >          in der Playlist zurück-/vorspringen\n"
-" p oder LEERTASTE  Pause (eine beliebige Taste zur Fortsetzung drücken)\n"
-" q oder ESC        Abspielen stoppen und Programm beenden\n"
-" + oder -          Audio-Verzögerung um +/- 0,1 Sekunde anpassen\n"
-" o                 OSD-Modi (Aus, Suchleiste, Suchleiste+Zeitangabe) durchlaufen\n"
-" * oder /          PCM-Lautstärke erhöhen oder vermindern\n"
-" x oder z          Untertitel-Verzögerung um +/- 0,1 Sekunde anpassen\n"
-" r oder t          Untertitel nach oben/unten schieben, siehe auch '-vf expand'\n"
-"\n"
-" * * * SIEHE MANPAGE FÜR DETAILS, WEITERE OPTIONEN UND TASTEN * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer Ausgaben ===========================
 

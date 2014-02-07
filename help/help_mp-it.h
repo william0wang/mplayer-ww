@@ -7,45 +7,55 @@
 
 // ========================= MPlayer help ===========================
 
-static const char help_text[]=
-"Uso:   mplayer [opzioni] [url|percorso/]nome_file\n"
-"\n"
-"Opzioni di base: (vedi la pagina man per la lista completa)\n"
-" -vo <drv[:dev]>  sceglie driver di uscita video ('-vo help' lista)\n"
-" -ao <drv[:dev]>  sceglie driver di uscita audio ('-ao help' lista)\n"
 #ifdef CONFIG_VCD
-" vcd://<trackno>  legge (S)VCD (Super Video CD) (dispositivo raw, non montato)\n"
+#define MSGTR_HelpVCD " vcd://<trackno>  legge (S)VCD (Super Video CD) (dispositivo raw, non montato)\n"
+#else
+#define MSGTR_HelpVCD
 #endif
+
 #ifdef CONFIG_DVDREAD
-" dvd://<titleno>  legge titolo/traccia DVD dal dispositivo anziché da file\n"
+#define MSGTR_HelpDVD " dvd://<titleno>  legge titolo/traccia DVD dal dispositivo anziché da file\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -alang/-slang    sceglie lingua audio/sottotitoli DVD (cod naz. 2 caratteri)\n"
-" -ss <posizione>  cerca una determinata posizione (in secondi o in hh:mm:ss) \n"
-" -nosound         non riproduce l'audio\n"
-" -fs              opzioni schermo intero (o -vm, -zoom, vedi pagina man)\n"
-" -x <x> -y <y>    imposta la risoluzione dello schermo (usare con -vm o -zoom)\n"
-" -sub <file>      file sottotitoli da usare (vedi anche -subfps, -subdelay)\n"
-" -playlist <file> specifica il file della playlist\n"
-" -vid x -aid y    seleziona il flusso video (x) ed audio (y) da riprodurre\n"
-" -fps x -srate y  cambia il rate del video (x fps) e dell'audio (y Hz)\n"
-" -pp <quality>    abilita filtro postelaborazione (vedi pagina man x dettagli)\n"
-" -framedrop       abilita lo scarto dei fotogrammi (per macchine lente)\n"
+
+#define MSGTR_Help \
+"Uso:   mplayer [opzioni] [url|percorso/]nome_file\n"\
+"\n"\
+"Opzioni di base: (vedi la pagina man per la lista completa)\n"\
+" -vo <drv[:dev]>  sceglie driver di uscita video ('-vo help' lista)\n"\
+" -ao <drv[:dev]>  sceglie driver di uscita audio ('-ao help' lista)\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -alang/-slang    sceglie lingua audio/sottotitoli DVD (cod naz. 2 caratteri)\n"\
+" -ss <posizione>  cerca una determinata posizione (in secondi o in hh:mm:ss) \n"\
+" -nosound         non riproduce l'audio\n"\
+" -fs              opzioni schermo intero (o -vm, -zoom, vedi pagina man)\n"\
+" -x <x> -y <y>    imposta la risoluzione dello schermo (usare con -vm o -zoom)\n"\
+" -sub <file>      file sottotitoli da usare (vedi anche -subfps, -subdelay)\n"\
+" -playlist <file> specifica il file della playlist\n"\
+" -vid x -aid y    seleziona il flusso video (x) ed audio (y) da riprodurre\n"\
+" -fps x -srate y  cambia il rate del video (x fps) e dell'audio (y Hz)\n"\
+" -pp <quality>    abilita filtro postelaborazione (vedi pagina man x dettagli)\n"\
+" -framedrop       abilita lo scarto dei fotogrammi (per macchine lente)\n"\
+"\n"\
+"Tasti principali: (vedi pagina man per lista, controlla anche input.conf)\n"\
+" <-  o  ->        va indietro/avanti di 10 secondi\n"\
+" su o giù         va avanti/indietro di  1 minuto\n"\
+" pagsu o paggiù   va avanti/indietro di 10 minuti\n"\
+" < o >            va indietro/avanti nella playlist\n"\
+" p o SPAZIO       pausa (premere un qualunque tasto per continuare)\n"\
+" q o ESC          ferma la riproduzione ed esce dal programma\n"\
+" + o -            regola il ritardo audio di +/- 0.1 secondi\n"\
+" o                modalità OSD: niente / barra ricerca / barra ricerca + tempo\n"\
+" * o /            incrementa o decrementa il volume PCM\n"\
+" x o z            regola il ritardo dei sottotitoli di +/- 0.1 secondi\n"\
+" r o t            posizione alto/basso dei sottotitoli, vedi anche -vf expand\n"\
+"\n"\
+" * * * VEDI PAGINA MAN PER DETTAGLI, ULTERIORI OPZIONI AVANZATE E TASTI! * * *\n"\
 "\n"
-"Tasti principali: (vedi pagina man per lista, controlla anche input.conf)\n"
-" <-  o  ->        va indietro/avanti di 10 secondi\n"
-" su o giù         va avanti/indietro di  1 minuto\n"
-" pagsu o paggiù   va avanti/indietro di 10 minuti\n"
-" < o >            va indietro/avanti nella playlist\n"
-" p o SPAZIO       pausa (premere un qualunque tasto per continuare)\n"
-" q o ESC          ferma la riproduzione ed esce dal programma\n"
-" + o -            regola il ritardo audio di +/- 0.1 secondi\n"
-" o                modalità OSD: niente / barra ricerca / barra ricerca + tempo\n"
-" * o /            incrementa o decrementa il volume PCM\n"
-" x o z            regola il ritardo dei sottotitoli di +/- 0.1 secondi\n"
-" r o t            posizione alto/basso dei sottotitoli, vedi anche -vf expand\n"
-"\n"
-" * * * VEDI PAGINA MAN PER DETTAGLI, ULTERIORI OPZIONI AVANZATE E TASTI! * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer messages ===========================
 

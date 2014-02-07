@@ -6,45 +6,55 @@
 
 // ========================= MPlayer help ===========================
 
-static const char help_text[]=
-"Benyt:   mplayer [indstillinger] [URL|sti/]filnavn\n"
-"\n"
-"Basale indstillinger (se manualen for en komplet liste):\n"
-" -vo <drv[:enhed]> vælg videodriver og enhed (detaljer, se '-vo help')\n"
-" -ao <drv[:enhed]> vælg lyddriver og enhed (detaljer, se '-ao help')\n"
 #ifdef CONFIG_VCD
-" vcd://<spor>  afspil et VCD (Video CD) spor fra et drev i stedet for en fil\n"
+#define MSGTR_HelpVCD " vcd://<spor>  afspil et VCD (Video CD) spor fra et drev i stedet for en fil\n"
+#else
+#define MSGTR_HelpVCD
 #endif
+
 #ifdef CONFIG_DVDREAD
-" dvd://<titelnr> afspil DVD titel fra et drev i stedet for en fil\n"
-" -alang/-slang   vælg sprog til lyd og undertekster (vha. landekode på 2 tegn)\n"
+#define MSGTR_HelpDVD " dvd://<titelnr> afspil DVD titel fra et drev i stedet for en fil\n"\
+                      " -alang/-slang   vælg sprog til lyd og undertekster (vha. landekode på 2 tegn)\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -ss <tidspos>   søg til en given position (sekund eller hh:mm:ss)\n"
-" -nosound        slå lyd fra\n"
-" -fs             afspil i fuldskærm (el. -vm, -zoom, se manualen)\n"
-" -x <x> -y <y>   skærmopløsning til -vm eller -zoom)\n"
-" -sub <fil>      angiv fil med undertekster (se også -subfps, -subdelay)\n"
-" -playlist <fil> angiv afspilningsliste\n"
-" -vid x -aid y   vælg filmspor (x) og lydspor (y)\n"
-" -fps x -srate y sæt billedfrekvensen til x billeder pr. sekund og lydfrekvensen til y Hz\n"
-" -pp <kvalitet>  benyt efterbehandlingsfiltre (detaljer, se manualen)\n"
-" -framedrop      spring enkelte billeder over hvis nødvendigt (til langsomme maskiner)\n"
+
+#define MSGTR_Help \
+"Benyt:   mplayer [indstillinger] [URL|sti/]filnavn\n"\
+"\n"\
+"Basale indstillinger (se manualen for en komplet liste):\n"\
+" -vo <drv[:enhed]> vælg videodriver og enhed (detaljer, se '-vo help')\n"\
+" -ao <drv[:enhed]> vælg lyddriver og enhed (detaljer, se '-ao help')\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -ss <tidspos>   søg til en given position (sekund eller hh:mm:ss)\n"\
+" -nosound        slå lyd fra\n"\
+" -fs             afspil i fuldskærm (el. -vm, -zoom, se manualen)\n"\
+" -x <x> -y <y>   skærmopløsning til -vm eller -zoom)\n"\
+" -sub <fil>      angiv fil med undertekster (se også -subfps, -subdelay)\n"\
+" -playlist <fil> angiv afspilningsliste\n"\
+" -vid x -aid y   vælg filmspor (x) og lydspor (y)\n"\
+" -fps x -srate y sæt billedfrekvensen til x billeder pr. sekund og lydfrekvensen til y Hz\n"\
+" -pp <kvalitet>  benyt efterbehandlingsfiltre (detaljer, se manualen)\n"\
+" -framedrop      spring enkelte billeder over hvis nødvendigt (til langsomme maskiner)\n"\
+"\n"\
+"Basale taster: (se manualen for en fuldstændig liste, check også input.conf)\n"\
+" <-  eller  ->   søg 10 sekunder frem eller tilbage\n"\
+" up eller down   søg 1 minut frem eller tilbage \n"\
+" pgup el. pgdown søg 10 minutter frem eller tilbage\n"\
+" < eller >       søg frem eller tilbage i afspilningslisten\n"\
+" p eller SPACE   pause filmen (starter igen ved tryk på en vilkårlig tast)\n"\
+" q eller ESC     stop afspilning og afslut program\n"\
+" + eller -       juster lydens forsinkelse med +/- 0.1 sekundt\n"\
+" o               vælg OSD type:  ingen / søgebjælke / søgebjælke+tid\n"\
+" * eller /       juster lydstyrken op og ned\n"\
+" z eller x       tilpas underteksters forsinkelse med +/- 0.1 sekund\n"\
+" r eller t       tilpas underteksters position op/ned, se også -vf expand\n"\
+"\n"\
+" * * * SE MANUALEN FOR DETALJER, FLERE (AVANCEREDE) MULIGHEDER OG TASTER * * *\n"\
 "\n"
-"Basale taster: (se manualen for en fuldstændig liste, check også input.conf)\n"
-" <-  eller  ->   søg 10 sekunder frem eller tilbage\n"
-" up eller down   søg 1 minut frem eller tilbage \n"
-" pgup el. pgdown søg 10 minutter frem eller tilbage\n"
-" < eller >       søg frem eller tilbage i afspilningslisten\n"
-" p eller SPACE   pause filmen (starter igen ved tryk på en vilkårlig tast)\n"
-" q eller ESC     stop afspilning og afslut program\n"
-" + eller -       juster lydens forsinkelse med +/- 0.1 sekundt\n"
-" o               vælg OSD type:  ingen / søgebjælke / søgebjælke+tid\n"
-" * eller /       juster lydstyrken op og ned\n"
-" z eller x       tilpas underteksters forsinkelse med +/- 0.1 sekund\n"
-" r eller t       tilpas underteksters position op/ned, se også -vf expand\n"
-"\n"
-" * * * SE MANUALEN FOR DETALJER, FLERE (AVANCEREDE) MULIGHEDER OG TASTER * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer messages ===========================
 

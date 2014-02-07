@@ -3,44 +3,54 @@
 
 // ========================= MPlayer hjelp ===========================
 
-static const char help_text[]=
-"Bruk:    mplayer [valg] [sti/]filnavn\n"
-"\n"
-"Valg:\n"
-" -vo <drv[:dev]> velg video-ut driver og enhet (se '-vo help' for liste)\n"
-" -ao <drv[:dev]> velg lyd-ut driver og enhet (se '-ao help' for liste)\n"
 #ifdef CONFIG_VCD
-" vcd://<sporno>   spill VCD (video cd) spor fra enhet i stedet for fil\n"
+#define MSGTR_HelpVCD " vcd://<sporno>   spill VCD (video cd) spor fra enhet i stedet for fil\n"
+#else
+#define MSGTR_HelpVCD
 #endif
+
 #ifdef CONFIG_DVDREAD
-" dvd://<tittelno> spill DVD tittel/spor fra enhet i stedet for fil\n"
+#define MSGTR_HelpDVD " dvd://<tittelno> spill DVD tittel/spor fra enhet i stedet for fil\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -ss <timepos>   søk til gitt (sekunder eller hh:mm:ss) posisjon\n"
-" -nosound        ikke spill av lyd\n"
-" -channels <n>   målnummer for lyd output kanaler\n"
-" -fs -vm -zoom   fullskjerm avspillings valg (fullscr,vidmode chg,softw.scale)\n"
-" -x <x> -y <y>   skaler bildet til <x> * <y> oppløsning [hvis -vo driver støtter det!]\n"
-" -sub <fil>      spesifiser hvilken subtitle fil som skal brukes (se også -subfps, -subdelay)\n"
-" -vid x -aid y   spesifiser hvilken video (x) og lyd (y) stream som skal spilles av\n"
-" -fps x -srate y spesifiser video (x fps) og lyd (y Hz) hastiget\n"
-" -pp <quality>   slå på etterbehandlingsfilter (0-4 for DivX, 0-63 for mpeg)\n"
-" -nobps          bruk alternativ A-V sync metode for AVI filer (kan være nyttig!)\n"
-" -framedrop      slå på bilde-dropping (for trege maskiner)\n"
-" -wid <window id> bruk eksisterende vindu for video output (nytting med plugger!)\n"
+
+#define MSGTR_Help \
+"Bruk:    mplayer [valg] [sti/]filnavn\n"\
+"\n"\
+"Valg:\n"\
+" -vo <drv[:dev]> velg video-ut driver og enhet (se '-vo help' for liste)\n"\
+" -ao <drv[:dev]> velg lyd-ut driver og enhet (se '-ao help' for liste)\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -ss <timepos>   søk til gitt (sekunder eller hh:mm:ss) posisjon\n"\
+" -nosound        ikke spill av lyd\n"\
+" -channels <n>   målnummer for lyd output kanaler\n"\
+" -fs -vm -zoom   fullskjerm avspillings valg (fullscr,vidmode chg,softw.scale)\n"\
+" -x <x> -y <y>   skaler bildet til <x> * <y> oppløsning [hvis -vo driver støtter det!]\n"\
+" -sub <fil>      spesifiser hvilken subtitle fil som skal brukes (se også -subfps, -subdelay)\n"\
+" -vid x -aid y   spesifiser hvilken video (x) og lyd (y) stream som skal spilles av\n"\
+" -fps x -srate y spesifiser video (x fps) og lyd (y Hz) hastiget\n"\
+" -pp <quality>   slå på etterbehandlingsfilter (0-4 for DivX, 0-63 for mpeg)\n"\
+" -nobps          bruk alternativ A-V sync metode for AVI filer (kan være nyttig!)\n"\
+" -framedrop      slå på bilde-dropping (for trege maskiner)\n"\
+" -wid <window id> bruk eksisterende vindu for video output (nytting med plugger!)\n"\
+"\n"\
+"Tastatur:\n"\
+" <- eller ->       søk bakover/fremover 10 sekunder\n"\
+" opp eller ned     søk bakover/fremover 1 minutt\n"\
+" < or >            søk bakover/fremover i playlisten\n"\
+" p eller MELLOMROM pause filmen (trykk en tast for å fortsette)\n"\
+" q eller ESC       stopp avspilling og avslutt programmet\n"\
+" + eller -         juster lyd-forsinkelse med +/- 0.1 sekund\n"\
+" o                 gå gjennom OSD modi:  ingen / søkelinje / søkelinje+tidsvisning\n"\
+" * eller /         øk eller mink volumet (trykk 'm' for å velge master/pcm)\n"\
+" z or x            juster undertittelens forsinkelse med +/- 0.1 sekund\n"\
+"\n"\
+" * * * SE PÅ MANSIDE FOR DETALJER, FLERE (AVANSERTE) VALG OG TASTER! * * *\n"\
 "\n"
-"Tastatur:\n"
-" <- eller ->       søk bakover/fremover 10 sekunder\n"
-" opp eller ned     søk bakover/fremover 1 minutt\n"
-" < or >            søk bakover/fremover i playlisten\n"
-" p eller MELLOMROM pause filmen (trykk en tast for å fortsette)\n"
-" q eller ESC       stopp avspilling og avslutt programmet\n"
-" + eller -         juster lyd-forsinkelse med +/- 0.1 sekund\n"
-" o                 gå gjennom OSD modi:  ingen / søkelinje / søkelinje+tidsvisning\n"
-" * eller /         øk eller mink volumet (trykk 'm' for å velge master/pcm)\n"
-" z or x            juster undertittelens forsinkelse med +/- 0.1 sekund\n"
-"\n"
-" * * * SE PÅ MANSIDE FOR DETALJER, FLERE (AVANSERTE) VALG OG TASTER! * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer messages ===========================
 

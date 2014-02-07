@@ -3,45 +3,55 @@
 
 // ========================= MPlayer help ===========================
 
-static const char help_text[]=
-"사용법:   mplayer [선택사항] [url|경로/]파일명\n"
-"\n"
-"기본 선택사항: (전체 목록은 man 페이지 참조)\n"
-" -vo <drv[:dev]>  비디오 출력 드라이버 및 장치 선택 (목록보기는 '-vo help')\n"
-" -ao <drv[:dev]>  오디오 출력 드라이버 및 장치 선택 (목록보기는 '-ao help')\n"
 #ifdef CONFIG_VCD
-" vcd://<trackno>  (S)VCD (Super Video CD) 트랙 재생 (장치로부터, 마운트 없이)\n"
+#define MSGTR_HelpVCD " vcd://<trackno>  (S)VCD (Super Video CD) 트랙 재생 (장치로부터, 마운트 없이)\n"
+#else
+#define MSGTR_HelpVCD
 #endif
+
 #ifdef CONFIG_DVDREAD
-" dvd://<titleno>  일반 파일이 아닌 장치로부터 DVD 타이틀 재생\n"
-" -alang/-slang    DVD 오디오/자막 언어 선택 (두 글자의 국가 코드)\n"
+#define MSGTR_HelpDVD " dvd://<titleno>  일반 파일이 아닌 장치로부터 DVD 타이틀 재생\n"\
+                      " -alang/-slang    DVD 오디오/자막 언어 선택 (두 글자의 국가 코드)\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -ss <timepos>    특정 위치로 찾아가기 (초 또는 시:분:초)\n"
-" -nosound         소리 재생 안함\n"
-" -fs              전체화면 재생 (또는 -vm, -zoom, 자세한 사항은 man 페이지)\n"
-" -x <x> -y <y>    화면을 <x>*<y>해상도로 설정 (-vm이나 -zoom과 함께 사용함)\n"
-" -sub <file>      사용할 자막 파일 지정 (-subfps, -subdelay도 참고할 것)\n"
-" -playlist <file> 재생목록 파일 지정\n"
-" -vid x -aid y    재생할 비디오(x) 와 오디오(y) 스트림 선택\n"
-" -fps x -srate y  비디오(x fps)와 오디오(y Hz) 비율 변경\n"
-" -pp <quality>    후행처리 필터 사용 (자세한 사항은 man 페이지 참조)\n"
-" -framedrop       프레임 건너뛰기 사용 (느린 컴퓨터용 선택사항)\n"
+
+#define MSGTR_Help \
+"사용법:   mplayer [선택사항] [url|경로/]파일명\n"\
+"\n"\
+"기본 선택사항: (전체 목록은 man 페이지 참조)\n"\
+" -vo <drv[:dev]>  비디오 출력 드라이버 및 장치 선택 (목록보기는 '-vo help')\n"\
+" -ao <drv[:dev]>  오디오 출력 드라이버 및 장치 선택 (목록보기는 '-ao help')\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -ss <timepos>    특정 위치로 찾아가기 (초 또는 시:분:초)\n"\
+" -nosound         소리 재생 안함\n"\
+" -fs              전체화면 재생 (또는 -vm, -zoom, 자세한 사항은 man 페이지)\n"\
+" -x <x> -y <y>    화면을 <x>*<y>해상도로 설정 (-vm이나 -zoom과 함께 사용함)\n"\
+" -sub <file>      사용할 자막 파일 지정 (-subfps, -subdelay도 참고할 것)\n"\
+" -playlist <file> 재생목록 파일 지정\n"\
+" -vid x -aid y    재생할 비디오(x) 와 오디오(y) 스트림 선택\n"\
+" -fps x -srate y  비디오(x fps)와 오디오(y Hz) 비율 변경\n"\
+" -pp <quality>    후행처리 필터 사용 (자세한 사항은 man 페이지 참조)\n"\
+" -framedrop       프레임 건너뛰기 사용 (느린 컴퓨터용 선택사항)\n"\
+"\n"\
+"기본 조정키: (전체 조정키 목록은 man 페이지 참조, input.conf도 확인할 것)\n"\
+" <-  또는  ->     10초 뒤로/앞으로 이동\n"\
+" up 또는 down     1분 뒤로/앞으로 이동\n"\
+" pgup 또는 pgdown 10분 뒤로/앞으로 이동\n"\
+" < 또는 >         재생목록에서 뒤로/앞으로 이동\n"\
+" p 또는 SPACE     잠시 멈춤 (아무키나 누르면 계속)\n"\
+" q 또는 ESC       재생을 멈추고 프로그램을 끝냄\n"\
+" + 또는 -         +/- 0.1초씩 오디오 지연 조정\n"\
+" o                OSD모드 변경:  없음/탐색줄/탐색줄+타이머\n"\
+" * 또는 /         PCM 음량을 높임/낮춤\n"\
+" z 또는 x         +/- 0.1초씩 자막 지연 조정\n"\
+" r 또는 t         자막 위치를 위로/아래로 조정, -vf expand도 참고할 것\n"\
+"\n"\
+" * * * 더 자세한 (고급) 선택사항 및 조정키는 MAN 페이지를 참조하세요. * * *\n"\
 "\n"
-"기본 조정키: (전체 조정키 목록은 man 페이지 참조, input.conf도 확인할 것)\n"
-" <-  또는  ->     10초 뒤로/앞으로 이동\n"
-" up 또는 down     1분 뒤로/앞으로 이동\n"
-" pgup 또는 pgdown 10분 뒤로/앞으로 이동\n"
-" < 또는 >         재생목록에서 뒤로/앞으로 이동\n"
-" p 또는 SPACE     잠시 멈춤 (아무키나 누르면 계속)\n"
-" q 또는 ESC       재생을 멈추고 프로그램을 끝냄\n"
-" + 또는 -         +/- 0.1초씩 오디오 지연 조정\n"
-" o                OSD모드 변경:  없음/탐색줄/탐색줄+타이머\n"
-" * 또는 /         PCM 음량을 높임/낮춤\n"
-" z 또는 x         +/- 0.1초씩 자막 지연 조정\n"
-" r 또는 t         자막 위치를 위로/아래로 조정, -vf expand도 참고할 것\n"
-"\n"
-" * * * 더 자세한 (고급) 선택사항 및 조정키는 MAN 페이지를 참조하세요. * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer messages ===========================
 

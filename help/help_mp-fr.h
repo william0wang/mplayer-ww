@@ -7,45 +7,55 @@
 
 // ========================= Aide MPlayer ===========================
 
-static const char help_text[]=
-"Utilisation :      mplayer [options] [url|répertoire/]fichier\n"
-"\n"
-"Options de base :  (liste complète dans la page de man)\n"
-" -vo <pil[:pér]>  pilote et périph. vidéo de sortie ('-vo help' pour liste)\n"
-" -ao <pil[:pér]>  pilote et périph. audio de sortie ('-ao help' pour liste)\n"
 #ifdef CONFIG_VCD
-" vcd://<n°piste>  lit piste (S)VCD (Super Video CD) (périf. brut, non-monté)\n"
+#define MSGTR_HelpVCD " vcd://<n°piste>  lit piste (S)VCD (Super Video CD) (périf. brut, non-monté)\n"
+#else
+#define MSGTR_HelpVCD
 #endif
+
 #ifdef CONFIG_DVDREAD
-" dvd://<n°titre>  lit titre DVD du périf. plutôt que d'un fichier\n"
-" -alang/-slang    langue audio/sous-titres du DVD (code pays 2 lettres)\n"
+#define MSGTR_HelpDVD " dvd://<n°titre>  lit titre DVD du périf. plutôt que d'un fichier\n"\
+                      " -alang/-slang    langue audio/sous-titres du DVD (code pays 2 lettres)\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -ss <pos>        démarre lecture à 'pos' (temps en secondes ou hh:mm:ss)\n"
-" -nosound         ne joue aucun son\n"
-" -fs              plein-écran (ou -vm, -zoom, détails dans page man)\n"
-" -x <x> -y <y>    résolution de l'affichage (à utiliser avec -vm ou -zoom)\n"
-" -sub <fich>      fichier sous-titres à utiliser (cf. -subfps, -subdelay)\n"
-" -playlist <fich> fichier des titres audio à lire\n"
-" -vid x -aid y    spécifie les flux vidéo (x) et audio (y) à lire\n"
-" -fps x -srate y  change fréquences vidéo (x fps) et audio (y Hz)\n"
-" -pp <qualité>    active le filtre de post-traitement (détails page man)\n"
-" -framedrop       active saut d'images (pour machines lentes)\n"
+
+#define MSGTR_Help \
+"Utilisation :      mplayer [options] [url|répertoire/]fichier\n"\
+"\n"\
+"Options de base :  (liste complète dans la page de man)\n"\
+" -vo <pil[:pér]>  pilote et périph. vidéo de sortie ('-vo help' pour liste)\n"\
+" -ao <pil[:pér]>  pilote et périph. audio de sortie ('-ao help' pour liste)\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -ss <pos>        démarre lecture à 'pos' (temps en secondes ou hh:mm:ss)\n"\
+" -nosound         ne joue aucun son\n"\
+" -fs              plein-écran (ou -vm, -zoom, détails dans page man)\n"\
+" -x <x> -y <y>    résolution de l'affichage (à utiliser avec -vm ou -zoom)\n"\
+" -sub <fich>      fichier sous-titres à utiliser (cf. -subfps, -subdelay)\n"\
+" -playlist <fich> fichier des titres audio à lire\n"\
+" -vid x -aid y    spécifie les flux vidéo (x) et audio (y) à lire\n"\
+" -fps x -srate y  change fréquences vidéo (x fps) et audio (y Hz)\n"\
+" -pp <qualité>    active le filtre de post-traitement (détails page man)\n"\
+" -framedrop       active saut d'images (pour machines lentes)\n"\
+"\n"\
+"Fonctions au clavier: (liste complète dans page man, voir aussi input.conf)\n"\
+" <- ou ->         arrière/avant 10 secondes\n"\
+" haut ou bas      arrière/avant 1 minute\n"\
+" PgUp ou PgDown   arrière/avant 10 minutes\n"\
+" < ou >           fichier précédent/suivant dans liste audio à lire\n"\
+" p ou ESPACE      pause film (presser n'importe quelle touche pour continuer)\n"\
+" q ou ESC         arrête la lecture et quitte le programme\n"\
+" + ou -           ajuste délai audio : +/- 0.1 seconde\n"\
+" o                cycle mode OSD: aucun/barre recherche/barre rech. + temps\n"\
+" * ou /           augmente/diminue le volume PCM\n"\
+" x ou z           ajuste délai des sous-titres : +/- 0.1 seconde\n"\
+" r ou t           ajuste position sous-titres : +haut/+bas, cf. -vf expand\n"\
+"\n"\
+" * * * VOIR PAGE MAN POUR DÉTAILS, AUTRES OPTIONS (AVANCÉES) ET TOUCHES * * *\n"\
 "\n"
-"Fonctions au clavier: (liste complète dans page man, voir aussi input.conf)\n"
-" <- ou ->         arrière/avant 10 secondes\n"
-" haut ou bas      arrière/avant 1 minute\n"
-" PgUp ou PgDown   arrière/avant 10 minutes\n"
-" < ou >           fichier précédent/suivant dans liste audio à lire\n"
-" p ou ESPACE      pause film (presser n'importe quelle touche pour continuer)\n"
-" q ou ESC         arrête la lecture et quitte le programme\n"
-" + ou -           ajuste délai audio : +/- 0.1 seconde\n"
-" o                cycle mode OSD: aucun/barre recherche/barre rech. + temps\n"
-" * ou /           augmente/diminue le volume PCM\n"
-" x ou z           ajuste délai des sous-titres : +/- 0.1 seconde\n"
-" r ou t           ajuste position sous-titres : +haut/+bas, cf. -vf expand\n"
-"\n"
-" * * * VOIR PAGE MAN POUR DÉTAILS, AUTRES OPTIONS (AVANCÉES) ET TOUCHES * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= Messages MPlayer ===========================
 
