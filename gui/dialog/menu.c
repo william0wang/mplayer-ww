@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 
 #include "config.h"
 #include "help_mp.h"
@@ -221,177 +222,217 @@ GtkWidget * AddSeparator( GtkWidget * Menu )
 typedef struct
 {
  int id;
+ const char * id2;
  const char * name;
 } Languages_t;
 
 #ifdef CONFIG_DVDREAD
 #define lng( a,b ) ( (int)(a) * 256 + b )
 static Languages_t Languages[] =
-         {
-           { lng( 'a','a' ), "ʿAfár af"                      },
-           { lng( 'a','b' ), "аҧсуа бызшәа"         },
-           { lng( 'a','f' ), "Afrikaans"                       },
-           { lng( 'a','m' ), "ኣማርኛ"                    },
-           { lng( 'a','r' ), "العربية"                  },
-           { lng( 'a','s' ), "অসমীয়া"           },
-           { lng( 'a','y' ), "Aymar Aru"                       },
-           { lng( 'a','z' ), "Azərbaycanca"                   },
-           { lng( 'b','a' ), "Башҡорт теле"         },
-           { lng( 'b','e' ), "беларуская мова"   },
-           { lng( 'b','g' ), "български език"     },
-           { lng( 'b','i' ), "Bislama"                         },
-           { lng( 'b','n' ), "বাংলা"                 },
-           { lng( 'b','o' ), "བོད་སྐད"           },
-           { lng( 'b','r' ), "Brezhoneg"                       },
-           { lng( 'b','s' ), "Bosanski"                        },
-           { lng( 'c','a' ), "Català"                         },
-           { lng( 'c','e' ), "Нохчийн мотт"         },
-           { lng( 'c','h' ), "Chamoru"                         },
-           { lng( 'c','o' ), "Corsu"                           },
-           { lng( 'c','s' ), "Čeština"                       },
-           { lng( 'c','v' ), "Чӑвашла"                  },
-           { lng( 'c','y' ), "Cymraeg"                         },
-           { lng( 'd','a' ), "Dansk"                           },
-           { lng( 'd','e' ), "Deutsch"                         },
-           { lng( 'd','z' ), "ཇོང་ཁ"                 },
-           { lng( 'e','l' ), "Ελληνικά"                },
-           { lng( 'e','n' ), "English"                         },
-           { lng( 'e','o' ), "Esperanto"                       },
-           { lng( 'e','s' ), "Español"                        },
-           { lng( 'e','t' ), "Eesti keel"                      },
-           { lng( 'e','u' ), "Euskara"                         },
-           { lng( 'f','a' ), "فارسی"                      },
-           { lng( 'f','i' ), "Suomi"                           },
-           { lng( 'f','j' ), "Vakaviti"                        },
-           { lng( 'f','o' ), "Føroyskt"                       },
-           { lng( 'f','r' ), "Français"                       },
-           { lng( 'f','y' ), "Frysk"                           },
-           { lng( 'g','a' ), "Gaeilge"                         },
-           { lng( 'g','d' ), "Gàidhlig"                       },
-           { lng( 'g','l' ), "Galego"                          },
-           { lng( 'g','n' ), "Avañe'ẽ"                      },
-           { lng( 'g','u' ), "ગુજરાતી"           },
-           { lng( 'h','a' ), "هَوُسَ"                    },
-           { lng( 'h','e' ), "עִבְרִית"                },
-           { lng( 'h','i' ), "हिन्दी"              },
-           { lng( 'h','r' ), "Hrvatska"                        },
-           { lng( 'h','u' ), "Magyar"                          },
-           { lng( 'h','y' ), "Հայերեն"                  },
-           { lng( 'h','z' ), "Otjiherero"                      },
-           { lng( 'i','d' ), "Bahasa Indonesia"                },
-           { lng( 'i','s' ), "Íslenska"                       },
-           { lng( 'i','t' ), "Italiano"                        },
-           { lng( 'i','u' ), "ᐃᓄᒃᑎᑐᑦ"              },
-           { lng( 'j','a' ), "日本語"                       },
-           { lng( 'j','i' ), "יידיש"                      },
-           { lng( 'j','v' ), "Basa Jawa"                       },
-           { lng( 'k','a' ), "ქართული"           },
-           { lng( 'k','i' ), "Gĩkũyũ"                       },
-           { lng( 'k','j' ), "Kuanyama"                        },
-           { lng( 'k','k' ), "Қазақ тілі"             },
-           { lng( 'k','l' ), "Kalaallisut"                     },
-           { lng( 'k','m' ), "ភាសាខ្មែរ"     },
-           { lng( 'k','n' ), "ಕನ್ನಡ"                 },
-           { lng( 'k','o' ), "한국어"                       },
-           { lng( 'k','s' ), "कॉशुर"                 },
-           { lng( 'k','u' ), "کوردی"                      },
-           { lng( 'k','v' ), "коми кыв"                 },
-           { lng( 'k','y' ), "Кыргызча"                },
-           { lng( 'l','a' ), "Lingua latina"                   },
-           { lng( 'l','b' ), "Lëtzebuergesch"                 },
-           { lng( 'l','n' ), "Lingála"                        },
-           { lng( 'l','o' ), "ພາສາລາວ"           },
-           { lng( 'l','t' ), "Lietuvių kalba"                 },
-           { lng( 'l','v' ), "Latviešu"                       },
-           { lng( 'm','g' ), "Malagasy"                        },
-           { lng( 'm','h' ), "Kajin M̧ajeļ"                  },
-           { lng( 'm','i' ), "Te Reo Māori"                   },
-           { lng( 'm','k' ), "Македонски јазик" },
-           { lng( 'm','l' ), "മലയാളം"              },
-           { lng( 'm','n' ), "ᠮᠣᠨᠭᠭᠣᠯ"           },
-           { lng( 'm','r' ), "मराठी"                 },
-           { lng( 'm','s' ), "Bahasa Melayu"                   },
-           { lng( 'm','t' ), "Malti"                           },
-           { lng( 'm','y' ), "မြန်မာစကား"  },
-           { lng( 'n','b' ), "Bokmål"                         },
-           { lng( 'n','d' ), "isiNdebele"                      },
-           { lng( 'n','e' ), "नेपाली"              },
-           { lng( 'n','l' ), "Nederlands"                      },
-           { lng( 'n','n' ), "Nynorsk"                         },
-           { lng( 'n','r' ), "isiNdebele"                      },
-           { lng( 'n','v' ), "Diné bizaad"                    },
-           { lng( 'n','y' ), "Chichewa"                        },
-           { lng( 'o','c' ), "Occitan"                         },
-           { lng( 'o','m' ), "Afaan Oromoo"                    },
-           { lng( 'o','r' ), "ଓଡ଼ିଆ"                 },
-           { lng( 'o','s' ), "Ирон ӕвзаг"             },
-           { lng( 'p','a' ), "ਪੰਜਾਬੀ"              },
-           { lng( 'p','l' ), "Język polski"                   },
-           { lng( 'p','s' ), "‏پښتو"                     },
-           { lng( 'p','t' ), "Português"                      },
-           { lng( 'q','u' ), "Runa Simi"                       },
-           { lng( 'r','m' ), "Rätoromanisch"                  },
-           { lng( 'r','n' ), "íkiRǔndi"                      },
-           { lng( 'r','o' ), "Română)"                       },
-           { lng( 'r','u' ), "Русский"                  },
-           { lng( 'r','w' ), "Ikinyarwanda"                    },
-           { lng( 's','c' ), "Sardu"                           },
-           { lng( 's','d' ), "‏سنڌي‎"                  },
-           { lng( 's','g' ), "Sängö"                         },
-           { lng( 's','i' ), "සිංහල"                 },
-           { lng( 's','k' ), "Slovenčina"                     },
-           { lng( 's','l' ), "Slovenščina"                   },
-           { lng( 's','m' ), "Gagana Sāmoa"                   },
-           { lng( 's','n' ), "chiShona"                        },
-           { lng( 's','o' ), "Af-ka Soomaali-ga"               },
-           { lng( 's','q' ), "Shqip"                           },
-           { lng( 's','r' ), "Српски"                    },
-           { lng( 's','s' ), "siSwati"                         },
-           { lng( 's','t' ), "seSotho"                         },
-           { lng( 's','u' ), "Basa Sunda"                      },
-           { lng( 's','v' ), "Svenska"                         },
-           { lng( 's','w' ), "Kiswahili"                       },
-           { lng( 't','a' ), "தமிழ்"                 },
-           { lng( 't','e' ), "తెలుగు"              },
-           { lng( 't','g' ), "тоҷикӣ"                    },
-           { lng( 't','h' ), "ภาษาไทย"           },
-           { lng( 't','i' ), "ትግርኛ"                    },
-           { lng( 't','k' ), "Türkmençe"                     },
-           { lng( 't','l' ), "Tagalog"                         },
-           { lng( 't','n' ), "Setswana"                        },
-           { lng( 't','o' ), "Lea fakatonga"                   },
-           { lng( 't','r' ), "Türkçe"                        },
-           { lng( 't','s' ), "Xitsonga"                        },
-           { lng( 't','t' ), "татарча"                  },
-           { lng( 't','w' ), "Twi"                             },
-           { lng( 't','y' ), "Reo Tahiti"                      },
-           { lng( 'u','g' ), "ئۇيغۇرچە‎"             },
-           { lng( 'u','k' ), "Українська"            },
-           { lng( 'u','r' ), "‏اردو‎"                  },
-           { lng( 'u','z' ), "Oʻzbek tili"                    },
-           { lng( 'v','i' ), "Tiếng Việt"                  },
-           { lng( 'w','o' ), "Wolof"                           },
-           { lng( 'x','h' ), "isiXhosa"                        },
-           { lng( 'y','i' ), "ייִדיש"                    },
-           { lng( 'y','o' ), "Yorùbá"                        },
-           { lng( 'z','a' ), "壮语"                          },
-           { lng( 'z','h' ), "漢語"                          },
-           { lng( 'z','u' ), "isiZulu"                         },
-         };
-#undef lng
+{
+  { lng( 'a','a' ), "aar", "ʿAfár af"                      },
+  { lng( 'a','b' ), "abk", "аҧсуа бызшәа"         },
+  { lng( 'a','f' ), "afr", "Afrikaans"                       },
+  { lng( 'a','m' ), "amh", "ኣማርኛ"                    },
+  { lng( 'a','r' ), "ara", "العربية"                  },
+  { lng( 'a','s' ), "asm", "অসমীয়া"           },
+  { lng( 'a','y' ), "aym", "Aymar Aru"                       },
+  { lng( 'a','z' ), "aze", "Azərbaycanca"                   },
+  { lng( 'b','a' ), "bak", "Башҡорт теле"         },
+  { lng( 'b','e' ), "bel", "беларуская мова"   },
+  { lng( 'b','g' ), "bul", "български език"     },
+  { lng( 'b','i' ), "bis", "Bislama"                         },
+  { lng( 'b','n' ), "ben", "বাংলা"                 },
+  { lng( 'b','o' ), "bod", "བོད་སྐད"           },
+  { lng( 'b','o' ), "tib", "བོད་སྐད"           },
+  { lng( 'b','r' ), "bre", "Brezhoneg"                       },
+  { lng( 'b','s' ), "bos", "Bosanski"                        },
+  { lng( 'c','a' ), "cat", "Català"                         },
+  { lng( 'c','e' ), "che", "Нохчийн мотт"         },
+  { lng( 'c','h' ), "cha", "Chamoru"                         },
+  { lng( 'c','o' ), "cos", "Corsu"                           },
+  { lng( 'c','s' ), "ces", "Čeština"                       },
+  { lng( 'c','s' ), "cze", "Čeština"                       },
+  { lng( 'c','v' ), "chv", "Чӑвашла"                  },
+  { lng( 'c','y' ), "cym", "Cymraeg"                         },
+  { lng( 'c','y' ), "wel", "Cymraeg"                         },
+  { lng( 'd','a' ), "dan", "Dansk"                           },
+  { lng( 'd','e' ), "deu", "Deutsch"                         },
+  { lng( 'd','e' ), "ger", "Deutsch"                         },
+  { lng( 'd','z' ), "dzo", "ཇོང་ཁ"                 },
+  { lng( 'e','l' ), "ell", "Ελληνικά"                },
+  { lng( 'e','l' ), "gre", "Ελληνικά"                },
+  { lng( 'e','n' ), "eng", "English"                         },
+  { lng( 'e','o' ), "epo", "Esperanto"                       },
+  { lng( 'e','s' ), "spa", "Español"                        },
+  { lng( 'e','t' ), "est", "Eesti keel"                      },
+  { lng( 'e','u' ), "eus", "Euskara"                         },
+  { lng( 'e','u' ), "baq", "Euskara"                         },
+  { lng( 'f','a' ), "fas", "فارسی"                      },
+  { lng( 'f','a' ), "per", "فارسی"                      },
+  { lng( 'f','i' ), "fin", "Suomi"                           },
+  { lng( 'f','j' ), "fij", "Vakaviti"                        },
+  { lng( 'f','o' ), "fao", "Føroyskt"                       },
+  { lng( 'f','r' ), "fra", "Français"                       },
+  { lng( 'f','r' ), "fre", "Français"                       },
+  { lng( 'f','y' ), "fry", "Frysk"                           },
+  { lng( 'g','a' ), "gle", "Gaeilge"                         },
+  { lng( 'g','d' ), "gla", "Gàidhlig"                       },
+  { lng( 'g','l' ), "glg", "Galego"                          },
+  { lng( 'g','n' ), "grn", "Avañe'ẽ"                      },
+  { lng( 'g','u' ), "guj", "ગુજરાતી"           },
+  { lng( 'h','a' ), "hau", "هَوُسَ"                    },
+  { lng( 'h','e' ), "heb", "עִבְרִית"                },
+  { lng( 'h','i' ), "hin", "हिन्दी"              },
+  { lng( 'h','r' ), "hrv", "Hrvatska"                        },
+  { lng( 'h','u' ), "hun", "Magyar"                          },
+  { lng( 'h','y' ), "hye", "Հայերեն"                  },
+  { lng( 'h','y' ), "arm", "Հայերեն"                  },
+  { lng( 'h','z' ), "her", "Otjiherero"                      },
+  { lng( 'i','d' ), "ind", "Bahasa Indonesia"                },
+  { lng( 'i','s' ), "isl", "Íslenska"                       },
+  { lng( 'i','s' ), "ice", "Íslenska"                       },
+  { lng( 'i','t' ), "ita", "Italiano"                        },
+  { lng( 'i','u' ), "iku", "ᐃᓄᒃᑎᑐᑦ"              },
+  { lng( 'j','a' ), "jpn", "日本語"                       },
+  { lng( 'j','v' ), "jav", "Basa Jawa"                       },
+  { lng( 'k','a' ), "kat", "ქართული"           },
+  { lng( 'k','a' ), "geo", "ქართული"           },
+  { lng( 'k','i' ), "kik", "Gĩkũyũ"                       },
+  { lng( 'k','j' ), "kua", "Kuanyama"                        },
+  { lng( 'k','k' ), "kaz", "Қазақ тілі"             },
+  { lng( 'k','l' ), "kal", "Kalaallisut"                     },
+  { lng( 'k','m' ), "khm", "ភាសាខ្មែរ"     },
+  { lng( 'k','n' ), "kan", "ಕನ್ನಡ"                 },
+  { lng( 'k','o' ), "kor", "한국어"                       },
+  { lng( 'k','s' ), "kas", "कॉशुर"                 },
+  { lng( 'k','u' ), "kur", "کوردی"                      },
+  { lng( 'k','v' ), "kom", "коми кыв"                 },
+  { lng( 'k','y' ), "kir", "Кыргызча"                },
+  { lng( 'l','a' ), "lat", "Lingua latina"                   },
+  { lng( 'l','b' ), "ltz", "Lëtzebuergesch"                 },
+  { lng( 'l','n' ), "lin", "Lingála"                        },
+  { lng( 'l','o' ), "lao", "ພາສາລາວ"           },
+  { lng( 'l','t' ), "lit", "Lietuvių kalba"                 },
+  { lng( 'l','v' ), "lav", "Latviešu"                       },
+  { lng( 'm','g' ), "mlg", "Malagasy"                        },
+  { lng( 'm','h' ), "mah", "Kajin M̧ajeļ"                  },
+  { lng( 'm','i' ), "mri", "Te Reo Māori"                   },
+  { lng( 'm','i' ), "mao", "Te Reo Māori"                   },
+  { lng( 'm','k' ), "mkd", "Македонски јазик" },
+  { lng( 'm','k' ), "mac", "Македонски јазик" },
+  { lng( 'm','l' ), "mal", "മലയാളം"              },
+  { lng( 'm','n' ), "mon", "ᠮᠣᠨᠭᠭᠣᠯ"           },
+  { lng( 'm','r' ), "mar", "मराठी"                 },
+  { lng( 'm','s' ), "msa", "Bahasa Melayu"                   },
+  { lng( 'm','s' ), "may", "Bahasa Melayu"                   },
+  { lng( 'm','t' ), "mlt", "Malti"                           },
+  { lng( 'm','y' ), "mya", "မြန်မာစကား"  },
+  { lng( 'm','y' ), "bur", "မြန်မာစကား"  },
+  { lng( 'n','b' ), "nob", "Bokmål"                         },
+  { lng( 'n','d' ), "nde", "isiNdebele"                      },
+  { lng( 'n','e' ), "nep", "नेपाली"              },
+  { lng( 'n','l' ), "nld", "Nederlands"                      },
+  { lng( 'n','l' ), "dut", "Nederlands"                      },
+  { lng( 'n','n' ), "nno", "Nynorsk"                         },
+  { lng( 'n','r' ), "nbl", "isiNdebele"                      },
+  { lng( 'n','v' ), "nav", "Diné bizaad"                    },
+  { lng( 'n','y' ), "nya", "Chichewa"                        },
+  { lng( 'o','c' ), "oci", "Occitan"                         },
+  { lng( 'o','m' ), "orm", "Afaan Oromoo"                    },
+  { lng( 'o','r' ), "ori", "ଓଡ଼ିଆ"                 },
+  { lng( 'o','s' ), "oss", "Ирон ӕвзаг"             },
+  { lng( 'p','a' ), "pan", "ਪੰਜਾਬੀ"              },
+  { lng( 'p','l' ), "pol", "Język polski"                   },
+  { lng( 'p','s' ), "pus", "‏پښتو"                     },
+  { lng( 'p','t' ), "por", "Português"                      },
+  { lng( 'q','u' ), "que", "Runa Simi"                       },
+  { lng( 'r','m' ), "roh", "Rätoromanisch"                  },
+  { lng( 'r','n' ), "run", "íkiRǔndi"                      },
+  { lng( 'r','o' ), "ron", "Română)"                       },
+  { lng( 'r','o' ), "rum", "Română)"                       },
+  { lng( 'r','u' ), "rus", "Русский"                  },
+  { lng( 'r','w' ), "kin", "Ikinyarwanda"                    },
+  { lng( 's','c' ), "srd", "Sardu"                           },
+  { lng( 's','d' ), "snd", "‏سنڌي‎"                  },
+  { lng( 's','g' ), "sag", "Sängö"                         },
+  { lng( 's','i' ), "sin", "සිංහල"                 },
+  { lng( 's','k' ), "slk", "Slovenčina"                     },
+  { lng( 's','k' ), "slo", "Slovenčina"                     },
+  { lng( 's','l' ), "slv", "Slovenščina"                   },
+  { lng( 's','m' ), "smo", "Gagana Sāmoa"                   },
+  { lng( 's','n' ), "sna", "chiShona"                        },
+  { lng( 's','o' ), "som", "Af-ka Soomaali-ga"               },
+  { lng( 's','q' ), "sqi", "Shqip"                           },
+  { lng( 's','q' ), "alb", "Shqip"                           },
+  { lng( 's','r' ), "srp", "Српски"                    },
+  { lng( 's','s' ), "ssw", "siSwati"                         },
+  { lng( 's','t' ), "sot", "seSotho"                         },
+  { lng( 's','u' ), "sun", "Basa Sunda"                      },
+  { lng( 's','v' ), "swe", "Svenska"                         },
+  { lng( 's','w' ), "swa", "Kiswahili"                       },
+  { lng( 't','a' ), "tam", "தமிழ்"                 },
+  { lng( 't','e' ), "tel", "తెలుగు"              },
+  { lng( 't','g' ), "tgk", "тоҷикӣ"                    },
+  { lng( 't','h' ), "tha", "ภาษาไทย"           },
+  { lng( 't','i' ), "tir", "ትግርኛ"                    },
+  { lng( 't','k' ), "tuk", "Türkmençe"                     },
+  { lng( 't','l' ), "tgl", "Tagalog"                         },
+  { lng( 't','n' ), "tsn", "Setswana"                        },
+  { lng( 't','o' ), "ton", "Lea fakatonga"                   },
+  { lng( 't','r' ), "tur", "Türkçe"                        },
+  { lng( 't','s' ), "tso", "Xitsonga"                        },
+  { lng( 't','t' ), "tat", "татарча"                  },
+  { lng( 't','w' ), "twi", "Twi"                             },
+  { lng( 't','y' ), "tah", "Reo Tahiti"                      },
+  { lng( 'u','g' ), "uig", "ئۇيغۇرچە‎"             },
+  { lng( 'u','k' ), "ukr", "Українська"            },
+  { lng( 'u','r' ), "urd", "‏اردو‎"                  },
+  { lng( 'u','z' ), "uzb", "Oʻzbek tili"                    },
+  { lng( 'v','i' ), "vie", "Tiếng Việt"                  },
+  { lng( 'w','o' ), "wol", "Wolof"                           },
+  { lng( 'x','h' ), "xho", "isiXhosa"                        },
+  { lng( 'y','i' ), "yid", "יידיש"                      },
+  { lng( 'y','o' ), "yor", "Yorùbá"                        },
+  { lng( 'z','a' ), "zha", "壮语"                          },
+  { lng( 'z','h' ), "zho", "漢語"                          },
+  { lng( 'z','h' ), "chi", "漢語"                          },
+  { lng( 'z','u' ), "zul", "isiZulu"                         },
+};
 
 static char * ChannelTypes[] =
 	{ "Dolby Digital","","Mpeg1","Mpeg2","PCM","","Digital Theatre System" };
 static char * ChannelNumbers[] =
 	{ "","Stereo","","","","5.1" };
 
-static const char * GetLanguage( int language )
+enum
 {
+  GET_LANG_INT,
+  GET_LANG_CHR
+};
+
+static const char * GetLanguage( void *language, int type )
+{
+ int l;
+ char *p;
  unsigned int i;
+ if ( type == GET_LANG_INT ) l = *(int *) language;
+ else
+  {
+    p = language;
+
+    if ( p[2] == 0)
+     {
+       l = lng( p[0], p[1] );
+       type = GET_LANG_INT;
+     }
+    else if ( p[3] != 0) return language;
+  }
  for ( i=0;i<sizeof( Languages ) / sizeof( Languages_t );i++ )
-  if ( Languages[i].id == language ) return Languages[i].name;
+  if ( type == GET_LANG_INT ? Languages[i].id == l : strcasecmp(Languages[i].id2, p) == 0 ) return Languages[i].name;
  return MSGTR_GUI_Unknown;
 }
+#undef lng
 #endif
 
 
@@ -515,7 +556,7 @@ GtkWidget * CreatePopUpMenu( void )
        char tmp[64]; int i;
        for ( i=0;i < guiInfo.AudioStreams;i++ )
         {
-	 snprintf( tmp,64,"%s - %s %s",GetLanguage( guiInfo.AudioStream[i].language ),
+	 snprintf( tmp,64,"%s - %s %s",GetLanguage( &guiInfo.AudioStream[i].language, GET_LANG_INT ),
 	   ChannelTypes[ guiInfo.AudioStream[i].type ],
 	   ChannelNumbers[ guiInfo.AudioStream[i].channels ] );
          AddMenuCheckItem( window1, (const char*)dolby_xpm, DVDAudioLanguageMenu,tmp,
@@ -535,7 +576,7 @@ GtkWidget * CreatePopUpMenu( void )
        AddMenuItem( window1, (const char*)empty1px_xpm, DVDSubtitleLanguageMenu,MSGTR_GUI__none_,( (unsigned short)-1 << 16 ) + ivSetDVDSubtitle );
        for ( i=0;i < guiInfo.Subtitles;i++ )
         {
-         av_strlcpy( tmp,GetLanguage( guiInfo.Subtitle[i].language ),sizeof(tmp) );
+         av_strlcpy( tmp,GetLanguage( &guiInfo.Subtitle[i].language, GET_LANG_INT ),sizeof(tmp) );
          AddMenuCheckItem( window1, (const char*)empty1px_xpm, DVDSubtitleLanguageMenu,tmp,
 			   dvdsub_id == guiInfo.Subtitle[i].id,
 			   ( guiInfo.Subtitle[i].id << 16 ) + ivSetDVDSubtitle );
@@ -643,7 +684,7 @@ GtkWidget * CreatePopUpMenu( void )
          int aid = ((sh_audio_t *)demuxer->a_streams[i])->aid;
          int selected_id = (audio_id == aid || (audio_id == -1 && aid == demuxer_default_audio_track(demuxer)));
          char lng[32], tmp[64];
-         if ( demuxer_audio_lang( demuxer, i, lng, sizeof(lng) ) == 0 ) snprintf( tmp,sizeof(tmp),MSGTR_GUI_TrackN" - %s",aid,lng );
+         if ( demuxer_audio_lang( demuxer, i, lng, sizeof(lng) ) == 0 ) snprintf( tmp,sizeof(tmp),MSGTR_GUI_TrackN" - %s",aid,GetLanguage( lng, GET_LANG_CHR ) );
          else snprintf( tmp,sizeof(tmp),MSGTR_GUI_TrackN,aid );
          AddMenuCheckItem( window1, (const char*)empty1px_xpm, SubMenu,tmp,selected_id,( aid << 16 ) + ivSetAudio );
         }
@@ -715,7 +756,7 @@ GtkWidget * CreatePopUpMenu( void )
           }
          }
        }
-      if ( ret == 0 ) snprintf( tmp, sizeof(tmp), MSGTR_GUI_TrackN" - %s", i, lng );
+      if ( ret == 0 ) snprintf( tmp, sizeof(tmp), MSGTR_GUI_TrackN" - %s", i, GetLanguage( lng, GET_LANG_CHR ) );
       else snprintf( tmp, sizeof(tmp), MSGTR_GUI_TrackN, i );
       AddMenuCheckItem( window1,(const char*)empty1px_xpm,SubMenu,tmp,pos == i,( i << 16 ) + ivSetSubtitle );
      }
