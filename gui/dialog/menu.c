@@ -25,6 +25,7 @@
 #include "access_mpcontext.h"
 #include "mixer.h"
 #include "mpcommon.h"
+#include "mp_core.h"
 
 #include "menu.h"
 #include "dialog.h"
@@ -663,14 +664,28 @@ GtkWidget * CreatePopUpMenu( void )
   /* cheap subtitle switching for non-DVD streams */
   if ( global_sub_size && guiInfo.StreamType != STREAMTYPE_DVD )
    {
-    int pos, i;
+    int pos, i, j, subs0 = guiInfo.mpcontext->sub_counts[SUB_SOURCE_SUBS], subs1 = guiInfo.mpcontext->sub_counts[SUB_SOURCE_VOBSUB];
     pos = mpctx_get_global_sub_pos(guiInfo.mpcontext);
     SubMenu=AddSubMenu( window1, (const char*)subtitle_xpm, Menu, MSGTR_GUI_Subtitles );
     AddMenuCheckItem( window1, (const char*)empty1px_xpm, SubMenu, MSGTR_GUI__none_, pos == -1, (-1 << 16) + ivSetSubtitle );
     for ( i=0;i < global_sub_size;i++ )
      {
-      char tmp[64];
-      snprintf( tmp, sizeof(tmp), MSGTR_GUI_TrackN, i );
+      int ret = -1;
+      char lng[32], tmp[64];
+      if ( i >= subs0 + subs1 )
+       {
+        for ( j=0;j < MAX_S_STREAMS;j++ )
+         {
+          if ( demuxer->s_streams[j] ) ret++;
+          if ( ret == i - subs0 - subs1 )
+          {
+           ret = demuxer_sub_lang( demuxer, j, lng, sizeof(lng) );
+           break;
+          }
+         }
+       }
+      if ( ret == 0 ) snprintf( tmp, sizeof(tmp), MSGTR_GUI_TrackN" - %s", i, lng );
+      else snprintf( tmp, sizeof(tmp), MSGTR_GUI_TrackN, i );
       AddMenuCheckItem( window1,(const char*)empty1px_xpm,SubMenu,tmp,pos == i,( i << 16 ) + ivSetSubtitle );
      }
    }
