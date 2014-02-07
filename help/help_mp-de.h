@@ -1059,8 +1059,8 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_WIN32_PriorityNormal "normal"
 #define MSGTR_GUI_WIN32_Save "Speichern"
 #define MSGTR_GUI_WIN32_SavePlaylist "Wiedergabeliste speichern"
-#define MSGTR_GUI_WIN32_SeekBackwards "Zurückpositionieren"
-#define MSGTR_GUI_WIN32_SeekForwards "Vorpositionieren"
+#define MSGTR_GUI_WIN32_SeekBackwards "Sprung zurück"
+#define MSGTR_GUI_WIN32_SeekForwards "Sprung vor"
 #define MSGTR_GUI_WIN32_SelectPlaylist "Wiedergabeliste auswählen"
 #define MSGTR_GUI_WIN32_SelectTitleChapter "Titel/Kapitel wählen"
 #define MSGTR_GUI_WIN32_ShowHide "Ein-/Ausblenden"
@@ -1126,7 +1126,7 @@ static const char help_text[] = MSGTR_Help;
 
 // sub.c
 
-#define MSGTR_VO_SUB_Seekbar "Suchlaufleiste"
+#define MSGTR_VO_SUB_Seekbar "Fortschrittsanzeige"
 #define MSGTR_VO_SUB_Play "Play"
 #define MSGTR_VO_SUB_Pause "Pause"
 #define MSGTR_VO_SUB_Stop "Stop"
