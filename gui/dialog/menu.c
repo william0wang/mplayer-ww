@@ -26,6 +26,8 @@
 #include "mixer.h"
 #include "mpcommon.h"
 #include "mp_core.h"
+#include "sub/sub.h"
+#include "sub/vobsub.h"
 
 #include "menu.h"
 #include "dialog.h"
@@ -671,8 +673,20 @@ GtkWidget * CreatePopUpMenu( void )
     for ( i=0;i < global_sub_size;i++ )
      {
       int ret = -1;
-      char lng[32], tmp[64];
-      if ( i >= subs0 + subs1 )
+      char lng[32], tmp[64], *lang;
+      /* VOBsub */
+      if ( ( i >= subs0 && i < subs0 + subs1 ) && vo_vobsub )
+       {
+        lang = vobsub_get_id( vo_vobsub, vobsub_get_id_by_index( vo_vobsub, i - subs0 ) );
+
+        if ( lang )
+         {
+          av_strlcpy( lng, lang, sizeof(lng) );
+          ret = 0;
+         }
+       }
+      /* embedded (demuxer) */
+      else if ( i >= subs0 + subs1 )
        {
         for ( j=0;j < MAX_S_STREAMS;j++ )
          {
