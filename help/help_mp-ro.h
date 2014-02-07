@@ -1,5 +1,5 @@
 // FIXME: This needs to be redone properly.
-// Partially sync'ed with help_mp-en.h $Revision$
+// Partially sync'ed with help_mp-en.h
 // This is a retranslation of the file by Bogdan Butnaru <bogdanb@fastmail.fm>,
 // based on the previous translation by Codre Adrian
 // <codreadrian@softhome.net> (address bounces).
