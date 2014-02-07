@@ -635,8 +635,8 @@ GtkWidget * CreatePopUpMenu( void )
         {
          int aid = ((sh_audio_t *)demuxer->a_streams[i])->aid;
          int selected_id = (audio_id == aid || (audio_id == -1 && aid == demuxer_default_audio_track(demuxer)));
-         char tmp[32];
-         snprintf( tmp,32,MSGTR_GUI_TrackN,aid );
+         char tmp[64];
+         snprintf( tmp,sizeof(tmp),MSGTR_GUI_TrackN,aid );
          AddMenuCheckItem( window1, (const char*)empty1px_xpm, SubMenu,tmp,selected_id,( aid << 16 ) + ivSetAudio );
         }
      }
@@ -668,8 +668,8 @@ GtkWidget * CreatePopUpMenu( void )
     AddMenuCheckItem( window1, (const char*)empty1px_xpm, SubMenu, MSGTR_GUI__none_, pos == -1, (-1 << 16) + ivSetSubtitle );
     for ( i=0;i < global_sub_size;i++ )
      {
-      char tmp[32];
-      snprintf( tmp, 32, MSGTR_GUI_TrackN, i );
+      char tmp[64];
+      snprintf( tmp, sizeof(tmp), MSGTR_GUI_TrackN, i );
       AddMenuCheckItem( window1,(const char*)empty1px_xpm,SubMenu,tmp,pos == i,( i << 16 ) + ivSetSubtitle );
      }
    }
