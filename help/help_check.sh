@@ -38,6 +38,7 @@ for h in "$@"; do
 #include "config.h"
 #include "$h"
 void $CHECK () {
+strdup(help_text);
 EOF
 
   while read line; do
