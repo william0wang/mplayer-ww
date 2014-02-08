@@ -543,6 +543,8 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                 case ID_APPLY:
                 {
                     int strl;
+                    char *caption;
+
                     if(guiInfo.Playing) gui(GUI_SET_STATE, (void *)GUI_STOP);
 
                     /* Set the video driver */
@@ -632,7 +634,9 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                     else if(SendDlgItemMessage(hwnd, ID_OSD3, BM_GETCHECK, 0, 0) == BST_CHECKED)
                         osd_level = 3;
 
-                    MessageBox(hwnd, acp(MSGTR_GUI_MSG_PlaybackNeedsRestart), acp(MSGTR_GUI_Warning), MB_OK);
+                    caption = strdup(acp(MSGTR_GUI_Warning));
+                    MessageBox(hwnd, acp(MSGTR_GUI_MSG_PlaybackNeedsRestart), caption, MB_OK);
+                    free(caption);
                     DestroyWindow(hwnd);
                     break;
                 }
