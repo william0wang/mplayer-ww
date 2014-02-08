@@ -220,7 +220,7 @@ static int x11_errorhandler(Display * display, XErrorEvent * event)
 
     XGetErrorText(display, event->error_code, (char *) &msg, MSGLEN);
 
-    mp_msg(MSGT_VO, MSGL_ERR, "X11 error: %s\n", msg);
+    mp_msg(MSGT_VO, MSGL_ERR, MSGTR_X11Error, msg);
 
     mp_msg(MSGT_VO, MSGL_V,
            "Type: %x, display: %p, resourceid: %lx, serial: %lx\n",
@@ -431,7 +431,7 @@ int vo_init(void)
 
     // Required so that XLookupString returns UTF-8
     if (!setlocale(LC_CTYPE, "C.UTF-8") && !setlocale(LC_CTYPE, "en_US.utf8"))
-        mp_msg(MSGT_VO, MSGL_WARN, "Could not find a UTF-8 locale, some keys will not be handled.\n");
+        mp_msg(MSGT_VO, MSGL_WARN, MSGTR_CouldntFindUTF8Locale);
     XSetErrorHandler(x11_errorhandler);
 
     dispName = XDisplayName(mDisplayName);
@@ -442,7 +442,7 @@ int vo_init(void)
     if (!mDisplay)
     {
         mp_msg(MSGT_VO, MSGL_ERR,
-               "vo: couldn't open the X11 display (%s)!\n", dispName);
+               MSGTR_CouldntOpenDisplay, dispName);
         return 0;
     }
     mScreen = DefaultScreen(mDisplay);  // screen ID
@@ -924,7 +924,7 @@ static int handle_x11_event(Display *mydisplay, XEvent *event)
                 }
                 break;
             case DestroyNotify:
-                mp_msg(MSGT_VO, MSGL_WARN, "Our window was destroyed, exiting\n");
+                mp_msg(MSGT_VO, MSGL_WARN, MSGTR_WindowDestroyed);
                 mplayer_put_key(KEY_CLOSE_WIN);
                 break;
 	    case ClientMessage:
@@ -1530,7 +1530,7 @@ void saver_on(Display * mDisplay)
         {
             if (!DPMSEnable(mDisplay))
             {                   // restoring power saving settings
-                mp_msg(MSGT_VO, MSGL_WARN, "DPMS not available?\n");
+                mp_msg(MSGT_VO, MSGL_WARN, MSGTR_DPMSnotAvailable);
             } else
             {
                 // DPMS does not seem to be enabled unless we call DPMSInfo
@@ -1545,7 +1545,7 @@ void saver_on(Display * mDisplay)
                            "Successfully enabled DPMS\n");
                 } else
                 {
-                    mp_msg(MSGT_VO, MSGL_WARN, "Could not enable DPMS\n");
+                    mp_msg(MSGT_VO, MSGL_WARN, MSGTR_DPMSnotEnabled);
                 }
             }
         }
@@ -1592,9 +1592,9 @@ static int x11_selectinput_errorhandler(Display * display,
     {
         selectinput_err = 1;
         mp_msg(MSGT_VO, MSGL_ERR,
-               "X11 error: BadAccess during XSelectInput Call\n");
+               MSGTR_BadAccessXSelectInput);
         mp_msg(MSGT_VO, MSGL_ERR,
-               "X11 error: The 'ButtonPressMask' mask of specified window was probably already used by another application (see man XSelectInput)\n");
+               MSGTR_ButtonPressMaskInUse);
         /* If you think MPlayer should shutdown with this error,
          * comment out the following line */
         return 0;
@@ -1626,7 +1626,7 @@ void vo_x11_selectinput_witherr(Display * display, Window w,
     if (selectinput_err)
     {
         mp_msg(MSGT_VO, MSGL_ERR,
-               "X11 error: MPlayer discards mouse control (reconfiguring)\n");
+               MSGTR_DiscardMouseControl);
         XSelectInput(display, w,
                      event_mask &
                      (~
@@ -1652,7 +1652,7 @@ void vo_vm_switch(void)
         have_vm = 1;
     } else {
         mp_msg(MSGT_VO, MSGL_WARN,
-               "XF86VidMode extension not available.\n");
+               MSGTR_NoXF86VidModeExtension);
     }
 
     if (have_vm)
@@ -1708,7 +1708,7 @@ void vo_vm_close(void)
                 && (vidmodes[i]->vdisplay == vo_screenheight))
             {
                 mp_msg(MSGT_VO, MSGL_INFO,
-                       "Returning to original mode %dx%d\n",
+                       MSGTR_ReturningOriginalMode,
                        vo_screenwidth, vo_screenheight);
                 break;
             }
@@ -2250,7 +2250,7 @@ int vo_xv_init_colorkey(void)
         if ( rez != Success )
         {
           mp_msg( MSGT_VO, MSGL_FATAL,
-                  "[xv common] Couldn't set colorkey!\n" );
+                  MSGTR_CouldntSetColorkey );
           return 0; // error setting colorkey
         }
       }
@@ -2267,8 +2267,7 @@ int vo_xv_init_colorkey(void)
       else
       {
         mp_msg( MSGT_VO, MSGL_FATAL,
-                "[xv common] Couldn't get colorkey!"
-                "Maybe the selected Xv port has no overlay.\n" );
+                MSGTR_CouldntGetColorkey );
         return 0; // error getting colorkey
       }
     }
