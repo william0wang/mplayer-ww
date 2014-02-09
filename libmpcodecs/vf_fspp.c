@@ -75,7 +75,7 @@ static const short custom_threshold[64]=
   20,  27,  26,  23,  20,  15,  11,   5
 };
 
-static const uint8_t  __attribute__((aligned(32))) dither[8][8]={
+DECLARE_ASM_CONST(32, uint8_t, dither)[8][8]={
     {  0,  48,  12,  60,   3,  51,  15,  63, },
     { 32,  16,  44,  28,  35,  19,  47,  31, },
     {  8,  56,   4,  52,  11,  59,   7,  55, },
@@ -416,7 +416,7 @@ static void filter(struct vf_priv_s *p, uint8_t *dst, uint8_t *src,
     const int stride= is_luma ? p->temp_stride : (width+16);//((width+16+15)&(~15))
     const int step=6-p->log2_count;
     const int qps= 3 + is_luma;
-    int32_t __attribute__((aligned(32))) block_align[4*8*BLOCKSZ+ 4*8*BLOCKSZ];
+    DECLARE_ALIGNED(32, int32_t, block_align)[4*8*BLOCKSZ+ 4*8*BLOCKSZ];
     int16_t *block= (int16_t *)block_align;
     int16_t *block3=(int16_t *)(block_align+4*8*BLOCKSZ);
 
@@ -873,7 +873,7 @@ static void column_fidct_c(int16_t* thr_adr, int16_t *data, int16_t *output, int
 
 static void column_fidct_mmx(int16_t* thr_adr,  int16_t *data,  int16_t *output,  int cnt)
 {
-    uint64_t __attribute__((aligned(8))) temps[4];
+    DECLARE_ALIGNED(8, uint64_t, temps)[4];
     __asm__ volatile(
         ASMALIGN(4)
         "1:                   \n\t"
@@ -1674,7 +1674,7 @@ static void row_idct_c(int16_t* workspace,
 static void row_idct_mmx (int16_t* workspace,
                           int16_t* output_adr,  int output_stride,  int cnt)
 {
-    uint64_t __attribute__((aligned(8))) temps[4];
+    DECLARE_ALIGNED(8, uint64_t, temps)[4];
     __asm__ volatile(
         "lea (%%"REG_a",%%"REG_a",2), %%"REG_d"    \n\t"
         "1:                     \n\t"
@@ -1940,7 +1940,7 @@ static void row_fdct_c(int16_t *data, const uint8_t *pixels, int line_size, int 
 
 static void row_fdct_mmx(int16_t *data,  const uint8_t *pixels,  int line_size,  int cnt)
 {
-    uint64_t __attribute__((aligned(8))) temps[4];
+    DECLARE_ALIGNED(8, uint64_t, temps)[4];
     __asm__ volatile(
         "lea (%%"REG_a",%%"REG_a",2), %%"REG_d"    \n\t"
         "6:                     \n\t"
