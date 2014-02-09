@@ -545,8 +545,6 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                     int strl;
                     char *caption;
 
-                    if(guiInfo.Playing) gui(GUI_SET_STATE, (void *)GUI_STOP);
-
                     /* Set the video driver */
                     free(video_driver_list[0]);
                     strl = SendMessage(vo_driver, CB_GETCURSEL, 0, 0);
