@@ -215,11 +215,11 @@ static void store_slice_mmx(uint8_t *dst, int16_t *src, long dst_stride, long sr
         "psraw %%mm5, %%mm3            \n\t"
         "psraw %%mm5, %%mm4            \n\t"
         "1:                        \n\t"
-        "movq %%mm7, (%%"REG_S",%%"REG_a",)     \n\t"
+        "movq %%mm7, (%%"REG_S",%%"REG_a")     \n\t"
         "movq (%%"REG_S"), %%mm0           \n\t"
         "movq 8(%%"REG_S"), %%mm1          \n\t"
 
-        "movq %%mm7, 8(%%"REG_S",%%"REG_a",)    \n\t"
+        "movq %%mm7, 8(%%"REG_S",%%"REG_a")    \n\t"
         "paddw %%mm3, %%mm0            \n\t"
         "paddw %%mm4, %%mm1            \n\t"
 
@@ -286,15 +286,15 @@ static void store_slice2_mmx(uint8_t *dst, int16_t *src, long dst_stride, long s
         "movq 8(%%"REG_S"), %%mm1          \n\t"
         "paddw %%mm3, %%mm0            \n\t"
 
-        "paddw (%%"REG_S",%%"REG_a",), %%mm0    \n\t"
+        "paddw (%%"REG_S",%%"REG_a"), %%mm0    \n\t"
         "paddw %%mm4, %%mm1            \n\t"
-        "movq 8(%%"REG_S",%%"REG_a",), %%mm6    \n\t"
+        "movq 8(%%"REG_S",%%"REG_a"), %%mm6    \n\t"
 
-        "movq %%mm7, (%%"REG_S",%%"REG_a",)     \n\t"
+        "movq %%mm7, (%%"REG_S",%%"REG_a")     \n\t"
         "psraw %%mm2, %%mm0            \n\t"
         "paddw %%mm6, %%mm1            \n\t"
 
-        "movq %%mm7, 8(%%"REG_S",%%"REG_a",)    \n\t"
+        "movq %%mm7, 8(%%"REG_S",%%"REG_a")    \n\t"
         "psraw %%mm2, %%mm1            \n\t"
         "packuswb %%mm1, %%mm0         \n\t"
 
@@ -1816,7 +1816,7 @@ static void row_idct_mmx (int16_t* workspace,
         "paddw (%%"REG_D"), %%mm5          \n\t"
         "psraw $3, %%mm7              \n\t"
 
-        "paddw (%%"REG_D",%%"REG_a",), %%mm1    \n\t"
+        "paddw (%%"REG_D",%%"REG_a"), %%mm1    \n\t"
         "paddw %%mm2, %%mm0            \n\t"
 
         "paddw (%%"REG_D",%%"REG_a",2), %%mm7   \n\t"
@@ -1825,7 +1825,7 @@ static void row_idct_mmx (int16_t* workspace,
         "movq %%mm5, (%%"REG_D")           \n\t"
         "paddw %%mm2, %%mm6            \n\t"
 
-        "movq %%mm1, (%%"REG_D",%%"REG_a",)     \n\t"
+        "movq %%mm1, (%%"REG_D",%%"REG_a")     \n\t"
         "psraw $3, %%mm0              \n\t"
 
         "movq %%mm7, (%%"REG_D",%%"REG_a",2)    \n\t"
@@ -1837,7 +1837,7 @@ static void row_idct_mmx (int16_t* workspace,
         "paddw (%%"REG_D",%%"REG_a",2), %%mm0   \n\t"
         "psubw %%mm4, %%mm5            \n\t" //d3
 
-        "paddw (%%"REG_D",%%"REG_d",), %%mm3    \n\t"
+        "paddw (%%"REG_D",%%"REG_d"), %%mm3    \n\t"
         "psraw $3, %%mm6              \n\t"
 
         "paddw 1*8+%3, %%mm4           \n\t" //d4
@@ -1852,13 +1852,13 @@ static void row_idct_mmx (int16_t* workspace,
         "paddw (%%"REG_D"), %%mm5          \n\t"
         "psraw $3, %%mm4              \n\t"
 
-        "paddw (%%"REG_D",%%"REG_a",), %%mm4    \n\t"
+        "paddw (%%"REG_D",%%"REG_a"), %%mm4    \n\t"
         "add $"DCTSIZE_S"*2*4, %%"REG_S"      \n\t" //4 rows
 
-        "movq %%mm3, (%%"REG_D",%%"REG_d",)     \n\t"
+        "movq %%mm3, (%%"REG_D",%%"REG_d")     \n\t"
         "movq %%mm6, (%%"REG_D",%%"REG_a",4)    \n\t"
         "movq %%mm5, (%%"REG_D")           \n\t"
-        "movq %%mm4, (%%"REG_D",%%"REG_a",)     \n\t"
+        "movq %%mm4, (%%"REG_D",%%"REG_a")     \n\t"
 
         "sub %%"REG_d", %%"REG_D"             \n\t"
         "add $8, %%"REG_D"               \n\t"
@@ -1947,7 +1947,7 @@ static void row_fdct_mmx(int16_t *data,  const uint8_t *pixels,  int line_size, 
         "movd (%%"REG_S"), %%mm0           \n\t"
         "pxor %%mm7, %%mm7             \n\t"
 
-        "movd (%%"REG_S",%%"REG_a",), %%mm1     \n\t"
+        "movd (%%"REG_S",%%"REG_a"), %%mm1     \n\t"
         "punpcklbw %%mm7, %%mm0        \n\t"
 
         "movd (%%"REG_S",%%"REG_a",2), %%mm2    \n\t"
@@ -1962,7 +1962,7 @@ static void row_fdct_mmx(int16_t *data,  const uint8_t *pixels,  int line_size, 
         "movd (%%"REG_S",%%"REG_a",4), %%mm3    \n\t" //7  ;prefetch!
         "movq %%mm1, %%mm6             \n\t"
 
-        "movd (%%"REG_S",%%"REG_d",), %%mm4     \n\t" //6
+        "movd (%%"REG_S",%%"REG_d"), %%mm4     \n\t" //6
         "punpcklbw %%mm7, %%mm3        \n\t"
 
         "psubw %%mm3, %%mm5            \n\t"
@@ -1983,7 +1983,7 @@ static void row_fdct_mmx(int16_t *data,  const uint8_t *pixels,  int line_size, 
         "movd (%%"REG_S"), %%mm5           \n\t" //3
         "paddw %%mm3, %%mm2            \n\t"
 
-        "movd (%%"REG_S",%%"REG_a",), %%mm6     \n\t" //4
+        "movd (%%"REG_S",%%"REG_a"), %%mm6     \n\t" //4
         "punpcklbw %%mm7, %%mm5        \n\t"
 
         "psubw %%mm3, %%mm4            \n\t"
