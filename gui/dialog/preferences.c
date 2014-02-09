@@ -277,6 +277,8 @@ static void button_toggled( GtkToggleButton *button, gpointer user_data )
 
 static void prButton( GtkButton * button, gpointer user_data )
 {
+ static int inform = True;
+
  (void) button;
 
  switch ( (int)user_data )
@@ -383,6 +385,12 @@ static void prButton( GtkButton * button, gpointer user_data )
 
 	setdup( &dvd_device,gtk_entry_get_text( GTK_ENTRY( prEDVDDevice ) ) );
 	setdup( &cdrom_device,gtk_entry_get_text( GTK_ENTRY( prECDRomDevice ) ) );
+
+	if ( inform )
+	 {
+	  gtkMessageBox( MSGBOX_INFORMATION,MSGTR_GUI_MSG_PlaybackNeedsRestart );
+	  inform = False;
+	 }
 
    case bCancel:
 	gtk_widget_destroy( Preferences );
@@ -1447,14 +1455,6 @@ void ShowPreferences( void )
 
  gtk_widget_show( Preferences );
  gtkSetLayer( Preferences );
- {
-  static int visible = True;
-  if ( visible )
-   {
-    gtkMessageBox( MSGBOX_INFORMATION,MSGTR_GUI_MSG_PlaybackNeedsRestart );
-    visible=False;
-   }
- }
 }
 
 #ifdef CONFIG_OSS_AUDIO
