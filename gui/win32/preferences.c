@@ -632,9 +632,13 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                     else if(SendDlgItemMessage(hwnd, ID_OSD3, BM_GETCHECK, 0, 0) == BST_CHECKED)
                         osd_level = 3;
 
+                    if (guiInfo.Playing)
+                    {
                     caption = strdup(acp(MSGTR_GUI_Information));
                     MessageBox(hwnd, acp(MSGTR_GUI_MSG_PlaybackNeedsRestart), caption, MB_OK | MB_ICONINFORMATION);
                     free(caption);
+                    }
+
                     DestroyWindow(hwnd);
                     break;
                 }

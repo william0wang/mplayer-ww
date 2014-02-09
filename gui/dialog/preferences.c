@@ -386,7 +386,7 @@ static void prButton( GtkButton * button, gpointer user_data )
 	setdup( &dvd_device,gtk_entry_get_text( GTK_ENTRY( prEDVDDevice ) ) );
 	setdup( &cdrom_device,gtk_entry_get_text( GTK_ENTRY( prECDRomDevice ) ) );
 
-	if ( inform )
+	if ( guiInfo.Playing && inform )
 	 {
 	  gtkMessageBox( MSGBOX_INFORMATION,MSGTR_GUI_MSG_PlaybackNeedsRestart );
 	  inform = False;
