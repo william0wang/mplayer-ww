@@ -634,9 +634,9 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
 
                     if (guiInfo.Playing)
                     {
-                    caption = strdup(acp(MSGTR_GUI_Information));
-                    MessageBox(hwnd, acp(MSGTR_GUI_MSG_PlaybackNeedsRestart), caption, MB_OK | MB_ICONINFORMATION);
-                    free(caption);
+                        caption = strdup(acp(MSGTR_GUI_Information));
+                        MessageBox(hwnd, acp(MSGTR_GUI_MSG_PlaybackNeedsRestart), caption, MB_OK | MB_ICONINFORMATION);
+                        free(caption);
                     }
 
                     DestroyWindow(hwnd);
