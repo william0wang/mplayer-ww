@@ -35,7 +35,12 @@ for h in "$@"; do
   cat <<EOF > ${CHECK}.c
 #include <inttypes.h>
 #include <string.h>
-#include "config.h"
+#ifndef CONFIG_VCD
+#define CONFIG_VCD
+#endif
+#ifndef CONFIG_DVDREAD
+#define CONFIG_DVDREAD
+#endif
 #include "$h"
 void $CHECK () {
 strdup(help_text);
