@@ -216,19 +216,14 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CdDevNotfound "CD-ROM 장치 '%s'를 찾을 수 없습니다!\n"
 #define MSGTR_ErrTrackSelect "VCD 트랙을 선택하는 도중 에러가 발생했습니다."
 #define MSGTR_ReadSTDIN "표준입력(stdin)으로 부터 읽고 있습니다...\n"
-#define MSGTR_UnableOpenURL "URL을 열 수 없습니다.: %s\n"
-#define MSGTR_ConnToServer "서버에 연결되었습니다.: %s\n"
 #define MSGTR_FileNotFound "파일을 찾을 수 없습니다.: '%s'\n"
 
 #define MSGTR_SMBInitError "libsmbclient 라이브러리를 초기화할 수 없습니다.: %d\n"
 #define MSGTR_SMBFileNotFound "lan으로 부터 열 수 없습니다.: '%s'\n"
-#define MSGTR_SMBNotCompiled "MPlayer가 SMB읽기를 할 수 있도록 컴파일되지 않았습니다.\n"
 
 #define MSGTR_CantOpenDVD "DVD 장치를 열 수 없습니다.: %s (%s)\n"
 #define MSGTR_DVDnumTitles "이 DVD에는 %d개의 타이틀이 있습니다.\n"
 #define MSGTR_DVDinvalidTitle "유효하지 않은 DVD 타이틀 번호입니다.: %d\n"
-#define MSGTR_DVDnumChapters "이 DVD 타이틀에는 %d개의 챕터가 있습니다.\n"
-#define MSGTR_DVDinvalidChapter "유효하지 않은 DVD 챕터 번호입니다.: %d\n"
 #define MSGTR_DVDnumAngles "이 DVD 타이틀에는 %d개의 앵글이 있습니다.\n"
 #define MSGTR_DVDinvalidAngle "유효하지 않은 DVD 앵글 번호입니다.: %d\n"
 #define MSGTR_DVDnoIFO "DVD 타이틀 %d를 위한 IFO파일을 열 수 없습니다.\n"
@@ -243,8 +238,6 @@ static const char help_text[] = MSGTR_Help;
                       "AVI 파일의 경우, -ni 옵션으로 non-interleaved 모드로 강제 시도해보세요.\n"
 #define MSGTR_SwitchToNi "\n잘못된 interleaved AVI 파일을 발견했습니다. -ni 모드로 변경합니다...\n"
 #define MSGTR_Detected_XXX_FileFormat "%s 파일 형식을 발견했습니다.\n"
-#define MSGTR_DetectedAudiofile "오디오 파일을 감지하였습니다.\n"
-#define MSGTR_InvalidMPEGES "유효하지 않은 MPEG-ES 스트림??? 저작자에게 문의하세요, 버그일지도 모릅니다. :(\n"
 #define MSGTR_FormatNotRecognized "============= 죄송합니다. 이 파일형식을 인식하지못했거나 지원하지않습니다 ===============\n"\
                                   "=== 만약 이 파일이 AVI, ASF 또는 MPEG 스트림이라면, 저작자에게 문의하세요! ===\n"
 #define MSGTR_MissingVideoStream "비디오 스트림을 찾지 못했습니다.\n"
@@ -265,7 +258,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MOVcomprhdr "MOV: 압축된 헤더는 (아직) 지원되지않습니다.\n"
 #define MSGTR_MOVvariableFourCC "MOV: 경고: 가변적인 FOURCC 발견!?\n"
 #define MSGTR_MOVtooManyTrk "MOV: 경고: 트랙이 너무 많습니다."
-#define MSGTR_DetectedTV "TV를 발견하였습니다! ;-)\n"
 #define MSGTR_ErrorOpeningOGGDemuxer "ogg 해석기를 열 수 없습니다.\n"
 #define MSGTR_CannotOpenAudioStream "오디오 스트림을 열 수 없습니다.: %s\n"
 #define MSGTR_CannotOpenSubtitlesStream "자막 스트림을 열 수 없습니다.: %s\n"
@@ -317,7 +309,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CannotFindColorspace "'scale'을 시도했지만, 맞는 컬러공간을 찾을 수 없습니다. :(\n"
 
 // vd.c
-#define MSGTR_CodecDidNotSet "VDec: 코덱이 sh->disp_w와 sh->disp_h로 설정되지 않아서, 다시 시도합니다.\n"
 #define MSGTR_CouldNotFindColorspace "어울리는 컬러공간을 찾을 수 없습니다. -vf 크기조절로 다시 시도합니다...\n"
 #define MSGTR_MovieAspectIsSet "화면비율이 %.2f:1 입니다. - 화면비율을 조정하기위해 사전 크기조절을 합니다.\n"
 #define MSGTR_MovieAspectUndefined "화면비율이 정의되지 않았습니다. - 사전 크기조절이 적용되지 않았습니다.\n"

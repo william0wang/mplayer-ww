@@ -219,19 +219,14 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CdDevNotfound "CD-ROM drev '%s' ikke fundet!\n"
 #define MSGTR_ErrTrackSelect "Fejl i valg af VCD nummer!"
 #define MSGTR_ReadSTDIN "Læser fra stdin...\n"
-#define MSGTR_UnableOpenURL "Kunne ikke åbne adressen: %s\n"
-#define MSGTR_ConnToServer "Forbundet til serveren: %s\n"
 #define MSGTR_FileNotFound "Filen blev ikke fundet: '%s'\n"
 
 #define MSGTR_SMBInitError "Kunne ikke initialisere libsmbclient bibliotek: %d\n"
 #define MSGTR_SMBFileNotFound "Kunne ikke åbne netværksadressen '%s'\n"
-#define MSGTR_SMBNotCompiled "MPlayer er ikke blevet kompileret med SMB læse-understøttelse\n"
 
 #define MSGTR_CantOpenDVD "Kunne ikke åbne DVD drev: %s (%s)\n"
 #define MSGTR_DVDnumTitles "Der er %d titler på denne DVD.\n"
 #define MSGTR_DVDinvalidTitle "Ugyldig DVD-titel: %d\n"
-#define MSGTR_DVDnumChapters "Der er %d kapitler i denne DVD-titel.\n"
-#define MSGTR_DVDinvalidChapter "Ugyldigt DVD-kapitel: %d\n"
 #define MSGTR_DVDnumAngles "Der er %d vinkler i denne DVD-titel.\n"
 #define MSGTR_DVDinvalidAngle "Ugyldig DVD-vinkel: %d\n"
 #define MSGTR_DVDnoIFO "Kunne ikke finde IFO filen for DVD-titel %d.\n"
@@ -246,8 +241,6 @@ static const char help_text[] = MSGTR_Help;
                       "For AVI filer, prøv at påtvinge non-interleaved tilstand med -ni.\n"
 #define MSGTR_SwitchToNi "\nDefekt .AVI - skifter til ikke-interleaved (-ni)...\n"
 #define MSGTR_Detected_XXX_FileFormat "Filformat er %s\n"
-#define MSGTR_DetectedAudiofile "Filen er en lydfil!\n"
-#define MSGTR_InvalidMPEGES "Ugyldig MPEG-ES stream??? Rapporter venligst dette, det kunne være en fejl i programmet :(\n"
 #define MSGTR_FormatNotRecognized "============ Desværre, dette filformat kunne ikke genkendes =================\n"\
 "=== Er denne fil af typen AVI, ASF eller MPEG, så rapporter venligst dette, det kan skyldes en fejl. ==\n"
 #define MSGTR_MissingVideoStream "Ingen videospor fundet.\n"
@@ -268,7 +261,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MOVcomprhdr "MOV: Komprimerede headers (endnu) ikke understøttet!\n"
 #define MSGTR_MOVvariableFourCC "MOV: Advarsel! variabel FOURCC!?\n"
 #define MSGTR_MOVtooManyTrk "MOV: Advarsel! For mange spor"
-#define MSGTR_DetectedTV "TV genkendt! ;-)\n"
 #define MSGTR_ErrorOpeningOGGDemuxer "Kan ikke åbne ogg demuxe.r\n"
 #define MSGTR_CannotOpenAudioStream "Kan ikke åbne lydsspor: %s\n"
 #define MSGTR_CannotOpenSubtitlesStream "Kan ikke åbne spor %s af underteksterne\n"
@@ -318,7 +310,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CannotFindColorspace "Kunne ikke finde fælles colorspace, selv med 'scale' :(\n"
 
 // vd.c
-#define MSGTR_CodecDidNotSet "VDek: codec satte ikke sh->disp_w og sh->disp_h, prøver en anden løsning!\n"
 #define MSGTR_CouldNotFindColorspace "Kunne ikke finde colorspace som matcher - prøver med -vf scale...\n"
 #define MSGTR_MovieAspectIsSet "Størrelsesforhold er %.2f:1 - præskalerer for at rette størrelsesforholdet.\n"
 #define MSGTR_MovieAspectUndefined "Størrelsesforholdet er ikke defineret - ingen præskalering benyttet.\n"

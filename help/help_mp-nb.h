@@ -104,15 +104,11 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CdDevNotfound "CD-ROM enhet '%s' ikke funnet!\n"
 #define MSGTR_ErrTrackSelect "Feil under valg av VCD spor!"
 #define MSGTR_ReadSTDIN "Leser fra stdin...\n"
-#define MSGTR_UnableOpenURL "Kan ikke åpne URL: %s\n"
-#define MSGTR_ConnToServer "Koblet til server: %s\n"
 #define MSGTR_FileNotFound "Finner ikke filen: '%s'\n"
 
 #define MSGTR_CantOpenDVD "Kan ikke åpne DVD enhet: %s (%s)\n"
 #define MSGTR_DVDnumTitles "Det er %d titler på denne DVD.\n"
 #define MSGTR_DVDinvalidTitle "Ugyldig DVD tittelnummer: %d\n"
-#define MSGTR_DVDnumChapters "Det er %d kapitler i denne DVD tittelen.\n"
-#define MSGTR_DVDinvalidChapter "Ugyldig DVD kapittelnummer: %d\n"
 #define MSGTR_DVDnumAngles "Det er %d vinkler i denne DVD tittelen.\n"
 #define MSGTR_DVDinvalidAngle "Ugyldig DVD vinkel nummer: %d\n"
 #define MSGTR_DVDnoIFO "Kan ikke åpne IFO filen for DVD tittel %d.\n"
@@ -125,7 +121,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_TooManyVideoInBuffer "\nDEMUXER: For mange (%d i %d bytes) video pakker i bufferen!\n"
 #define MSGTR_MaybeNI "(kanskje du spiller av en ikke-interleaved stream/fil eller codec'en feilet)\n"
 #define MSGTR_Detected_XXX_FileFormat "Detekterte %s filformat!\n"
-#define MSGTR_InvalidMPEGES "Ugyldig MPEG-ES stream??? kontakt utvikleren, det kan være en feil :(\n"
 #define MSGTR_FormatNotRecognized "======== Beklager, dette filformatet er ikke gjenkjent/støttet ===============\n"\
                                   "=== Hvis det er en AVI, ASF eller MPEG stream, kontakt utvikleren! ===\n"
 #define MSGTR_MissingVideoStream "Ingen video stream funnet!\n"

@@ -144,42 +144,23 @@ static const char help_text[] = MSGTR_Help;
 "  du rapporterar en trolig bugg.\n"
 #define MSGTR_LoadingConfig "Laddar konfiguration '%s'\n"
 #define MSGTR_AddedSubtitleFile "SUB: lade till textningsfil %d: %s \n"
-#define MSGTR_ErrorOpeningOutputFile "Fel vid öppning av fil [%s] för skrivning!\n"
 #define MSGTR_RTCDeviceNotOpenable "Misslyckades att öppna %s: %s (den borde vara läsbar av användaren.)\n"
 #define MSGTR_LinuxRTCInitErrorIrqpSet "'Linux RTC' initieringsfel i 'ioctl' rtc_irqp_set %lu: %s\n"
 #define MSGTR_IncreaseRTCMaxUserFreq "Försök lägg till \"echo %lu > /proc/sys/dev/rtc/max-user-freq\" till ditt systems uppstartningsscript.\n"
 #define MSGTR_LinuxRTCInitErrorPieOn "'Linux RTC init' fel i 'ioctl' [rtc_pie_on]: %s\n"
-#define MSGTR_UsingTimingType "Använder %s tidtagning.\n"
 #define MSGTR_Getch2InitializedTwice "VARNING: getch2_init anropad dubbelt!\n"
-#define MSGTR_DumpstreamFdUnavailable "Kan inte dumpa denna ström - ingen 'fd' tillgänglig.\n"
 #define MSGTR_CantOpenLibmenuFilterWithThisRootMenu "Kan inte öppna 'libmenu video filter' med rotmeny %s.\n"
 #define MSGTR_AudioFilterChainPreinitError "Fel vid förinitiering av audiofilter!\n"
 #define MSGTR_LinuxRTCReadError "'Linux RTC' läsfel: %s\n"
 #define MSGTR_SoftsleepUnderflow "Varning! Softsleep underflow!\n"
-#define MSGTR_DvdnavNullEvent "DVDNAV-händelse NULL?!\n"
-#define MSGTR_DvdnavHighlightEventBroken "DVDNAV-händelse: Highlight-händelse trasig\n" // FIXME highlight
-#define MSGTR_DvdnavEvent "DVDNAV-händelse Event: %s\n"
-#define MSGTR_DvdnavHighlightHide "DVDNAV-händelse: Highlight gömd\n"
-#define MSGTR_DvdnavStillFrame "######################################## DVDNAV-händelse: Fortfarande bildruta: %d sekunder\n"
-#define MSGTR_DvdnavNavStop "DVDNAV-händelse: Nav Stop\n" // FIXME Nav Stop?
-#define MSGTR_DvdnavNavNOP "DVDNAV-händelse: Nav NOP\n"
-#define MSGTR_DvdnavNavSpuStreamChangeVerbose "DVDNAV-händelse: 'Nav SPU'-strömningsändring: fysisk: %d/%d/%d logisk: %d\n"
-#define MSGTR_DvdnavNavSpuStreamChange "DVDNAV-händelse: 'Nav SPU'-strömningsändring: fysisk: %d logisk: %d\n"
-#define MSGTR_DvdnavNavAudioStreamChange "DVDNAV-händelse: 'Nav Audio'-strömningsändring: fysisk: %d logisk: %d\n"
-#define MSGTR_DvdnavNavVTSChange "DVDNAV-händelse: 'Nav VTS' ändrad\n"
-#define MSGTR_DvdnavNavCellChange "DVDNAV-händelse: 'Nav Cell' ändrad\n"
-#define MSGTR_DvdnavNavSpuClutChange "DVDNAV-händelse: 'Nav SPU CLUT' ändrad\n"
-#define MSGTR_DvdnavNavSeekDone "DVDNAV-händelse: 'Nav Seek' ändrad\n"
 /*
  * FIXME A lot of shorted words, not translating atm
  */
-#define MSGTR_MenuCall "Menyanrop\n"
 
 #define MSGTR_EdlOutOfMem "Kan inte allokera tillräckligt med minne för att hålla EDL-data.\n"
 #define MSGTR_EdlRecordsNo "Läst %d EDL-funtioner.\n"
 #define MSGTR_EdlQueueEmpty "Det är inga EDL-funktioner att ta hand om.\n"
 #define MSGTR_EdlCantOpenForWrite "Kan inte öppna EDL-fil [%s] för skrivning.\n"
-#define MSGTR_EdlCantOpenForRead "Kan inte öppna EDL-fil [%s] för läsning.\n"
 #define MSGTR_EdlNOsh_video "Kan inte använda EDL utan video, inaktiverar.\n"
 #define MSGTR_EdlNOValidLine "Icke godkänd EDL-rad: %s\n"
 #define MSGTR_EdlBadlyFormattedLine "Dåligt formaterad EDL-rad [%d]. Kastar bort.\n"
@@ -207,9 +188,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_OpenedStream "klart: format: %d  data: 0x%X - 0x%x\n"
 #define MSGTR_VCodecFramecopy "videocodec: framecopy (%dx%d %dbpp fourcc=%x)\n" // FIXME translate?
 #define MSGTR_ACodecFramecopy "audiocodec: framecopy (format=%x chans=%d rate=%d bits=%d B/s=%d sample-%d)\n" // -''-
-#define MSGTR_CBRPCMAudioSelected "CBR PCM audio valt\n"
 #define MSGTR_MP3AudioSelected "MP3 audio valt\n"
-#define MSGTR_CannotAllocateBytes "Kunde inte allokera %d byte\n"
 #define MSGTR_SettingAudioDelay "Sätter AUDIO DELAY till %5.3f\n"
 #define MSGTR_LimitingAudioPreload "Begränsar audioförinladdning till 0.4s\n" // preload?
 #define MSGTR_IncreasingAudioDensity "Höjer audiodensitet till 4\n"
@@ -320,7 +299,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_ErrorParsingCommandLine "fel vid tolkning av cmdline"
 #define MSGTR_VideoStreamRequired "Videoström är obligatoriskt!\n"
 #define MSGTR_ForcingInputFPS "'input fps' kommer att bli tolkad som %5.3f istället\n"
-#define MSGTR_RawvideoDoesNotSupportAudio "Ut-filformat RAWVIDEO stödjer inte audio - deaktiverar audio\n"
 #define MSGTR_DemuxerDoesntSupportNosound "Denna demuxer stödjer inte -nosound ännu.\n"
 #define MSGTR_MemAllocFailed "minnesallokering misslyckades"
 #define MSGTR_NoMatchingFilter "Kunde inte finna matchande filter/ao-format!\n"
@@ -407,7 +385,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_OutdatedCodecsConf "Denna codecs.conf är för gammal och inkompatibel med denna MPlayer version!" // release is more like 'släpp', sounds wrong, using version instead
 
 // fifo.c
-#define MSGTR_CannotMakePipe "Kan inte skapa en PIPE!\n" // FIXME make?
 
 // m_config.c
 #define MSGTR_SaveSlotTooOld "Allt för gammal sparningsslottar funna från nivå %d: %d !!!\n" // FIXME slot?
@@ -423,19 +400,14 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CdDevNotfound "CD-ROM-enhet '%s' ej funnet.\n"
 #define MSGTR_ErrTrackSelect "Fel vid val av VCD-spår."
 #define MSGTR_ReadSTDIN "Läser från stdin...\n"
-#define MSGTR_UnableOpenURL "Oförmögen att öppna URL: %s\n"
-#define MSGTR_ConnToServer "Ansluten till server: %s\n"
 #define MSGTR_FileNotFound "Fil ej funnen: '%s'\n"
 
 #define MSGTR_SMBInitError "Kan inte initiera libsmbclient-bilioteket: %d\n"
 #define MSGTR_SMBFileNotFound "Kunde inte öppna från LAN: '%s'\n"
-#define MSGTR_SMBNotCompiled "MPlayer var inte kompilerad med SMB-lässtöd.\n"
 
 #define MSGTR_CantOpenDVD "Kunde inte öppna DVD-enhet: %s (%s)\n"
 #define MSGTR_DVDnumTitles "Det är %d titlar på denna DVD.\n"
 #define MSGTR_DVDinvalidTitle "Icke godkänt DVD-titelnummer: %d\n"
-#define MSGTR_DVDnumChapters "Der är %d kapitel på denna DVD-titel.\n"
-#define MSGTR_DVDinvalidChapter "Ej godkänt DVD-kapitelnummer: %d\n"
 #define MSGTR_DVDnumAngles "Det är %d vinkar på denna DVD-titel.\n"
 #define MSGTR_DVDinvalidAngle "Ej godkänd DVD-vinkelsnummer: %d\n"
 #define MSGTR_DVDnoIFO "Kan inte öppna IFO-fil för DVD-titel %d.\n"
@@ -450,8 +422,6 @@ static const char help_text[] = MSGTR_Help;
                       "För AVI-filer, försök med att forcera icke-interleaved-lägen med -ni argumentet.\n" // FIXME non-interleaved
 #define MSGTR_SwitchToNi "\nSvårt interleaved AVI-fil detekterad, går över till '-ni'-läge...\n"
 #define MSGTR_Detected_XXX_FileFormat "%s filformat detekterat.\n"
-#define MSGTR_DetectedAudiofile "Audiofilformat detekterat.\n"
-#define MSGTR_InvalidMPEGES "Icke godkänd 'MPEG-ES'-ström??? Kontakta upphovsmannen, det kanske är en bugg :(\n" //FIXME author???
 #define MSGTR_FormatNotRecognized "================ Tyvärr, detta filformat är inte rekogniserbart/stött ==================\n"\
                                   "=== Om denna fil är en AVi, ASF eller MPEG-ström, var vänlig kontakta upphovsmannen! ===\n" //FIXME author???
 #define MSGTR_MissingVideoStream "Ingen videoström funnen.\n"
@@ -472,7 +442,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MOVcomprhdr "MOV: filhuvudkomprimeringssupport kräver ZLIB!\n"
 #define MSGTR_MOVvariableFourCC "MOV: VARNING: Variabel FOURCC påvisad!?\n"
 #define MSGTR_MOVtooManyTrk "MOV: VARNING: allt förmånga spår"
-#define MSGTR_DetectedTV "TV påvisad! ;-)\n"
 #define MSGTR_ErrorOpeningOGGDemuxer "Oförmögen att öppna oggdemuxern.\n"
 #define MSGTR_CannotOpenAudioStream "Kan inte öppna audioström: %s\n"
 #define MSGTR_CannotOpenSubtitlesStream "Kan inte öppna textningsström: %s\n"
@@ -524,7 +493,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CannotFindColorspace "Kunde inte hitta matchande färgrymder, t.o.m. vid insättning av 'scale' :(\n" // FIXME colorspace
 
 // vd.c
-#define MSGTR_CodecDidNotSet "VDec: Codec satt inte sh->disp_w samt sh->disp_h, försöker gå runt problemet.\n"
 #define MSGTR_CouldNotFindColorspace "Kunde inte finna matchande färgrymder - försöker åter med -vf scale...\n" // -''-
 #define MSGTR_MovieAspectIsSet "Movie-Aspect är %.2f:1 - prescaling till korrekt film-aspect.\n"
 #define MSGTR_MovieAspectUndefined "Film-Aspect är ej definerad - ingen prescaling kommer att äga rum.\n"
@@ -731,8 +699,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_VO_CantCreateFile "Oförmögen att skapa utfil."
 #define MSGTR_VO_DirectoryCreateSuccess "Ut-katalog skapad."
 #define MSGTR_VO_ValueOutOfRange "Värden utanför godkänd rymd"
-#define MSGTR_VO_NoValueSpecified "Inget värde angett."
-#define MSGTR_VO_UnknownSuboptions "Okänd suboption" // -''-
 
 // vo_jpeg.c
 #define MSGTR_VO_JPEG_ProgressiveJPEG "'Progressive JPEG' aktiverat."
@@ -749,7 +715,6 @@ static const char help_text[] = MSGTR_Help;
 
 // vo_yuv4mpeg.c
 #define MSGTR_VO_YUV4MPEG_InterlacedHeightDivisibleBy4 "'Interlaced'-mode kräver bildhöjd som är delbar med 4." // FIXME interlaced?
-#define MSGTR_VO_YUV4MPEG_InterlacedLineBufAllocFail "Oförmögen att allokera linjebufferrt för interlaced-mode."
 #define MSGTR_VO_YUV4MPEG_WidthDivisibleBy2 "Bildbredd måste vara delbart med 2."
 #define MSGTR_VO_YUV4MPEG_OutFileOpenError "Kan inte få minnes- eller filhanterare att skriva till \"%s\"!"
 #define MSGTR_VO_YUV4MPEG_OutFileWriteError "Fel vid skrivning av bild till ut!" // FIXME output here?
@@ -837,12 +802,9 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_AO_SUN_RtscWriteFailed "[AO SUN] rtsc: skrivning misslyckades."
 #define MSGTR_AO_SUN_CantOpenAudioDev "[AO SUN] Kan inte öppna audioenhet %s, %s  -> inget ljud.\n"
 #define MSGTR_AO_SUN_UnsupSampleRate "[AO SUN] audio_setup: ditt kort hanterar inte %d kanaler, %s, %d Hz samplerate.\n" // FIXME samplerate
-#define MSGTR_AO_SUN_CantUseSelect "[AO SUN]\n   ***  Din ljudkortsenhet hanterar inte select()  ***\nKompilera om med '#undef HAVE_AUDIO_SELECT' i config.h !\n\n"
-#define MSGTR_AO_SUN_CantReopenReset "[AO SUN]\nFatalt fel: *** KAN INTE ÅTERÖPPNA / ÅTERSTÄLLA AUDIOENHET (%s) ***\n"
 
 // ao_plugin.c
 
-#define MSGTR_AO_PLUGIN_InvalidPlugin "[AO PLUGIN] icke godkänd plugin: %s\n" // FIXME plugin - translate?
 
 // ========================== LIBMPCODECS ===================================
 

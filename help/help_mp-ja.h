@@ -163,19 +163,14 @@ static const char help_text[] = MSGTR_Help;
 // open.c, stream.c:
 #define MSGTR_CdDevNotfound "CD-ROM デバイス '%s' が存在しません.\n"
 #define MSGTR_ReadSTDIN "標準入力から読み込んでいます...\n"
-#define MSGTR_UnableOpenURL "指定されたURLを読み込めません: %s\n"
-#define MSGTR_ConnToServer "サーバに接続中: %s\n"
 #define MSGTR_FileNotFound "ファイルが存在しません: '%s'\n"
 
 #define MSGTR_SMBInitError "libsmbclient の初期化失敗: %d\n"
 #define MSGTR_SMBFileNotFound "ローカルエリアネットワークから開くことが出来ませんでした: '%s'\n"
-#define MSGTR_SMBNotCompiled "MPlayer はSMB reading support を無効にしてコンパイルされています\n"
 
 #define MSGTR_CantOpenDVD "DVDデバイスを開くことが出来ませんでした: %s (%s)\n"
 #define MSGTR_DVDnumTitles "このDVDには %d タイトル記録されています.\n"
 #define MSGTR_DVDinvalidTitle "不正な DVD タイトル番号です: %d\n"
-#define MSGTR_DVDnumChapters "このDVDは %d キャプターあります.\n"
-#define MSGTR_DVDinvalidChapter "不正なDVDキャプター番号ですr: %d\n"
 #define MSGTR_DVDnumAngles "このDVDには %d アングルあります.\n"
 #define MSGTR_DVDinvalidAngle "不正なDVDアングル番号です: %d\n"
 #define MSGTR_DVDnoIFO "Cannot open the IFO file for DVD title %d.\n"
@@ -194,7 +189,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_TooManyAudioInBuffer "\nバッファに多過ぎる音声パケットが与えられてます: (%d in %d bytes).\n"
 #define MSGTR_TooManyVideoInBuffer "\nバッファに多過ぎる映像パケットが与えられてます: (%d in %d bytes).\n"
 #define MSGTR_Detected_XXX_FileFormat "%s ファイルフォーマットと判断.\n"
-#define MSGTR_DetectedAudiofile "音声ファイルと判断.\n"
 #define MSGTR_FormatNotRecognized "============ このファイルフォーマットは サポートしていません =============\n"\
                                   "======= もしこのファイルが AVI、ASF、MPEGなら作成者に連絡して下さい ======\n"
 #define MSGTR_MissingVideoStream "映像ストリームが存在しません.\n"
@@ -213,7 +207,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MOVcomprhdr "MOV: 圧縮されたヘッダ(Compressed headers)をサポートするには ZLIB が必要です\n"
 #define MSGTR_MOVvariableFourCC "MOV: 警告: Variable FOURCC detected!?\n"
 #define MSGTR_MOVtooManyTrk "MOV: 警告: too many tracks"
-#define MSGTR_DetectedTV "TV detected! ;-)\n"
 #define MSGTR_ErrorOpeningOGGDemuxer "ogg demuxer を開くことが出来ません.\n"
 #define MSGTR_CannotOpenAudioStream "音声ストリームを開くことが出来ません: %s\n"
 #define MSGTR_CannotOpenSubtitlesStream "サブタイトルストリームを開くことが出来ません: %s\n"

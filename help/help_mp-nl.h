@@ -143,38 +143,19 @@ static const char help_text[] = MSGTR_Help;
 
 #define MSGTR_LoadingConfig "Bezig met het laden van de configuratie '%s'\n"
 #define MSGTR_AddedSubtitleFile "SUB: bestand met ondertitels toegevoegd (%d): %s\n"
-#define MSGTR_ErrorOpeningOutputFile "Fout bij het openen van het bestand [%s]! Geen schrijfrechten!\n"
 #define MSGTR_RTCDeviceNotOpenable "Kon %s niet openen: %s (moet leesbaar zijn voor deze gebruiker.)\n"
 #define MSGTR_LinuxRTCInitErrorIrqpSet "Linux RTC initialisatiefout in ioctl (rtc_irqp_set %lu): %s\n"
 #define MSGTR_IncreaseRTCMaxUserFreq "Probeer \"echo %lu > /proc/sys/dev/rtc/max-user-freq\" toe te voegen in de opstartbestanden van uw systeem.\n"
 #define MSGTR_LinuxRTCInitErrorPieOn "Linux RTC initialisatiefout in ioctl (rtc_pie_on): %s\n"
-#define MSGTR_UsingTimingType "Gebruikt %s timing.\n"
 #define MSGTR_Getch2InitializedTwice "WAARSCHUWING: getch2_init is twee maal opgeroepen!\n"
-#define MSGTR_DumpstreamFdUnavailable "Deze stream can niet opgeslagen worde - geen bestandsomschrijving (file descriptor) beschikbaar.\n"
 #define MSGTR_CantOpenLibmenuFilterWithThisRootMenu "Kan de libmenu video filter niet openen met het root menu %s.\n"
 #define MSGTR_AudioFilterChainPreinitError "Er is een fout opgetreden bijde pre-initialisatie van de audio filter!\n"
 #define MSGTR_LinuxRTCReadError "Linux RTC leesfout: %s\n"
 #define MSGTR_SoftsleepUnderflow "Waarschuwing! Softsleep underflow!\n"
-#define MSGTR_DvdnavNullEvent "DVDNAV Event NULL?!\n"
-#define MSGTR_DvdnavHighlightEventBroken "DVDNAV Event: Highlight event broken\n"
-#define MSGTR_DvdnavEvent "DVDNAV Event: %s\n"
-#define MSGTR_DvdnavHighlightHide "DVDNAV Event: Highlight Hide\n"
-#define MSGTR_DvdnavStillFrame "######################################## DVDNAV Event: Still Frame: %d sec(s)\n"
-#define MSGTR_DvdnavNavStop "DVDNAV Event: Nav Stop\n"
-#define MSGTR_DvdnavNavNOP "DVDNAV Event: Nav NOP\n"
-#define MSGTR_DvdnavNavSpuStreamChangeVerbose "DVDNAV Event: Nav SPU Stream Change: phys: %d/%d/%d logical: %d\n"
-#define MSGTR_DvdnavNavSpuStreamChange "DVDNAV Event: Nav SPU Stream Change: phys: %d logical: %d\n"
-#define MSGTR_DvdnavNavAudioStreamChange "DVDNAV Event: Nav Audio Stream Change: phys: %d logical: %d\n"
-#define MSGTR_DvdnavNavVTSChange "DVDNAV Event: Nav VTS Change\n"
-#define MSGTR_DvdnavNavCellChange "DVDNAV Event: Nav Cell Change\n"
-#define MSGTR_DvdnavNavSpuClutChange "DVDNAV Event: Nav SPU CLUT Change\n"
-#define MSGTR_DvdnavNavSeekDone "DVDNAV Event: Nav Seek Done\n"
-#define MSGTR_MenuCall "Menu call\n"
 #define MSGTR_EdlOutOfMem "Kan niet genoeg geheugen toewijzen voor de EDL data.\n"
 #define MSGTR_EdlRecordsNo "Bezig met het lezen van %d EDL acties.\n"
 #define MSGTR_EdlQueueEmpty "Er zijn geen EDL acties meer te verwerken.\n"
 #define MSGTR_EdlCantOpenForWrite "Kan het EDL bestand [%s] niet openen om te schrijven.\n"
-#define MSGTR_EdlCantOpenForRead "Kan het EDL bestand [%s] niet openen om te lezen.\n"
 #define MSGTR_EdlNOsh_video "Kan EDl niet gebruiken zonder video, daarom wordt het uitgeschakeld.\n"
 #define MSGTR_EdlNOValidLine "Ongeldige EDL lijn: %s\n"
 #define MSGTR_EdlBadlyFormattedLine "Slecht geformatteerde EDL lijn [%d] Deze wordt niet gebruikt.\n"
@@ -202,9 +183,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_OpenedStream "succes: formaat: %d  data: 0x%X - 0x%x\n"
 #define MSGTR_VCodecFramecopy "videocodec: framecopy (%dx%d %dbpp fourcc=%x)\n"
 #define MSGTR_ACodecFramecopy "audiocodec: framecopy (formaat=%x chans=%d rate=%d bits=%d B/s=%d sample-%d)\n"
-#define MSGTR_CBRPCMAudioSelected "CBR PCM audio geselecteerd\n"
 #define MSGTR_MP3AudioSelected "MP3 audio geselecteerd\n"
-#define MSGTR_CannotAllocateBytes "Kon %d bytes niet toewijzen\n"
 #define MSGTR_SettingAudioDelay " AUDIO DELAY wordt gezet op %5.3f\n"
 #define MSGTR_LimitingAudioPreload "Audio audio preload wordt beperkt tot 0.4s\n"
 #define MSGTR_IncreasingAudioDensity "Audio densiteit wordt opgevoerd tot 4\n"
@@ -313,7 +292,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_ErrorParsingCommandLine "Fout bij het analyseren van de commandoregel"
 #define MSGTR_VideoStreamRequired "Een Video stream is verplicht!\n"
 #define MSGTR_ForcingInputFPS "input fps zal geinterpreteerd worden als %5.3f \n"
-#define MSGTR_RawvideoDoesNotSupportAudio "Het output bestandsformaat RAWVIDEO ondersteunt geen audio - geluid \n"
 #define MSGTR_DemuxerDoesntSupportNosound "Deze demuxer ondersteunt -nosound nog niet.\n"
 #define MSGTR_MemAllocFailed "geheugentoewijzing gefaald"
 #define MSGTR_NoMatchingFilter "Kon geen geldig(e) filter/ao formaat vinden!\n"
@@ -399,7 +377,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CodecDefinitionIncorrect "De codec is niet correct gedefinieerd."
 #define MSGTR_OutdatedCodecsConf "Dit codecs.conf bestand is te oud en incompatibel met deze versie van MPlayer!"
 
-#define MSGTR_CannotMakePipe "Kan geen PIPE aanmaken!\n"
 #define MSGTR_SaveSlotTooOld "Een te oud save slot voor lvl %d gevonden: %d !!!\n"
 #define MSGTR_InvalidCfgfileOption "De %s optie kan niet gebruikt worden in het configuratie bestand.\n"
 #define MSGTR_InvalidCmdlineOption "De %s optie kan niet gebruikt worden op de commandoregel.\n"
@@ -413,19 +390,14 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CdDevNotfound "CD-ROM Device '%s' niet gevonden!\n"
 #define MSGTR_ErrTrackSelect "Fout bij het selecteren van VCD track!"
 #define MSGTR_ReadSTDIN "Lezen van stdin...\n"
-#define MSGTR_UnableOpenURL "Onmogelijk om URL te openen: %s\n"
-#define MSGTR_ConnToServer "Verbonden met server: %s\n"
 #define MSGTR_FileNotFound "Bestand niet gevonden: '%s'\n"
 
 #define MSGTR_SMBInitError "Kon de libsmbclient bibliotheek niet initialiseren: %d\n"
 #define MSGTR_SMBFileNotFound "Kon netwerkbestand '%s' niet openen\n"
-#define MSGTR_SMBNotCompiled "MPlayer werd niet gecompileerd met SMB leesondersteuning\n"
 
 #define MSGTR_CantOpenDVD "Kon DVD device niet openen: %s (%s)\n"
 #define MSGTR_DVDnumTitles "Er zijn %d titels op deze DVD.\n"
 #define MSGTR_DVDinvalidTitle "Foutieve DVD titelnummer: %d\n"
-#define MSGTR_DVDnumChapters "Er zijn %d hoofdstukken in deze DVD titel.\n"
-#define MSGTR_DVDinvalidChapter "Foutief DVD hoofdstuknummer: %d\n"
 #define MSGTR_DVDnumAngles "Er zijn %d gezichtspunten in deze DVD titel.\n"
 #define MSGTR_DVDinvalidAngle "Foutief DVD gezichtspuntnummer: %d\n"
 #define MSGTR_DVDnoIFO "Kan het IFO bestand voor DVD titel %d niet openen.\n"
@@ -440,8 +412,6 @@ static const char help_text[] = MSGTR_Help;
                       "Voor .AVI bestanden probeer je best non-interleaved mode met de optie -ni\n"
 #define MSGTR_SwitchToNi "\nSlecht geinterleaved .AVI bestand gedetecteerd - schakel om naar -ni mode!\n"
 #define MSGTR_Detected_XXX_FileFormat "%s bestandsformaat gedetecteerd!\n"
-#define MSGTR_DetectedAudiofile "Audio bestandsformaat gedetecteerd!\n"
-#define MSGTR_InvalidMPEGES "Invalid MPEG-ES stream??? Contacteer de auteur, het zou een bug kunnen zijn :(\n"
 #define MSGTR_FormatNotRecognized "============= Sorry, dit bestandsformaat niet herkend/ondersteund ===============\n"\
                                   "=== Als dit een AVI bestand, ASF bestand of MPEG stream is, contacteer dan aub de auteur! ===\n"
 #define MSGTR_MissingVideoStream "Geen video stream gevonden!\n"
@@ -462,7 +432,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MOVcomprhdr "MOV: Gecomprimeerde headers (nog) niet ondersteund!\n"
 #define MSGTR_MOVvariableFourCC "MOV: Waarschuwing! variabele FOURCC gedetecteerd!?\n"
 #define MSGTR_MOVtooManyTrk "MOV: Waarschuwing! te veel tracks!"
-#define MSGTR_DetectedTV "TV gedetecteerd! ;-)\n"
 #define MSGTR_ErrorOpeningOGGDemuxer "Kan de Ogg demuxer niet openen\n"
 #define MSGTR_CannotOpenAudioStream "Kan audio stream niet openen: %s\n"
 #define MSGTR_CannotOpenSubtitlesStream "Kan ondertitelingstream niet openen: %s\n"
@@ -514,7 +483,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CannotFindColorspace "Kan geen gemeenschappelijke colorspace vinden, zelfs bij gebruik van 'scale' :(\n"
 
 // vd.c
-#define MSGTR_CodecDidNotSet "VDec: codec stelde sh->disp_w en sh->disp_h niet in, ik probeer het probleem te omzeilen!\n"
 #define MSGTR_CouldNotFindColorspace "Kon geen bijpassende kleurenruimte vinden - ik probeer opnieuw met -vf scale...\n"
 #define MSGTR_MovieAspectIsSet "Film-Aspect is %.2f:1 - voorscalering naar het correcte film-aspect.\n"
 #define MSGTR_MovieAspectUndefined "Movie-Aspect is niet gedefinieerd - geen voorscalering toegepast.\n"
@@ -719,8 +687,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_VO_CantCreateFile "Kan het output bestand niet aanmaken."
 #define MSGTR_VO_DirectoryCreateSuccess "Output directory succesvol aangemaakt."
 #define MSGTR_VO_ValueOutOfRange "Waarde buiten het bereik"
-#define MSGTR_VO_NoValueSpecified "Geen waarde opgegeven."
-#define MSGTR_VO_UnknownSuboptions "Onbekende suboptie(s)"
 
 // vo_jpeg.c
 #define MSGTR_VO_JPEG_ProgressiveJPEG "Progressieve JPEG geactiveerd."
@@ -737,7 +703,6 @@ static const char help_text[] = MSGTR_Help;
 
 // vo_yuv4mpeg.c
 #define MSGTR_VO_YUV4MPEG_InterlacedHeightDivisibleBy4 "De interlaced mode vereist een beeldhoogte die deelbaar is door vier."
-#define MSGTR_VO_YUV4MPEG_InterlacedLineBufAllocFail "Kan geen \"lijn\" buffer toewijzen voor de interlaced mode."
 #define MSGTR_VO_YUV4MPEG_WidthDivisibleBy2 "De beeldbreedte moet deelbaar zijn door twee."
 #define MSGTR_VO_YUV4MPEG_OutFileOpenError "Kan geen geheugen of \"file handle\" verkrijgen om de \"%s\" te schrijven!"
 #define MSGTR_VO_YUV4MPEG_OutFileWriteError "Fout bij het schrijven van het beeld naar de output!"
@@ -819,7 +784,6 @@ static const char help_text[] = MSGTR_Help;
 
 // ao_plugin.c
 
-#define MSGTR_AO_PLUGIN_InvalidPlugin "[AO PLUGIN] ongeldige plugin: %s\n"
 
 // ========================== LIBMPCODECS ===================================
 

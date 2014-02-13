@@ -146,38 +146,20 @@ static const char help_text[] = MSGTR_Help;
 "  и няма да помогнем, ако не осигурите тази информация, когато съобщавате за бъг.\n"
 #define MSGTR_LoadingConfig "Зарежда се конфигурационен файл '%s'\n"
 #define MSGTR_AddedSubtitleFile "SUB: добавен е файл със субтитри (%d): %s\n"
-#define MSGTR_ErrorOpeningOutputFile "Грешка при отваряне на файла [%s] за запис!\n"
 #define MSGTR_RTCDeviceNotOpenable "Грешка при отваряне на %s: %s (необходими са права за четене).\n"
 #define MSGTR_LinuxRTCInitErrorIrqpSet "Linux RTC грешка при инициализация в ioctl (rtc_irqp_set кд%lu): %s\n"
 #define MSGTR_IncreaseRTCMaxUserFreq "Добавете \"echo %lu > /proc/sys/dev/rtc/max-user-freq\" към системните стартови скриптове.\n"
 #define MSGTR_LinuxRTCInitErrorPieOn "Linux RTC init грешка в ioctl (rtc_pie_on): %s\n"
-#define MSGTR_UsingTimingType "използва се  %s таймер.\n"
 #define MSGTR_Getch2InitializedTwice "Внимание: Функцията getch2_init е извикана двукратно!\n"
 #define MSGTR_CantOpenLibmenuFilterWithThisRootMenu "Видео филтъра libmenu не може да бъде отворен без root меню %s.\n"
 #define MSGTR_AudioFilterChainPreinitError "Грешка при предварителна инициализация на аудио филтрите!\n"
 #define MSGTR_LinuxRTCReadError "Linux RTC грешка при четене: %s\n"
 #define MSGTR_SoftsleepUnderflow "Внимание! Softsleep underflow!\n"
-#define MSGTR_DvdnavNullEvent "DVDNAV Събитие NULL?!\n"
-#define MSGTR_DvdnavHighlightEventBroken "DVDNAV Събитие: Highlight event broken\n"
-#define MSGTR_DvdnavEvent "DVDNAV Събитие: %s\n"
-#define MSGTR_DvdnavHighlightHide "DVDNAV Събитие: Highlight Hide\n"
-#define MSGTR_DvdnavStillFrame "###################################### DVDNAV Събитие: Неподвижен кадър: %d сек\n"
-#define MSGTR_DvdnavNavStop "DVDNAV Събитие: Nav Стоп\n"
-#define MSGTR_DvdnavNavNOP "DVDNAV Събитие: Nav NOP\n"
-#define MSGTR_DvdnavNavSpuStreamChangeVerbose "DVDNAV Събитие: Nav Смяна на SPU Поток: физ: %d/%d/%d лог: %d\n"
-#define MSGTR_DvdnavNavSpuStreamChange "DVDNAV Събитие: Nav Смяна на SPU Поток: физ: %d лог: %d\n"
-#define MSGTR_DvdnavNavAudioStreamChange "DVDNAV Събитие: Nav Смяна на Аудио Поток: физ: %d лог: %d\n"
-#define MSGTR_DvdnavNavVTSChange "DVDNAV Събитие: Nav Смяна на VTS\n"
-#define MSGTR_DvdnavNavCellChange "DVDNAV Събитие: Nav Смяна на Клетка\n"
-#define MSGTR_DvdnavNavSpuClutChange "DVDNAV Събитие: Nav Смяна на SPU CLUT\n"
-#define MSGTR_DvdnavNavSeekDone "DVDNAV Събитие: Nav Превъртането Приключено\n"
-#define MSGTR_MenuCall "Menu call\n"
 
 #define MSGTR_EdlOutOfMem "Не може да се задели достатъчно памет за EDL данните.\n"
 #define MSGTR_EdlRecordsNo "Прочетени са %d EDL действия.\n"
 #define MSGTR_EdlQueueEmpty "Няма EDL действия, които да бъдат извършени.\n"
 #define MSGTR_EdlCantOpenForWrite "EDL файла [%s] не може да бъде отворен за запис.\n"
-#define MSGTR_EdlCantOpenForRead "EDL файла [%s] не може да бъде отворен за четене.\n"
 #define MSGTR_EdlNOsh_video "EDL не може да се ползва без видео, изключва се.\n"
 #define MSGTR_EdlNOValidLine "Невалиден ред в EDL: %s\n"
 #define MSGTR_EdlBadlyFormattedLine "Зле форматиран EDL ред [%d] Отхвърля се.\n"
@@ -210,9 +192,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_OpenedStream "успех: формат: %d  данни: 0x%X - 0x%x\n"
 #define MSGTR_VCodecFramecopy "videocodec: framecopy (%dx%d %dbpp fourcc=%x)\n"
 #define MSGTR_ACodecFramecopy "audiocodec: framecopy (format=%x chans=%d rate=%d bits=%d B/s=%d sample-%d)\n"
-#define MSGTR_CBRPCMAudioSelected "Избрано е CBR (постоянен битрейт) PCM аудио\n"
 #define MSGTR_MP3AudioSelected "Избрано е MP3 аудио\n"
-#define MSGTR_CannotAllocateBytes "Не може да се заделят %d байта\n"
 #define MSGTR_SettingAudioDelay "АУДИО ЗАКЪСНЕНИЕТО е настроено на %5.3f\n"
 #define MSGTR_LimitingAudioPreload "Предварителното аудио зареждане е ограничено на 0.4с\n"
 #define MSGTR_IncreasingAudioDensity "Гъстотата на звука е увеличена на 4\n"
@@ -325,7 +305,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_ErrorParsingCommandLine "грешка при обработката на командния ред"
 #define MSGTR_VideoStreamRequired "Задължително е да има видео поток!\n"
 #define MSGTR_ForcingInputFPS "Входящите кадри в секунда ще се интерпретират като %5.3f\n"
-#define MSGTR_RawvideoDoesNotSupportAudio "Изходния формат RAWVIDEO не поддържа аудио - звука се премахва\n"
 #define MSGTR_DemuxerDoesntSupportNosound "Tози разпределител все още не поддържа -nosound .\n"
 #define MSGTR_MemAllocFailed "не може да задели памет"
 #define MSGTR_NoMatchingFilter "Не може да бъде намерен подходящ филтър/изходен аудио формат!\n"
@@ -412,7 +391,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_OutdatedCodecsConf "Tози codecs.conf е твърде стар и несъвместим с тази версия на MPlayer!"
 
 // fifo.c
-#define MSGTR_CannotMakePipe "Не може да се създаде програмен канал (PIPE)!\n"
 
 // m_config.c
 #define MSGTR_SaveSlotTooOld "Твърде стар save slot е открит в lvl %d: %d !!!\n"
@@ -428,19 +406,14 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CdDevNotfound "CD-ROM устройство '%s' не е открито.\n"
 #define MSGTR_ErrTrackSelect "Грешка при избор на VCD пътечка."
 #define MSGTR_ReadSTDIN "Четене от стандартния вход (stdin)...\n"
-#define MSGTR_UnableOpenURL "URL адреса не може да бъде отворен: %s\n"
-#define MSGTR_ConnToServer "Установена е връзка със сървъра: %s\n"
 #define MSGTR_FileNotFound "Файла не е намерен: '%s'\n"
 
 #define MSGTR_SMBInitError "Библиотеката libsmbclient не може да бъде инициализирана: %d\n"
 #define MSGTR_SMBFileNotFound "'%s' не може да бъде отворен през LAN\n"
-#define MSGTR_SMBNotCompiled "MPlayer не е компилиран със поддръжка на четене от SMB.\n"
 
 #define MSGTR_CantOpenDVD "Не може да бъде отворено DVD устройство: %s (%s)\n"
 #define MSGTR_DVDnumTitles "Има %d заглавия на това DVD.\n"
 #define MSGTR_DVDinvalidTitle "Невалиден номер на DVD заглавие: %d\n"
-#define MSGTR_DVDnumChapters "Има %d раздела в това DVD заглавие.\n"
-#define MSGTR_DVDinvalidChapter "Невалиден номер на DVD раздел: %d\n"
 #define MSGTR_DVDnumAngles "Има %d гледни точки в това DVD заглавие..\n"
 #define MSGTR_DVDinvalidAngle "Невалиден номер на гледна точка: %d\n"
 #define MSGTR_DVDnoIFO "Не може да бъде отворен IFO файла на това DVD заглавие %d.\n"
@@ -455,8 +428,6 @@ static const char help_text[] = MSGTR_Help;
                       "За AVI файлове, опитайте да наложите non-interleaved режим със опцията -ni.\n"
 #define MSGTR_SwitchToNi "\nЗле структуриран AVI файл - превключване към -ni режим...\n"
 #define MSGTR_Detected_XXX_FileFormat "%s формат.\n"
-#define MSGTR_DetectedAudiofile "Аудио файл.\n"
-#define MSGTR_InvalidMPEGES "Невалиден MPEG-ES поток??? Свържете се с автора, може да е бъг :(\n"
 #define MSGTR_FormatNotRecognized "============ За съжаление, този формат не се разпознава/поддържа =============\n"\
                                   "=== Ако този файл е AVI, ASF или MPEG поток, моля уведомете автора! ===\n"
 #define MSGTR_MissingVideoStream "Не е открит видео поток.\n"
@@ -477,7 +448,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MOVcomprhdr "MOV: Поддръжката на компресирани хедъри изисква ZLIB!\n"
 #define MSGTR_MOVvariableFourCC "MOV: ВНИМАНИЕ: Открит е променлив FOURCC код!?\n"
 #define MSGTR_MOVtooManyTrk "MOV: ВНИМАНИЕ: твърде много пътечки"
-#define MSGTR_DetectedTV "Открита е телевизия! ;-)\n"
 #define MSGTR_ErrorOpeningOGGDemuxer "Не може да бъде отворен ogg разпределител.\n"
 #define MSGTR_CannotOpenAudioStream "Не може да се отвори звуков поток: %s\n"
 #define MSGTR_CannotOpenSubtitlesStream "Не могат да бъдат отворени субтитри: %s\n"
@@ -529,7 +499,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CannotFindColorspace "Не може да бъде открит съответстващ цветови формат, дори с вмъкване на 'scale':(\n"
 
 // vd.c
-#define MSGTR_CodecDidNotSet "VDec: Кодекът не е указал sh->disp_w и sh->disp_h, опит за решение.\n"
 #define MSGTR_CouldNotFindColorspace "Не е открит подходящ цветови формат - повторен опит с -vf scale...\n"
 #define MSGTR_MovieAspectIsSet "Пропорциите на филма са %.2f:1 - мащабиране до правилните пропорции .\n"
 #define MSGTR_MovieAspectUndefined "Не са дефинирани пропорции - без предварително мащабиране.\n"
@@ -753,8 +722,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_VO_CantCreateFile "Файлът не може да бъде създаден."
 #define MSGTR_VO_DirectoryCreateSuccess "Директорията е успешно създадена."
 #define MSGTR_VO_ValueOutOfRange "Стойността е извън допустимите граници"
-#define MSGTR_VO_NoValueSpecified "Не е указана стойност."
-#define MSGTR_VO_UnknownSuboptions "Неизвестна подопция(и)"
 
 // vo_aa.c
 
@@ -782,7 +749,6 @@ static const char help_text[] = MSGTR_Help;
 
 // vo_yuv4mpeg.c
 #define MSGTR_VO_YUV4MPEG_InterlacedHeightDivisibleBy4 "Режимът interlaced изисква височината на образа да е кратна на  4."
-#define MSGTR_VO_YUV4MPEG_InterlacedLineBufAllocFail "Не може да се задели буфер за редовете за interlaced режим."
 #define MSGTR_VO_YUV4MPEG_WidthDivisibleBy2 "Широчината на образа трябва да е кратна на 2."
 #define MSGTR_VO_YUV4MPEG_OutFileOpenError "Не е получена памет или файлов манипулатор за запис \"%s\"!"
 #define MSGTR_VO_YUV4MPEG_OutFileWriteError "Грешка при извеждане на изображението!"
@@ -808,7 +774,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_AO_OSS_ChanNotFound "[AO OSS] audio_setup:\nСмесителят на звуковата карта няма канал '%s', използва се подразбиращ се.\n"
 #define MSGTR_AO_OSS_CantOpenDev "[AO OSS] audio_setup: Аудио устройство %s не може да бъде отворено: %s\n"
 #define MSGTR_AO_OSS_CantMakeFd "[AO OSS] audio_setup: Не може да бъде създаден файлов дескриптор: %s\n"
-//#define MSGTR_AO_OSS_CantSetAC3 "[AO OSS] Не може да се зададе за устройство %s формат AC3, опит с S16...\n"
 #define MSGTR_AO_OSS_CantSet "[AO OSS] Аудио устройство %s не може да бъде настроено за %s извеждане, проба с %s...\n"
 #define MSGTR_AO_OSS_CantSetChans "[AO OSS] audio_setup: Не може да настрои звуковата карта за %d канала.\n"
 #define MSGTR_AO_OSS_CantUseGetospace "[AO OSS] audio_setup: драйверът не поддържа SNDCTL_DSP_GETOSPACE :-(\n"
@@ -870,12 +835,9 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_AO_SUN_RtscWriteFailed "[AO SUN] rtsc: провал на записа."
 #define MSGTR_AO_SUN_CantOpenAudioDev "[AO SUN] Не може да бъде отворено устройство %s, %s  -> без звук.\n"
 #define MSGTR_AO_SUN_UnsupSampleRate "[AO SUN] audio_setup: вашата звукова карта не поддържа %d канал, %s, %d Hz честота.\n"
-#define MSGTR_AO_SUN_CantUseSelect "[AO SUN]\n   ***  Вашият аудио драйвер НЕ поддържа функцията select()  ***\nРекомпилирайте MPlayer с #undef HAVE_AUDIO_SELECT в config.h !\n\n"
-#define MSGTR_AO_SUN_CantReopenReset "[AO SUN]Фатална грешка:\n *** АУДИО УСТРОЙСТВОТО (%s) НЕ МОЖЕ ДА БЪДЕ ПРЕ-ОТВОРЕНО/РЕСТАРТИРАНО ***\n"
 
 // ao_plugin.c
 
-#define MSGTR_AO_PLUGIN_InvalidPlugin "[AO PLUGIN] невалиден плъгин: %s\n"
 
 // ======================= AF Audio Filters ================================
 
@@ -883,7 +845,6 @@ static const char help_text[] = MSGTR_Help;
 
 #define MSGTR_AF_LADSPA_AvailableLabels "достъпни етикети в"
 #define MSGTR_AF_LADSPA_WarnNoInputs "ВНИМАНИЕ! Този LADSPA плъгин не приема аудио.\n  Пристигащият аудио сигнал ще бъде загубен."
-#define MSGTR_AF_LADSPA_ErrMultiChannel "Многоканални (>2) плъгини не се поддържат (все още).\n  Използвайте само моно и стерео плъгини."
 #define MSGTR_AF_LADSPA_ErrNoOutputs "Този LADSPA плъгин не извежда звук."
 #define MSGTR_AF_LADSPA_ErrInOutDiff "Броя на аудио входовете на този LADSPA плъгин се различава от броя на аудио изходите."
 #define MSGTR_AF_LADSPA_ErrFailedToLoad "не може да се зареди"

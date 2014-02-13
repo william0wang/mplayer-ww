@@ -224,19 +224,14 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CdDevNotfound "Dispositivo de CD-ROM '%s' não encontrado!\n"
 #define MSGTR_ErrTrackSelect "Erro selecionando trilha do VCD!"
 #define MSGTR_ReadSTDIN "Lendo de stdin...\n"
-#define MSGTR_UnableOpenURL "Impossível abrir URL: %s\n"
-#define MSGTR_ConnToServer "Conecatado ao servidor: %s\n"
 #define MSGTR_FileNotFound "Arquivo não encontrado: '%s'\n"
 
 #define MSGTR_SMBInitError "Impossível inicializar biblioteca libsmbclient: %d\n"
 #define MSGTR_SMBFileNotFound "Impossível abrir da \"lan\": '%s'\n"
-#define MSGTR_SMBNotCompiled "MPlayer não foi compilado com suporte a leitura de SMB\n"
 
 #define MSGTR_CantOpenDVD "Impossível abrir dispositivo de DVD: %s (%s)\n"
 #define MSGTR_DVDnumTitles "Existem %d títulos neste DVD.\n"
 #define MSGTR_DVDinvalidTitle "Número do título do DVD inválido: %d\n"
-#define MSGTR_DVDnumChapters "Existem %d capítulos neste título de DVD.\n"
-#define MSGTR_DVDinvalidChapter "Número do capítulo do DVD inválido: %d\n"
 #define MSGTR_DVDnumAngles "Existem %d anglos neste título de DVD.\n"
 #define MSGTR_DVDinvalidAngle "Número do anglo do DVD inválido: %d\n"
 #define MSGTR_DVDnoIFO "Impossível abrir o arquivo IFO para o título de DVD %d.\n"
@@ -251,8 +246,6 @@ static const char help_text[] = MSGTR_Help;
                       "Para arquivos .AVI, tente forçar um modo não-entrelaçado com a opção -ni.\n"
 #define MSGTR_SwitchToNi "\nDetectado .AVI mau entrelaçado - mudando para o modo -ni!\n"
 #define MSGTR_Detected_XXX_FileFormat "Detectado formato de arquivo %s!\n"
-#define MSGTR_DetectedAudiofile "Detectado arquivo de audio!\n"
-#define MSGTR_InvalidMPEGES "Fluxo MPEG-ES inválido??? Contacte o autor, pode ser um bug :(\n"
 #define MSGTR_FormatNotRecognized "======= Desculpe, este formato de arquivo não é reconhecido/suportado ========\n"\
                                   "== Se este arquivo é um fluxo AVI, ASF ou MPEG, por favor contacte o autor ==\n"
 #define MSGTR_MissingVideoStream "Nenhuma trilha de vídeo encontrado!\n"
@@ -273,7 +266,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MOVcomprhdr "MOV: Cabeçalhos comprimidos não suportados (ainda)!\n"
 #define MSGTR_MOVvariableFourCC "MOV: Advertência! Variável FOURCC detectada!?\n"
 #define MSGTR_MOVtooManyTrk "MOV: Advertência! Trilhas demais!"
-#define MSGTR_DetectedTV "TV detectada! ;-)\n"
 #define MSGTR_ErrorOpeningOGGDemuxer "Impossível abrir o demuxer ogg\n"
 #define MSGTR_CannotOpenAudioStream "Impossível abrir trilha de audio: %s\n"
 #define MSGTR_CannotOpenSubtitlesStream "Impossível abrir trilha de legendas: %s\n"
@@ -323,7 +315,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CannotFindColorspace "Impossível encontrar um \"colorspace\" comum, mesmo inserindo \"scale\" :(\n"
 
 // vd.c
-#define MSGTR_CodecDidNotSet "VDec: codec não configurou sh->disp_w e sh->disp_h, tentando solução alternativa!\n"
 #define MSGTR_CouldNotFindColorspace "Impossível encotrar \"colorspace\" similar - retentando com -vf scale...\n"
 #define MSGTR_MovieAspectIsSet "Aspecto do filme é  %.2f:1 - pré-redimensionando para corrigir o aspecto do filme.\n"
 #define MSGTR_MovieAspectUndefined "Aspecto do filme é indefinido - nenhum pré-redimensionamento aplicado.\n"

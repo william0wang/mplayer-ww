@@ -150,39 +150,20 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_LoadingExtensionProfile "Загружаю профиль для расширения '%s'\n"
 #define MSGTR_AddedSubtitleFile "СУБТИТРЫ: добавлен файл субтитров (%d): %s\n"
 #define MSGTR_RemovedSubtitleFile "СУБТИТРЫ: Удалён файл субтитров (%d): %s\n"
-#define MSGTR_ErrorOpeningOutputFile "Ошибка открытия файла [%s] для записи!\n"
 #define MSGTR_RTCDeviceNotOpenable "Не могу открыть %s: %s (пользователь должен обладать правом чтения на этот файл).\n"
 #define MSGTR_LinuxRTCInitErrorIrqpSet "Ошибка инициализации Linux RTC в ioctl (rtc_irqp_set %lu): %s\n"
 #define MSGTR_IncreaseRTCMaxUserFreq "Попробуйте добавить \"echo %lu > /proc/sys/dev/rtc/max-user-freq\" \nв загрузочные скрипты Вашей системы.\n"
 #define MSGTR_LinuxRTCInitErrorPieOn "Ошибка инициализации Linux RTC в ioctl (rtc_pie_on): %s\n"
-#define MSGTR_UsingTimingType "Используется %s синхронизация.\n"
 #define MSGTR_Getch2InitializedTwice "ПРЕДУПРЕЖДЕНИЕ: getch2_init вызван дважды!\n"
-#define MSGTR_DumpstreamFdUnavailable "Не могу создать дамп этого потока - нет доступных файловых описателей.\n"
 #define MSGTR_CantOpenLibmenuFilterWithThisRootMenu "Не могу открыть видеофильтр libmenu с этим корневым меню %s.\n"
 #define MSGTR_AudioFilterChainPreinitError "Ошибка в цепочке pre-init аудиофильтра!\n"
 #define MSGTR_LinuxRTCReadError "Ошибка чтения Linux RTC: %s\n"
 #define MSGTR_SoftsleepUnderflow "Предупреждение! Недопустимо низкое значение программной задержки!\n"
-#define MSGTR_DvdnavNullEvent "Событие DVDNAV NULL?!\n"
-#define MSGTR_DvdnavHighlightEventBroken "Событие DVDNAV: Событие выделения сломано\n"
-#define MSGTR_DvdnavEvent "Событие DVDNAV: %s\n"
-#define MSGTR_DvdnavHighlightHide "Событие DVDNAV: Выделение скрыто\n"
-#define MSGTR_DvdnavStillFrame "######################################## Событие DVDNAV: Стоп-кадр: %d сек\n"
-#define MSGTR_DvdnavNavStop "Событие DVDNAV: Остановка Nav \n"
-#define MSGTR_DvdnavNavNOP "Событие DVDNAV: Nav NOP\n"
-#define MSGTR_DvdnavNavSpuStreamChangeVerbose "Событие DVDNAV: Изменение SPU-потока Nav: физически: %d/%d/%d логически: %d\n"
-#define MSGTR_DvdnavNavSpuStreamChange "Событие DVDNAV: Изменение SPU-потока Nav: физически: %d логически: %d\n"
-#define MSGTR_DvdnavNavAudioStreamChange "Событие DVDNAV: Изменение аудиопотока Nav: физически: %d логически: %d\n"
-#define MSGTR_DvdnavNavVTSChange "Событие DVDNAV: Изменение Nav VTS\n"
-#define MSGTR_DvdnavNavCellChange "Событие DVDNAV: Изменение ячейки Nav\n"
-#define MSGTR_DvdnavNavSpuClutChange "Событие DVDNAV: Изменение Nav SPU CLUT\n"
-#define MSGTR_DvdnavNavSeekDone "Событие DVDNAV: Завершено позиционирование Nav\n"
-#define MSGTR_MenuCall "Вызов меню\n"
 
 #define MSGTR_EdlOutOfMem "Не могу выделить достаточный объём памяти для хранения данных EDL.\n"
 #define MSGTR_EdlRecordsNo "Чтение %d EDL действий.\n"
 #define MSGTR_EdlQueueEmpty "Нет действий EDL, которые следует исполнить (очередь пуста).\n"
 #define MSGTR_EdlCantOpenForWrite "Не могу открыть файл EDL [%s] для записи.\n"
-#define MSGTR_EdlCantOpenForRead "Не могу открыть файл EDL [%s] для чтения.\n"
 #define MSGTR_EdlNOsh_video "Нельзя использовать EDL без видео, отключаю.\n"
 #define MSGTR_EdlNOValidLine "Неверная строка EDL: %s\n"
 #define MSGTR_EdlBadlyFormattedLine "Плохо форматированная строка EDL [%d]. Пропускаю.\n"
@@ -197,7 +178,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_OSDenabled "включено"
 #define MSGTR_OSDdisabled "выключено"
 #define MSGTR_OSDAudio "Аудио: %s"
-#define MSGTR_OSDVideo "Видео: %s"
 #define MSGTR_OSDChannel "Канал: %s"
 #define MSGTR_OSDSubDelay "Задержка субтитров: %d мс"
 #define MSGTR_OSDSpeed "Скорость: x %6.2f"
@@ -278,9 +258,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_OpenedStream "успех: формат: %d  данные: 0x%X - 0x%x\n"
 #define MSGTR_VCodecFramecopy "видеокодек: копирование кадров (%dx%d %dbpp fourcc=%x)\n"
 #define MSGTR_ACodecFramecopy "аудиокодек: копирование кадров (формат=%x цепочек=%d скорость=%d битов=%d Б/с=%d образец=%d)\n"
-#define MSGTR_CBRPCMAudioSelected "Выбрано CBR PCM аудио\n"
 #define MSGTR_MP3AudioSelected "Выбрано MP3 аудио\n"
-#define MSGTR_CannotAllocateBytes "Не могу выделить память для %d байт\n"
 #define MSGTR_SettingAudioDelay "Устанавливаю задержку аудио в %5.3f\n"
 #define MSGTR_SettingVideoDelay "Устанавливаю задержку видео в %5.3fs.\n"
 #define MSGTR_LimitingAudioPreload "Ограничиваю предварительную загрузку аудио до 0.4с\n"
@@ -397,7 +375,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_ErrorParsingCommandLine "ошибка анализа командной строки"
 #define MSGTR_VideoStreamRequired "Наличие потока видео обязательно!\n"
 #define MSGTR_ForcingInputFPS "входные кадры/сек будут заменены на %5.3f\n"
-#define MSGTR_RawvideoDoesNotSupportAudio "Выходной формат файла RAWVIDEO не поддерживает аудио - отключаю аудио\n"
 #define MSGTR_DemuxerDoesntSupportNosound "Этот демультиплексор пока что не поддерживает -nosound.\n"
 #define MSGTR_MemAllocFailed "не могу выделить память"
 #define MSGTR_NoMatchingFilter "Не могу найти соответствующий фильтр/формат_аудиовывода!\n"
@@ -484,7 +461,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_OutdatedCodecsConf "Этот codecs.conf слишком стар и несовместим с данным релизом MPlayer!"
 
 // fifo.c
-#define MSGTR_CannotMakePipe "Не могу создать канал!\n"
 
 // parser-mecmd.c, parser-mpcmd.c
 #define MSGTR_NoFileGivenOnCommandLine "'--' означает конец опций, но имя файла в командной строке не указано.\n"
@@ -742,8 +718,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_VO_CantCreateFile "Не могу создать выходной файл."
 #define MSGTR_VO_DirectoryCreateSuccess "Директория вывода успешно создана."
 #define MSGTR_VO_ValueOutOfRange "значение вне допустимого диапазона"
-#define MSGTR_VO_NoValueSpecified "Значение не указано."
-#define MSGTR_VO_UnknownSuboptions "Неизвестная(ые) субопция(и)"
 
 // libvo/aspect.c
 #define MSGTR_LIBVO_ASPECT_NoSuitableNewResFound "[ASPECT] Предупреждение: Не найдено подходящего разрешения!\n"
@@ -879,8 +853,6 @@ static const char help_text[] = MSGTR_Help;
 
 // libvo/vo_sdl.c
 #define MSGTR_LIBVO_SDL_CouldntGetAnyAcceptableSDLModeForOutput "[VO_SDL] Не могу получить какой-либо приемлемый режим SDL для вывода.\n"
-#define MSGTR_LIBVO_SDL_SetVideoModeFailed "[VO_SDL] set_video_mode: Сбой SDL_SetVideoMode: %s.\n"
-#define MSGTR_LIBVO_SDL_MappingI420ToIYUV "[VO_SDL] Отображение I420 в IYUV.\n"
 #define MSGTR_LIBVO_SDL_UnsupportedImageFormat "[VO_SDL] Неподдерживаемый формат изображения (0x%X).\n"
 #define MSGTR_LIBVO_SDL_InfoPleaseUseVmOrZoom "[VO_SDL] Информация: используйте -vm или -zoom для переключения\nв лучшее разрешение.\n"
 #define MSGTR_LIBVO_SDL_FailedToSetVideoMode "[VO_SDL] Не могу установить видеорежим: %s.\n"
@@ -988,10 +960,8 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_LIBVO_VESA_IncompatibleDriverVersion "[VESA_LVO] Версия вашего драйвера fb_vid несовместима с этой версией MPlayer!\n"
 
 // libvo/vo_x11.c
-#define MSGTR_LIBVO_X11_DrawFrameCalled "[VO_X11] Вызван draw_frame()!!!!!!\n"
 
 // libvo/vo_xv.c
-#define MSGTR_LIBVO_XV_DrawFrameCalled "[VO_XV] Вызван draw_frame()!!!!!!\n"
 #define MSGTR_LIBVO_XV_SharedMemoryNotSupported "[VO_XV] Разделяемая память не поддерживается\nВозврат к обычному Xv.\n"
 #define MSGTR_LIBVO_XV_XvNotSupportedByX11 "[VO_XV] Извините, Xv не поддерживается этой версией/драйвером X11\n[VO_XV] ******** Попробуйте -vo x11  или  -vo sdl  *********\n"
 #define MSGTR_LIBVO_XV_XvQueryAdaptorsFailed  "[VO_XV] Ошибка XvQueryAdaptors.\n"
@@ -1009,7 +979,6 @@ static const char help_text[] = MSGTR_Help;
 
 // vo_yuv4mpeg.c
 #define MSGTR_VO_YUV4MPEG_InterlacedHeightDivisibleBy4 "Для режима c чересстрочной развёрткой необходимо, чтобы высота изображения\nделилась на 4."
-#define MSGTR_VO_YUV4MPEG_InterlacedLineBufAllocFail "Не могу выделить память для линейного буфера в режиме чересстрочной развёртки."
 #define MSGTR_VO_YUV4MPEG_WidthDivisibleBy2 "Ширина изображения должна делиться на 2."
 #define MSGTR_VO_YUV4MPEG_OutFileOpenError "Не могу выделить память или файловый описатель для записи \"%s\"!"
 #define MSGTR_VO_YUV4MPEG_OutFileWriteError "Ошибка записи изображения в вывод!"
@@ -1023,20 +992,17 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_LIBVO_SUB_VIDIX_CantStopPlayback "[VO_SUB_VIDIX] Не могу остановить воспроизведение: %s\n"
 #define MSGTR_LIBVO_SUB_VIDIX_InterleavedUvForYuv410pNotSupported "[VO_SUB_VIDIX] Слоёный UV для YUV410P не поддерживается.\n"
 #define MSGTR_LIBVO_SUB_VIDIX_DummyVidixdrawsliceWasCalled "[VO_SUB_VIDIX] Был вызван фиктивный vidix_draw_slice().\n"
-#define MSGTR_LIBVO_SUB_VIDIX_DummyVidixdrawframeWasCalled "[VO_SUB_VIDIX] Был вызван фиктивный vidix_draw_frame().\n"
 #define MSGTR_LIBVO_SUB_VIDIX_UnsupportedFourccForThisVidixDriver "[VO_SUB_VIDIX] Неподдерживаемый FourCC для этого драйвера VIDIX: %x (%s).\n"
 #define MSGTR_LIBVO_SUB_VIDIX_VideoServerHasUnsupportedResolution "[VO_SUB_VIDIX] У сервера видео разрешение (%dx%d) не поддерживается,\nподдерживаемое: %dx%d-%dx%d.\n"
 #define MSGTR_LIBVO_SUB_VIDIX_VideoServerHasUnsupportedColorDepth "[VO_SUB_VIDIX] Сервер видео не поддерживает глубину цвета vidix (%d).\n"
 #define MSGTR_LIBVO_SUB_VIDIX_DriverCantUpscaleImage "[VO_SUB_VIDIX] Драйвер VIDIX не может увеличить изображение (%d%d -> %d%d).\n"
 #define MSGTR_LIBVO_SUB_VIDIX_DriverCantDownscaleImage "[VO_SUB_VIDIX] Драйвер VIDIX не может уменьшить изображение (%d%d -> %d%d).\n"
 #define MSGTR_LIBVO_SUB_VIDIX_CantConfigurePlayback "[VO_SUB_VIDIX] Не могу настроить воспроизведение: %s.\n"
-#define MSGTR_LIBVO_SUB_VIDIX_YouHaveWrongVersionOfVidixLibrary "[VO_SUB_VIDIX] У Вас неверная версия библиотеки VIDIX.\n"
 #define MSGTR_LIBVO_SUB_VIDIX_CouldntFindWorkingVidixDriver "[VO_SUB_VIDIX] Не могу найти работающий драйвер VIDIX.\n"
 #define MSGTR_LIBVO_SUB_VIDIX_CouldntGetCapability "[VO_SUB_VIDIX] Не могу получить возможность: %s.\n"
 
 // x11_common.c
 #define MSGTR_EwmhFullscreenStateFailed "\nX11: Не могу послать событие EWMH fullscreen!\n"
-#define MSGTR_CouldNotFindXScreenSaver "xscreensaver_disable: Не могу найти окно XScreenSaver'а.\n"
 #define MSGTR_SelectedVideoMode "XF86VM: Выбран видеорежим %dx%d для размера изображения %dx%d.\n"
 
 #define MSGTR_InsertingAfVolume "[Микшер] Нет аппаратного микширования, вставляю фильтр громкости.\n"
@@ -1119,8 +1085,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_AO_SUN_RtscWriteFailed "[AO SUN] rtsc: запись не удалась."
 #define MSGTR_AO_SUN_CantOpenAudioDev "[AO SUN] Не могу открыть аудиоустройство %s, %s -> нет звука.\n"
 #define MSGTR_AO_SUN_UnsupSampleRate "[AO SUN] инициализация аудио: ваша карта не поддерживает канал %d,\n%s, частоту дискретизации %d Гц.\n"
-#define MSGTR_AO_SUN_CantUseSelect "[AO SUN]\n   ***  Ваш аудиодрайвер НЕ поддерживает select()  ***\nПерекомпилируйте MPlayer с #undef HAVE_AUDIO_SELECT в config.h !\n\n"
-#define MSGTR_AO_SUN_CantReopenReset "[AO SUN] Фатальная ошибка:\n*** НЕ МОГУ ПОВТОРНО ОТКРЫТЬ / СБРОСИТЬ АУДИОУСТРОЙСТВО (%s) ***\n"
 
 // ao_alsa.c
 #define MSGTR_AO_ALSA_InvalidMixerIndexDefaultingToZero "[AO_ALSA] Неверный индекс микшера. Возврат к 0.\n"
@@ -1156,7 +1120,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_AO_ALSA_UnableToSetHwParameters "[AO_ALSA] Невозможно установить hw-параметры: %s\n"
 #define MSGTR_AO_ALSA_UnableToGetBufferSize "[AO_ALSA] Невозможно получить размер буфера: %s\n"
 #define MSGTR_AO_ALSA_UnableToGetSwParameters "[AO_ALSA] Невозможно получить sw-параметры: %s\n"
-#define MSGTR_AO_ALSA_UnableToSetSwParameters "[AO_ALSA] Невозможно установить sw-параметры: %s\n"
 #define MSGTR_AO_ALSA_UnableToGetBoundary "[AO_ALSA] Невозможно получить границу: %s\n"
 #define MSGTR_AO_ALSA_UnableToSetStartThreshold "[AO_ALSA] Невозможно установить порог запуска: %s\n"
 #define MSGTR_AO_ALSA_UnableToSetStopThreshold "[AO_ALSA] Невозможно установить порог останова: %s\n"
@@ -1174,7 +1137,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_AO_ALSA_CannotGetPcmStatus "[AO_ALSA] Невозможно получить pcm статус: %s\n"
 
 // ao_plugin.c
-#define MSGTR_AO_PLUGIN_InvalidPlugin "[AO ПЛАГИН] неверный плагин: %s\n"
 
 
 // ======================= audio filters ================================
@@ -1185,7 +1147,6 @@ static const char help_text[] = MSGTR_Help;
 // af_ladspa.c
 #define MSGTR_AF_LADSPA_AvailableLabels "доступные метки в"
 #define MSGTR_AF_LADSPA_WarnNoInputs "ПРЕДУПРЕЖДЕНИЕ! У этого LADSPA плагина отсутствуют аудиовходы.\n  Входящий сигнал аудио будет потерян."
-#define MSGTR_AF_LADSPA_ErrMultiChannel "Мультиканальные (>2) плагины пока что не поддерживаются.\n  Используйте только моно- и стереоплагины."
 #define MSGTR_AF_LADSPA_ErrNoOutputs "У этого LADSPA плагина отсутствуют выходы аудио."
 #define MSGTR_AF_LADSPA_ErrInOutDiff "Число аудиовходов и аудиовыходов у LADSPA плагина отличается."
 #define MSGTR_AF_LADSPA_ErrFailedToLoad "не могу загрузить"
@@ -1232,11 +1193,9 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_INPUT_INPUT_ErrOnCmdFd "Ошибка в описателе %d файла команд\n"
 #define MSGTR_INPUT_INPUT_ErrReadingInputConfig "Ошибка чтения конфигурационного файла ввода %s: %s\n"
 #define MSGTR_INPUT_INPUT_ErrUnknownKey "Неизвестная клавиша '%s'\n"
-#define MSGTR_INPUT_INPUT_ErrUnfinishedBinding "Неоконченная привязка %s\n"
 #define MSGTR_INPUT_INPUT_ErrBuffer2SmallForKeyName "Буфер слишком мал для названия этой клавиши: %s\n"
 #define MSGTR_INPUT_INPUT_ErrNoCmdForKey "Не найдено команды для клавиши %s"
 #define MSGTR_INPUT_INPUT_ErrBuffer2SmallForCmd "Буфер слишком мал для команды %s\n"
-#define MSGTR_INPUT_INPUT_ErrWhyHere "Что мы здесь делаем?\n"
 #define MSGTR_INPUT_INPUT_ErrCantInitJoystick "Не могу инициализировать джойстик ввода\n"
 #define MSGTR_INPUT_INPUT_ErrCantOpenFile "Не могу выполнить open %s: %s\n"
 #define MSGTR_INPUT_INPUT_ErrCantInitAppleRemote "Не могу инициализировать Пульт ДУ Apple Remote.\n"
@@ -1272,8 +1231,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_InvalidAudioStreamUsingDefault "AVI: неверный ID видео потока: %d - игнорирование (используется значение по-умолчанию)\n"
 #define MSGTR_ON2AviFormat "ON2 AVI формат"
 #define MSGTR_Detected_XXX_FileFormat "Обнаружен %s формат файла!\n"
-#define MSGTR_DetectedAudiofile "Обнаружен аудиофайл.\n"
-#define MSGTR_InvalidMPEGES "Недопустимый MPEG-ES поток??? свяжитесь с автором, это может быть ошибкой :(\n"
 #define MSGTR_FormatNotRecognized "======= Извините, формат этого файла не распознан/не поддерживается ==========\n"\
                                   "===== Если это AVI, ASF или MPEG поток, пожалуйста свяжитесь с автором! ======\n"
 #define MSGTR_SettingProcessPriority "Устанавливаю приоритет процесса: %s\n"
@@ -1297,7 +1254,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MOVcomprhdr "MOV: Для поддержки сжатых заголовков необходим zlib!\n"
 #define MSGTR_MOVvariableFourCC "MOV: Предупреждение! Обнаружен переменный FOURCC!?\n"
 #define MSGTR_MOVtooManyTrk "MOV: Предупреждение! слишком много треков!"
-#define MSGTR_DetectedTV "Найден ТВ! ;-)\n"
 #define MSGTR_ErrorOpeningOGGDemuxer "Не могу открыть демультиплексор ogg.\n"
 #define MSGTR_CannotOpenAudioStream "Не могу открыть аудиопоток: %s\n"
 #define MSGTR_CannotOpenSubtitlesStream "Не могу открыть поток субтитров: %s\n"
@@ -1348,13 +1304,10 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CdDevNotfound "CD-ROM '%s' не найден!\n"
 #define MSGTR_ErrTrackSelect "Ошибка выбора дорожки VCD!"
 #define MSGTR_ReadSTDIN "Чтение из stdin (со стандартного входа)...\n"
-#define MSGTR_UnableOpenURL "Не могу открыть URL: %s\n"
-#define MSGTR_ConnToServer "Соединение с сервером: %s\n"
 #define MSGTR_FileNotFound "Файл не найден: '%s'\n"
 
 #define MSGTR_SMBInitError "Не могу инициализировать библиотеку libsmbclient: %d\n"
 #define MSGTR_SMBFileNotFound "Не могу открыть по сети: '%s'\n"
-#define MSGTR_SMBNotCompiled "MPlayer не был скомпилирован с поддержкой чтения SMB.\n"
 
 #define MSGTR_CantOpenDVD "Не могу открыть DVD: %s (%s)\n"
 
@@ -1391,7 +1344,6 @@ static const char help_text[] = MSGTR_Help;
 // demux_mkv.c
 #define MSGTR_MPDEMUX_MKV_ZlibInitializationFailed "[mkv] ошибка инициализации zlib.\n"
 #define MSGTR_MPDEMUX_MKV_ZlibDecompressionFailed "[mkv] ошибка zlib распаковки.\n"
-#define MSGTR_MPDEMUX_MKV_LzoInitializationFailed "[mkv] ошибка инициализации lzo.\n"
 #define MSGTR_MPDEMUX_MKV_LzoDecompressionFailed "[mkv] ошибка lzo распаковки.\n"
 #define MSGTR_MPDEMUX_MKV_TrackEncrypted "[mkv] Дорожка номер %u зашифрована, а расшифровка еще не \n[mkv] реализована. Пропуск дорожки.\n"
 #define MSGTR_MPDEMUX_MKV_UnknownContentEncoding "[mkv] Неизвестный тип шифрования содержимого для дорожки %u. Пропуск дорожки.\n"
@@ -1406,13 +1358,9 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPDEMUX_MKV_WillPlayVideoTrack "[mkv] Будет воспроизводиться дорожка %u.\n"
 #define MSGTR_MPDEMUX_MKV_NoVideoTrackFound "[mkv] Не найдена/не требуется видео дорожка.\n"
 #define MSGTR_MPDEMUX_MKV_NoAudioTrackFound "[mkv] Не найдена/не требуется аудио дорожка.\n"
-#define MSGTR_MPDEMUX_MKV_WillDisplaySubtitleTrack "[mkv] Будет отображаться дорожка субтитров %u.\n"
 #define MSGTR_MPDEMUX_MKV_NoBlockDurationForSubtitleTrackFound "[mkv] Предупреждение: Не найдена длительность блока трека субтитров.\n"
-#define MSGTR_MPDEMUX_MKV_TooManySublines "[mkv] Внимание: слишком много строк для рендеринга, пропущены.\n"
-#define MSGTR_MPDEMUX_MKV_TooManySublinesSkippingAfterFirst "\n[mkv] Предупреждение: слишком много строк для рендеринга,\nпропущены все кроме первой %i.\n"
 
 // demux_nuv.c
-#define MSGTR_MPDEMUX_NUV_NoVideoBlocksInFile "В файле нет блоков видео.\n"
 
 // demux_xmms.c
 #define MSGTR_MPDEMUX_XMMS_FoundPlugin "Найден плагин: %s (%s).\n"
@@ -1518,7 +1466,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPCODECS_AudioFramesizeDiffers "[AD_LIBDV] Предупреждение! Размер фрейма аудио отличается! read=%d  hdr=%d.\n"
 
 // vd.c
-#define MSGTR_CodecDidNotSet "VDec: Кодек не установил sh->disp_w и sh->disp_h, пытаюсь обойти.\n"
 #define MSGTR_CouldNotFindColorspace "Не могу найти подходящее цветовое пространство - попытаюсь с -vf scale...\n"
 #define MSGTR_MovieAspectIsSet "Movie-Aspect - %.2f:1 - выполняю предварительное масштабирование\nдля коррекции соотношения сторон фильма.\n"
 #define MSGTR_MovieAspectUndefined "Movie-Aspect не определён - предварительное масштабирование не применяется.\n"
@@ -1530,15 +1477,12 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPCODECS_CouldntAllocateImageForCinepakCodec "[VD_DMO] Не могу выделить изображение для кодека cinepak.\n"
 
 // libmpcodecs/vd_ffmpeg.c
-#define MSGTR_MPCODECS_XVMCAcceleratedCodec "[VD_FFMPEG] XVMC ускоренный кодек.\n"
 #define MSGTR_MPCODECS_ArithmeticMeanOfQP "[VD_FFMPEG] Арифметическое среднее QP: %2.4f, Гармоническое среднее QP: %2.4f\n"
 #define MSGTR_MPCODECS_DRIFailure "[VD_FFMPEG] Сбой DRI.\n"
 #define MSGTR_MPCODECS_CouldntAllocateImageForCodec "[VD_FFMPEG] Не могу выделить изображения для кодека.\n"
 #define MSGTR_MPCODECS_XVMCAcceleratedMPEG2 "[VD_FFMPEG] XVMC-ускоренный MPEG-2.\n"
 #define MSGTR_MPCODECS_TryingPixfmt "[VD_FFMPEG] Пробую pixfmt=%d.\n"
 #define MSGTR_MPCODECS_McGetBufferShouldWorkOnlyWithXVMC "[VD_FFMPEG] Буфер mc_get_buffer должен использоваться только с XVMC ускорением!!"
-#define MSGTR_MPCODECS_UnexpectedInitVoError "[VD_FFMPEG] Неожиданная ошибка init_vo.\n"
-#define MSGTR_MPCODECS_UnrecoverableErrorRenderBuffersNotTaken "[VD_FFMPEG] Невосстановимая ошибка: не получены буферы рендеринга.\n"
 #define MSGTR_MPCODECS_OnlyBuffersAllocatedByVoXvmcAllowed "[VD_FFMPEG] Разрешены только буферы, выделенные vo_xvmc.\n"
 
 // libmpcodecs/ve_lavc.c
@@ -1576,7 +1520,6 @@ static const char help_text[] = MSGTR_Help;
 
 // libmpcodecs/vf_expand.c
 #define MSGTR_MPCODECS_FullDRNotPossible "Полный DR невозможен, пробую SLICES взамен!\n"
-#define MSGTR_MPCODECS_WarnNextFilterDoesntSupportSlices  "ПРЕДУПРЕЖДЕНИЕ! Следующий фильтр не поддерживает SLICES,\nприготовьтесь к ошибке сегментации памяти (sig11)...\n"
 #define MSGTR_MPCODECS_FunWhydowegetNULL "Почему мы получили NULL??\n"
 
 // libmpcodecs/vf_test.c, vf_yuy2.c, vf_yvu9.c
@@ -1586,69 +1529,19 @@ static const char help_text[] = MSGTR_Help;
 // ================================== LIBASS ====================================
 
 // ass_bitmap.c
-#define MSGTR_LIBASS_FT_Glyph_To_BitmapError "[ass] Сбой FT_Glyph_To_Bitmap %d \n"
-#define MSGTR_LIBASS_UnsupportedPixelMode "[ass] Неподдерживаемый пиксельный режим: %d\n"
-#define MSGTR_LIBASS_GlyphBBoxTooLarge "[ass] Рамка, ограничивающая символ, слишком велика: %dx%dpx\n"
 
 // ass.c
-#define MSGTR_LIBASS_NoStyleNamedXFoundUsingY "[ass] [%p] Внимание: стиль '%s' не найден, использую '%s'\n"
-#define MSGTR_LIBASS_BadTimestamp "[ass] неверная временная метка\n"
-#define MSGTR_LIBASS_BadEncodedDataSize "[ass] неверный размер кодированный данных\n"
-#define MSGTR_LIBASS_FontLineTooLong "[ass] Линия шрифта слишком длинна: %d, %s\n"
-#define MSGTR_LIBASS_EventFormatHeaderMissing "[ass] Отсутствует заголовок формата событий\n"
-#define MSGTR_LIBASS_ErrorOpeningIconvDescriptor "[ass] ошибка открытия дескриптора iconv\n"
-#define MSGTR_LIBASS_ErrorRecodingFile "[ass] ошибка записи файла.\n"
 #define MSGTR_LIBASS_FopenFailed "[ass] ass_read_file(%s): сбой fopen\n"
-#define MSGTR_LIBASS_FseekFailed "[ass] ass_read_file(%s): сбой fseek\n"
 #define MSGTR_LIBASS_RefusingToLoadSubtitlesLargerThan100M "[ass] ass_read_file(%s): Отклонение загрузки субтитров больше 100M\n"
-#define MSGTR_LIBASS_ReadFailed "Ошибка чтения, %d: %s\n"
-#define MSGTR_LIBASS_AddedSubtitleFileMemory "[ass] Добавлен файл субтитров: <память> (стилей: %d, событий: %d)\n"
-#define MSGTR_LIBASS_AddedSubtitleFileFname "[ass] Добавлен файл субтитров: %s (стилей: %d, событий: %d)\n"
-#define MSGTR_LIBASS_FailedToCreateDirectory "[ass] Ошибка создания каталога %s\n"
-#define MSGTR_LIBASS_NotADirectory "[ass] Не каталог: %s\n"
 
 // ass_cache.c
-#define MSGTR_LIBASS_TooManyFonts "[ass] Слишком много шрифтов\n"
-#define MSGTR_LIBASS_ErrorOpeningFont "[ass] Ошибка открытия шрифта: %s, %d\n"
 
 // ass_fontconfig.c
-#define MSGTR_LIBASS_SelectedFontFamilyIsNotTheRequestedOne "[ass] fontconfig: Выбранный шрифт не совпадает с запрошенным: '%s' != '%s'\n"
-#define MSGTR_LIBASS_UsingDefaultFontFamily "[ass] fontconfig_select: Используется семейство шрифтов по-умолчанию: (%s, %d, %d) -> %s, %d\n"
-#define MSGTR_LIBASS_UsingDefaultFont "[ass] fontconfig_select: Используется шрифт по-умолчанию: (%s, %d, %d) -> %s, %d\n"
-#define MSGTR_LIBASS_UsingArialFontFamily "[ass] fontconfig_select: Используется семейство шрифтов 'Arial': (%s, %d, %d) -> %s, %d\n"
-#define MSGTR_LIBASS_FcInitLoadConfigAndFontsFailed "[ass] Сбой FcInitLoadConfigAndFonts.\n"
-#define MSGTR_LIBASS_UpdatingFontCache "[ass] Обновление кеша шрифтов.\n"
-#define MSGTR_LIBASS_BetaVersionsOfFontconfigAreNotSupported "[ass] Бета версии fontconfig не поддерживаются.\n[ass] Обновитесь прежде чем отсылать отчеты о любых ошибках.\n"
-#define MSGTR_LIBASS_FcStrSetAddFailed "[ass] Сбой FcStrSetAdd.\n"
-#define MSGTR_LIBASS_FcDirScanFailed "[ass] Сбой FcDirScan.\n"
-#define MSGTR_LIBASS_FcDirSave "[ass] Сбой FcDirSave.\n"
-#define MSGTR_LIBASS_FcConfigAppFontAddDirFailed "[ass] Сбой FcConfigAppFontAddDir\n"
-#define MSGTR_LIBASS_FontconfigDisabledDefaultFontWillBeUsed "[ass] Fontconfig отключен, будет использоваться только шрифт по-умолчанию.\n"
-#define MSGTR_LIBASS_FunctionCallFailed "[ass] Сбой %s\n"
 
 // ass_render.c
-#define MSGTR_LIBASS_NeitherPlayResXNorPlayResYDefined "[ass] Не определены ни PlayResX, ни PlayResY. Предполагаю 384x288.\n"
-#define MSGTR_LIBASS_PlayResYUndefinedSettingY "[ass] PlayResY не определено, устанавливаю %d.\n"
-#define MSGTR_LIBASS_PlayResXUndefinedSettingX "[ass] PlayResX не определено, устанавливаю %d.\n"
-#define MSGTR_LIBASS_FT_Init_FreeTypeFailed "[ass] Сбой FT_Init_FreeType.\n"
-#define MSGTR_LIBASS_Init "[ass] Инициализация.\n"
-#define MSGTR_LIBASS_InitFailed "[ass] Сбой инициализации.\n"
-#define MSGTR_LIBASS_BadCommand "[ass] Неверная команда: %c%c\n"
 //FIXME glyph
-#define MSGTR_LIBASS_ErrorLoadingGlyph  "[ass] Ошибка загрузки глифа [glyph].\n"
-#define MSGTR_LIBASS_FT_Glyph_Stroke_Error "[ass] Ошибка FT_Glyph_Stroke %d \n"
-#define MSGTR_LIBASS_UnknownEffectType_InternalError "[ass] Неизвестный тип эффекта (внутренняя ошибка)\n"
-#define MSGTR_LIBASS_NoStyleFound "[ass] Стили не найдены!\n"
-#define MSGTR_LIBASS_EmptyEvent "[ass] Пустое событие!\n"
-#define MSGTR_LIBASS_MAX_GLYPHS_Reached "[ass] Достигнуто значение MAX_GLYPHS: событие %d, начало = %llu, длительность = %llu\n Текст = %s\n"
-#define MSGTR_LIBASS_EventHeightHasChanged "[ass] Внимание! Высота события изменилась!  \n"
 
 // ass_font.c
-#define MSGTR_LIBASS_GlyphNotFoundReselectingFont "[ass] Глиф 0x%X не найден, выбираю еще один шрифт для (%s, %d, %d)\n"
-#define MSGTR_LIBASS_GlyphNotFound "[ass] В шрифте не найден глиф 0x%X для (%s, %d, %d)\n"
-#define MSGTR_LIBASS_ErrorOpeningMemoryFont "[ass] Ошибка открытия шрифта в памяти: %s\n"
-#define MSGTR_LIBASS_NoCharmaps "[ass] шрифт без таблиц символов\n"
-#define MSGTR_LIBASS_NoCharmapAutodetected "[ass] автоматически определить таблицу символов не удалось, пробуется первая доступная\n"
 
 
 // ================================== stream ====================================
@@ -1714,14 +1607,11 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPDEMUX_ASF_BufferMallocFailed "Ошибка: Не могу выделить буфер в %d байт(а/ов).\n"
 #define MSGTR_MPDEMUX_ASF_ErrReadingNetworkStream "Ошибка чтения сетевого потока.\n"
 #define MSGTR_MPDEMUX_ASF_ErrChunk2Small "Ошибка: Звено слишком мало.\n"
-#define MSGTR_MPDEMUX_ASF_ErrSubChunkNumberInvalid "Ошибка: Номер подцепочки неверен.\n"
 #define MSGTR_MPDEMUX_ASF_Bandwidth2SmallCannotPlay "Скорость передачи слишком мала, файл не может быть проигран!\n"
 #define MSGTR_MPDEMUX_ASF_Bandwidth2SmallDeselectedAudio "Скорость передачи слишком мала, отключаю аудиопоток.\n"
 #define MSGTR_MPDEMUX_ASF_Bandwidth2SmallDeselectedVideo "Скорость передачи слишком мала, отключаю видеопоток.\n"
 #define MSGTR_MPDEMUX_ASF_InvalidLenInHeader "Неверная длина в заголовке ASF!\n"
-#define MSGTR_MPDEMUX_ASF_ErrReadingChunkHeader "Ошибка чтения заголовка звена.\n"
 #define MSGTR_MPDEMUX_ASF_ErrChunkBiggerThanPacket "Ошибка: chunk_size > packet_size\n"
-#define MSGTR_MPDEMUX_ASF_ErrReadingChunk "Ошибка чтения звена.\n"
 #define MSGTR_MPDEMUX_ASF_ASFRedirector "=====> Перенаправитель ASF\n"
 #define MSGTR_MPDEMUX_ASF_InvalidProxyURL "неверный URL прокси\n"
 #define MSGTR_MPDEMUX_ASF_UnknownASFStreamType "неизвестный тип потока ASF\n"
@@ -1742,8 +1632,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPDEMUX_AUDIOIN_NotEnoughSamples "\nНедостаточная выборка аудио!\n"
 
 // cache2.c
-#define MSGTR_MPDEMUX_CACHE2_NonCacheableStream "\rЭтот поток не кэшируем.\n"
-#define MSGTR_MPDEMUX_CACHE2_ReadFileposDiffers "!!! read_filepos различаются!!! Сообщите об этой ошибке...\n"
 
 // stream_cdda.c
 #define MSGTR_MPDEMUX_CDDA_CantOpenCDDADevice "Не могу открыть устройство CDDA.\n"
@@ -1769,7 +1657,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPDEMUX_CDDB_ParseOKFoundAlbumTitle "Анализ успешен, найдено: %s\n"
 #define MSGTR_MPDEMUX_CDDB_AlbumNotFound "Альбом не найден.\n"
 #define MSGTR_MPDEMUX_CDDB_ServerReturnsCommandSyntaxErr "Сервер вернул: ошибка синтаксиса команды\n"
-#define MSGTR_MPDEMUX_CDDB_NoSitesInfoAvailable "Недоступна информация о сайте.\n"
 #define MSGTR_MPDEMUX_CDDB_FailedToGetProtocolLevel "Не могу получить уровень протокола.\n"
 #define MSGTR_MPDEMUX_CDDB_NoCDInDrive "Нет CD в приводе.\n"
 
@@ -1796,10 +1683,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_NoDVDSupport "MPlayer был скомпилирован без поддержки DVD, выходим.\n"
 #define MSGTR_DVDnumTitles "На этом DVD %d роликов.\n"
 #define MSGTR_DVDinvalidTitle "Недопустимый номер DVD ролика: %d\n"
-#define MSGTR_DVDnumChapters "В этом DVD ролике %d раздел[а/ов].\n"
-#define MSGTR_DVDinvalidChapter "Недопустимый номер раздела DVD: %d\n"
 #define MSGTR_DVDinvalidChapterRange "Неверное описание диапазона раздела %s\n"
-#define MSGTR_DVDinvalidLastChapter "Неверный номер последнего раздела DVD: %d\n"
 #define MSGTR_DVDnumAngles "В этом DVD ролике %d углов.\n"
 #define MSGTR_DVDinvalidAngle "Недопустимый номер DVD угла: %d\n"
 #define MSGTR_DVDnoIFO "Не могу открыть IFO файл для DVD ролика %d.\n"
@@ -1829,15 +1713,11 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_RADIO_QueryControlFailed "[radio] сбой вызова ioctl query control: %s\n"
 #define MSGTR_RADIO_GetVolumeFailed "[radio] сбой вызова ioctl get volume: %s\n"
 #define MSGTR_RADIO_SetVolumeFailed "[radio] сбой вызова ioctl set volume: %s\n"
-#define MSGTR_RADIO_DroppingFrame "\n[radio] потерян аудио фрейм (байт: %d)!\n"
-#define MSGTR_RADIO_BufferEmpty "[radio] grab_audio_frame: буфер пуст, ожидание данных. байт: %d.\n"
-#define MSGTR_RADIO_AudioInitFailed "[radio] сбой вызова audio_in_init: %s\n"
 #define MSGTR_RADIO_AllocateBufferFailed "[radio] Невозможно создать аудио буфер (блок=%d,размер=%d): %s\n"
 #define MSGTR_RADIO_CurrentFreq "[radio] Текущая частота: %.2f\n"
 #define MSGTR_RADIO_SelectedChannel "[radio] Выбрана станция: %d - %s (частота: %.2f)\n"
 #define MSGTR_RADIO_ChangeChannelNoChannelList "[radio] Невозможно изменить станцию: не передан список радиостанций.\n"
 #define MSGTR_RADIO_UnableOpenDevice "[radio] Невозможно открыть '%s': %s\n"
-#define MSGTR_RADIO_InitFracFailed "[radio] сбой вызова init_frac\n"
 #define MSGTR_RADIO_WrongFreq "[radio] Неверная частота: %.2f\n"
 #define MSGTR_RADIO_UsingFreq "[radio] Используется частота: %.2f.\n"
 #define MSGTR_RADIO_AudioInInitFailed "[radio] сбой вызова audio_in_init\n"
@@ -1888,7 +1768,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_TV_Bt848MmapFailed "tvi_bsdbt848: Сбой mmap. Ошибка: %s\n"
 #define MSGTR_TV_Bt848FrameBufAllocFailed "tvi_bsdbt848: Ошибка выделения памяти для кадрового буфера. Ошибка: %s\n"
 #define MSGTR_TV_Bt848ErrorSettingWidth "tvi_bsdbt848: Невозможно установить ширину изображения. Ошибка: %s\n"
-#define MSGTR_TV_Bt848ErrorSettingHeight "tvi_bsdbt848: Невозможно установить высоту изображения. Ошибка: %s\n"
 #define MSGTR_TV_Bt848UnableToStopCapture "tvi_bsdbt848: Невозможно остановить захват. Ошибка: %s\n"
 #define MSGTR_TV_TTSupportedLanguages "Поддерживаемые языки Телетекста:\n"
 #define MSGTR_TV_TTSelectedLanguage "Выбран язык Телетекста по умолчанию: %s\n"
@@ -1921,8 +1800,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_TVI_DS_ErrorParsingVideoFormatStruct "tvi_dshow: Невозможно разобрать структуру видео формата.\n"
 #define MSGTR_TVI_DS_UnableSetAudioMode "tvi_dshow: Невозможно установить аудио режим %d. Ошибка:0x%x\n"
 #define MSGTR_TVI_DS_UnsupportedMediaType "tvi_dshow: Неподдерживаемый медиа тип передан в %s\n"
-#define MSGTR_TVI_DS_UnableGetsupportedVideoFormats "tvi_dshow: Невозможно получить поддерживаемые медиа форматы у видео коннектора. Ошибка:0x%x\n"
-#define MSGTR_TVI_DS_UnableGetsupportedAudioFormats "tvi_dshow: Невозможно получить поддерживаемые медиа форматы у аудио коннектора. Ошибка:0x%x Отключение аудио.\n"
 #define MSGTR_TVI_DS_UnableFindNearestChannel "tvi_dshow: Невозможно найти ближайший канал в системной таблице частот\n"
 #define MSGTR_TVI_DS_UnableToSetChannel "tvi_dshow: Невозможно переключиться на ближайший канал в системой таблице частот. Ошибка:0x%x\n"
 #define MSGTR_TVI_DS_UnableTerminateVPPin "tvi_dshow: Невозможно подсоединить к VideoPort коннектору ни один фильтр из графа. Ошибка:0x%x\n"

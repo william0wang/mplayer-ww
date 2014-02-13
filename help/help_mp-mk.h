@@ -217,19 +217,14 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CdDevNotfound "CD-ROM Уредот '%s' не е пронајден.\n"
 #define MSGTR_ErrTrackSelect "Грешка во избирањето на VCD датотеката."
 #define MSGTR_ReadSTDIN "Читање од stdin...\n"
-#define MSGTR_UnableOpenURL "Не може да се отвори URL: %s\n"
-#define MSGTR_ConnToServer "Поврзан со серверот: %s\n"
 #define MSGTR_FileNotFound "Датотеката не е пронајдена: '%s'\n"
 
 #define MSGTR_SMBInitError "Не може да ја иницијализира libsmbclient библиотеката: %d\n"
 #define MSGTR_SMBFileNotFound "Не може да отвори од локалната мрежа: '%s'\n"
-#define MSGTR_SMBNotCompiled "MPlayer не е компајлиран со подршка за SMB читање\n"
 
 #define MSGTR_CantOpenDVD "Не можеше да се отвори DVD уредот: %s (%s)\n"
 #define MSGTR_DVDnumTitles "Има %d наслови на ова DVD.\n"
 #define MSGTR_DVDinvalidTitle "Невалиден DVD број на насловот: %d\n"
-#define MSGTR_DVDnumChapters "Има %d поглавја на овој DVD наслов.\n"
-#define MSGTR_DVDinvalidChapter "Невалиден DVD број на поглавјето: %d\n"
 #define MSGTR_DVDnumAngles "Има %d агли на овој DVD наслов.\n"
 #define MSGTR_DVDinvalidAngle "Невалиден DVD број на аголот: %d\n"
 #define MSGTR_DVDnoIFO "Не може да ја отвори IFO датотеката за DVD насловот %d.\n"
@@ -244,8 +239,6 @@ static const char help_text[] = MSGTR_Help;
                       "За AVI датотеки, обиди се да го присилиш непреклопувачкиот мод со опцијата -ni.\n"
 #define MSGTR_SwitchToNi "\nОткриена е лошо преклопена AVI датотека - се префрла на модот -ni...\n"
 #define MSGTR_Detected_XXX_FileFormat "Пронајден е %s формат на датотеката.\n"
-#define MSGTR_DetectedAudiofile "Пронајдена е аудио датотека.\n"
-#define MSGTR_InvalidMPEGES "Невалиден MPEG-ES проток??? Контактирајте со авторот, можеби е баг :(\n"
 #define MSGTR_FormatNotRecognized "============ Извинете, овој формат на датотеката не е пропознат/подржан =============\n"\
                                   "=== Ако оваа датотека е AVI, ASF или MPEG проток, ве молиме контактирајте со авторот! ===\n"
 #define MSGTR_MissingVideoStream "Не е пронајден видео проток.\n"
@@ -266,7 +259,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MOVcomprhdr "MOV: За подршка на компресирани хедери потребно е ZLIB!\n"
 #define MSGTR_MOVvariableFourCC "MOV: ПРЕДУПРЕДУВАЊЕ: Откриено е променливо FOURCC!?\n"
 #define MSGTR_MOVtooManyTrk "MOV: ПРЕДУПРЕДУВАЊЕ: премногу траки"
-#define MSGTR_DetectedTV "Пронајден е ТВ! ;-)\n"
 #define MSGTR_ErrorOpeningOGGDemuxer "Не може да се отвори ogg демуксерот.\n"
 #define MSGTR_CannotOpenAudioStream "Не може да се отвори аудио протокот: %s\n"
 #define MSGTR_CannotOpenSubtitlesStream "Не може да се отвори протокот за преводи: %s\n"
@@ -318,7 +310,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CannotFindColorspace "Не може да се пронајде заеднички простор за боја, дури ни со внесување на 'нијанса' :(\n"
 
 // vd.c
-#define MSGTR_CodecDidNotSet "VDec: Кодекот не ги подеси sh->disp_w и sh->disp_h, се обидува да заобиколи.\n"
 #define MSGTR_CouldNotFindColorspace "Не може да се пронајде соодветен простор за боја - се обидува повторно со -vf scale...\n"
 #define MSGTR_MovieAspectIsSet "Аспектот на Филмот е %.2f:1 - се преместува на точниот аспект на филмот.\n"
 #define MSGTR_MovieAspectUndefined "Аспектот на филмот не е дефиниран - не е применето преместување.\n"

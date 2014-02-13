@@ -217,19 +217,14 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CdDevNotfound "Η CD-ROM συσκευή '%s' δεν βρέθηκε!\n"
 #define MSGTR_ErrTrackSelect "Σφάλμα στην επιλογή του VCD track!"
 #define MSGTR_ReadSTDIN "Διαβάζοντας από το stdin...\n"
-#define MSGTR_UnableOpenURL "Αδύνατο το άνοιγμα του URL: %s\n"
-#define MSGTR_ConnToServer "Πραγματοποιήθηκε σύνδεση με τον server: %s\n"
 #define MSGTR_FileNotFound "Το αρχείο: '%s' δεν βρέθηκε\n"
 
 #define MSGTR_SMBInitError "Αδύνατη η αρχικοποίηση της βιβλιοθήκης libsmbclient: %d\n"
 #define MSGTR_SMBFileNotFound "Δεν μπόρεσα να ανοίξω από το τοπικό δίκτυο: '%s'\n"
-#define MSGTR_SMBNotCompiled "MPlayer δεν μεταφράστηκε με υποστήριξη ανάγνωσης SMB\n"
 
 #define MSGTR_CantOpenDVD "Δεν μπόρεσα να ανοίξω την συσκευή DVD: %s (%s)\n"
 #define MSGTR_DVDnumTitles "Υπάρχουν %d τίτλοι στο DVD.\n"
 #define MSGTR_DVDinvalidTitle "Άκυρος αριθμός για τον τίτλο του DVD: %d\n"
-#define MSGTR_DVDnumChapters "Υπάρχουν %d κεφάλαια σε αυτόν τον τίτλο του DVD.\n"
-#define MSGTR_DVDinvalidChapter "Λάθος αριθμός των κεφαλαίων του DVD: %d\n"
 #define MSGTR_DVDnumAngles "Υπάρχουν %d γωνίες σε αυτό τον τίτλο του DVD.\n"
 #define MSGTR_DVDinvalidAngle "Λάθος αριθμός των γωνιών του DVD: %d\n"
 #define MSGTR_DVDnoIFO "Δεν είναι δυνατό το άνοιγμα του IFO αρχείο για τον τίτλο του DVD %d.\n"
@@ -244,8 +239,6 @@ static const char help_text[] = MSGTR_Help;
                       "Για .AVI αρχεία, ενεργοποιήστε τη μέθοδο non-interleaved με την επιλογή -ni\n"
 #define MSGTR_SwitchToNi "\n Αναγνωρίστηκε λάθος interleaved .AVI - εναλλαγή στη μέθοδο -ni!\n"
 #define MSGTR_Detected_XXX_FileFormat "Αναγνωρίστηκε αρχείο τύπου %s!\n"
-#define MSGTR_DetectedAudiofile "Αναγνωρίστηκε αρχείο ήχου!\n"
-#define MSGTR_InvalidMPEGES "Μη Αναγνωρίσιμο κανάλι MPEG-ES??? Επικοινώνησε με τον δημιουργό, μπορεί να είναι ένα bug :(\n"
 #define MSGTR_FormatNotRecognized "============= Λυπάμαι, αυτό το είδος αρχείου δεν αναγνωρίζεται/υποστηρίζεται ===============\n"\
                                   "=== Αν το αρχείο είναι ένα AVI, ASF ή MPEG κανάλι, παρακαλώ επικοινωνήστε με τον δημιουργό! ===\n"
 #define MSGTR_MissingVideoStream "Δεν βρέθηκε κανάλι βίντεο!\n"
@@ -266,7 +259,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MOVcomprhdr "MOV: Συμπιεσμένες επικεφαλίδες δεν υποστηρίζονται (ακόμα)!\n"
 #define MSGTR_MOVvariableFourCC "MOV: ΠΡΟΕΙΔΟΠΟΙΗΣΗ! μεταβλητό FOURCC βρέθηκε!?\n"
 #define MSGTR_MOVtooManyTrk "MOV: Προειδοποίηση! βρέθηκαν πολλά tracks!"
-#define MSGTR_DetectedTV "Βρέθηκε TV! ;-)\n"
 #define MSGTR_ErrorOpeningOGGDemuxer "Δεν είναι δυνατό το άνοιγμα του ogg demuxer\n"
 #define MSGTR_CannotOpenAudioStream "Δεν είναι δυνατό το άνοιγμα του καναλιού ήχου: %s\n"
 #define MSGTR_CannotOpenSubtitlesStream "Δεν είναι δυνατό το άνοιγμα του καναλιού υποτίτλων: %s\n"
@@ -318,7 +310,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CannotFindColorspace "Αδύνατη εύρεση για colorspace, ακόμη και με την εισαγωγή 'scale' :(\n"
 
 // vd.c
-#define MSGTR_CodecDidNotSet "VDec: το codec δεν όρισε sh->disp_w και sh->disp_h, προσπάθεια επίλυσης!\n"
 #define MSGTR_CouldNotFindColorspace "Δεν βρέθηκε αντίστοιχο colorspace - προσπάθεια με -vf scale...\n"
 #define MSGTR_MovieAspectIsSet "Η αναλογία της ταινίας είναι %.2f:1 - προκλιμάκωση για την διόρθωση της εμφάνισης της ταινίας.\n"
 #define MSGTR_MovieAspectUndefined "Η αναλογία της ταινίας δεν είναι ορισμένη - δεν εφαρμόζεται προκλιμάκωση.\n"

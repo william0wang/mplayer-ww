@@ -150,39 +150,20 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_LoadingExtensionProfile "Uzantıya bağlı profil yükleniyor '%s'\n"
 #define MSGTR_AddedSubtitleFile "ALTYAZI: (%d) altyazı dosyası eklendi : %s\n"
 #define MSGTR_RemovedSubtitleFile "ALTYAZI: (%d) altyazı dosyası kaldırıldı: %s\n"
-#define MSGTR_ErrorOpeningOutputFile "Yazma esnasında [%s] dosyası açılış hatası!\n"
 #define MSGTR_RTCDeviceNotOpenable "%s dosyası açılamadı: %s (kullanıcı için okunabilir olmalı)\n"
 #define MSGTR_LinuxRTCInitErrorIrqpSet "ioctl'de Linux RTC açılış hatası  (rtc_irqp_set %lu): %s\n"
 #define MSGTR_IncreaseRTCMaxUserFreq "\"echo %lu > /proc/sys/dev/rtc/max-user-freq\" seçeneğini sistem açılış betiklerine eklemeyi deneyiniz.\n"
 #define MSGTR_LinuxRTCInitErrorPieOn "ioctl'de Linux RTC açılış hatası (rtc_pie_on): %s\n"
-#define MSGTR_UsingTimingType "%s zamanlaması kullanılıyor.\n"
 #define MSGTR_Getch2InitializedTwice "UYARI:getch2_init iki defa çağırıldı!\n"
-#define MSGTR_DumpstreamFdUnavailable "Bu yayın dökülemez (dump) - kullanılabilir dosya tanımlayıcısı yok.\n"
 #define MSGTR_CantOpenLibmenuFilterWithThisRootMenu "%s root menüsü ile libmenu video filtresi açılamaz.\n"
 #define MSGTR_AudioFilterChainPreinitError "Ses filtresi zincirinde başlama öncesi hata!\n"
 #define MSGTR_LinuxRTCReadError "Linux RTC okuma hatası: %s\n"
 #define MSGTR_SoftsleepUnderflow "Uyarı! softsleep underflow!\n"
-#define MSGTR_DvdnavNullEvent "DVDNAV Olayı NULL?!\n"
-#define MSGTR_DvdnavHighlightEventBroken "DVDNAV Olayı: Vurgu olayı bozuk\n"
-#define MSGTR_DvdnavEvent "DVDNAV Olayı: %s\n"
-#define MSGTR_DvdnavHighlightHide "DVDNAV Olayı: Vurgu Saklı\n"
-#define MSGTR_DvdnavStillFrame "########################## DVDNAV Olayı: Hareketsiz kare: %d sn\n"
-#define MSGTR_DvdnavNavStop "DVDNAV Olayı: Nav Duruş DVDNAV\n"
-#define MSGTR_DvdnavNavNOP "DVDNAV Olayı: Nav NOP\n"
-#define MSGTR_DvdnavNavSpuStreamChangeVerbose "DVDNAV Olayı: Nav SPU yayın değişimi: fzksel: %d/%d/%d mntksal: %d\n"
-#define MSGTR_DvdnavNavSpuStreamChange "DVDNAV Olayı: Nav SPU yayın değişimi: fzksel: %d mntksal: %d\n"
-#define MSGTR_DvdnavNavAudioStreamChange "DVDNAV Olayı: Nav ses yayın değişimi: fzksel: %d mntksal: %d\n"
-#define MSGTR_DvdnavNavVTSChange "DVDNAV Olayı: Nav VTS Değişimi\n"
-#define MSGTR_DvdnavNavCellChange "DVDNAV Olayı: Nav Hücre Değişimi\n"
-#define MSGTR_DvdnavNavSpuClutChange "DVDNAV Olayı: Nav SPU CLUT değişimi\n"
-#define MSGTR_DvdnavNavSeekDone "DVDNAV Olayı: Nav Araması Tamam\n"
-#define MSGTR_MenuCall "Menü Çağrısı\n"
 
 #define MSGTR_EdlOutOfMem "EDl verisini tutmak için yeterli bellek atanamıyor.\n"
 #define MSGTR_EdlRecordsNo "%d EDL hareketlerini Oku.\n"
 #define MSGTR_EdlQueueEmpty "Dikkat edilecek herhangi EDL hareketi yok.\n"
 #define MSGTR_EdlCantOpenForWrite "Yazma esnasında [%s] EDL dosyası açılamaz.\n"
-#define MSGTR_EdlCantOpenForRead "Okuma esnasında [%s] EDL dosyası açılamaz.\n"
 #define MSGTR_EdlNOsh_video "Video olmadan EDL kullanılamaz, devredışı bırakılıyor.\n"
 #define MSGTR_EdlNOValidLine "Geçersiz EDL satırı: %s\n"
 #define MSGTR_EdlBadlyFormattedLine "[%d] EDL satırı hatalı düzenlenmiş, çıkarılıyor.\n"
@@ -199,7 +180,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_OSDenabled "etkin"
 #define MSGTR_OSDdisabled "etkisiz"
 #define MSGTR_OSDAudio "Ses: %s"
-#define MSGTR_OSDVideo "Görüntü: %s"
 #define MSGTR_OSDChannel "Kanal: %s"
 #define MSGTR_OSDSubDelay "Altyazı gecikmesi: %d ms"
 #define MSGTR_OSDSpeed "Hız: x %6.2f"
@@ -281,9 +261,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_OpenedStream "başarım: biçim: %d veri: 0x%X - 0x%x\n"
 #define MSGTR_VCodecFramecopy "videocodec: framecopy (%dx%d %dbpp fourcc=%x)\n"
 #define MSGTR_ACodecFramecopy "audiocodec: framecopy (biçim=%x chens=%d rate=%d bits=%d B/s=%d sample-%d)\n"
-#define MSGTR_CBRPCMAudioSelected "CBR PCM ses seçili\n"
 #define MSGTR_MP3AudioSelected "MP3 ses seçili\n"
-#define MSGTR_CannotAllocateBytes "%d bayt atanamadı\n"
 #define MSGTR_SettingAudioDelay "Ses gecikmesi %5.3fs olarak ayarlanıyor.\n"
 #define MSGTR_SettingVideoDelay "Video gecikmesi %5.3fs olarak ayarlanıyor.\n"
 #define MSGTR_LimitingAudioPreload "Ses önyüklemesi 0.4s olarak sınırlanıyor\n"
@@ -400,7 +378,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_ErrorParsingCommandLine "komutsatırı ayrıştırma hatası"
 #define MSGTR_VideoStreamRequired "Video yayını(stream) zorunlu!\n"
 #define MSGTR_ForcingInputFPS "girdi fps değeri %5.3f olarak yorumlanacak\n"
-#define MSGTR_RawvideoDoesNotSupportAudio "Çıktı dosyası RAWVIDEO biçimi sesi desteklemiyor - ses devre dışı bırakılıyor\n"
 #define MSGTR_DemuxerDoesntSupportNosound "Ayrıştırıcı -nosound seçeneğini henüz desteklemiyor.\n"
 #define MSGTR_MemAllocFailed "Bellek atanamadı\n"
 #define MSGTR_NoMatchingFilter "filter/ao biçimi eşleşmesi bulunamadı!\n"
@@ -488,7 +465,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_OutdatedCodecsConf "Bu codecs.conf dosyası çok eski ve bu Mplayer sürümü ile bağdaşmıyor."
 
 // fifo.c
-#define MSGTR_CannotMakePipe "PIPE yapılamıyor!\n"
 
 // parser-mecmd.c, parser-mpcmd.c
 #define MSGTR_NoFileGivenOnCommandLine "'--' daha fazlaseçenek yok demektir, fakat komut satırında\n"\
@@ -523,13 +499,10 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CdDevNotfound "CD-ROM Sürücüsü '%s' bulunamadı!\n"
 #define MSGTR_ErrTrackSelect "VCD seçilirken hata!"
 #define MSGTR_ReadSTDIN "Standart girdiden okunuyor...\n"
-#define MSGTR_UnableOpenURL "URL adresi açılamadı: %s\n"
-#define MSGTR_ConnToServer "Sunucuya bağlanıldı: %s\n"
 #define MSGTR_FileNotFound "Dosya bulunamadı: '%s'\n"
 
 #define MSGTR_SMBInitError "libsmbclient kütüphanesi başlatılamadı: %d\n"
 #define MSGTR_SMBFileNotFound "Yerel ağdan açılamadı: '%s'\n"
-#define MSGTR_SMBNotCompiled "MPlayer SMB okuma desteği ile derlenilmedi.\n"
 
 #define MSGTR_CantOpenDVD "DVD sürücüsü açılamadı: %s (%s)\n"
 
@@ -542,10 +515,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_NoDVDSupport "Mplayer DVD desteği olmadan derlendi, çık\n"
 #define MSGTR_DVDnumTitles "Bu DVD üzerinde %d tane başlık var.\n"
 #define MSGTR_DVDinvalidTitle "Geçersiz DVD başlık numarası: %d\n"
-#define MSGTR_DVDnumChapters "Bu DVD başlığında %d bölüm var.\n"
-#define MSGTR_DVDinvalidChapter "Geçersiz DVD bölüm numarası: %d\n"
 #define MSGTR_DVDinvalidChapterRange "%s özelliği geçersiz bölüm aralığı\n"
-#define MSGTR_DVDinvalidLastChapter "Geçersiz DVD son bölüm numarası: %d\n"
 #define MSGTR_DVDnumAngles "Bu DVD başlığında %d angle var.\n"
 #define MSGTR_DVDinvalidAngle "Yanlış DVD angle numarası: %d\n"
 #define MSGTR_DVDnoIFO "DVD Başlığı için IFO dosyası açılamıyor %d.\n"
@@ -586,8 +556,6 @@ static const char help_text[] = MSGTR_Help;
 " (varsayılan kullanılıyor)\n"
 #define MSGTR_ON2AviFormat "ON2 AVI biçimi"
 #define MSGTR_Detected_XXX_FileFormat "%s dosya biçimi bulundu!\n"
-#define MSGTR_DetectedAudiofile "Ses dosyası bulundu !\n"
-#define MSGTR_InvalidMPEGES "Geçersiz MPEG-ES biçimi??? Geliştiricilere bildiriniz, bu bir hata olabilir.:(\n"
 #define MSGTR_FormatNotRecognized "============ Üzgünüm, bu dosya biçimi desteklenmiyor  ===========\n"\
                                   "=== Dosya bir AVI,ASF veya MPEG yayın biçimi ise, lütfen geliştiricilere bildiriniz. ===\n"
 #define MSGTR_SettingProcessPriority "İşlem önceliği ayarlanıyor: %s\n"
@@ -611,7 +579,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MOVcomprhdr "MOV: Sıkıştırılmış başlık desteği ZLIB gerektiriyor!\n"
 #define MSGTR_MOVvariableFourCC "MOV: UYARI: Değişken FOURCC bulundu!?\n"
 #define MSGTR_MOVtooManyTrk "MOV: UYARI: Çok sayıda parça!"
-#define MSGTR_DetectedTV "TV Bulundu! ;-)\n"
 #define MSGTR_ErrorOpeningOGGDemuxer "ogg ayrıştırıcısı açılamadı\n"
 #define MSGTR_CannotOpenAudioStream "Ses yayını açılamıyor: %s\n"
 #define MSGTR_CannotOpenSubtitlesStream "Altyazı yayını açılamıyor: %s\n"
@@ -674,7 +641,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CannotFindColorspace "Eşlenen renk biçimi bulunamadı, hatta 'scale' seçeneği eklensede :(\n"
 
 // vd.c
-#define MSGTR_CodecDidNotSet "VDec: Kodek ayarlanamadı: sh->disp_w ve sh->disp_h, çözülmeye çalışılıyor!\n"
 #define MSGTR_CouldNotFindColorspace "Renk biçimi bulunamadı.  -vf scale ile tekrar deneniyor...\n"
 #define MSGTR_MovieAspectIsSet "Video-Görünümü: %.2f:1 - doğru video görünümü için önölçekleniyor.\n"
 #define MSGTR_MovieAspectUndefined "Video-Görünümü tanımsız - önölçekleme onaylanamadı.\n"
@@ -684,7 +650,6 @@ static const char help_text[] = MSGTR_Help;
 
 // x11_common.c
 #define MSGTR_EwmhFullscreenStateFailed "\nX11: EWMH tam ekran sonucu gönderilemedi!\n"
-#define MSGTR_CouldNotFindXScreenSaver "xscreensaver_disable: X Ekran Koruyucu penceresi bulunamadı.\n"
 #define MSGTR_SelectedVideoMode "XF86VM: Seçili video modu %dx%d:  %dx%d görüntü boyutuna göre. \n"
 
 #define MSGTR_InsertingAfVolume "[Karıştırıcı] Karıştırma donanımı yok, ses filtresi ekleniyor.\n"
@@ -914,8 +879,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_VO_CantCreateFile "Çıktı dosyası oluşturulamıyor."
 #define MSGTR_VO_DirectoryCreateSuccess "Çıktı dizini başarıyla oluşturuldu."
 #define MSGTR_VO_ValueOutOfRange "Değer erişim dışı"
-#define MSGTR_VO_NoValueSpecified "Değer tanımlanmadı."
-#define MSGTR_VO_UnknownSuboptions "Bilinmeyen altseçenek(ler)"
 
 // vo_aa.c
 
@@ -942,7 +905,6 @@ static const char help_text[] = MSGTR_Help;
 
 // vo_yuv4mpeg.c
 #define MSGTR_VO_YUV4MPEG_InterlacedHeightDivisibleBy4 "Örme(interlaced) modu 4'e bölünebilme için görüntü yüksekliğini gerektiriyor."
-#define MSGTR_VO_YUV4MPEG_InterlacedLineBufAllocFail "Örme (interlaced) modu için ilerleme tamponu atanamıyor."
 #define MSGTR_VO_YUV4MPEG_WidthDivisibleBy2 "Görüntü genişliği 2 ile bölünür olmalıdır."
 #define MSGTR_VO_YUV4MPEG_OutFileOpenError " \"%s\" yazılması için bellek veya dosya kimlikleyiciye ulaşılamıyor!"
 #define MSGTR_VO_YUV4MPEG_OutFileWriteError "Çıktıya görüntü yazma hatası!"
@@ -1048,8 +1010,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_AO_SUN_RtscWriteFailed "[AO SUN] rtsc: yazılamadı.\n"
 #define MSGTR_AO_SUN_CantOpenAudioDev "[AO SUN] %s ses aygıtı açılamıyor, %s  -> ses yok.\n"
 #define MSGTR_AO_SUN_UnsupSampleRate "[AO SUN] ses_kurulumu: ses kartınız %d kanalını, %s, %d Hz  örnekleme oranını desteklemiyor.\n"
-#define MSGTR_AO_SUN_CantUseSelect "[AO SUN]\n   *** Ses sürücünüzün select() desteği YOK ***\nconfig.h dosyasında #undef HAVE_AUDIO_SELECT ile Mplayer'ı yeniden derleyiniz!\n\n"
-#define MSGTR_AO_SUN_CantReopenReset "[AO SUN]\nÖnemli Hata: ***SES AYGITI TEKRAR AÇILAMIYOR (%s) ***\n"
 
 // ao_alsa.c
 #define MSGTR_AO_ALSA_InvalidMixerIndexDefaultingToZero "[AO_ALSA] Geçersiz karıştırıcı içeriği. Varsayılan olarak 0. yapılıyor\n"
@@ -1085,7 +1045,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_AO_ALSA_UnableToSetHwParameters "[AO_ALSA] hw-parameters ayarlanamıyor: %s\n"
 #define MSGTR_AO_ALSA_UnableToGetBufferSize "[AO_ALSA] buffersize alınamıyor: %s\n"
 #define MSGTR_AO_ALSA_UnableToGetSwParameters "[AO_ALSA] sw-parameters alınamıyor: %s\n"
-#define MSGTR_AO_ALSA_UnableToSetSwParameters "[AO_ALSA] sw-parameters ayarlanamıyor: %s\n"
 #define MSGTR_AO_ALSA_UnableToGetBoundary "[AO_ALSA] Sınır alınamıyor: %s\n"
 #define MSGTR_AO_ALSA_UnableToSetStartThreshold "[AO_ALSA] Eşik başlaması ayarlanamıyor: %s\n"
 #define MSGTR_AO_ALSA_UnableToSetStopThreshold "[AO_ALSA] Eşik bitişi ayarlanamıyor: %s\n"
@@ -1104,7 +1063,6 @@ static const char help_text[] = MSGTR_Help;
 
 // ao_plugin.c
 
-#define MSGTR_AO_PLUGIN_InvalidPlugin "[AO PLUGIN] geçersiz ekyazılım(plugin): %s\n"
 
 // ======================= AF Audio Filters ================================
 
@@ -1115,7 +1073,6 @@ static const char help_text[] = MSGTR_Help;
 
 #define MSGTR_AF_LADSPA_AvailableLabels "kullanılabilir etiketler"
 #define MSGTR_AF_LADSPA_WarnNoInputs "UYARI! Bu LADSPA ekyazılımı(plugin) ses girdileri içermiyor.\n  Gelen ses sinyali kaybedilecek."
-#define MSGTR_AF_LADSPA_ErrMultiChannel "Çoklu-kanal (>2) ekyazılımları(plugins) henüz desteklenmiyor.\n Sadece mono ve stereo ekyazılımlarını kullanınız."
 #define MSGTR_AF_LADSPA_ErrNoOutputs "Bu LADSPA ekyazılımı(plugin) ses çıktıları içermiyor."
 #define MSGTR_AF_LADSPA_ErrInOutDiff "LADSPA ekyazılımı(plugin) ses girdisi ve çıktısının numaraları farklı."
 #define MSGTR_AF_LADSPA_ErrFailedToLoad "yüklenemedi"
@@ -1161,11 +1118,9 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_INPUT_INPUT_ErrOnCmdFd "%d komut dosya tanımlayıcısında hata\n"
 #define MSGTR_INPUT_INPUT_ErrReadingInputConfig "%s ayar dosyası girdi okumasında hata: %s\n"
 #define MSGTR_INPUT_INPUT_ErrUnknownKey "Bilinmeyen tuş '%s'\n"
-#define MSGTR_INPUT_INPUT_ErrUnfinishedBinding "Tamamlanmamış %s bağlayıcısı\n"
 #define MSGTR_INPUT_INPUT_ErrBuffer2SmallForKeyName "Bu tuş adı için tampon çok küçük: %s\n"
 #define MSGTR_INPUT_INPUT_ErrNoCmdForKey "%s tuşu için komut bulunamadı"
 #define MSGTR_INPUT_INPUT_ErrBuffer2SmallForCmd "%s komutu için tampon çok küçük\n"
-#define MSGTR_INPUT_INPUT_ErrWhyHere "Burada ne yapıyoruz?\n"
 #define MSGTR_INPUT_INPUT_ErrCantInitJoystick "Kumanda kolu girdisi açılamıyor\n"
 #define MSGTR_INPUT_INPUT_ErrCantOpenFile "%s açılamıyor: %s\n"
 #define MSGTR_INPUT_INPUT_ErrCantInitAppleRemote "Apple Remote açılamıyor.\n"
@@ -1254,14 +1209,11 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPDEMUX_ASF_BufferMallocFailed "Hata: %d bayt tampon atanamıyor\n"
 #define MSGTR_MPDEMUX_ASF_ErrReadingNetworkStream "Ağ yayını okunurken hata\n"
 #define MSGTR_MPDEMUX_ASF_ErrChunk2Small "Hata: Yığın(chunk) çok küçük\n"
-#define MSGTR_MPDEMUX_ASF_ErrSubChunkNumberInvalid "Hata: alt yığın(sub chunks) numaraları geçersiz\n"
 #define MSGTR_MPDEMUX_ASF_Bandwidth2SmallCannotPlay "Bant genişliği çok küçük, dosya oynatılamıyor!\n"
 #define MSGTR_MPDEMUX_ASF_Bandwidth2SmallDeselectedAudio "Bant genişliği çok küçük, ses yayın seçimini kaldırınız.\n"
 #define MSGTR_MPDEMUX_ASF_Bandwidth2SmallDeselectedVideo "Bant genişliği çok küçük, video yayın seçimini kaldırınız\n"
 #define MSGTR_MPDEMUX_ASF_InvalidLenInHeader "ASF başlığında geçersiz uzunluk!\n"
-#define MSGTR_MPDEMUX_ASF_ErrReadingChunkHeader "Yığın(chunk) başlığı okunurken hata\n"
 #define MSGTR_MPDEMUX_ASF_ErrChunkBiggerThanPacket "Hata: yığın_boyutu > paket_boyutu\n"
-#define MSGTR_MPDEMUX_ASF_ErrReadingChunk "Yığın(chunk) okunurken hata\n"
 #define MSGTR_MPDEMUX_ASF_ASFRedirector "=====> ASF yönlendirici\n"
 #define MSGTR_MPDEMUX_ASF_InvalidProxyURL "Geçersiz vekil sunucu URL'si\n"
 #define MSGTR_MPDEMUX_ASF_UnknownASFStreamType "Bilinmeyen asf yayın türü\n"
@@ -1300,8 +1252,6 @@ static const char help_text[] = MSGTR_Help;
 
 // cache2.c
 
-#define MSGTR_MPDEMUX_CACHE2_NonCacheableStream "\rBu yayın(stream) önbelleklenebilir değil.\n"
-#define MSGTR_MPDEMUX_CACHE2_ReadFileposDiffers "!!! read_filepos farklılık gösteriyor!!! bu hatayı bildiriniz...\n"
 
 // cdda.c
 
@@ -1329,7 +1279,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPDEMUX_CDDB_ParseOKFoundAlbumTitle "Ayrıştırma TAMAM, bulunan: %s\n"
 #define MSGTR_MPDEMUX_CDDB_AlbumNotFound "Albüm bulunamadı\n"
 #define MSGTR_MPDEMUX_CDDB_ServerReturnsCommandSyntaxErr "Sunucu dönüşleri: komut sözdizim hatası\n"
-#define MSGTR_MPDEMUX_CDDB_NoSitesInfoAvailable "Site bilgisi kullanılabilir değil\n"
 #define MSGTR_MPDEMUX_CDDB_FailedToGetProtocolLevel "Protokol seviyesi alınamadı\n"
 #define MSGTR_MPDEMUX_CDDB_NoCDInDrive "Sürücüde CD yok\n"
 
@@ -1384,7 +1333,6 @@ static const char help_text[] = MSGTR_Help;
 // demux_mkv.c
 #define MSGTR_MPDEMUX_MKV_ZlibInitializationFailed "[mkv] zlib başlatması başarısız.\n"
 #define MSGTR_MPDEMUX_MKV_ZlibDecompressionFailed "[mkv] zlib çıkarması başarısız.\n"
-#define MSGTR_MPDEMUX_MKV_LzoInitializationFailed "[mkv] lzo başlatması başarısız.\n"
 #define MSGTR_MPDEMUX_MKV_LzoDecompressionFailed "[mkv] lzo çıkarması başarısız.\n"
 #define MSGTR_MPDEMUX_MKV_TrackEncrypted "[mkv] %u numaralı parça şifrelenmiş ve şifre çözümü henüz\n[mkv] içeriğe alnmamış. Parça atlanıyor.\n"
 #define MSGTR_MPDEMUX_MKV_UnknownContentEncoding "[mkv] %u numaralı parça için bilinmeyen içerik şifrelemesi. Parça atlanıyor.\n"
@@ -1399,14 +1347,10 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPDEMUX_MKV_WillPlayVideoTrack "[mkv] %u numaralı görüntü parçası çalınacak.\n"
 #define MSGTR_MPDEMUX_MKV_NoVideoTrackFound "[mkv] Hiçbir görüntü parçası bulunmadı/istenmedi.\n"
 #define MSGTR_MPDEMUX_MKV_NoAudioTrackFound "[mkv] Hiçbir ses parçası bulunmadı/istenmedi.\n"
-#define MSGTR_MPDEMUX_MKV_WillDisplaySubtitleTrack "[mkv] %u numaralı altyazı parçası görüntülenecek.\n"
 #define MSGTR_MPDEMUX_MKV_NoBlockDurationForSubtitleTrackFound "[mkv] Uyarı: Altyazı parçası için hiçbir BlockDuration bulunamadı.\n"
-#define MSGTR_MPDEMUX_MKV_TooManySublines "[mkv] Uyarı: İşlenecek çok fazla altyazı var, atlanıyor.\n"
-#define MSGTR_MPDEMUX_MKV_TooManySublinesSkippingAfterFirst "\n[mkv] Uyarı: İşlenecek çok fazla altyazı var, ilk %i den sonra atlanıyor.\n"
 
 // demux_nuv.c
 
-#define MSGTR_MPDEMUX_NUV_NoVideoBlocksInFile "Dosyada video blokları yok.\n"
 
 // demux_xmms.c
 
@@ -1484,15 +1428,12 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPCODECS_CouldntAllocateImageForCinepakCodec "[VD_DMO] cinepak kodeğine görüntü atanamadı.\n"
 
 // libmpcodecs/vd_ffmpeg.c
-#define MSGTR_MPCODECS_XVMCAcceleratedCodec "[VD_FFMPEG] XVMC hızlı kodek.\n"
 #define MSGTR_MPCODECS_ArithmeticMeanOfQP "[VD_FFMPEG] QP'nin aritmetik karşılığı : %2.4f, QP'nin harmonik karşılığı: %2.4f\n"
 #define MSGTR_MPCODECS_DRIFailure "[VD_FFMPEG] DRI hatası.\n"
 #define MSGTR_MPCODECS_CouldntAllocateImageForCodec "[VD_FFMPEG] Kodeğine görüntü atanmadı.\n"
 #define MSGTR_MPCODECS_XVMCAcceleratedMPEG2 "[VD_FFMPEG] XVMC hızlı MPEG2.\n"
 #define MSGTR_MPCODECS_TryingPixfmt "[VD_FFMPEG] Deneyiniz pixfmt=%d.\n"
 #define MSGTR_MPCODECS_McGetBufferShouldWorkOnlyWithXVMC "[VD_FFMPEG]  mc_get_buffer sadece XVMC hızlandırmasıyla çalışmalı!!"
-#define MSGTR_MPCODECS_UnexpectedInitVoError "[VD_FFMPEG] Beklenmeyen açılış_vo hatası.\n"
-#define MSGTR_MPCODECS_UnrecoverableErrorRenderBuffersNotTaken "[VD_FFMPEG] Kurtarılamaz hata, imge oluşturma tamponları alınamadı.\n"
 #define MSGTR_MPCODECS_OnlyBuffersAllocatedByVoXvmcAllowed "[VD_FFMPEG] Sadece izin verilen vo_xvmc ile tamponlar atandı.\n"
 
 // libmpcodecs/ve_lavc.c
@@ -1524,7 +1465,6 @@ static const char help_text[] = MSGTR_Help;
 
 // libmpcodecs/vf_expand.c
 #define MSGTR_MPCODECS_FullDRNotPossible "Tam DR olanaksız, yerine SLICES seçeneğini deneyiniz!\n"
-#define MSGTR_MPCODECS_WarnNextFilterDoesntSupportSlices  "UYARI! Sonraki filtre SLICES desteklemiyor,   sig11 için hazırlayınız...\n"
 #define MSGTR_MPCODECS_FunWhydowegetNULL "Neden NULL ulaşıyoruz??\n"
 
 // libmpcodecs/vf_test.c, vf_yuy2.c, vf_yvu9.c
@@ -1643,8 +1583,6 @@ static const char help_text[] = MSGTR_Help;
 // libvo/vo_sdl.c
 
 #define MSGTR_LIBVO_SDL_CouldntGetAnyAcceptableSDLModeForOutput "[VO_SDL] Çıktı için herhangi uyumlu SDL moduna ulaşılamadı.\n"
-#define MSGTR_LIBVO_SDL_SetVideoModeFailed "[VO_SDL] video_mod_ayarlama: SDL_SetVideoMode başarısız: %s.\n"
-#define MSGTR_LIBVO_SDL_MappingI420ToIYUV "[VO_SDL] I420 IYUV ile eşleniyor.\n"
 #define MSGTR_LIBVO_SDL_UnsupportedImageFormat "[VO_SDL] Desteklenmeyen görüntü biçimi (0x%X).\n"
 #define MSGTR_LIBVO_SDL_InfoPleaseUseVmOrZoom "[VO_SDL] Bilgi: En iyi çözünürlük için lütfen -vm veya -zoom kullanınız.\n"
 #define MSGTR_LIBVO_SDL_FailedToSetVideoMode "[VO_SDL] Video modu ayarlanamadı: %s.\n"
@@ -1662,14 +1600,12 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_LIBVO_SUB_VIDIX_CantStopPlayback "[VO_SUB_VIDIX]  playback durdurulamıyor: %s\n"
 #define MSGTR_LIBVO_SUB_VIDIX_InterleavedUvForYuv410pNotSupported "[VO_SUB_VIDIX] YUV410P için boşluklu UV desteklenmiyor.\n"
 #define MSGTR_LIBVO_SUB_VIDIX_DummyVidixdrawsliceWasCalled "[VO_SUB_VIDIX] Yapay vidix_draw_slice() çağrıldı.\n"
-#define MSGTR_LIBVO_SUB_VIDIX_DummyVidixdrawframeWasCalled "[VO_SUB_VIDIX] Yapay vidix_draw_frame() çağrıldı.\n"
 #define MSGTR_LIBVO_SUB_VIDIX_UnsupportedFourccForThisVidixDriver "[VO_SUB_VIDIX] Bu VIDIX sürücüsü için FourCC desteklenmiyor: %x (%s).\n"
 #define MSGTR_LIBVO_SUB_VIDIX_VideoServerHasUnsupportedResolution "[VO_SUB_VIDIX] Video sunucusu (%dx%d) çözünürlüğünü desteklemiyor, desteklenen: %dx%d-%dx%d.\n"
 #define MSGTR_LIBVO_SUB_VIDIX_VideoServerHasUnsupportedColorDepth "[VO_SUB_VIDIX] Video sunucusu vidix (%d) ile renk derinliğini desteklemiyor.\n"
 #define MSGTR_LIBVO_SUB_VIDIX_DriverCantUpscaleImage "[VO_SUB_VIDIX] VIDIX sürücüsü ile görüntü yukarı ölçeklenemiyor (%d%d -> %d%d).\n"
 #define MSGTR_LIBVO_SUB_VIDIX_DriverCantDownscaleImage "[VO_SUB_VIDIX] VIDIX sürücüsü ile görüntü aşağı ölçeklenemiyor(%d%d -> %d%d).\n"
 #define MSGTR_LIBVO_SUB_VIDIX_CantConfigurePlayback "[VO_SUB_VIDIX] playback ayarlanamıyor: %s.\n"
-#define MSGTR_LIBVO_SUB_VIDIX_YouHaveWrongVersionOfVidixLibrary "[VO_SUB_VIDIX] VIDIX kütüphanesinin yanlış sürümüne sahipsiniz.\n"
 #define MSGTR_LIBVO_SUB_VIDIX_CouldntFindWorkingVidixDriver "[VO_SUB_VIDIX] Çalışan VIDIX sürücüsü bulunamadı.\n"
 #define MSGTR_LIBVO_SUB_VIDIX_CouldntGetCapability "[VO_SUB_VIDIX] Kapasiteye ulaşılamadı: %s.\n"
 
@@ -1769,11 +1705,9 @@ static const char help_text[] = MSGTR_Help;
 
 // libvo/vo_x11.c
 
-#define MSGTR_LIBVO_X11_DrawFrameCalled "[VO_X11] draw_frame() çağrıldı!!!!!!\n"
 
 // libvo/vo_xv.c
 
-#define MSGTR_LIBVO_XV_DrawFrameCalled "[VO_XV] draw_frame() çağrıldı!!!!!!\n"
 #define MSGTR_LIBVO_XV_SharedMemoryNotSupported "[VO_XV] Bellek paylaşımı desteklenmiyor\nNormale döndürülüyor Xv.\n"
 #define MSGTR_LIBVO_XV_XvNotSupportedByX11 "[VO_XV] Özür, Xv bu X11 versiyonu/sürücüsü tarafından desteklenmiyor\n[VO_XV] ********  -vo x11  veya  -vo sdl ile deneyin  *********\n"
 #define MSGTR_LIBVO_XV_XvQueryAdaptorsFailed  "[VO_XV] XvQueryAdaptors başarısız.\n"
@@ -1811,15 +1745,11 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_RADIO_QueryControlFailed "[radio] ioctl sorgu kontrolü, %s başarısız\n"
 #define MSGTR_RADIO_GetVolumeFailed "[radio] ioctl sesi al, %s\n başarısız."
 #define MSGTR_RADIO_SetVolumeFailed "[radio] ioctl sesi ayarla, %s\n başarısız."
-#define MSGTR_RADIO_DroppingFrame "\n[radio] çok kötü - ses çerçevesinden (%d bytes) atılıyor!\n"
-#define MSGTR_RADIO_BufferEmpty "[radio] grab_audio_frame: ara bellek boş, %d bilgi bytes için bekleniyor.\n"
-#define MSGTR_RADIO_AudioInitFailed "[radio] audio_in_init: %s\n başarısız."
 #define MSGTR_RADIO_AllocateBufferFailed "[radio] ses için ara bellek bulanamadı (blok=%d,arabel=%d): %s\n"
 #define MSGTR_RADIO_CurrentFreq "[radio] Mevcut frekans: %.2f\n"
 #define MSGTR_RADIO_SelectedChannel "[radio] Seçilen kanal: %d - %s (frek: %.2f)\n"
 #define MSGTR_RADIO_ChangeChannelNoChannelList "[radio] Kanal değiştirelemez: Kanal listesine kanal verilmedi.\n"
 #define MSGTR_RADIO_UnableOpenDevice "[radio] '%s': %s açılamadı.\n"
-#define MSGTR_RADIO_InitFracFailed "[radio] init_frac başarılamadı.\n"
 #define MSGTR_RADIO_WrongFreq "[radio] %.2f : Frekansı yanlış.\n"
 #define MSGTR_RADIO_UsingFreq "[radio] %.2f: Frekansı kullanılıyor\n"
 #define MSGTR_RADIO_AudioInInitFailed "[radio] audio_in_init başarılamadı.\n"
@@ -1834,68 +1764,18 @@ static const char help_text[] = MSGTR_Help;
 // ================================== LIBASS ====================================
 
 // ass_bitmap.c
-#define MSGTR_LIBASS_FT_Glyph_To_BitmapError "[ass] FT_Glyph_To_Bitmap hatası %d \n"
-#define MSGTR_LIBASS_UnsupportedPixelMode "[ass] Desteklenmeyen piksel modu: %d\n"
-#define MSGTR_LIBASS_GlyphBBoxTooLarge "[ass] Glyph sınırlandırıcı kutusu çok büyük: %dx%dpx\n"
 
 // ass.c
-#define MSGTR_LIBASS_NoStyleNamedXFoundUsingY "[ass] [%p] Uyarı: '%s' isminde bir tarz bulunamadı, '%s' kullanılıyor\n"
-#define MSGTR_LIBASS_BadTimestamp "[ass] Bozuk zaman damgası\n"
-#define MSGTR_LIBASS_BadEncodedDataSize "[ass] Bozuk şifreli veri boyutu\n"
-#define MSGTR_LIBASS_FontLineTooLong "[ass] Yazıtipi çizgisi çok uzun: %d, %s\n"
-#define MSGTR_LIBASS_EventFormatHeaderMissing "[ass] Olay biçim başlığı eksik\n"
-#define MSGTR_LIBASS_ErrorOpeningIconvDescriptor "[ass] iconv tanımlayıcısını açmada hata.\n"
-#define MSGTR_LIBASS_ErrorRecodingFile "[ass] Dosyayı tekrar kodlamada hata.\n"
 #define MSGTR_LIBASS_FopenFailed "[ass] ass_read_file(%s): fopen başarısız\n"
-#define MSGTR_LIBASS_FseekFailed "[ass] ass_read_file(%s): fseek başarısız\n"
 #define MSGTR_LIBASS_RefusingToLoadSubtitlesLargerThan100M "[ass] ass_read_file(%s): 100 megabayttan büyük altyazıları yüklemeyi reddediyor\n"
-#define MSGTR_LIBASS_ReadFailed "Okuma başarısız, %d: %s\n"
-#define MSGTR_LIBASS_AddedSubtitleFileMemory "[ass] Altyazı dosyasını ekledi: <bellek> (%d tarz, %d olay)\n"
-#define MSGTR_LIBASS_AddedSubtitleFileFname "[ass] Altyazı dosyasını ekledi: %s (%d tarz, %d olay)\n"
-#define MSGTR_LIBASS_FailedToCreateDirectory "[ass] Klasör oluşturulamadı %s\n"
-#define MSGTR_LIBASS_NotADirectory "[ass] Klasör değil: %s\n"
 
 // ass_cache.c
-#define MSGTR_LIBASS_TooManyFonts "[ass] Çok fazla yazıtipi\n"
-#define MSGTR_LIBASS_ErrorOpeningFont "[ass] Yazıtipini açarken hata: %s, %d\n"
 
 // ass_fontconfig.c
-#define MSGTR_LIBASS_SelectedFontFamilyIsNotTheRequestedOne "[ass] fontconfig: Seçilen yazıtipi ailesi istek yapılan değil: '%s' != '%s'\n"
-#define MSGTR_LIBASS_UsingDefaultFontFamily "[ass] fontconfig_select: Varsayılan yazıtipi ailesi kullanılıyor: (%s, %d, %d) -> %s, %d\n"
-#define MSGTR_LIBASS_UsingDefaultFont "[ass] fontconfig_select: Varsayılan yazıtipi kullanılıyor: (%s, %d, %d) -> %s, %d\n"
-#define MSGTR_LIBASS_UsingArialFontFamily "[ass] fontconfig_select: 'Arial' yazıtipi ailesi kullanılıyor: (%s, %d, %d) -> %s, %d\n"
-#define MSGTR_LIBASS_FcInitLoadConfigAndFontsFailed "[ass] FcInitLoadConfigAndFonts başarısız.\n"
-#define MSGTR_LIBASS_UpdatingFontCache "[ass] Yazıtipi tampon belleği güncelleniyor.\n"
-#define MSGTR_LIBASS_BetaVersionsOfFontconfigAreNotSupported "[ass] fontconfig'in beta versiyonları desteklenmiyor.\n[ass] Hata rapor etmeden önce güncelleyin.\n"
-#define MSGTR_LIBASS_FcStrSetAddFailed "[ass] FcStrSetAdd başarısız.\n"
-#define MSGTR_LIBASS_FcDirScanFailed "[ass] FcDirScan başarısız.\n"
-#define MSGTR_LIBASS_FcDirSave "[ass] FcDirSave başarısız.\n"
-#define MSGTR_LIBASS_FcConfigAppFontAddDirFailed "[ass] FcConfigAppFontAddDir başarısız\n"
-#define MSGTR_LIBASS_FontconfigDisabledDefaultFontWillBeUsed "[ass] Fontconfig devre dışı, sadece varsayılan yazıtipi kullanılacak.\n"
-#define MSGTR_LIBASS_FunctionCallFailed "[ass] %s başarısız\n"
 
 // ass_render.c
-#define MSGTR_LIBASS_NeitherPlayResXNorPlayResYDefined "[ass] Ne PlayResX, ne de PlayResY tanımlanmış. 384x288 varsayılıyor.\n"
-#define MSGTR_LIBASS_PlayResYUndefinedSettingY "[ass] PlayResY tanımsız, %d yapılıyor.\n"
-#define MSGTR_LIBASS_PlayResXUndefinedSettingX "[ass] PlayResX tanımsız, %d yapılıyor.\n"
-#define MSGTR_LIBASS_FT_Init_FreeTypeFailed "[ass] FT_Init_FreeType başarısız.\n"
-#define MSGTR_LIBASS_Init "[ass] Init\n"
-#define MSGTR_LIBASS_InitFailed "[ass] Init başarısız.\n"
-#define MSGTR_LIBASS_BadCommand "[ass] Bozuk komut: %c%c\n"
-#define MSGTR_LIBASS_ErrorLoadingGlyph  "[ass] glyph yüklenirken hata.\n"
-#define MSGTR_LIBASS_FT_Glyph_Stroke_Error "[ass] FT_Glyph_Stroke hatası %d \n"
-#define MSGTR_LIBASS_UnknownEffectType_InternalError "[ass] Bilinmeyen etki türü (dahili hata)\n"
-#define MSGTR_LIBASS_NoStyleFound "[ass] Hiçbir tarz bulunamadı!\n"
-#define MSGTR_LIBASS_EmptyEvent "[ass] Boş olay!\n"
-#define MSGTR_LIBASS_MAX_GLYPHS_Reached "[ass] MAX_GLYPHS'e ulaşıldı: olay %d, başlama = %llu, süre = %llu\n Metin = %s\n"
-#define MSGTR_LIBASS_EventHeightHasChanged "[ass] Uyarı! Olay yüksekliği değişti!  \n"
 
 // ass_font.c
-#define MSGTR_LIBASS_GlyphNotFoundReselectingFont "[ass] Glyph 0x%X bulunamadı, (%s, %d, %d) için tekrar yazıtipi seçiliyor\n"
-#define MSGTR_LIBASS_GlyphNotFound "[ass] Glyph 0x%X yazıtipinde bulunamadı, şunun için (%s, %d, %d) \n"
-#define MSGTR_LIBASS_ErrorOpeningMemoryFont "[ass] Belleği açmada hata, yazıtipi: %s\n"
-#define MSGTR_LIBASS_NoCharmaps "[ass] yazıtipinin karakter haritası yok\n"
-#define MSGTR_LIBASS_NoCharmapAutodetected "[ass] Hiçbir karakter haritası algılanmadı, ilki deneniyor\n"
 
 //tv.c
 #define MSGTR_TV_BogusNormParameter "tv.c: norm_from_string(%s): Dandik norm parametresi, %s olarak ayarlanıyor.\n"
@@ -1935,7 +1815,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_TV_Bt848MmapFailed "tvi_bsdbt848: mmap başarısız. Hata: %s\n"
 #define MSGTR_TV_Bt848FrameBufAllocFailed "tvi_bsdbt848: Kare(frame) buffer ataması başarısız. Hata: %s\n"
 #define MSGTR_TV_Bt848ErrorSettingWidth "tvi_bsdbt848: Resim genişliğini ayarlamada hata. Hata: %s\n"
-#define MSGTR_TV_Bt848ErrorSettingHeight "tvi_bsdbt848: Resim yüksekliğini ayarlamada hata. Hata: %s\n"
 #define MSGTR_TV_Bt848UnableToStopCapture "tvi_bsdbt848: Yakalama durdurulamıyor. Hata: %s\n"
 #define MSGTR_TV_TTSupportedLanguages "Desteklenen Teletext dilleri:\n"
 #define MSGTR_TV_TTSelectedLanguage "Seçilen Teletext dili: %s\n"
@@ -1968,8 +1847,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_TVI_DS_ErrorParsingVideoFormatStruct "tvi_dshow: Görüntü biçimi yapısı ayrıştırılamadı.\n"
 #define MSGTR_TVI_DS_UnableSetAudioMode "tvi_dshow: Ses modu ayarlanamadı: %d. Hata:0x%x\n"
 #define MSGTR_TVI_DS_UnsupportedMediaType "tvi_dshow: Desteklenmeyen ortam tipi şuraya gönderildi: %s\n"
-#define MSGTR_TVI_DS_UnableGetsupportedVideoFormats "tvi_dshow: Görüntü pininden desteklenen ortam biçimleri alınamadı. Hata:0x%x\n"
-#define MSGTR_TVI_DS_UnableGetsupportedAudioFormats "tvi_dshow: Ses pininden desteklenen ortam biçimleri alınamadı. Hata:0x%x Disabling audio.\n"
 #define MSGTR_TVI_DS_UnableFindNearestChannel "tvi_dshow: Sistem frekans tablosunda en yakın kanal bulunamadı.\n"
 #define MSGTR_TVI_DS_UnableToSetChannel "tvi_dshow: Sistem frekans tablosundan en yakın kanala geçiş yapılamadı. Hata:0x%x\n"
 #define MSGTR_TVI_DS_UnableTerminateVPPin "tvi_dshow:  VideoPort pini grafikte filtrelerle bitirilemedi. Hata:0x%x\n"

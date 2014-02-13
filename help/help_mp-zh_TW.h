@@ -150,39 +150,20 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_LoadingConfig "正在裝載配置文件 '%s'\n"
 #define MSGTR_AddedSubtitleFile "字幕: 添加字幕文件 (%d): %s\n"
 #define MSGTR_RemovedSubtitleFile "字幕: 删除字幕文件 (%d): %s\n"
-#define MSGTR_ErrorOpeningOutputFile "打開寫入文件 [%s] 失敗!\n"
 #define MSGTR_RTCDeviceNotOpenable "打開 %s 失敗: %s (此文件應該能被用户讀取。)\n"
 #define MSGTR_LinuxRTCInitErrorIrqpSet "Linux RTC 初始化錯誤在 ioctl (rtc_irqp_set %lu): %s\n"
 #define MSGTR_IncreaseRTCMaxUserFreq "試圖添加 \"echo %lu > /proc/sys/dev/rtc/max-user-freq\" 到你的係統啟動脚本。\n"
 #define MSGTR_LinuxRTCInitErrorPieOn "Linux RTC 初始化錯誤在 ioctl (rtc_pie_on): %s\n"
-#define MSGTR_UsingTimingType "正在使用 %s 計時。\n"
 #define MSGTR_Getch2InitializedTwice "警告: getch2_init 被調用兩次!\n"
-#define MSGTR_DumpstreamFdUnavailable "無法轉儲此流 - 没有可用的文件描述符。\n"
 #define MSGTR_CantOpenLibmenuFilterWithThisRootMenu "不能用根菜單 %s 打開 libmenu 視頻過濾器。\n"
 #define MSGTR_AudioFilterChainPreinitError "音頻過濾器鏈預啟動錯誤!\n"
 #define MSGTR_LinuxRTCReadError "Linux RTC 讀取錯誤: %s\n"
 #define MSGTR_SoftsleepUnderflow "警告! Softsleep 嚮下溢出!\n"
-#define MSGTR_DvdnavNullEvent "DVDNAV 事件為空?!\n"
-#define MSGTR_DvdnavHighlightEventBroken "DVDNAV 事件: 高亮事件損壞\n"
-#define MSGTR_DvdnavEvent "DVDNAV 事件: %s\n"
-#define MSGTR_DvdnavHighlightHide "DVDNAV 事件: 高亮隱藏\n"
-#define MSGTR_DvdnavStillFrame "######################################## DVDNAV 事件: 靜止幀: %d秒\n"
-#define MSGTR_DvdnavNavStop "DVDNAV 事件: Nav停止\n"
-#define MSGTR_DvdnavNavNOP "DVDNAV 事件: Nav無操作\n"
-#define MSGTR_DvdnavNavSpuStreamChangeVerbose "DVDNAV 事件: Nav SPU 流改變: 物理: %d/%d/%d 邏輯: %d\n"
-#define MSGTR_DvdnavNavSpuStreamChange "DVDNAV 事件: Nav SPU 流改變: 物理: %d 邏輯: %d\n"
-#define MSGTR_DvdnavNavAudioStreamChange "DVDNAV 事件: Nav 音頻流改變: 物理: %d 邏輯: %d\n"
-#define MSGTR_DvdnavNavVTSChange "DVDNAV 事件: Nav VTS 改變\n"
-#define MSGTR_DvdnavNavCellChange "DVDNAV 事件: Nav Cell 改變\n"
-#define MSGTR_DvdnavNavSpuClutChange "DVDNAV 事件: Nav SPU CLUT 改變\n"
-#define MSGTR_DvdnavNavSeekDone "DVDNAV 事件: Nav 搜尋完成\n"
-#define MSGTR_MenuCall "菜單調用\n"
 
 #define MSGTR_EdlOutOfMem "不能分配足够的内存來保持 EDL 數據。\n"
 #define MSGTR_EdlRecordsNo "讀取 %d EDL 動作。\n"
 #define MSGTR_EdlQueueEmpty "没有 EDL 動作要處理。\n"
 #define MSGTR_EdlCantOpenForWrite "打不開 EDL 文件 [%s] 寫入。\n"
-#define MSGTR_EdlCantOpenForRead "打不開 EDL 文件 [%s] 讀取。\n"
 #define MSGTR_EdlNOsh_video "没有視頻不能使用 EDL, 取消中。\n"
 #define MSGTR_EdlNOValidLine "無效 EDL 綫: %s\n"
 #define MSGTR_EdlBadlyFormattedLine "錯誤格式的 EDL 綫 [%d], 丢棄。\n"
@@ -198,7 +179,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_OSDenabled "已啟用"
 #define MSGTR_OSDdisabled "已停用"
 #define MSGTR_OSDAudio "音頻: %s"
-#define MSGTR_OSDVideo "視頻: %s"
 #define MSGTR_OSDChannel "頻道: %s"
 #define MSGTR_OSDSubDelay "字幕延遲: %d 毫秒"
 #define MSGTR_OSDSpeed "速度: x %6.2f"
@@ -272,9 +252,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_OpenedStream "成功: 格式: %d數據: 0x%X - 0x%x\n"
 #define MSGTR_VCodecFramecopy "視頻編解碼器: 幀複製 (%dx%d %dbpp fourcc=%x)\n"
 #define MSGTR_ACodecFramecopy "音頻編解碼器: 幀複製 (format=%x chans=%d rate=%d bits=%d B/s=%d sample-%d)\n"
-#define MSGTR_CBRPCMAudioSelected "已選 CBR PCM 音頻。\n"
 #define MSGTR_MP3AudioSelected "已選 MP3音頻。\n"
-#define MSGTR_CannotAllocateBytes "不能分配 %d 字節。\n"
 #define MSGTR_SettingAudioDelay "設置音頻延遲為 %5.3fs。\n"
 #define MSGTR_SettingVideoDelay "設置視頻延遲為 %5.3fs。\n"
 #define MSGTR_LimitingAudioPreload "限製音頻預載值為 0.4s。\n"
@@ -381,7 +359,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_ErrorParsingCommandLine "解析命令行錯誤"
 #define MSGTR_VideoStreamRequired "視頻流是必須的!\n"
 #define MSGTR_ForcingInputFPS "輸入幀率將被替換為 %5.3f。\n"
-#define MSGTR_RawvideoDoesNotSupportAudio "RAWVIDEO 輸出文件格式不支持音頻 - 停用音頻。\n"
 #define MSGTR_DemuxerDoesntSupportNosound "目前此分路器還不支持 -nosound。\n"
 #define MSGTR_MemAllocFailed "内存分配失敗。\n"
 #define MSGTR_NoMatchingFilter "没找到匹配的 filter/ao 格式!\n"
@@ -469,7 +446,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_OutdatedCodecsConf "此 codecs.conf 太舊，與當前的 MPlayer 不兼容!"
 
 // fifo.c
-#define MSGTR_CannotMakePipe "不能建立 PIPE!\n"
 
 // parser-mecmd.c, parser-mpcmd.c
 #define MSGTR_NoFileGivenOnCommandLine "'--' 表示没有更多選項, 但命令行没有給出文件名。\n"
@@ -503,13 +479,10 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CdDevNotfound "找不到 CD-ROM 設備 '%s'。\n"
 #define MSGTR_ErrTrackSelect "選擇 VCD 軌迹出錯。"
 #define MSGTR_ReadSTDIN "從標凖輸入中讀取...\n"
-#define MSGTR_UnableOpenURL "無法打開 URL: %s\n"
-#define MSGTR_ConnToServer "連接到服務器: %s\n"
 #define MSGTR_FileNotFound "找不到文件: '%s'\n"
 
 #define MSGTR_SMBInitError "不能初始 libsmbclient 庫: %d\n"
 #define MSGTR_SMBFileNotFound "打不開局域網内的: '%s'\n"
-#define MSGTR_SMBNotCompiled "MPlayer 没有編譯成支持 SMB 的讀取。\n"
 
 #define MSGTR_CantOpenDVD "打不開 DVD 設備: %s (%s)\n"
 
@@ -522,10 +495,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_NoDVDSupport "MPlayer 編譯成不支持 DVD，退出中。\n"
 #define MSGTR_DVDnumTitles "此 DVD 有 %d 個標題。\n"
 #define MSGTR_DVDinvalidTitle "無效的 DVD 標題號: %d\n"
-#define MSGTR_DVDnumChapters "此 DVD 標題有 %d 章節。\n"
-#define MSGTR_DVDinvalidChapter "無效的 DVD 章節號: %d\n"
 #define MSGTR_DVDinvalidChapterRange "無效的章節範圍 %s\n"
-#define MSGTR_DVDinvalidLastChapter "上次無效的 DVD 章節號: %d\n"
 #define MSGTR_DVDnumAngles "此 DVD 標題有 %d 個視角。\n"
 #define MSGTR_DVDinvalidAngle "無效的 DVD 視角號: %d\n"
 #define MSGTR_DVDnoIFO "打不開 DVD 標題 %d 的 IFO 文件。\n"
@@ -564,8 +534,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_InvalidAudioStreamUsingDefault "AVI: 無效的視頻流 ID: %d - 忽略 (使用默認值)\n"
 #define MSGTR_ON2AviFormat "ON2 AVI 格式"
 #define MSGTR_Detected_XXX_FileFormat "檢測到 %s 文件格式。\n"
-#define MSGTR_DetectedAudiofile "檢測到音頻文件。\n"
-#define MSGTR_InvalidMPEGES "MPEG-ES 流無效??? 請聯係作者, 這可能是個錯誤:(\n"
 #define MSGTR_FormatNotRecognized "============= 抱歉, 此文件格式無法辨認或支持 ===============\n"\
                                   "===     如果此文件是一個 AVI, ASF 或 MPEG 流, 請聯係作者!    ===\n"
 #define MSGTR_SettingProcessPriority "設置進程優先級: %s\n"
@@ -589,7 +557,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MOVcomprhdr "MOV: 支持壓縮的文件頭需要 ZLIB!\n"
 #define MSGTR_MOVvariableFourCC "MOV: 警告: 檢測到可變的 FourCC!?\n"
 #define MSGTR_MOVtooManyTrk "MOV: 警告: 軌迹太多。"
-#define MSGTR_DetectedTV "檢測到 TV! ;-)\n"
 #define MSGTR_ErrorOpeningOGGDemuxer "無法打開 Ogg 分路器。\n"
 #define MSGTR_CannotOpenAudioStream "打不開音頻流: %s\n"
 #define MSGTR_CannotOpenSubtitlesStream "打不開字幕流: %s\n"
@@ -648,7 +615,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_CannotFindColorspace "找不到匹配的色彩空間, 甚至靠插入 'scale' 也不行 :(\n"
 
 // vd.c
-#define MSGTR_CodecDidNotSet "VDec: 編解碼器無法設置 sh->disp_w 和 sh->disp_h, 嘗試繞過。\n"
 #define MSGTR_CouldNotFindColorspace "找不到匹配的色彩空間 - 重新嘗試 -vf scale...\n"
 #define MSGTR_MovieAspectIsSet "電影寬高比為 %.2f:1 - 預放大到正確的電影寬高比。\n"
 #define MSGTR_MovieAspectUndefined "電影寬高比未定義 - 没使用預放大。\n"
@@ -658,7 +624,6 @@ static const char help_text[] = MSGTR_Help;
 
 // x11_common.c
 #define MSGTR_EwmhFullscreenStateFailed "\nX11: 不能發送 EWMH 全屏事件!\n"
-#define MSGTR_CouldNotFindXScreenSaver "xscreensaver_disable: 找不到屏保(XScreenSaver)窗口。\n"
 #define MSGTR_SelectedVideoMode "XF86VM: 已選視頻模式 %dx%d (圖像大小 %dx%d)。\n"
 
 #define MSGTR_InsertingAfVolume "[混音器] 没有硬件混音, 插入音量過濾器。\n"
@@ -886,8 +851,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_VO_CantCreateFile "無法創建輸出文件。"
 #define MSGTR_VO_DirectoryCreateSuccess "輸出目録創建成功。"
 #define MSGTR_VO_ValueOutOfRange "值超出範圍"
-#define MSGTR_VO_NoValueSpecified "没有指定值。"
-#define MSGTR_VO_UnknownSuboptions "未知子選項"
 
 // vo_aa.c
 
@@ -914,7 +877,6 @@ static const char help_text[] = MSGTR_Help;
 
 // vo_yuv4mpeg.c
 #define MSGTR_VO_YUV4MPEG_InterlacedHeightDivisibleBy4 "交錯模式要求圖像高度能被 4 整除。"
-#define MSGTR_VO_YUV4MPEG_InterlacedLineBufAllocFail "無法為交錯模式分配綫緩衝。"
 #define MSGTR_VO_YUV4MPEG_WidthDivisibleBy2 "圖像寬度必須能被 2 整除。"
 #define MSGTR_VO_YUV4MPEG_OutFileOpenError "不能取得内存或文件句柄以寫入 \"%s\"!"
 #define MSGTR_VO_YUV4MPEG_OutFileWriteError "圖像寫到輸出錯誤!"
@@ -1019,8 +981,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_AO_SUN_RtscWriteFailed "[AO SUN] rtsc: 寫失敗。\n"
 #define MSGTR_AO_SUN_CantOpenAudioDev "[AO SUN] 無法打開音頻設備 %s, %s  -> 没聲音。\n"
 #define MSGTR_AO_SUN_UnsupSampleRate "[AO SUN] 音頻設置: 你的聲卡不支持 %d 通道, %s, %d Hz 采様率。\n"
-#define MSGTR_AO_SUN_CantUseSelect "[AO SUN]\n   ***  你的音頻驅動不支持 select()  ***\n用 config.h 中的 #undef HAVE_AUDIO_SELECT 重新編譯 MPlayer!\n\n"
-#define MSGTR_AO_SUN_CantReopenReset "[AO SUN]\n致命錯誤: *** 無法重新打開或重設音頻設備 (%s) ***\n"
 
 // ao_alsa.c
 #define MSGTR_AO_ALSA_InvalidMixerIndexDefaultingToZero "[AO_ALSA] 無效的混音索引。取默認值 0。\n"
@@ -1056,7 +1016,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_AO_ALSA_UnableToSetHwParameters "[AO_ALSA] 無法設置 hw-parameters: %s\n"
 #define MSGTR_AO_ALSA_UnableToGetBufferSize "[AO_ALSA] 無法取得緩衝大小: %s\n"
 #define MSGTR_AO_ALSA_UnableToGetSwParameters "[AO_ALSA] 無法取得 sw-parameters: %s\n"
-#define MSGTR_AO_ALSA_UnableToSetSwParameters "[AO_ALSA] 無法設置 sw-parameters: %s\n"
 #define MSGTR_AO_ALSA_UnableToGetBoundary "[AO_ALSA] 無法取得邊界: %s\n"
 #define MSGTR_AO_ALSA_UnableToSetStartThreshold "[AO_ALSA] 無法設置開始點: %s\n"
 #define MSGTR_AO_ALSA_UnableToSetStopThreshold "[AO_ALSA] 無法設置停止點: %s\n"
@@ -1075,7 +1034,6 @@ static const char help_text[] = MSGTR_Help;
 
 // ao_plugin.c
 
-#define MSGTR_AO_PLUGIN_InvalidPlugin "[AO PLUGIN] 無效插件: %s\n"
 
 // ======================= AF Audio Filters ================================
 
@@ -1085,7 +1043,6 @@ static const char help_text[] = MSGTR_Help;
 
 #define MSGTR_AF_LADSPA_AvailableLabels "可用的標簽"
 #define MSGTR_AF_LADSPA_WarnNoInputs "警告! 此 LADSPA 插件没有音頻輸入。\n 以後的音頻信號將會丢失。"
-#define MSGTR_AF_LADSPA_ErrMultiChannel "現在還不支持多通道(>2)插件。\n 祇能使用單聲道或立體聲道插件。"
 #define MSGTR_AF_LADSPA_ErrNoOutputs "此 LADSPA 插件没有音頻輸出。"
 #define MSGTR_AF_LADSPA_ErrInOutDiff "LADSPA 插件的音頻輸入和音頻輸出的數目不相等。"
 #define MSGTR_AF_LADSPA_ErrFailedToLoad "裝載失敗"
@@ -1131,11 +1088,9 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_INPUT_INPUT_ErrOnCmdFd "命令文件描述符 %d 發生錯誤\n"
 #define MSGTR_INPUT_INPUT_ErrReadingInputConfig "當讀取輸入配置文件 %s 時發生錯誤: %s\n"
 #define MSGTR_INPUT_INPUT_ErrUnknownKey "未知鍵 '%s'\n"
-#define MSGTR_INPUT_INPUT_ErrUnfinishedBinding "未完成的綁定 %s\n"
 #define MSGTR_INPUT_INPUT_ErrBuffer2SmallForKeyName "此鍵名的緩存太小: %s\n"
 #define MSGTR_INPUT_INPUT_ErrNoCmdForKey "找不到鍵 %s 的命令"
 #define MSGTR_INPUT_INPUT_ErrBuffer2SmallForCmd "此命令的緩存太小: %s\n"
-#define MSGTR_INPUT_INPUT_ErrWhyHere "怎麼會運行到這裏了?\n"
 #define MSGTR_INPUT_INPUT_ErrCantInitJoystick "不能初始華輸入法操縱杆\n"
 #define MSGTR_INPUT_INPUT_ErrCantOpenFile "打不開 %s: %s\n"
 #define MSGTR_INPUT_INPUT_ErrCantInitAppleRemote "不能初始化 Apple Remote 遙控器。\n"
@@ -1222,14 +1177,11 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPDEMUX_ASF_BufferMallocFailed "不能分配 %d 字節的緩衝。\n"
 #define MSGTR_MPDEMUX_ASF_ErrReadingNetworkStream "讀網絡流時發生錯誤。\n"
 #define MSGTR_MPDEMUX_ASF_ErrChunk2Small "錯誤: 區塊太小。\n"
-#define MSGTR_MPDEMUX_ASF_ErrSubChunkNumberInvalid "錯誤: 子區塊號無效。\n"
 #define MSGTR_MPDEMUX_ASF_Bandwidth2SmallCannotPlay "帶寬太小, 文件不能播放!\n"
 #define MSGTR_MPDEMUX_ASF_Bandwidth2SmallDeselectedAudio "帶寬太小, 取消選定音頻流。\n"
 #define MSGTR_MPDEMUX_ASF_Bandwidth2SmallDeselectedVideo "帶寬太小, 取消選定視頻流。\n"
 #define MSGTR_MPDEMUX_ASF_InvalidLenInHeader "無效的 ASF 頭部長度!\n"
-#define MSGTR_MPDEMUX_ASF_ErrReadingChunkHeader "讀區塊頭部時發生錯誤。\n"
 #define MSGTR_MPDEMUX_ASF_ErrChunkBiggerThanPacket "錯誤: chunk_size > packet_size\n"
-#define MSGTR_MPDEMUX_ASF_ErrReadingChunk "讀區塊時發生錯誤。\n"
 #define MSGTR_MPDEMUX_ASF_ASFRedirector "=====> ASF 轉嚮器\n"
 #define MSGTR_MPDEMUX_ASF_InvalidProxyURL "無效的代理 URL\n"
 #define MSGTR_MPDEMUX_ASF_UnknownASFStreamType "未知的 ASF 流類型\n"
@@ -1268,8 +1220,6 @@ static const char help_text[] = MSGTR_Help;
 
 // cache2.c
 
-#define MSGTR_MPDEMUX_CACHE2_NonCacheableStream "\r此流不可緩存。\n"
-#define MSGTR_MPDEMUX_CACHE2_ReadFileposDiffers "!!! read_filepos 不同!!! 請報告此錯誤...\n"
 
 // cdda.c
 
@@ -1297,7 +1247,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPDEMUX_CDDB_ParseOKFoundAlbumTitle "解析完成，找到: %s\n"
 #define MSGTR_MPDEMUX_CDDB_AlbumNotFound "没發現專輯。\n"
 #define MSGTR_MPDEMUX_CDDB_ServerReturnsCommandSyntaxErr "服務器返回: 命令語法錯誤\n"
-#define MSGTR_MPDEMUX_CDDB_NoSitesInfoAvailable "没有可用的站點信息。\n"
 #define MSGTR_MPDEMUX_CDDB_FailedToGetProtocolLevel "獲得協議級别失敗。\n"
 #define MSGTR_MPDEMUX_CDDB_NoCDInDrive "驅動器裏没有 CD。\n"
 
@@ -1352,7 +1301,6 @@ static const char help_text[] = MSGTR_Help;
 // demux_mkv.c
 #define MSGTR_MPDEMUX_MKV_ZlibInitializationFailed "[mkv] zlib 初始化失敗。\n"
 #define MSGTR_MPDEMUX_MKV_ZlibDecompressionFailed "[mkv] zlib 解壓失敗。\n"
-#define MSGTR_MPDEMUX_MKV_LzoInitializationFailed "[mkv] lzo 初始化失敗。\n"
 #define MSGTR_MPDEMUX_MKV_LzoDecompressionFailed "[mkv] lzo 解壓失敗。\n"
 #define MSGTR_MPDEMUX_MKV_TrackEncrypted "[mkv] 軌迹號 %u 已加密但解密還没\n[mkv] 實現。跳過軌迹。\n"
 #define MSGTR_MPDEMUX_MKV_UnknownContentEncoding "[mkv] 軌迹 %u 的内容編碼類型未知。跳過軌迹。\n"
@@ -1367,14 +1315,10 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPDEMUX_MKV_WillPlayVideoTrack "[mkv] 將播放視頻軌迹 %u。\n"
 #define MSGTR_MPDEMUX_MKV_NoVideoTrackFound "[mkv] 没有找到/所要的視頻軌迹。\n"
 #define MSGTR_MPDEMUX_MKV_NoAudioTrackFound "[mkv] 没有找到/所要的音頻軌迹。\n"
-#define MSGTR_MPDEMUX_MKV_WillDisplaySubtitleTrack "[mkv] 將播放字幕軌迹 %u。\n"
 #define MSGTR_MPDEMUX_MKV_NoBlockDurationForSubtitleTrackFound "[mkv] 警告: 對于所找到的字幕軌迹没有 BlockDuration。\n"
-#define MSGTR_MPDEMUX_MKV_TooManySublines "[mkv] Warning: 太多的字幕要渲染, 跳過。\n"
-#define MSGTR_MPDEMUX_MKV_TooManySublinesSkippingAfterFirst "\n[mkv] 警告: 太多的字幕要渲染, %i 以後跳過。n"
 
 // demux_nuv.c
 
-#define MSGTR_MPDEMUX_NUV_NoVideoBlocksInFile "文件中没有視頻塊。\n"
 
 // demux_xmms.c
 
@@ -1450,15 +1394,12 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPCODECS_CouldntAllocateImageForCinepakCodec "[VD_DMO] 無法為 cinepak 編解碼器分配圖像。\n"
 
 // libmpcodecs/vd_ffmpeg.c
-#define MSGTR_MPCODECS_XVMCAcceleratedCodec "[VD_FFMPEG] XVMC 加速的編解碼器。\n"
 #define MSGTR_MPCODECS_ArithmeticMeanOfQP "[VD_FFMPEG] QP 的算術平均值: %2.4f, QP 的調和平均值: %2.4f\n"
 #define MSGTR_MPCODECS_DRIFailure "[VD_FFMPEG] DRI 失敗。\n"
 #define MSGTR_MPCODECS_CouldntAllocateImageForCodec "[VD_FFMPEG] 無法為編解碼器分配圖像。\n"
 #define MSGTR_MPCODECS_XVMCAcceleratedMPEG2 "[VD_FFMPEG] XVMC-加速的 MPEG-2。\n"
 #define MSGTR_MPCODECS_TryingPixfmt "[VD_FFMPEG] 嘗試 pixfmt=%d。\n"
 #define MSGTR_MPCODECS_McGetBufferShouldWorkOnlyWithXVMC "[VD_FFMPEG] Mc_get_buffer 祇能用于 XVMC 加速!!"
-#define MSGTR_MPCODECS_UnexpectedInitVoError "[VD_FFMPEG] Init_vo 意外錯誤。\n"
-#define MSGTR_MPCODECS_UnrecoverableErrorRenderBuffersNotTaken "[VD_FFMPEG] 無法恢複的錯誤, 渲染緩衝無法獲得。\n"
 #define MSGTR_MPCODECS_OnlyBuffersAllocatedByVoXvmcAllowed "[VD_FFMPEG] 祇允許 vo_xvmc 分配的緩衝。\n"
 
 // libmpcodecs/ve_lavc.c
@@ -1490,7 +1431,6 @@ static const char help_text[] = MSGTR_Help;
 
 // libmpcodecs/vf_expand.c
 #define MSGTR_MPCODECS_FullDRNotPossible "無法完全使用 DR, 嘗試使用 SLICES!\n"
-#define MSGTR_MPCODECS_WarnNextFilterDoesntSupportSlices  "警告! 下一個濾鏡不支持 SLICES, 等着 sig11...\n"
 #define MSGTR_MPCODECS_FunWhydowegetNULL "為什麼我們得到了 NULL??\n"
 
 // libmpcodecs/vf_test.c, vf_yuy2.c, vf_yvu9.c
@@ -1598,8 +1538,6 @@ static const char help_text[] = MSGTR_Help;
 // libvo/vo_sdl.c
 
 #define MSGTR_LIBVO_SDL_CouldntGetAnyAcceptableSDLModeForOutput "[VO_SDL] 無法獲得可用的 SDL 輸出模式。\n"
-#define MSGTR_LIBVO_SDL_SetVideoModeFailed "[VO_SDL] set_video_mode: SDL_SetVideoMode 失敗: %s。\n"
-#define MSGTR_LIBVO_SDL_MappingI420ToIYUV "[VO_SDL] I420 映射到 IYUV。\n"
 #define MSGTR_LIBVO_SDL_UnsupportedImageFormat "[VO_SDL] 不支持的圖像格式 (0x%X)。\n"
 #define MSGTR_LIBVO_SDL_InfoPleaseUseVmOrZoom "[VO_SDL] 信息 - 請使用 -vm 或 -zoom 切換到最佳分辨率。\n"
 #define MSGTR_LIBVO_SDL_FailedToSetVideoMode "[VO_SDL] 設置視頻模式失敗: %s。\n"
@@ -1617,14 +1555,12 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_LIBVO_SUB_VIDIX_CantStopPlayback "[VO_SUB_VIDIX] 不能停止播放: %s\n"
 #define MSGTR_LIBVO_SUB_VIDIX_InterleavedUvForYuv410pNotSupported "[VO_SUB_VIDIX] YUV410P 不支持交錯的 UV。\n"
 #define MSGTR_LIBVO_SUB_VIDIX_DummyVidixdrawsliceWasCalled "[VO_SUB_VIDIX] 調用 dummy vidix_draw_slice()。\n"
-#define MSGTR_LIBVO_SUB_VIDIX_DummyVidixdrawframeWasCalled "[VO_SUB_VIDIX] 調用 dummy vidix_draw_frame()。\n"
 #define MSGTR_LIBVO_SUB_VIDIX_UnsupportedFourccForThisVidixDriver "[VO_SUB_VIDIX] 此 VIDIX 驅動不支持 FourCC: %x (%s)。\n"
 #define MSGTR_LIBVO_SUB_VIDIX_VideoServerHasUnsupportedResolution "[VO_SUB_VIDIX] 視頻服務器不支持分辨率 (%dx%d), 支持的分辨率: %dx%d-%dx%d。\n"
 #define MSGTR_LIBVO_SUB_VIDIX_VideoServerHasUnsupportedColorDepth "[VO_SUB_VIDIX] VIDIX 不支持視頻服務器的色深 (%d)。\n"
 #define MSGTR_LIBVO_SUB_VIDIX_DriverCantUpscaleImage "[VO_SUB_VIDIX] VIDIX 驅動不能放大圖像 (%d%d -> %d%d)。\n"
 #define MSGTR_LIBVO_SUB_VIDIX_DriverCantDownscaleImage "[VO_SUB_VIDIX] VIDIX 驅動不能縮小圖像 (%d%d -> %d%d)。\n"
 #define MSGTR_LIBVO_SUB_VIDIX_CantConfigurePlayback "[VO_SUB_VIDIX] 不能配置回放: %s。\n"
-#define MSGTR_LIBVO_SUB_VIDIX_YouHaveWrongVersionOfVidixLibrary "[VO_SUB_VIDIX] VIDIX 庫版本錯誤。\n"
 #define MSGTR_LIBVO_SUB_VIDIX_CouldntFindWorkingVidixDriver "[VO_SUB_VIDIX] 無法找到能工作的 VIDIX 驅動。\n"
 #define MSGTR_LIBVO_SUB_VIDIX_CouldntGetCapability "[VO_SUB_VIDIX] 無法獲得兼容性: %s。\n"
 
@@ -1724,11 +1660,9 @@ static const char help_text[] = MSGTR_Help;
 
 // libvo/vo_x11.c
 
-#define MSGTR_LIBVO_X11_DrawFrameCalled "[VO_X11] 調用 draw_frame()!!!!!!\n"
 
 // libvo/vo_xv.c
 
-#define MSGTR_LIBVO_XV_DrawFrameCalled "[VO_XV] 調用 draw_frame()!!!!!!\n"
 #define MSGTR_LIBVO_XV_SharedMemoryNotSupported "[VO_XV] 不支持共享内存\n回複到正常 Xv。\n"
 #define MSGTR_LIBVO_XV_XvNotSupportedByX11 "[VO_XV] 對不起, 此 X11 版本/驅動不支持 Xv\n[VO_XV] ******** 試試使用  -vo x11  或  -vo sdl  *********\n"
 #define MSGTR_LIBVO_XV_XvQueryAdaptorsFailed  "[VO_XV] XvQueryAdaptors 失敗.\n"
@@ -1764,15 +1698,11 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_RADIO_QueryControlFailed "[radio] ioctl 查詢控製失敗: %s\n"
 #define MSGTR_RADIO_GetVolumeFailed "[radio] ioctl 獲取音量失敗: %s\n"
 #define MSGTR_RADIO_SetVolumeFailed "[radio] ioctl 設定音量失敗: %s\n"
-#define MSGTR_RADIO_DroppingFrame "\n[radio] 太糟糕 - 丢失音頻幀 (%d 字節)!\n"
-#define MSGTR_RADIO_BufferEmpty "[radio] grab_audio_frame: 緩衝為空, 等待 %d 字節數據。\n"
-#define MSGTR_RADIO_AudioInitFailed "[radio] audio_in_init 失敗: %s\n"
 #define MSGTR_RADIO_AllocateBufferFailed "[radio] 不能分配音頻緩衝 (block=%d,buf=%d): %s\n"
 #define MSGTR_RADIO_CurrentFreq "[radio] 當前頻率: %.2f\n"
 #define MSGTR_RADIO_SelectedChannel "[radio] 已選通道: %d - %s (freq: %.2f)\n"
 #define MSGTR_RADIO_ChangeChannelNoChannelList "[radio] 不能改變通道: 無給定的通道列表。\n"
 #define MSGTR_RADIO_UnableOpenDevice "[radio] 無法打開 '%s': %s\n"
-#define MSGTR_RADIO_InitFracFailed "[radio] init_frac 失敗。\n"
 #define MSGTR_RADIO_WrongFreq "[radio] 錯誤頻率: %.2f\n"
 #define MSGTR_RADIO_UsingFreq "[radio] 使用頻率: %.2f。\n"
 #define MSGTR_RADIO_AudioInInitFailed "[radio] audio_in_init 失敗。\n"
@@ -1787,62 +1717,15 @@ static const char help_text[] = MSGTR_Help;
 // ================================== LIBASS ====================================
 
 // ass_bitmap.c
-#define MSGTR_LIBASS_FT_Glyph_To_BitmapError "[ass] FT_Glyph_To_Bitmap 出錯 %d \n"
-#define MSGTR_LIBASS_UnsupportedPixelMode "[ass] 不支持的象素模式: %d\n"
 
 // ass.c
-#define MSGTR_LIBASS_NoStyleNamedXFoundUsingY "[ass] [%p] 警告: 没有找到風格(style) '%s', 將使用 '%s'\n"
-#define MSGTR_LIBASS_BadTimestamp "[ass] 錯誤的時間戳\n"
-#define MSGTR_LIBASS_BadEncodedDataSize "[ass] 錯誤的編碼數據大小\n"
-#define MSGTR_LIBASS_FontLineTooLong "[ass] 字體行太長: %d, %s\n"
-#define MSGTR_LIBASS_EventFormatHeaderMissing "[ass] 未找到事件格式頭\n"
-#define MSGTR_LIBASS_ErrorOpeningIconvDescriptor "[ass] 打開iconv描述符出錯。\n"
-#define MSGTR_LIBASS_ErrorRecodingFile "[ass] 記録到文件出錯。\n"
 #define MSGTR_LIBASS_FopenFailed "[ass] ass_read_file(%s): 文件打開(fopen)失敗\n"
-#define MSGTR_LIBASS_FseekFailed "[ass] ass_read_file(%s): 文件定位(fseek)失敗\n"
 #define MSGTR_LIBASS_RefusingToLoadSubtitlesLargerThan100M "[ass] ass_read_file(%s): 拒絶裝入大于100M的字幕\n"
-#define MSGTR_LIBASS_ReadFailed "讀失敗, %d: %s\n"
-#define MSGTR_LIBASS_AddedSubtitleFileMemory "[ass] 已加入字幕文件: <内存> (%d styles, %d events)\n"
-#define MSGTR_LIBASS_AddedSubtitleFileFname "[ass] 已加入字幕文件: %s (%d styles, %d events)\n"
-#define MSGTR_LIBASS_FailedToCreateDirectory "[ass] 創建目録失敗 %s\n"
-#define MSGTR_LIBASS_NotADirectory "[ass] 不是一個目録: %s\n"
 
 // ass_cache.c
-#define MSGTR_LIBASS_TooManyFonts "[ass] 太多字體\n"
-#define MSGTR_LIBASS_ErrorOpeningFont "[ass] 打開字體出錯: %s, %d\n"
 
 // ass_fontconfig.c
-#define MSGTR_LIBASS_SelectedFontFamilyIsNotTheRequestedOne "[ass] fontconfig: 選中的字體家族不是要求的: '%s' != '%s'\n"
-#define MSGTR_LIBASS_UsingDefaultFontFamily "[ass] fontconfig_select: 使用缺省字體家族: (%s, %d, %d) -> %s, %d\n"
-#define MSGTR_LIBASS_UsingDefaultFont "[ass] fontconfig_select: 使用缺省字體: (%s, %d, %d) -> %s, %d\n"
-#define MSGTR_LIBASS_UsingArialFontFamily "[ass] fontconfig_select: 使用 'Arial' 字體家族: (%s, %d, %d) -> %s, %d\n"
-#define MSGTR_LIBASS_FcInitLoadConfigAndFontsFailed "[ass] FcInitLoadConfigAndFonts 失敗。\n"
-#define MSGTR_LIBASS_UpdatingFontCache "[ass] 更新字體緩存區。\n"
-#define MSGTR_LIBASS_BetaVersionsOfFontconfigAreNotSupported "[ass] 不支持測試版的fontconfig。\n[ass] 在報告bug前請先更新。\n"
-#define MSGTR_LIBASS_FcStrSetAddFailed "[ass] FcStrSetAdd 失敗。\n"
-#define MSGTR_LIBASS_FcDirScanFailed "[ass] FcDirScan 失敗。\n"
-#define MSGTR_LIBASS_FcDirSave "[ass] FcDirSave 失敗。\n"
-#define MSGTR_LIBASS_FcConfigAppFontAddDirFailed "[ass] FcConfigAppFontAddDir 失敗\n"
-#define MSGTR_LIBASS_FontconfigDisabledDefaultFontWillBeUsed "[ass] Fontconfig 已禁用, 將祇使用缺省字體。\n"
-#define MSGTR_LIBASS_FunctionCallFailed "[ass] %s 失敗\n"
 
 // ass_render.c
-#define MSGTR_LIBASS_NeitherPlayResXNorPlayResYDefined "[ass] PlayResX 和 PlayResY 都没有定義. 假定為 384x288。\n"
-#define MSGTR_LIBASS_PlayResYUndefinedSettingY "[ass] PlayResY 未定義, 設為 %d。\n"
-#define MSGTR_LIBASS_PlayResXUndefinedSettingX "[ass] PlayResX 未定義, 設為 %d。\n"
-#define MSGTR_LIBASS_FT_Init_FreeTypeFailed "[ass] FT_Init_FreeType 失敗。\n"
-#define MSGTR_LIBASS_Init "[ass] 初始化\n"
-#define MSGTR_LIBASS_InitFailed "[ass] 初始化失敗。\n"
-#define MSGTR_LIBASS_BadCommand "[ass] 錯誤的命令: %c%c\n"
-#define MSGTR_LIBASS_ErrorLoadingGlyph  "[ass] 裝入字形出錯。\n"
-#define MSGTR_LIBASS_FT_Glyph_Stroke_Error "[ass] FT_Glyph_Stroke 錯誤 %d \n"
-#define MSGTR_LIBASS_UnknownEffectType_InternalError "[ass] 未知的效果類型 (内部錯誤)\n"
-#define MSGTR_LIBASS_NoStyleFound "[ass] 找不到風格(style)!\n"
-#define MSGTR_LIBASS_EmptyEvent "[ass] 空事件!\n"
-#define MSGTR_LIBASS_MAX_GLYPHS_Reached "[ass] 達到了字形最大值: 事件 %d, 開始 = %llu, 時長 = %llu\n 文本 = %s\n"
-#define MSGTR_LIBASS_EventHeightHasChanged "[ass] 警告! 事件高度(height) 已改變!  \n"
 
 // ass_font.c
-#define MSGTR_LIBASS_GlyphNotFoundReselectingFont "[ass] 字形 0x%X 未找到, 重新選擇字體 (%s, %d, %d)\n"
-#define MSGTR_LIBASS_GlyphNotFound "[ass] 字形 0x%X 未在字體中找到 (%s, %d, %d)\n"
-#define MSGTR_LIBASS_ErrorOpeningMemoryFont "[ass] 打開内存字體出錯: %s\n"
