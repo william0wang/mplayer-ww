@@ -31,7 +31,7 @@
 .\" Title
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "2014-01-24" "The MPlayer Project" "The Movie Player"
+.TH MPlayer 1 "2014-02-13" "The MPlayer Project" "The Movie Player"
 .
 .SH NAME
 mplayer  \- movie player
@@ -638,7 +638,7 @@ font_autoscale
 font_blur
 .RB ( subfont-blur ") (FreeType only),"
 font_encoding
-.RB ( subfont-encoding ") (FreeType only),"
+.RB ( subfont-encoding ),
 font_factor
 .RB ( ffactor ),
 font_name
@@ -2902,11 +2902,13 @@ proportional to movie diagonal (default)
 Sets the font blur radius (default: 2).
 .
 .TP
-.B \-subfont\-encoding <value> (FreeType only)
+.B \-subfont\-encoding <value>
 Sets the font encoding.
 When set to 'unicode', all the glyphs from the font file will be rendered and
-unicode will be used (default: unicode). (For other values than 'unicode'
-your system has to support iconv(3) in order for this to work.)
+unicode will be used (default: unicode). (Without FreeType, setting any other
+value than 'unicode' will disable unicode glyphs rendering for font.desc
+files. With FreeType and for other values than 'unicode' your system has to
+support iconv(3) in order for this to work.)
 .
 .TP
 .B \-subfont\-osd\-scale <0\-100> (FreeType only)

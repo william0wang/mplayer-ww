@@ -33,7 +33,7 @@
 .\" Titel
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "24.01.2014" "Das MPlayer Projekt"
+.TH MPlayer 1 "13.02.2014" "Das MPlayer Projekt"
 .
 .SH NAME
 mplayer  \- Movie Player
@@ -654,7 +654,7 @@ font_autoscale
 font_blur
 .RB ( subfont-blur ") (nur mit FreeType),"
 font_encoding
-.RB ( subfont-encoding ") (nur mit FreeType),"
+.RB ( subfont-encoding ),
 font_factor
 .RB ( ffactor ),
 font_name
@@ -2814,12 +2814,13 @@ proportional zur Diagonale des Films (Standard)
 Setzt den Verwischradius für die Schriften (Standard: 2).
 .
 .TP
-.B \-subfont\-encoding <Wert> (nur bei FreeType)
+.B \-subfont\-encoding <Wert>
 Setzt die Schriftcodierung.
-Wenn 'unicode' angegeben wird, so werden alle Zeichen der Schriftdatei
-gerendert, und Unicode wird benutzt werden (Standard: unicode). (Für andere
-Werte als 'unicode' muss dein System iconv(3) unterstützen, um zu
-funktionieren.)
+Wenn 'unicode' angegeben wird, werden alle Zeichen der Schriftdatei
+gerendert und Unicode wird benutzt werden (Standard: unicode). (Ohne FreeType
+bewirkt jeder andere Wert, dass keine Unicode-Zeichen aus font.desc\-Dateien
+gerendert werden. Mit FreeType und für andere Werte als 'unicode' muss dein
+System iconv(3) unterstützen, um zu funktionieren.)
 .
 .TP
 .B \-subfont\-osd\-scale <0\-100> (nur bei FreeType)
