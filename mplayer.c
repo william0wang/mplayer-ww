@@ -1953,15 +1953,12 @@ static void mp_dvdnav_reset_stream(MPContext *ctx)
         ctx->demuxer->stream_pts = MP_NOPTS_VALUE;
     }
 
-    if (ctx->sh_audio) {
-        // free audio packets and reset
-        ds_free_packs(ctx->d_audio);
-        audio_delay -= ctx->sh_audio->stream_delay;
-        ctx->delay   = -audio_delay;
-        ctx->audio_out->reset();
-        resync_audio_stream(ctx->sh_audio);
-    }
-
+    // This is necessary to make video start in sync after
+    // a still frame. But do not discard pending audio packets,
+    // that causes issues since this code is also called on
+    // title changes (which is possibly a bug in itself *sigh*),
+    // and thus cause tiny audio skips.
+    ctx->delay   = -audio_delay;
     audio_delay = 0.0f;
     mpctx->sub_counts[SUB_SOURCE_DEMUX] = mp_dvdnav_number_of_subs(mpctx->stream);
     if (dvdsub_lang && dvdsub_id == dvdsub_lang_id) {
