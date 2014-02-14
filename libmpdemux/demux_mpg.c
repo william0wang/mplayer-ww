@@ -67,7 +67,7 @@ off_t ps_probe = 0;
 static int parse_psm(demuxer_t *demux, int len) {
   unsigned char c, id, type;
   unsigned int plen, prog_len, es_map_len;
-  mpg_demuxer_t *priv = (mpg_demuxer_t *) demux->priv;
+  mpg_demuxer_t *priv = demux->priv;
 
   mp_dbg(MSGT_DEMUX,MSGL_V, "PARSE_PSM, len=%d\n", len);
   if(! len || len > 1018)
@@ -269,10 +269,10 @@ static unsigned long long read_mpeg_timestamp(stream_t *s,int c){
 
 static void new_audio_stream(demuxer_t *demux, int aid){
   if(!demux->a_streams[aid]){
-    mpg_demuxer_t *mpg_d=(mpg_demuxer_t*)demux->priv;
+    mpg_demuxer_t *mpg_d=demux->priv;
     sh_audio_t* sh_a;
     new_sh_audio(demux,aid, NULL);
-    sh_a = (sh_audio_t*)demux->a_streams[aid];
+    sh_a = demux->a_streams[aid];
     sh_a->needs_parsing = 1;
     switch(aid & 0xE0){  // 1110 0000 b  (high 3 bit: type  low 5: id)
       case 0x00: sh_a->format=0x50;break; // mpeg
@@ -300,7 +300,7 @@ static int demux_mpg_read_packet(demuxer_t *demux,int id){
   double stream_pts = MP_NOPTS_VALUE;
   demux_stream_t *ds=NULL;
   demux_packet_t* dp;
-  mpg_demuxer_t *priv = (mpg_demuxer_t *) demux->priv;
+  mpg_demuxer_t *priv = demux->priv;
 
   mp_dbg(MSGT_DEMUX,MSGL_DBG3,"demux_read_packet: %X\n",id);
 
@@ -444,7 +444,7 @@ static int demux_mpg_read_packet(demuxer_t *demux,int id){
         ds=demux->video;
         if(!ds->sh) ds->sh=demux->v_streams[pes_ext2_subid];
         if(priv && ds->sh) {
-          sh_video_t *sh = (sh_video_t *)ds->sh;
+          sh_video_t *sh = ds->sh;
           sh->format = mmioFOURCC('W', 'V', 'C', '1');
         }
       }
@@ -557,7 +557,7 @@ static int demux_mpg_read_packet(demuxer_t *demux,int id){
       ds=demux->audio;
       if(!ds->sh) ds->sh=demux->a_streams[aid];
       if(priv && ds->sh) {
-        sh_audio_t *sh = (sh_audio_t *)ds->sh;
+        sh_audio_t *sh = ds->sh;
         if(priv->es_map[id - 0x1B0])
           sh->format = priv->es_map[id - 0x1B0];
           mp_dbg(MSGT_DEMUX,MSGL_DBG2,"ASSIGNED TO STREAM %d CODEC %x\n", id, priv->es_map[id - 0x1B0]);
@@ -573,7 +573,7 @@ static int demux_mpg_read_packet(demuxer_t *demux,int id){
       ds=demux->video;
       if(!ds->sh) ds->sh=demux->v_streams[aid];
       if(priv && ds->sh) {
-        sh_video_t *sh = (sh_video_t *)ds->sh;
+        sh_video_t *sh = ds->sh;
         if(priv->es_map[id - 0x1B0]) {
           sh->format = priv->es_map[id - 0x1B0];
           mp_dbg(MSGT_DEMUX,MSGL_DBG2,"ASSIGNED TO STREAM %d CODEC %x\n", id, priv->es_map[id - 0x1B0]);
@@ -913,7 +913,7 @@ static void demux_seek_mpg(demuxer_t *demuxer, float rel_seek_secs,
     demux_stream_t *d_video=demuxer->video;
     sh_audio_t *sh_audio=d_audio->sh;
     sh_video_t *sh_video=d_video->sh;
-    mpg_demuxer_t *mpg_d=(mpg_demuxer_t*)demuxer->priv;
+    mpg_demuxer_t *mpg_d=demuxer->priv;
     int precision = 1;
     float oldpts = 0;
     off_t oldpos = demuxer->filepos;
@@ -1016,7 +1016,7 @@ static void demux_seek_mpg(demuxer_t *demuxer, float rel_seek_secs,
 
 static int demux_mpg_control(demuxer_t *demuxer, int cmd, void *arg)
 {
-    mpg_demuxer_t *mpg_d=(mpg_demuxer_t*)demuxer->priv;
+    mpg_demuxer_t *mpg_d=demuxer->priv;
 
     switch(cmd) {
 	case DEMUXER_CTRL_GET_TIME_LENGTH:
@@ -1057,7 +1057,7 @@ static int demux_mpg_control(demuxer_t *demuxer, int cmd, void *arg)
                 for (i = 0; i < mpg_d->num_a_streams; i++)
                   if (*((int*)arg) == mpg_d->a_stream_ids[i]) break;
                 if (i < mpg_d->num_a_streams)
-                  sh_a = (sh_audio_t*)demuxer->a_streams[*((int*)arg)];
+                  sh_a = demuxer->a_streams[*((int*)arg)];
               }
               if (i < mpg_d->num_a_streams && d_audio->id != mpg_d->a_stream_ids[i]) {
                 d_audio->id = mpg_d->a_stream_ids[i];
