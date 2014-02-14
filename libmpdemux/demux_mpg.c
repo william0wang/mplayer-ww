@@ -189,14 +189,13 @@ static float read_first_mpeg_pts_at_position(demuxer_t* demuxer, off_t stream_po
 /// Open an mpg physical stream
 static demuxer_t* demux_mpg_open(demuxer_t* demuxer) {
   stream_t *s = demuxer->stream;
-  mpg_demuxer_t* mpg_d;
+  mpg_demuxer_t* mpg_d = calloc(1,sizeof(*mpg_d));
+  if (!mpg_d)
+    return NULL;
+  demuxer->priv = mpg_d;
 
   while (demuxer->video->packs + demuxer->audio->packs < 2)
     if (!ds_fill_buffer(demuxer->video)) return 0;
-  mpg_d = calloc(1,sizeof(mpg_demuxer_t));
-  if(mpg_d)
-  {
-    demuxer->priv = mpg_d;
     mpg_d->last_pts = -1.0;
     mpg_d->first_pts = -1.0;
 
@@ -245,7 +244,6 @@ static demuxer_t* demux_mpg_open(demuxer_t* demuxer) {
       stream_seek(s,pos);
       ds_fill_buffer(demuxer->video);
     } // if ( demuxer->seekable )
-  } // if ( mpg_d )
   return demuxer;
 }
 
