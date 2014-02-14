@@ -37,6 +37,7 @@
 #include "m_option.h"
 #include "m_struct.h"
 #include "osdep/osdep.h"
+#include "libmpdemux/demuxer.h"
 
 static struct stream_priv_s {
   char* filename;
@@ -224,6 +225,13 @@ static int open_f(stream_t *stream,int mode, void* opts, int* file_format) {
     stream->type = STREAMTYPE_FILE;
   }
 
+  // support sdp:// also via FFmpeg if live555 was not compiled in
+  if (stream->url && !strncmp(stream->url, "sdp://", 6)) {
+    *file_format = DEMUXER_TYPE_LAVF;
+    stream->type = STREAMTYPE_SDP;
+    stream->flags = STREAM_NON_CACHEABLE;
+  }
+
   mp_msg(MSGT_OPEN,MSGL_V,"[file] File size is %"PRId64" bytes\n", (int64_t)len);
 
   stream->fd = f;
@@ -242,7 +250,7 @@ const stream_info_t stream_info_file = {
   "Albeu",
   "based on the code from ??? (probably Arpi)",
   open_f,
-  { "file", "", NULL },
+  { "file", "", "sdp", NULL },
   &stream_opts,
   1 // Urls are an option string
 };
