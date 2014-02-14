@@ -1047,8 +1047,6 @@ static int demux_mpg_control(demuxer_t *demuxer, int cmd, void *arg)
               sh_audio_t *sh_audio = d_audio->sh;
               sh_audio_t *sh_a = sh_audio;
               int i;
-	      if(!sh_audio)
-	        return DEMUXER_CTRL_NOTIMPL;
               if (*((int*)arg) < 0)
               {
               for (i = 0; i < mpg_d->num_a_streams; i++) {
