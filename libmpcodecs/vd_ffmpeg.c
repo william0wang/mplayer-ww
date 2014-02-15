@@ -995,7 +995,7 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
             int8_t *q = av_frame_get_qp_table(pic, &qstride, &dummy);
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++)
-                    quality += (double)*(q+x);
+                    quality += q[x];
                 q += qstride;
             }
             quality /= w * h;
@@ -1028,7 +1028,7 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
 
         ctx->qp_stat[(int)(quality+0.5)]++;
         ctx->qp_sum += quality;
-        ctx->inv_qp_sum += 1.0/(double)FFMAX(quality, 1);
+        ctx->inv_qp_sum += 1.0/FFMAX(quality, 1);
 
         break;
     }
