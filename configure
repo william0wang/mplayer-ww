@@ -588,7 +588,7 @@ Advanced options:
   --enable-debug[=1-3]      compile-in debugging information [disable]
   --enable-profile          compile-in profiling information [disable]
   --disable-sighandler      disable sighandler for crashes [enable]
-  --enable-relocatable      enable compiling as relocatable/PIE executable [disable]
+  --enable-relocatable      enable compiling as relocatable/PIE executable [auto]
   --enable-crash-debug      enable automatic gdb attach on crash [disable]
   --enable-dynamic-plugins  enable dynamic A/V plugins [disable]
 
