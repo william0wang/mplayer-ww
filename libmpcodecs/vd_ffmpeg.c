@@ -992,11 +992,13 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
             int x, y;
             int w = ((avctx->width  << lavc_param_lowres)+15) >> 4;
             int h = ((avctx->height << lavc_param_lowres)+15) >> 4;
-            int8_t *q = pic->qscale_table;
+            int qstride;
+            int dummy;
+            int8_t *q = av_frame_get_qp_table(pic, &qstride, &dummy);
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++)
                     quality += (double)*(q+x);
-                q += pic->qstride;
+                q += qstride;
             }
             quality /= w * h;
         }
@@ -1089,10 +1091,8 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
         swap_palette(mpi->planes[1]);
 #endif
 /* to comfirm with newer lavc style */
-    mpi->qscale =pic->qscale_table;
-    mpi->qstride=pic->qstride;
+    mpi->qscale = av_frame_get_qp_table(pic, &mpi->qstride, &mpi->qscale_type);
     mpi->pict_type=pic->pict_type;
-    mpi->qscale_type= pic->qscale_type;
     mpi->fields = MP_IMGFIELD_ORDERED;
     if(pic->interlaced_frame) mpi->fields |= MP_IMGFIELD_INTERLACED;
     if(pic->top_field_first ) mpi->fields |= MP_IMGFIELD_TOP_FIRST;
