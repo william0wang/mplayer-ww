@@ -76,6 +76,7 @@ LIBVD_EXTERN(ffmpeg)
 typedef struct {
     AVCodecContext *avctx;
     AVFrame *pic;
+    AVFrame *refcount_frame;
     enum AVPixelFormat pix_fmt;
     int do_slices;
     int do_dr1;
@@ -338,7 +339,7 @@ static int init(sh_video_t *sh){
 
     ctx->ip_count= ctx->b_count= 0;
 
-    ctx->pic = avcodec_alloc_frame();
+    ctx->pic = av_frame_alloc();
     ctx->avctx = avcodec_alloc_context3(lavc_codec);
     avctx = ctx->avctx;
     avctx->opaque = sh;
@@ -482,6 +483,7 @@ static int init(sh_video_t *sh){
         set_format_params(avctx, PIX_FMT_XVMC_MPEG2_IDCT);
     avctx->thread_count = lavc_param_threads;
     avctx->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
+    avctx->refcounted_frames = 1;
 
     /* open it */
     if (avcodec_open2(avctx, lavc_codec, &opts) < 0) {
@@ -502,6 +504,10 @@ static void uninit(sh_video_t *sh){
     vd_ffmpeg_ctx *ctx = sh->context;
     AVCodecContext *avctx = ctx->avctx;
 
+    if (ctx->refcount_frame) {
+        av_frame_unref(ctx->refcount_frame);
+        ctx->refcount_frame = NULL;
+    }
     if(lavc_param_vstats && avctx->coded_frame){
         int i;
         for(i=1; i<32; i++){
@@ -885,6 +891,10 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
     int dr1= ctx->do_dr1;
     AVPacket pkt;
 
+    if (ctx->refcount_frame) {
+        av_frame_unref(ctx->refcount_frame);
+        ctx->refcount_frame = NULL;
+    }
     if(data && len<=0) return NULL; // skipped frame
 
 //ffmpeg interlace (mpeg2) bug have been fixed. no need of -noslices
@@ -938,6 +948,7 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
         ctx->palette_sent = 1;
     }
     ret = avcodec_decode_video2(avctx, pic, &got_picture, &pkt);
+    ctx->refcount_frame = pic;
     pkt.data = NULL;
     pkt.size = 0;
     av_packet_free_side_data(&pkt);
