@@ -508,14 +508,14 @@ static void uninit(sh_video_t *sh){
         av_frame_unref(ctx->refcount_frame);
         ctx->refcount_frame = NULL;
     }
-    if(lavc_param_vstats && avctx->coded_frame){
+    if(lavc_param_vstats){
         int i;
-        for(i=1; i<32; i++){
+        for(i=0; i<32; i++){
             mp_msg(MSGT_DECVIDEO, MSGL_INFO, "QP: %d, count: %d\n", i, ctx->qp_stat[i]);
         }
         mp_msg(MSGT_DECVIDEO, MSGL_INFO, MSGTR_MPCODECS_ArithmeticMeanOfQP,
-            ctx->qp_sum / avctx->coded_frame->coded_picture_number,
-            1.0/(ctx->inv_qp_sum / avctx->coded_frame->coded_picture_number)
+            ctx->qp_sum / avctx->frame_number,
+            1.0/(ctx->inv_qp_sum / avctx->frame_number)
             );
     }
 
@@ -966,10 +966,9 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
         static long long int all_len=0;
         static int frame_number=0;
         static double all_frametime=0.0;
-        AVFrame *pic= avctx->coded_frame;
         double quality=0.0;
 
-        if(!pic) break;
+        if(!got_picture) break;
 
         if(!fvstats) {
             time_t today2;
@@ -1030,7 +1029,7 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
 
         ctx->qp_stat[(int)(quality+0.5)]++;
         ctx->qp_sum += quality;
-        ctx->inv_qp_sum += 1.0/(double)quality;
+        ctx->inv_qp_sum += 1.0/(double)FFMAX(quality, 1);
 
         break;
     }
