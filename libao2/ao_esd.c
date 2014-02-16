@@ -165,7 +165,6 @@ static int init(int rate_hz, int channels, int format, int flags)
     float lag_seconds, lag_net, lag_serv;
     struct timeval proto_start, proto_end;
 
-    if (esd_fd < 0) {
 	esd_fd = esd_open_sound(server);
 	if (esd_fd < 0) {
 	    mp_msg(MSGT_AO, MSGL_ERR, MSGTR_AO_ESD_CantOpenSound,
@@ -190,7 +189,6 @@ static int init(int rate_hz, int channels, int format, int flags)
 	    esd_print_server_info(esd_svinfo);
 	}
 	*/
-    }
 
     esd_fmt = ESD_STREAM | ESD_PLAY;
 
