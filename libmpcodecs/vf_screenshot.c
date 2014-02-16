@@ -43,7 +43,8 @@
 
 struct vf_priv_s {
     int frameno;
-    char fname[102];
+    char fname[PATH_MAX];
+    char *prefix;
     /// shot stores current screenshot mode:
     /// 0: don't take screenshots
     /// 1: take single screenshot, reset to 0 afterwards
@@ -130,7 +131,7 @@ static int fexists(char *fname)
 static void gen_fname(struct vf_priv_s* priv)
 {
     do {
-        snprintf(priv->fname, sizeof(priv->fname), "shot%04d.png", ++priv->frameno);
+        snprintf(priv->fname, sizeof(priv->fname), "%s%04d.png", priv->prefix, ++priv->frameno);
     } while (fexists(priv->fname) && priv->frameno < 100000);
     if (fexists(priv->fname)) {
         priv->fname[0] = '\0';
@@ -282,6 +283,7 @@ static void uninit(vf_instance_t *vf)
     if(vf->priv->ctx) sws_freeContext(vf->priv->ctx);
     av_free(vf->priv->buffer);
     free(vf->priv->outbuffer);
+    free(vf->priv->prefix);
     free(vf->priv);
 }
 
@@ -296,6 +298,7 @@ static int vf_open(vf_instance_t *vf, char *args)
     vf->get_image=get_image;
     vf->uninit=uninit;
     vf->priv=malloc(sizeof(struct vf_priv_s));
+    vf->priv->prefix = strdup(args ? args : "shot");
     vf->priv->frameno=0;
     vf->priv->shot=0;
     vf->priv->store_slices=0;
