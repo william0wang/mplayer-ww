@@ -1289,7 +1289,7 @@ get_image( mp_image_t *mpi )
           }
 
           mpi->flags |= MP_IMGFLAG_DIRECT;
-          mpi->priv = (void *) buf;
+          mpi->priv = (void *)(intptr_t)buf;
           current_buf = buf;
 
           return VO_TRUE;
@@ -1306,7 +1306,7 @@ static uint32_t
 draw_image( mp_image_t *mpi )
 {
      if (mpi->flags & MP_IMGFLAG_DIRECT) {
-          current_buf = (int) mpi->priv;
+          current_buf = (intptr_t)mpi->priv;
           return VO_TRUE;
      }
      if (mpi->flags & MP_IMGFLAG_DRAW_CALLBACK)
