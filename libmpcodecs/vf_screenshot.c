@@ -124,8 +124,7 @@ static void write_png(struct vf_priv_s *priv)
 static int fexists(char *fname)
 {
     struct stat dummy;
-    if (stat(fname, &dummy) == 0) return 1;
-    else return 0;
+    return stat(fname, &dummy) == 0;
 }
 
 static void gen_fname(struct vf_priv_s* priv)
