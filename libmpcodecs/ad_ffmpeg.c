@@ -313,7 +313,7 @@ static int decode_audio(sh_audio_t *sh_audio,unsigned char *buf,int minlen,int m
 {
     unsigned char *start=NULL;
     int y,len=-1, got_frame;
-    AVFrame *frame = avcodec_alloc_frame();
+    AVFrame *frame = av_frame_alloc();
 
     if (!frame)
         return AVERROR(ENOMEM);
@@ -376,6 +376,6 @@ static int decode_audio(sh_audio_t *sh_audio,unsigned char *buf,int minlen,int m
             break;
     }
 
-  av_free(frame);
+  av_frame_free(&frame);
   return len;
 }
