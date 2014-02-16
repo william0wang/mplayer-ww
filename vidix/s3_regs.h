@@ -218,13 +218,13 @@ do { \
 #define VID_OR32(p,i,val)  VID_WR32(p,i,VID_RD32(p,i)|(val))
 #define VID_XOR32(p,i,val) VID_WR32(p,i,VID_RD32(p,i)^(val))
 
-#define VGAIN8(addr) VID_RD08(info->control_base+0x8000, addr)
-#define VGAIN16(addr) VID_RD16(info->control_base+0x8000, addr)
-#define VGAIN(addr) VID_RD32(info->control_base+0x8000, addr)
+#define VGAIN8(addr) VID_RD08((uint8_t *)info->control_base+0x8000, addr)
+#define VGAIN16(addr) VID_RD16((uint8_t *)info->control_base+0x8000, addr)
+#define VGAIN(addr) VID_RD32((uint8_t *)info->control_base+0x8000, addr)
 
-#define VGAOUT8(addr,val) VID_WR08(info->control_base+0x8000, addr, val)
-#define VGAOUT16(addr,val) VID_WR16(info->control_base+0x8000, addr, val)
-#define VGAOUT(addr,val) VID_WR32(info->control_base+0x8000, addr, val)
+#define VGAOUT8(addr,val) VID_WR08((uint8_t *)info->control_base+0x8000, addr, val)
+#define VGAOUT16(addr,val) VID_WR16((uint8_t *)info->control_base+0x8000, addr, val)
+#define VGAOUT(addr,val) VID_WR32((uint8_t *)info->control_base+0x8000, addr, val)
 
 #define INREG(addr) VID_RD32(info->control_base, addr)
 #define OUTREG(addr,val) VID_WR32(info->control_base, addr, val)
