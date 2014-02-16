@@ -176,7 +176,7 @@ static void get_image(struct vf_instance *vf, mp_image_t *mpi)
 
     mpi->flags|=MP_IMGFLAG_DIRECT;
 
-    mpi->priv=(void*)vf->dmpi;
+    mpi->priv=vf->dmpi;
 }
 
 static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
