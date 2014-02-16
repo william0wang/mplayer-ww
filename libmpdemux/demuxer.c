@@ -670,7 +670,7 @@ int ds_fill_buffer(demux_stream_t *ds)
             mp_dbg(MSGT_DEMUXER, MSGL_DBG3, "ds_fill_buffer(d_sub) called\n");
         else
             mp_dbg(MSGT_DEMUXER, MSGL_DBG3,
-                   "ds_fill_buffer(unknown 0x%X) called\n", (unsigned int) ds);
+                   "ds_fill_buffer(unknown %p) called\n", ds);
     }
     while (1) {
         int apacks = demux->audio ? demux->audio->packs : 0;
