@@ -20,9 +20,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#if HAVE_MALLOC_H
-#include <malloc.h>
-#endif
 #include <string.h>
 #include <inttypes.h>
 
@@ -77,8 +74,7 @@ static int config(struct vf_instance *vf,
     vf->priv->ctx=sws_getContextFromCmdLine(width, height, outfmt,
                                  d_width, d_height, IMGFMT_RGB24);
 
-    vf->priv->outbuffer_size = d_width * d_height * 3 * 2;
-    vf->priv->outbuffer = realloc(vf->priv->outbuffer, vf->priv->outbuffer_size);
+    av_fast_malloc(&vf->priv->outbuffer, &vf->priv->outbuffer_size, d_width * d_height * 3 * 2);
     vf->priv->avctx->width = d_width;
     vf->priv->avctx->height = d_height;
     vf->priv->avctx->compression_level = 0;
@@ -274,7 +270,7 @@ static void uninit(vf_instance_t *vf)
     if(vf->priv->ctx) sws_freeContext(vf->priv->ctx);
     av_freep(&vf->priv->pic->data[0]);
     av_frame_free(&vf->priv->pic);
-    free(vf->priv->outbuffer);
+    av_freep(&vf->priv->outbuffer);
     free(vf->priv->prefix);
     free(vf->priv);
 }
