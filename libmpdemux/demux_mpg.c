@@ -195,7 +195,7 @@ static demuxer_t* demux_mpg_open(demuxer_t* demuxer) {
   demuxer->priv = mpg_d;
 
   while (demuxer->video->packs + demuxer->audio->packs < 2)
-    if (!ds_fill_buffer(demuxer->video)) return 0;
+    if (!demux_fill_buffer(demuxer, demuxer->video)) return 0;
     mpg_d->last_pts = -1.0;
     mpg_d->first_pts = -1.0;
 
