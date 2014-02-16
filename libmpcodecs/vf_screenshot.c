@@ -130,7 +130,7 @@ static int fexists(char *fname)
 static void gen_fname(struct vf_priv_s* priv)
 {
     do {
-        snprintf (priv->fname, 100, "shot%04d.png", ++priv->frameno);
+        snprintf(priv->fname, sizeof(priv->fname), "shot%04d.png", ++priv->frameno);
     } while (fexists(priv->fname) && priv->frameno < 100000);
     if (fexists(priv->fname)) {
         priv->fname[0] = '\0';
