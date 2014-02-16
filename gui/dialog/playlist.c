@@ -97,7 +97,7 @@ static void plRowSelect( GtkCList * clist,gint row,gint column,GdkEvent * event,
  (void) column;
  (void) event;
 
- switch ( (int) user_data )
+ switch ( (intptr_t) user_data )
   {
    case 0: CLFileSelected[row]=True; break;
    case 1: CLListSelected[row]=True; break;
@@ -110,7 +110,7 @@ static void plUnRowSelect( GtkCList * clist,gint row,gint column,GdkEvent * even
  (void) column;
  (void) event;
 
- switch ( (int) user_data )
+ switch ( (intptr_t) user_data )
   {
    case 0: CLFileSelected[row]=False; break;
    case 1: CLListSelected[row]=False; break;
@@ -121,7 +121,7 @@ static void plButtonReleased( GtkButton * button,gpointer user_data )
 {
  (void) button;
 
- switch ( (int) user_data )
+ switch ( (intptr_t) user_data )
  {
   case 1: // ok
        {
@@ -158,7 +158,7 @@ static void plButtonReleased( GtkButton * button,gpointer user_data )
 	    if ( old )
 	     {
 	      listMgr( PLAYLIST_ITEM_SET_CURR,old );
-	      guiInfo.Track = (int) listMgr( PLAYLIST_ITEM_GET_POS,old );
+	      guiInfo.Track = (intptr_t) listMgr( PLAYLIST_ITEM_GET_POS,old );
 	      item = NULL;
 	     }
 	   }
@@ -171,7 +171,7 @@ static void plButtonReleased( GtkButton * button,gpointer user_data )
 	   }
 	 }
 	else if (isPlaylistStreamtype && !guiInfo.Playing) uiUnsetFile();
-	guiInfo.Tracks = (int) listMgr( PLAYLIST_ITEM_GET_POS,0 );
+	guiInfo.Tracks = (intptr_t) listMgr( PLAYLIST_ITEM_GET_POS,0 );
 	free(curr.path);
 	free(curr.name);
        }
@@ -254,7 +254,7 @@ static gboolean plKeyReleased( GtkWidget * widget,
    if ( GTK_WIDGET_TYPE( widget ) == GTK_TYPE_BUTTON ) plButtonReleased( NULL, user_data );
    else
     {
-     switch ( (int) user_data )
+     switch ( (intptr_t) user_data )
       {
        case 0:
             plButtonReleased( NULL, (void *) 3 );
@@ -281,7 +281,7 @@ static gboolean plEvent ( GtkWidget * widget,
   {
     if ( gtk_clist_get_selection_info( GTK_CLIST( widget ), bevent->x, bevent->y, &row, &col ) )
     {
-      switch ( (int) user_data )
+      switch ( (intptr_t) user_data )
       {
         case 0:
           CLFileSelected[row] = True;

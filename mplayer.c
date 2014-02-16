@@ -3061,7 +3061,7 @@ int main(int argc, char *argv[])
     if (use_gui) {
         guiInit();
         gui(GUI_SET_CONTEXT, mpctx);
-        gui(GUI_SET_STATE, (void *)(filename ? GUI_PLAY : GUI_STOP));
+        gui(GUI_SET_STATE, (void *)(intptr_t)(filename ? GUI_PLAY : GUI_STOP));
     }
 #endif
 
@@ -3103,7 +3103,7 @@ play_next_file:
                 if (cmd->id == MP_CMD_GUI)
                     gui(GUI_RUN_MESSAGE, cmd->args[0].v.s);
                 else
-                    gui(GUI_RUN_COMMAND, (void *)cmd->id);
+                    gui(GUI_RUN_COMMAND, (void *)(intptr_t)cmd->id);
                 mp_cmd_free(cmd);
             }
         }

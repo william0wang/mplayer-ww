@@ -133,7 +133,7 @@ static gboolean eqHScaleMotion( GtkWidget * widget,GdkEventMotion  * event,gpoin
  (void) widget;
  (void) event;
 
- switch ( (int)user_data )
+ switch ( (intptr_t)user_data )
   {
    case 0: eq.gain=A3125adj->value; break;
    case 1: eq.gain=A6250adj->value; break;
@@ -148,7 +148,7 @@ static gboolean eqHScaleMotion( GtkWidget * widget,GdkEventMotion  * event,gpoin
    default: return FALSE;
   }
  eq.gain=-eq.gain;
- eq.band=(int)user_data;
+ eq.band=(intptr_t)user_data;
  if ( Channel == -1 )
   {
    int i;
@@ -164,7 +164,7 @@ static gboolean eqVScaleMotion( GtkWidget * widget,GdkEventMotion  * event,gpoin
  (void) widget;
  (void) event;
 
- switch( (int)user_data )
+ switch( (intptr_t)user_data )
   {
    case 1: mplayer( MPLAYER_SET_CONTRAST,VContrastadj->value,0 );      break;
    case 2: mplayer( MPLAYER_SET_BRIGHTNESS,VBrightnessadj->value,0 );  break;
@@ -179,7 +179,7 @@ static void eqButtonReleased( GtkButton * button,gpointer user_data )
 {
  (void) button;
 
- switch( (int)user_data )
+ switch( (intptr_t)user_data )
   {
    case 0:
         gtk_widget_destroy( Equalizer );
@@ -565,7 +565,7 @@ static void ecButtonReleased( GtkButton * button,gpointer user_data )
 {
  (void) button;
 
- if ( (int)user_data )
+ if ( (intptr_t)user_data )
  { // if you pressed Ok
   nfree( gtkEquChannel1 ); gtkEquChannel1=gstrdup( gtk_entry_get_text( GTK_ENTRY( CEChannel1 ) ) );
   nfree( gtkEquChannel2 ); gtkEquChannel2=gstrdup( gtk_entry_get_text( GTK_ENTRY( CEChannel2 ) ) );

@@ -226,7 +226,7 @@ static void prEntry( GtkEditable * editable,gpointer user_data )
 
  (void) editable;
 
- switch( (int)user_data )
+ switch( (intptr_t)user_data )
   {
 #ifdef CONFIG_FREETYPE
    case 0: // font encoding
@@ -281,7 +281,7 @@ static void prButton( GtkButton * button, gpointer user_data )
 
  (void) button;
 
- switch ( (int)user_data )
+ switch ( (intptr_t)user_data )
   {
    case bOk:
 	/* 1st page */
@@ -433,7 +433,7 @@ static gboolean prHScaler( GtkWidget * widget,GdkEvent * event,gpointer user_dat
  (void) widget;
  (void) event;
 
- switch ( (int)user_data )
+ switch ( (intptr_t)user_data )
   {
    case 0: // extra stereo coefficient
 	if ( !guiInfo.Playing ) break;
@@ -482,7 +482,7 @@ static void prToggled( GtkToggleButton * togglebutton,gpointer user_data )
 
  (void) togglebutton;
 
- switch ( (int)user_data )
+ switch ( (intptr_t)user_data )
   {
    case 0: // extra stereo coefficient
 	if ( guiInfo.Playing )
@@ -505,7 +505,7 @@ static void prToggled( GtkToggleButton * togglebutton,gpointer user_data )
    case 5:
    case 6:
    case 7:
-	mplayer( MPLAYER_SET_FONT_AUTOSCALE,(int)user_data - 4,0 );
+	mplayer( MPLAYER_SET_FONT_AUTOSCALE,(intptr_t)user_data - 4,0 );
 	break;
    case 8:
 	if ( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBCache ) ) ) gtk_widget_set_sensitive( SBCache,TRUE );
@@ -540,7 +540,7 @@ static void prCListRow( GtkCList * clist,gint row,gint column,GdkEvent * event,g
  (void) column;
  (void) event;
 
- switch ( (int)user_data )
+ switch ( (intptr_t)user_data )
   {
    case 0: // audio driver
 	gtk_clist_get_text( GTK_CLIST( CLADrivers ),row,0,(char **)&ao_driver );
@@ -1598,7 +1598,7 @@ static void audioButton(GtkButton *button, gpointer user_data) {
 
   (void) button;
 
-  switch( (int)user_data ) {
+  switch( (intptr_t)user_data ) {
     case 1:
 #ifdef CONFIG_OSS_AUDIO
       if (strncmp(ao_driver[0], "oss", 3) == 0) {
@@ -1814,7 +1814,7 @@ static void dxr3Button( GtkButton * button,gpointer user_data )
 {
  (void) button;
 
- switch ( (int)user_data )
+ switch ( (intptr_t)user_data )
  {
   case 0: // Ok
        nfree( gtkDXR3Device ); gtkDXR3Device=strdup( gtk_entry_get_text( GTK_ENTRY( CEDXR3Device ) ) );

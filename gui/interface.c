@@ -209,7 +209,7 @@ void guiInit(void)
 
     if (playlist && !filename) {
         uiSetFile(playlist->path, playlist->name, STREAMTYPE_FILE);
-        guiInfo.Tracks = (int)listMgr(PLAYLIST_ITEM_GET_POS, 0);
+        guiInfo.Tracks = (intptr_t)listMgr(PLAYLIST_ITEM_GET_POS, 0);
         guiInfo.Track  = 1;
         filename       = NULL; // don't start playing
     }
@@ -332,12 +332,12 @@ int gui(int what, void *data)
 
     case GUI_SET_STATE:
 
-        switch ((int)data) {
+        switch ((intptr_t)data) {
         case GUI_STOP:
         case GUI_PLAY:
 // if ( !gtkShowVideoWindow ) wsWindowVisibility( &guiApp.videoWindow,wsHideWindow );
         case GUI_PAUSE:
-            guiInfo.Playing = (int)data;
+            guiInfo.Playing = (intptr_t)data;
             break;
         }
 
@@ -359,9 +359,9 @@ int gui(int what, void *data)
 
     case GUI_RUN_COMMAND:
 
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[interface] GUI_RUN_COMMAND: %d\n", (int)data);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[interface] GUI_RUN_COMMAND: %d\n", (int)(intptr_t)data);
 
-        switch ((int)data) {
+        switch ((intptr_t)data) {
         case MP_CMD_VO_FULLSCREEN:
             uiEvent(evFullScreen, True);
             break;
@@ -619,7 +619,7 @@ int gui(int what, void *data)
         switch (guiInfo.StreamType) {
         case STREAMTYPE_FILE:
         case STREAMTYPE_STREAM:
-            guiInfo.Tracks = (int)listMgr(PLAYLIST_ITEM_GET_POS, 0);
+            guiInfo.Tracks = (intptr_t)listMgr(PLAYLIST_ITEM_GET_POS, 0);
             break;
 
         case STREAMTYPE_CDDA:
@@ -812,7 +812,7 @@ int gui(int what, void *data)
         if (next) {
             uiSetFile(next->path, next->name, STREAMTYPE_FILE);
             guiInfo.NewPlay = GUI_FILE_NEW;
-            guiInfo.Track   = (int)listMgr(PLAYLIST_ITEM_GET_POS, next);
+            guiInfo.Track   = (intptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
         } else {
             if (guiInfo.NewPlay == GUI_FILE_NEW)
                 break;

@@ -51,7 +51,7 @@ static void prButton( GtkButton * button,gpointer user_data )
 
  if ( sbSelectedSkin )
  {
-  switch ( (int)user_data )
+  switch ( (intptr_t)user_data )
    {
     case 0: // cancel
 	if ( strcmp( sbSelectedSkin,gtkOldSkin ) ) uiChangeSkin( gtkOldSkin );
