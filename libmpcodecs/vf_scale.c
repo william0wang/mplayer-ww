@@ -654,7 +654,7 @@ struct SwsContext *sws_getContextFromCmdLine(int srcW, int srcH, int srcFormat, 
 
 /// An example of presets usage
 static const struct size_preset {
-  char* name;
+  const char* name;
   int w, h;
 } vf_size_presets_defs[] = {
   // TODO add more 'standard' resolutions
