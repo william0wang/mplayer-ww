@@ -198,8 +198,7 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
     }
 
     if(vf->priv->shot) {
-        if (vf->priv->shot==1)
-            vf->priv->shot=0;
+        vf->priv->shot &= ~1;
         gen_fname(vf->priv);
         if (vf->priv->fname[0]) {
             if (!vf->priv->store_slices)
@@ -220,13 +219,9 @@ static int control (vf_instance_t *vf, int request, void *data)
      **/
     if(request==VFCTRL_SCREENSHOT) {
         if (data && *(int*)data) { // repeated screenshot mode
-            if (vf->priv->shot==2)
-                vf->priv->shot=0;
-            else
-                vf->priv->shot=2;
+            vf->priv->shot ^= 2;
         } else { // single screenshot
-            if (!vf->priv->shot)
-                vf->priv->shot=1;
+            vf->priv->shot |= 1;
         }
         return CONTROL_TRUE;
     }
