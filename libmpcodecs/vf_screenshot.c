@@ -289,14 +289,9 @@ static int vf_open(vf_instance_t *vf, char *args)
     vf->draw_slice=draw_slice;
     vf->get_image=get_image;
     vf->uninit=uninit;
-    vf->priv=malloc(sizeof(struct vf_priv_s));
+    vf->priv = calloc(1, sizeof(struct vf_priv_s));
     vf->priv->pic = av_frame_alloc();
     vf->priv->prefix = strdup(args ? args : "shot");
-    vf->priv->frameno=0;
-    vf->priv->shot=0;
-    vf->priv->store_slices=0;
-    vf->priv->outbuffer=0;
-    vf->priv->ctx=0;
     vf->priv->avctx = avcodec_alloc_context3(NULL);
     vf->priv->avctx->pix_fmt = PIX_FMT_RGB24;
     avcodec_register_all();
