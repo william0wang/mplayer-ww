@@ -71,6 +71,7 @@ static int config(struct vf_instance *vf,
                   unsigned int flags, unsigned int outfmt)
 {
     int res;
+    if (vf->priv->ctx) sws_freeContext(vf->priv->ctx);
     vf->priv->ctx=sws_getContextFromCmdLine(width, height, outfmt,
                                  d_width, d_height, IMGFMT_RGB24);
 
