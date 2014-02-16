@@ -319,7 +319,7 @@ out:
   this->scaled_frame_width = 0;
   this->scaled_frame_height = 0;
   this->palette_crop_cache.valid = 0;
-  return 1;
+  return ret;
 }
 
 int spudec_apply_palette_crop(void *this, uint32_t palette,
