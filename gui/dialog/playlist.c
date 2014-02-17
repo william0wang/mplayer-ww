@@ -465,8 +465,8 @@ static GtkWidget * CreatePlaylist( void )
   gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scrolledwindow1 ),GTK_POLICY_AUTOMATIC,GTK_POLICY_AUTOMATIC );
 
   CTDirTree=gtk_ctree_new( 1,0 );
-  gtk_signal_connect( GTK_OBJECT( CTDirTree ),"tree-expand",GTK_SIGNAL_FUNC( plCTree ),(void*)0 );
-  gtk_signal_connect( GTK_OBJECT( CTDirTree ),"select-row",GTK_SIGNAL_FUNC( plCTRow ),(void *)0 );
+  gtk_signal_connect( GTK_OBJECT( CTDirTree ),"tree-expand",GTK_SIGNAL_FUNC( plCTree ),NULL );
+  gtk_signal_connect( GTK_OBJECT( CTDirTree ),"select-row",GTK_SIGNAL_FUNC( plCTRow ),NULL );
   gtk_container_add( GTK_CONTAINER( scrolledwindow1 ),CTDirTree );
   gtk_clist_set_column_auto_resize( GTK_CLIST( CTDirTree ),0,TRUE );
   gtk_clist_set_column_width( GTK_CLIST( CTDirTree ),0,80 );
