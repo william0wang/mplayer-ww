@@ -21,6 +21,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -158,7 +159,7 @@ static void plButtonReleased( GtkButton * button,gpointer user_data )
 	    if ( old )
 	     {
 	      listMgr( PLAYLIST_ITEM_SET_CURR,old );
-	      guiInfo.Track = (intptr_t) listMgr( PLAYLIST_ITEM_GET_POS,old );
+	      guiInfo.Track = (uintptr_t) listMgr( PLAYLIST_ITEM_GET_POS,old );
 	      item = NULL;
 	     }
 	   }
@@ -171,7 +172,7 @@ static void plButtonReleased( GtkButton * button,gpointer user_data )
 	   }
 	 }
 	else if (isPlaylistStreamtype && !guiInfo.Playing) uiUnsetFile();
-	guiInfo.Tracks = (intptr_t) listMgr( PLAYLIST_ITEM_GET_POS,0 );
+	guiInfo.Tracks = (uintptr_t) listMgr( PLAYLIST_ITEM_GET_POS,0 );
 	free(curr.path);
 	free(curr.name);
        }

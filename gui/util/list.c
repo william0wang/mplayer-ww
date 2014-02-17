@@ -21,6 +21,7 @@
  * @brief List management
  */
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -52,7 +53,7 @@ static urlItem *urlList;
  */
 void *listMgr(int cmd, void *data)
 {
-    unsigned int pos;
+    uintptr_t pos;
     plItem *pdat  = (plItem *)data;
     urlItem *udat = (urlItem *)data;
 
@@ -127,7 +128,7 @@ void *listMgr(int cmd, void *data)
         pos = 0;
 
         if (plList) {
-            unsigned int i = 0;
+            uintptr_t i  = 0;
             plItem *item   = plList;
 
             do {

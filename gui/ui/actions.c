@@ -21,6 +21,7 @@
  * @brief User interface actions
  */
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -745,7 +746,7 @@ void uiCurr(void)
         if (curr) {
             uiSetFile(curr->path, curr->name, STREAMTYPE_FILE);
             guiInfo.PlaylistNext = False;
-            guiInfo.Track = (intptr_t)listMgr(PLAYLIST_ITEM_GET_POS, curr);
+            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, curr);
             break;
         }
 
@@ -815,7 +816,7 @@ void uiPrev(void)
         if (prev) {
             uiSetFile(prev->path, prev->name, STREAMTYPE_FILE);
             guiInfo.PlaylistNext = !guiInfo.Playing;
-            guiInfo.Track = (intptr_t)listMgr(PLAYLIST_ITEM_GET_POS, prev);
+            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, prev);
             break;
         }
 
@@ -883,7 +884,7 @@ void uiNext(void)
         if (next) {
             uiSetFile(next->path, next->name, STREAMTYPE_FILE);
             guiInfo.PlaylistNext = !guiInfo.Playing;
-            guiInfo.Track = (intptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
+            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
             break;
         }
 

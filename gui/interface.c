@@ -17,6 +17,7 @@
  */
 
 #include <stdarg.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -209,7 +210,7 @@ void guiInit(void)
 
     if (playlist && !filename) {
         uiSetFile(playlist->path, playlist->name, STREAMTYPE_FILE);
-        guiInfo.Tracks = (intptr_t)listMgr(PLAYLIST_ITEM_GET_POS, 0);
+        guiInfo.Tracks = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, 0);
         guiInfo.Track  = 1;
         filename       = NULL; // don't start playing
     }
@@ -619,7 +620,7 @@ int gui(int what, void *data)
         switch (guiInfo.StreamType) {
         case STREAMTYPE_FILE:
         case STREAMTYPE_STREAM:
-            guiInfo.Tracks = (intptr_t)listMgr(PLAYLIST_ITEM_GET_POS, 0);
+            guiInfo.Tracks = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, 0);
             break;
 
         case STREAMTYPE_CDDA:
@@ -812,7 +813,7 @@ int gui(int what, void *data)
         if (next) {
             uiSetFile(next->path, next->name, STREAMTYPE_FILE);
             guiInfo.NewPlay = GUI_FILE_NEW;
-            guiInfo.Track   = (intptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
+            guiInfo.Track   = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
         } else {
             if (guiInfo.NewPlay == GUI_FILE_NEW)
                 break;
