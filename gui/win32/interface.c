@@ -556,6 +556,7 @@ void guiDone(void)
 /* this function gets called by mplayer to update the gui */
 int gui(int what, void *data)
 {
+    int idata = (intptr_t) data;
     stream_t *stream = data;
 #ifdef CONFIG_DVDREAD
     dvd_priv_t *dvdp;
@@ -686,7 +687,7 @@ int gui(int what, void *data)
             break;
         case GUI_SET_STATE:
         {
-            guiInfo.Playing = (intptr_t) data;
+            guiInfo.Playing = idata;
             switch (guiInfo.Playing)
             {
                 case GUI_PLAY:
@@ -710,9 +711,9 @@ int gui(int what, void *data)
         }
         case GUI_RUN_COMMAND:
         {
-            mp_msg(MSGT_GPLAYER,MSGL_V, "cmd: %d\n", (int)(intptr_t) data);
+            mp_msg(MSGT_GPLAYER,MSGL_V, "cmd: %d\n", idata);
             /* MPlayer asks us to quit */
-            switch((intptr_t) data)
+            switch(idata)
             {
                 case MP_CMD_VO_FULLSCREEN:
                     uiFullScreen();

@@ -319,7 +319,7 @@ int gui(int what, void *data)
 #ifdef CONFIG_DVDREAD
     dvd_priv_t *dvd;
 #endif
-    int msg, state;
+    int idata = (intptr_t)data, msg, state;
     stream_t *stream = NULL;
     sh_audio_t *sh_audio;
     mixer_t *mixer;
@@ -333,12 +333,12 @@ int gui(int what, void *data)
 
     case GUI_SET_STATE:
 
-        switch ((intptr_t)data) {
+        switch (idata) {
         case GUI_STOP:
         case GUI_PLAY:
 // if ( !gtkShowVideoWindow ) wsWindowVisibility( &guiApp.videoWindow,wsHideWindow );
         case GUI_PAUSE:
-            guiInfo.Playing = (intptr_t)data;
+            guiInfo.Playing = idata;
             break;
         }
 
@@ -360,9 +360,9 @@ int gui(int what, void *data)
 
     case GUI_RUN_COMMAND:
 
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[interface] GUI_RUN_COMMAND: %d\n", (int)(intptr_t)data);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[interface] GUI_RUN_COMMAND: %d\n", idata);
 
-        switch ((intptr_t)data) {
+        switch (idata) {
         case MP_CMD_VO_FULLSCREEN:
             uiEvent(evFullScreen, True);
             break;
