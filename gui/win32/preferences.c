@@ -542,22 +542,24 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                     return 0;
                 case ID_APPLY:
                 {
-                    int strl;
-                    char *caption;
+                    int idx, strl;
+                    char *driver, *caption;
 
                     /* Set the video driver */
-                    free(video_driver_list[0]);
-                    strl = SendMessage(vo_driver, CB_GETCURSEL, 0, 0);
-                    video_driver_list[0] = malloc(strl);
-                    SendMessage(vo_driver, CB_GETLBTEXT, (WPARAM)strl,
-                                (LPARAM)video_driver_list[0]);
+                    idx = SendMessage(vo_driver, CB_GETCURSEL, 0, 0);
+                    strl = SendMessage(vo_driver, CB_GETLBTEXTLEN, (WPARAM)idx, 0);
+                    driver = malloc(strl + 1);
+                    SendMessage(vo_driver, CB_GETLBTEXT, (WPARAM)idx, (LPARAM)driver);
+                    listSet(&video_driver_list, driver);
+                    free(driver);
 
                     /* Set the audio driver */
-                    free(audio_driver_list[0]);
-                    strl = SendMessage(ao_driver, CB_GETCURSEL, 0, 0);
-                    audio_driver_list[0] = malloc(strl);
-                    SendMessage(ao_driver, CB_GETLBTEXT, (WPARAM)strl,
-                                (LPARAM)audio_driver_list[0]);
+                    idx = SendMessage(ao_driver, CB_GETCURSEL, 0, 0);
+                    strl = SendMessage(ao_driver, CB_GETLBTEXTLEN, (WPARAM)idx, 0);
+                    driver = malloc(strl + 1);
+                    SendMessage(ao_driver, CB_GETLBTEXT, (WPARAM)idx, (LPARAM)driver);
+                    listSet(&audio_driver_list, driver);
+                    free(driver);
 
                     /* Set the priority level */
                     SendMessage(prio, CB_GETLBTEXT, (WPARAM)SendMessage(prio, CB_GETCURSEL, 0, 0), (LPARAM)procprio);
