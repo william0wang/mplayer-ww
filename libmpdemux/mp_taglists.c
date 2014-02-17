@@ -23,8 +23,13 @@
 #include "mp_taglists.h"
 #include "libavutil/common.h"
 #include "libavformat/avformat.h"
-// for AVCodecTag
-#include "libavformat/internal.h"
+// this is really defined in libavformat/internal.h
+// but requiring that header is a bit messy when building against
+// a system copy of FFmpeg.
+struct AVCodecTag {
+    enum AVCodecID id;
+    unsigned int tag;
+};
 
 static const struct AVCodecTag mp_wav_tags[] = {
     { AV_CODEC_ID_ADPCM_4XM,         MKTAG('4', 'X', 'M', 'A') },
