@@ -51,7 +51,7 @@ static void prButton( GtkButton * button,gpointer user_data )
 
  if ( sbSelectedSkin )
  {
-  switch ( (intptr_t)user_data )
+  switch ( GPOINTER_TO_INT(user_data) )
    {
     case 0: // cancel
 	if ( strcmp( sbSelectedSkin,gtkOldSkin ) ) uiChangeSkin( gtkOldSkin );
@@ -145,8 +145,8 @@ static GtkWidget * CreateSkinBrowser( void )
 
  gtk_signal_connect( GTK_OBJECT( SkinBrowser ),"destroy",GTK_SIGNAL_FUNC( gtk_widget_destroyed ),&SkinBrowser );
  gtk_signal_connect( GTK_OBJECT( SkinList ),"select-row",GTK_SIGNAL_FUNC( on_SkinList_select_row ),NULL );
- gtk_signal_connect( GTK_OBJECT( Ok ),"clicked",GTK_SIGNAL_FUNC( prButton ),(void *)1 );
- gtk_signal_connect( GTK_OBJECT( Cancel ),"clicked",GTK_SIGNAL_FUNC( prButton ),(void *)0 );
+ gtk_signal_connect( GTK_OBJECT( Ok ),"clicked",GTK_SIGNAL_FUNC( prButton ),GINT_TO_POINTER(1) );
+ gtk_signal_connect( GTK_OBJECT( Cancel ),"clicked",GTK_SIGNAL_FUNC( prButton ),GINT_TO_POINTER(0) );
 
  if ( ( sbSkinDirInHome=calloc( 1,strlen( skinDirInHome ) + 4 ) ) != NULL )
   { strcpy( sbSkinDirInHome,skinDirInHome ); strcat( sbSkinDirInHome,"/*" ); }

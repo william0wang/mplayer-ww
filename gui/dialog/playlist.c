@@ -98,7 +98,7 @@ static void plRowSelect( GtkCList * clist,gint row,gint column,GdkEvent * event,
  (void) column;
  (void) event;
 
- switch ( (intptr_t) user_data )
+ switch ( GPOINTER_TO_INT( user_data) )
   {
    case 0: CLFileSelected[row]=True; break;
    case 1: CLListSelected[row]=True; break;
@@ -111,7 +111,7 @@ static void plUnRowSelect( GtkCList * clist,gint row,gint column,GdkEvent * even
  (void) column;
  (void) event;
 
- switch ( (intptr_t) user_data )
+ switch ( GPOINTER_TO_INT( user_data) )
   {
    case 0: CLFileSelected[row]=False; break;
    case 1: CLListSelected[row]=False; break;
@@ -122,7 +122,7 @@ static void plButtonReleased( GtkButton * button,gpointer user_data )
 {
  (void) button;
 
- switch ( (intptr_t) user_data )
+ switch ( GPOINTER_TO_INT( user_data) )
  {
   case 1: // ok
        {
@@ -255,13 +255,13 @@ static gboolean plKeyReleased( GtkWidget * widget,
    if ( GTK_WIDGET_TYPE( widget ) == GTK_TYPE_BUTTON ) plButtonReleased( NULL, user_data );
    else
     {
-     switch ( (intptr_t) user_data )
+     switch ( GPOINTER_TO_INT( user_data) )
       {
        case 0:
-            plButtonReleased( NULL, (void *) 3 );
+            plButtonReleased( NULL, GINT_TO_POINTER(3) );
             break;
        case 1:
-            plButtonReleased( NULL, (void *) 2 );
+            plButtonReleased( NULL, GINT_TO_POINTER(2) );
             break;
       }
     }
@@ -282,17 +282,17 @@ static gboolean plEvent ( GtkWidget * widget,
   {
     if ( gtk_clist_get_selection_info( GTK_CLIST( widget ), bevent->x, bevent->y, &row, &col ) )
     {
-      switch ( (intptr_t) user_data )
+      switch ( GPOINTER_TO_INT( user_data) )
       {
         case 0:
           CLFileSelected[row] = True;
-          plButtonReleased( NULL, (void *) 3 );
+          plButtonReleased( NULL, GINT_TO_POINTER(3) );
           CLFileSelected[row] = False;
           return TRUE;
 
         case 1:
           CLListSelected[row] = True;
-          plButtonReleased( NULL, (void *) 2 );
+          plButtonReleased( NULL, GINT_TO_POINTER(2) );
           return TRUE;
       }
     }
@@ -559,23 +559,23 @@ static GtkWidget * CreatePlaylist( void )
 
   gtk_signal_connect( GTK_OBJECT( Playlist ),"destroy",GTK_SIGNAL_FUNC( gtk_widget_destroyed ),&Playlist );
 
-  gtk_signal_connect( GTK_OBJECT( CLFiles ),"select-row",GTK_SIGNAL_FUNC( plRowSelect ),(void *)0 );
-  gtk_signal_connect( GTK_OBJECT( CLFiles ),"unselect-row",GTK_SIGNAL_FUNC( plUnRowSelect ),(void *)0 );
-  gtk_signal_connect( GTK_OBJECT( CLFiles ),"event",GTK_SIGNAL_FUNC( plEvent ),(void *)0 );
-  gtk_signal_connect( GTK_OBJECT( CLFiles ),"key-release-event",GTK_SIGNAL_FUNC( plKeyReleased ),(void *)0 );
-  sigSel=gtk_signal_connect( GTK_OBJECT( CLSelected ),"select-row",GTK_SIGNAL_FUNC( plRowSelect ),(void*)1 );
-  sigUnsel=gtk_signal_connect( GTK_OBJECT( CLSelected ),"unselect-row",GTK_SIGNAL_FUNC( plUnRowSelect ),(void*)1 );
-  sigEvent=gtk_signal_connect( GTK_OBJECT( CLSelected ),"event",GTK_SIGNAL_FUNC( plEvent ),(void *)1 );
-  gtk_signal_connect( GTK_OBJECT( CLSelected ),"key-release-event",GTK_SIGNAL_FUNC( plKeyReleased ),(void *)1 );
+  gtk_signal_connect( GTK_OBJECT( CLFiles ),"select-row",GTK_SIGNAL_FUNC( plRowSelect ),GINT_TO_POINTER(0) );
+  gtk_signal_connect( GTK_OBJECT( CLFiles ),"unselect-row",GTK_SIGNAL_FUNC( plUnRowSelect ),GINT_TO_POINTER(0) );
+  gtk_signal_connect( GTK_OBJECT( CLFiles ),"event",GTK_SIGNAL_FUNC( plEvent ),GINT_TO_POINTER(0) );
+  gtk_signal_connect( GTK_OBJECT( CLFiles ),"key-release-event",GTK_SIGNAL_FUNC( plKeyReleased ),GINT_TO_POINTER(0) );
+  sigSel=gtk_signal_connect( GTK_OBJECT( CLSelected ),"select-row",GTK_SIGNAL_FUNC( plRowSelect ),GINT_TO_POINTER(1) );
+  sigUnsel=gtk_signal_connect( GTK_OBJECT( CLSelected ),"unselect-row",GTK_SIGNAL_FUNC( plUnRowSelect ),GINT_TO_POINTER(1) );
+  sigEvent=gtk_signal_connect( GTK_OBJECT( CLSelected ),"event",GTK_SIGNAL_FUNC( plEvent ),GINT_TO_POINTER(1) );
+  gtk_signal_connect( GTK_OBJECT( CLSelected ),"key-release-event",GTK_SIGNAL_FUNC( plKeyReleased ),GINT_TO_POINTER(1) );
 
-  gtk_signal_connect( GTK_OBJECT( Add ),"released",GTK_SIGNAL_FUNC( plButtonReleased ),(void*)3 );
-  gtk_signal_connect( GTK_OBJECT( Add ),"key-release-event",GTK_SIGNAL_FUNC( plKeyReleased ),(void*)3 );
-  gtk_signal_connect( GTK_OBJECT( Remove ),"released",GTK_SIGNAL_FUNC( plButtonReleased ),(void*)2 );
-  gtk_signal_connect( GTK_OBJECT( Remove ),"key-release-event",GTK_SIGNAL_FUNC( plKeyReleased ),(void*)2 );
-  gtk_signal_connect( GTK_OBJECT( Ok ),"released",GTK_SIGNAL_FUNC( plButtonReleased ),(void*)1 );
-  gtk_signal_connect( GTK_OBJECT( Ok ),"key-release-event",GTK_SIGNAL_FUNC( plKeyReleased ),(void*)1 );
-  gtk_signal_connect( GTK_OBJECT( Cancel ),"released",GTK_SIGNAL_FUNC( plButtonReleased ),(void*)0 );
-  gtk_signal_connect( GTK_OBJECT( Cancel ),"key-release-event",GTK_SIGNAL_FUNC( plKeyReleased ),(void*)0 );
+  gtk_signal_connect( GTK_OBJECT( Add ),"released",GTK_SIGNAL_FUNC( plButtonReleased ),GINT_TO_POINTER(3) );
+  gtk_signal_connect( GTK_OBJECT( Add ),"key-release-event",GTK_SIGNAL_FUNC( plKeyReleased ),GINT_TO_POINTER(3) );
+  gtk_signal_connect( GTK_OBJECT( Remove ),"released",GTK_SIGNAL_FUNC( plButtonReleased ),GINT_TO_POINTER(2) );
+  gtk_signal_connect( GTK_OBJECT( Remove ),"key-release-event",GTK_SIGNAL_FUNC( plKeyReleased ),GINT_TO_POINTER(2) );
+  gtk_signal_connect( GTK_OBJECT( Ok ),"released",GTK_SIGNAL_FUNC( plButtonReleased ),GINT_TO_POINTER(1) );
+  gtk_signal_connect( GTK_OBJECT( Ok ),"key-release-event",GTK_SIGNAL_FUNC( plKeyReleased ),GINT_TO_POINTER(1) );
+  gtk_signal_connect( GTK_OBJECT( Cancel ),"released",GTK_SIGNAL_FUNC( plButtonReleased ),GINT_TO_POINTER(0) );
+  gtk_signal_connect( GTK_OBJECT( Cancel ),"key-release-event",GTK_SIGNAL_FUNC( plKeyReleased ),GINT_TO_POINTER(0) );
 
   gtk_window_add_accel_group( GTK_WINDOW( Playlist ),accel_group );
 

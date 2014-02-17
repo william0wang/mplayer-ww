@@ -226,7 +226,7 @@ static void prEntry( GtkEditable * editable,gpointer user_data )
 
  (void) editable;
 
- switch( (intptr_t)user_data )
+ switch( GPOINTER_TO_INT(user_data) )
   {
 #ifdef CONFIG_FREETYPE
    case 0: // font encoding
@@ -281,7 +281,7 @@ static void prButton( GtkButton * button, gpointer user_data )
 
  (void) button;
 
- switch ( (intptr_t)user_data )
+ switch ( GPOINTER_TO_INT(user_data) )
   {
    case bOk:
 	/* 1st page */
@@ -433,7 +433,7 @@ static gboolean prHScaler( GtkWidget * widget,GdkEvent * event,gpointer user_dat
  (void) widget;
  (void) event;
 
- switch ( (intptr_t)user_data )
+ switch ( GPOINTER_TO_INT(user_data) )
   {
    case 0: // extra stereo coefficient
 	if ( !guiInfo.Playing ) break;
@@ -482,7 +482,7 @@ static void prToggled( GtkToggleButton * togglebutton,gpointer user_data )
 
  (void) togglebutton;
 
- switch ( (intptr_t)user_data )
+ switch ( GPOINTER_TO_INT(user_data) )
   {
    case 0: // extra stereo coefficient
 	if ( guiInfo.Playing )
@@ -505,7 +505,7 @@ static void prToggled( GtkToggleButton * togglebutton,gpointer user_data )
    case 5:
    case 6:
    case 7:
-	mplayer( MPLAYER_SET_FONT_AUTOSCALE,(intptr_t)user_data - 4,0 );
+	mplayer( MPLAYER_SET_FONT_AUTOSCALE,GPOINTER_TO_INT(user_data) - 4,0 );
 	break;
    case 8:
 	if ( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( CBCache ) ) ) gtk_widget_set_sensitive( SBCache,TRUE );
@@ -540,7 +540,7 @@ static void prCListRow( GtkCList * clist,gint row,gint column,GdkEvent * event,g
  (void) column;
  (void) event;
 
- switch ( (intptr_t)user_data )
+ switch ( GPOINTER_TO_INT(user_data) )
   {
    case 0: // audio driver
 	gtk_clist_get_text( GTK_CLIST( CLADrivers ),row,0,(char **)&ao_driver );
@@ -1122,14 +1122,14 @@ static GtkWidget * CreatePreferences( void )
 
   gtk_signal_connect( GTK_OBJECT( Preferences ),"destroy",GTK_SIGNAL_FUNC( gtk_widget_destroyed ),&Preferences );
 
-  gtk_signal_connect( GTK_OBJECT( AConfig ),"clicked",GTK_SIGNAL_FUNC( prButton ),(void*)bAConfig );
-  gtk_signal_connect( GTK_OBJECT( BOk ),"clicked",GTK_SIGNAL_FUNC( prButton ),(void*)bOk );
-  gtk_signal_connect( GTK_OBJECT( BCancel ),"clicked",GTK_SIGNAL_FUNC( prButton ),(void*)bCancel );
-  gtk_signal_connect( GTK_OBJECT( VConfig ),"clicked",GTK_SIGNAL_FUNC( prButton ),(void*)bVconfig );
+  gtk_signal_connect( GTK_OBJECT( AConfig ),"clicked",GTK_SIGNAL_FUNC( prButton ),GINT_TO_POINTER(bAConfig) );
+  gtk_signal_connect( GTK_OBJECT( BOk ),"clicked",GTK_SIGNAL_FUNC( prButton ),GINT_TO_POINTER(bOk) );
+  gtk_signal_connect( GTK_OBJECT( BCancel ),"clicked",GTK_SIGNAL_FUNC( prButton ),GINT_TO_POINTER(bCancel) );
+  gtk_signal_connect( GTK_OBJECT( VConfig ),"clicked",GTK_SIGNAL_FUNC( prButton ),GINT_TO_POINTER(bVconfig) );
 #if 0
-  gtk_signal_connect( GTK_OBJECT( BLoadSubtitle ),"clicked",GTK_SIGNAL_FUNC( prButton ),(void*)bLSubtitle );
+  gtk_signal_connect( GTK_OBJECT( BLoadSubtitle ),"clicked",GTK_SIGNAL_FUNC( prButton ),GINT_TO_POINTER(bLSubtitle) );
 #endif
-  gtk_signal_connect( GTK_OBJECT( BLoadFont ),"clicked",GTK_SIGNAL_FUNC( prButton ),(void*)bLFont );
+  gtk_signal_connect( GTK_OBJECT( BLoadFont ),"clicked",GTK_SIGNAL_FUNC( prButton ),GINT_TO_POINTER(bLFont) );
 
   gtk_signal_connect( GTK_OBJECT( CBSubUtf8 ),"toggled",GTK_SIGNAL_FUNC( button_toggled ),NULL );
   gtk_signal_connect( GTK_OBJECT( CBSubUnicode ),"toggled",GTK_SIGNAL_FUNC( button_toggled ),NULL );
@@ -1414,44 +1414,44 @@ void ShowPreferences( void )
 #endif
 
 /* signals */
- gtk_signal_connect( GTK_OBJECT( CBExtraStereo ),"toggled",GTK_SIGNAL_FUNC( prToggled ),(void*)0 );
- gtk_signal_connect( GTK_OBJECT( CBNormalize ),"toggled",GTK_SIGNAL_FUNC( prToggled ),(void*)1 );
- gtk_signal_connect( GTK_OBJECT( CBSoftwareMixer ),"toggled",GTK_SIGNAL_FUNC( prToggled ),(void*)1 );
- gtk_signal_connect( GTK_OBJECT( CBAudioEqualizer ),"toggled",GTK_SIGNAL_FUNC( prToggled ),(void*)2 );
- gtk_signal_connect( GTK_OBJECT( CBShowVideoWindow ),"toggled",GTK_SIGNAL_FUNC( prToggled ), (void*)3 );
+ gtk_signal_connect( GTK_OBJECT( CBExtraStereo ),"toggled",GTK_SIGNAL_FUNC( prToggled ),GINT_TO_POINTER(0) );
+ gtk_signal_connect( GTK_OBJECT( CBNormalize ),"toggled",GTK_SIGNAL_FUNC( prToggled ),GINT_TO_POINTER(1) );
+ gtk_signal_connect( GTK_OBJECT( CBSoftwareMixer ),"toggled",GTK_SIGNAL_FUNC( prToggled ),GINT_TO_POINTER(1) );
+ gtk_signal_connect( GTK_OBJECT( CBAudioEqualizer ),"toggled",GTK_SIGNAL_FUNC( prToggled ),GINT_TO_POINTER(2) );
+ gtk_signal_connect( GTK_OBJECT( CBShowVideoWindow ),"toggled",GTK_SIGNAL_FUNC( prToggled ), GINT_TO_POINTER(3) );
 #ifdef CONFIG_FREETYPE
- gtk_signal_connect( GTK_OBJECT( RBFontNoAutoScale ),"toggled",GTK_SIGNAL_FUNC( prToggled ),(void*)4 );
- gtk_signal_connect( GTK_OBJECT( RBFontAutoScaleHeight ),"toggled",GTK_SIGNAL_FUNC( prToggled ),(void*)5 );
- gtk_signal_connect( GTK_OBJECT( RBFontAutoScaleWidth ),"toggled",GTK_SIGNAL_FUNC( prToggled ),(void*)6 );
- gtk_signal_connect( GTK_OBJECT( RBFontAutoScaleDiagonal ),"toggled",GTK_SIGNAL_FUNC( prToggled ),(void*)7 );
+ gtk_signal_connect( GTK_OBJECT( RBFontNoAutoScale ),"toggled",GTK_SIGNAL_FUNC( prToggled ),GINT_TO_POINTER(4) );
+ gtk_signal_connect( GTK_OBJECT( RBFontAutoScaleHeight ),"toggled",GTK_SIGNAL_FUNC( prToggled ),GINT_TO_POINTER(5) );
+ gtk_signal_connect( GTK_OBJECT( RBFontAutoScaleWidth ),"toggled",GTK_SIGNAL_FUNC( prToggled ),GINT_TO_POINTER(6) );
+ gtk_signal_connect( GTK_OBJECT( RBFontAutoScaleDiagonal ),"toggled",GTK_SIGNAL_FUNC( prToggled ),GINT_TO_POINTER(7) );
 #endif
- gtk_signal_connect( GTK_OBJECT( CBCache ),"toggled",GTK_SIGNAL_FUNC( prToggled ),(void*)8);
- gtk_signal_connect( GTK_OBJECT( CBAutoSync ),"toggled",GTK_SIGNAL_FUNC( prToggled ),(void*)9);
+ gtk_signal_connect( GTK_OBJECT( CBCache ),"toggled",GTK_SIGNAL_FUNC( prToggled ),GINT_TO_POINTER(8));
+ gtk_signal_connect( GTK_OBJECT( CBAutoSync ),"toggled",GTK_SIGNAL_FUNC( prToggled ),GINT_TO_POINTER(9));
 #ifdef CONFIG_ASS
- gtk_signal_connect( GTK_OBJECT( CBUseASS ),"toggled",GTK_SIGNAL_FUNC( prToggled ),(void*)10);
+ gtk_signal_connect( GTK_OBJECT( CBUseASS ),"toggled",GTK_SIGNAL_FUNC( prToggled ),GINT_TO_POINTER(10));
 #endif
 
- gtk_signal_connect( GTK_OBJECT( HSExtraStereoMul ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)0 );
- gtk_signal_connect( GTK_OBJECT( HSAudioDelay ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)1 );
- gtk_signal_connect( GTK_OBJECT( HSPanscan ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)2 );
- gtk_signal_connect( GTK_OBJECT( HSSubDelay ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)3 );
- gtk_signal_connect( GTK_OBJECT( HSSubPosition ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)4 );
+ gtk_signal_connect( GTK_OBJECT( HSExtraStereoMul ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),GINT_TO_POINTER(0) );
+ gtk_signal_connect( GTK_OBJECT( HSAudioDelay ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),GINT_TO_POINTER(1) );
+ gtk_signal_connect( GTK_OBJECT( HSPanscan ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),GINT_TO_POINTER(2) );
+ gtk_signal_connect( GTK_OBJECT( HSSubDelay ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),GINT_TO_POINTER(3) );
+ gtk_signal_connect( GTK_OBJECT( HSSubPosition ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),GINT_TO_POINTER(4) );
 #ifdef CONFIG_FREETYPE
- gtk_signal_connect( GTK_OBJECT( HSFontBlur ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)6 );
- gtk_signal_connect( GTK_OBJECT( HSFontOutLine ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)7 );
- gtk_signal_connect( GTK_OBJECT( HSFontTextScale ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)8 );
- gtk_signal_connect( GTK_OBJECT( HSFontOSDScale ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)9 );
- gtk_signal_connect( GTK_OBJECT( EFontEncoding ),"changed",GTK_SIGNAL_FUNC( prEntry ),(void *)0 );
+ gtk_signal_connect( GTK_OBJECT( HSFontBlur ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),GINT_TO_POINTER(6) );
+ gtk_signal_connect( GTK_OBJECT( HSFontOutLine ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),GINT_TO_POINTER(7) );
+ gtk_signal_connect( GTK_OBJECT( HSFontTextScale ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),GINT_TO_POINTER(8) );
+ gtk_signal_connect( GTK_OBJECT( HSFontOSDScale ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),GINT_TO_POINTER(9) );
+ gtk_signal_connect( GTK_OBJECT( EFontEncoding ),"changed",GTK_SIGNAL_FUNC( prEntry ),GINT_TO_POINTER(0) );
 #else
- gtk_signal_connect( GTK_OBJECT( HSFontFactor ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)5 );
+ gtk_signal_connect( GTK_OBJECT( HSFontFactor ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),GINT_TO_POINTER(5) );
 #endif
 #ifdef CONFIG_ICONV
- gtk_signal_connect( GTK_OBJECT( ESubEncoding ),"changed",GTK_SIGNAL_FUNC( prEntry ),(void *)1 );
+ gtk_signal_connect( GTK_OBJECT( ESubEncoding ),"changed",GTK_SIGNAL_FUNC( prEntry ),GINT_TO_POINTER(1) );
 #endif
- gtk_signal_connect( GTK_OBJECT( HSPPQuality ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),(void*)10 );
+ gtk_signal_connect( GTK_OBJECT( HSPPQuality ),"motion-notify-event",GTK_SIGNAL_FUNC( prHScaler ),GINT_TO_POINTER(10) );
 
- gtk_signal_connect( GTK_OBJECT( CLADrivers ),"select-row",GTK_SIGNAL_FUNC( prCListRow ),(void*)0 );
- gtk_signal_connect( GTK_OBJECT( CLVDrivers ),"select-row",GTK_SIGNAL_FUNC( prCListRow ),(void*)1 );
+ gtk_signal_connect( GTK_OBJECT( CLADrivers ),"select-row",GTK_SIGNAL_FUNC( prCListRow ),GINT_TO_POINTER(0) );
+ gtk_signal_connect( GTK_OBJECT( CLVDrivers ),"select-row",GTK_SIGNAL_FUNC( prCListRow ),GINT_TO_POINTER(1) );
 
  gtk_widget_show( Preferences );
  gtkSetLayer( Preferences );
@@ -1598,7 +1598,7 @@ static void audioButton(GtkButton *button, gpointer user_data) {
 
   (void) button;
 
-  switch( (intptr_t)user_data ) {
+  switch( GPOINTER_TO_INT(user_data) ) {
     case 1:
 #ifdef CONFIG_OSS_AUDIO
       if (strncmp(ao_driver[0], "oss", 3) == 0) {
@@ -1741,8 +1741,8 @@ static GtkWidget *CreateAudioConfig( void ) {
   BAudioCancel = gtkAddButton(MSGTR_GUI_Cancel, hbuttonbox);
 
   gtk_signal_connect(GTK_OBJECT(AudioConfig), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &AudioConfig);
-  gtk_signal_connect(GTK_OBJECT(BAudioOk), "clicked", GTK_SIGNAL_FUNC(audioButton), (void*)1);
-  gtk_signal_connect(GTK_OBJECT(BAudioCancel), "clicked", GTK_SIGNAL_FUNC(audioButton), (void*)0);
+  gtk_signal_connect(GTK_OBJECT(BAudioOk), "clicked", GTK_SIGNAL_FUNC(audioButton), GINT_TO_POINTER(1));
+  gtk_signal_connect(GTK_OBJECT(BAudioCancel), "clicked", GTK_SIGNAL_FUNC(audioButton), GINT_TO_POINTER(0));
 
   accel_group = gtk_accel_group_new();
   gtk_widget_add_accelerator(BAudioOk, "clicked", accel_group, GDK_Return, 0, GTK_ACCEL_VISIBLE);
@@ -1814,7 +1814,7 @@ static void dxr3Button( GtkButton * button,gpointer user_data )
 {
  (void) button;
 
- switch ( (intptr_t)user_data )
+ switch ( GPOINTER_TO_INT(user_data) )
  {
   case 0: // Ok
        nfree( gtkDXR3Device ); gtkDXR3Device=strdup( gtk_entry_get_text( GTK_ENTRY( CEDXR3Device ) ) );
@@ -1886,8 +1886,8 @@ GtkWidget * CreateDXR3Config( void )
 
  gtk_signal_connect( GTK_OBJECT( DXR3Config ),"destroy",GTK_SIGNAL_FUNC( gtk_widget_destroyed ),&DXR3Config );
 
- gtk_signal_connect( GTK_OBJECT( dxr3BOk ),"clicked",GTK_SIGNAL_FUNC( dxr3Button ),(void *)0 );
- gtk_signal_connect( GTK_OBJECT( dxr3BCancel ),"clicked",GTK_SIGNAL_FUNC( dxr3Button ),(void *)1 );
+ gtk_signal_connect( GTK_OBJECT( dxr3BOk ),"clicked",GTK_SIGNAL_FUNC( dxr3Button ),GINT_TO_POINTER(0) );
+ gtk_signal_connect( GTK_OBJECT( dxr3BCancel ),"clicked",GTK_SIGNAL_FUNC( dxr3Button ),GINT_TO_POINTER(1) );
 
  gtk_window_add_accel_group( GTK_WINDOW( DXR3Config ),accel_group );
 
