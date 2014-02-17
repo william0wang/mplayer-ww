@@ -7688,14 +7688,17 @@ Die Option fd weist den Filter an, die geforderte Skalierung immer auszuführen
 .RE
 .
 .TP
-.B screenshot
+.B screenshot=Präfix
 Erlaubt das Erstellen von Schnappschüssen des Videos mit Hilfe
 von Slave-Kommandos, die an Tasten gebunden werden können.
 Siehe Dokumentation des Slave-Modus und den Abschnitt INTERAKTIVE STEUERUNG
 für Details.
-Es werden Dateien mit dem Namen 'shotNNNN.png' im aktuellen Verzeichnis
+Standardmäßig werden Dateien mit dem Namen 'shotNNNN.png' im aktuellen Verzeichnis
 abgelegt, NNNN entspricht hierbei der ersten verfügbaren Nummer \- keine Datei
 wird überschrieben.
+Durch Angabe eines Präfixes lassen sich Name und Verzeichnis ändern, so
+werden z. B. mit \-vf screenshot=shots/now Dateien mit Namen nowNNNN.png im
+Verzeichnis shots abgelegt.
 Der Filter führt zu keiner Mehrbelastung, solange er nicht benutzt wird und
 akzeptiert beliebige Farbräume, es ist also ungefährlich ihn in die
 Konfigurationsdatei mit aufzunehmen.
