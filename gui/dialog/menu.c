@@ -744,7 +744,7 @@ GtkWidget * CreatePopUpMenu( void )
          }
        }
       /* embedded (demuxer) */
-      else if ( i >= subs0 + subs1 )
+      else if ( ( i >= subs0 + subs1 ) && demuxer )
        {
         for ( j=0;j < MAX_S_STREAMS;j++ )
          {
