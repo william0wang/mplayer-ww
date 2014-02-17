@@ -30,6 +30,7 @@
 #endif
 
 #include <windows.h>
+#include <stdint.h>
 
 #if defined(__CYGWIN__) || defined(__WINE__)
 #define _beginthreadex CreateThread
@@ -685,7 +686,7 @@ int gui(int what, void *data)
             break;
         case GUI_SET_STATE:
         {
-            guiInfo.Playing = (int) data;
+            guiInfo.Playing = (intptr_t) data;
             switch (guiInfo.Playing)
             {
                 case GUI_PLAY:
@@ -709,9 +710,9 @@ int gui(int what, void *data)
         }
         case GUI_RUN_COMMAND:
         {
-            mp_msg(MSGT_GPLAYER,MSGL_V, "cmd: %d\n", (int) data);
+            mp_msg(MSGT_GPLAYER,MSGL_V, "cmd: %d\n", (int)(intptr_t) data);
             /* MPlayer asks us to quit */
-            switch((int) data)
+            switch((intptr_t) data)
             {
                 case MP_CMD_VO_FULLSCREEN:
                     uiFullScreen();
