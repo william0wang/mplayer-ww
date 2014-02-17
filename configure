@@ -6111,6 +6111,7 @@ if test "$_libdvdcss_internal" = yes ; then
     cflags_libdvdcss="-D_WIN32_IE=0x0500 -mwin32"
   elif mingw32 ; then
     cflags_libdvdcss="-D_WIN32_IE=0x0500"
+    libs_mplayer="$libs_mplayer -lshfolder"
   fi
   cflags_libdvdcss_dvdread="-Ilibdvdcss"
   def_dvdcss="#define HAVE_DVDCSS_DVDCSS_H 1"
