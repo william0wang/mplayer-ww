@@ -7057,6 +7057,7 @@ echores "$_librtmp"
 echocheck "FFmpeg"
 ffmpeg=no
 if test "$ffmpeg_a" = auto ; then
+  ffmpeg_a=no
   test -d ffmpeg/libavcodec && ffmpeg_a=yes && ffmpeg_so=no && ffmpeg=yes
 fi
 if test "$ffmpeg_so" = auto ; then
