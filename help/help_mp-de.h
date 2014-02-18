@@ -11,56 +11,60 @@
 // FIXME: improve wording/meaning of periodsize|timer.. for ao_alsa.c strings
 
 
-// ========================= MPlayer help ===========================
+// ========================= MPlayer Hilfe ==========================
 
 #ifdef CONFIG_VCD
-#define MSGTR_HelpVCD " vcd://<tracknr>   (S)VCD-Titel (Super Video CD) spielen\n"\
-                      "                   (direkter Gerätezugriff, kein mount)\n"
+#define MSGTR_HelpVCD " vcd://<Tracknr>   gib den (S)VCD-Titel (Super Video CD) wieder\n"\
+                      "                   (direkter Gerätezugriff, kein Einhängen)\n"
 #else
 #define MSGTR_HelpVCD
 #endif
 
 #ifdef CONFIG_DVDREAD
-#define MSGTR_HelpDVD " dvd://<titelnr>   DVD-Titel (statt einfach die ganze Datei) spielen\n"
+#define MSGTR_HelpDVD " dvd://<Titelnr>   gib den DVD-Titel wieder (vom Gerät, statt die reine Datei)\n"
 #else
 #define MSGTR_HelpDVD
 #endif
 
 #define MSGTR_Help \
-"Verwendung:   mplayer [Optionen] [URL|Verzeichnis/]Dateiname\n"\
+"Aufruf:   mplayer [Optionen] [URL|Verzeichnis/]Dateiname\n"\
 "\n"\
-"Grundlegende Optionen: (vollständige Liste in der Manpage)\n"\
-" -vo <treiber>     Videoausgabetreiber wählen ('-vo help' für eine Liste)\n"\
-" -ao <treiber>     Audioausgabetreiber wählen ('-ao help' für eine Liste)\n"\
+"Grundlegende Optionen (vollständige Liste in der Man-Page):\n"\
+" -vo <Treiber>     bestimme den Videotreiber ('-vo help' für eine Liste)\n"\
+" -ao <Treiber>     bestimme den Audiotreiber ('-ao help' für eine Liste)\n"\
 MSGTR_HelpVCD \
 MSGTR_HelpDVD \
-" -alang/-slang     DVD-Audio/Untertitel-Sprache wählen (2-Zeichen-Ländercode)\n"\
-" -ss <position>    zur Position (Sekunden oder HH:MM:SS) spulen\n"\
-" -nosound          ohne Ton spielen\n"\
-" -fs               im Vollbildmodus spielen (oder -vm, -zoom, siehe Manpage)\n"\
-" -x <x> -y <y>     Bildschirmauflösung festlegen\n"\
+" -alang/-slang     wähle die DVD-Audio-/Untertitel-Sprache aus\n"\
+"                   (zweistelliger Ländercode)\n"\
+" -ss <Position>    positioniere wie angegeben (Sekunden oder HH:MM:SS)\n"\
+" -nosound          gib ohne Ton wieder\n"\
+" -fs               gib im Vollbildmodus wieder (oder -vm, -zoom; siehe Man-Page)\n"\
+" -x <x> -y <y>     lege die Größe der Anzeige fest\n"\
 "                   (bei Verwendung mit -vm oder -zoom)\n"\
-" -sub <datei>      Untertitel-Datei verwenden (siehe auch -subfps, -subdelay)\n"\
-" -playlist <datei> Playlist aus Datei verwenden\n"\
-" -vid x -aid y     Videostream (x) und Audiostream (y) zum Abspielen wählen\n"\
-" -fps x -srate y   Videoframerate (x fps) und Audiosamplingrate (y Hz) ändern\n"\
-" -pp <qualität>    Nachbearbeitungsfilter aktivieren (siehe Manpage für Details)\n"\
-" -framedrop        einzelne Frames verwerfen (bei langsamen Rechnern)\n"\
+" -sub <Datei>      bestimme die zu verwendende Untertiteldatei\n"\
+"                   (siehe auch -subfps, -subdelay)\n"\
+" -playlist <Datei> bestimme die Wiedergabelistedatei\n"\
+" -vid x -aid y     wähle den Video- (x) oder Audiostream (y) zur Wiedergabe aus\n"\
+" -fps x -srate y   ändere die Bildfrequenz (x fps) oder Abtastrate (y Hz)\n"\
+" -pp <Qualität>    aktiviere den Nachbearbeitungsfilter (Details siehe Man-Page)\n"\
+" -framedrop        aktiviere das Weglassen von Einzelbildern\n"\
+"                   (für langsame Rechner)\n"\
 "\n"\
-"Grundlegende Tasten: (vollständige Liste in der Manpage, siehe auch input.conf)\n"\
-" <- oder ->        10 Sekunden zurück-/vorspringen\n"\
-" runter/hoch       1 Minute zurück-/vorspringen\n"\
-" Bild runter/hoch  10 Minuten zurück-/vorspringen\n"\
-" < oder >          in der Playlist zurück-/vorspringen\n"\
+"Grundlegende Tasten (vollständige Liste in der Man-Page; prüfe auch input.conf):\n"\
+" <- oder ->        springe 10 Sekunden zurück oder vor\n"\
+" runter/hoch       springe 1 Minute zurück/vor\n"\
+" Bild runter/hoch  springe 10 Minuten zurück/vor\n"\
+" < oder >          gehe in der Wiedergabeliste zurück oder weiter\n"\
 " p oder LEERTASTE  Pause (eine beliebige Taste zur Fortsetzung drücken)\n"\
-" q oder ESC        Abspielen stoppen und Programm beenden\n"\
-" + oder -          Audio-Verzögerung um +/- 0,1 Sekunde anpassen\n"\
-" o                 OSD-Modi (Aus, Suchleiste, Suchleiste+Zeitangabe) durchlaufen\n"\
-" * oder /          PCM-Lautstärke erhöhen oder vermindern\n"\
-" x oder z          Untertitel-Verzögerung um +/- 0,1 Sekunde anpassen\n"\
-" r oder t          Untertitel nach oben/unten schieben, siehe auch '-vf expand'\n"\
+" q oder ESC        halte die Wiedergabe an und beende das Programm\n"\
+" + oder -          passe die Audioverzögerung um +/- 0,1 Sekunden an\n"\
+" o                 wechsele die OSD-Anzeige (Aus, Fortschritt, plus Laufzeiten)\n"\
+" * oder /          erhöhe oder vermindere die PCM-Lautstärke\n"\
+" x oder z          passe die Untertitelverzögerung um +/- 0,1 Sekunden an\n"\
+" r oder t          passe die Lage der Untertitel nach oben/unten an\n"\
+"                   (siehe auch '-vf expand')\n"\
 "\n"\
-" * * * SIEHE MANPAGE FÜR DETAILS, WEITERE OPTIONEN UND TASTEN * * *\n"\
+" * * * SIEHE MAN-PAGE FÜR DETAILS, MEHR (ERWEITERTE) OPTIONEN UND TASTEN * * *\n"\
 "\n"
 
 static const char help_text[] = MSGTR_Help;
