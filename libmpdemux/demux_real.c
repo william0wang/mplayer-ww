@@ -1313,11 +1313,10 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    sh_audio_t *sh = new_sh_audio(demuxer, aid, NULL);
 		    char buf[128]; /* for codec name */
 		    int frame_size;
-		    int sub_packet_size;
-		    int sub_packet_h;
+		    int sub_packet_size = 0;
+		    int sub_packet_h = 0;
 		    int version;
-		    int flavor;
-		    int coded_frame_size;
+		    int coded_frame_size = 0;
 		    int codecdata_length;
 		    int i;
 		    char *buft;
@@ -1381,7 +1380,7 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    stream_skip(demuxer->stream, 2); /* version (4 or 5) */
 		    hdr_size = stream_read_dword(demuxer->stream); // header size
 		    mp_msg(MSGT_DEMUX,MSGL_V,"header size: %d\n", hdr_size);
-		    flavor = stream_read_word(demuxer->stream);/* codec flavor id */
+		    stream_skip(demuxer->stream, 2);/* codec flavor id */
 		    coded_frame_size = stream_read_dword(demuxer->stream);/* needed by codec */
 		    mp_msg(MSGT_DEMUX,MSGL_V,"coded_frame_size: %d\n", coded_frame_size);
 		    stream_skip(demuxer->stream, 4); // big number
