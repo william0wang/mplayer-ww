@@ -1532,19 +1532,32 @@ if ! test -e ffmpeg ; then
 fi
 
 list_subparts() {
+  test ! -e ffmpeg/libav${3} && return 1
   pattern="s/^[^#]*${1}.*([^ ,]*, *\([^ ,)]*\).*/\1_${2}/p"
   sed -n "$pattern" ffmpeg/libav${3} | toupper
+  return 0
 }
 
+echocheck "ffmpeg/libavcodec/allcodecs.c"
 libavdecoders_all=$(list_subparts  DEC      decoder  codec/allcodecs.c)
 libavencoders_all=$(list_subparts  ENC      encoder  codec/allcodecs.c)
 libavparsers_all=$(list_subparts   PARSER   parser   codec/allcodecs.c)
 libavbsfs_all=$(list_subparts      BSF      bsf      codec/allcodecs.c)
 libavhwaccels_all=$(list_subparts  HWACCEL  hwaccel  codec/allcodecs.c)
+test $? -eq 0 && _list_subparts=found || _list_subparts="not found"
+echores "$_list_subparts"
+
+echocheck "ffmpeg/libavformat/allformats.c"
 libavdemuxers_all=$(list_subparts  DEMUX    demuxer  format/allformats.c)
 libavmuxers_all=$(list_subparts    _MUX     muxer    format/allformats.c)
 libavprotocols_all=$(list_subparts PROTOCOL protocol format/allformats.c)
+test $? -eq 0 && _list_subparts=found || _list_subparts="not found"
+echores "$_list_subparts"
+
+echocheck "ffmpeg/libavfilter/allfilters.c"
 libavfilters_all=$(list_subparts   FILTER   filter   filter/allfilters.c)
+test $? -eq 0 && _list_subparts=found || _list_subparts="not found"
+echores "$_list_subparts"
 
 filter_out_component() {
   eval list=\$libav${1}s
