@@ -7826,7 +7826,8 @@ EOF
     if test "$_xshape" = yes ; then
       def_xshape='#define CONFIG_XSHAPE 1'
     else
-      die "The GUI requires the X11 extension XShape (which was not found)."
+      def_xshape='#undef CONFIG_XSHAPE'
+      res_comment="some skins will look ugly without it"
     fi
     echores "$_xshape"
 
