@@ -7788,10 +7788,11 @@ if test "$_gui" = yes ; then
 
   # Required libraries
   test "$ffmpeg" != yes && die "The GUI requires FFmpeg."
-  test "$ffmpeg_so" = yes || case "$libavdecoders" in
-    *PNG_DECODER*) ;;
-    *) die "The GUI requires libavcodec with PNG support (needs zlib)." ;;
-  esac
+  test "$ffmpeg_so" = yes ||
+    case "$libavdecoders" in
+      *PNG_DECODER*) ;;
+      *) die "The GUI requires libavcodec with PNG support (needs zlib)." ;;
+    esac
   test "$_freetype" = no && test "$_bitmap_font" = no &&
     die "The GUI requires either FreeType or bitmap font support."
 
