@@ -7856,8 +7856,8 @@ EOF
           echores "GLib 2 devel packages were not found, trying GTK+ 1.2"
         fi
       else
-        echores "GTK+ 2 devel packages were not found, trying GTK+ 1.2"
         _gtk1=yes
+        echores "GTK+ 2 devel packages were not found, trying GTK+ 1.2"
       fi
     fi
 
@@ -8923,8 +8923,8 @@ $def_xmms
 
 
 /* GUI */
-$def_gtk2
 $def_gui
+$def_gtk2
 $def_xshape
 
 
