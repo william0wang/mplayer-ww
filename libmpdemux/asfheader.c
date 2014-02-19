@@ -387,8 +387,6 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
   int audio_streams=0;
   int video_streams=0;
   uint16_t stream_count=0;
-  int best_video = -1;
-  int best_audio = -1;
   uint64_t data_len;
   ASF_stream_header_t *streamh;
   uint8_t *buffer;
