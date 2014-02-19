@@ -282,9 +282,7 @@ static int dts_decode_header(uint8_t *indata_ptr, int *rate, int *nblks, int *sf
 {
   int ftype;
   int surp;
-  int unknown_bit;
   int fsize;
-  int amode;
 
   int word_mode;
   int le_mode;
@@ -341,7 +339,6 @@ static int dts_decode_header(uint8_t *indata_ptr, int *rate, int *nblks, int *sf
     surp = (surp + 1) % 32;
 
     /* One unknown bit, crc? */
-    unknown_bit = indata_ptr[4+le_mode] >> 1 & 0x01;
 
     /* NBLKS 7 bits: Valid Range=5-127, Invalid Range=0-4 */
     *nblks = (indata_ptr[4+le_mode] & 0x01) << 6 | indata_ptr[5-le_mode] >> 2;
@@ -357,7 +354,6 @@ static int dts_decode_header(uint8_t *indata_ptr, int *rate, int *nblks, int *sf
     ++fsize;
 
     /* Audio Channel Arrangement ACC AMODE 6 bits */
-    amode = (indata_ptr[7-le_mode] & 0x0f) << 2 | indata_ptr[8+le_mode] >> 6;
 
     /* Source Sampling rate ACC SFREQ 4 bits */
     *sfreq = indata_ptr[8+le_mode] >> 2 & 0x0f;
@@ -400,8 +396,6 @@ static int dts_decode_header(uint8_t *indata_ptr, int *rate, int *nblks, int *sf
     fsize = fsize * 8 / 14 * 2;
 
     /* Audio Channel Arrangement ACC AMODE 6 bits */
-    amode = (indata_ptr[8+le_mode] & 0x03) << 4
-            | (indata_ptr[9-le_mode] & 0xf0) >> 4;
 
     /* Source Sampling rate ACC SFREQ 4 bits */
     *sfreq = indata_ptr[9-le_mode] & 0x0f;
