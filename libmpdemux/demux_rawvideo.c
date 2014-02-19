@@ -119,6 +119,7 @@ static demuxer_t* demux_rawvideo_open(demuxer_t* demuxer) {
   demuxer->movi_start = demuxer->stream->start_pos;
   demuxer->movi_end = demuxer->stream->end_pos;
 
+  demuxer->video->id = 0;
   demuxer->video->sh = sh_video;
   sh_video->ds = demuxer->video;
 

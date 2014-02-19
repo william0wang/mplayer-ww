@@ -136,6 +136,7 @@ static demuxer_t* demux_open_roq(demuxer_t* demuxer)
         // this is a good opportunity to create a video stream header
         sh_video = new_sh_video(demuxer, 0);
         // make sure the demuxer knows about the new stream header
+        demuxer->video->id = 0;
         demuxer->video->sh = sh_video;
         // make sure that the video demuxer stream header knows about its
         // parent video demuxer stream

@@ -428,6 +428,7 @@ static demuxer_t * demux_mng_open(demuxer_t * demuxer)
     // Make sure the demuxer knows about the new video stream header
     // (even though new_sh_video() ought to take care of it).
     // (Thanks to demux_gif.c for this.)
+    demuxer->video->id = 0;
     demuxer->video->sh = sh_video;
 
     // Make sure that the video demuxer stream header knows about its

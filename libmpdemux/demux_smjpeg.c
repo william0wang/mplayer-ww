@@ -126,6 +126,7 @@ static demuxer_t* demux_open_smjpeg(demuxer_t* demuxer){
 	{
 	case mmioFOURCC('_','V','I','D'):
 	    sh_video = new_sh_video(demuxer, 0);
+	    demuxer->video->id = 0;
 	    demuxer->video->sh = sh_video;
 	    sh_video->ds = demuxer->video;
 

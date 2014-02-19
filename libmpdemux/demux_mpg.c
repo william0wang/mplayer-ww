@@ -1086,6 +1086,7 @@ static demuxer_t* demux_mpg_es_open(demuxer_t* demuxer)
 
     demuxer->audio->sh = NULL;   // ES streams has no audio channel
     demuxer->video->sh = new_sh_video(demuxer,0); // create dummy video stream header, id=0
+    demuxer->video->id = 0;
     sh_video=demuxer->video->sh;sh_video->ds=demuxer->video;
 
     return demuxer;
@@ -1094,6 +1095,7 @@ static demuxer_t* demux_mpg_es_open(demuxer_t* demuxer)
 static demuxer_t *demux_mpg_gxf_open(demuxer_t *demuxer) {
   demuxer->audio->sh = NULL;
   demuxer->video->sh = new_sh_video(demuxer,0);
+  demuxer->video->id = 0;
   ((sh_video_t *)demuxer->video->sh)->ds = demuxer->video;
   demuxer->priv = (void *) 0xffffffff;
   return demuxer;

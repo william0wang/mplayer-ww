@@ -114,6 +114,7 @@ void rtpCodecInitialize_video(demuxer_t* demuxer,
   sh_video->bih = bih;
   demux_stream_t* d_video = demuxer->video;
   d_video->sh = sh_video; sh_video->ds = d_video;
+  d_video->id = 0;
 
   // Map known video MIME types to the BITMAPINFOHEADER parameters
   // that this program uses.  (Note that not all types need all

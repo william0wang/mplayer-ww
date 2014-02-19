@@ -170,6 +170,7 @@ static demuxer_t* demux_open_rawdv(demuxer_t* demuxer)
    // make sure the demuxer knows about the new video stream header
    // (even though new_sh_video() ought to take care of it)
    demuxer->seekable = 1;
+   demuxer->video->id = 0;
    demuxer->video->sh = sh_video;
 
    // make sure that the video demuxer stream header knows about its

@@ -214,6 +214,7 @@ static demuxer_t* demux_open_nsv ( demuxer_t* demuxer )
             /* Make sure the demuxer knows about the new video stream header
              * (even though new_sh_video() ought to take care of it)
              */
+            demuxer->video->id = 0;
             demuxer->video->sh = sh_video;
 
             /* Make sure that the video demuxer stream header knows about its

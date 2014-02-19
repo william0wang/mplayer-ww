@@ -156,6 +156,7 @@ static demuxer_t * demux_open_pva (demuxer_t * demuxer)
 
 	//printf("priv->just_synced %s after initial sync!\n",priv->just_synced?"set":"UNSET");
 
+	demuxer->video->id = 0;
 	demuxer->video->sh=sh_video;
 
 	//printf("demuxer->stream->end_pos= %d\n",demuxer->stream->end_pos);
