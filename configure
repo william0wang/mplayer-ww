@@ -7832,9 +7832,8 @@ EOF
     fi
     echores "$_xshape"
 
-    # Check for GTK
+    # Check for GTK2
     if test "$_gtk1" = no ; then
-      # Check for GTK2 :
       echocheck "GTK+ version"
 
       if $_pkg_config gtk+-2.0 --exists ; then
@@ -7862,8 +7861,8 @@ EOF
       fi
     fi
 
+    # Check for (old) GTK1
     if test "$_gtk1" = yes ; then
-      # Check for old GTK (1.2.x)
       echocheck "GTK+ version"
 
       if test -z "$_gtkconfig" ; then
@@ -7880,7 +7879,7 @@ EOF
       libs_mplayer="$libs_mplayer $($_gtkconfig --libs 2>&1)"
       echores "$_gtk (using $_gtkconfig)"
 
-      # Check for GLIB
+      # Check for (old) GLIB1
       echocheck "GLib version"
       if test -z "$_glibconfig" ; then
         if ( glib-config --version ) >/dev/null 2>&1 ; then
