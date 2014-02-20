@@ -8056,7 +8056,7 @@ fi
 # the OMF format needs to come after the 'extern symbol prefix' check, which
 # uses nm.
 if os2 ; then
-  extra_ldflags="$extra_ldflags -Zomf -Zstack 16384 -Zbin-files -Zargs-wild"
+  extra_ldflags="$extra_ldflags -Zomf -Zstack 16384 -Zbin-files -Zargs-wild -Zhigh-mem"
 fi
 
 # linker paths should be the same for mencoder and mplayer
