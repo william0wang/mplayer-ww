@@ -1858,7 +1858,7 @@ fi
 echocheck "cross compilation"
 if test $_cross_compile = auto ; then
   _cross_compile=yes
-  cflag_check "" && "$TMPEXE" && _cross_compile=no
+  cflag_check "" && "$TMPEXE" 2> /dev/null && _cross_compile=no
 fi
 echores $_cross_compile
 
