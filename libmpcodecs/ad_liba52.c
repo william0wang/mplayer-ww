@@ -22,12 +22,12 @@
 #include <unistd.h>
 #include <math.h>
 #include <assert.h>
+#include <stdint.h>
 
 #include "config.h"
 
 #include "mp_msg.h"
 #include "help_mp.h"
-#include "mpbswap.h"
 
 #include "ad_internal.h"
 #include "dec_audio.h"
@@ -35,6 +35,8 @@
 #include "cpudetect.h"
 
 #include "libaf/af_format.h"
+
+#include <libavutil/common.h>
 
 #include <a52dec/a52.h>
 #include <a52dec/mm_accel.h>
@@ -68,6 +70,16 @@ static const ad_info_t info =
 
 LIBAD_EXTERN(liba52)
 
+static void swap_bytes(uint8_t * buf, int size)
+{
+   size -= size & 1;
+   while (size > 0) {
+     FFSWAP(uint8_t, buf[0], buf[1]);
+     buf += 2;
+     size -= 2;
+   }
+}
+
 static int a52_fillbuff(sh_audio_t *sh_audio)
 {
 int length=0;
@@ -83,11 +95,11 @@ while(1){
 	if(c<0) return -1; /* EOF*/
         sh_audio->a_in_buffer[sh_audio->a_in_buffer_len++]=c;
     }
-    if(sh_audio->format==MKTAG('d','n','e','t')) swab(sh_audio->a_in_buffer,sh_audio->a_in_buffer,8);
+    if(sh_audio->format==MKTAG('d','n','e','t')) swap_bytes(sh_audio->a_in_buffer,8);
     length = a52_syncinfo (sh_audio->a_in_buffer, &flags, &sample_rate, &bit_rate);
     if(length>=7 && length<=3840) break; /* we're done.*/
     /* bad file => resync*/
-    if(sh_audio->format==MKTAG('d','n','e','t')) swab(sh_audio->a_in_buffer,sh_audio->a_in_buffer,8);
+    if(sh_audio->format==MKTAG('d','n','e','t')) swap_bytes(sh_audio->a_in_buffer,8);
     memmove(sh_audio->a_in_buffer,sh_audio->a_in_buffer+1,7);
     --sh_audio->a_in_buffer_len;
 }
@@ -97,7 +109,7 @@ while(1){
     sh_audio->samplesize=sh_audio->sample_format==AF_FORMAT_FLOAT_NE ? 4 : 2;
     demux_read_data(sh_audio->ds,sh_audio->a_in_buffer+8,length-8);
     if(sh_audio->format==MKTAG('d','n','e','t'))
-	swab(sh_audio->a_in_buffer+8,sh_audio->a_in_buffer+8,length-8);
+	swap_bytes(sh_audio->a_in_buffer+8,length-8);
 
 #ifdef CONFIG_LIBA52_INTERNAL
     if(crc16_block(sh_audio->a_in_buffer+2,length-2)!=0)
