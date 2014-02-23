@@ -294,9 +294,6 @@ static int demux_lmlm4_fill_buffer(demuxer_t *demux, demux_stream_t *ds)
 }
 
 static demuxer_t* demux_open_lmlm4(demuxer_t* demuxer){
-    sh_audio_t *sh_audio=NULL;
-    sh_video_t *sh_video=NULL;
-
 #if 0
     sh_video_t* sh_video;
     sh_audio_t* sh_audio;
@@ -305,7 +302,6 @@ static demuxer_t* demux_open_lmlm4(demuxer_t* demuxer){
 
     sh_video = new_sh_video(demuxer, 0);
     demuxer->video->sh = sh_video;
-    sh_video->ds = demuxer->video;
     sh_video->disp_w = 640;
     sh_video->disp_h = 480;
     sh_video->format = mmioFOURCC('D','I','V','X');
@@ -323,7 +319,6 @@ static demuxer_t* demux_open_lmlm4(demuxer_t* demuxer){
 
     sh_audio = new_sh_audio(demuxer, 0, NULL);
     demuxer->audio->sh = sh_audio;
-    sh_audio->ds = demuxer->audio;
 
     sh_audio->wf = calloc(1, sizeof(*sh_audio->wf));
 
@@ -346,15 +341,11 @@ static demuxer_t* demux_open_lmlm4(demuxer_t* demuxer){
     if(!ds_fill_buffer(demuxer->video)){
         mp_msg(MSGT_DEMUXER,MSGL_INFO,"LMLM4: " MSGTR_MissingVideoStream);
         demuxer->video->sh=NULL;
-    } else {
-        sh_video=demuxer->video->sh;sh_video->ds=demuxer->video;
     }
     if(demuxer->audio->id!=-2) {
         if(!ds_fill_buffer(demuxer->audio)){
             mp_msg(MSGT_DEMUXER,MSGL_INFO,"LMLM4: " MSGTR_MissingAudioStream);
             demuxer->audio->sh=NULL;
-        } else {
-            sh_audio=demuxer->audio->sh;sh_audio->ds=demuxer->audio;
         }
     }
 

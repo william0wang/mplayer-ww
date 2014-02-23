@@ -173,11 +173,6 @@ static demuxer_t* demux_open_rawdv(demuxer_t* demuxer)
    demuxer->video->id = 0;
    demuxer->video->sh = sh_video;
 
-   // make sure that the video demuxer stream header knows about its
-   // parent video demuxer stream (this is getting wacky), or else
-   // video_read_properties() will choke
-   sh_video->ds = demuxer->video;
-
    // custom fourcc for internal MPlayer use
 //   sh_video->format = mmioFOURCC('R', 'A', 'D', 'V');
    sh_video->format = mmioFOURCC('D', 'V', 'S', 'D');
@@ -210,7 +205,6 @@ static demuxer_t* demux_open_rawdv(demuxer_t* demuxer)
        sh_audio_t *sh_audio =  new_sh_audio(demuxer, 0, NULL);
        demuxer->audio->id = 0;
 	    demuxer->audio->sh = sh_audio;
-	    sh_audio->ds = demuxer->audio;
        mp_msg(MSGT_DEMUXER,MSGL_V,"demux_open_rawdv() chan: %d samplerate: %d\n",dv_decoder->audio->num_channels,dv_decoder->audio->frequency );
        // custom fourcc for internal MPlayer use
        sh_audio->format = mmioFOURCC('R', 'A', 'D', 'V');

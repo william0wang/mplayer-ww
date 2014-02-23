@@ -262,7 +262,6 @@ static demuxer_t* demux_open_y4m(demuxer_t* demuxer){
     sh->bih=calloc(1, sizeof(*sh->bih));
 
     demuxer->video->sh=sh;
-    sh->ds=demuxer->video;
     demuxer->video->id=0;
 
     read_streaminfo(demuxer);

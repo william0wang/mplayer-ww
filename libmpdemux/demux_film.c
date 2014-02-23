@@ -282,7 +282,6 @@ static demuxer_t* demux_open_film(demuxer_t* demuxer)
         sh_video = new_sh_video(demuxer, 0);
         demuxer->video->id = 0;
         demuxer->video->sh = sh_video;
-        sh_video->ds = demuxer->video;
 
         sh_video->format = video_format;
         sh_video->disp_h = stream_read_dword(demuxer->stream);
@@ -316,7 +315,6 @@ static demuxer_t* demux_open_film(demuxer_t* demuxer)
           sh_audio = new_sh_audio(demuxer, 0, NULL);
           demuxer->audio->id = 0;
           demuxer->audio->sh = sh_audio;
-          sh_audio->ds = demuxer->audio;
 
           sh_audio->wf = malloc(sizeof(*sh_audio->wf));
 
@@ -348,7 +346,6 @@ static demuxer_t* demux_open_film(demuxer_t* demuxer)
         sh_audio = new_sh_audio(demuxer, 0, NULL);
         demuxer->audio->id = 0;
         demuxer->audio->sh = sh_audio;
-        sh_audio->ds = demuxer->audio;
 
         sh_audio->wf = malloc(sizeof(*sh_audio->wf));
 

@@ -300,11 +300,6 @@ static demuxer_t* demux_open_gif(demuxer_t* demuxer)
   demuxer->video->id = 0;
   demuxer->video->sh = sh_video;
 
-  // make sure that the video demuxer stream header knows about its
-  // parent video demuxer stream (this is getting wacky), or else
-  // video_read_properties() will choke
-  sh_video->ds = demuxer->video;
-
   sh_video->format = mmioFOURCC(8, 'R', 'G', 'B');
 
   sh_video->fps = 5.0f;

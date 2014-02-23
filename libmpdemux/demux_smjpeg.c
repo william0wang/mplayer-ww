@@ -128,7 +128,6 @@ static demuxer_t* demux_open_smjpeg(demuxer_t* demuxer){
 	    sh_video = new_sh_video(demuxer, 0);
 	    demuxer->video->id = 0;
 	    demuxer->video->sh = sh_video;
-	    sh_video->ds = demuxer->video;
 
 	    sh_video->bih = calloc(1, sizeof(*sh_video->bih));
 
@@ -152,7 +151,6 @@ static demuxer_t* demux_open_smjpeg(demuxer_t* demuxer){
 	    sh_audio = new_sh_audio(demuxer, 0, NULL);
 	    demuxer->audio->id = 0;
 	    demuxer->audio->sh = sh_audio;
-	    sh_audio->ds = demuxer->audio;
 
 	    sh_audio->wf = calloc(1, sizeof(*sh_audio->wf));
 

@@ -172,7 +172,6 @@ static demuxer_t * demux_open_pva (demuxer_t * demuxer)
 	 */
 
 	sh_video->format=0x10000002;
-	sh_video->ds=demuxer->video;
 
 	/*
 	printf("demuxer->video->id==%d\n",demuxer->video->id);
@@ -182,7 +181,6 @@ static demuxer_t * demux_open_pva (demuxer_t * demuxer)
 	demuxer->audio->id = 0;
 	demuxer->audio->sh=sh_audio;
 	sh_audio->format=0x50;
-	sh_audio->ds=demuxer->audio;
 
 	demuxer->movi_start=0;
 	demuxer->movi_end=demuxer->stream->end_pos;

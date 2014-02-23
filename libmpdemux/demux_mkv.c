@@ -1652,7 +1652,6 @@ static int demux_mkv_open_video(demuxer_t *demuxer, mkv_track_t *track,
     sh_v->ImageDesc = ImageDesc;
     mp_msg(MSGT_DEMUX, MSGL_V, "[mkv] Aspect: %f\n", sh_v->aspect);
 
-    sh_v->ds = demuxer->video;
     return 0;
 }
 
@@ -1668,7 +1667,6 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
     mkv_d->audio_tracks[mkv_d->last_aid] = track->tnum;
 
     sh_a->default_track = track->default_track;
-    sh_a->ds = demuxer->audio;
     sh_a->wf = malloc(sizeof(*sh_a->wf));
     if (track->ms_compat && (track->private_size >= sizeof(*sh_a->wf))) {
         WAVEFORMATEX *wf = (WAVEFORMATEX *) track->private_data;

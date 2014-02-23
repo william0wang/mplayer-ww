@@ -200,7 +200,6 @@ static demuxer_t* demux_open_nsv ( demuxer_t* demuxer )
             demuxer->audio->id = 0;
             demuxer->audio->sh = sh_audio;
             sh_audio->format=mmioFOURCC(hdr[8],hdr[9],hdr[10],hdr[11]);
-            sh_audio->ds = demuxer->audio;
             priv->a_format=mmioFOURCC(hdr[8],hdr[9],hdr[10],hdr[11]);
         }
 
@@ -216,12 +215,6 @@ static demuxer_t* demux_open_nsv ( demuxer_t* demuxer )
              */
             demuxer->video->id = 0;
             demuxer->video->sh = sh_video;
-
-            /* Make sure that the video demuxer stream header knows about its
-             * parent video demuxer stream (this is getting wacky), or else
-             * video_read_properties() will choke
-             */
-            sh_video->ds = demuxer->video;
 
             //   bytes 4-7  video codec fourcc
             priv->v_format = sh_video->format=mmioFOURCC(hdr[4],hdr[5],hdr[6],hdr[7]);

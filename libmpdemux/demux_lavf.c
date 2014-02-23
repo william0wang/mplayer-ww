@@ -316,7 +316,6 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
             sh_audio->audio.dwScale /= g;
             sh_audio->audio.dwRate  /= g;
 //          printf("sca:%d rat:%d fs:%d sr:%d ba:%d\n", sh_audio->audio.dwScale, sh_audio->audio.dwRate, codec->frame_size, codec->sample_rate, codec->block_align);
-            sh_audio->ds= demuxer->audio;
             sh_audio->format= codec->codec_tag;
             sh_audio->channels= codec->channels;
             sh_audio->samplerate= codec->sample_rate;
@@ -411,7 +410,6 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
                 codec->width, codec->sample_aspect_ratio.num,
                 codec->height, codec->sample_aspect_ratio.den);
 
-            sh_video->ds= demuxer->video;
             if(codec->extradata_size)
                 memcpy(sh_video->bih + 1, codec->extradata, codec->extradata_size);
             if( mp_msg_test(MSGT_HEADER,MSGL_V) ) print_video_header(sh_video->bih, MSGL_V);

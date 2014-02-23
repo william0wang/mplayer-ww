@@ -1077,7 +1077,6 @@ if((unsigned)rm_stream_id<MAX_STREAMS){
     if(demuxer->audio->id==-1 && demuxer->a_streams[mp_stream_id]){
 	sh_audio_t *sh = demuxer->a_streams[mp_stream_id];
 	demuxer->audio->id=mp_stream_id;
-	sh->ds=demuxer->audio;
 	demuxer->audio->sh=sh;
 	priv->audio_buf = calloc(priv->sub_packet_h[demuxer->audio->id], priv->audiopk_size[demuxer->audio->id]);
 	priv->audio_timestamp = calloc(priv->sub_packet_h[demuxer->audio->id], sizeof(double));
@@ -1088,7 +1087,6 @@ if((unsigned)rm_stream_id<MAX_STREAMS){
     if(demuxer->video->id==-1 && demuxer->v_streams[mp_stream_id]){
 	sh_video_t *sh = demuxer->v_streams[mp_stream_id];
 	demuxer->video->id=mp_stream_id;
-	sh->ds=demuxer->video;
 	demuxer->video->sh=sh;
         mp_msg(MSGT_DEMUX,MSGL_V,"Auto-selected RM video ID = %d (rm id %d)\n",mp_stream_id, rm_stream_id);
 	goto got_video;
@@ -1510,7 +1508,6 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    }
 
 		    if(demuxer->audio->id==stream_id){
-			sh->ds=demuxer->audio;
 			demuxer->audio->sh=sh;
         	priv->audio_buf = calloc(priv->sub_packet_h[demuxer->audio->id], priv->audiopk_size[demuxer->audio->id]);
         	priv->audio_timestamp = calloc(priv->sub_packet_h[demuxer->audio->id], sizeof(double));
@@ -1538,7 +1535,6 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    sh->wf->wFormatTag = sh->format = mmioFOURCC('a','d','u',0x55);
 
 		    if(demuxer->audio->id==stream_id){
-			    sh->ds=demuxer->audio;
 			    demuxer->audio->sh=sh;
 		    }
 
@@ -1684,7 +1680,6 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    }
 
 		    if(demuxer->video->id==stream_id){
-			sh->ds=demuxer->video;
 			demuxer->video->sh=sh;
 		    }
 

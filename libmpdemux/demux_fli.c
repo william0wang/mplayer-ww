@@ -131,11 +131,6 @@ static demuxer_t* demux_open_fli(demuxer_t* demuxer){
   demuxer->video->id = 0;
   demuxer->video->sh = sh_video;
 
-  // make sure that the video demuxer stream header knows about its
-  // parent video demuxer stream (this is getting wacky), or else
-  // video_read_properties() will choke
-  sh_video->ds = demuxer->video;
-
   // custom fourcc for internal MPlayer use
   sh_video->format = mmioFOURCC('F', 'L', 'I', 'C');
 

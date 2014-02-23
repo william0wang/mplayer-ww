@@ -1371,7 +1371,6 @@ demuxer_t *init_avi_with_ogg(demuxer_t *demuxer)
     od->audio->id = 0;
     od->video->id = -2;
     od->audio->sh = sh_audio;
-    sh_audio->ds     = od->audio;
     sh_audio->format = FOURCC_VORBIS;
     fixup_vorbis_wf(sh_audio, ogg_d);
 

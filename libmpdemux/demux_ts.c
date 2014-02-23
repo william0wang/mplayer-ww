@@ -355,7 +355,6 @@ static void ts_add_stream(demuxer_t * demuxer, ES_stream_t *es)
 		{
 			sh->needs_parsing = 1;
 			sh->format = IS_AUDIO(es->type) ? es->type : es->subtype;
-			sh->ds = demuxer->audio;
 
 			priv->ts.streams[es->pid].id = priv->last_aid;
 			priv->ts.streams[es->pid].sh = sh;
@@ -378,7 +377,6 @@ static void ts_add_stream(demuxer_t * demuxer, ES_stream_t *es)
 		if(sh)
 		{
 			sh->format = IS_VIDEO(es->type) ? es->type : es->subtype;
-			sh->ds = demuxer->video;
 
 			priv->ts.streams[es->pid].id = priv->last_vid;
 			priv->ts.streams[es->pid].sh = sh;
@@ -1055,7 +1053,6 @@ static demuxer_t *demux_open_ts(demuxer_t * demuxer)
 		ts_add_stream(demuxer, priv->ts.pids[params.vpid]);
 		sh_video = priv->ts.streams[params.vpid].sh;
 		demuxer->video->id = priv->ts.streams[params.vpid].id;
-		sh_video->ds = demuxer->video;
 		sh_video->format = params.vtype;
 		demuxer->video->sh = sh_video;
 	}
@@ -1068,7 +1065,6 @@ static demuxer_t *demux_open_ts(demuxer_t * demuxer)
 		ts_add_stream(demuxer, priv->ts.pids[params.apid]);
 		sh_audio = priv->ts.streams[params.apid].sh;
 		demuxer->audio->id = priv->ts.streams[params.apid].id;
-		sh_audio->ds = demuxer->audio;
 		sh_audio->format = params.atype;
 		demuxer->audio->sh = sh_audio;
 	}

@@ -138,9 +138,6 @@ static demuxer_t* demux_open_roq(demuxer_t* demuxer)
         // make sure the demuxer knows about the new stream header
         demuxer->video->id = 0;
         demuxer->video->sh = sh_video;
-        // make sure that the video demuxer stream header knows about its
-        // parent video demuxer stream
-        sh_video->ds = demuxer->video;
 
         sh_video->disp_w = stream_read_word_le(demuxer->stream);
         sh_video->disp_h = stream_read_word_le(demuxer->stream);
@@ -165,9 +162,6 @@ static demuxer_t* demux_open_roq(demuxer_t* demuxer)
         // make sure the demuxer knows about the new stream header
         demuxer->audio->id = 0;
         demuxer->audio->sh = sh_audio;
-        // make sure that the audio demuxer stream header knows about its
-        // parent audio demuxer stream
-        sh_audio->ds = demuxer->audio;
 
         // go through the bother of making a WAVEFORMATEX structure
         sh_audio->wf = malloc(sizeof(*sh_audio->wf));

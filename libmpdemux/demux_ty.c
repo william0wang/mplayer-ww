@@ -860,17 +860,10 @@ static int ty_check_file(demuxer_t* demuxer)
 
 static demuxer_t* demux_open_ty(demuxer_t* demuxer)
 {
-    sh_audio_t *sh_audio=NULL;
-    sh_video_t *sh_video=NULL;
-
-    sh_video=demuxer->video->sh;sh_video->ds=demuxer->video;
-
     if(demuxer->audio->id!=-2) {
         if(!ds_fill_buffer(demuxer->audio)){
             mp_msg(MSGT_DEMUXER,MSGL_INFO,"MPEG: " MSGTR_MissingAudioStream);
             demuxer->audio->sh=NULL;
-        } else {
-            sh_audio=demuxer->audio->sh;sh_audio->ds=demuxer->audio;
         }
     }
 
