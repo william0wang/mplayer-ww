@@ -23,12 +23,12 @@
 #ifndef MPLAYER_VCD_READ_OS2_H
 #define MPLAYER_VCD_READ_OS2_H
 
+#include "mp_msg.h"
+
 #ifdef __KLIBC__
 #include <emx/umalloc.h>
 #define calloc _lcalloc
 #endif
-
-#include "mp_msg.h"
 
 struct __attribute__((packed)) msf {
     BYTE bFrame;
@@ -243,6 +243,10 @@ static int vcd_read(mp_vcd_priv_t *vcd, char *mem)
 
     return VCD_SECTOR_DATA;
 }
+
+#ifdef __KLIBC__
+#undef calloc
+#endif
 
 #endif /* MPLAYER_VCD_READ_OS2_H */
 
