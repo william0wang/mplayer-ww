@@ -514,7 +514,6 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                     SendDlgItemMessage(hwnd, ID_OSD1, BM_SETCHECK, BST_CHECKED, 0);
                     SendDlgItemMessage(hwnd, ID_OSD2, BM_SETCHECK, BST_UNCHECKED, 0);
                     SendDlgItemMessage(hwnd, ID_OSD3, BM_SETCHECK, BST_UNCHECKED, 0);
-                    SendMessage(hwnd, WM_COMMAND, (WPARAM)ID_APPLY, 0);
                     break;
                 }
                 case ID_CANCEL:
