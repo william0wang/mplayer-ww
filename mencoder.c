@@ -301,7 +301,7 @@ static volatile int at_eof=0;
 static volatile int interrupted=0;
 
 static void exit_sighandler(int x){
-    at_eof=1;
+    at_eof=3;
     interrupted=2; /* 1 means error */
 }
 
@@ -1238,7 +1238,7 @@ if (sh_audio && audio_delay != 0.) fixdelay(d_video, d_audio, mux_a, &frame_data
 // Just assume a seek. Also works if time stamps do not start with 0
 did_seek = 1;
 
-while(!at_eof){
+while(at_eof != 3){
 
     int blit_frame=0;
     float a_pts=0;
@@ -1246,9 +1246,11 @@ while(!at_eof){
     int skip_flag=0; // 1=skip  -1=duplicate
     double a_muxer_time;
     double v_muxer_time;
+    int force_audio = at_eof & 1;
 
     a_muxer_time = adjusted_muxer_time(mux_a);
     v_muxer_time = adjusted_muxer_time(mux_v);
+    at_eof = sh_audio ? 0 : 2;
 
     if((end_at.type == END_AT_SIZE && end_at.pos <= stream_tell(muxer->stream))  ||
        (end_at.type == END_AT_TIME && end_at.pos < v_muxer_time))
@@ -1274,7 +1276,7 @@ goto_redo_edl:
 
             result = edl_seek(next_edl_record, demuxer, d_audio, mux_a, &frame_data, mux_v->codec==VCODEC_COPY);
 
-            if (result == 2) { at_eof=1; break; } // EOF
+            if (result == 2) { at_eof=3; break; } // EOF
             else if (result == 0) edl_seeking = 0; // no seeking
             else { // sucess
                 did_seek = 1;
@@ -1306,9 +1308,10 @@ goto_redo_edl:
 
 if(sh_audio){
     // get audio:
-    while(a_muxer_time-audio_preload<v_muxer_time){
+    while(force_audio || a_muxer_time-audio_preload<v_muxer_time){
         float tottime;
 	int len=0;
+	force_audio = 0;
 
 	ptimer_start = GetTimerMS();
 	// CBR - copy 0.5 sec of audio
@@ -1387,7 +1390,7 @@ if(sh_audio){
 		}
 	    }
 	}
-	if(len<=0) break; // EOF?
+	if(len<=0) { if (!mux_a->buffer_len && !sh_audio->a_out_buffer_len && sh_audio->ds->eof) at_eof |= 2; break; } // EOF?
 	muxer_write_chunk(mux_a,len,AVIIF_KEYFRAME, MP_NOPTS_VALUE, MP_NOPTS_VALUE);
 	a_muxer_time = adjusted_muxer_time(mux_a); // update after muxing
 	if(!mux_a->h.dwSampleSize && a_muxer_time>0)
@@ -1408,7 +1411,7 @@ if(sh_audio){
 
     if (!frame_data.already_read) {
         frame_data.in_size=video_read_frame(sh_video,&frame_data.frame_time,&frame_data.start,force_fps);
-        frame_data.flush = frame_data.in_size < 0 && d_video->eof &&
+        frame_data.flush = frame_data.in_size < 0 && d_video->eof && (at_eof & 2) &&
                            mux_v->codec != VCODEC_COPY &&
                            mux_v->codec != VCODEC_FRAMENO;
         if (frame_data.flush) {
@@ -1418,7 +1421,7 @@ if(sh_audio){
         sh_video->timer+=frame_data.frame_time;
     }
     frame_data.frame_time /= playback_speed;
-    if(frame_data.in_size<0){ at_eof=1; break; }
+    if(frame_data.in_size<0){ frame_data.already_read = 0; at_eof|=1; continue; }
     ++decoded_frameno;
 
     v_timer_corr-=frame_data.frame_time-(float)mux_v->h.dwScale/mux_v->h.dwRate;
@@ -1428,17 +1431,17 @@ if(demuxer2){	// 3-pass encoding, read control file (frameno.avi)
 	while(next_frameno<decoded_frameno){
 	    int* start;
 	    int len=ds_get_packet(demuxer2->video,(unsigned char**) &start);
-	    if(len<0){ at_eof=1;break;}
+	    if(len<0){ at_eof|=1;break;}
 	    if(len==0) --skip_flag; else  // duplicate
 	    if(len==4) next_frameno=start[0];
 	}
-    if(at_eof) break;
+    if(at_eof) continue;
 	skip_flag=next_frameno-decoded_frameno;
     // find next frame:
 	while(next_frameno<=decoded_frameno){
 	    int* start;
 	    int len=ds_get_packet(demuxer2->video,(unsigned char**) &start);
-	    if(len<0){ at_eof=1;break;}
+	    if(len<0){ at_eof|=1;break;}
 	    if(len==0) --skip_flag; else  // duplicate
 	    if(len==4) next_frameno=start[0];
 	}
@@ -1493,7 +1496,7 @@ default:
     void *decoded_frame = decode_video(sh_video,frame_data.start,frame_data.in_size,
                                        drop_frame, MP_NOPTS_VALUE, NULL);
     if (frame_data.flush && !decoded_frame)
-        at_eof = 1;
+        at_eof = 3;
     if (did_seek && sh_video->pts != MP_NOPTS_VALUE) {
         did_seek = 0;
         sub_offset = sh_video->pts;
@@ -1602,8 +1605,8 @@ if(sh_audio && !demuxer2){
 #endif
       if(!quiet) {
 	if( mp_msg_test(MSGT_STATUSLINE,MSGL_V) ) {
-		mp_msg(MSGT_STATUSLINE,MSGL_STATUS,"Pos:%6.1fs %6df (%2d%%) %3dfps Trem:%4dmin %3dmb  A-V:%5.3f [%d:%d] A/Vms %d/%d D/B/S %d/%d/%d \r",
-	    	v_muxer_time, decoded_frameno, (int)(p*100),
+		mp_msg(MSGT_STATUSLINE,MSGL_STATUS,"VPos:%6.1fs APos:%6.1fs %6df (%2d%%) %3dfps Trem:%4dmin %3dmb  A-V:%5.3f [%d:%d] A/Vms %d/%d D/B/S %d/%d/%d \r",
+	    	v_muxer_time, a_muxer_time, decoded_frameno, (int)(p*100),
 	    	(t>1) ? (int)(decoded_frameno/t+0.5) : 0,
 	    	(p>0.001) ? (int)((t/p-t)/60) : 0,
 	    	(p>0.001) ? (int)(stream_tell(muxer->stream)/p/1024/1024) : 0,
