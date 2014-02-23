@@ -392,6 +392,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
             SendDlgItemMessage(hwnd, ID_TRACKBAR1, TBM_SETPOS, 1, (LPARAM)stereopos);
 
             SendDlgItemMessage(hwnd, ID_TRACKBAR2, TBM_SETPOS, 1, (LPARAM)delaypos);
+            EnableWindow(GetDlgItem(hwnd, ID_TRACKBAR2), TRUE);
 
             if(gtkCacheOn) {
                 SendDlgItemMessage(hwnd, ID_CACHE, BM_SETCHECK, 1, 0);
@@ -449,12 +450,9 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                     if(SendDlgItemMessage(hwnd, ID_EXTRASTEREO, BM_GETCHECK, 0, 0) == BST_CHECKED)
                     {
                         EnableWindow(GetDlgItem(hwnd, ID_TRACKBAR1), 1);
-                        EnableWindow(GetDlgItem(hwnd, ID_TRACKBAR2), 1);
                     } else {
                         EnableWindow(GetDlgItem(hwnd, ID_TRACKBAR1), 0);
-                        EnableWindow(GetDlgItem(hwnd, ID_TRACKBAR2), 0);
                         SendDlgItemMessage(hwnd, ID_TRACKBAR1, TBM_SETPOS, 1, (LPARAM)10.0);
-                        SendDlgItemMessage(hwnd, ID_TRACKBAR2, TBM_SETPOS, 1, (LPARAM)0);
                     }
                     break;
                 }
