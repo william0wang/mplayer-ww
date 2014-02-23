@@ -40,25 +40,6 @@
 #include "dialogs.h"
 
 
-static void set_defaults(void)
-{
-    proc_priority = "normal";
-    vo_doublebuffering = TRUE;
-    vo_directrendering = FALSE;
-    frame_dropping = 0;
-    soft_vol = FALSE;
-    gtkAONorm = FALSE;
-    gtkAOExtraStereo = FALSE;
-    gtkAOExtraStereoMul = 1.0;
-    audio_delay = 0.0;
-    video_window = TRUE;
-    gtkCacheOn = FALSE;
-    gtkCacheSize = 2048;
-    gtkAutoSyncOn = FALSE;
-    gtkAutoSync = 0;
-    player_idle_mode = TRUE;
-}
-
 static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
     HWND btn, label, edit1, edit2, updown1, updown2, track1, track2;
@@ -506,7 +487,6 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                 }
                 case ID_DEFAULTS:
                 {
-                    set_defaults();
                     SendDlgItemMessage(hwnd, ID_VO_DRIVER, CB_SETCURSEL,
                                        (WPARAM)SendMessage(vo_driver, CB_FINDSTRING, -1, (LPARAM)"directx"), 0);
 
@@ -514,26 +494,26 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                                        (WPARAM)SendMessage(ao_driver, CB_FINDSTRING, -1, (LPARAM)"dsound"), 0);
 
                     SendDlgItemMessage(hwnd, ID_PRIO, CB_SETCURSEL,
-                                       (WPARAM)SendMessage(prio, CB_FINDSTRING, -1, (LPARAM)proc_priority), 0);
+                                       (WPARAM)SendMessage(prio, CB_FINDSTRING, -1, (LPARAM)"normal"), 0);
 
-                    SendDlgItemMessage(hwnd, ID_TRACKBAR1, TBM_SETPOS, 1, (LPARAM)10.0);
-                    SendDlgItemMessage(hwnd, ID_TRACKBAR2, TBM_SETPOS, 1, (LPARAM)0.0);
+                    SendDlgItemMessage(hwnd, ID_TRACKBAR1, TBM_SETPOS, TRUE, (LPARAM)10.0);
+                    SendDlgItemMessage(hwnd, ID_TRACKBAR2, TBM_SETPOS, TRUE, (LPARAM)0.0);
                     SendDlgItemMessage(hwnd, ID_UPDOWN1, UDM_SETPOS32, 0, (LPARAM)gtkCacheSize);
                     SendDlgItemMessage(hwnd, ID_UPDOWN2, UDM_SETPOS32, 0, (LPARAM)gtkAutoSync);
-                    SendDlgItemMessage(hwnd, ID_DOUBLE, BM_SETCHECK, 0, 0);
-                    SendDlgItemMessage(hwnd, ID_DIRECT, BM_SETCHECK, 0, 0);
-                    SendDlgItemMessage(hwnd, ID_IDLE, BM_SETCHECK, 0, 0);
-                    SendDlgItemMessage(hwnd, ID_FRAMEDROP, BM_SETCHECK, 0, 0);
-                    SendDlgItemMessage(hwnd, ID_NORMALIZE, BM_SETCHECK, 0, 0);
-                    SendDlgItemMessage(hwnd, ID_SOFTMIX, BM_SETCHECK, 0, 0);
-                    SendDlgItemMessage(hwnd, ID_EXTRASTEREO, BM_SETCHECK, 0, 0);
-                    SendDlgItemMessage(hwnd, ID_CACHE, BM_SETCHECK, 0, 0);
-                    SendDlgItemMessage(hwnd, ID_AUTOSYNC, BM_SETCHECK, 0, 0);
-                    SendDlgItemMessage(hwnd, ID_VIDEOWINDOW, BM_SETCHECK, 1, 0);
-                    SendDlgItemMessage(hwnd, ID_NONE, BM_SETCHECK, 0, 0);
-                    SendDlgItemMessage(hwnd, ID_OSD1, BM_SETCHECK, 1, 0);
-                    SendDlgItemMessage(hwnd, ID_OSD2, BM_SETCHECK, 0, 0);
-                    SendDlgItemMessage(hwnd, ID_OSD3, BM_SETCHECK, 0, 0);
+                    SendDlgItemMessage(hwnd, ID_DOUBLE, BM_SETCHECK, BST_CHECKED, 0);
+                    SendDlgItemMessage(hwnd, ID_DIRECT, BM_SETCHECK, BST_UNCHECKED, 0);
+                    SendDlgItemMessage(hwnd, ID_IDLE, BM_SETCHECK, BST_UNCHECKED, 0);
+                    SendDlgItemMessage(hwnd, ID_FRAMEDROP, BM_SETCHECK, BST_UNCHECKED, 0);
+                    SendDlgItemMessage(hwnd, ID_NORMALIZE, BM_SETCHECK, BST_UNCHECKED, 0);
+                    SendDlgItemMessage(hwnd, ID_SOFTMIX, BM_SETCHECK, BST_UNCHECKED, 0);
+                    SendDlgItemMessage(hwnd, ID_EXTRASTEREO, BM_SETCHECK, BST_UNCHECKED, 0);
+                    SendDlgItemMessage(hwnd, ID_CACHE, BM_SETCHECK, BST_UNCHECKED, 0);
+                    SendDlgItemMessage(hwnd, ID_AUTOSYNC, BM_SETCHECK, BST_UNCHECKED, 0);
+                    SendDlgItemMessage(hwnd, ID_VIDEOWINDOW, BM_SETCHECK, BST_CHECKED, 0);
+                    SendDlgItemMessage(hwnd, ID_NONE, BM_SETCHECK, BST_UNCHECKED, 0);
+                    SendDlgItemMessage(hwnd, ID_OSD1, BM_SETCHECK, BST_CHECKED, 0);
+                    SendDlgItemMessage(hwnd, ID_OSD2, BM_SETCHECK, BST_UNCHECKED, 0);
+                    SendDlgItemMessage(hwnd, ID_OSD3, BM_SETCHECK, BST_UNCHECKED, 0);
                     SendMessage(hwnd, WM_COMMAND, (WPARAM)ID_APPLY, 0);
                     break;
                 }
