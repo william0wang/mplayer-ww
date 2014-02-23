@@ -326,6 +326,8 @@ static int bluray_stream_open(stream_t *s, int mode,
                "ID_BLURAY_TITLE_%d_ANGLE=%d\n", i + 1, ti->angle_count);
         mp_msg(MSGT_IDENTIFY, MSGL_V,
                "ID_BLURAY_TITLE_%d_LENGTH=%d.%03d\n", i + 1, sec, msec);
+        mp_msg(MSGT_IDENTIFY, MSGL_V,
+               "ID_BLURAY_TITLE_%d_PLAYLIST=%05d\n", i + 1, ti->playlist);
 
         /* try to guess which title may contain the main movie */
         if (ti->duration > max_duration) {
