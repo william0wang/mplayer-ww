@@ -7102,6 +7102,9 @@ else
   def_ffmpeg_a='#undef CONFIG_FFMPEG_A'
   def_ffmpeg_so='#undef CONFIG_FFMPEG_SO'
   nocodecmodules="ffmpeg $nocodecmodules"
+  echo "Compiling without FFmpeg is currently not supported/working."
+  echo "Please contact us if that is an issue for you."
+  die "both internal and external FFmpeg missing"
 fi
 test "$_vf_lavfi" = yes && def_vf_lavfi='#define CONFIG_VF_LAVFI 1'|| libavfilters=''
 test "$_libavcodec_mpegaudio_hp" = yes &&
