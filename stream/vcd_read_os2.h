@@ -23,6 +23,11 @@
 #ifndef MPLAYER_VCD_READ_OS2_H
 #define MPLAYER_VCD_READ_OS2_H
 
+#ifdef __KLIBC__
+#include <emx/umalloc.h>
+#define calloc _lcalloc
+#endif
+
 #include "mp_msg.h"
 
 struct __attribute__((packed)) msf {
