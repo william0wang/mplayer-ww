@@ -509,6 +509,8 @@ static void list_chapters(ifo_handle_t *vts_file, tt_srpt_t *tt_srpt, int title_
     unsigned int t=0;
     ptt_info_t *ptt;
     pgc_t *pgc;
+    if (!mp_msg_test(MSGT_IDENTIFY, MSGL_INFO))
+        return;
 
     title_no = tt_srpt->title[title_no].vts_ttn - 1;
     if(vts_file->vts_ptt_srpt->title[title_no].nr_of_ptts < 2)
@@ -519,6 +521,8 @@ static void list_chapters(ifo_handle_t *vts_file, tt_srpt_t *tt_srpt, int title_
     for(i=0; i<vts_file->vts_ptt_srpt->title[title_no].nr_of_ptts; i++)
     {
         pgc = vts_file->vts_pgcit->pgci_srp[ptt[i].pgcn-1].pgc;
+        if (!pgc)
+            continue;
         cell = pgc->program_map[ptt[i].pgn-1]; //here the cell is 1-based
         if(ptt[i].pgn<pgc->nr_of_programs)
             last_cell = pgc->program_map[ptt[i].pgn];
