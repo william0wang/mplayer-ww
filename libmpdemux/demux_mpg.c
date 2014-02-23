@@ -1082,12 +1082,9 @@ static int demux_mpg_pes_probe(demuxer_t *demuxer) {
 
 static demuxer_t* demux_mpg_es_open(demuxer_t* demuxer)
 {
-    sh_video_t *sh_video=NULL;
-
     demuxer->audio->sh = NULL;   // ES streams has no audio channel
     demuxer->video->sh = new_sh_video(demuxer,0); // create dummy video stream header, id=0
     demuxer->video->id = 0;
-    sh_video=demuxer->video->sh;sh_video->ds=demuxer->video;
 
     return demuxer;
 }
@@ -1096,28 +1093,22 @@ static demuxer_t *demux_mpg_gxf_open(demuxer_t *demuxer) {
   demuxer->audio->sh = NULL;
   demuxer->video->sh = new_sh_video(demuxer,0);
   demuxer->video->id = 0;
-  ((sh_video_t *)demuxer->video->sh)->ds = demuxer->video;
   demuxer->priv = (void *) 0xffffffff;
   return demuxer;
 }
 
 static demuxer_t* demux_mpg_ps_open(demuxer_t* demuxer)
 {
-    sh_audio_t *sh_audio=NULL;
-    sh_video_t *sh_video=NULL;
-
-    sh_video=demuxer->video->sh;sh_video->ds=demuxer->video;
+    sh_video_t *sh_video = demuxer->video->sh;
 
     if(demuxer->audio->id!=-2) {
         if(!ds_fill_buffer(demuxer->audio)){
             mp_msg(MSGT_DEMUXER,MSGL_INFO,"MPEG: " MSGTR_MissingAudioStream);
             demuxer->audio->sh=NULL;
-        } else {
-            sh_audio=demuxer->audio->sh;sh_audio->ds=demuxer->audio;
         }
     }
 
-    if(!sh_video->format && ps_probe > 0) {
+    if(sh_video && !sh_video->format && ps_probe > 0) {
         int head;
         off_t pos = stream_tell(demuxer->stream);
 
