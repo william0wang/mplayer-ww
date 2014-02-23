@@ -590,13 +590,13 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                     if(SendDlgItemMessage(hwnd, ID_CACHE, BM_GETCHECK, 0, 0) == BST_CHECKED)
                         gtkCacheOn = TRUE;
                     else gtkCacheOn = FALSE;
-                    gtkCacheSize = SendDlgItemMessage(hwnd, ID_UPDOWN1, UDM_GETPOS32, 0, NULL);
+                    gtkCacheSize = SendDlgItemMessage(hwnd, ID_UPDOWN1, UDM_GETPOS32, 0, (LPARAM)NULL);
 
                     /* autosync */
                     if(SendDlgItemMessage(hwnd, ID_AUTOSYNC, BM_GETCHECK, 0, 0) == BST_CHECKED)
                         gtkAutoSyncOn = TRUE;
                     else gtkAutoSyncOn = FALSE;
-                    gtkAutoSync = SendDlgItemMessage(hwnd, ID_UPDOWN2, UDM_GETPOS32, 0, NULL);
+                    gtkAutoSync = SendDlgItemMessage(hwnd, ID_UPDOWN2, UDM_GETPOS32, 0, (LPARAM)NULL);
 
                     /* video window */
                     if(SendDlgItemMessage(hwnd, ID_VIDEOWINDOW, BM_GETCHECK, 0, 0) == BST_CHECKED)
