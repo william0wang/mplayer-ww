@@ -520,6 +520,9 @@ static void list_chapters(ifo_handle_t *vts_file, tt_srpt_t *tt_srpt, int title_
     mp_msg(MSGT_IDENTIFY, MSGL_INFO, "CHAPTERS: ");
     for(i=0; i<vts_file->vts_ptt_srpt->title[title_no].nr_of_ptts; i++)
     {
+        int pgc_idx = ptt[i].pgcn-1;
+        if (pgc_idx < 0 || pgc_idx >= vts_file->vts_pgcit->nr_of_pgci_srp)
+            continue;
         pgc = vts_file->vts_pgcit->pgci_srp[ptt[i].pgcn-1].pgc;
         if (!pgc)
             continue;
