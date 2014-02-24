@@ -869,13 +869,13 @@ static GtkWidget * CreatePreferences( void )
   gtk_box_pack_start( GTK_BOX( hbox9 ),hbox91,TRUE,FALSE,0 );
   gtk_widget_show( hbox91 );
   SBASSTopMargin=gtkAddSpinButton( MSGTR_GUI_Top":",
-	(GtkAdjustment *)gtk_adjustment_new(0,0,512,1,8,0),hbox91 );
+	(GtkAdjustment *)gtk_adjustment_new(0,0,2000,1,8,0),hbox91 );
 
   hbox92=gtk_hbox_new( FALSE,0 );
   gtk_box_pack_start( GTK_BOX( hbox9 ),hbox92,TRUE,FALSE,0 );
   gtk_widget_show( hbox92 );
   SBASSBottomMargin=gtkAddSpinButton( MSGTR_GUI_Bottom":",
-	(GtkAdjustment *)gtk_adjustment_new(0,0,512,1,8,0),hbox92 );
+	(GtkAdjustment *)gtk_adjustment_new(0,0,2000,1,8,0),hbox92 );
 
   label=gtkAddLabel( MSGTR_GUI_OSD_Subtitles,NULL );
     gtk_notebook_set_tab_label( GTK_NOTEBOOK( notebook1 ),gtk_notebook_get_nth_page( GTK_NOTEBOOK( notebook1 ),2 ),label );

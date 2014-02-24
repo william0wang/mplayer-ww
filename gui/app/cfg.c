@@ -238,8 +238,8 @@ static const m_option_t gui_opts[] = {
 #ifdef CONFIG_ASS
     { "ass_enabled",                 &ass_enabled,             CONF_TYPE_FLAG,        0,           0,     1,          NULL },
     { "ass_use_margins",             &ass_use_margins,         CONF_TYPE_FLAG,        0,           0,     1,          NULL },
-    { "ass_top_margin",              &ass_top_margin,          CONF_TYPE_INT,         CONF_RANGE,  0,     512,        NULL },
-    { "ass_bottom_margin",           &ass_bottom_margin,       CONF_TYPE_INT,         CONF_RANGE,  0,     512,        NULL },
+    { "ass_top_margin",              &ass_top_margin,          CONF_TYPE_INT,         CONF_RANGE,  0,     2000,       NULL },
+    { "ass_bottom_margin",           &ass_bottom_margin,       CONF_TYPE_INT,         CONF_RANGE,  0,     2000,       NULL },
 #endif
 
     { NULL,                          NULL,                     0,                     0,           0,     0,          NULL }
