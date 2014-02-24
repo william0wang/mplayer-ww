@@ -739,7 +739,7 @@ static GtkWidget * CreatePreferences( void )
   HSPanscan=gtkAddHScale( HSPanscanadj,NULL,1 );
     gtk_table_attach( GTK_TABLE( table1 ),HSPanscan,1,2,0,1,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
-  HSFPSadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,1000,0.001,0,0 ) );
+  HSFPSadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,120,0.001,0,0 ) );
   HSFPS=gtk_spin_button_new( GTK_ADJUSTMENT( HSFPSadj ),1,3 );
     gtk_widget_show( HSFPS );
     gtk_spin_button_set_numeric( GTK_SPIN_BUTTON( HSFPS ),TRUE );
