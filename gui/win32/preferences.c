@@ -32,6 +32,7 @@
 #include "osdep/priority.h"
 #include "mixer.h"
 #include "gui/util/list.h"
+#include "gui/util/string.h"
 #include "gui/ui/ui.h"
 #include "gui/interface.h"
 #include "gui.h"
@@ -539,7 +540,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
 
                     /* Set the priority level */
                     SendMessage(prio, CB_GETLBTEXT, (WPARAM)SendMessage(prio, CB_GETCURSEL, 0, 0), (LPARAM)procprio);
-                    proc_priority = strdup(procprio);
+                    setdup(&proc_priority, procprio);
 
                     /* double buffering */
                     if(SendDlgItemMessage(hwnd, ID_DOUBLE, BM_GETCHECK, 0, 0) == BST_CHECKED)
