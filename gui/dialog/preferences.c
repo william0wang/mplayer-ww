@@ -954,28 +954,28 @@ static GtkWidget * CreatePreferences( void )
     gtk_table_attach( GTK_TABLE( table1 ),label,0,1,2,3,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   HSFontBluradj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,100,0.1,0,0 ) );
-  HSFontBlur=gtkAddHScale( HSFontBluradj,NULL,2 );
+  HSFontBlur=gtkAddHScale( HSFontBluradj,NULL,1 );
     gtk_table_attach( GTK_TABLE( table1 ),HSFontBlur,1,2,2,3,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   label=gtkAddLabel( MSGTR_GUI_Outline":",NULL );
     gtk_table_attach( GTK_TABLE( table1 ),label,0,1,3,4,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   HSFontOutLineadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,100,0.1,0,0 ) );
-  HSFontOutLine=gtkAddHScale( HSFontOutLineadj,NULL,2 );
+  HSFontOutLine=gtkAddHScale( HSFontOutLineadj,NULL,1 );
     gtk_table_attach( GTK_TABLE( table1 ),HSFontOutLine,1,2,3,4,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   label=gtkAddLabel( MSGTR_GUI_SizeSubtitles":",NULL );
     gtk_table_attach( GTK_TABLE( table1 ),label,0,1,4,5,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   HSFontTextScaleadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,100,0.1,0,0 ) );
-  HSFontTextScale=gtkAddHScale( HSFontTextScaleadj,NULL,2 );
+  HSFontTextScale=gtkAddHScale( HSFontTextScaleadj,NULL,1 );
     gtk_table_attach( GTK_TABLE( table1 ),HSFontTextScale,1,2,4,5,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   label=gtkAddLabel( MSGTR_GUI_SizeOSD":",NULL );
     gtk_table_attach( GTK_TABLE( table1 ),label,0,1,5,6,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
   HSFontOSDScaleadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,100,0.1,0,0 ) );
-  HSFontOSDScale=gtkAddHScale( HSFontOSDScaleadj,NULL,2 );
+  HSFontOSDScale=gtkAddHScale( HSFontOSDScaleadj,NULL,1 );
     gtk_table_attach( GTK_TABLE( table1 ),HSFontOSDScale,1,2,5,6,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 #else
   hbox7=gtkAddHBox( vbox603,1 );
