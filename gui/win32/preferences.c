@@ -46,9 +46,8 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
     static HWND vo_driver, ao_driver, prio;
     int i = 0, j = 0;
     char procprio[11];
-    float x = 10.0, y = 10.0, stereopos, delaypos;
-    stereopos = gtkAOExtraStereoMul * x;
-    delaypos = audio_delay * y;
+    float stereopos = gtkAOExtraStereoMul * 10.0;
+    float delaypos = audio_delay * 10.0;
 
     switch (iMsg)
     {
