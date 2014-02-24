@@ -1079,7 +1079,7 @@ static GtkWidget * CreatePreferences( void )
   CBAutoSync=gtkAddCheckButton( MSGTR_GUI_EnableAutomaticAVSync,vbox602 );
   hbox5=gtkAddHBox( vbox602,1 );
   gtkAddLabel( MSGTR_GUI_SyncValue":",hbox5 );
-  SBAutoSyncadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,10000,1,10,10 ) );
+  SBAutoSyncadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,10000,1,10,0 ) );
   SBAutoSync=gtk_spin_button_new( GTK_ADJUSTMENT( SBAutoSyncadj ),1,0 );
   gtk_widget_show( SBAutoSync );
   gtk_box_pack_start( GTK_BOX( hbox5 ),SBAutoSync,TRUE,TRUE,0 );
