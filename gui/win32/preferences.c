@@ -46,7 +46,6 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
     HWND btn, label, edit1, edit2, updown1, updown2, track1, track2;
     static HWND vo_driver, ao_driver, prio;
     int i = 0, j = 0;
-    char procprio[11];
     float stereopos = gtkAOExtraStereoMul * 10.0;
     float delaypos = audio_delay * 10.0;
 
@@ -520,7 +519,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                 case ID_APPLY:
                 {
                     int idx, strl;
-                    char *driver, *caption;
+                    char *driver, *procprio, *caption;
 
                     /* Set the video driver */
                     idx = SendMessage(vo_driver, CB_GETCURSEL, 0, 0);
@@ -539,8 +538,12 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                     free(driver);
 
                     /* Set the priority level */
-                    SendMessage(prio, CB_GETLBTEXT, (WPARAM)SendMessage(prio, CB_GETCURSEL, 0, 0), (LPARAM)procprio);
+                    idx = SendMessage(prio, CB_GETCURSEL, 0, 0);
+                    strl = SendMessage(prio, CB_GETLBTEXTLEN, (WPARAM)idx, 0);
+                    procprio = malloc(strl + 1);
+                    SendMessage(prio, CB_GETLBTEXT, (WPARAM)idx, (LPARAM)procprio);
                     setdup(&proc_priority, procprio);
+                    free(procprio);
 
                     /* double buffering */
                     if(SendDlgItemMessage(hwnd, ID_DOUBLE, BM_GETCHECK, 0, 0) == BST_CHECKED)
