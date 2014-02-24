@@ -41,6 +41,40 @@
 #include "dialogs.h"
 
 
+/**
+ * @brief Translate between the priority text presented to the user
+ *        and the internal priority name.
+ *
+ * @param prio priority text or name to be translated
+ * @param idx 0 (translate internal name to localized user text) or
+ *            1 (translate localized user text to internal name)
+ *
+ * @return translation according to @a idx
+ */
+static const char *get_priority (const char *prio, int idx)
+{
+  static const struct
+  {
+    const char *localization;
+    const char *name;
+  } priority[] = {{MSGTR_GUI_WIN32_PriorityHigh, "high"},
+                  {MSGTR_GUI_WIN32_PriorityAboveNormal, "abovenormal"},
+                  {MSGTR_GUI_WIN32_PriorityNormal, "normal"},
+                  {MSGTR_GUI_WIN32_PriorityBelowNormal, "belownormal"},
+                  {MSGTR_GUI_WIN32_PriorityLow, "idle"}};
+  unsigned int i;
+
+  for (i = 0; i < sizeof(priority) / sizeof(*priority); i++)
+  {
+    const char *l = acp(priority[i].localization);
+
+    if (strcmp(idx == 0 ? priority[i].name : l, prio) == 0)
+      return (idx == 0 ? l : priority[i].name);
+  }
+
+  return NULL;
+}
+
 static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
     HWND btn, label, edit1, edit2, updown1, updown2, track1, track2;
@@ -425,7 +459,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
             if(proc_priority)
                 SendDlgItemMessage(hwnd, ID_PRIO, CB_SETCURSEL,
                                    (WPARAM)SendMessage(prio, CB_FINDSTRING, -1,
-                                   (LPARAM)proc_priority), 0);
+                                   (LPARAM)get_priority(proc_priority, 0)), 0);
 
             else SendDlgItemMessage(hwnd, ID_PRIO, CB_SETCURSEL, 2, 0);
 
@@ -542,7 +576,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                     strl = SendMessage(prio, CB_GETLBTEXTLEN, (WPARAM)idx, 0);
                     procprio = malloc(strl + 1);
                     SendMessage(prio, CB_GETLBTEXT, (WPARAM)idx, (LPARAM)procprio);
-                    setdup(&proc_priority, procprio);
+                    setdup(&proc_priority, get_priority(procprio, 1));
                     free(procprio);
 
                     /* double buffering */
