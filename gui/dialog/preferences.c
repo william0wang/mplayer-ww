@@ -1043,8 +1043,8 @@ static GtkWidget * CreatePreferences( void )
 
   gtkAddLabel( MSGTR_GUI_MaximumUsageSpareCPU":",hbox5 );
 
-  if ( guiInfo.sh_video && guiInfo.Playing ) HSPPQualityadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,get_video_quality_max( guiInfo.sh_video ),0,0,0 ) );
-   else HSPPQualityadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,100,0,0,0 ) );
+  if ( guiInfo.sh_video && guiInfo.Playing ) HSPPQualityadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,get_video_quality_max( guiInfo.sh_video ),1,0,0 ) );
+   else HSPPQualityadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,100,1,0,0 ) );
   HSPPQuality=gtkAddHScale( HSPPQualityadj,hbox5,0 );
 
   vbox602=gtkAddVBox(
