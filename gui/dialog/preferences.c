@@ -801,7 +801,7 @@ static GtkWidget * CreatePreferences( void )
   HSSubDelay=gtkAddHScale( HSSubDelayadj,NULL,1 );
     gtk_table_attach( GTK_TABLE( table1 ),HSSubDelay,1,2,0,1,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
-  HSSubPositionadj=GTK_ADJUSTMENT( gtk_adjustment_new( 100,0,100,1,0,0 ) );
+  HSSubPositionadj=GTK_ADJUSTMENT( gtk_adjustment_new( 100,0,150,1,0,0 ) );
   HSSubPosition=gtkAddHScale( HSSubPositionadj,NULL,0 );
     gtk_table_attach( GTK_TABLE( table1 ),HSSubPosition,1,2,1,2,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
