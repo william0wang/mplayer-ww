@@ -735,7 +735,7 @@ static GtkWidget * CreatePreferences( void )
   label=gtkAddLabel( MSGTR_GUI_FrameRate":",NULL );
     gtk_table_attach( GTK_TABLE( table1 ),label,0,1,1,2,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
-  HSPanscanadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,1,0.001,0,0 ) );
+  HSPanscanadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,0,1,0.1,0,0 ) );
   HSPanscan=gtkAddHScale( HSPanscanadj,NULL,1 );
     gtk_table_attach( GTK_TABLE( table1 ),HSPanscan,1,2,0,1,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
