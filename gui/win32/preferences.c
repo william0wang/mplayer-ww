@@ -46,7 +46,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
     static HWND vo_driver, ao_driver, prio;
     int i = 0, j = 0;
     char procprio[11];
-    float x = 10.0, y = 100.0, stereopos, delaypos;
+    float x = 10.0, y = 10.0, stereopos, delaypos;
     stereopos = gtkAOExtraStereoMul * x;
     delaypos = audio_delay * y;
 
@@ -286,6 +286,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                                   ((LPCREATESTRUCT) lParam) -> hInstance,
                                   NULL);
             SendDlgItemMessage(hwnd, ID_TRACKBAR2, TBM_SETRANGE, 1, MAKELONG(-1000, 1000));
+            SendDlgItemMessage(hwnd, ID_TRACKBAR2, TBM_SETLINESIZE, 0, (LPARAM) 1);
 
             /* cache */
             edit1 = CreateWindowEx(WS_EX_CLIENTEDGE, "edit", "cache",
@@ -581,7 +582,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                     gtkAOExtraStereoMul = SendDlgItemMessage(hwnd, ID_TRACKBAR1, TBM_GETPOS, 0, 0) / 10.0;
 
                     /* audio delay */
-                    audio_delay = SendDlgItemMessage(hwnd, ID_TRACKBAR2, TBM_GETPOS, 0, 0) / 100.0;
+                    audio_delay = SendDlgItemMessage(hwnd, ID_TRACKBAR2, TBM_GETPOS, 0, 0) / 10.0;
 
                     /* cache */
                     if(SendDlgItemMessage(hwnd, ID_CACHE, BM_GETCHECK, 0, 0) == BST_CHECKED)

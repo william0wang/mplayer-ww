@@ -682,8 +682,8 @@ static GtkWidget * CreatePreferences( void )
   hbox8=gtkAddHBox( vbox3,1 );
   gtkAddLabel( MSGTR_GUI_AudioDelay":",hbox8 );
 
-  HSAudioDelayadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,-10,10,0.01,0,0 ) );
-  HSAudioDelay=gtkAddHScale( HSAudioDelayadj,hbox8,2 );
+  HSAudioDelayadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,-100,100,0.1,0,0 ) );
+  HSAudioDelay=gtkAddHScale( HSAudioDelayadj,hbox8,1 );
   label=gtkAddLabel( MSGTR_GUI_Audio,NULL );
     gtk_notebook_set_tab_label( GTK_NOTEBOOK( notebook1 ),gtk_notebook_get_nth_page( GTK_NOTEBOOK( notebook1 ),0 ),label );
 
