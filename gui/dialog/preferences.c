@@ -797,7 +797,7 @@ static GtkWidget * CreatePreferences( void )
   label=gtkAddLabel( MSGTR_GUI_Encoding":",NULL );
     gtk_table_attach( GTK_TABLE( table1 ),label,0,1,3,4,(GtkAttachOptions)( GTK_FILL ),(GtkAttachOptions)( GTK_FILL ),0,0 );
 
-  HSSubDelayadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,-10.0,10,0.01,0,0 ) );
+  HSSubDelayadj=GTK_ADJUSTMENT( gtk_adjustment_new( 0,-10.0,10,0.1,0,0 ) );
   HSSubDelay=gtkAddHScale( HSSubDelayadj,NULL,1 );
     gtk_table_attach( GTK_TABLE( table1 ),HSSubDelay,1,2,0,1,(GtkAttachOptions)( GTK_EXPAND | GTK_FILL ),(GtkAttachOptions)( 0 ),0,0 );
 
