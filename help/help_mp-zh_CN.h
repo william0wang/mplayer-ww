@@ -1,4 +1,4 @@
-// Synced with help_mp-en.h rev. 36769
+// Synced with help_mp-en.h rev. 36831
 //
 // Translated by JRaSH <jrash06@gmail.com>
 
@@ -600,6 +600,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_CpShiftJis "日文（SHIFT-JIS）"
 #define MSGTR_GUI_CpUnicode "Unicode"
 #define MSGTR_GUI_CpUTF8 "UTF-8"
+#define MSGTR_GUI_DecimalMark "."
 #define MSGTR_GUI__Default_ "（默认设置）"
 #define MSGTR_GUI_DefaultSetting "默认配置"
 #define MSGTR_GUI_Delay "延迟"
@@ -679,6 +680,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_FrontRight "前右"
 #define MSGTR_GUI_HideVideoWindow "播放后隐藏视频窗口"
 #define MSGTR_GUI_Hue "色调"
+#define MSGTR_GUI_Information "信息"
 #define MSGTR_GUI_Lavc "lavc（实时 mpeg1 编码）"
 #define MSGTR_GUI_MaximumUsageSpareCPU "空闲 CPU 时间的最大使用量"
 #define MSGTR_GUI_Miscellaneous "杂项"
@@ -804,6 +806,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_Translations "翻译\n"
 #define MSGTR_GUI_TurnOffXScreenSaver "关闭 XScreenSaver 屏保"
 #define MSGTR_GUI_TV "电视"
+#define MSGTR_GUI_Unknown "未知"
 #define MSGTR_GUI_URL "网络链接"
 #define MSGTR_GUI_VCD "VCD"
 #define MSGTR_GUI_Video "视频"
@@ -1138,6 +1141,19 @@ static const char help_text[] = MSGTR_Help;
 // x11_common.c
 #define MSGTR_EwmhFullscreenStateFailed "\nX11：无法发送 EWMH 全屏事件消息！\n"
 #define MSGTR_SelectedVideoMode "XF86VM：已选择视频模式 %dx%d（图像大小 %dx%d）。\n"
+#define MSGTR_X11Error "X11 错误：%s\n"
+#define MSGTR_CouldntFindUTF8Locale "无法找到 UTF-8 的地区设定，\n超出 Latin-1 范围的字符将无法处理。\n"
+#define MSGTR_CouldntOpenDisplay "vo：无法打开 X11 显示终端（%s）！\n"
+#define MSGTR_WindowDestroyed "窗口已销毁，退出中\n"
+#define MSGTR_DPMSnotAvailable "DPMS 不可用？\n"
+#define MSGTR_DPMSnotEnabled "无法启用 DPMS\n"
+#define MSGTR_BadAccessXSelectInput "X11 错误：XSelectInput 调用时出现 BadAccess 异常\n"
+#define MSGTR_ButtonPressMaskInUse "X11 错误：指定窗口的‘ButtonPressMask’蒙板可能已被其它应用程序使用（参见 man XSelectInput）\n"
+#define MSGTR_DiscardMouseControl "X11 错误：MPlayer 失去鼠标的操控（重新配置中）\n"
+#define MSGTR_NoXF86VidModeExtension "XF86VidMode 扩展组件不可用。\n"
+#define MSGTR_ReturningOriginalMode "重设为原来的模式 %dx%d\n"
+#define MSGTR_CouldntSetColorkey "[xv common] 无法设置 colorkey!\n"
+#define MSGTR_CouldntGetColorkey "[xv common] 无法获得 colorkey！可能所选的 Xv 端口没有采用覆盖模式。\n"
 
 #define MSGTR_InsertingAfVolume "[混音器] 没有硬件混音支持，插入音量过滤器。\n"
 #define MSGTR_NoVolume "[混音器] 没有可用的音量控制器。\n"
@@ -1662,6 +1678,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPDEMUX_AIALSA_CannotInstallSWParams "无法设置软件参数：\n"
 #define MSGTR_MPDEMUX_AIALSA_ErrorOpeningAudio "打开音频出错：%s\n"
 #define MSGTR_MPDEMUX_AIALSA_AlsaXRUN "ALSA xrun!!!（长度至少为 %.3f ms）\n"
+#define MSGTR_MPDEMUX_AIALSA_AlsaXRUN "ALSA xrun!!!（至少 %.3f ms 长）\n"
 #define MSGTR_MPDEMUX_AIALSA_AlsaXRUNPrepareError "ALSA xrun：准备出错：%s"
 #define MSGTR_MPDEMUX_AIALSA_AlsaReadWriteError "ALSA 读/写错误"
 
@@ -1961,7 +1978,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_TVI_DS_GetActualMediatypeFailed "tvi_dshow：无法识别媒体的实际类型（错误代码：0x%x）。使用与所请求相同的类型。\n"
 
 // url.c
-#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "字符串似乎已经经过 url_escape %c%c%c 换码了。\n"
+#define MSGTR_MPDEMUX_URL_StringAlreadyEscaped "字符串似乎已经经过 url escape %c%c%c 编码了。\n"
 
 // subtitles
 #define MSGTR_SUBTITLES_SubRip_UnknownFontColor "SubRip：字幕含有未知字体颜色：%s\n"
