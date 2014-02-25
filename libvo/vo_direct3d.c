@@ -782,18 +782,12 @@ static int control(uint32_t request, void *data)
         vo_w32_fullscreen();
         resize_d3d();
         return VO_TRUE;
-    case VOCTRL_RESET:
-        return VO_NOTIMPL;
     case VOCTRL_PAUSE:
         priv->is_paused = 1;
         return VO_TRUE;
     case VOCTRL_RESUME:
         priv->is_paused = 0;
         return VO_TRUE;
-    case VOCTRL_SET_EQUALIZER:
-        return VO_NOTIMPL;
-    case VOCTRL_GET_EQUALIZER:
-        return VO_NOTIMPL;
     case VOCTRL_ONTOP:
         vo_w32_ontop();
         return VO_TRUE;
