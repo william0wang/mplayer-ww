@@ -86,7 +86,7 @@ static int compare_func(const void *a, const void *b)
  char * tmp;
  int    i;
  if ( !a || !b || !( (DirNodeType *)a )->path ) return -1;
- tmp=strdup( (char *)b ); tmp[strlen( tmp )-1]=0;
+ tmp=strdup( b ); tmp[strlen( tmp )-1]=0;
  i=strcmp( ( (DirNodeType *)a )->path,tmp );
  free( tmp );
  return i;

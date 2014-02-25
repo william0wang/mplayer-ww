@@ -985,7 +985,7 @@ void mplayer(int what, float value, void *data)
 
     case MPLAYER_SET_FONT_ENCODING:
         nfree(subtitle_font_encoding);
-        subtitle_font_encoding = gstrdup((char *)data);
+        subtitle_font_encoding = gstrdup(data);
         mplayer(MPLAYER_LOAD_FONT, 0, 0);
         break;
 
@@ -1024,7 +1024,7 @@ void mplayer(int what, float value, void *data)
 
     case MPLAYER_SET_SUB_ENCODING:
         nfree(sub_cp);
-        sub_cp = gstrdup((char *)data);
+        sub_cp = gstrdup(data);
         break;
 
     case MPLAYER_SET_EXTRA_STEREO:
@@ -1055,22 +1055,22 @@ void mplayer(int what, float value, void *data)
 
     case MPLAYER_SET_CONTRAST:
         if (guiInfo.sh_video)
-            set_video_colors(guiInfo.sh_video, "contrast", (int)value);
+            set_video_colors(guiInfo.sh_video, "contrast", value);
         break;
 
     case MPLAYER_SET_BRIGHTNESS:
         if (guiInfo.sh_video)
-            set_video_colors(guiInfo.sh_video, "brightness", (int)value);
+            set_video_colors(guiInfo.sh_video, "brightness", value);
         break;
 
     case MPLAYER_SET_HUE:
         if (guiInfo.sh_video)
-            set_video_colors(guiInfo.sh_video, "hue", (int)value);
+            set_video_colors(guiInfo.sh_video, "hue", value);
         break;
 
     case MPLAYER_SET_SATURATION:
         if (guiInfo.sh_video)
-            set_video_colors(guiInfo.sh_video, "saturation", (int)value);
+            set_video_colors(guiInfo.sh_video, "saturation", value);
         break;
 
     case MPLAYER_SET_EQUALIZER:

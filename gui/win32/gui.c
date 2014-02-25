@@ -629,11 +629,11 @@ static LRESULT CALLBACK VideoProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
             rect_height = rd.bottom - rd.top;
 
             /* maintain our aspect ratio */
-            tmpheight = ((float)rect_width/video_aspect);
+            tmpheight = rect_width/video_aspect;
             tmpheight += tmpheight % 2;
             if(tmpheight > rect_height)
             {
-                rect_width = ((float)rect_height*video_aspect);
+                rect_width = rect_height*video_aspect;
                 rect_width += rect_width % 2;
             }
             else rect_height = tmpheight;
@@ -927,12 +927,12 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                     if(item->type == tyHpotmeter)
                     {
                         item->x = GET_X_LPARAM(lParam) - gui->mousewx;
-                        item->value = (float)((float)((item->x - item->wx) * 100.0f) / (float)(item->wwidth - item->width));
+                        item->value = ((item->x - item->wx) * 100.0f) / (float)(item->wwidth - item->width);
                     }
                     if(item->type == tyPotmeter)
                     {
                         gui->mousewx = GET_X_LPARAM(lParam) - gui->activewidget->x;
-                        item->value = (float) (gui->mousewx * 100.0f) / (float) item->wwidth;
+                        item->value = (gui->mousewx * 100.0f) / (float) item->wwidth;
                     }
 
                     if((item->type == tyPotmeter) || (item->type == tyHpotmeter) || (item->type == tyVpotmeter))
@@ -944,15 +944,15 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                             item->value = 0.0f;
 
                         if(item->msg == evSetVolume)
-                            guiInfo.Volume = (float) item->value;
+                            guiInfo.Volume = item->value;
                         else if(item->msg == evSetMoviePosition)
-                            guiInfo.Position = (float) item->value;
+                            guiInfo.Position = item->value;
                         else if(item->msg == evSetBalance)
                         {
                             /* make the range for 50% a bit bigger, because the sliders for balance usually suck */
                             if((item->value - 50.0f < 1.5f) && (item->value - 50.0f > -1.5f))
                                 item->value = 50.0f;
-                            guiInfo.Balance = (float) item->value;
+                            guiInfo.Balance = item->value;
                         }
                         updatedisplay(gui, hWnd);
                         handlemsg(hWnd, item->msg);

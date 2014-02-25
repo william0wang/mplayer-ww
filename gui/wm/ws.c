@@ -1307,7 +1307,7 @@ void wsImageCreate(wsWindow *win, int w, int h)
             mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
         }
 
-        win->Shminfo.shmaddr = (char *)shmat(win->Shminfo.shmid, 0, 0);
+        win->Shminfo.shmaddr = shmat(win->Shminfo.shmid, 0, 0);
 
         if (win->Shminfo.shmaddr == ((char *)-1)) {
             XDestroyImage(win->xImage);
