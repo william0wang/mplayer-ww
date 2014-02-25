@@ -354,16 +354,16 @@ static void prButton( GtkButton * button, gpointer user_data )
 	 int i;
 	 const char * tmp = gtk_entry_get_text( GTK_ENTRY( EVFM ) );
          for( i=0;mpcodecs_vd_drivers[i];i++ )
-          if ( !gstrcmp( tmp,(char *)mpcodecs_vd_drivers[i]->info->name ) )
-	   { listSet( &video_fm_list,(char *)mpcodecs_vd_drivers[i]->info->short_name ); break; }
+          if ( !gstrcmp( tmp,mpcodecs_vd_drivers[i]->info->name ) )
+	   { listSet( &video_fm_list,mpcodecs_vd_drivers[i]->info->short_name ); break; }
 	}
 
 	{
 	 int i;
 	 const char * tmp = gtk_entry_get_text( GTK_ENTRY( EAFM ) );
          for( i=0;mpcodecs_ad_drivers[i];i++ )
-          if ( !gstrcmp( tmp,(char *)mpcodecs_ad_drivers[i]->info->name ) )
-	   { listSet( &audio_fm_list,(char *)mpcodecs_ad_drivers[i]->info->short_name ); break; }
+          if ( !gstrcmp( tmp,mpcodecs_ad_drivers[i]->info->name ) )
+	   { listSet( &audio_fm_list,mpcodecs_ad_drivers[i]->info->short_name ); break; }
 	}
 
 	/* 6th page */
@@ -1203,7 +1203,7 @@ void ShowPreferences( void )
       char * name = gstrdup( audio_driver_list[0] );
       char * sep = gstrchr( audio_driver_list[0],':' );
       if ( sep ) *sep=0;
-      if ( !gstrcmp( name,(char *)info->short_name ) ) old_audio_driver=i - 1;
+      if ( !gstrcmp( name,info->short_name ) ) old_audio_driver=i - 1;
       free( name );
      }
     tmp[0]=(char *)info->short_name; tmp[1]=(char *)info->name; gtk_clist_append( GTK_CLIST( CLADrivers ),tmp );
@@ -1245,7 +1245,7 @@ void ShowPreferences( void )
   while ( video_out_drivers[i] )
    if ( video_out_drivers[i++]->control( VOCTRL_GUISUPPORT,NULL ) == VO_TRUE )
     {
-     if ( video_driver_list && !gstrcmp( video_driver_list[0],(char *)video_out_drivers[i - 1]->info->short_name ) ) old_video_driver=c; c++;
+     if ( video_driver_list && !gstrcmp( video_driver_list[0],video_out_drivers[i - 1]->info->short_name ) ) old_video_driver=c; c++;
      tmp[0]=(char *)video_out_drivers[i - 1]->info->short_name; tmp[1]=(char *)video_out_drivers[i - 1]->info->name;
      gtk_clist_append( GTK_CLIST( CLVDrivers ),tmp );
     }
@@ -1347,7 +1347,7 @@ void ShowPreferences( void )
   for( i=0;mpcodecs_vd_drivers[i];i++ )
    {
     Items=g_list_append( Items,(char *)mpcodecs_vd_drivers[i]->info->name );
-    if ( video_fm_list && !gstrcmp( video_fm_list[0],(char *)mpcodecs_vd_drivers[i]->info->short_name ) ) name=(char *)mpcodecs_vd_drivers[i]->info->name;
+    if ( video_fm_list && !gstrcmp( video_fm_list[0],mpcodecs_vd_drivers[i]->info->short_name ) ) name=(char *)mpcodecs_vd_drivers[i]->info->name;
    }
   gtk_combo_set_popdown_strings( GTK_COMBO( CBVFM ),Items );
   g_list_free( Items );
@@ -1363,7 +1363,7 @@ void ShowPreferences( void )
   for( i=0;mpcodecs_ad_drivers[i];i++ )
    {
     Items=g_list_append( Items,(char *)mpcodecs_ad_drivers[i]->info->name );
-    if ( audio_fm_list && !gstrcmp( audio_fm_list[0],(char *)mpcodecs_ad_drivers[i]->info->short_name ) ) name=(char *)mpcodecs_ad_drivers[i]->info->name;
+    if ( audio_fm_list && !gstrcmp( audio_fm_list[0],mpcodecs_ad_drivers[i]->info->short_name ) ) name=(char *)mpcodecs_ad_drivers[i]->info->name;
    }
   gtk_combo_set_popdown_strings( GTK_COMBO( CBAFM ),Items );
   g_list_free( Items );

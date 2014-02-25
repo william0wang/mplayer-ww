@@ -421,7 +421,7 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
     }
     else if(!strncmp(desc, "selected", 8))
     {
-        win->base->bitmap[1] = pngRead(skin, (char *) desc + 9);
+        win->base->bitmap[1] = pngRead(skin, desc + 9);
         mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [ITEM] [BASE] added image %s\n", win->base->bitmap[1]->name);
     }
     else if(!strncmp(desc, "slabel",6))

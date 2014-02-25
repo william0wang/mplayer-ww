@@ -363,7 +363,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
             {
                 const vo_info_t *info = video_out_drivers[i++]->info;
                 if(!video_driver_list)
-                    listSet(&video_driver_list, (char *)info->short_name);
+                    listSet(&video_driver_list, info->short_name);
                 SendDlgItemMessage(hwnd, ID_VO_DRIVER, CB_ADDSTRING, 0, (LPARAM) info->short_name);
             }
             /* Special case for directx:noaccel */
@@ -374,7 +374,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
             {
                 const ao_info_t *info = audio_out_drivers[j++]->info;
                 if(!audio_driver_list)
-                    listSet(&audio_driver_list, (char *)info->short_name);
+                    listSet(&audio_driver_list, info->short_name);
                 SendDlgItemMessage(hwnd, ID_AO_DRIVER, CB_ADDSTRING, 0, (LPARAM) info->short_name);
             }
             SendMessage(ao_driver, WM_SETFONT, (WPARAM) GetStockObject(DEFAULT_GUI_FONT), 0);
