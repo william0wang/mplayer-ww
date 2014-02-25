@@ -1,4 +1,4 @@
-.\" sync with en/mplayer.1 rev. 36721
+.\" sync with en/mplayer.1 rev. 36848
 .\" MPlayer (C) 2000-2014 MPlayer Team
 .\" This man page was/is translated by JRaSH<jrash06 at gmail.com>
 .
@@ -31,7 +31,7 @@
 .\" 标题
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "2014-01-24" "MPlayer 项目" "影视播放器"
+.TH MPlayer 1 "2014-02-13" "MPlayer 项目" "影视播放器"
 .
 .SH 名称
 mplayer  \- 影视播放器
@@ -638,7 +638,7 @@ font_autoscale
 font_blur
 .RB ( subfont-blur ")（仅用于 FreeType），"
 font_encoding
-.RB ( subfont-encoding ")（仅用于 FreeType），"
+.RB ( subfont-encoding ")，"
 font_factor
 .RB ( ffactor )，
 font_name
@@ -2902,11 +2902,13 @@ sub,subtitles,/tmp/subs，那么 MPlayer 将在这些目录下搜索\
 设置字体模糊化半径（默认值：2）。
 .
 .TP
-.B \-subfont\-encoding <参数值>（仅用于 FreeType）
+.B \-subfont\-encoding <参数值>
 设置字幕编码方式。\
 当设为‘unicode’时，将渲染字体文件中的所有字形，\
-并使用 unicode 编码（默认值：unicode）。（使用‘unicode’以外的值时，\
-系统必须支持 iconv(3) 以使该选项能够生效。）
+并使用 unicode 编码（默认值：unicode）。（没有使用 FreeType 字体时，设为\
+‘unicode’以外的值将禁用 font.desc 文件的 unicode 字形渲染。\
+使用 FreeType 并且设为‘unicode’以外的值时，系统必须支持\
+support iconv(3) 以使用该选项可正常工作。）
 .
 .TP
 .B \-subfont\-osd\-scale <0\-100>（仅用于 FreeType）
@@ -7936,13 +7938,16 @@ xtile * ytile的数。\
 .RE
 .
 .TP
-.B screenshot
+.B screenshot=前缀字符串
 允许使用可以与按键绑定的被动模式下的命令\
 获取影片的截屏。\
 参见被动模式的说明文档以及交互式控制一节\
 以获取详细信息。\
-命名为‘shotNNNN.png’的文件将保存在工作目录下，\
+默认情况下命名为‘shotNNNN.png’的文件将保存在工作目录下，\
 所用的编号为第一个可以用的编号——不会覆盖任何文件。\
+指定前缀字符串可改变文件的名字和位置，例如，
+\-vf screenshot=shots/now 将把文件保存在 shots 目录下\
+并以 nowNNNN.png 为文件名。\
 该过滤器在不用时不占用资源，并且支持任意色彩空间，\
 所以将其添加进配置文件中很安全。\
 需确保 screenshot 过滤器位于所有产生希望保存于图像的\
