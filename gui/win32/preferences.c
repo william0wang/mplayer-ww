@@ -362,8 +362,9 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
             while(video_out_drivers[i])
             {
                 const vo_info_t *info = video_out_drivers[i++]->info;
-                if(!video_driver_list) listSet(&video_driver_list, (char *)info->short_name);
-                    SendDlgItemMessage(hwnd, ID_VO_DRIVER, CB_ADDSTRING, 0, (LPARAM) info->short_name);
+                if(!video_driver_list)
+                    listSet(&video_driver_list, (char *)info->short_name);
+                SendDlgItemMessage(hwnd, ID_VO_DRIVER, CB_ADDSTRING, 0, (LPARAM) info->short_name);
             }
             /* Special case for directx:noaccel */
             SendDlgItemMessage(hwnd, ID_VO_DRIVER, CB_ADDSTRING, 0, (LPARAM) "directx:noaccel");
