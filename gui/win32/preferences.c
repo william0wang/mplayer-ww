@@ -373,11 +373,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
             {
                 const ao_info_t *info = audio_out_drivers[j++]->info;
                 if(!audio_driver_list)
-                {
-                    // FIXME: default priority (i.e. order in audio_out_drivers) should be fixed instead
-                    // if win32 as default is really desirable
-                    listSet(&audio_driver_list, "win32"/*(char *)info->short_name*/);
-                }
+                    listSet(&audio_driver_list, (char *)info->short_name);
                 SendDlgItemMessage(hwnd, ID_AO_DRIVER, CB_ADDSTRING, 0, (LPARAM) info->short_name);
             }
             SendMessage(ao_driver, WM_SETFONT, (WPARAM) GetStockObject(DEFAULT_GUI_FONT), 0);
