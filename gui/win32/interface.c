@@ -501,6 +501,8 @@ static unsigned __stdcall GuiThread(void* param)
 {
     MSG msg;
 
+    (void) param;
+
     if(!skinName) skinName = strdup("Blue");
     if(!mygui) mygui = create_gui(get_path("skins"), guiSetEvent);
     if(!mygui) exit_player(EXIT_ERROR);
@@ -816,6 +818,8 @@ static int import_file_into_gui(char *pathname, int insert)
 {
     char file[MAX_PATH];
     char *filepart = file;
+
+    (void) insert;   // NOTE TO MYSELF: this isn't yet implemented
 
     if (strstr(pathname, "://"))
     {
