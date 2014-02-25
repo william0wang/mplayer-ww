@@ -183,7 +183,7 @@ void guiInit(void)
     uiPlaybarInit();
     uiMenuInit();
 
-    WinID = guiApp.videoWindow.WindowID;
+    WinID = (Window)guiApp.videoWindow.WindowID;
 
     btnModify(evSetVolume, guiInfo.Volume);
     btnModify(evSetBalance, guiInfo.Balance);

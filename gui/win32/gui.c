@@ -1462,7 +1462,7 @@ int create_videowindow(gui_t *gui)
     DragAcceptFiles(gui->videowindow, TRUE);
 
     if(video_window)
-        WinID = gui->videowindow;
+        WinID = (INT_PTR) gui->videowindow;
     ShowWindow(gui->videowindow, SW_SHOW);
     UpdateWindow(gui->videowindow);
     return 0;
