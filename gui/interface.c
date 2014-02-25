@@ -468,7 +468,7 @@ int gui(int what, void *data)
 
             while (video_out_drivers[i++]) {
                 if (video_out_drivers[i - 1]->control(VOCTRL_GUISUPPORT, NULL) == VO_TRUE) {
-                    listSet(&video_driver_list, (char *)video_out_drivers[i - 1]->info->short_name);
+                    listSet(&video_driver_list, video_out_drivers[i - 1]->info->short_name);
                     break;
                 }
             }
@@ -486,7 +486,7 @@ int gui(int what, void *data)
 
             while (video_out_drivers[i++]) {
                 if (video_out_drivers[i - 1]->control(VOCTRL_GUISUPPORT, NULL) == VO_TRUE) {
-                    if ((video_driver_list && !gstrcmp(video_driver_list[0], (char *)video_out_drivers[i - 1]->info->short_name)) && (video_out_drivers[i - 1]->control(VOCTRL_GUI_NOWINDOW, NULL) == VO_TRUE)) {
+                    if ((video_driver_list && !gstrcmp(video_driver_list[0], video_out_drivers[i - 1]->info->short_name)) && (video_out_drivers[i - 1]->control(VOCTRL_GUI_NOWINDOW, NULL) == VO_TRUE)) {
                         guiInfo.VideoWindow = False;
                         break;
                     }
