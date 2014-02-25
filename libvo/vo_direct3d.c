@@ -810,7 +810,7 @@ static int control(uint32_t request, void *data)
     case VOCTRL_GET_PANSCAN:
         return VO_TRUE;
     }
-    return VO_FALSE;
+    return VO_NOTIMPL;
 }
 
 /** @brief libvo Callback: Configre the Direct3D adapter.
