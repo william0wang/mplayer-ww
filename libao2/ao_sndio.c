@@ -130,8 +130,7 @@ static int init(int rate, int channels, int format, int flags)
     bpf = par.bps * par.pchan;
     ao_data.format = af_bits2fmt(8 * par.bps);
     ao_data.format |= par.sig ? AF_FORMAT_SI : AF_FORMAT_US;
-    if (par.bits > 8)
-        ao_data.format |= par.le ? AF_FORMAT_LE : AF_FORMAT_BE;
+    ao_data.format |= par.le ? AF_FORMAT_LE : AF_FORMAT_BE;
     ao_data.channels = par.pchan;
     ao_data.bps = bpf * par.rate;
     ao_data.buffersize = par.bufsz * bpf;
