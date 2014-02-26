@@ -1677,7 +1677,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPDEMUX_AIALSA_PeriodEqualsBufferSize "无法使用长度等于缓冲大小的采样间隔 (%u == %lu)\n"
 #define MSGTR_MPDEMUX_AIALSA_CannotInstallSWParams "无法设置软件参数：\n"
 #define MSGTR_MPDEMUX_AIALSA_ErrorOpeningAudio "打开音频出错：%s\n"
-#define MSGTR_MPDEMUX_AIALSA_AlsaXRUN "ALSA xrun!!!（长度至少为 %.3f ms）\n"
+#define MSGTR_MPDEMUX_AIALSA_AlsaStatusError "ALSA 状态错误：%s"
 #define MSGTR_MPDEMUX_AIALSA_AlsaXRUN "ALSA xrun!!!（至少 %.3f ms 长）\n"
 #define MSGTR_MPDEMUX_AIALSA_AlsaXRUNPrepareError "ALSA xrun：准备出错：%s"
 #define MSGTR_MPDEMUX_AIALSA_AlsaReadWriteError "ALSA 读/写错误"
