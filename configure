@@ -1507,9 +1507,12 @@ if test -e ffmpeg/.svn ; then
     exit 1
 fi
 
+FFBRANCH=master
+test -e FFBRANCH && FFBRANCH=$(cat FFMPEG_BRANCH)
+
 if test -e ffmpeg/mp_auto_pull ; then
     echo "Updating FFmpeg, (re)move ffmpeg/mp_auto_pull to disable"
-    (cd ffmpeg && git checkout master)
+    (cd ffmpeg && git checkout $FFBRANCH)
     if ! (cd ffmpeg && git pull --rebase --ff-only) ; then
         echo "git pull failed, (re)move ffmpeg/mp_auto_pull to disable pulling"
         exit 1
@@ -1519,7 +1522,7 @@ fi
 if ! test -e ffmpeg ; then
     echo "No FFmpeg checkout, press enter to download one with git or CTRL+C to abort"
     read tmp
-    if ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
+    if ! git clone -b $FFBRANCH --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
         rm -rf ffmpeg
         echo "Failed to get a FFmpeg checkout"
         echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
