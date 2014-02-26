@@ -3499,6 +3499,10 @@ goto_enable_cache:
             exit_player(EXIT_ERROR);
         }
         stream_dump_progress_start();
+
+        // force retry in case bad interleaving caused EOF before.
+        ds->fill_count = 0;
+        ds->eof = 0;
         while (!ds->eof) {
             unsigned char *start;
             double pts;
