@@ -3480,10 +3480,12 @@ goto_enable_cache:
         // disable other streams:
         if (mpctx->d_audio && mpctx->d_audio != ds) {
             ds_free_packs(mpctx->d_audio);
+            select_audio(mpctx->demuxer, -2, NULL);
             mpctx->d_audio->id = -2;
         }
         if (mpctx->d_video && mpctx->d_video != ds) {
             ds_free_packs(mpctx->d_video);
+            select_video(mpctx->demuxer, -2);
             mpctx->d_video->id = -2;
         }
         if (mpctx->d_sub && mpctx->d_sub != ds) {
