@@ -138,6 +138,15 @@ void list_audio_out(void){
     mp_msg(MSGT_GLOBAL, MSGL_INFO,"\n");
 }
 
+static int init_wrapper(const ao_functions_t *ao, int rate, int channels, int format, int flags)
+{
+    int res = ao->init(rate, channels, format, flags);
+    if (ao_data.format == (AF_FORMAT_U8 ^ AF_FORMAT_LE) ||
+        ao_data.format == (AF_FORMAT_S8 ^ AF_FORMAT_LE))
+        ao_data.format ^= AF_FORMAT_LE;
+    return res;
+}
+
 const ao_functions_t* init_best_audio_out(char** ao_list,int use_plugin,int rate,int channels,int format,int flags){
     int i;
     // first try the preferred drivers, with their optional subdevice param:
@@ -166,7 +175,7 @@ const ao_functions_t* init_best_audio_out(char** ao_list,int use_plugin,int rate
             const ao_functions_t* audio_out=audio_out_drivers[i];
             if(!strncmp(audio_out->info->short_name,ao,ao_len)){
                 // name matches, try it
-                if(audio_out->init(rate,channels,format,flags))
+                if(init_wrapper(audio_out,rate,channels,format,flags))
                     return audio_out; // success!
                 else
                     mp_msg(MSGT_AO, MSGL_WARN, MSGTR_AO_FailedInit, ao);
@@ -188,7 +197,7 @@ const ao_functions_t* init_best_audio_out(char** ao_list,int use_plugin,int rate
     for(i=0;audio_out_drivers[i];i++){
         const ao_functions_t* audio_out=audio_out_drivers[i];
 //        if(audio_out->control(AOCONTROL_QUERY_FORMAT, (int)format) == CONTROL_TRUE)
-        if(audio_out->init(rate,channels,format,flags))
+        if(init_wrapper(audio_out,rate,channels,format,flags))
             return audio_out; // success!
     }
     return NULL;
