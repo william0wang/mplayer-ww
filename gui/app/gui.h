@@ -54,4 +54,7 @@
 /// Check whether #guiItem @a item has a button (and thus a pressed state).
 #define hasButton(item) (item.type == itButton || item.type == itHPotmeter || item.type == itVPotmeter)
 
+/// Check whether #guiItem @a item utilizes member 'value'
+#define hasValue(item) (item.type == itHPotmeter || item.type == itVPotmeter || item.type == itPotmeter)
+
 #endif /* MPLAYER_GUI_GUI_H */
