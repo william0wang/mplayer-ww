@@ -239,7 +239,7 @@ void btnModify(int event, float state)
  * @brief Set the @a pressed state (i.e. a new value) to the item belonging to an event.
  *
  * @param event event
- * @param set new value
+ * @param state new state
  */
 void btnSet(int event, int state)
 {
