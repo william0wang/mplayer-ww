@@ -252,6 +252,6 @@ void btnSet(int event, int state)
 
     for (i = 0; i <= guiApp.IndexOfPlaybarItems; i++)
         if (guiApp.playbarItems[i].message == event)
-            if (hasButton(guiApp.mainItems[i]))
+            if (hasButton(guiApp.playbarItems[i]))
                 guiApp.playbarItems[i].pressed = state;
 }
