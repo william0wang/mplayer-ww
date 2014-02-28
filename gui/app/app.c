@@ -241,15 +241,17 @@ void btnModify(int event, float state)
  * @param event event
  * @param set new value
  */
-void btnSet(int event, int set)
+void btnSet(int event, int state)
 {
     int i;
 
     for (i = 0; i <= guiApp.IndexOfMainItems; i++)
         if (guiApp.mainItems[i].message == event)
-            guiApp.mainItems[i].pressed = set;
+            if (hasButton(guiApp.mainItems[i]))
+                guiApp.mainItems[i].pressed = state;
 
     for (i = 0; i <= guiApp.IndexOfPlaybarItems; i++)
         if (guiApp.playbarItems[i].message == event)
-            guiApp.playbarItems[i].pressed = set;
+            if (hasButton(guiApp.mainItems[i]))
+                guiApp.playbarItems[i].pressed = state;
 }

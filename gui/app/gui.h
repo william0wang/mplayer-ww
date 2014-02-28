@@ -24,6 +24,8 @@
 #ifndef MPLAYER_GUI_GUI_H
 #define MPLAYER_GUI_GUI_H
 
+#include "gui/app/app.h"
+
 #include "stream/stream.h"
 
 /// Name of the program the GUI utilizes
@@ -48,5 +50,8 @@
 
 /// Check whether @a x/y is inside the rectangle given by @a top @a x/y and @a bottom @a x/y.
 #define isInside(x, y, tx, ty, bx, by) ((x) > (tx) && (y) > (ty) && (x) < (bx) && (y) < (by))
+
+/// Check whether #guiItem @a item has a button (and thus a pressed state).
+#define hasButton(item) (item.type == itButton || item.type == itHPotmeter || item.type == itVPotmeter)
 
 #endif /* MPLAYER_GUI_GUI_H */

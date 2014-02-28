@@ -179,6 +179,6 @@ guiItem *appFindItem(int event);
 int appFindMessage(const char *name);
 void appFreeStruct(void);
 void btnModify(int event, float state);
-void btnSet(int event, int set);
+void btnSet(int event, int state);
 
 #endif /* MPLAYER_GUI_APP_H */
