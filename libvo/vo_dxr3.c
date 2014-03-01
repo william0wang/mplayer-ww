@@ -181,7 +181,7 @@ static int control(uint32_t request, void *data)
 {
 	switch (request) {
 	case VOCTRL_GUISUPPORT:
-		return VO_TRUE;
+		return dxr3_overlay ? VO_TRUE : VO_FALSE;
 	case VOCTRL_GUI_NOWINDOW:
 		if (dxr3_overlay) {
 			return VO_FALSE;
