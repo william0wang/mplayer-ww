@@ -482,15 +482,13 @@ int gui(int what, void *data)
         {
             int i = 0;
 
-            guiInfo.VideoWindow = True;
+            guiInfo.VideoWindow = False;
 
             while (video_out_drivers[i++]) {
-                if (video_out_drivers[i - 1]->control(VOCTRL_GUISUPPORT, NULL) == VO_TRUE) {
-                    if ((video_driver_list && !gstrcmp(video_driver_list[0], video_out_drivers[i - 1]->info->short_name)) && (video_out_drivers[i - 1]->control(VOCTRL_GUI_NOWINDOW, NULL) == VO_TRUE)) {
-                        guiInfo.VideoWindow = False;
+                    if ((video_driver_list && !gstrcmp(video_driver_list[0], video_out_drivers[i - 1]->info->short_name)) && (video_out_drivers[i - 1]->control(VOCTRL_GUISUPPORT, NULL) == VO_TRUE)) {
+                        guiInfo.VideoWindow = True;
                         break;
                     }
-                }
             }
         }
 

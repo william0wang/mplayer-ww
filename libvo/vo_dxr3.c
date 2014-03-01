@@ -182,11 +182,6 @@ static int control(uint32_t request, void *data)
 	switch (request) {
 	case VOCTRL_GUISUPPORT:
 		return dxr3_overlay ? VO_TRUE : VO_FALSE;
-	case VOCTRL_GUI_NOWINDOW:
-		if (dxr3_overlay) {
-			return VO_FALSE;
-		}
-		return VO_TRUE;
 	case VOCTRL_SET_SPU_PALETTE:
 		if (ioctl(fd_spu, EM8300_IOCTL_SPU_SETPALETTE, data) < 0) {
 			mp_msg(MSGT_VO,MSGL_ERR, MSGTR_LIBVO_DXR3_UnableToLoadNewSPUPalette);

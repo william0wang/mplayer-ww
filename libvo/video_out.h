@@ -51,7 +51,6 @@
 #define VOCTRL_RESET 3
 /* true if vo driver can use GUI created windows */
 #define VOCTRL_GUISUPPORT 4
-#define VOCTRL_GUI_NOWINDOW 19
 /* used to switch to fullscreen */
 #define VOCTRL_FULLSCREEN 5
 /* signal a device pause */
@@ -71,7 +70,6 @@
 /* equalizer controls */
 #define VOCTRL_SET_EQUALIZER 17
 #define VOCTRL_GET_EQUALIZER 18
-//#define VOCTRL_GUI_NOWINDOW 19
 /* Frame duplication */
 #define VOCTRL_DUPLICATE_FRAME 20
 // ... 21
