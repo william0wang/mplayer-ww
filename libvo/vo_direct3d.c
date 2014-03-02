@@ -788,6 +788,8 @@ static int control(uint32_t request, void *data)
     case VOCTRL_RESUME:
         priv->is_paused = 0;
         return VO_TRUE;
+    case VOCTRL_GUISUPPORT:
+        return VO_TRUE;
     case VOCTRL_ONTOP:
         vo_w32_ontop();
         return VO_TRUE;

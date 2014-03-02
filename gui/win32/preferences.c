@@ -235,7 +235,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
 
             btn = CreateWindow("button", acp(MSGTR_GUI_WIN32_DisplayInVideoWindow),
                                WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-                               10, 249, 250, 25,
+                               10, 249, 300, 25,
                                hwnd, (HMENU) ID_VIDEOWINDOW,
                                ((LPCREATESTRUCT) lParam) -> hInstance,
                                NULL);

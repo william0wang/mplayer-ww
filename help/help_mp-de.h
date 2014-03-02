@@ -1029,7 +1029,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_WIN32_DebugConsole "Debugging-Konsole"
 #define MSGTR_GUI_WIN32_Defaults "Standard"
 #define MSGTR_GUI_WIN32_DirectoryList "Verzeichnisliste"
-#define MSGTR_GUI_WIN32_DisplayInVideoWindow "Im Videofenster anzeigen (nur DirectX)"
+#define MSGTR_GUI_WIN32_DisplayInVideoWindow "Im Videofenster anzeigen (nur DirectX oder Direct3D)"
 #define MSGTR_GUI_WIN32_Down "Runter"
 #define MSGTR_GUI_WIN32_Load "Laden"
 #define MSGTR_GUI_WIN32_OnlineHelp "Online-Hilfe"

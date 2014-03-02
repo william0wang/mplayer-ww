@@ -1137,6 +1137,8 @@ static int control(uint32_t request, void *data)
         vo_w32_fullscreen();
         Directx_ManageDisplay();
         return VO_TRUE;
+    case VOCTRL_GUISUPPORT:
+        return VO_TRUE;
     case VOCTRL_GET_PANSCAN:
         return VO_TRUE;
     case VOCTRL_SET_PANSCAN:
