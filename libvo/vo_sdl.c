@@ -1333,6 +1333,8 @@ static int control(uint32_t request, void *data)
       return get_image(data);
   case VOCTRL_QUERY_FORMAT:
     return query_format(*((uint32_t*)data));
+  case VOCTRL_GUISUPPORT:
+    return priv->X ? VO_TRUE : VO_FALSE;
   case VOCTRL_FULLSCREEN:
     if (priv->surface->flags & SDL_FULLSCREEN) {
       set_video_mode(priv->windowsize.w, priv->windowsize.h, priv->bpp, priv->sdlflags);
