@@ -466,6 +466,35 @@ static MRESULT EXPENTRY WndProc(HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2)
         return (MRESULT)TRUE;
         }
 
+    case WM_SIZE:
+        {
+        RECTL rcl;
+        struct vo_rect src_rect;
+        struct vo_rect dst_rect;
+
+        WinQueryWindowRect(hwnd, &rcl);
+
+        vo_dwidth  = rcl.xRight - rcl.xLeft;
+        vo_dheight = rcl.yTop - rcl.yBottom;
+
+        calc_src_dst_rects(SRC_WIDTH, SRC_HEIGHT, &src_rect, &dst_rect,
+                           NULL, NULL);
+
+        m_int.kvas.rclSrcRect.xLeft   = src_rect.left;
+        m_int.kvas.rclSrcRect.yTop    = src_rect.top;
+        m_int.kvas.rclSrcRect.xRight  = src_rect.right;
+        m_int.kvas.rclSrcRect.yBottom = src_rect.bottom;
+        m_int.kvas.rclDstRect.xLeft   = dst_rect.left;
+        m_int.kvas.rclDstRect.yTop    = dst_rect.top;
+        m_int.kvas.rclDstRect.xRight  = dst_rect.right;
+        m_int.kvas.rclDstRect.yBottom = dst_rect.bottom;
+
+        // setup to resize
+        setAspectRatio((vo_fs || vo_keepaspect) ? KVAR_FORCEANY : KVAR_NONE);
+
+        return 0;
+        }
+
     case WM_BUTTON1DOWN:
     case WM_BUTTON3DOWN:
     case WM_BUTTON2DOWN:
