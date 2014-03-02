@@ -508,6 +508,19 @@ static MRESULT EXPENTRY WndProc(HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2)
 
         return (MRESULT)TRUE;
 
+    case WM_MOUSEMOVE:
+        {
+        int x = SHORT1FROMMP(mp1);
+        int y = SHORT2FROMMP(mp1);
+
+        // invert Y
+        y = (vo_dheight - 1) - y;
+
+        vo_mouse_movement(x, y);
+
+        break;
+        }
+
     case WM_PAINT:
         {
         HPS     hps;
