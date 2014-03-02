@@ -24,10 +24,6 @@
 #ifndef MPLAYER_GUI_GUI_H
 #define MPLAYER_GUI_GUI_H
 
-#include "gui/app/app.h"
-
-#include "stream/stream.h"
-
 /// Name of the program the GUI utilizes
 #define MPlayer "MPlayer"
 
