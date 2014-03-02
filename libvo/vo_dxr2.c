@@ -931,6 +931,9 @@ static int control(uint32_t request, void *data)
   case VOCTRL_ONTOP:
     vo_x11_ontop();
     return VO_TRUE;
+  case VOCTRL_GUISUPPORT:
+    if (sub_vo) return sub_vo->control(VOCTRL_GUISUPPORT, NULL);
+    else return VO_FALSE;
   case VOCTRL_FULLSCREEN:
     if(!use_ol)
       return VO_NOTIMPL;
