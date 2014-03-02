@@ -55,6 +55,7 @@
 #include "libvo/video_out.h"
 #include "libvo/x11_common.h"
 #include "osdep/timer.h"
+#include "stream/stream.h"
 #ifdef CONFIG_DVDREAD
 #include "stream/stream_dvd.h"
 #endif
