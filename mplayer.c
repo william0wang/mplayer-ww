@@ -3933,6 +3933,9 @@ goto_enable_cache:
                     // clear highlight
                     if (vo_spudec)
                         spudec_apply_palette_crop(vo_spudec, 0, 0, 0, 0, 0);
+                    osd_set_nav_box(0, 0, 0, 0);
+                    vo_osd_changed(OSDTYPE_DVDNAV);
+                    vo_osd_changed(OSDTYPE_SPU);
                     if (mpctx->sh_video &&
                         stream_control(mpctx->demuxer->stream,
                                        STREAM_CTRL_GET_ASPECT_RATIO, &ar)
