@@ -764,7 +764,7 @@ static int item_font(char *in)
         return 1;
 
     cutItem(in, fnt, ',', 0);   // Note: This seems needless but isn't for compatibility
-                                // reasons with a meanwhile depreciated second parameter.
+                                // reasons with a meanwhile deprecated second parameter.
     switch (fntRead(path, fnt)) {
     case -1:
         skin_error(MSGTR_GUI_MSG_SkinMemoryError);
