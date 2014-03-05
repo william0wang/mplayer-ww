@@ -1523,7 +1523,7 @@ if test -e ffmpeg/mp_auto_pull ; then
     fi
 fi
 
-if ! test -e ffmpeg ; then
+if test "$ffmpeg_a" != "no" && ! test -e ffmpeg ; then
     echo "No FFmpeg checkout, press enter to download one with git or CTRL+C to abort"
     read tmp
     if ! git clone -b $FFBRANCH --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
@@ -7098,6 +7098,7 @@ if test "$ffmpeg_so" = auto ; then
 fi
 
 if test "$ffmpeg" = yes; then
+  header_check libavutil/x86/asm.h || die "libavutil/x86/asm.h header is required for shared FFmpeg"
   def_ffmpeg='#define CONFIG_FFMPEG 1'
   if test "$ffmpeg_a" = yes ; then
     codecmodules="ffmpeg(internal) $codecmodules"
