@@ -839,6 +839,11 @@ static int config(uint32_t width, uint32_t height,
         rcl = m_int.rclDst;
     }
 
+    // trick to setup image parameters in WM_SIZE
+    // if new sizes of a window are same as old ones,
+    // WM_SIZE is not called
+    WinSetWindowPos(m_int.hwndFrame, NULLHANDLE, 0, 0, 0, 0, SWP_SIZE);
+
     WinCalcFrameRect(m_int.hwndFrame, &rcl, FALSE);
 
     WinSetWindowPos(m_int.hwndFrame, HWND_TOP,
