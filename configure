@@ -7089,6 +7089,7 @@ if test "$ffmpeg_so" = auto ; then
     inc_ffmpeg=$($_pkg_config --cflags libswscale libavformat libavcodec libavutil)
     ld_tmp=$($_pkg_config --libs libswscale libavformat libavcodec libavutil)
     header_check libavutil/avutil.h $inc_ffmpeg $ld_tmp &&
+      extra_cflags="$extra_cflags $inc_ffmpeg" &&
       extra_ldflags="$extra_ldflags $ld_tmp" && ffmpeg_so=yes && ffmpeg=yes
   elif header_check libavutil/avutil.h -lswscale -lavformat -lavcodec -lavutil ; then
     extra_ldflags="$extra_ldflags -lswscale -lavformat -lavcodec -lavutil"
@@ -7134,6 +7135,7 @@ if test "$postproc" = auto ; then
     inc_postproc=$($_pkg_config --cflags libpostproc)
     ld_tmp=$($_pkg_config --libs libpostproc)
     header_check libpostproc/postprocess.h $inc_postproc $ld_tmp &&
+      extra_cflags="$extra_cflags $inc_postproc" &&
       extra_ldflags="$extra_ldflags $ld_tmp" && postproc=yes
   elif header_check libpostproc/postprocess.h -lpostproc ; then
     extra_ldflags="$extra_ldflags -lpostproc"
