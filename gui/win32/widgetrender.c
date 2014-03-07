@@ -336,9 +336,6 @@ void renderwidget(skin_t *skin, image *dest, widget *item, int state)
             item->x = item->wx + item->wwidth - item->width;
         if(item->x < item->wx)
             item->x = item->wx;
-        /* workaround for blue */
-        if(item->type == tyHpotmeter)
-            height = (item->height < img->height / 3) ? item->height : img->height / 3;
     }
     render(skin->desktopbpp, dest, img, item->x, item->y, 0, y, img->width, height, 1);
 }
