@@ -7099,7 +7099,7 @@ if test "$ffmpeg_so" = auto ; then
 fi
 
 if test "$ffmpeg" = yes; then
-  touch config.h
+  test -e config.h || touch config.h
   header_check libavutil/x86/asm.h || die "libavutil/x86/asm.h header is required for shared FFmpeg"
   def_ffmpeg='#define CONFIG_FFMPEG 1'
   if test "$ffmpeg_a" = yes ; then
