@@ -476,7 +476,6 @@ static void loadfonts(skin_t* skin)
     for (x=0; x<skin->fontcount; x++)
     {
         FILE *fp;
-        int linenumber=0;
         char *filename;
         char *tmp = calloc(1, MAX_LINESIZE);
         char *desc = calloc(1, MAX_LINESIZE);
@@ -495,7 +494,6 @@ static void loadfonts(skin_t* skin)
             int pos = 0;
             unsigned int i;
             fgets(tmp, MAX_LINESIZE, fp);
-            linenumber++;
             memset(desc, 0, MAX_LINESIZE);
             for (i=0; i<strlen(tmp); i++)
             {
