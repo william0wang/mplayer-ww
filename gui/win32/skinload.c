@@ -233,7 +233,6 @@ static void freeskin(skin_t *skin)
         unsigned int x;
 
         nfree(skin->fonts[i]->name);
-        nfree(skin->fonts[i]->id);
 
         for (x=0; x<skin->fonts[i]->charcount; x++)
             nfree(skin->fonts[i]->chars[x]);
@@ -659,20 +658,8 @@ skin_t* loadskin(char* skindir, int desktopbpp)
         }
         else if(!strncmp(desc, "font", 4))
         {
-            unsigned int i;
             int id = 0;
             char temp[MAX_LINESIZE];
-            int base = counttonextchar(desc, '=')+1;
-            findnextstring(temp, desc, &base);
-            findnextstring(temp, desc, &base);
-            for (i=0; i<skin->fontcount; i++)
-                if(!strcmp(skin->fonts[i]->id, temp))
-                {
-                    id = i;
-                    break;
-                }
-            if(!id)
-            {
                 int base = counttonextchar(desc, '=') + 1;
                 findnextstring(temp, desc, &base);
                 id = skin->fontcount;
@@ -680,9 +667,7 @@ skin_t* loadskin(char* skindir, int desktopbpp)
                 skin->fonts = realloc(skin->fonts, sizeof(font_t *) * skin->fontcount);
                 skin->fonts[id]=calloc(1, sizeof(font_t));
                 skin->fonts[id]->name = strdup(temp);
-                skin->fonts[id]->id = strdup(findnextstring(temp, desc, &base));
-            }
-            mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [FONT] id  \"%s\" name \"%s\"\n", skin->fonts[id]->name, skin->fonts[id]->id);
+            mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [FONT] name \"%s\"\n", skin->fonts[id]->name);
         }
         else
             skin->addwidget(skin, mywindow, desc);

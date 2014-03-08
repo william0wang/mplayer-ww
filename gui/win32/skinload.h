@@ -45,7 +45,6 @@ typedef struct
 typedef struct
 {
     char *name;
-    char *id;
     image *image;
     unsigned int charcount;
     char_t **chars;
