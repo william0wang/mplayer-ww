@@ -660,13 +660,13 @@ skin_t* loadskin(char* skindir, int desktopbpp)
         {
             int id = 0;
             char temp[MAX_LINESIZE];
-                int base = counttonextchar(desc, '=') + 1;
-                findnextstring(temp, desc, &base);
-                id = skin->fontcount;
-                (skin->fontcount)++;
-                skin->fonts = realloc(skin->fonts, sizeof(font_t *) * skin->fontcount);
-                skin->fonts[id]=calloc(1, sizeof(font_t));
-                skin->fonts[id]->name = strdup(temp);
+            int base = counttonextchar(desc, '=') + 1;
+            findnextstring(temp, desc, &base);
+            id = skin->fontcount;
+            (skin->fontcount)++;
+            skin->fonts = realloc(skin->fonts, sizeof(font_t *) * skin->fontcount);
+            skin->fonts[id]=calloc(1, sizeof(font_t));
+            skin->fonts[id]->name = strdup(temp);
             mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [FONT] name \"%s\"\n", skin->fonts[id]->name);
         }
         else
