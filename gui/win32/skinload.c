@@ -93,6 +93,8 @@ static const evName evNames[] =
 
 static const int evBoxs = sizeof(evNames) / sizeof(evName);
 
+static int linenumber;
+
 static char *geteventname(int event)
 {
     int i;
@@ -548,12 +550,13 @@ skin_t* loadskin(char* skindir, int desktopbpp)
 {
     FILE *fp;
     int reachedendofwindow = FALSE;
-    int linenumber = 0;
     skin_t *skin = calloc(1, sizeof(skin_t));
     char *filename;
     char *tmp = calloc(1, MAX_LINESIZE);
     char *desc = calloc(1, MAX_LINESIZE);
     window* mywindow = NULL;
+
+    linenumber = 0;
 
     /* setup funcs */
     skin->freeskin = freeskin;
