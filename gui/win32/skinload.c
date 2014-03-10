@@ -121,7 +121,7 @@ static void skin_legacy (const char *old, const char *data)
     }
     else if (strcmp(old, "evSetURL") == 0 && strcmp(data, old) == 0)
         mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, old, "evLoadURL");
-    else if (strcmp(old, "sub") == 0)
+    else if (strcmp(old, "sub") == 0 || strcmp(old, "potmeter") == 0)
         mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, old, data);
 }
 
@@ -364,23 +364,34 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
               (mywidget->bitmap[0]) ? mywidget->bitmap[0]->name : NULL,
                mywidget->x, mywidget->y, mywidget->width, mywidget->height, mywidget->msg);
     }
-    else if(!strncmp(desc, "hpotmeter", 9) || !strncmp(desc, "vpotmeter", 9))
+    else if(!strncmp(desc, "hpotmeter", 9) || !strncmp(desc, "vpotmeter", 9) || /* legacy */ !strncmp(desc, "potmeter", 8))
     {
         int base = counttonextchar(desc, '=') + 1;
-        int i;
+        int i = 0;
         /* hpotmeter = button, bwidth, bheight, phases, numphases, default, X, Y, width, height, message */
-        if(!strncmp(desc, "hpotmeter", 9)) mywidget->type = tyHpotmeter;
-        else mywidget->type = tyVpotmeter;
-        mywidget->bitmap[0] = pngRead(skin, findnextstring(temp, desc, &base));
+        if(!strncmp(desc, "vpotmeter", 9)) mywidget->type = tyVpotmeter;
+        else mywidget->type = tyHpotmeter;
+        if (*desc != 'p')
+        {
+        mywidget->bitmap[i++] = pngRead(skin, findnextstring(temp, desc, &base));
         mywidget->width = atoi(findnextstring(temp, desc, &base));
         mywidget->height = atoi(findnextstring(temp, desc, &base));
-        mywidget->bitmap[1] = pngRead(skin, findnextstring(temp, desc, &base));
+        }
+        mywidget->bitmap[i] = pngRead(skin, findnextstring(temp, desc, &base));
         mywidget->phases = atoi(findnextstring(temp, desc, &base));
         mywidget->value = atof(findnextstring(temp, desc, &base));
         mywidget->x = mywidget->wx = atoi(findnextstring(temp, desc, &base));
         mywidget->y = mywidget->wy = atoi(findnextstring(temp, desc, &base));
         mywidget->wwidth = atoi(findnextstring(temp, desc, &base));
         mywidget->wheight = atoi(findnextstring(temp, desc, &base));
+        if (*desc == 'p')
+        {
+            // legacy
+            skin_legacy("potmeter", "hpotmeter");
+
+            mywidget->width = mywidget->wwidth;
+            mywidget->height = mywidget->wheight;
+        }
         findnextstring(temp, desc, &base);
         mywidget->msg = evNone;
         for (i=0; i<evBoxs; i++)

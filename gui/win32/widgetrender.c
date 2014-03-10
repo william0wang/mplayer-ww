@@ -310,7 +310,7 @@ void renderwidget(skin_t *skin, image *dest, widget *item, int state)
     if(!img) return;
 
     y = item->y;
-    if(item->type == tyPotmeter)
+    if(/* item->type == tyPotmeter */ /* legacy (potmeter) */ item->type == tyHpotmeter && item->width == item->wwidth)
     {
         height = img->height / item->phases;
         y =  height * (int)(item->value * item->phases / 100);

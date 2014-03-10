@@ -79,7 +79,7 @@ static void skin_legacy(const char *old, const char *data)
             mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, old, "$p");
     } else if (strcmp(old, "evSetURL") == 0 && strcmp(data, old) == 0)
         mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, old, "evLoadURL");
-    else if (strcmp(old, "sub") == 0)
+    else if (strcmp(old, "sub") == 0 || strcmp(old, "potmeter") == 0)
         mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, old, data);
 }
 
@@ -719,6 +719,15 @@ static int item_vpotmeter(char *in)
  */
 static int item_potmeter(char *in)
 {
+    char param[256];
+
+    // legacy
+    skin_legacy("potmeter", "hpotmeter");
+
+    snprintf(param, sizeof(param), "NULL,0,0,%s", in);
+
+    return item_hpotmeter(param);
+/*
     unsigned char phfname[256];
     unsigned char buf[512];
     int ph, d, x, y, w, h, message;
@@ -782,6 +791,7 @@ static int item_potmeter(char *in)
     }
 
     return 0;
+*/
 }
 
 /**
@@ -1014,7 +1024,7 @@ static _item skinItem[] = {
     { "font",       item_font       },
     { "hpotmeter",  item_hpotmeter  },
     { "menu",       item_menu       },
-    { "potmeter",   item_potmeter   },
+    { "potmeter",   item_potmeter   }, // legacy
     { "section",    item_section    },
     { "selected",   item_selected   },
     { "slabel",     item_slabel     },
