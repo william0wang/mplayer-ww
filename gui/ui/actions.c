@@ -45,14 +45,14 @@
 #include "m_property.h"
 #include "mixer.h"
 #include "mp_core.h"
+#include "mp_fifo.h"
 #include "mp_msg.h"
 #include "mpcommon.h"
 #include "mplayer.h"
 #include "input/input.h"
 #include "libmpdemux/demuxer.h"
 #include "libvo/video_out.h"
-#include "libvo/wskeys.h"
-#include "libvo/x11_common.h"
+#include "osdep/keycodes.h"
 #include "osdep/timer.h"
 #include "stream/stream.h"
 #include "sub/sub.h"
@@ -310,11 +310,11 @@ play:
         break;
 
     case evIncVolume:
-        vo_x11_putkey(wsGrayMul);
+        mplayer_put_key(KEY_VOLUME_UP);
         break;
 
     case evDecVolume:
-        vo_x11_putkey(wsGrayDiv);
+        mplayer_put_key(KEY_VOLUME_DOWN);
         break;
 
     case evMute:
