@@ -57,6 +57,33 @@ static int *currWinItemIdx;
 static guiItem *currWinItems;
 
 /**
+ * @brief Print a legacy information on an entry.
+ *
+ * @param old identifier (and deprecated entry)
+ * @param data pointer to additional data necessary for checking and
+ *             to print the information on @a old
+ */
+static void skin_legacy(const char *old, const char *data)
+{
+    const char *p;
+
+    if (strcmp(old, "fontid") == 0) {
+        p = strchr(data, ',');
+
+        if (p)
+            mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, p, "font = fontfile");
+    } else if (strcmp(old, "$l") == 0) {
+        p = strstr(old, data);
+
+        if (p && (p == data || p[-1] != '$'))
+            mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, old, "$p");
+    } else if (strcmp(old, "evSetURL") == 0 && strcmp(data, old) == 0)
+        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, old, "evLoadURL");
+    else if (strcmp(old, "sub") == 0)
+        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, old, data);
+}
+
+/**
  * @brief Display a skin error message.
  *
  * @param format format string
@@ -231,8 +258,11 @@ static int item_window(char *in)
 
     strlower(in);
 
-    if (strcmp(in, "sub") == 0)
-        strcpy(in, "video");                           // legacy
+    // legacy
+    if (strcmp(in, "sub") == 0) {
+        strcpy(in, "video");
+        skin_legacy("sub", in);
+    }
 
     if (strcmp(in, "main") == 0) {
         currWin = &skin->main;
@@ -415,6 +445,9 @@ static int item_button(char *in)
         skin_error(MSGTR_GUI_MSG_SkinUnknownMessage, msg);
         return 1;
     }
+    // legacy
+    else
+        skin_legacy("evSetURL", msg);
 
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    button image: %s %d,%d\n", fname, x, y);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     message: %s (#%d)\n", msg, message);
@@ -531,6 +564,9 @@ static int item_menu(char *in)
         skin_error(MSGTR_GUI_MSG_SkinUnknownMessage, msg);
         return 1;
     }
+    // legacy
+    else
+        skin_legacy("evSetURL", msg);
 
     item = next_item();
 
@@ -595,6 +631,9 @@ static int item_hpotmeter(char *in)
         skin_error(MSGTR_GUI_MSG_SkinUnknownMessage, buf);
         return 1;
     }
+    // legacy
+    else
+        skin_legacy("evSetURL", buf);
 
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    h/v potmeter image: %s %d,%d %dx%d\n", phfname, x, y, w, h);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     button image: %s %dx%d\n", pfname, pwidth, pheight);
@@ -708,6 +747,9 @@ static int item_potmeter(char *in)
         skin_error(MSGTR_GUI_MSG_SkinUnknownMessage, buf);
         return 1;
     }
+    // legacy
+    else
+        skin_legacy("evSetURL", buf);
 
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    potmeter image: %s %d,%d %dx%d\n", phfname, x, y, w, h);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     numphases: %d, default: %d%%\n", ph, d);
@@ -765,6 +807,9 @@ static int item_font(char *in)
 
     cutItem(in, fnt, ',', 0);   // Note: This seems needless but isn't for compatibility
                                 // reasons with a meanwhile deprecated second parameter.
+    // legacy
+    skin_legacy("fontid", in);
+
     switch (fntRead(path, fnt)) {
     case -1:
         skin_error(MSGTR_GUI_MSG_SkinMemoryError);
@@ -882,6 +927,9 @@ static int item_dlabel(char *in)
     cutItem(in, fnt, ',', 4);
     cutItem(in, txt, ',', 5);
     cutItem(txt, txt, '"', 1);
+
+    // legacy
+    skin_legacy("$l", txt);
 
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    dlabel: \"%s\"\n", txt);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     pos: %d,%d\n", x, y);

@@ -28,6 +28,7 @@
 #include <windows.h>
 
 #include "mp_msg.h"
+#include "help_mp.h"
 #include "cpudetect.h"
 #include "libswscale/swscale.h"
 #include "libavutil/imgutils.h"
@@ -94,6 +95,35 @@ static const evName evNames[] =
 static const int evBoxs = sizeof(evNames) / sizeof(evName);
 
 static int linenumber;
+
+/**
+ * @brief Print a legacy information on an entry.
+ *
+ * @param old identifier (and deprecated entry)
+ * @param data pointer to additional data necessary for checking and
+ *             to print the information on @a old
+ */
+static void skin_legacy (const char *old, const char *data)
+{
+    const char *p;
+
+    if (strcmp(old, "fontid") == 0)
+    {
+        p = strchr(data, ',');
+
+        if (p) mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, p, "font = fontfile");
+    }
+    else if (strcmp(old, "$l") == 0)
+    {
+        p = strstr(old, data);
+
+        if (p && (p == data || p[-1] != '$')) mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, old, "$p");
+    }
+    else if (strcmp(old, "evSetURL") == 0 && strcmp(data, old) == 0)
+        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, old, "evLoadURL");
+    else if (strcmp(old, "sub") == 0)
+        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, old, data);
+}
 
 static char *geteventname(int event)
 {
@@ -322,6 +352,9 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
         {
             if(!strcmp(temp, evNames[i].name))
             {
+                // legacy
+                skin_legacy("evSetURL", temp);
+
                 mywidget->msg = evNames[i].msg;
                 break;
             }
@@ -354,6 +387,9 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
         {
             if(!strcmp(temp, evNames[i].name))
             {
+                // legacy
+                skin_legacy("evSetURL", temp);
+
                 mywidget->msg = evNames[i].msg;
                 break;
             }
@@ -386,6 +422,9 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
         {
             if(!strcmp(temp, evNames[i].name))
             {
+                // legacy
+                skin_legacy("evSetURL", temp);
+
                 mywidget->msg=evNames[i].msg;
                 break;
             }
@@ -413,6 +452,9 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
         {
             if(!strcmp(temp, evNames[i].name))
             {
+                // legacy
+                skin_legacy("evSetURL", temp);
+
                 mywidget->msg = evNames[i].msg;
                 break;
             }
@@ -466,6 +508,10 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
             }
         }
         mywidget->label=strdup(findnextstring(temp, desc, &base));
+
+        // legacy
+        skin_legacy("$l", mywidget->label);
+
         mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [ITEM] [DLABEL] %i %i %i %i %s \"%s\"\n",
                mywidget->x, mywidget->y, mywidget->length, mywidget->align, mywidget->font->name, mywidget->label);
     }
@@ -623,6 +669,8 @@ skin_t* loadskin(char* skindir, int desktopbpp)
             {
                 mywindow->type = wiVideo;
                 mywindow->decoration = TRUE;
+                // legacy
+                if (desc[7] == 's') skin_legacy("sub", "video");
             }
             else if(!strncmp(desc + 7, "menu", 4)) mywindow->type = wiMenu;
             else if(!strncmp(desc + 7, "playbar", 7)) mywindow->type = wiPlaybar;
@@ -668,6 +716,10 @@ skin_t* loadskin(char* skindir, int desktopbpp)
             skin->fonts = realloc(skin->fonts, sizeof(font_t *) * skin->fontcount);
             skin->fonts[id]=calloc(1, sizeof(font_t));
             skin->fonts[id]->name = strdup(temp);
+
+            // legacy
+            skin_legacy("fontid", desc);
+
             mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [FONT] name \"%s\"\n", skin->fonts[id]->name);
         }
         else

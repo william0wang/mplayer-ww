@@ -37,6 +37,8 @@ MPlayer
 
     GUI:
     * Support for TV/DVB
+    * Console message with information on deprecated (but still supported)
+      entries in the skin configuration file
 
   1.1: "We gave up on 1.0"
 

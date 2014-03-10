@@ -719,6 +719,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_MSG_SkinFontFileNotFound "Font description file not found.\n"
 #define MSGTR_GUI_MSG_SkinFontImageNotFound "Font image file not found.\n"
 #define MSGTR_GUI_MSG_SkinFontNotFound "Font '%s' not found.\n"
+#define MSGTR_GUI_MSG_SkinLegacy "Skin config file at line %d: '%s' is deprecated, use '%s' instead.\n"
 #define MSGTR_GUI_MSG_SkinMemoryError "Not enough memory\n"
 #define MSGTR_GUI_MSG_SkinTooManyFonts "Too many fonts defined.\n"
 #define MSGTR_GUI_MSG_SkinTooManyItems "Too many items defined.\n"
