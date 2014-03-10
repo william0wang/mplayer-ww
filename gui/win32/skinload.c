@@ -373,9 +373,9 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
         else mywidget->type = tyHpotmeter;
         if (*desc != 'p')
         {
-        mywidget->bitmap[i++] = pngRead(skin, findnextstring(temp, desc, &base));
-        mywidget->width = atoi(findnextstring(temp, desc, &base));
-        mywidget->height = atoi(findnextstring(temp, desc, &base));
+            mywidget->bitmap[i++] = pngRead(skin, findnextstring(temp, desc, &base));
+            mywidget->width = atoi(findnextstring(temp, desc, &base));
+            mywidget->height = atoi(findnextstring(temp, desc, &base));
         }
         mywidget->bitmap[i] = pngRead(skin, findnextstring(temp, desc, &base));
         mywidget->phases = atoi(findnextstring(temp, desc, &base));

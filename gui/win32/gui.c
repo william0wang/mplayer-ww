@@ -933,8 +933,7 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                             item->x = GET_X_LPARAM(lParam);
                             wd = item->wwidth;
                         }
-                        else
-                        item->x = GET_X_LPARAM(lParam) - gui->mousewx;
+                        else item->x = GET_X_LPARAM(lParam) - gui->mousewx;
 
                         item->value = ((item->x - item->wx) * 100.0f) / (float) wd;
                     }
