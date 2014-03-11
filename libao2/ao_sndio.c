@@ -103,6 +103,10 @@ static int init(int rate, int channels, int format, int flags)
     }
     sio_initpar(&par);
     par.bits = af_fmt2bits(format);
+    par.bps = (par.bits + 7) >> 3;
+    // normally bits == 8*bps so this makes no difference
+    // but we can support more formats for msb == 1, see "if" below
+    par.msb = 1;
     par.sig = (format & AF_FORMAT_SIGN_MASK) == AF_FORMAT_SI;
     if (par.bits > 8)
         par.le = (format & AF_FORMAT_END_MASK) == AF_FORMAT_LE;
@@ -118,7 +122,8 @@ static int init(int rate, int channels, int format, int flags)
         mp_msg(MSGT_AO, MSGL_ERR, "ao2: couldn't get params\n");
         goto err_out;
     }
-    if (par.bps != SIO_BPS(par.bits)) {
+    // we do not care if LSBs are discarded
+    if (par.bits < 8 * par.bps && !par.msb) {
         mp_msg(MSGT_AO, MSGL_ERR, "ao2: unsupported format\n");
         goto err_out;
     }
