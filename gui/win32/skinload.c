@@ -392,6 +392,12 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
             mywidget->width = mywidget->wwidth;
             mywidget->height = mywidget->wheight;
         }
+        if (mywidget->bitmap[0] == NULL || mywidget->width == 0 || mywidget->height == 0)
+        {
+            mywidget->bitmap[0] = mywidget->bitmap[1];
+            mywidget->width = mywidget->wwidth;
+            mywidget->height = mywidget->wheight;
+        }
         findnextstring(temp, desc, &base);
         mywidget->msg = evNone;
         for (i=0; i<evBoxs; i++)
