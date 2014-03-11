@@ -367,31 +367,32 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
     else if(!strncmp(desc, "hpotmeter", 9) || !strncmp(desc, "vpotmeter", 9) || /* legacy */ !strncmp(desc, "potmeter", 8))
     {
         int base = counttonextchar(desc, '=') + 1;
-        int i = 0;
+        int i;
         /* hpotmeter = button, bwidth, bheight, phases, numphases, default, X, Y, width, height, message */
         if(!strncmp(desc, "vpotmeter", 9)) mywidget->type = tyVpotmeter;
         else mywidget->type = tyHpotmeter;
-        if (*desc != 'p')
+        if (*desc == 'p')
         {
-            mywidget->bitmap[i++] = pngRead(skin, findnextstring(temp, desc, &base));
+            mywidget->bitmap[0] = NULL;
+            mywidget->width = 0;
+            mywidget->height = 0;
+
+            // legacy
+            skin_legacy("potmeter", "hpotmeter");
+        }
+        else
+        {
+            mywidget->bitmap[0] = pngRead(skin, findnextstring(temp, desc, &base));
             mywidget->width = atoi(findnextstring(temp, desc, &base));
             mywidget->height = atoi(findnextstring(temp, desc, &base));
         }
-        mywidget->bitmap[i] = pngRead(skin, findnextstring(temp, desc, &base));
+        mywidget->bitmap[1] = pngRead(skin, findnextstring(temp, desc, &base));
         mywidget->phases = atoi(findnextstring(temp, desc, &base));
         mywidget->value = atof(findnextstring(temp, desc, &base));
         mywidget->x = mywidget->wx = atoi(findnextstring(temp, desc, &base));
         mywidget->y = mywidget->wy = atoi(findnextstring(temp, desc, &base));
         mywidget->wwidth = atoi(findnextstring(temp, desc, &base));
         mywidget->wheight = atoi(findnextstring(temp, desc, &base));
-        if (*desc == 'p')
-        {
-            // legacy
-            skin_legacy("potmeter", "hpotmeter");
-
-            mywidget->width = mywidget->wwidth;
-            mywidget->height = mywidget->wheight;
-        }
         if (mywidget->bitmap[0] == NULL || mywidget->width == 0 || mywidget->height == 0)
         {
             mywidget->bitmap[0] = mywidget->bitmap[1];
