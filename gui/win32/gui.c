@@ -935,17 +935,17 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                         }
                         else item->x = GET_X_LPARAM(lParam) - gui->mousewx;
 
-                        item->value = ((item->x - item->wx) * 100.0f) / (float) wd;
+                        item->value = 100.0 * (item->x - item->wx) / wd;
                     }
                     if(item->type == tyVpotmeter)
                     {
                         item->y = GET_Y_LPARAM(lParam) - gui->mousewy;
-                        item->value = 100.0f - ((item->y - item->wy)  * 100.0f) / (float) (item->wheight - item->height);
+                        item->value = 100.0 - 100.0 * (item->y - item->wy) / (item->wheight - item->height);
                     }
                     if(item->type == tyPotmeter)
                     {
                         gui->mousewx = GET_X_LPARAM(lParam) - gui->activewidget->x;
-                        item->value = (gui->mousewx * 100.0f) / (float) item->wwidth;
+                        item->value = 100.0 * gui->mousewx / item->wwidth;
                     }
 
                     if((item->type == tyPotmeter) || (item->type == tyHpotmeter) || (item->type == tyVpotmeter))

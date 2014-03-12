@@ -177,12 +177,12 @@ static void uiPlaybarMouse( int Button, int X, int Y, int RX, int RY )
 	 {
 	  case itPotmeter:
 	  case itHPotmeter:
-	       btnModify( item->message,(float)( X - item->x ) / item->width * 100.0 );
+	       btnModify( item->message,100.0 * ( X - item->x ) / item->width);
 	       uiEvent( item->message,item->value );
 	       value=item->value;
 	       break;
 	  case itVPotmeter:
-	       btnModify( item->message, ( 1.0 - (float)( Y - item->y ) / item->height) * 100.0 );
+	       btnModify( item->message,100.0 - 100.0 * ( Y - item->y ) / item->height );
 	       uiEvent( item->message,item->value );
 	       value=item->value;
 	       break;
@@ -215,13 +215,13 @@ rollerhandled:
 	       if (guiApp.menuIsPresent) guiApp.menuWindow.MouseHandler( 0,RX,RY,0,0 );
 	       break;
 	  case itPotmeter:
-	       item->value=(float)( X - item->x ) / item->width * 100.0;
+	       item->value=100.0 * ( X - item->x ) / item->width;
 	       goto potihandled;
 	  case itVPotmeter:
-	       item->value=(1.0 - (float)( Y - item->y ) / item->height) * 100.0;
+	       item->value=100.0 - 100.0 * ( Y - item->y ) / item->height;
 	       goto potihandled;
 	  case itHPotmeter:
-	       item->value=(float)( X - item->x ) / item->width * 100.0;
+	       item->value=100.0 * ( X - item->x ) / item->width;
 potihandled:
 	       if ( item->value > 100.0f ) item->value=100.0f;
 	       if ( item->value < 0.0f ) item->value=0.0f;
