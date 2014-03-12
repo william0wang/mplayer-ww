@@ -528,7 +528,7 @@ Vous pouvez utiliser les variables suivantes dans le texte:
 </row>
 <row>
 <entry>$V</entry>
-<entry>volume au format <emphasis>xxx.xx</emphasis></entry>
+<entry>volume au format <emphasis>xxx.x</emphasis></entry>
 </row>
 <row>
 <entry>$b</entry>
@@ -536,7 +536,7 @@ Vous pouvez utiliser les variables suivantes dans le texte:
 </row>
 <row>
 <entry>$B</entry>
-<entry>balance au format <emphasis>xxx.xx</emphasis></entry>
+<entry>balance au format <emphasis>xxx.x</emphasis></entry>
 </row>
 <row>
 <entry>$$</entry>

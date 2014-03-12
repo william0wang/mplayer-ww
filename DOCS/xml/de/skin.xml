@@ -655,7 +655,7 @@ end
                   </row>
                   <row>
                     <entry>$V</entry>
-                    <entry>Lautstärke im <emphasis>xxx.xx</emphasis>-Format</entry>
+                    <entry>Lautstärke im <emphasis>xxx.x</emphasis>-Format</entry>
                   </row>
                   <row>
                     <entry>$b</entry>
@@ -663,7 +663,7 @@ end
                   </row>
                   <row>
                     <entry>$B</entry>
-                    <entry>Balance in <emphasis>xxx.xx</emphasis>-Format</entry>
+                    <entry>Balance in <emphasis>xxx.x</emphasis>-Format</entry>
                   </row>
                   <row>
                     <entry>$$</entry>

@@ -540,7 +540,7 @@ tekście:
 </row>
 <row>
 <entry>$V</entry>
-<entry>format głośności <emphasis>xxx.xx</emphasis> format</entry>
+<entry>format głośności <emphasis>xxx.x</emphasis> format</entry>
 </row>
 <row>
 <entry>$b</entry>
@@ -548,7 +548,7 @@ tekście:
 </row>
 <row>
 <entry>$B</entry>
-<entry>format balansu <emphasis>xxx.xx</emphasis></entry>
+<entry>format balansu <emphasis>xxx.x</emphasis></entry>
 </row>
 <row>
 <entry>$$</entry>

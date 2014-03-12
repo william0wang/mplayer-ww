@@ -537,7 +537,7 @@ blokkokban.
   </row>
   <row>
     <entry>$V</entry>
-    <entry>hangerő <emphasis>xxx.xx</emphasis> formátumban</entry>
+    <entry>hangerő <emphasis>xxx.x</emphasis> formátumban</entry>
   </row>
   <row>
     <entry>$b</entry>
@@ -545,7 +545,7 @@ blokkokban.
   </row>
   <row>
     <entry>$B</entry>
-    <entry>balansz <emphasis>xxx.xx</emphasis> formátumban</entry>
+    <entry>balansz <emphasis>xxx.x</emphasis> formátumban</entry>
   </row>
   <row>
     <entry>$$</entry>

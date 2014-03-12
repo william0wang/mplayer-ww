@@ -547,7 +547,7 @@ texto). La etiqueta es mostrada usando la tipografía identificada por
 </row>
 <row>
 <entry>$V</entry>
-<entry>volumen en formato <emphasis>xxx.xx</emphasis></entry>
+<entry>volumen en formato <emphasis>xxx.x</emphasis></entry>
 </row>
 <row>
 <entry>$b</entry>
@@ -555,7 +555,7 @@ texto). La etiqueta es mostrada usando la tipografía identificada por
 </row>
 <row>
 <entry>$B</entry>
-<entry>balance en formato <emphasis>xxx.xx</emphasis></entry>
+<entry>balance en formato <emphasis>xxx.x</emphasis></entry>
 </row>
 <row>
 <entry>$$</entry>

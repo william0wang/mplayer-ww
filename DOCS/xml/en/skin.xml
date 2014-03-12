@@ -542,7 +542,7 @@ blocks.
   </row>
   <row>
     <entry>$V</entry>
-    <entry>volume in <emphasis>xxx.xx</emphasis> format</entry>
+    <entry>volume in <emphasis>xxx.x</emphasis> format</entry>
   </row>
   <row>
     <entry>$b</entry>
@@ -550,7 +550,7 @@ blocks.
   </row>
   <row>
     <entry>$B</entry>
-    <entry>balance in <emphasis>xxx.xx</emphasis> format</entry>
+    <entry>balance in <emphasis>xxx.x</emphasis> format</entry>
   </row>
   <row>
     <entry>$$</entry>
