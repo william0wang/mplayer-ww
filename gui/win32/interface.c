@@ -296,7 +296,7 @@ static void guiSetEvent(int event)
             break;
         case evSetMoviePosition:
         {
-            rel_seek_secs = guiInfo.Position / 100.0f;
+            rel_seek_secs = guiInfo.Position / 100.0;
             abs_seek_pos = SEEK_ABSOLUTE | SEEK_FACTOR;
             break;
         }
@@ -323,8 +323,8 @@ static void guiSetEvent(int event)
             if (guiInfo.Balance == 50.0f)
                 mixer_setvolume(mixer, guiInfo.Volume, guiInfo.Volume);
 
-            l = guiInfo.Volume * (100.0f - guiInfo.Balance) / 50.0f;
-            r = guiInfo.Volume * guiInfo.Balance / 50.0f;
+            l = guiInfo.Volume * (100.0 - guiInfo.Balance) / 50.0;
+            r = guiInfo.Volume * guiInfo.Balance / 50.0;
 
             if (l > guiInfo.Volume) l=guiInfo.Volume;
             if (r > guiInfo.Volume) r=guiInfo.Volume;
@@ -753,7 +753,7 @@ int gui(int what, void *data)
                 mixer_getvolume(mixer, &l, &r);
                 guiInfo.Volume = (r > l ? r : l); /* max(r,l) */
                 if (r != l)
-                    guiInfo.Balance = ((r-l) + 100.0f) * 0.5f;
+                    guiInfo.Balance = ((r-l) + 100.0) * 0.5;
                 else
                     guiInfo.Balance = 50.0f;
             }
