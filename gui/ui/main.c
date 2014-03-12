@@ -193,12 +193,10 @@ rollerhandled:
             case itPRMButton:
                  if (guiApp.menuIsPresent) guiApp.menuWindow.MouseHandler( 0,RX,RY,0,0 );
                  break;
-            case itPotmeter:
-                 item->value=100.0 * ( X - item->x ) / item->width;
-                 goto potihandled;
             case itVPotmeter:
                  item->value=100.0 - 100.0 * ( Y - item->y ) / item->height;
                  goto potihandled;
+            case itPotmeter:
             case itHPotmeter:
                  item->value=100.0 * ( X - item->x ) / item->width;
 potihandled:
