@@ -323,8 +323,8 @@ static void guiSetEvent(int event)
             if (guiInfo.Balance == 50.0f)
                 mixer_setvolume(mixer, guiInfo.Volume, guiInfo.Volume);
 
-            l = guiInfo.Volume * ((100.0f - guiInfo.Balance) / 50.0f);
-            r = guiInfo.Volume * ((guiInfo.Balance) / 50.0f);
+            l = guiInfo.Volume * (100.0f - guiInfo.Balance) / 50.0f;
+            r = guiInfo.Volume * guiInfo.Balance / 50.0f;
 
             if (l > guiInfo.Volume) l=guiInfo.Volume;
             if (r > guiInfo.Volume) r=guiInfo.Volume;

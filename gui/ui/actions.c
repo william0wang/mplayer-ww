@@ -324,15 +324,15 @@ play:
     case evSetVolume:
         guiInfo.Volume = param;
         {
-            float l = guiInfo.Volume * ((100.0 - guiInfo.Balance) / 50.0);
-            float r = guiInfo.Volume * ((guiInfo.Balance) / 50.0);
+            float l = guiInfo.Volume * (100.0 - guiInfo.Balance) / 50.0;
+            float r = guiInfo.Volume * guiInfo.Balance / 50.0;
             mixer_setvolume(mixer, FFMIN(l, guiInfo.Volume), FFMIN(r, guiInfo.Volume));
         }
 
         if (osd_level) {
             osd_visible = (GetTimerMS() + 1000) | 1;
             vo_osd_progbar_type  = OSD_VOLUME;
-            vo_osd_progbar_value = ((guiInfo.Volume) * 256.0) / 100.0;
+            vo_osd_progbar_value = guiInfo.Volume * 256.0 / 100.0;
             vo_osd_changed(OSDTYPE_PROGBAR);
         }
 
@@ -349,7 +349,7 @@ play:
         if (osd_level) {
             osd_visible = (GetTimerMS() + 1000) | 1;
             vo_osd_progbar_type  = OSD_BALANCE;
-            vo_osd_progbar_value = ((guiInfo.Balance) * 256.0) / 100.0;
+            vo_osd_progbar_value = guiInfo.Balance * 256.0 / 100.0;
             vo_osd_changed(OSDTYPE_PROGBAR);
         }
 
