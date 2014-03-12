@@ -304,10 +304,10 @@ static void updatedisplay(gui_t *gui, HWND hwnd)
 
     if(!hwnd) return;
 
-    /* load all potmeters hpotmeters */
+    /* load all potmeters hpotmeters vpotmeters */
     for(i=0; i<gui->skin->widgetcount; i++)
     {
-        if(gui->skin->widgets[i]->type == tyHpotmeter || gui->skin->widgets[i]->type == tyPotmeter)
+        if(gui->skin->widgets[i]->type == tyHpotmeter || gui->skin->widgets[i]->type == tyVpotmeter || gui->skin->widgets[i]->type == tyPotmeter)
         {
             if(gui->skin->widgets[i]->msg == evSetVolume)
                 gui->skin->widgets[i]->value = guiInfo.Volume;
@@ -936,6 +936,11 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                         else item->x = GET_X_LPARAM(lParam) - gui->mousewx;
 
                         item->value = ((item->x - item->wx) * 100.0f) / (float) wd;
+                    }
+                    if(item->type == tyVpotmeter)
+                    {
+                        item->y = GET_Y_LPARAM(lParam) - gui->mousewy;
+                        item->value = 100.0f - ((item->y - item->wy)  * 100.0f) / (float) (item->wheight - item->height);
                     }
                     if(item->type == tyPotmeter)
                     {
