@@ -138,9 +138,9 @@ static char *generatetextfromlabel(widget *item)
     stringreplace(text, "$7", "%.4i:%.2i", guiInfo.RunningTime / 60, guiInfo.RunningTime % 60);
     stringreplace(text, "$8", "%i:%.2i:%.2i", guiInfo.ElapsedTime / 3600,
                  (guiInfo.ElapsedTime / 60) % 60, guiInfo.ElapsedTime % 60);
-    stringreplace(text, "$v", "%3.2f", guiInfo.Volume);
+    stringreplace(text, "$v", "%3.2f%%", guiInfo.Volume);
     stringreplace(text, "$V", "%3.1f", guiInfo.Volume);
-    stringreplace(text, "$b", "%3.2f", guiInfo.Balance);
+    stringreplace(text, "$b", "%3.2f%%", guiInfo.Balance);
     stringreplace(text, "$B", "%3.1f", guiInfo.Balance);
     stringreplace(text, "$t", "%.2i", guiInfo.Track);
     stringreplace(text, "$o", "%s", acp(TranslateFilename(0, tmp, sizeof(tmp))));
