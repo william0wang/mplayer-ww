@@ -43,7 +43,7 @@ static const char gui_configuration[] =  "gui.conf";
 /* params */
 int   gtkAONorm = FALSE;
 int   gtkAOExtraStereo = FALSE;
-float gtkAOExtraStereoMul = 1.0;
+float gtkAOExtraStereoMul = 1.0f;
 int   gtkCacheOn = FALSE;
 int   gtkCacheSize = 2048;
 int   gtkAutoSyncOn = FALSE;

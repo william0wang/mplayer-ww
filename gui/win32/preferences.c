@@ -419,7 +419,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                     EnableWindow(track2, 1);
                 }
             }
-            else gtkAOExtraStereoMul = 1.0;
+            else gtkAOExtraStereoMul = 1.0f;
             SendDlgItemMessage(hwnd, ID_TRACKBAR1, TBM_SETPOS, 1, (LPARAM)stereopos);
 
             SendDlgItemMessage(hwnd, ID_TRACKBAR2, TBM_SETPOS, 1, (LPARAM)delaypos);
@@ -611,7 +611,7 @@ static LRESULT CALLBACK PrefsWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM
                         gtkAOExtraStereo = TRUE;
                     else {
                         gtkAOExtraStereo = FALSE;
-                        gtkAOExtraStereoMul = 10.0;
+                        gtkAOExtraStereoMul = 10.0f;
                     }
                     gtkAOExtraStereoMul = SendDlgItemMessage(hwnd, ID_TRACKBAR1, TBM_GETPOS, 0, 0) / 10.0;
 

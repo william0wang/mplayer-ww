@@ -950,7 +950,7 @@ static int update_videowindow(void)
         rd.right = rd.left+guiInfo.VideoWidth;
         rd.bottom = rd.top+guiInfo.VideoHeight;
 
-        if (movie_aspect > 0.0)       // forced aspect from the cmdline
+        if (movie_aspect > 0.0f)       // forced aspect from the cmdline
             video_aspect = movie_aspect;
     }
 
