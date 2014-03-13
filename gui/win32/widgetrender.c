@@ -142,6 +142,7 @@ static char *generatetextfromlabel(widget *item)
     stringreplace(text, "$V", "%3.1f", guiInfo.Volume);
     stringreplace(text, "$b", "%3.2f%%", guiInfo.Balance);
     stringreplace(text, "$B", "%3.1f", guiInfo.Balance);
+    stringreplace(text, "$D", "%3.0f", guiInfo.Balance);
     stringreplace(text, "$t", "%.2i", guiInfo.Track);
     stringreplace(text, "$o", "%s", acp(TranslateFilename(0, tmp, sizeof(tmp))));
     stringreplace(text, "$x", "%i", guiInfo.VideoWidth);

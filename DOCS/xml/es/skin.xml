@@ -558,6 +558,10 @@ texto). La etiqueta es mostrada usando la tipografía identificada por
 <entry>balance en formato <emphasis>xxx.x</emphasis></entry>
 </row>
 <row>
+<entry>$D</entry>
+<entry>balance en formato <emphasis>xxx</emphasis></entry>
+</row>
+<row>
 <entry>$$</entry>
 <entry>el caracter $</entry>
 </row>

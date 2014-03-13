@@ -580,6 +580,10 @@ end
     <entry>баланс в формате <emphasis>xxx.x</emphasis></entry>
   </row>
   <row>
+    <entry>$D</entry>
+    <entry>баланс в формате <emphasis>xxx</emphasis></entry>
+  </row>
+  <row>
     <entry>$$</entry>
     <entry>символ $</entry>
   </row>

@@ -548,6 +548,10 @@ blokkokban.
     <entry>balansz <emphasis>xxx.x</emphasis> formátumban</entry>
   </row>
   <row>
+    <entry>$D</entry>
+    <entry>balansz <emphasis>xxx</emphasis> formátumban</entry>
+  </row>
+  <row>
     <entry>$$</entry>
     <entry>az $ karakter</entry>
   </row>

@@ -666,6 +666,10 @@ end
                     <entry>Balance in Format <emphasis>xxx.x</emphasis></entry>
                   </row>
                   <row>
+                    <entry>$D</entry>
+                    <entry>Balance im Format <emphasis>xxx</emphasis></entry>
+                  </row>
+                  <row>
                     <entry>$$</entry>
                     <entry><literal>$</literal>-Zeichen</entry>
                   </row>

@@ -551,6 +551,10 @@ tekście:
 <entry>format balansu <emphasis>xxx.x</emphasis></entry>
 </row>
 <row>
+<entry>$D</entry>
+<entry>format balansu <emphasis>xxx</emphasis></entry>
+</row>
+<row>
 <entry>$$</entry>
 <entry>znak $</entry>
 </row>

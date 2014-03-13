@@ -539,6 +539,10 @@ Vous pouvez utiliser les variables suivantes dans le texte:
 <entry>balance au format <emphasis>xxx.x</emphasis></entry>
 </row>
 <row>
+<entry>$D</entry>
+<entry>balance au format <emphasis>xxx</emphasis></entry>
+</row>
+<row>
 <entry>$$</entry>
 <entry>le caractère $</entry>
 </row>

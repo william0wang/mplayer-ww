@@ -134,6 +134,11 @@ calclengthmmmmss:
                 av_strlcat(trbuf, tmp, sizeof(trbuf));
                 break;
 
+            case 'D':
+                snprintf(tmp, sizeof(tmp), "%3.0f", guiInfo.Balance);
+                av_strlcat(trbuf, tmp, sizeof(trbuf));
+                break;
+
             case 'x':
                 snprintf(tmp, sizeof(tmp), "%d", guiInfo.VideoWidth);
                 av_strlcat(trbuf, tmp, sizeof(trbuf));

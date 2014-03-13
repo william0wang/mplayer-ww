@@ -553,6 +553,10 @@ blocks.
     <entry>balance in <emphasis>xxx.x</emphasis> format</entry>
   </row>
   <row>
+    <entry>$D</entry>
+    <entry>balance in <emphasis>xxx</emphasis> format</entry>
+  </row>
+  <row>
     <entry>$$</entry>
     <entry>the $ character</entry>
   </row>
