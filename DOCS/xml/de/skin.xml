@@ -619,51 +619,51 @@ end
                 <tbody>
                   <row>
                     <entry>$1</entry>
-                    <entry>bisherige Laufzeit im <emphasis>hh:mm:ss</emphasis>-Format</entry>
+                    <entry>bisherige Laufzeit im Format <emphasis>hh:mm:ss</emphasis></entry>
                   </row>
                   <row>
                     <entry>$2</entry>
-                    <entry>bisherige Laufzeit im <emphasis>mmmm:ss</emphasis>-Format</entry>
+                    <entry>bisherige Laufzeit im Format <emphasis>mmmm:ss</emphasis></entry>
                   </row>
                   <row>
                     <entry>$3</entry>
-                    <entry>bisherige Laufzeit im <emphasis>hh</emphasis>-Format (Stunden)</entry>
+                    <entry>bisherige Laufzeit im Format <emphasis>hh</emphasis> (Stunden)</entry>
                   </row>
                   <row>
                     <entry>$4</entry>
-                    <entry>bisherige Laufzeit im <emphasis>mm</emphasis>-Format (Minuten)</entry>
+                    <entry>bisherige Laufzeit im Format <emphasis>mm</emphasis> (Minuten)</entry>
                   </row>
                   <row>
                     <entry>$5</entry>
-                    <entry>bisherige Laufzeit im <emphasis>ss</emphasis>-Format (Sekunden)</entry>
+                    <entry>bisherige Laufzeit im Format <emphasis>ss</emphasis> (Sekunden)</entry>
                   </row>
                   <row>
                     <entry>$6</entry>
-                    <entry>Gesamtlaufzeit im <emphasis>hh:mm:ss</emphasis>-Format</entry>
+                    <entry>Gesamtlaufzeit im Format <emphasis>hh:mm:ss</emphasis></entry>
                   </row>
                   <row>
                     <entry>$7</entry>
-                    <entry>Gesamtlaufzeit im <emphasis>mmmm:ss</emphasis>-Format</entry>
+                    <entry>Gesamtlaufzeit im Format <emphasis>mmmm:ss</emphasis></entry>
                   </row>
                   <row>
                     <entry>$8</entry>
-                    <entry>bisherige Laufzeit im <emphasis>h:mm:ss</emphasis>-Format</entry>
+                    <entry>bisherige Laufzeit im Format <emphasis>h:mm:ss</emphasis></entry>
                   </row>
                   <row>
                     <entry>$v</entry>
-                    <entry>Lautstärke im <emphasis>xxx.xx</emphasis>%-Format</entry>
+                    <entry>Lautstärke im Format <emphasis>xxx.xx</emphasis>%</entry>
                   </row>
                   <row>
                     <entry>$V</entry>
-                    <entry>Lautstärke im <emphasis>xxx.x</emphasis>-Format</entry>
+                    <entry>Lautstärke im Format <emphasis>xxx.x</emphasis></entry>
                   </row>
                   <row>
                     <entry>$b</entry>
-                    <entry>Balance im <emphasis>xxx.xx</emphasis>%-Format</entry>
+                    <entry>Balance im Format <emphasis>xxx.xx</emphasis>%</entry>
                   </row>
                   <row>
                     <entry>$B</entry>
-                    <entry>Balance in <emphasis>xxx.x</emphasis>-Format</entry>
+                    <entry>Balance in Format <emphasis>xxx.x</emphasis></entry>
                   </row>
                   <row>
                     <entry>$$</entry>
