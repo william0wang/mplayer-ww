@@ -26,8 +26,6 @@
 #include "gui/skin/font.h"
 #include "gui/util/string.h"
 
-#include "access_mpcontext.h"
-#include "mixer.h"
 #include "libavutil/avstring.h"
 #include "osdep/timer.h"
 #include "stream/stream.h"
@@ -43,7 +41,6 @@ static char *Translate(char *str)
     char tmp[512];
     unsigned int i, c;
     int t;
-    mixer_t *mixer = NULL;
 
     *trbuf = 0;
 
@@ -169,15 +166,6 @@ calclengthmmmmss:
                 break;
 
             case 'a':
-
-                if (guiInfo.mpcontext)
-                    mixer = mpctx_get_mixer(guiInfo.mpcontext);
-
-                if (mixer && mixer->muted) {
-                    av_strlcat(trbuf, "n", sizeof(trbuf));
-                    break;
-                }
-
                 switch (guiInfo.AudioChannels) {
                 case 0:
                     av_strlcat(trbuf, "n", sizeof(trbuf));
@@ -191,7 +179,6 @@ calclengthmmmmss:
                     av_strlcat(trbuf, "t", sizeof(trbuf));
                     break;
                 }
-
                 break;
 
             case 'T':
