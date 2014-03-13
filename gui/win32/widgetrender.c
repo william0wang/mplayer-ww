@@ -161,11 +161,13 @@ static char *generatetextfromlabel(widget *item)
     else if(guiInfo.AudioChannels == 2) stringreplace(text, "$a", "t");
     else stringreplace(text, "$a", "r");
 
-    if(guiInfo.StreamType == 0)
+    if(guiInfo.StreamType == STREAMTYPE_FILE)
         stringreplace(text, "$T", "f");
     else if(guiInfo.StreamType == STREAMTYPE_DVD || guiInfo.StreamType == STREAMTYPE_DVDNAV)
         stringreplace(text, "$T", "d");
-    else stringreplace(text, "$T", "u");
+    else if(guiInfo.StreamType == STREAMTYPE_STREAM)
+        stringreplace(text, "$T", "u");
+    else stringreplace(text, "$T", " ");
 
     stringreplace(text, "$f", acp(TranslateFilename(1, tmp, sizeof(tmp))));
     stringreplace(text, "$F", acp(TranslateFilename(2, tmp, sizeof(tmp))));
