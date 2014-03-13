@@ -158,7 +158,8 @@ static char *generatetextfromlabel(widget *item)
 
     if(guiInfo.AudioChannels == 0) stringreplace(text, "$a", "n");
     else if(guiInfo.AudioChannels == 1) stringreplace(text, "$a", "m");
-    else stringreplace(text, "$a", "t");
+    else if(guiInfo.AudioChannels == 2) stringreplace(text, "$a", "t");
+    else stringreplace(text, "$a", "r");
 
     if(guiInfo.StreamType == 0)
         stringreplace(text, "$T", "f");

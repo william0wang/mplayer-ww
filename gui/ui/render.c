@@ -178,6 +178,10 @@ calclengthmmmmss:
                 case 2:
                     av_strlcat(trbuf, "t", sizeof(trbuf));
                     break;
+
+                default:
+                    av_strlcat(trbuf, "r", sizeof(trbuf));
+                    break;
                 }
                 break;
 

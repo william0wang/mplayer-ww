@@ -673,7 +673,7 @@ end
                     <entry>$a</entry>
                     <entry>
                       Buchstabe entsprechend dem Audio-Typ (Nichts: <keycap>n</keycap>,
-                      Mono: <keycap>m</keycap>, Stereo: <keycap>t</keycap>)
+                      Mono: <keycap>m</keycap>, Stereo: <keycap>t</keycap>, Surround: <keycap>r</keycap>)
                     </entry>
                   </row>
                   <row>
@@ -922,6 +922,7 @@ image = font.png
             <row><entry><keycap>n</keycap></entry><entry>Kein Sound</entry></row>
             <row><entry><keycap>m</keycap></entry><entry>Mono-Sound</entry></row>
             <row><entry><keycap>t</keycap></entry><entry>Stereo-Sound</entry></row>
+            <row><entry><keycap>r</keycap></entry><entry>Surround-Sound</entry></row>
             <row><entry><keycap>f</keycap></entry><entry>Stream ist eine Datei</entry></row>
             <row><entry><keycap>a</keycap></entry><entry>Stream ist eine CD</entry></row>
             <row><entry><keycap>v</keycap></entry><entry>Stream ist eine Video-CD</entry></row>
