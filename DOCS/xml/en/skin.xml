@@ -582,7 +582,7 @@ blocks.
     <entry>
     a character according to the stream type (file: <keycap>f</keycap>,
     CD: <keycap>a</keycap>, Video CD: <keycap>v</keycap>, DVD: <keycap>d</keycap>,
-    URL: <keycap>u</keycap>)
+    URL: <keycap>u</keycap>, TV/DVB: <keycap>b</keycap>)
     </entry>
   </row>
   <row>
