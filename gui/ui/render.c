@@ -175,6 +175,22 @@ calclengthmmmmss:
                     av_strlcat(trbuf, "e", sizeof(trbuf));
                 break;
 
+            case 'P':
+                switch (guiInfo.Playing) {
+                case GUI_STOP:
+                    av_strlcat(trbuf, "s", sizeof(trbuf));
+                    break;
+
+                case GUI_PLAY:
+                    av_strlcat(trbuf, "p", sizeof(trbuf));
+                    break;
+
+                case GUI_PAUSE:
+                    av_strlcat(trbuf, "e", sizeof(trbuf));
+                    break;
+                }
+                break;
+
             case 'a':
                 switch (guiInfo.AudioChannels) {
                 case 0:

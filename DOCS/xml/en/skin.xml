@@ -594,6 +594,10 @@ blocks.
     </entry>
   </row>
   <row>
+    <entry>$P</entry>
+    <entry>a character according to the playback state (stopped: <keycap>s</keycap>, playing: <keycap>p</keycap>, paused: <keycap>e</keycap>)</entry>
+  </row>
+  <row>
     <entry>$p</entry>
     <entry>the <keycap>p</keycap> character (if a movie is playing)</entry>
   </row>
@@ -622,7 +626,7 @@ blocks.
   </informaltable>
 
   <note><para>
-  The <literal>$a, $T, $p, $s</literal> and <literal>$e</literal>
+  The <literal>$a, $T, $P, $p, $s</literal> and <literal>$e</literal>
   variables all return characters that should be displayed as special symbols
   (for example, <keycap>e</keycap> is for the pause symbol that usually looks
   something like ||). You should have a font for normal characters and

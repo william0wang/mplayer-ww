@@ -151,9 +151,21 @@ static char *generatetextfromlabel(widget *item)
     stringreplace(text, "$C", "%s", guiInfo.sh_video ? codecname : "");
     stringreplace(text, "$$", "$");
 
-    if(guiInfo.Playing == GUI_STOP) stringreplace(text, "$s", "s");
-    else if(guiInfo.Playing == GUI_PLAY) stringreplace(text, "$p", "p");
-    else if(guiInfo.Playing == GUI_PAUSE) stringreplace(text, "$e", "e");
+    if(guiInfo.Playing == GUI_STOP)
+    {
+        stringreplace(text, "$P", "s");
+        stringreplace(text, "$s", "s");
+    }
+    else if(guiInfo.Playing == GUI_PLAY)
+    {
+        stringreplace(text, "$P", "p");
+        stringreplace(text, "$p", "p");
+    }
+    else if(guiInfo.Playing == GUI_PAUSE)
+    {
+        stringreplace(text, "$P", "e");
+        stringreplace(text, "$e", "e");
+    }
 
     if(guiInfo.AudioChannels == 0) stringreplace(text, "$a", "n");
     else if(guiInfo.AudioChannels == 1) stringreplace(text, "$a", "m");
