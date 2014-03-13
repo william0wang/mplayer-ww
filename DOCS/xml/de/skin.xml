@@ -658,6 +658,10 @@ end
                     <entry>Lautstärke im Format <emphasis>xxx.x</emphasis></entry>
                   </row>
                   <row>
+                    <entry>$U</entry>
+                    <entry>Lautstärke im Format <emphasis>xxx</emphasis></entry>
+                  </row>
+                  <row>
                     <entry>$b</entry>
                     <entry>Balance im Format <emphasis>xxx.xx</emphasis>%</entry>
                   </row>

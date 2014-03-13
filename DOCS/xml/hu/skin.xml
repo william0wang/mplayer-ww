@@ -540,6 +540,10 @@ blokkokban.
     <entry>hangerő <emphasis>xxx.x</emphasis> formátumban</entry>
   </row>
   <row>
+    <entry>$U</entry>
+    <entry>hangerő <emphasis>xxx</emphasis> formátumban</entry>
+  </row>
+  <row>
     <entry>$b</entry>
     <entry>balansz <emphasis>xxx.xx</emphasis>% formátumban</entry>
   </row>

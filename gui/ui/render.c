@@ -124,6 +124,11 @@ calclengthmmmmss:
                 av_strlcat(trbuf, tmp, sizeof(trbuf));
                 break;
 
+            case 'U':
+                snprintf(tmp, sizeof(tmp), "%3.0f", guiInfo.Volume);
+                av_strlcat(trbuf, tmp, sizeof(trbuf));
+                break;
+
             case 'b':
                 snprintf(tmp, sizeof(tmp), "%3.2f%%", guiInfo.Balance);
                 av_strlcat(trbuf, tmp, sizeof(trbuf));

@@ -140,6 +140,7 @@ static char *generatetextfromlabel(widget *item)
                  (guiInfo.ElapsedTime / 60) % 60, guiInfo.ElapsedTime % 60);
     stringreplace(text, "$v", "%3.2f%%", guiInfo.Volume);
     stringreplace(text, "$V", "%3.1f", guiInfo.Volume);
+    stringreplace(text, "$U", "%3.0f", guiInfo.Volume);
     stringreplace(text, "$b", "%3.2f%%", guiInfo.Balance);
     stringreplace(text, "$B", "%3.1f", guiInfo.Balance);
     stringreplace(text, "$D", "%3.0f", guiInfo.Balance);

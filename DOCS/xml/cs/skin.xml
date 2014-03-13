@@ -569,6 +569,10 @@ a '<literal>window = playbar</literal>' ... '<literal>end</literal>'.
     <entry>hlasitost ve formátu <emphasis>xxx.x</emphasis></entry>
   </row>
   <row>
+    <entry>$U</entry>
+    <entry>hlasitost ve formátu <emphasis>xxx</emphasis></entry>
+  </row>
+  <row>
     <entry>$b</entry>
     <entry>stereováha ve formátu <emphasis>xxx.xx</emphasis>%</entry>
   </row>

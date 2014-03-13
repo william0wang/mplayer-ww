@@ -543,6 +543,10 @@ tekście:
 <entry>format głośności <emphasis>xxx.x</emphasis> format</entry>
 </row>
 <row>
+<entry>$U</entry>
+<entry>format głośności <emphasis>xxx</emphasis> format</entry>
+</row>
+<row>
 <entry>$b</entry>
 <entry>format balansu w %<emphasis>xxx.xx</emphasis></entry>
 </row>

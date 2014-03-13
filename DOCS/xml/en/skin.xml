@@ -545,6 +545,10 @@ blocks.
     <entry>volume in <emphasis>xxx.x</emphasis> format</entry>
   </row>
   <row>
+    <entry>$U</entry>
+    <entry>volume in <emphasis>xxx</emphasis> format</entry>
+  </row>
+  <row>
     <entry>$b</entry>
     <entry>balance in <emphasis>xxx.xx</emphasis>% format</entry>
   </row>

@@ -572,6 +572,10 @@ end
     <entry>кромкость в формате <emphasis>xxx.x</emphasis></entry>
   </row>
   <row>
+    <entry>$U</entry>
+    <entry>кромкость в формате <emphasis>xxx</emphasis></entry>
+  </row>
+  <row>
     <entry>$b</entry>
     <entry>баланс в формате <emphasis>xxx.xx</emphasis>%</entry>
   </row>

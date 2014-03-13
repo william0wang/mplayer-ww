@@ -531,6 +531,10 @@ Vous pouvez utiliser les variables suivantes dans le texte:
 <entry>volume au format <emphasis>xxx.x</emphasis></entry>
 </row>
 <row>
+<entry>$U</entry>
+<entry>volume au format <emphasis>xxx</emphasis></entry>
+</row>
+<row>
 <entry>$b</entry>
 <entry>balance au format <emphasis>xxx.xx</emphasis>%</entry>
 </row>

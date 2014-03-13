@@ -550,6 +550,10 @@ texto). La etiqueta es mostrada usando la tipografía identificada por
 <entry>volumen en formato <emphasis>xxx.x</emphasis></entry>
 </row>
 <row>
+<entry>$U</entry>
+<entry>volumen en formato <emphasis>xxx</emphasis></entry>
+</row>
+<row>
 <entry>$b</entry>
 <entry>balance en formato <emphasis>xxx.xx</emphasis>%</entry>
 </row>
