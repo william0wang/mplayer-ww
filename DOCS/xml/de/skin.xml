@@ -672,7 +672,7 @@ end
                   <row>
                     <entry>$a</entry>
                     <entry>
-                      Buchstabe entsprechend dem Audio-Typ (Nichts: <keycap>n</keycap>,
+                      Buchstabe entsprechend dem Audio-Typ (Kein: <keycap>n</keycap>,
                       Mono: <keycap>m</keycap>, Stereo: <keycap>t</keycap>, Surround: <keycap>r</keycap>)
                     </entry>
                   </row>
@@ -686,11 +686,11 @@ end
                   </row>
                   <row>
                     <entry>$f</entry>
-                    <entry>Dateiname in kleinbuchstaben</entry>
+                    <entry>Dateiname in Kleinbuchstaben</entry>
                   </row>
                   <row>
                     <entry>$F</entry>
-                    <entry>Dateiname in GROSSBUCHSTABEN</entry>
+                    <entry>Dateiname in Grossbuchstaben</entry>
                   </row>
                   <row>
                     <entry>$T</entry>
