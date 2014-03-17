@@ -299,7 +299,7 @@ static void PutImage(guiImage *bf, int x, int y, int max, int ofs)
 #endif
 }
 
-static void SimplePotmeterPutImage(guiImage *bf, int x, int y, float frac)
+static void SinglePhasePutImage(guiImage *bf, int x, int y, float frac)
 {
     int i = 0, w, r, ix, iy;
     uint32_t *buf = NULL;
@@ -361,7 +361,7 @@ void RenderAll(wsWindow *window, guiItem *Items, int nrItems, char *db)
         case itPimage:
 
             if (item->numphases == 1)
-                SimplePotmeterPutImage(&item->Bitmap, item->x, item->y, item->value / 100.0);
+                SinglePhasePutImage(&item->Bitmap, item->x, item->y, item->value / 100.0);
             else
                 PutImage(&item->Bitmap, item->x, item->y, item->numphases, (item->numphases - 1) * (item->value / 100.0));
 
@@ -370,7 +370,7 @@ void RenderAll(wsWindow *window, guiItem *Items, int nrItems, char *db)
         case itHPotmeter:
 
             if (item->numphases == 1)
-                SimplePotmeterPutImage(&item->Bitmap, item->x, item->y, item->value / 100.0);
+                SinglePhasePutImage(&item->Bitmap, item->x, item->y, item->value / 100.0);
             else
                 PutImage(&item->Bitmap, item->x, item->y, item->numphases, (item->numphases - 1) * (item->value / 100.0));
 
