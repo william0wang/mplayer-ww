@@ -421,12 +421,12 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
                 mywidget->wx, mywidget->wy, mywidget->wwidth, mywidget->wwidth,
                 mywidget->msg);
     }
-    else if(!strncmp(desc, "potmeter", 8))
+    else if(!strncmp(desc, "pimage", 6))
     {
         int base = counttonextchar(desc, '=') + 1;
         int i;
-        /* potmeter = phases, numphases, default, X, Y, width, height, message */
-        mywidget->type = tyPotmeter;
+        /* pimage = phases, numphases, default, X, Y, width, height, message */
+        mywidget->type = tyPimage;
         mywidget->bitmap[0] = pngRead(skin, findnextstring(temp, desc, &base));
         mywidget->phases = atoi(findnextstring(temp, desc, &base));
         mywidget->value = atof(findnextstring(temp, desc, &base));
@@ -447,7 +447,7 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
                 break;
             }
         }
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [ITEM] [POTMETER] %s %i %i %i %f %i %i msg %i\n",
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [ITEM] [PIMAGE] %s %i %i %i %f %i %i msg %i\n",
                 (mywidget->bitmap[0]) ? mywidget->bitmap[0]->name : NULL,
                 mywidget->width, mywidget->height,
                 mywidget->phases, mywidget->value,

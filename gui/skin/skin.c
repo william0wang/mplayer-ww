@@ -713,6 +713,8 @@ static int item_vpotmeter(char *in)
  *
  *        Syntax: potmeter=phases,numphases,default,x,y,width,height,message
  *
+ * @note THIS ITEM IS DEPRECATED.
+ *
  * @param in definition to be analyzed
  *
  * @return 0 (ok) or 1 (error)
@@ -727,13 +729,25 @@ static int item_potmeter(char *in)
     snprintf(param, sizeof(param), "NULL,0,0,%s", in);
 
     return item_hpotmeter(param);
-/*
+}
+
+/**
+ * @brief Parse a @a pimage definition.
+ *
+ *        Syntax: pimage=phases,numphases,default,x,y,width,height,message
+ *
+ * @param in definition to be analyzed
+ *
+ * @return 0 (ok) or 1 (error)
+ */
+static int item_pimage(char *in)
+{
     unsigned char phfname[256];
     unsigned char buf[512];
     int ph, d, x, y, w, h, message;
     guiItem *item;
 
-    if (!window_item("potmeter"))
+    if (!window_item("pimage"))
         return 1;
 
     if (in_window("video"))
@@ -760,7 +774,7 @@ static int item_potmeter(char *in)
     else
         skin_legacy("evSetURL", buf);
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    potmeter image: %s %d,%d %dx%d\n", phfname, x, y, w, h);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    pimage image: %s %d,%d %dx%d\n", phfname, x, y, w, h);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     numphases: %d, default: %d%%\n", ph, d);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     message: %s (#%d)\n", buf, message);
 
@@ -769,7 +783,7 @@ static int item_potmeter(char *in)
     if (!item)
         return 1;
 
-    item->type      = itPotmeter;
+    item->type      = itPimage;
     item->x         = x;
     item->y         = y;
     item->width     = w;
@@ -791,7 +805,6 @@ static int item_potmeter(char *in)
     }
 
     return 0;
-*/
 }
 
 /**
@@ -1024,6 +1037,7 @@ static _item skinItem[] = {
     { "font",       item_font       },
     { "hpotmeter",  item_hpotmeter  },
     { "menu",       item_menu       },
+    { "pimage",     item_pimage     },
     { "potmeter",   item_potmeter   }, // legacy
     { "section",    item_section    },
     { "selected",   item_selected   },

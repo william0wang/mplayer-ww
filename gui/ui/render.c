@@ -358,7 +358,7 @@ void RenderAll(wsWindow *window, guiItem *Items, int nrItems, char *db)
             PutImage(&item->Bitmap, item->x, item->y, 3, ofs);
             break;
 
-        case itPotmeter:
+        case itPimage:
 
             if (item->numphases == 1)
                 SimplePotmeterPutImage(&item->Bitmap, item->x, item->y, item->value / 100.0);

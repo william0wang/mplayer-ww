@@ -48,8 +48,7 @@ aktiválható).
   Egy <emphasis role="bold">potmeter</emphasis>nek (főként a kereső sáv és a
   hangerő/balansz állító) bármennyi fázisa lehet a képének egymás alatti
   tetszőleges feldarabolásával. Lásd a
-  <link linkend="skin-hpotmeter">hpotmeter</link>t és
-  <link linkend="skin-potmeter">potmeter</link>t a részletekért.
+  <link linkend="skin-hpotmeter">hpotmeter</link>t a részletekért.
   </para>
 
   <para>
@@ -428,19 +427,6 @@ blokkokban.
     <literal>hpotmeter</literal> értékének megváltozásakor generálódik
   </para></listitem>
   </itemizedlist>
-  </para></listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
-  <anchor id="skin-potmeter"/>potmeter = phases, numphases, default, X, Y, width, height, message
-  </literal></term>
-  <listitem><para>
-  Egy <literal>hpotmeter</literal> gomb nélkül. (Gondolom a megfordítása volt az
-  eredeti cél, de csak a vízszintes vonszolásra reagál.) A paraméterek leírását
-  lásd a <link linkend="skin-hpotmeter">hpotmeter</link>-nél.
-  A <literal>phases</literal> lehet <literal>NULL</literal>, de ez eléggé haszontalan,
-  mivel akkor nem látod, hogy a <literal>potmeter</literal> hova van állítva.
   </para></listitem>
 </varlistentry>
 

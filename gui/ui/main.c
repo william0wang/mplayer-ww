@@ -146,7 +146,6 @@ static void uiMainMouse( int Button,int X,int Y,int RX,int RY )
           value=0;
           switch( itemtype )
            {
-            case itPotmeter:
             case itHPotmeter:
                  btnModify( item->message,100.0 * ( X - item->x ) / item->width );
 		 uiEvent( item->message,item->value );
@@ -173,7 +172,7 @@ rollerhandled:
           if (currentselected != - 1)
            {
             item=&guiApp.mainItems[currentselected];
-            if ( ( item->type == itHPotmeter )||( item->type == itVPotmeter )||( item->type == itPotmeter ) )
+            if ( ( item->type == itHPotmeter )||( item->type == itVPotmeter ) )
              {
               item->value+=value;
               btnModify( item->message,item->value );
@@ -196,7 +195,6 @@ rollerhandled:
             case itVPotmeter:
                  item->value=100.0 - 100.0 * ( Y - item->y ) / item->height;
                  goto potihandled;
-            case itPotmeter:
             case itHPotmeter:
                  item->value=100.0 * ( X - item->x ) / item->width;
 potihandled:

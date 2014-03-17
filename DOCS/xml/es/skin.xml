@@ -103,8 +103,7 @@ con clic derecho).
   Un <emphasis role="bold">medidor</emphasis> (usado principalmente para la barra
   de búsqueda y el control de volumen/balance) puede tener cualquier número de fases
   dividiendo su imagen en diferentes partes unas debajo de otras. Vea
-  <link linkend="skin-hpotmeter">hpotmeter</link> y
-  <link linkend="skin-potmeter">potmeter</link> para detalles.
+  <link linkend="skin-hpotmeter">hpotmeter</link> para detalles.
 </para><para>
   <emphasis role="bold">Etiquetas</emphasis> son un poco especiales: Los caractere
   necesarios para pintarlas se toman de un archivo de imagen, y los caracteres en
@@ -441,19 +440,6 @@ que se desplaze horizontalmente. Los parámetros son:
     </itemizedlist>
 
     </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
-  <anchor id="skin-potmeter"/>potmeter = fases, numfases, defecto, X, Y, ancho, alto, mensaje
-  </literal></term>
-  <listitem><para>
-Un <literal>hpotmeter</literal> sin un botón. (Creo que está hecho para hacer una especie
-de botón que gire sobre sí mismo, pero reacciona a arrastre horizontal solamente). Para la
-descripción de los parámetros vea <link linkend="skin-hpotmeter">hpotmeter</link>.
-<literal>fases</literal> puede ser <literal>NULL</literal>, pero es poco útil,
-porque no le permite ver donde está establecido el valor del <literal>potmeter</literal>.
-    </para></listitem>
 </varlistentry>
 
 <varlistentry>

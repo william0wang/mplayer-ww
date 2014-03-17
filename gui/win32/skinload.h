@@ -117,7 +117,7 @@ skin_t *loadskin(char *skindir, int desktopbpp);
 #define tyButton        2
 #define tyHpotmeter     3
 #define tyVpotmeter     4
-#define tyPotmeter      5
+#define tyPimage        5
 #define tyMenu          6
 #define tySlabel        7
 #define tyDlabel        8

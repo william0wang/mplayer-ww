@@ -99,8 +99,7 @@
               die Suchleiste und die Lautstärke-/Balance-Regler) kann durch die Aufteilung
               der Grafik in verschiedene untereinander liegende Teile
               eine beliebige Anzahl von Phasen haben. Siehe
-              <link linkend="skin-hpotmeter">hpotmeter</link> und
-              <link linkend="skin-potmeter">potmeter</link> für Details.
+              <link linkend="skin-hpotmeter">hpotmeter</link> für Details.
             </para>
             <para>
               <emphasis role="bold">Labels</emphasis> sind ein wenig speziell: Die Buchstaben und Zeichen,
@@ -527,19 +526,29 @@ end
         <varlistentry>
           <term>
             <literal>
-              <anchor id="skin-potmeter"/>potmeter = phases, numphases, default, X, Y, width, height, message
+              <anchor id="skin-pimage"/>pimage = phases, numphases, default, X, Y, width, height, message
             </literal>
           </term>
           <listitem>
             <para>
-              Ein <literal>hpotmeter</literal> ohne einen Button. (ich schätze, es ist dazu
-              bestimmt, herumgedreht zu werden, reagiert aber nur auf horizontales Ziehen.)
-              Eine Beschreibung der Parameter findest du unter
-              <link linkend="skin-hpotmeter">hpotmeter</link>.
-              <literal>phases</literal> können <literal>NULL</literal> sein, dies ist aber ziemlich
-              sinnlos, da du nicht sehen kannst, wo das <literal>Potentiometer</literal> hingesetzt
-              wurde.
+              Platziere verschiedene Phasen einer Grafik an Position <literal>X,Y</literal>.
+              Dieses Element kann sehr gut zusammen mit Potentiometern
+              verwendet werden, um deren Zustand zu visualisieren.
+              <literal>phases</literal> kann <literal>NULL</literal> sein,
+              was aber ziemlich sinnlos ist, weil dann nichts angezeigt wird.
+              Eine Beschreibung der Parameter findet sich unter
+              <link linkend="skin-hpotmeter">hpotmeter</link>. Der einzige
+              Unterschied zu den Parametern dort betrifft die Nachricht:
             </para>
+            <itemizedlist>
+              <listitem>
+                <para>
+                  <literal>message</literal> - die Nachricht, auf die
+                  reagiert werden (d. h. eine Änderung von
+                  <literal>pimage</literal> bewirken) soll
+                </para>
+              </listitem>
+            </itemizedlist>
           </listitem>
         </varlistentry>
 

@@ -51,6 +51,6 @@
 #define hasButton(item) (item.type == itButton || item.type == itHPotmeter || item.type == itVPotmeter)
 
 /// Check whether #guiItem @a item utilizes member 'value'
-#define hasValue(item) (item.type == itHPotmeter || item.type == itVPotmeter || item.type == itPotmeter)
+#define hasValue(item) (item.type == itHPotmeter || item.type == itVPotmeter || item.type == itPimage)
 
 #endif /* MPLAYER_GUI_GUI_H */

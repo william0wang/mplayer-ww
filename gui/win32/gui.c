@@ -304,10 +304,10 @@ static void updatedisplay(gui_t *gui, HWND hwnd)
 
     if(!hwnd) return;
 
-    /* load all potmeters hpotmeters vpotmeters */
+    /* load all hpotmeters vpotmeters pimages */
     for(i=0; i<gui->skin->widgetcount; i++)
     {
-        if(gui->skin->widgets[i]->type == tyHpotmeter || gui->skin->widgets[i]->type == tyVpotmeter || gui->skin->widgets[i]->type == tyPotmeter)
+        if(gui->skin->widgets[i]->type == tyHpotmeter || gui->skin->widgets[i]->type == tyVpotmeter || gui->skin->widgets[i]->type == tyPimage)
         {
             if(gui->skin->widgets[i]->msg == evSetVolume)
                 gui->skin->widgets[i]->value = guiInfo.Volume;
@@ -825,7 +825,7 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
             gui->mousey = GET_Y_LPARAM(lParam);
             /* inside a widget */
             gui->activewidget = clickedinsidewidget(gui, get_windowtype(hWnd), gui->mousex, gui->mousey);
-            if(gui->activewidget)
+            if(gui->activewidget && gui->activewidget->type != tyPimage)
             {
                 gui->activewidget->pressed = 1;
                 gui->mousewx = gui->mousex - gui->activewidget->x;
@@ -942,13 +942,8 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                         item->y = GET_Y_LPARAM(lParam) - gui->mousewy;
                         item->value = 100.0 - 100.0 * (item->y - item->wy) / (item->wheight - item->height);
                     }
-                    if(item->type == tyPotmeter)
-                    {
-                        gui->mousewx = GET_X_LPARAM(lParam) - gui->activewidget->x;
-                        item->value = 100.0 * gui->mousewx / item->wwidth;
-                    }
 
-                    if((item->type == tyPotmeter) || (item->type == tyHpotmeter) || (item->type == tyVpotmeter))
+                    if((item->type == tyHpotmeter) || (item->type == tyVpotmeter))
                     {
                         /* Bound checks */
                         if(item->value > 100.0f)

@@ -100,7 +100,7 @@ enum {
     itDLabel,
     itHPotmeter,
     itVPotmeter,
-    itPotmeter,
+    itPimage,
     itMenu,
     itPLMButton = 100,
     itPRMButton

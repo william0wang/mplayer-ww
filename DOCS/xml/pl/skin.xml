@@ -91,8 +91,7 @@ aktywowane prawym przyciskiem myszy).
   jako pasek przewijania i kontrolka głośności/balansu) może składać się z
   każdej liczby stanów poprzez podzielenie jego obrazka na wiele części, z
   których jedna jest pod drugą. Zobacz
-  <link linkend="skin-hpotmeter">hpotmeter</link> oraz
-  <link linkend="skin-potmeter">potmeter</link>, by dowiedzieć się więcej.
+  <link linkend="skin-hpotmeter">hpotmeter</link> by dowiedzieć się więcej.
 </para><para>
   <emphasis role="bold">Etykiety</emphasis> są nieco specyficzne: Znaki
   potrzebne do ich narysowania są pobierane z pliku graficznego, a znaki
@@ -429,19 +428,6 @@ Jego parametry to:
     </itemizedlist>
 
     </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
-  <anchor id="skin-potmeter"/>potmeter = fazy, liczba_faz, domyślny, X, Y, szerokość, wysokość, sygnał
-  </literal></term>
-  <listitem><para>
-<literal>hpotmeter</literal> bez przycisku. (domyślam się, że chodzi o to, aby
-nim kręcić, ale reaguje on tylko na poziome przesuwanie). Opis parametrów znajdziesz w części o
-<link linkend="skin-hpotmeter">hpotmeter</link>.
-Parametr <literal>fazy</literal> może mieć wartość <literal>NULL</literal>, ale
-jest to zupełnie bezużyteczne, gdyż nie widać wtedy położenia potencjometru.
-    </para></listitem>
 </varlistentry>
 
 <varlistentry>

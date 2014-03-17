@@ -99,8 +99,7 @@ pravým myšítkem).
   A <emphasis role="bold">potenciometr</emphasis> (hlavně používaný pro
   lištu převíjení a ovládání hlasitosti/stereováhy) může mít libovolný počet
   fází dělících jeho obraz na jednotlivé části pod sebou. Detaily viz
-  <link linkend="skin-hpotmeter">hpotenciometr</link> a
-  <link linkend="skin-potmeter">potenciometr</link>.
+  <link linkend="skin-hpotmeter">hpotenciometr</link>.
   </para>
 
   <para>
@@ -458,19 +457,6 @@ a '<literal>window = playbar</literal>' ... '<literal>end</literal>'.
       hodnoty <literal>hpotmeter</literal>u
   </para></listitem>
   </itemizedlist>
-  </para></listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
-  <anchor id="skin-potmeter"/>potmeter = fáze, počet_fází, výchozí, X, Y, šířka, výška, zpráva
-  </literal></term>
-  <listitem><para>
-  <literal>hpotmeter</literal> bez tlačítka. (soudil bych, že byl míněn jako
-  otočný, ale reaguje pouze na horizontální tažení.) Popis parametrů je stejný
-  jako v <link linkend="skin-hpotmeter">hpotmeter</link>.
-  <literal>fáze</literal> mohou být <literal>NULL</literal>, ale je to vcelku
-  k ničemu, jelikož nemůžete vidět, jak je nastaven <literal>potmeter</literal>.
   </para></listitem>
 </varlistentry>
 

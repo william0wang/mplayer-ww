@@ -318,13 +318,13 @@ void renderwidget(skin_t *skin, image *dest, widget *item, int state)
     int y;
 
     if(!dest) return;
-    if((item->type == tyButton) || (item->type == tyHpotmeter) || (item->type == tyVpotmeter) || (item->type == tyPotmeter))
+    if((item->type == tyButton) || (item->type == tyHpotmeter) || (item->type == tyVpotmeter) || (item->type == tyPimage))
         img = item->bitmap[0];
 
     if(!img) return;
 
     y = item->y;
-    if(/* item->type == tyPotmeter */ /* legacy (potmeter) */ item->type == tyHpotmeter && item->width == item->wwidth)
+    if(item->type == tyPimage || /* legacy (potmeter) */ (item->type == tyHpotmeter && item->width == item->wwidth))
     {
         height = img->height / item->phases;
         y =  height * (int)(item->value * item->phases / 100);
@@ -341,7 +341,7 @@ void renderwidget(skin_t *skin, image *dest, widget *item, int state)
     if(item->type == tyButton)
         render(skin->desktopbpp, dest, find_background(skin,item), item->x, item->y, item->x, item->y, img->width, height, 1);
 
-    if((item->type == tyHpotmeter) || (item->type == tyVpotmeter) || (item->type == tyPotmeter))
+    if((item->type == tyHpotmeter) || (item->type == tyVpotmeter) || (item->type == tyPimage))
     {
         if(item->type == tyVpotmeter)
         {

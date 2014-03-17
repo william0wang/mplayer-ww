@@ -86,8 +86,7 @@ Actuellement, trois fenêtres doivent être décorées: la
   Un <emphasis role="bold">podomètre</emphasis> (principalement utilisé pour la
   barre d'avancement et le contrôle du volume/balance) peut posséder n'importe quel
   nombre d'états en empilant ces images, verticalement. Voir
-  <link linkend="skin-hpotmeter">hpotmeter</link> et
-  <link linkend="skin-potmeter">potmeter</link> pour plus de détails.
+  <link linkend="skin-hpotmeter">hpotmeter</link> pour plus de détails.
 </para><para>
   Les <emphasis role="bold">labels</emphasis> sont un peu particuliers : les
   caractères nécessaires pour les dessiner sont récupérés depuis un fichier image,
@@ -421,19 +420,6 @@ horizontalement.
     </itemizedlist>
 
     </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
-  <anchor id="skin-potmeter"/>potmeter = phases, numphases, default, X, Y, largeur, hauteur, message
-  </literal></term>
-  <listitem><para>
-Un <literal>hpotmeter</literal> sans bouton. (je suppose qu'il est censé tourner
-en rond, mais il réagit uniquement aux tractions horizontales.) Pour une
-description de ses paramètres lisez <link linkend="skin-hpotmeter">hpotmeter</link>.
-Ses <literal>phases</literal> peuvent être fixées à <literal>NULL</literal>, mais ce n'est
-pas vraiment utile, puisque vous ne pouvez pas voir son niveau.
-    </para></listitem>
 </varlistentry>
 
 <varlistentry>

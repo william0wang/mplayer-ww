@@ -47,8 +47,7 @@ Currently there are four windows to be decorated: the
   A <emphasis role="bold">potmeter</emphasis> (mainly used for the seek bar and
   volume/balance control) can have any number of phases by dividing its image
   into different parts below each other. See
-  <link linkend="skin-hpotmeter">hpotmeter</link> and
-  <link linkend="skin-potmeter">potmeter</link> for details.
+  <link linkend="skin-hpotmeter">hpotmeter</link> for details.
   </para>
 
   <para>
@@ -438,15 +437,21 @@ blocks.
 
 <varlistentry>
   <term><literal>
-  <anchor id="skin-potmeter"/>potmeter = phases, numphases, default, X, Y, width, height, message
+  <anchor id="skin-pimage"/>pimage = phases, numphases, default, X, Y, width, height, message
   </literal></term>
   <listitem><para>
-  A <literal>hpotmeter</literal> without a button. (I guess it is meant to be
-  turned around, but it reacts to horizontal dragging only.) For the description
-  of the parameters see <link linkend="skin-hpotmeter">hpotmeter</link>.
-  <literal>phases</literal> can be <literal>NULL</literal>, but it is quite
-  useless, since you cannot see where the <literal>potmeter</literal> is set.
-  </para></listitem>
+  Place different phases of an image at position <literal>X,Y</literal>.
+  This element goes nicely with potentiometers to visualize their state.
+  <literal>phases</literal> can be <literal>NULL</literal>, but this is quite
+  useless, since nothing will be displayed then.
+  For a description of the parameters see
+  <link linkend="skin-hpotmeter">hpotmeter</link>. There is only a difference
+  concerning the message:</para>
+  <itemizedlist><listitem><para>
+  <literal>message</literal> - the message to be reacted on, i.e. which
+  shall cause a change of <literal>pimage</literal>.
+  </para></listitem></itemizedlist>
+  </listitem>
 </varlistentry>
 
 <varlistentry>
