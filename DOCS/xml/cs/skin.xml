@@ -335,6 +335,20 @@ a '<literal>window = playbar</literal>' ... '<literal>end</literal>'.
 <variablelist>
 <varlistentry>
   <term><literal>
+  <anchor id="skin-decoration"/>decoration = enable|disable
+  </literal></term>
+  <listitem><para>
+  Zapne (enable) nebo vypne (disable) dekoraci hlavního okna, produkovanou
+  okenním manažerem. Výchozí je <emphasis role="bold">disable</emphasis>.
+  </para>
+  <note><para>
+  V okně display to nefunguje, není to potřeba.
+  </para></note>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><literal>
   <anchor id="skin-main-base"/>base = obrázek, X, Y
   </literal></term>
   <listitem><para>
@@ -372,20 +386,6 @@ a '<literal>window = playbar</literal>' ... '<literal>end</literal>'.
 +------------+<!--
   --></screen>
   </informalfigure>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
-  <anchor id="skin-decoration"/>decoration = enable|disable
-  </literal></term>
-  <listitem><para>
-  Zapne (enable) nebo vypne (disable) dekoraci hlavního okna, produkovanou
-  okenním manažerem. Výchozí je <emphasis role="bold">disable</emphasis>.
-  </para>
-  <note><para>
-  V okně display to nefunguje, není to potřeba.
-  </para></note>
   </listitem>
 </varlistentry>
 

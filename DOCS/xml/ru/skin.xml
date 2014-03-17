@@ -333,6 +333,21 @@ end
 <variablelist>
 <varlistentry>
   <term><literal>
+  <anchor id="skin-decoration"/>decoration = enable|disable
+  </literal></term>
+  <listitem>
+  <para>
+  Включает или выключает декорации главного окна, осуществляемые window manager . По-умолчанию
+  <emphasis role="bold">disable</emphasis>.
+  </para>
+  <note><para>
+  Это не работает для окна отображения, в этом нет надобности.
+  </para></note>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><literal>
   <anchor id="skin-main-base"/>base = image, X, Y
   </literal></term>
   <listitem>
@@ -373,21 +388,6 @@ end
 +------------+<!--
   --></screen>
   </informalfigure>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
-  <anchor id="skin-decoration"/>decoration = enable|disable
-  </literal></term>
-  <listitem>
-  <para>
-  Включает или выключает декорации главного окна, осуществляемые window manager . По-умолчанию
-  <emphasis role="bold">disable</emphasis>.
-  </para>
-  <note><para>
-  Это не работает для окна отображения, в этом нет надобности.
-  </para></note>
   </listitem>
 </varlistentry>
 

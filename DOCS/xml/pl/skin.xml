@@ -312,6 +312,18 @@ oraz '<literal>window = playbar</literal>' ... '<literal>end</literal>'.
 <variablelist>
 <varlistentry>
   <term><literal>
+  <anchor id="skin-decoration"/>decoration = enable|disable (włączona|wyłączona)
+  </literal></term>
+  <listitem><para>
+Włącza lub wyłącza dekorację menedżera okna w oknie głównym.
+Domyślnie jest <emphasis role="bold">wyłączona</emphasis>.
+    </para>
+    <note><para>Nie działa to w oknie ekranu, gdyż nie ma takiej potrzeby.</para></note>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><literal>
   <anchor id="skin-main-base"/>base = obrazek, X, Y
   </literal></term>
   <listitem><para>
@@ -349,18 +361,6 @@ podczas kliknięcia na przycisk. Obrazek ten opisany przez
 +---------------+
 </screen>
 </informalfigure>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
-  <anchor id="skin-decoration"/>decoration = enable|disable (włączona|wyłączona)
-  </literal></term>
-  <listitem><para>
-Włącza lub wyłącza dekorację menedżera okna w oknie głównym.
-Domyślnie jest <emphasis role="bold">wyłączona</emphasis>.
-    </para>
-    <note><para>Nie działa to w oknie ekranu, gdyż nie ma takiej potrzeby.</para></note>
   </listitem>
 </varlistentry>
 

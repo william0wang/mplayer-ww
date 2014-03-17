@@ -356,6 +356,25 @@ end
         <varlistentry>
           <term>
             <literal>
+              <anchor id="skin-decoration"/>decoration = enable|disable
+            </literal>
+          </term>
+          <listitem>
+            <para>
+              Aktiviere oder deaktiviere die Fenstermanager-Dekoration des Hauptfensters.
+              Standard ist <emphasis role="bold">disable</emphasis>.
+            </para>
+            <note>
+              <para>
+                Dies kann für die Abspielleiste nicht benutzt werden.
+              </para>
+            </note>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>
+            <literal>
               <anchor id="skin-main-base"/>base = image, X, Y
             </literal>
           </term>
@@ -404,25 +423,6 @@ end
              Ein spezieller Wert von <literal>NULL</literal> kann für <literal>image</literal>
              benutzt werden, wenn keine Grafik angezeigt werden soll.
             </para>
-          </listitem>
-        </varlistentry>
-
-        <varlistentry>
-          <term>
-            <literal>
-              <anchor id="skin-decoration"/>decoration = enable|disable
-            </literal>
-          </term>
-          <listitem>
-            <para>
-              Aktiviere oder deaktiviere die Fenstermanager-Dekoration des Hauptfensters.
-              Standard ist <emphasis role="bold">disable</emphasis>.
-            </para>
-            <note>
-              <para>
-                Dies kann für die Abspielleiste nicht benutzt werden.
-              </para>
-            </note>
           </listitem>
         </varlistentry>
 

@@ -306,6 +306,21 @@ blocks.
 <variablelist>
 <varlistentry>
   <term><literal>
+  <anchor id="skin-decoration"/>decoration = enable|disable
+  </literal></term>
+  <listitem>
+  <para>
+  Enable or disable window manager decoration of the main window. Default is
+  <emphasis role="bold">disable</emphasis>.
+  </para>
+  <note><para>
+  This isn't available for the playbar.
+  </para></note>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><literal>
   <anchor id="skin-main-base"/>base = image, X, Y
   </literal></term>
   <listitem>
@@ -346,21 +361,6 @@ blocks.
   <para>
   A special value of <literal>NULL</literal> can be used if you want no <literal>image</literal>.
   </para>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
-  <anchor id="skin-decoration"/>decoration = enable|disable
-  </literal></term>
-  <listitem>
-  <para>
-  Enable or disable window manager decoration of the main window. Default is
-  <emphasis role="bold">disable</emphasis>.
-  </para>
-  <note><para>
-  This isn't available for the playbar.
-  </para></note>
   </listitem>
 </varlistentry>
 

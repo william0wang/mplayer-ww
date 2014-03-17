@@ -301,6 +301,19 @@ et '<literal>window = playbar</literal>' ... '<literal>end</literal>'.
 <variablelist>
 <varlistentry>
   <term><literal>
+  <anchor id="skin-decoration"/>decoration = enable|disable
+  </literal></term>
+  <listitem><para>
+Active (enable) ou désactive (disable) la décoration du gestionnaire de fenêtre
+pour la fenêtre principale. <emphasis role="bold">disable</emphasis> par défaut.
+    </para>
+    <note><para>Cela ne fonctionne pas pour la fenêtre d'affichage, il n'y en a pas
+    besoin.</para></note>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><literal>
   <anchor id="skin-main-base"/>base = image, X, Y
   </literal></term>
   <listitem><para>
@@ -338,19 +351,6 @@ trois états empilés verticalement (pour les trois états du bouton), comme cec
 +------------+
 </screen>
 </informalfigure>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
-  <anchor id="skin-decoration"/>decoration = enable|disable
-  </literal></term>
-  <listitem><para>
-Active (enable) ou désactive (disable) la décoration du gestionnaire de fenêtre
-pour la fenêtre principale. <emphasis role="bold">disable</emphasis> par défaut.
-    </para>
-    <note><para>Cela ne fonctionne pas pour la fenêtre d'affichage, il n'y en a pas
-    besoin.</para></note>
   </listitem>
 </varlistentry>
 

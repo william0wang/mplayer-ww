@@ -302,6 +302,21 @@ blokkokban.
 <variablelist>
 <varlistentry>
   <term><literal>
+  <anchor id="skin-decoration"/>decoration = enable|disable
+  </literal></term>
+  <listitem>
+  <para>
+  Engedélyezi vagy letiltja a főablakban az ablakkezelő dekorációját.
+  Alapértelmezetten <emphasis role="bold">disable</emphasis>.
+  </para>
+  <note><para>
+  Ez nem működik a megjelenítő ablakban, nincs rá szükség.
+  </para></note>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><literal>
   <anchor id="skin-main-base"/>base = image, X, Y
   </literal></term>
   <listitem>
@@ -342,21 +357,6 @@ blokkokban.
 +-------------+<!--
   --></screen>
   </informalfigure>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
-  <anchor id="skin-decoration"/>decoration = enable|disable
-  </literal></term>
-  <listitem>
-  <para>
-  Engedélyezi vagy letiltja a főablakban az ablakkezelő dekorációját.
-  Alapértelmezetten <emphasis role="bold">disable</emphasis>.
-  </para>
-  <note><para>
-  Ez nem működik a megjelenítő ablakban, nincs rá szükség.
-  </para></note>
   </listitem>
 </varlistentry>
 
