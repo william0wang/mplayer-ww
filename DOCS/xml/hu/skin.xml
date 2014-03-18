@@ -469,8 +469,8 @@ blokkokban.
   egy karakter magasságával egyezik meg). Ha a megjelenítendő szöveg
   szélesebb ennél, scrollozva lesz,
   különben az <literal>align</literal> paraméter által megadott módon
-  pozícionálódik: <literal>0</literal> jobbra, <literal>1</literal>
-  középre, <literal>2</literal> balra igazítva.
+  pozícionálódik: <literal>0</literal> balra, <literal>1</literal>
+  középre, <literal>2</literal> jobbra igazítva.
   </para>
   <para>
   A megjelenítendő szöveget a <literal>text</literal> adja meg: dupla

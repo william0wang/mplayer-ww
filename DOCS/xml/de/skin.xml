@@ -607,9 +607,9 @@ end
               Wird der anzuzeigende Text breiter als dieser Wert, wird er gescrollt,
               andernfalls wird er innerhalb des angegebenen Bereichs gemäß des
               <literal>align</literal>-Parameters ausgerichtet:
-              <literal>0</literal> steht für rechts,
+              <literal>0</literal> steht für links,
               <literal>1</literal> steht für zentriert,
-              <literal>2</literal> steht für links.
+              <literal>2</literal> steht für rechts.
             </para>
             <para>
               Der anzuzeigende Text wird mit <literal>text</literal> festgelegt:

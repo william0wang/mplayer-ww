@@ -460,8 +460,8 @@ dynamique parce que son texte est rafraîchi périodiquement. La longueur maximu
 label est définie par <literal>longueur</literal> (sa hauteur dépend de la hauteur
 des caractères). Si le texte a afficher dépasse cette longueur il sera scrollé, ou
 bien aligné dans l'espace spécifié par la valeur du paramètre
-<literal>align</literal>: <literal>0</literal> pour droite,
-<literal>1</literal> pour centre, et <literal>2</literal> pour gauche.
+<literal>align</literal>: <literal>0</literal> pour gauche,
+<literal>1</literal> pour centre, et <literal>2</literal> pour droite.
 </para>
 <para>
 Le texte à afficher est donné par <literal>texte</literal>: il doit être écrit

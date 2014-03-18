@@ -499,8 +499,8 @@ end
   Если отображаемый текст шире этого значения, он будет скроллироваться,
   иначе он выравнивается в пределах указанного пространства в соответствии со
   значением параметра
-  <literal>align</literal>: <literal>0</literal> - вправо,
-  <literal>1</literal> - по центру, <literal>2</literal> - влево.
+  <literal>align</literal>: <literal>0</literal> - влево,
+  <literal>1</literal> - по центру, <literal>2</literal> - вправо.
   </para>
   <para>
   Отображаемый текст задается параметром <literal>text</literal>: Он должен быть

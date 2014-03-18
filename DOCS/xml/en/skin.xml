@@ -493,8 +493,8 @@ blocks.
   of a character). If the text to be displayed is wider than that, it will be
   scrolled,
   otherwise it is aligned within the specified space by the value of the
-  <literal>align</literal> parameter: <literal>0</literal> is for right,
-  <literal>1</literal> is for center, <literal>2</literal> is for left.
+  <literal>align</literal> parameter: <literal>0</literal> is for left,
+  <literal>1</literal> is for center, <literal>2</literal> is for right.
   </para>
   <para>
   The text to be displayed is given by <literal>text</literal>: It must be

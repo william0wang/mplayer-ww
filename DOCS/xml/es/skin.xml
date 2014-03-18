@@ -479,8 +479,8 @@ llama dinámica porque su texto es refrescado periódicamente. La longitud máxi
 etiqueta viene dada por <literal>width</literal> (su altura es la altura de un caracter).
 Si el texto que ha de ser mostrado es más ancho que esta, será desplazado,
 si no será alineado dentro del espacio especificado por el valor del parámetro
-<literal>align</literal>: <literal>0</literal> es para derecha,
-<literal>1</literal> para centrado, <literal>2</literal> para izquierda.
+<literal>align</literal>: <literal>0</literal> es para izquierda,
+<literal>1</literal> para centrado, <literal>2</literal> para derecha.
 </para>
 <para>
 El texto que ha de ser mostrado viene dado por <literal>text</literal>: Debe ser
