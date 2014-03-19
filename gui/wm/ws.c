@@ -1443,8 +1443,8 @@ void wsMouseVisibility(wsWindow *win, int vis)
     case wsHideMouseCursor:
 
         if (win->wsCursor == None) {
-        win->wsCursor = XCreatePixmapCursor(wsDisplay, win->wsCursorPixmap, win->wsCursorPixmap, &win->wsColor, &win->wsColor, 0, 0);
-        XDefineCursor(wsDisplay, win->WindowID, win->wsCursor);
+            win->wsCursor = XCreatePixmapCursor(wsDisplay, win->wsCursorPixmap, win->wsCursorPixmap, &win->wsColor, &win->wsColor, 0, 0);
+            XDefineCursor(wsDisplay, win->WindowID, win->wsCursor);
         }
 
         break;
