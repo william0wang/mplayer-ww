@@ -82,7 +82,7 @@ static void uiPlaybarDraw( void )
 	 {
 	  playbarLength=guiApp.videoWindow.Height - guiApp.playbar.height;
 	  uiPlaybarFade=0;
-	  vo_mouse_autohide=False;
+	  wsMouseVisibility(&guiApp.videoWindow, wsShowMouseCursor);
 	 }
         wsWindowMove( &guiApp.playbarWindow,True,x,playbarLength );
 	break;
@@ -93,7 +93,7 @@ static void uiPlaybarDraw( void )
 	  playbarLength=guiApp.videoWindow.Height;
 	  uiPlaybarFade=0;
 	  playbarVisible=False;
-          vo_mouse_autohide=True;
+          wsMouseVisibility(&guiApp.videoWindow, wsHideMouseCursor);
           wsWindowVisibility( &guiApp.playbarWindow,wsHideWindow );
 	  return;
 	 }
@@ -107,7 +107,7 @@ static void uiPlaybarDraw( void )
    btnModify( evSetMoviePosition,guiInfo.Position );
    btnModify( evSetVolume,guiInfo.Volume );
 
-   vo_mouse_autohide=False;
+   wsMouseVisibility(&guiApp.videoWindow, wsShowMouseCursor);
 
    fast_memcpy( playbarDrawBuffer,guiApp.playbar.Bitmap.Image,guiApp.playbar.Bitmap.ImageSize );
    RenderAll( &guiApp.playbarWindow,guiApp.playbarItems,guiApp.IndexOfPlaybarItems,playbarDrawBuffer );
