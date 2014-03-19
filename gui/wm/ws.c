@@ -1433,11 +1433,11 @@ void wsMouseVisibility(wsWindow *win, int vis)
     case wsShowMouseCursor:
 
         if (win->wsCursor != None) {
+            XDefineCursor(wsDisplay, win->WindowID, None);
             XFreeCursor(wsDisplay, win->wsCursor);
             win->wsCursor = None;
         }
 
-        XDefineCursor(wsDisplay, win->WindowID, 0);
         break;
 
     case wsHideMouseCursor:
