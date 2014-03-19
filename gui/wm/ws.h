@@ -178,10 +178,7 @@ void wsWindowRedraw(wsWindow *win);
 void wsWindowShape(wsWindow *win, char *data);
 void wsWindowIcon(Display *display, Window Win, guiIcon_t *icon);
 
-// ----------------------------------------------------------------------------------------------
-//    Show / hide mouse cursor.
-// ----------------------------------------------------------------------------------------------
-void wsMouseVisibility(wsWindow *win, int vis);
+void wsMouseVisibility(wsWindow *win, int visibility);
 
 // ----------------------------------------------------------------------------------------------
 // Image handling

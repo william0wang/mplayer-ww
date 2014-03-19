@@ -1424,12 +1424,16 @@ void wsImageResize(wsWindow *win, int w, int h)
     wsImageCreate(win, w, h);
 }
 
-// ----------------------------------------------------------------------------------------------
-//    Show / hide mouse cursor.
-// ----------------------------------------------------------------------------------------------
-void wsMouseVisibility(wsWindow *win, int vis)
+/**
+ * @brief Hide or show the mouse pointer in a window.
+ *
+ * @param win pointer to a ws window structure
+ * @param visibility either #wsHideMouseCursor to hide or #wsShowMouseCursor
+ *                   to show the mouse pointer in the window
+ */
+void wsMouseVisibility(wsWindow *win, int visibility)
 {
-    switch (vis) {
+    switch (visibility) {
     case wsShowMouseCursor:
 
         if (win->wsCursor != None) {
