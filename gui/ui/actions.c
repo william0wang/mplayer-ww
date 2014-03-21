@@ -306,7 +306,8 @@ play:
         break;
 
     case evSetMoviePosition:
-        uiAbsSeek(param);
+        guiInfo.Position = param;
+        uiAbsSeek(guiInfo.Position);
         break;
 
     case evIncVolume:
