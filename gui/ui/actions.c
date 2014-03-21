@@ -200,7 +200,7 @@ play:
                     guiInfo.Track = 1;
 
                 guiInfo.MediumChanged = GUI_MEDIUM_NEW;
-                guiInfo.PlaylistNext = !guiInfo.Playing;
+                guiInfo.PlaylistNext  = !guiInfo.Playing;
 
                 break;
 

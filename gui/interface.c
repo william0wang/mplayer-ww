@@ -808,7 +808,7 @@ int gui(int what, void *data)
         if (next) {
             uiSetFile(next->path, next->name, STREAMTYPE_FILE);
             guiInfo.MediumChanged = GUI_MEDIUM_NEW;
-            guiInfo.Track   = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
+            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
         } else {
             if (guiInfo.MediumChanged == GUI_MEDIUM_NEW)
                 break;
