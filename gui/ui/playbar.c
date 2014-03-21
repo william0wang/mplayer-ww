@@ -106,6 +106,7 @@ static void uiPlaybarDraw( void )
   {
    btnModify( evSetMoviePosition,guiInfo.Position );
    btnModify( evSetVolume,guiInfo.Volume );
+   btnModify( evSetBalance,guiInfo.Balance );
 
    wsMouseVisibility(&guiApp.videoWindow, wsShowMouseCursor);
 
