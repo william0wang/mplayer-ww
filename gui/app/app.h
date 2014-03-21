@@ -81,6 +81,7 @@ enum {
     ivSetDVDAudio,
     ivSetDVDSubtitle,
     ivPlayDVD,
+    ivSetVolume,
     ivShowPopUpMenu,
     ivHidePopUpMenu,
     ivRedraw

@@ -323,12 +323,16 @@ play:
         break;
 
     case evSetVolume:
+    case ivSetVolume:
         guiInfo.Volume = param;
         {
             float l = guiInfo.Volume * (100.0 - guiInfo.Balance) / 50.0;
             float r = guiInfo.Volume * guiInfo.Balance / 50.0;
             mixer_setvolume(mixer, FFMIN(l, guiInfo.Volume), FFMIN(r, guiInfo.Volume));
         }
+
+        if (ev == evSetVolume)
+            break;
 
         if (osd_level) {
             osd_visible = (GetTimerMS() + 1000) | 1;
