@@ -69,8 +69,8 @@ enum {
 
 //@{
 /// NewPlay reason
-#define GUI_FILE_SAME 1
-#define GUI_FILE_NEW  2
+#define GUI_MEDIUM_SAME 1
+#define GUI_MEDIUM_NEW  2
 //@}
 
 /// mplayer() instructions

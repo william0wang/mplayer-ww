@@ -212,7 +212,7 @@ static void guiSetEvent(int event)
             guiInfo.Track = 1;
             guiInfo.Chapter = 1;
             guiInfo.Angle = 1;
-            guiInfo.NewPlay = GUI_FILE_SAME;
+            guiInfo.NewPlay = GUI_MEDIUM_SAME;
 
 #ifdef __WINE__
             // dvd_device is in the Windows style (D:\), which needs to be
@@ -356,13 +356,13 @@ static void guiSetEvent(int event)
             {
                 case STREAMTYPE_DVD:
                 {
-                    guiInfo.NewPlay = GUI_FILE_SAME;
+                    guiInfo.NewPlay = GUI_MEDIUM_SAME;
                     gui(GUI_SET_STATE, (void *) GUI_PLAY);
                     break;
                 }
                 default:
                 {
-                    guiInfo.NewPlay = GUI_FILE_NEW;
+                    guiInfo.NewPlay = GUI_MEDIUM_NEW;
                     update_playlistwindow();
                     guiInfo.PlaylistNext = guiInfo.Playing? 0 : 1;
                     gui(GUI_SET_STATE, (void *) GUI_STOP);
@@ -391,7 +391,7 @@ void uiPlay( void )
        uiPause();
        return;
    }
-   guiInfo.NewPlay = GUI_FILE_NEW;
+   guiInfo.NewPlay = GUI_MEDIUM_NEW;
    gui(GUI_SET_STATE, (void *) GUI_PLAY);
 }
 
@@ -779,12 +779,12 @@ int gui(int what, void *data)
                   movie_aspect = -1;
 
               guiInfo.PlaylistNext = TRUE;
-              guiInfo.NewPlay = GUI_FILE_NEW;
+              guiInfo.NewPlay = GUI_MEDIUM_NEW;
               uiSetFile(NULL, mygui->playlist->tracks[(mygui->playlist->current)++]->filename, STREAMTYPE_FILE);
               //sprintf(guiInfo.Filename, mygui->playlist->tracks[(mygui->playlist->current)++]->filename);
           }
 
-          if(guiInfo.NewPlay == GUI_FILE_NEW)
+          if(guiInfo.NewPlay == GUI_MEDIUM_NEW)
               break;
 
           guiInfo.ElapsedTime = 0;
