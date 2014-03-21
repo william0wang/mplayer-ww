@@ -751,9 +751,7 @@ int gui(int what, void *data)
             guiInfo.Balance = (b + 1.0) * 50.0; // transform -1..1 to 0..100
 
             if (guiInfo.Balance != last_balance) {
-                l = guiInfo.Volume * (100.0 - guiInfo.Balance) / 50.0;
-                r = guiInfo.Volume * guiInfo.Balance / 50.0;
-                mixer_setvolume(mixer, FFMIN(l, guiInfo.Volume), FFMIN(r, guiInfo.Volume));
+                uiEvent(ivSetVolume, guiInfo.Volume);
                 last_balance = guiInfo.Balance;
             }
         }
