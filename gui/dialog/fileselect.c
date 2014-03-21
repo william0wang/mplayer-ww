@@ -478,7 +478,7 @@ static void fs_Ok_released(GtkButton *button, gpointer user_data)
             g_free(selected);
         }
 
-        guiInfo.NewPlay = GUI_MEDIUM_NEW;
+        guiInfo.MediumChanged = GUI_MEDIUM_NEW;
         sub_fps = 0;
         fs_PersistantHistory(fsSelectedDirectory);
         break;

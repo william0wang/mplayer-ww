@@ -199,7 +199,7 @@ play:
                 if (!guiInfo.Track)
                     guiInfo.Track = 1;
 
-                guiInfo.NewPlay      = GUI_MEDIUM_NEW;
+                guiInfo.MediumChanged = GUI_MEDIUM_NEW;
                 guiInfo.PlaylistNext = !guiInfo.Playing;
 
                 break;
@@ -213,7 +213,7 @@ play:
                 if (!guiInfo.Track)
                     guiInfo.Track = (guiInfo.StreamType == STREAMTYPE_VCD ? 2 : 1);
 
-                guiInfo.NewPlay = GUI_MEDIUM_SAME;
+                guiInfo.MediumChanged = GUI_MEDIUM_SAME;
 
                 break;
             }

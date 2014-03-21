@@ -404,7 +404,7 @@ int gui(int what, void *data)
         usec_sleep(20000);
         wsEvents();
 
-        if (guiInfo.NewPlay == GUI_MEDIUM_NEW) {
+        if (guiInfo.MediumChanged == GUI_MEDIUM_NEW) {
             audio_id  = -1;
             video_id  = -1;
             dvdsub_id = -1;
@@ -593,12 +593,12 @@ int gui(int what, void *data)
 
         if (guiInfo.AudioFilename)
             audio_stream = gstrdup(guiInfo.AudioFilename);
-        else if (guiInfo.NewPlay == GUI_MEDIUM_NEW)
+        else if (guiInfo.MediumChanged == GUI_MEDIUM_NEW)
             nfree(audio_stream);
 
 // audio_stream = NULL;
 
-        guiInfo.NewPlay = 0;
+        guiInfo.MediumChanged = 0;
 
         ass_enabled       = gtkASS.enabled;
         ass_use_margins   = gtkASS.use_margins;
@@ -807,10 +807,10 @@ int gui(int what, void *data)
 
         if (next) {
             uiSetFile(next->path, next->name, STREAMTYPE_FILE);
-            guiInfo.NewPlay = GUI_MEDIUM_NEW;
+            guiInfo.MediumChanged = GUI_MEDIUM_NEW;
             guiInfo.Track   = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
         } else {
-            if (guiInfo.NewPlay == GUI_MEDIUM_NEW)
+            if (guiInfo.MediumChanged == GUI_MEDIUM_NEW)
                 break;
 
             filename = NULL;

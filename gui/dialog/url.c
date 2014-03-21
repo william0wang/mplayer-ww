@@ -81,7 +81,7 @@ static void button_clicked(GtkButton *button, gpointer user_data)
                     listMgr(URLLIST_ITEM_ADD, item);
                 }
 
-                guiInfo.NewPlay = GUI_MEDIUM_NEW;
+                guiInfo.MediumChanged = GUI_MEDIUM_NEW;
                 uiEvent(evPlay, 0);
             }
         }

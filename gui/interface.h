@@ -68,7 +68,7 @@ enum {
 //@}
 
 //@{
-/// NewPlay reason
+/// MediumChanged reason
 #define GUI_MEDIUM_SAME 1
 #define GUI_MEDIUM_NEW  2
 //@}
@@ -134,7 +134,7 @@ typedef struct {
     float Volume;
     float Balance;
 
-    int NewPlay;              // public, read access by MPlayer
+    int MediumChanged;        // public, read access by MPlayer
     int PlaylistNext;
 } guiInterface_t;
 
