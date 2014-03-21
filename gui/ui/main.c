@@ -172,7 +172,6 @@ rollerhandled:
             if ( ( item->type == itHPotmeter )||( item->type == itVPotmeter ) )
              {
               item->value+=value;
-              btnModify( item->message,item->value );
               uiEvent( item->message,item->value );
              }
            }
