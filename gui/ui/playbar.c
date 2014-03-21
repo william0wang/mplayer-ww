@@ -177,14 +177,10 @@ static void uiPlaybarMouse( int Button, int X, int Y, int RX, int RY )
 	switch( itemtype )
 	 {
 	  case itHPotmeter:
-	       btnModify( item->message,100.0 * ( X - item->x ) / item->width);
-	       uiEvent( item->message,item->value );
-	       value=item->value;
+	       value=100.0 * ( X - item->x ) / item->width;
 	       break;
 	  case itVPotmeter:
-	       btnModify( item->message,100.0 - 100.0 * ( Y - item->y ) / item->height );
-	       uiEvent( item->message,item->value );
-	       value=item->value;
+	       value=100.0 - 100.0 * ( Y - item->y ) / item->height;
 	       break;
 	 }
 	uiEvent( item->message,value );
