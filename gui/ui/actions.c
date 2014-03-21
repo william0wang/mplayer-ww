@@ -93,7 +93,7 @@ static void MediumPrepare(int type)
 
 void uiEvent(int ev, float param)
 {
-    int iparam     = (int)param, osd;
+    int iparam     = (int)param;
     mixer_t *mixer = mpctx_get_mixer(guiInfo.mpcontext);
     float aspect;
     char cmd[40];
@@ -346,10 +346,7 @@ play:
     case evSetBalance:
         guiInfo.Balance = param;
         mixer_setbalance(mixer, (guiInfo.Balance - 50.0) / 50.0);     // transform 0..100 to -1..1
-        osd       = osd_level;
-        osd_level = 0;
-        uiEvent(evSetVolume, guiInfo.Volume);
-        osd_level = osd;
+        uiEvent(ivSetVolume, guiInfo.Volume);
 
         if (osd_level) {
             osd_visible = (GetTimerMS() + 1000) | 1;
