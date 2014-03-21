@@ -598,7 +598,7 @@ int gui(int what, void *data)
 
 // audio_stream = NULL;
 
-        guiInfo.MediumChanged = 0;
+        guiInfo.MediumChanged = False;
 
         ass_enabled       = gtkASS.enabled;
         ass_use_margins   = gtkASS.use_margins;
