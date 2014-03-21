@@ -785,7 +785,7 @@ int gui(int what, void *data)
         wsEvent(data);
         break;
 
-    case GUI_END_FILE:
+    case GUI_END_PLAY:
 
         guiInfo.sh_video = NULL;
 

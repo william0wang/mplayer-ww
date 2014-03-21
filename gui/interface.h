@@ -39,7 +39,7 @@ extern int use_gui;             // this is defined in mplayer.c
 
 /// gui() instructions
 enum {
-    GUI_END_FILE,
+    GUI_END_PLAY,
     GUI_HANDLE_X_EVENT,
     GUI_PREPARE,
     GUI_REDRAW,
