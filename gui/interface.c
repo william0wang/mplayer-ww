@@ -704,8 +704,6 @@ int gui(int what, void *data)
             guiInfo.VideoHeight = 0;
         }
 
-        gui(GUI_SET_MIXER, mpctx_get_mixer(guiInfo.mpcontext));
-
         if (gtkEnableAudioEqualizer) {
             equalizer_t eq;
             unsigned int i, j;
