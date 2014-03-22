@@ -740,16 +740,16 @@ int gui(int what, void *data)
 
         mixer = data;
 
-            mixer_getvolume(mixer, &l, &r);
-            guiInfo.Volume = FFMAX(l, r);
+        mixer_getvolume(mixer, &l, &r);
+        guiInfo.Volume = FFMAX(l, r);
 
-            mixer_getbalance(mixer, &b);
-            guiInfo.Balance = (b + 1.0) * 50.0; // transform -1..1 to 0..100
+        mixer_getbalance(mixer, &b);
+        guiInfo.Balance = (b + 1.0) * 50.0;   // transform -1..1 to 0..100
 
-            if (guiInfo.Balance != last_balance) {
-                uiEvent(ivSetVolume, guiInfo.Volume);
-                last_balance = guiInfo.Balance;
-            }
+        if (guiInfo.Balance != last_balance) {
+            uiEvent(ivSetVolume, guiInfo.Volume);
+            last_balance = guiInfo.Balance;
+        }
 
         break;
 
