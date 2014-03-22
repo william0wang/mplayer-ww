@@ -317,6 +317,7 @@ static void add_vf(char *str)
  */
 int gui(int what, void *data)
 {
+    static float last_balance = 50.0f;
 #ifdef CONFIG_DVDREAD
     dvd_priv_t *dvd;
 #endif
@@ -324,6 +325,7 @@ int gui(int what, void *data)
     stream_t *stream = NULL;
     sh_audio_t *sh_audio;
     mixer_t *mixer;
+    float l, r, b;
     plItem *next = NULL;
 
     switch (what) {
@@ -738,10 +740,6 @@ int gui(int what, void *data)
 
         mixer = data;
 
-        if (mixer) {
-            float l, r, b;
-            static float last_balance = 50.0f;
-
             mixer_getvolume(mixer, &l, &r);
             guiInfo.Volume = FFMAX(l, r);
 
@@ -752,7 +750,6 @@ int gui(int what, void *data)
                 uiEvent(ivSetVolume, guiInfo.Volume);
                 last_balance = guiInfo.Balance;
             }
-        }
 
         break;
 
