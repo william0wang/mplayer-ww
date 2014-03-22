@@ -736,7 +736,7 @@ int gui(int what, void *data)
 
         break;
 
-    case GUI_SET_MIXER:
+    case GUI_SET_VOLUME_BALANCE:
 
         mixer = data;
 

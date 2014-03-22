@@ -743,7 +743,7 @@ int gui(int what, void *data)
         }
         case GUI_RUN_MESSAGE:
           break;
-        case GUI_SET_MIXER:
+        case GUI_SET_VOLUME_BALANCE:
         {
             if(audio_out)
             {
