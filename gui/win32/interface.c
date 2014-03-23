@@ -560,6 +560,7 @@ int gui(int what, void *data)
 {
     int idata = (intptr_t) data;
     stream_t *stream;
+    sh_audio_t *sh_audio;
 #ifdef CONFIG_DVDREAD
     dvd_priv_t *dvdp;
 #endif
@@ -621,7 +622,8 @@ int gui(int what, void *data)
         }
         case GUI_SET_AUDIO:
         {
-            if (data && !guiInfo.sh_video) guiInfo.VideoWindow = FALSE;
+            sh_audio = data;
+            if (sh_audio && !guiInfo.sh_video) guiInfo.VideoWindow = FALSE;
             if(IsWindowVisible(mygui->videowindow) && !guiInfo.VideoWindow)
                 ShowWindow(mygui->videowindow, SW_HIDE);
             break;
