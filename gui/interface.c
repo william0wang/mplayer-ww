@@ -700,6 +700,9 @@ int gui(int what, void *data)
 
         guiInfo.AudioChannels = sh_audio ? sh_audio->channels : 0;
 
+        if (guiInfo.AudioChannels < 2)
+            btnSet(evSetBalance, btnDisabled);
+
         if (sh_audio && !guiInfo.sh_video) {
             guiInfo.VideoWindow = False;
             guiInfo.VideoWidth  = 0;
@@ -783,6 +786,8 @@ int gui(int what, void *data)
     case GUI_END_PLAY:
 
         guiInfo.sh_video = NULL;
+
+        btnSet(evSetBalance, btnReleased);
 
         uiEvent(ivRedraw, True);
 
