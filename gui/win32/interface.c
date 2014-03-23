@@ -559,7 +559,7 @@ void guiDone(void)
 int gui(int what, void *data)
 {
     int idata = (intptr_t) data;
-    stream_t *stream = data;
+    stream_t *stream;
 #ifdef CONFIG_DVDREAD
     dvd_priv_t *dvdp;
 #endif
@@ -658,6 +658,7 @@ int gui(int what, void *data)
         }
         case GUI_SET_STREAM:
         {
+            stream = data;
             guiInfo.StreamType = stream->type;
             switch(stream->type)
             {
