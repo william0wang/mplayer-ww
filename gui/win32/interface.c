@@ -634,8 +634,7 @@ int gui(int what, void *data)
             guiInfo.sh_video = data;
             if (guiInfo.sh_video)
             {
-                sh_video_t *sh = data;
-                codecname = sh->codec->name;
+                codecname = guiInfo.sh_video->codec->name;
 
                 /* we have video, show the video window */
                 if(!IsWindowVisible(mygui->videowindow) || IsIconic(mygui->videowindow))
