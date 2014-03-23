@@ -632,7 +632,7 @@ int gui(int what, void *data)
         case GUI_SET_VIDEO:
         {
             guiInfo.sh_video = data;
-            if (data)
+            if (guiInfo.sh_video)
             {
                 sh_video_t *sh = data;
                 codecname = sh->codec->name;
