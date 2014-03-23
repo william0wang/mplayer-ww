@@ -1,4 +1,4 @@
-// Synced with help_mp-en.h rev. 36831
+// Synced with help_mp-en.h rev. 36987
 //
 // Translated by JRaSH <jrash06@gmail.com>
 
@@ -719,6 +719,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_MSG_SkinFontFileNotFound "未找到字体描述文件。\n"
 #define MSGTR_GUI_MSG_SkinFontImageNotFound "未找到字体图像文件。\n"
 #define MSGTR_GUI_MSG_SkinFontNotFound "字体标识符（%s）不存在\n"
+#define MSGTR_GUI_MSG_SkinLegacy "界面外观配置文件，行 %d：‘%s’已过时，应使用‘%s’。\n"
 #define MSGTR_GUI_MSG_SkinMemoryError "内存不足\n"
 #define MSGTR_GUI_MSG_SkinTooManyFonts "定义的字体过多。\n"
 #define MSGTR_GUI_MSG_SkinTooManyItems "定义项过多。\n"
@@ -820,7 +821,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_WIN32_DebugConsole "调试控制终端"
 #define MSGTR_GUI_WIN32_Defaults "默认值"
 #define MSGTR_GUI_WIN32_DirectoryList "目录列表"
-#define MSGTR_GUI_WIN32_DisplayInVideoWindow "在视频窗口中显示（仅用于 DirectX）"
+#define MSGTR_GUI_WIN32_DisplayInVideoWindow "在视频窗口中显示（仅用于 DirectX 或 Direct3D）"
 #define MSGTR_GUI_WIN32_Down "向下"
 #define MSGTR_GUI_WIN32_Load "加载"
 #define MSGTR_GUI_WIN32_OnlineHelp "线上帮助内容"
