@@ -623,6 +623,7 @@ int gui(int what, void *data)
         case GUI_SET_AUDIO:
         {
             sh_audio = data;
+            guiInfo.AudioChannels = sh_audio ? sh_audio->channels : 0;
             if (sh_audio && !guiInfo.sh_video) guiInfo.VideoWindow = FALSE;
             if(IsWindowVisible(mygui->videowindow) && !guiInfo.VideoWindow)
                 ShowWindow(mygui->videowindow, SW_HIDE);
