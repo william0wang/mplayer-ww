@@ -660,7 +660,7 @@ int gui(int what, void *data)
         {
             stream = data;
             guiInfo.StreamType = stream->type;
-            switch(stream->type)
+            switch(guiInfo.StreamType)
             {
                 case STREAMTYPE_DVD:
                     guiInfo.Tracks = 0;
