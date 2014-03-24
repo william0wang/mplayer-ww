@@ -716,8 +716,9 @@ int gui(int what, void *data)
         if (last_balance < 0.0f) {
             uiEvent(ivSetVolume, guiInfo.Volume);
 
-            if (guiInfo.AudioChannels >= 2)
-                uiEvent(ivSetBalance, guiInfo.Balance);
+            // DISABLED UNTIL BUGFIX IN MIXER.C/AF_FORMAT.C FOR AC3 AUDIO
+            //if (guiInfo.AudioChannels? =?= 2)
+            //    uiEvent(ivSetBalance, guiInfo.Balance);
 
             last_balance = guiInfo.Balance;
         }
