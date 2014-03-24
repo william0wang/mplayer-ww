@@ -68,6 +68,7 @@
  */
 guiInterface_t guiInfo = {
     .StreamType   = STREAMTYPE_DUMMY,
+    .Volume       = 50.0f,
     .Balance      = 50.0f,
     .PlaylistNext = True
 };
