@@ -50,6 +50,7 @@
 #include "gui/util/list.h"
 #include "gui/util/mem.h"
 #include "gui/util/string.h"
+#include "gui/wm/ws.h"
 #include "preferences.h"
 #include "fileselect.h"
 #include "tools.h"

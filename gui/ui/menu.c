@@ -30,6 +30,7 @@
 #include "actions.h"
 #include "ui.h"
 #include "gui/util/mem.h"
+#include "gui/wm/ws.h"
 
 #include "gui/dialog/dialog.h"
 

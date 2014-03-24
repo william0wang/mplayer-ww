@@ -20,6 +20,7 @@
 #define MPLAYER_GUI_RENDER_H
 
 #include "gui/app/app.h"
+#include "gui/wm/ws.h"
 
 void RenderAll(wsWindow *window, guiItem *Items, int nrItems, char *db);
 
