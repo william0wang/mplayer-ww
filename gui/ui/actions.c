@@ -331,7 +331,7 @@ play:
             mixer_setvolume(mixer, FFMIN(l, guiInfo.Volume), FFMIN(r, guiInfo.Volume));
         }
 
-        if (ev == evSetVolume)
+        if (ev == ivSetVolume)
             break;
 
         if (osd_level) {
