@@ -186,9 +186,12 @@ void guiInit(void)
 
     WinID = (Window)guiApp.videoWindow.WindowID;
 
-    btnModify(evSetVolume, guiInfo.Volume);
-    btnModify(evSetBalance, guiInfo.Balance);
-    btnModify(evSetMoviePosition, guiInfo.Position);
+    btnValue(evSetVolume, &guiInfo.Volume);
+    btnValue(evSetBalance, &guiInfo.Balance);
+    btnValue(evSetMoviePosition, &guiInfo.Position);
+
+    if (guiInfo.Position)
+        uiEvent(evSetMoviePosition, guiInfo.Position);
 
     wsWindowVisibility(&guiApp.mainWindow, wsShowWindow);
 
@@ -317,7 +320,7 @@ static void add_vf(char *str)
  */
 int gui(int what, void *data)
 {
-    static float last_balance = 50.0f;
+    static float last_balance = -1.0f;
 #ifdef CONFIG_DVDREAD
     dvd_priv_t *dvd;
 #endif
@@ -707,6 +710,15 @@ int gui(int what, void *data)
             guiInfo.VideoWindow = False;
             guiInfo.VideoWidth  = 0;
             guiInfo.VideoHeight = 0;
+        }
+
+        if (last_balance < 0.0f) {
+            uiEvent(ivSetVolume, guiInfo.Volume);
+
+            if (guiInfo.AudioChannels >= 2)
+                uiEvent(ivSetBalance, guiInfo.Balance);
+
+            last_balance = guiInfo.Balance;
         }
 
         if (gtkEnableAudioEqualizer) {

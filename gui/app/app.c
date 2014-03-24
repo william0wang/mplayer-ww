@@ -231,3 +231,21 @@ void btnSet(int event, int state)
             if (hasButton(guiApp.playbarItems[i]))
                 guiApp.playbarItems[i].pressed = state;
 }
+
+/**
+ * @brief Retrieve the value of the (main) item belonging to an event.
+ *
+ * @param event event
+ * @param value pointer to a variable to store the value (if event has been found)
+ */
+void btnValue(int event, float *value)
+{
+    int i;
+
+    for (i = 0; i <= guiApp.IndexOfMainItems; i++)
+        if (guiApp.mainItems[i].message == event)
+            if (hasValue(guiApp.mainItems[i]) && hasButton(guiApp.mainItems[i])) {
+                *value = guiApp.mainItems[i].value;
+                return;
+            }
+}

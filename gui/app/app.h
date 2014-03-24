@@ -182,5 +182,6 @@ int appFindMessage(const char *name);
 void appFreeStruct(void);
 void btnModify(int event, float value);
 void btnSet(int event, int state);
+void btnValue(int event, float *value);
 
 #endif /* MPLAYER_GUI_APP_H */
