@@ -20,7 +20,6 @@
  */
 
 #include <X11/Xlib.h>
-#include "ws.h"
 #include "wsxdnd.h"
 
 #include <stdio.h>
