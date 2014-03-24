@@ -344,9 +344,13 @@ play:
         break;
 
     case evSetBalance:
+    case ivSetBalance:
         guiInfo.Balance = param;
         mixer_setbalance(mixer, (guiInfo.Balance - 50.0) / 50.0);     // transform 0..100 to -1..1
         uiEvent(ivSetVolume, guiInfo.Volume);
+
+        if (ev == ivSetBalance)
+            break;
 
         if (osd_level) {
             osd_visible = (GetTimerMS() + 1000) | 1;

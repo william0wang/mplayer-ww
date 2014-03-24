@@ -193,6 +193,7 @@ enum
   ivSetDVDSubtitle,
   ivPlayDVD,
   ivSetVolume,
+  ivSetBalance,
   ivShowPopUpMenu,
   ivHidePopUpMenu,
   ivRedraw
