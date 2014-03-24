@@ -348,20 +348,12 @@ void renderwidget(skin_t *skin, image *dest, widget *item, int state)
             /* repaint the area behind the slider */
             render(skin->desktopbpp, dest, find_background(skin, item), item->wx, item->wy, item->wx, item->wy, item->width, item->wheight, 1);
             item->y = (100 - item->value) * (item->wheight-item->height) / 100 + item->wy;
-            if((item->y + item->height) > (item->wy + item->wheight))
-                item->y = item->wy + item->wheight - item->height;
-            if(item->y < item->wy)
-                item->y = item->wy;
         }
         else
         {
             /* repaint the area behind the slider */
             render(skin->desktopbpp, dest, find_background(skin, item), item->wx, item->wy, item->wx, item->wy, item->wwidth, item->height, 1);
             item->x = item->value * (item->wwidth-item->width) / 100 + item->wx;
-            if((item->x + item->width) > (item->wx + item->wwidth))
-                item->x = item->wx + item->wwidth - item->width;
-            if(item->x < item->wx)
-                item->x = item->wx;
         }
     }
     render(skin->desktopbpp, dest, img, item->x, item->y, 0, y, img->width, height, 1);
