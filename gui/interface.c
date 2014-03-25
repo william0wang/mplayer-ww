@@ -709,6 +709,8 @@ int gui(int what, void *data)
 
         guiInfo.AudioChannels = sh_audio ? sh_audio->channels : 0;
 
+        if (guiInfo.AudioPassthrough)
+            btnSet(evSetVolume, btnDisabled);
         if (guiInfo.AudioChannels < 2 || guiInfo.AudioPassthrough)
             btnSet(evSetBalance, btnDisabled);
 
@@ -805,6 +807,7 @@ int gui(int what, void *data)
 
         guiInfo.sh_video = NULL;
 
+        btnSet(evSetVolume, btnReleased);
         btnSet(evSetBalance, btnReleased);
 
         uiEvent(ivRedraw, True);
