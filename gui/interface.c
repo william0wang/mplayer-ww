@@ -709,7 +709,7 @@ int gui(int what, void *data)
 
         guiInfo.AudioChannels = sh_audio ? sh_audio->channels : 0;
 
-        if (guiInfo.AudioChannels < 2)
+        if (guiInfo.AudioChannels < 2 || guiInfo.AudioPassthrough)
             btnSet(evSetBalance, btnDisabled);
 
         if (sh_audio && !guiInfo.sh_video) {
