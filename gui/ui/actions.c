@@ -658,6 +658,11 @@ void uiChangeSkin(char *name)
 
     /* */
 
+    if (guiInfo.AudioPassthrough)
+        btnSet(evSetVolume, btnDisabled);
+    if (guiInfo.AudioChannels < 2 || guiInfo.AudioPassthrough)
+        btnSet(evSetBalance, btnDisabled);
+
     btnSet(evFullScreen, (guiApp.videoWindow.isFullScreen ? btnPressed : btnReleased));
 
     wsWindowLayer(wsDisplay, guiApp.mainWindow.WindowID, guiApp.videoWindow.isFullScreen);
