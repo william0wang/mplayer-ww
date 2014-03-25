@@ -202,7 +202,7 @@ calclengthmmmmss:
                     break;
 
                 case 2:
-                    av_strlcat(trbuf, "t", sizeof(trbuf));
+                    av_strlcat(trbuf, (guiInfo.AudioPassthrough ? "r" : "t"), sizeof(trbuf));
                     break;
 
                 default:
