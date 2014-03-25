@@ -60,6 +60,7 @@
 #include "libvo/video_out.h"
 #include "libao2/audio_out.h"
 #include "access_mpcontext.h"
+#include "libmpcodecs/ad.h"
 #include "libmpcodecs/vd.h"
 #include "libmpcodecs/dec_audio.h"
 #include "gui/ui/actions.h"
@@ -561,6 +562,7 @@ int gui(int what, void *data)
     int idata = (intptr_t) data;
     stream_t *stream;
     sh_audio_t *sh_audio;
+    const ad_functions_t *ad;
 #ifdef CONFIG_DVDREAD
     dvd_priv_t *dvdp;
 #endif
@@ -623,6 +625,8 @@ int gui(int what, void *data)
         case GUI_SET_AUDIO:
         {
             sh_audio = data;
+            ad = sh_audio->ad_driver;
+            guiInfo.AudioPassthrough = (gstrcmp(ad->info->short_name, "hwac3") == 0);
             guiInfo.AudioChannels = sh_audio ? sh_audio->channels : 0;
             if (sh_audio && !guiInfo.sh_video) guiInfo.VideoWindow = FALSE;
             if(IsWindowVisible(mygui->videowindow) && !guiInfo.VideoWindow)
@@ -793,6 +797,7 @@ int gui(int what, void *data)
           guiInfo.ElapsedTime = 0;
           guiInfo.Position = 0;
           guiInfo.AudioChannels = 0;
+          guiInfo.AudioPassthrough = FALSE;
 
           guiInfo.Track = 1;
           guiInfo.Chapter = 1;

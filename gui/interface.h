@@ -108,6 +108,8 @@ typedef struct {
     int StreamType;
     int AudioChannels;
 
+    int AudioPassthrough;
+
     int AudioStreams;
     stream_language_t AudioStream[32];
 

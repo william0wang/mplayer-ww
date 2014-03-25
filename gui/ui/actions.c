@@ -707,6 +707,7 @@ void uiUnsetMedia(int totals)
     guiInfo.VideoWidth    = 0;
     guiInfo.VideoHeight   = 0;
     guiInfo.AudioChannels = 0;
+    guiInfo.AudioPassthrough = False;
     guiInfo.RunningTime   = 0;
 
     if (totals) {

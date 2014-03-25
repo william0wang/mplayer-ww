@@ -48,6 +48,7 @@
 #include "input/input.h"
 #include "libaf/equalizer.h"
 #include "libavutil/common.h"
+#include "libmpcodecs/ad.h"
 #include "libmpcodecs/dec_audio.h"
 #include "libmpcodecs/dec_video.h"
 #include "libmpcodecs/vd.h"
@@ -328,6 +329,7 @@ int gui(int what, void *data)
     int idata = (intptr_t)data, msg, state;
     stream_t *stream = NULL;
     sh_audio_t *sh_audio;
+    const ad_functions_t *ad;
     mixer_t *mixer;
     float l, r, b;
     plItem *next = NULL;
@@ -701,6 +703,9 @@ int gui(int what, void *data)
     case GUI_SET_AUDIO:
 
         sh_audio = data;
+
+        ad = sh_audio->ad_driver;
+        guiInfo.AudioPassthrough = (gstrcmp(ad->info->short_name, "hwac3") == 0);
 
         guiInfo.AudioChannels = sh_audio ? sh_audio->channels : 0;
 
