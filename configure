@@ -8630,6 +8630,7 @@ SLIBNAME_WITH_MAJOR = \$(SLIBNAME)-42
 # Some FFmpeg codecs depend on these. Enable them unconditionally for now.
 CONFIG_AANDCTTABLES  = yes
 CONFIG_AUDIO_FRAME_QUEUE = yes
+CONFIG_CABAC   = yes
 CONFIG_DCT     = yes
 CONFIG_DSPUTIL = yes
 CONFIG_DWT     = yes
