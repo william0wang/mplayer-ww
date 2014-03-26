@@ -69,8 +69,8 @@ static int fntAddNewFont(char *name)
     av_strlcpy(Fonts[id]->name, name, MAX_FONT_NAME);
 
     for (i = 0; i < ASCII_CHRS + EXTRA_CHRS; i++) {
-        Fonts[id]->Fnt[i].x  = -1;
-        Fonts[id]->Fnt[i].y  = -1;
+        Fonts[id]->Fnt[i].x = -1;
+        Fonts[id]->Fnt[i].y = -1;
         Fonts[id]->Fnt[i].w = -1;
         Fonts[id]->Fnt[i].h = -1;
     }
