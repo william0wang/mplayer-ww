@@ -71,8 +71,8 @@ static int fntAddNewFont(char *name)
     for (i = 0; i < ASCII_CHRS + EXTRA_CHRS; i++) {
         Fonts[id]->Fnt[i].x  = -1;
         Fonts[id]->Fnt[i].y  = -1;
-        Fonts[id]->Fnt[i].sx = -1;
-        Fonts[id]->Fnt[i].sy = -1;
+        Fonts[id]->Fnt[i].w = -1;
+        Fonts[id]->Fnt[i].h = -1;
     }
 
     return id;
@@ -167,12 +167,12 @@ int fntRead(char *path, char *fname)
             Fonts[id]->Fnt[i].y = atoi(buf);
 
             cutItem(param, buf, ',', 2);
-            Fonts[id]->Fnt[i].sx = atoi(buf);
+            Fonts[id]->Fnt[i].w = atoi(buf);
 
             cutItem(param, buf, ',', 3);
-            Fonts[id]->Fnt[i].sy = atoi(buf);
+            Fonts[id]->Fnt[i].h = atoi(buf);
 
-            mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[font]  char: '%s' params: %d,%d %dx%d\n", item, Fonts[id]->Fnt[i].x, Fonts[id]->Fnt[i].y, Fonts[id]->Fnt[i].sx, Fonts[id]->Fnt[i].sy);
+            mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[font]  char: '%s' params: %d,%d %dx%d\n", item, Fonts[id]->Fnt[i].x, Fonts[id]->Fnt[i].y, Fonts[id]->Fnt[i].w, Fonts[id]->Fnt[i].h);
         } else if (!strcmp(item, "image")) {
             av_strlcpy(buf, path, sizeof(buf));
             av_strlcat(buf, param, sizeof(buf));
@@ -285,11 +285,11 @@ int fntTextWidth(int id, char *str)
     while (*p) {
         c = fntGetCharIndex(id, &p, utf8, 1);
 
-        if (c == -1 || Fonts[id]->Fnt[c].sx == -1)
+        if (c == -1 || Fonts[id]->Fnt[c].w == -1)
             c = ' ';
 
-        if (Fonts[id]->Fnt[c].sx != -1)
-            size += Fonts[id]->Fnt[c].sx;
+        if (Fonts[id]->Fnt[c].w != -1)
+            size += Fonts[id]->Fnt[c].w;
     }
 
     return size;
@@ -315,10 +315,10 @@ static int fntTextHeight(int id, char *str)
     while (*p) {
         c = fntGetCharIndex(id, &p, utf8, 1);
 
-        if (c == -1 || Fonts[id]->Fnt[c].sx == -1)
+        if (c == -1 || Fonts[id]->Fnt[c].w == -1)
             c = ' ';
 
-        h = Fonts[id]->Fnt[c].sy;
+        h = Fonts[id]->Fnt[c].h;
 
         if (h > max)
             max = h;
@@ -407,17 +407,17 @@ guiImage *fntTextRender(guiItem *item, int px, char *txt)
         c = fntGetCharIndex(id, &u, utf8, 1);
 
         if (c != -1)
-            fw = Fonts[id]->Fnt[c].sx;
+            fw = Fonts[id]->Fnt[c].w;
 
         if (c == -1 || fw == -1) {
             c  = ' ';
-            fw = Fonts[id]->Fnt[c].sx;
+            fw = Fonts[id]->Fnt[c].w;
         }
 
         if (fw == -1)
             continue;
 
-        fh  = Fonts[id]->Fnt[c].sy;
+        fh  = Fonts[id]->Fnt[c].h;
         fyc = Fonts[id]->Fnt[c].y * fbw + Fonts[id]->Fnt[c].x;
         yc  = dx;
 
@@ -443,17 +443,17 @@ guiImage *fntTextRender(guiItem *item, int px, char *txt)
             c = fntGetCharIndex(id, &u, utf8, -1);
 
             if (c != -1)
-                fw = Fonts[id]->Fnt[c].sx;
+                fw = Fonts[id]->Fnt[c].w;
 
             if (c == -1 || fw == -1) {
                 c  = ' ';
-                fw = Fonts[id]->Fnt[c].sx;
+                fw = Fonts[id]->Fnt[c].w;
             }
 
             if (fw == -1)
                 continue;
 
-            fh  = Fonts[id]->Fnt[c].sy;
+            fh  = Fonts[id]->Fnt[c].h;
             fyc = Fonts[id]->Fnt[c].y * fbw + Fonts[id]->Fnt[c].x;
 
             dx -= fw;
