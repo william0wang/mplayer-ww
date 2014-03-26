@@ -72,7 +72,7 @@ calclengthmmmmss:
                 break;
 
             case '4':
-                snprintf(trans, sizeof(trans), "%02d", (guiInfo.ElapsedTime / 60) % 60);
+                snprintf(trans, sizeof(trans), "%02d", guiInfo.ElapsedTime / 60 % 60);
                 av_strlcat(translation, trans, sizeof(translation));
                 break;
 
@@ -105,7 +105,7 @@ calclengthmmmmss:
                     break;
 
                 case 2:
-                    av_strlcat(translation, (guiInfo.AudioPassthrough ? "r" : "t"), sizeof(translation));
+                    av_strlcat(translation, guiInfo.AudioPassthrough ? "r" : "t", sizeof(translation));
                     break;
 
                 default:
