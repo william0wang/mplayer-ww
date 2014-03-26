@@ -542,11 +542,13 @@ int af_init(af_stream_t* s)
    If the filter couldn't be added the return value is NULL. */
 af_instance_t* af_add(af_stream_t* s, char* name){
   af_instance_t* new;
+  int first_is_format;
   // Sanity check
   if(!s || !s->first || !name)
     return NULL;
+  first_is_format = !strcmp(s->first->info->name,"format");
   // Insert the filter somewhere nice
-  if(!strcmp(s->first->info->name,"format"))
+  if(first_is_format)
     new = af_append(s, s->first, name);
   else
     new = af_prepend(s, s->first, name);
@@ -556,7 +558,17 @@ af_instance_t* af_add(af_stream_t* s, char* name){
   // Reinitalize the filter list
   if(AF_OK != af_reinit(s, s->first) ||
      AF_OK != fixup_output_format(s)){
-    free(new);
+    // remove auto-inserted filters
+    af_instance_t *to_remove = first_is_format ? s->first->next : s->first;
+    while (to_remove != new)
+    {
+        af_instance_t *next = to_remove->next;
+        af_remove(s, to_remove);
+        to_remove = next;
+    }
+    af_remove(s, new);
+    af_reinit(s, s->first);
+    fixup_output_format(s);
     return NULL;
   }
   return new;
