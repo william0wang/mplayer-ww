@@ -52,40 +52,12 @@ static char *TranslateVariables(const char *text)
             }
         } else {
             switch (text[++i]) {
-            case 't':
-                snprintf(trans, sizeof(trans), "%02d", guiInfo.Track);
-                av_strlcat(translation, trans, sizeof(translation));
-                break;
-
-            case 'o':
-                TranslateFilename(0, trans, sizeof(trans));
-                av_strlcat(translation, trans, sizeof(translation));
-                break;
-
-            case 'f':
-                TranslateFilename(1, trans, sizeof(trans));
-                av_strlcat(translation, trans, sizeof(translation));
-                break;
-
-            case 'F':
-                TranslateFilename(2, trans, sizeof(trans));
-                av_strlcat(translation, trans, sizeof(translation));
-                break;
-
-            case '6':
-                t = guiInfo.RunningTime;
-                goto calclengthhhmmss;
-
             case '1':
                 t = guiInfo.ElapsedTime;
 calclengthhhmmss:
                 snprintf(trans, sizeof(trans), "%02d:%02d:%02d", t / 3600, t / 60 % 60, t % 60);
                 av_strlcat(translation, trans, sizeof(translation));
                 break;
-
-            case '7':
-                t = guiInfo.RunningTime;
-                goto calclengthmmmmss;
 
             case '2':
                 t = guiInfo.ElapsedTime;
@@ -109,86 +81,17 @@ calclengthmmmmss:
                 av_strlcat(translation, trans, sizeof(translation));
                 break;
 
+            case '6':
+                t = guiInfo.RunningTime;
+                goto calclengthhhmmss;
+
+            case '7':
+                t = guiInfo.RunningTime;
+                goto calclengthmmmmss;
+
             case '8':
                 snprintf(trans, sizeof(trans), "%01d:%02d:%02d", guiInfo.ElapsedTime / 3600, (guiInfo.ElapsedTime / 60) % 60, guiInfo.ElapsedTime % 60);
                 av_strlcat(translation, trans, sizeof(translation));
-                break;
-
-            case 'v':
-                snprintf(trans, sizeof(trans), "%3.2f%%", guiInfo.Volume);
-                av_strlcat(translation, trans, sizeof(translation));
-                break;
-
-            case 'V':
-                snprintf(trans, sizeof(trans), "%3.1f", guiInfo.Volume);
-                av_strlcat(translation, trans, sizeof(translation));
-                break;
-
-            case 'U':
-                snprintf(trans, sizeof(trans), "%3.0f", guiInfo.Volume);
-                av_strlcat(translation, trans, sizeof(translation));
-                break;
-
-            case 'b':
-                snprintf(trans, sizeof(trans), "%3.2f%%", guiInfo.Balance);
-                av_strlcat(translation, trans, sizeof(translation));
-                break;
-
-            case 'B':
-                snprintf(trans, sizeof(trans), "%3.1f", guiInfo.Balance);
-                av_strlcat(translation, trans, sizeof(translation));
-                break;
-
-            case 'D':
-                snprintf(trans, sizeof(trans), "%3.0f", guiInfo.Balance);
-                av_strlcat(translation, trans, sizeof(translation));
-                break;
-
-            case 'x':
-                snprintf(trans, sizeof(trans), "%d", guiInfo.VideoWidth);
-                av_strlcat(translation, trans, sizeof(translation));
-                break;
-
-            case 'y':
-                snprintf(trans, sizeof(trans), "%d", guiInfo.VideoHeight);
-                av_strlcat(translation, trans, sizeof(translation));
-                break;
-
-            case 'C':
-                snprintf(trans, sizeof(trans), "%s", guiInfo.CodecName ? guiInfo.CodecName : "");
-                av_strlcat(translation, trans, sizeof(translation));
-                break;
-
-            case 's':
-                if (guiInfo.Playing == GUI_STOP)
-                    av_strlcat(translation, "s", sizeof(translation));
-                break;
-
-            case 'l': // legacy
-            case 'p':
-                if (guiInfo.Playing == GUI_PLAY)
-                    av_strlcat(translation, "p", sizeof(translation));
-                break;
-
-            case 'e':
-                if (guiInfo.Playing == GUI_PAUSE)
-                    av_strlcat(translation, "e", sizeof(translation));
-                break;
-
-            case 'P':
-                switch (guiInfo.Playing) {
-                case GUI_STOP:
-                    av_strlcat(translation, "s", sizeof(translation));
-                    break;
-
-                case GUI_PLAY:
-                    av_strlcat(translation, "p", sizeof(translation));
-                    break;
-
-                case GUI_PAUSE:
-                    av_strlcat(translation, "e", sizeof(translation));
-                    break;
-                }
                 break;
 
             case 'a':
@@ -209,6 +112,78 @@ calclengthmmmmss:
                     av_strlcat(translation, "r", sizeof(translation));
                     break;
                 }
+                break;
+
+            case 'b':
+                snprintf(trans, sizeof(trans), "%3.2f%%", guiInfo.Balance);
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'B':
+                snprintf(trans, sizeof(trans), "%3.1f", guiInfo.Balance);
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'C':
+                snprintf(trans, sizeof(trans), "%s", guiInfo.CodecName ? guiInfo.CodecName : "");
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'D':
+                snprintf(trans, sizeof(trans), "%3.0f", guiInfo.Balance);
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'e':
+                if (guiInfo.Playing == GUI_PAUSE)
+                    av_strlcat(translation, "e", sizeof(translation));
+                break;
+
+            case 'f':
+                TranslateFilename(1, trans, sizeof(trans));
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'F':
+                TranslateFilename(2, trans, sizeof(trans));
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'o':
+                TranslateFilename(0, trans, sizeof(trans));
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'l': // legacy
+            case 'p':
+                if (guiInfo.Playing == GUI_PLAY)
+                    av_strlcat(translation, "p", sizeof(translation));
+                break;
+
+            case 'P':
+                switch (guiInfo.Playing) {
+                case GUI_STOP:
+                    av_strlcat(translation, "s", sizeof(translation));
+                    break;
+
+                case GUI_PLAY:
+                    av_strlcat(translation, "p", sizeof(translation));
+                    break;
+
+                case GUI_PAUSE:
+                    av_strlcat(translation, "e", sizeof(translation));
+                    break;
+                }
+                break;
+
+            case 's':
+                if (guiInfo.Playing == GUI_STOP)
+                    av_strlcat(translation, "s", sizeof(translation));
+                break;
+
+            case 't':
+                snprintf(trans, sizeof(trans), "%02d", guiInfo.Track);
+                av_strlcat(translation, trans, sizeof(translation));
                 break;
 
             case 'T':
@@ -242,6 +217,31 @@ calclengthmmmmss:
                     av_strlcat(translation, " ", sizeof(translation));
                     break;
                 }
+                break;
+
+            case 'U':
+                snprintf(trans, sizeof(trans), "%3.0f", guiInfo.Volume);
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'v':
+                snprintf(trans, sizeof(trans), "%3.2f%%", guiInfo.Volume);
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'V':
+                snprintf(trans, sizeof(trans), "%3.1f", guiInfo.Volume);
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'x':
+                snprintf(trans, sizeof(trans), "%d", guiInfo.VideoWidth);
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'y':
+                snprintf(trans, sizeof(trans), "%d", guiInfo.VideoHeight);
+                av_strlcat(translation, trans, sizeof(translation));
                 break;
 
             case '$':
