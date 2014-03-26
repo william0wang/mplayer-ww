@@ -707,7 +707,7 @@ int gui(int what, void *data)
         ad = sh_audio->ad_driver;
         guiInfo.AudioPassthrough = (gstrcmp(ad->info->short_name, "hwac3") == 0);
 
-        guiInfo.AudioChannels = sh_audio ? sh_audio->channels : 0;
+        guiInfo.AudioChannels = (sh_audio ? sh_audio->channels : 0);
 
         if (guiInfo.AudioPassthrough)
             btnSet(evSetVolume, btnDisabled);
