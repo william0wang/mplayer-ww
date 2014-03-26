@@ -35,6 +35,13 @@
 static char *image_buffer;
 static int image_width;
 
+/**
+ * @brief Translate all variables in the @a text.
+ *
+ * @param text text containing variables
+ *
+ * @return new text with all variables translated
+ */
 static char *TranslateVariables(const char *text)
 {
     static char translation[512];
