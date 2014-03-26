@@ -54,15 +54,13 @@ static char *TranslateVariables(const char *text)
             switch (text[++i]) {
             case '1':
                 t = guiInfo.ElapsedTime;
-calclengthhhmmss:
-                snprintf(trans, sizeof(trans), "%02d:%02d:%02d", t / 3600, t / 60 % 60, t % 60);
+HH_MM_SS:       snprintf(trans, sizeof(trans), "%02d:%02d:%02d", t / 3600, t / 60 % 60, t % 60);
                 av_strlcat(translation, trans, sizeof(translation));
                 break;
 
             case '2':
                 t = guiInfo.ElapsedTime;
-calclengthmmmmss:
-                snprintf(trans, sizeof(trans), "%04d:%02d", t / 60, t % 60);
+MMMM_SS:        snprintf(trans, sizeof(trans), "%04d:%02d", t / 60, t % 60);
                 av_strlcat(translation, trans, sizeof(translation));
                 break;
 
@@ -83,11 +81,11 @@ calclengthmmmmss:
 
             case '6':
                 t = guiInfo.RunningTime;
-                goto calclengthhhmmss;
+                goto HH_MM_SS;
 
             case '7':
                 t = guiInfo.RunningTime;
-                goto calclengthmmmmss;
+                goto MMMM_SS;
 
             case '8':
                 snprintf(trans, sizeof(trans), "%01d:%02d:%02d", guiInfo.ElapsedTime / 3600, (guiInfo.ElapsedTime / 60) % 60, guiInfo.ElapsedTime % 60);
