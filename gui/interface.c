@@ -749,7 +749,7 @@ int gui(int what, void *data)
         // ...without video there will be no call to GUI_SETUP_VIDEO_WINDOW
         if (!guiInfo.VideoWindow) {
             wsWindowVisibility(&guiApp.videoWindow, wsHideWindow);
-            btnSet(evFullScreen, (gtkLoadFullscreen ? btnPressed : btnReleased));
+            btnSet(evFullScreen, gtkLoadFullscreen ? btnPressed : btnReleased);
         }
 
         // ...option variable fullscreen determines whether MPlayer will handle
@@ -877,7 +877,7 @@ int gui(int what, void *data)
             } else {
                 wsWindowVisibility(&guiApp.videoWindow, wsHideWindow);
                 guiInfo.VideoWindow = False;
-                btnSet(evFullScreen, (gtkLoadFullscreen ? btnPressed : btnReleased));
+                btnSet(evFullScreen, gtkLoadFullscreen ? btnPressed : btnReleased);
             }
 
             gui(GUI_SET_STATE, (void *)GUI_STOP);
@@ -1161,7 +1161,7 @@ void mplayerLoadSubtitle(const char *name)
     if (name) {
         mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_LoadingSubtitle, name);
 
-        subdata = sub_read_file(name, (guiInfo.sh_video ? guiInfo.sh_video->fps : 0));
+        subdata = sub_read_file(name, guiInfo.sh_video ? guiInfo.sh_video->fps : 0);
 
         if (!subdata)
             gmp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_CantLoadSub, name);

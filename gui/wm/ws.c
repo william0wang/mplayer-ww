@@ -1328,7 +1328,7 @@ void wsImageCreate(wsWindow *win, int w, int h)
     {
         win->xImage = XCreateImage(wsDisplay, win->VisualInfo.visual, win->VisualInfo.depth,
                                    ZPixmap, 0, 0, w, h,
-                                   (wsScreenDepth == 3) ? 32 : wsScreenDepth,
+                                   wsScreenDepth == 3 ? 32 : wsScreenDepth,
                                    0);
 
         if ((win->xImage->data = malloc(win->xImage->bytes_per_line * win->xImage->height)) == NULL) {

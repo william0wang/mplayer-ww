@@ -359,7 +359,7 @@ static int item_base(char *in)
     if (currWin->width == 0 || currWin->height == 0)
         return 1;
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    %s: %dx%d\n", (is_video && w && h ? "size" : " bitmap"), currWin->width, currWin->height);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    %s: %dx%d\n", is_video && w && h ? "size" : " bitmap", currWin->width, currWin->height);
 
     if (!is_video) {
         if (!bpRenderMask(&currWin->Bitmap, &currWin->Mask)) {
