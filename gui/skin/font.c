@@ -28,7 +28,6 @@
 
 #include "font.h"
 #include "skin.h"
-#include "gui/util/cut.h"
 #include "gui/util/mem.h"
 #include "gui/util/string.h"
 

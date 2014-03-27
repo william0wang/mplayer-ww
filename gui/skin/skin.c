@@ -30,7 +30,6 @@
 #include "gui/app/app.h"
 #include "gui/app/gui.h"
 #include "gui/dialog/dialog.h"
-#include "gui/util/cut.h"
 #include "gui/util/string.h"
 
 #include "help_mp.h"

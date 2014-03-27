@@ -22,6 +22,15 @@
 #include <stddef.h>
 #include <stdio.h>
 
+/**
+ * @brief Wraps #cutItemString():
+ *        Extract a part of a string delimited by a separator character
+ *        at most the size of @a out.
+ */
+#define cutItem(in, out, sep, num) cutItemString(in, out, sep, num, sizeof(out))
+
+void cutItemString(char *in, char *out, char sep, int num, size_t maxout);
+int cutItemToInt(char *in, char sep, int num);
 char *decomment(char *in);
 char *fgetstr(char *str, int size, FILE *file);
 char *gstrchr(const char *str, int c);
