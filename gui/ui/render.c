@@ -35,7 +35,7 @@
 #define DLABEL_DELAY 2500   // in milliseconds
 
 static char *image_buffer;
-static int image_width;
+static int drawbuf_width;
 
 /**
  * @brief Convert #guiInfo member Filename.
@@ -357,41 +357,41 @@ MMMM_SS:        snprintf(trans, sizeof(trans), "%04d:%02d", t / 60, t % 60);
     return translation;
 }
 
-static void PutImage(guiImage *bf, int x, int y, int max, int ofs)
+static void PutImage(guiImage *img, int x, int y, int parts, int index)
 {
     int i, ix, iy;
-    uint32_t *drw, *buf;
-    register uint32_t tmp;
+    uint32_t *pixels, *drawbuf;
+    register uint32_t pixel;
 
     /* register uint32_t yc; */
 
-    if (!bf || (bf->Image == NULL))
+    if (!img || (img->Image == NULL))
         return;
 
-    i   = bf->Width * (bf->Height / max) * ofs;
-    buf = (uint32_t *)image_buffer;
-    drw = (uint32_t *)bf->Image;
+    i       = img->Width * (img->Height / parts) * index;
+    drawbuf = (uint32_t *)image_buffer;
+    pixels  = (uint32_t *)img->Image;
 
 #if 1
-    for (iy = y; iy < (int)(y + bf->Height / max); iy++)
-        for (ix = x; ix < (int)(x + bf->Width); ix++) {
-            tmp = drw[i++];
+    for (iy = y; iy < (int)(y + img->Height / parts); iy++)
+        for (ix = x; ix < (int)(x + img->Width); ix++) {
+            pixel = pixels[i++];
 
-            if (!IS_TRANSPARENT(tmp))
-                buf[iy * image_width + ix] = tmp;
+            if (!IS_TRANSPARENT(pixel))
+                drawbuf[iy * drawbuf_width + ix] = pixel;
         }
 #else
-    yc = y * image_width;
+    yc = y * drawbuf_width;
 
-    for (iy = y; iy < (int)(y + bf->Height / max); iy++) {
-        for (ix = x; ix < (int)(x + bf->Width); ix++) {
-            tmp = drw[i++];
+    for (iy = y; iy < (int)(y + img->Height / parts); iy++) {
+        for (ix = x; ix < (int)(x + img->Width); ix++) {
+            pixel = pixels[i++];
 
-            if (!IS_TRANSPARENT(tmp))
-                buf[yc + ix] = tmp;
+            if (!IS_TRANSPARENT(pixel))
+                drawbuf[yc + ix] = pixel;
         }
 
-        yc += image_width;
+        yc += drawbuf_width;
     }
 #endif
 }
@@ -415,7 +415,7 @@ static void SinglePhasePutImage(guiImage *bf, int x, int y, float frac)
             tmp = drw[i++];
 
             if (!IS_TRANSPARENT(tmp))
-                buf[iy * image_width + ix] = tmp;
+                buf[iy * drawbuf_width + ix] = tmp;
         }
 
         i += r;
@@ -429,7 +429,7 @@ void RenderAll(wsWindow *window, guiItem *Items, int nrItems, char *db)
     int i, ofs;
 
     image_buffer = db;
-    image_width  = window->Width;
+    drawbuf_width = window->Width;
 
     for (i = 0; i < nrItems + 1; i++) {
         item = &Items[i];
