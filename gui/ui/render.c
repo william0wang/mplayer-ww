@@ -359,9 +359,8 @@ MMMM_SS:        snprintf(trans, sizeof(trans), "%04d:%02d", t / 60, t % 60);
 
 static void PutImage(guiImage *bf, int x, int y, int max, int ofs)
 {
-    int i = 0, ix, iy;
-    uint32_t *buf = NULL;
-    uint32_t *drw = NULL;
+    int i, ix, iy;
+    uint32_t *drw, *buf;
     register uint32_t tmp;
 
     /* register uint32_t yc; */
@@ -400,8 +399,7 @@ static void PutImage(guiImage *bf, int x, int y, int max, int ofs)
 static void SinglePhasePutImage(guiImage *bf, int x, int y, float frac)
 {
     int i = 0, w, r, ix, iy;
-    uint32_t *buf = NULL;
-    uint32_t *drw = NULL;
+    uint32_t *drw, *buf;
     register uint32_t tmp;
 
     if (!bf || (bf->Image == NULL))
