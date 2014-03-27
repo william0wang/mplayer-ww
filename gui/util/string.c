@@ -25,14 +25,7 @@
 #include <string.h>
 
 #include "string.h"
-#include "gui/interface.h"
 #include "gui/app/gui.h"
-
-#include "access_mpcontext.h"
-#include "config.h"
-#include "help_mp.h"
-#include "libavutil/avstring.h"
-#include "stream/stream.h"
 
 /**
  * @brief Convert a string to lower case.
@@ -255,113 +248,6 @@ void setddup(char **old, const char *dir, const char *name)
     *old = malloc(strlen(dir) + strlen(name) + 2);
     if (*old)
         sprintf(*old, "%s/%s", dir, name);
-}
-
-/**
- * @brief Convert #guiInfo member Filename.
- *
- * @param how 0 (cut file path and extension),
- *            1 (additionally, convert lower case) or
- *            2 (additionally, convert upper case)
- * @param fname pointer to a buffer to receive the converted Filename
- * @param maxlen size of @a fname buffer
- *
- * @return pointer to @a fname buffer
- */
-char *TranslateFilename(int how, char *fname, size_t maxlen)
-{
-    char *p;
-    size_t len;
-    stream_t *stream;
-
-    switch (guiInfo.StreamType) {
-    case STREAMTYPE_FILE:
-
-        if (guiInfo.Filename && *guiInfo.Filename) {
-            p = strrchr(guiInfo.Filename,
-#if HAVE_DOS_PATHS
-                        '\\');
-#else
-                        '/');
-#endif
-
-            if (p)
-                av_strlcpy(fname, p + 1, maxlen);
-            else
-                av_strlcpy(fname, guiInfo.Filename, maxlen);
-
-            len = strlen(fname);
-
-            if (len > 3 && fname[len - 3] == '.')
-                fname[len - 3] = 0;
-            else if (len > 4 && fname[len - 4] == '.')
-                fname[len - 4] = 0;
-            else if (len > 5 && fname[len - 5] == '.')
-                fname[len - 5] = 0;
-        } else
-            av_strlcpy(fname, MSGTR_GUI_MSG_NoFileLoaded, maxlen);
-
-        break;
-
-    case STREAMTYPE_STREAM:
-
-        av_strlcpy(fname, guiInfo.Filename, maxlen);
-        break;
-
-    case STREAMTYPE_CDDA:
-
-        snprintf(fname, maxlen, MSGTR_GUI_TitleN, guiInfo.Track);
-        break;
-
-    case STREAMTYPE_VCD:
-
-        snprintf(fname, maxlen, MSGTR_GUI_TitleN, guiInfo.Track - 1);
-        break;
-
-    case STREAMTYPE_DVD:
-
-        if (guiInfo.Chapter)
-            snprintf(fname, maxlen, MSGTR_GUI_ChapterN, guiInfo.Chapter);
-        else
-            av_strlcpy(fname, MSGTR_GUI_NoChapter, maxlen);
-
-        break;
-
-    case STREAMTYPE_TV:
-    case STREAMTYPE_DVB:
-
-        p      = MSGTR_GUI_NoChannelName;
-        stream = mpctx_get_stream(guiInfo.mpcontext);
-
-        if (stream)
-            stream_control(stream, STREAM_CTRL_GET_CURRENT_CHANNEL, &p);
-
-        av_strlcpy(fname, p, maxlen);
-        break;
-
-    default:
-
-        av_strlcpy(fname, MSGTR_GUI_MSG_NoMediaOpened, maxlen);
-        break;
-    }
-
-    if (how) {
-        p = fname;
-
-        while (*p) {
-            char t = 0;
-
-            if (how == 1 && *p >= 'A' && *p <= 'Z')
-                t = 32;
-            if (how == 2 && *p >= 'a' && *p <= 'z')
-                t = -32;
-
-            *p = *p + t;
-            p++;
-        }
-    }
-
-    return fname;
 }
 
 /**
