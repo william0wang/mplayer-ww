@@ -42,7 +42,7 @@ char *strlower(char *in)
 
     while (*p) {
         if (*p >= 'A' && *p <= 'Z')
-            *p += 'a' - 'A';
+            *p += 0x20;
 
         p++;
     }
