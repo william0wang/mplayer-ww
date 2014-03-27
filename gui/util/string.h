@@ -19,6 +19,7 @@
 #ifndef MPLAYER_GUI_STRING_H
 #define MPLAYER_GUI_STRING_H
 
+#include <stddef.h>
 #include <stdio.h>
 
 char *decomment(char *in);
