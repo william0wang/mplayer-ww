@@ -422,36 +422,36 @@ static void SinglePhasePutImage(guiImage *bf, int x, int y, float frac)
     }
 }
 
-void RenderAll(wsWindow *window, guiItem *Items, int nrItems, char *db)
+void RenderAll(wsWindow *window, guiItem *items, int nrItems, char *drawbuf)
 {
     guiItem *item;
     guiImage *image = NULL;
-    int i, ofs;
+    int i, index;
 
-    image_buffer = db;
+    image_buffer  = drawbuf;
     drawbuf_width = window->Width;
 
     for (i = 0; i < nrItems + 1; i++) {
-        item = &Items[i];
+        item = &items[i];
 
         switch (item->pressed) {
         case btnPressed:
-            ofs = 0;
+            index = 0;
             break;
 
         case btnReleased:
-            ofs = 1;
+            index = 1;
             break;
 
         default:
-            ofs = 2;
+            index = 2;
             break;
         }
 
         switch (item->type) {
         case itButton:
 
-            PutImage(&item->Bitmap, item->x, item->y, 3, ofs);
+            PutImage(&item->Bitmap, item->x, item->y, 3, index);
             break;
 
         case itPimage:
@@ -470,13 +470,13 @@ void RenderAll(wsWindow *window, guiItem *Items, int nrItems, char *db)
             else
                 PutImage(&item->Bitmap, item->x, item->y, item->numphases, (item->numphases - 1) * (item->value / 100.0));
 
-            PutImage(&item->Mask, item->x + (item->width - item->pwidth) * (item->value / 100.0), item->y, 3, ofs);
+            PutImage(&item->Mask, item->x + (item->width - item->pwidth) * (item->value / 100.0), item->y, 3, index);
             break;
 
         case itVPotmeter:
 
             PutImage(&item->Bitmap, item->x, item->y, item->numphases, item->numphases * (1.0 - item->value / 100.0));
-            PutImage(&item->Mask, item->x, item->y + (item->height - item->pheight) * (1.0 - item->value / 100.0), 3, ofs);
+            PutImage(&item->Mask, item->x, item->y + (item->height - item->pheight) * (1.0 - item->value / 100.0), 3, index);
             break;
 
         case itSLabel:
@@ -534,5 +534,5 @@ void RenderAll(wsWindow *window, guiItem *Items, int nrItems, char *db)
         }
     }
 
-    wsImageRender(window, db);
+    wsImageRender(window, drawbuf);
 }
