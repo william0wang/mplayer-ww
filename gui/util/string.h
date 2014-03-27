@@ -32,6 +32,7 @@ void setddup(char **old, const char *dir, const char *name);
 void setdup(char **old, const char *str);
 char *strlower(char *in);
 char *strswap(char *in, char from, char to);
+char *strupper(char *in);
 char *trim(char *in);
 
 #endif /* MPLAYER_GUI_STRING_H */

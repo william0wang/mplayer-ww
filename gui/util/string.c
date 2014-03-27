@@ -51,6 +51,29 @@ char *strlower(char *in)
 }
 
 /**
+ * @brief Convert a string to upper case.
+ *
+ * @param string to be converted
+ *
+ * @return converted string
+ *
+ * @note Only characters from a to z will be converted and this is an in-place conversion.
+ */
+char *strupper(char *in)
+{
+    char *p = in;
+
+    while (*p) {
+        if (*p >= 'a' && *p <= 'z')
+            *p -= 0x20;
+
+        p++;
+    }
+
+    return in;
+}
+
+/**
  * @brief Swap characters in a string.
  *
  * @param in string to be processed
