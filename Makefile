@@ -523,7 +523,6 @@ SRCS_MPLAYER-$(GUI_GTK)      += gui/app/app.c                           \
                                 gui/ui/playbar.c                        \
                                 gui/ui/render.c                         \
                                 gui/ui/video.c                          \
-                                gui/util/cut.c                          \
                                 gui/wm/ws.c                             \
                                 gui/wm/wsxdnd.c                         \
 
