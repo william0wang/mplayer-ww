@@ -365,7 +365,7 @@ static int item_base(char *in)
             skin_error(MSGTR_GUI_MSG_SkinMemoryError);
             return 1;
         }
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     mask: %lux%lu\n", currWin->Mask.Width, currWin->Mask.Height);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     mask: %ux%u\n", currWin->Mask.Width, currWin->Mask.Height);
     }
 
     if (is_bar)
@@ -477,7 +477,7 @@ static int item_button(char *in)
         if (skinImageRead(file, &item->Bitmap) != 0)
             return 1;
 
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     (bitmap: %lux%lu)\n", item->Bitmap.Width, item->Bitmap.Height);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     (bitmap: %ux%u)\n", item->Bitmap.Width, item->Bitmap.Height);
     }
 
     return 0;
@@ -665,7 +665,7 @@ static int item_hpotmeter(char *in)
         if (skinImageRead(buf, &item->Bitmap) != 0)
             return 1;
 
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     (potmeter bitmap: %lux%lu)\n", item->Bitmap.Width, item->Bitmap.Height);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     (potmeter bitmap: %ux%u)\n", item->Bitmap.Width, item->Bitmap.Height);
     }
 
     item->Mask.Image = NULL;
@@ -677,7 +677,7 @@ static int item_hpotmeter(char *in)
         if (skinImageRead(buf, &item->Mask) != 0)
             return 1;
 
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     (button bitmap: %lux%lu)\n", item->Mask.Width, item->Mask.Height);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     (button bitmap: %ux%u)\n", item->Mask.Width, item->Mask.Height);
     }
 
     return 0;
@@ -800,7 +800,7 @@ static int item_pimage(char *in)
         if (skinImageRead(buf, &item->Bitmap) != 0)
             return 1;
 
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     (bitmap: %lux%lu)\n", item->Bitmap.Width, item->Bitmap.Height);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     (bitmap: %ux%u)\n", item->Bitmap.Width, item->Bitmap.Height);
     }
 
     return 0;

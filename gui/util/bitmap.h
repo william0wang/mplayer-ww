@@ -27,11 +27,11 @@
 #define IS_TRANSPARENT(c) ((ALPHA_OPAQUE | (c)) == GUI_TRANSPARENT)
 
 typedef struct {
-    unsigned long Width;
-    unsigned long Height;
+    unsigned int Width;
+    unsigned int Height;
     unsigned int Bpp;
-    unsigned long ImageSize;
-    char *Image;
+    unsigned int ImageSize;
+    unsigned char *Image;
 } guiImage;
 
 void bpFree(guiImage *img);
