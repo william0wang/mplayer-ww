@@ -133,8 +133,8 @@ int fntRead(char *path, char *fname)
             continue;
 
         n = (strncmp(buf, "\"=", 2) == 0 ? 1 : 0);
-        cutItem(buf, item, '=', n);
-        cutItem(buf, param, '=', n + 1);
+        cutStr(buf, item, '=', n);
+        cutStr(buf, param, '=', n + 1);
 
         if (item[0] == '"') {
             if (!item[1])
@@ -142,7 +142,7 @@ int fntRead(char *path, char *fname)
             else if (item[1] == '"')
                 item[1] = 0;
             else
-                cutItem(item, item, '"', 1);
+                cutStr(item, item, '"', 1);
 
             if (item[0] & 0x80) {
                 for (i = 0; i < EXTRA_CHRS; i++) {
@@ -159,16 +159,16 @@ int fntRead(char *path, char *fname)
             } else
                 i = item[0];
 
-            cutItem(param, buf, ',', 0);
+            cutStr(param, buf, ',', 0);
             Fonts[id]->Fnt[i].x = atoi(buf);
 
-            cutItem(param, buf, ',', 1);
+            cutStr(param, buf, ',', 1);
             Fonts[id]->Fnt[i].y = atoi(buf);
 
-            cutItem(param, buf, ',', 2);
+            cutStr(param, buf, ',', 2);
             Fonts[id]->Fnt[i].w = atoi(buf);
 
-            cutItem(param, buf, ',', 3);
+            cutStr(param, buf, ',', 3);
             Fonts[id]->Fnt[i].h = atoi(buf);
 
             mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[font]  char: '%s' params: %d,%d %dx%d\n", item, Fonts[id]->Fnt[i].x, Fonts[id]->Fnt[i].y, Fonts[id]->Fnt[i].w, Fonts[id]->Fnt[i].h);

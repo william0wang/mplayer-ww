@@ -315,11 +315,11 @@ static int item_base(char *in)
     is_bar   = (strcmp(currWinName, "playbar") == 0);
     is_menu  = (strcmp(currWinName, "menu") == 0);
 
-    cutItem(in, fname, ',', 0);
-    x = cutItemToInt(in, ',', 1);
-    y = cutItemToInt(in, ',', 2);
-    w = cutItemToInt(in, ',', 3);
-    h = cutItemToInt(in, ',', 4);
+    cutStr(in, fname, ',', 0);
+    x = cutInt(in, ',', 1);
+    y = cutInt(in, ',', 2);
+    w = cutInt(in, ',', 3);
+    h = cutInt(in, ',', 4);
 
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    image: %s", fname);
 
@@ -397,9 +397,9 @@ static int item_background(char *in)
     if (in_window("menu"))
         return 1;
 
-    currWin->R = cutItemToInt(in, ',', 0);
-    currWin->G = cutItemToInt(in, ',', 1);
-    currWin->B = cutItemToInt(in, ',', 2);
+    currWin->R = cutInt(in, ',', 0);
+    currWin->G = cutInt(in, ',', 1);
+    currWin->B = cutInt(in, ',', 2);
 
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    background color: #%02x%02x%02x\n", currWin->R, currWin->G, currWin->B);
 
@@ -431,12 +431,12 @@ static int item_button(char *in)
     if (in_window("menu"))
         return 1;
 
-    cutItem(in, fname, ',', 0);
-    x = cutItemToInt(in, ',', 1);
-    y = cutItemToInt(in, ',', 2);
-    w = cutItemToInt(in, ',', 3);
-    h = cutItemToInt(in, ',', 4);
-    cutItem(in, msg, ',', 5);
+    cutStr(in, fname, ',', 0);
+    x = cutInt(in, ',', 1);
+    y = cutInt(in, ',', 2);
+    w = cutInt(in, ',', 3);
+    h = cutInt(in, ',', 4);
+    cutStr(in, msg, ',', 5);
 
     message = appFindMessage(msg);
 
@@ -551,11 +551,11 @@ static int item_menu(char *in)
     if (in_window("playbar"))
         return 1;
 
-    x = cutItemToInt(in, ',', 0);
-    y = cutItemToInt(in, ',', 1);
-    w = cutItemToInt(in, ',', 2);
-    h = cutItemToInt(in, ',', 3);
-    cutItem(in, msg, ',', 4);
+    x = cutInt(in, ',', 0);
+    y = cutInt(in, ',', 1);
+    w = cutInt(in, ',', 2);
+    h = cutInt(in, ',', 3);
+    cutStr(in, msg, ',', 4);
 
     message = appFindMessage(msg);
 
@@ -612,17 +612,17 @@ static int item_hpotmeter(char *in)
     if (in_window("menu"))
         return 1;
 
-    cutItem(in, pfname, ',', 0);
-    pwidth  = cutItemToInt(in, ',', 1);
-    pheight = cutItemToInt(in, ',', 2);
-    cutItem(in, phfname, ',', 3);
-    ph = cutItemToInt(in, ',', 4);
-    d  = cutItemToInt(in, ',', 5);
-    x  = cutItemToInt(in, ',', 6);
-    y  = cutItemToInt(in, ',', 7);
-    w  = cutItemToInt(in, ',', 8);
-    h  = cutItemToInt(in, ',', 9);
-    cutItem(in, buf, ',', 10);
+    cutStr(in, pfname, ',', 0);
+    pwidth  = cutInt(in, ',', 1);
+    pheight = cutInt(in, ',', 2);
+    cutStr(in, phfname, ',', 3);
+    ph = cutInt(in, ',', 4);
+    d  = cutInt(in, ',', 5);
+    x  = cutInt(in, ',', 6);
+    y  = cutInt(in, ',', 7);
+    w  = cutInt(in, ',', 8);
+    h  = cutInt(in, ',', 9);
+    cutStr(in, buf, ',', 10);
 
     message = appFindMessage(buf);
 
@@ -754,14 +754,14 @@ static int item_pimage(char *in)
     if (in_window("menu"))
         return 1;
 
-    cutItem(in, phfname, ',', 0);
-    ph = cutItemToInt(in, ',', 1);
-    d  = cutItemToInt(in, ',', 2);
-    x  = cutItemToInt(in, ',', 3);
-    y  = cutItemToInt(in, ',', 4);
-    w  = cutItemToInt(in, ',', 5);
-    h  = cutItemToInt(in, ',', 6);
-    cutItem(in, buf, ',', 7);
+    cutStr(in, phfname, ',', 0);
+    ph = cutInt(in, ',', 1);
+    d  = cutInt(in, ',', 2);
+    x  = cutInt(in, ',', 3);
+    y  = cutInt(in, ',', 4);
+    w  = cutInt(in, ',', 5);
+    h  = cutInt(in, ',', 6);
+    cutStr(in, buf, ',', 7);
 
     message = appFindMessage(buf);
 
@@ -827,8 +827,8 @@ static int item_font(char *in)
     if (in_window("menu"))
         return 1;
 
-    cutItem(in, fnt, ',', 0);   // Note: This seems needless but isn't for compatibility
-                                // reasons with a meanwhile deprecated second parameter.
+    cutStr(in, fnt, ',', 0);   // Note: This seems needless but isn't for compatibility
+                               // reasons with a meanwhile deprecated second parameter.
     // legacy
     skin_legacy("fontid", in);
 
@@ -879,11 +879,11 @@ static int item_slabel(char *in)
     if (in_window("menu"))
         return 1;
 
-    x = cutItemToInt(in, ',', 0);
-    y = cutItemToInt(in, ',', 1);
-    cutItem(in, fnt, ',', 2);
-    cutItem(in, txt, ',', 3);
-    cutItem(txt, txt, '"', 1);
+    x = cutInt(in, ',', 0);
+    y = cutInt(in, ',', 1);
+    cutStr(in, fnt, ',', 2);
+    cutStr(in, txt, ',', 3);
+    cutStr(txt, txt, '"', 1);
 
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    slabel: \"%s\"\n", txt);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     pos: %d,%d\n", x, y);
@@ -942,13 +942,13 @@ static int item_dlabel(char *in)
     if (in_window("menu"))
         return 1;
 
-    x = cutItemToInt(in, ',', 0);
-    y = cutItemToInt(in, ',', 1);
-    w = cutItemToInt(in, ',', 2);
-    a = cutItemToInt(in, ',', 3);
-    cutItem(in, fnt, ',', 4);
-    cutItem(in, txt, ',', 5);
-    cutItem(txt, txt, '"', 1);
+    x = cutInt(in, ',', 0);
+    y = cutInt(in, ',', 1);
+    w = cutInt(in, ',', 2);
+    a = cutInt(in, ',', 3);
+    cutStr(in, fnt, ',', 4);
+    cutStr(in, txt, ',', 5);
+    cutStr(txt, txt, '"', 1);
 
     // legacy
     skin_legacy("$l", txt);
@@ -1147,8 +1147,8 @@ int skinRead(char *sname)
         if (!*line)
             continue;
 
-        cutItem(line, item, '=', 0);
-        cutItem(line, param, '=', 1);
+        cutStr(line, item, '=', 0);
+        cutStr(line, param, '=', 1);
         strlower(item);
 
         for (i = 0; i < FF_ARRAY_ELEMS(skinItem); i++) {

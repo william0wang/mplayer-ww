@@ -177,7 +177,7 @@ char *decomment(char *in)
  * @param num number of separator characters to be skipped before extraction starts
  * @param maxout maximum length of extracted part (including the trailing null byte)
  */
-void cutItemString(char *in, char *out, char sep, int num, size_t maxout)
+void cutString(char *in, char *out, char sep, int num, size_t maxout)
 {
     int n;
     unsigned int i, c;
@@ -204,11 +204,11 @@ void cutItemString(char *in, char *out, char sep, int num, size_t maxout)
  *
  * @return extracted number (numeric part)
  */
-int cutItemToInt(char *in, char sep, int num)
+int cutInt(char *in, char sep, int num)
 {
     char tmp[64];
 
-    cutItem(in, tmp, sep, num);
+    cutStr(in, tmp, sep, num);
 
     return atoi(tmp);
 }
