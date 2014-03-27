@@ -198,21 +198,8 @@ char *TranslateFilename (int how, char *fname, size_t maxlen)
             break;
     }
 
-    if (how)
-    {
-        p = fname;
-
-        while (*p)
-        {
-            char t = 0;
-
-            if (how == 1 && *p >= 'A' && *p <= 'Z') t = 32;
-            if (how == 2 && *p >= 'a' && *p <= 'z') t = -32;
-
-            *p = *p + t;
-            p++;
-        }
-    }
+    if (how == 1) strlower(fname);
+    if (how == 2) strupper(fname);
 
     return fname;
 }
