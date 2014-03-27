@@ -361,9 +361,7 @@ static void PutImage(guiImage *img, int x, int y, int parts, int index)
 {
     int i, ix, iy;
     uint32_t *pixels, *drawbuf;
-    register uint32_t pixel;
-
-    /* register uint32_t yc; */
+    register uint32_t yc, pixel;
 
     if (!img || (img->Image == NULL))
         return;
@@ -372,15 +370,6 @@ static void PutImage(guiImage *img, int x, int y, int parts, int index)
     drawbuf = (uint32_t *)image_buffer;
     pixels  = (uint32_t *)img->Image;
 
-#if 1
-    for (iy = y; iy < (int)(y + img->Height / parts); iy++)
-        for (ix = x; ix < (int)(x + img->Width); ix++) {
-            pixel = pixels[i++];
-
-            if (!IS_TRANSPARENT(pixel))
-                drawbuf[iy * drawbuf_width + ix] = pixel;
-        }
-#else
     yc = y * drawbuf_width;
 
     for (iy = y; iy < (int)(y + img->Height / parts); iy++) {
@@ -393,7 +382,6 @@ static void PutImage(guiImage *img, int x, int y, int parts, int index)
 
         yc += drawbuf_width;
     }
-#endif
 }
 
 static void SinglePhasePutImage(guiImage *bf, int x, int y, float frac)
