@@ -363,8 +363,8 @@ static void PutImage(int x, int y, uint32_t *drawbuf, int drawbuf_width, guiImag
     if (!img || (img->Image == NULL))
         return;
 
-    i       = img->Width * (img->Height / parts) * index;
-    pixels  = (uint32_t *)img->Image;
+    i      = img->Width * (img->Height / parts) * index;
+    pixels = (uint32_t *)img->Image;
 
     yc = y * drawbuf_width;
 
