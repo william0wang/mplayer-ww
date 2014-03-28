@@ -357,7 +357,7 @@ MMMM_SS:        snprintf(trans, sizeof(trans), "%04d:%02d", t / 60, t % 60);
 
 static void PutImage(int x, int y, uint32_t *drawbuf, int drawbuf_width, guiImage *img, int parts, int index, int below)
 {
-    register int i, iw, ic, yc;
+    register int i, ic, yc;
     register uint32_t pixel;
     int xlimit, ylimit, ix, iy;
     uint32_t *pixels;
@@ -373,8 +373,6 @@ static void PutImage(int x, int y, uint32_t *drawbuf, int drawbuf_width, guiImag
         i      = (img->Width / parts) * index;
         xlimit = x + img->Width / parts;
         ylimit = y + img->Height;
-
-        iw = img->Width;
     }
 
     pixels = (uint32_t *)img->Image;
@@ -392,7 +390,7 @@ static void PutImage(int x, int y, uint32_t *drawbuf, int drawbuf_width, guiImag
         }
 
         if (!below)
-            i = ic + iw;
+            i = ic + img->Width;
 
         yc += drawbuf_width;
     }
