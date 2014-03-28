@@ -617,11 +617,11 @@ static int item_hpotmeter(char *in)
     bheight = cutInt(in, ',', 2);
     cutStr(in, phfname, ',', 3);
     num = cutInt(in, ',', 4);
-    d  = cutInt(in, ',', 5);
-    x  = cutInt(in, ',', 6);
-    y  = cutInt(in, ',', 7);
-    w  = cutInt(in, ',', 8);
-    h  = cutInt(in, ',', 9);
+    d   = cutInt(in, ',', 5);
+    x   = cutInt(in, ',', 6);
+    y   = cutInt(in, ',', 7);
+    w   = cutInt(in, ',', 8);
+    h   = cutInt(in, ',', 9);
     cutStr(in, buf, ',', 10);
 
     message = appFindMessage(buf);
@@ -756,11 +756,11 @@ static int item_pimage(char *in)
 
     cutStr(in, phfname, ',', 0);
     num = cutInt(in, ',', 1);
-    d  = cutInt(in, ',', 2);
-    x  = cutInt(in, ',', 3);
-    y  = cutInt(in, ',', 4);
-    w  = cutInt(in, ',', 5);
-    h  = cutInt(in, ',', 6);
+    d   = cutInt(in, ',', 2);
+    x   = cutInt(in, ',', 3);
+    y   = cutInt(in, ',', 4);
+    w   = cutInt(in, ',', 5);
+    h   = cutInt(in, ',', 6);
     cutStr(in, buf, ',', 7);
 
     message = appFindMessage(buf);
