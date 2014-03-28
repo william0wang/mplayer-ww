@@ -362,7 +362,7 @@ static void PutImage(int x, int y, uint32_t *drawbuf, int drawbuf_width, guiImag
     int xlimit, ylimit, ix, iy;
     uint32_t *pixels;
 
-    if (!img || (img->Image == NULL))
+    if (!img || !img->Image)
         return;
 
     if (below) {
