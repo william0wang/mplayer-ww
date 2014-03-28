@@ -384,32 +384,6 @@ static void PutImage(guiImage *img, int x, int y, int parts, int index)
     }
 }
 
-static void SinglePhasePutImage(guiImage *bf, int x, int y, float frac)
-{
-    int i = 0, w, r, ix, iy;
-    uint32_t *drw, *buf;
-    register uint32_t tmp;
-
-    if (!bf || (bf->Image == NULL))
-        return;
-
-    buf = (uint32_t *)image_buffer;
-    drw = (uint32_t *)bf->Image;
-    w   = bf->Width * frac;
-    r   = bf->Width - w;
-
-    for (iy = y; iy < (int)(y + bf->Height); iy++) {
-        for (ix = x; ix < (int)(x + w); ix++) {
-            tmp = drw[i++];
-
-            if (!IS_TRANSPARENT(tmp))
-                buf[iy * drawbuf_width + ix] = tmp;
-        }
-
-        i += r;
-    }
-}
-
 void RenderAll(wsWindow *window, guiItem *items, int nrItems, char *drawbuf)
 {
     guiItem *item;
@@ -444,20 +418,12 @@ void RenderAll(wsWindow *window, guiItem *items, int nrItems, char *drawbuf)
 
         case itPimage:
 
-            if (item->numphases == 1)
-                SinglePhasePutImage(&item->Bitmap, item->x, item->y, item->value / 100.0);
-            else
-                PutImage(&item->Bitmap, item->x, item->y, item->numphases, (item->numphases - 1) * (item->value / 100.0));
-
+            PutImage(&item->Bitmap, item->x, item->y, item->numphases, (item->numphases - 1) * (item->value / 100.0));
             break;
 
         case itHPotmeter:
 
-            if (item->numphases == 1)
-                SinglePhasePutImage(&item->Bitmap, item->x, item->y, item->value / 100.0);
-            else
-                PutImage(&item->Bitmap, item->x, item->y, item->numphases, (item->numphases - 1) * (item->value / 100.0));
-
+            PutImage(&item->Bitmap, item->x, item->y, item->numphases, (item->numphases - 1) * (item->value / 100.0));
             PutImage(&item->Mask, item->x + (item->width - item->pwidth) * (item->value / 100.0), item->y, 3, index);
             break;
 
