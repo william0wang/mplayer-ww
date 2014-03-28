@@ -921,6 +921,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_MSG_SkinErrorBitmap16Bit "Die Farbtiefe von %s beträgt 16 bpp oder weniger, was nicht unterstützt wird.\n"
 #define MSGTR_GUI_MSG_SkinErrorItem "Dieses Element wird in '%s' nicht unterstützt.\n"
 #define MSGTR_GUI_MSG_SkinErrorMessage "Fehler in der Skin-Konfigurationsdatei in Zeile %d: %s"
+#define MSGTR_GUI_MSG_SkinErrorNumphases "Die Anzahl der Phasen darf nicht null sein.\n"
 #define MSGTR_GUI_MSG_SkinErrorSection "Für '%s' wurde kein Abschnitt angegeben.\n"
 #define MSGTR_GUI_MSG_SkinErrorWindow "Für '%s' wurde kein Fenster angegeben.\n"
 #define MSGTR_GUI_MSG_SkinFileNotFound "Skin-Datei %s nicht gefunden.\n"

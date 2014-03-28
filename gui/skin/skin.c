@@ -659,6 +659,11 @@ static int item_hpotmeter(char *in)
     item->Bitmap.Image = NULL;
 
     if (strcmp(phfname, "NULL") != 0) {
+        if (num == 0) {
+            skin_error(MSGTR_GUI_MSG_SkinErrorNumphases);
+            return 1;
+        }
+
         av_strlcpy(buf, path, sizeof(buf));
         av_strlcat(buf, phfname, sizeof(buf));
 
@@ -794,6 +799,11 @@ static int item_pimage(char *in)
     item->Bitmap.Image = NULL;
 
     if (strcmp(phfname, "NULL") != 0) {
+        if (num == 0) {
+            skin_error(MSGTR_GUI_MSG_SkinErrorNumphases);
+            return 1;
+        }
+
         av_strlcpy(buf, path, sizeof(buf));
         av_strlcat(buf, phfname, sizeof(buf));
 
