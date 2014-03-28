@@ -429,7 +429,7 @@ void RenderAll(wsWindow *window, guiItem *items, int nrItems, char *drawbuf)
 
         case itVPotmeter:
 
-            PutImage(&item->Bitmap, item->x, item->y, item->numphases, item->numphases * (1.0 - item->value / 100.0));
+            PutImage(&item->Bitmap, item->x, item->y, item->numphases, (item->numphases - 1) * (item->value / 100.0));
             PutImage(&item->Mask, item->x, item->y + (item->height - item->pheight) * (1.0 - item->value / 100.0), 3, index);
             break;
 
