@@ -39,14 +39,14 @@ Currently there are four windows to be decorated: the
 
   <para>
   A <emphasis role="bold">button</emphasis> has three states (pressed, released,
-  disabled), thus its image must be divided into three parts vertically. See the
+  disabled), thus its image must be divided into three parts placed below each other. See the
   <link linkend="skin-button">button</link> item for details.
   </para>
 
   <para>
   A <emphasis role="bold">potmeter</emphasis> (mainly used for the seek bar and
   volume/balance control) can have any number of phases by dividing its image
-  into different parts below each other. See
+  into different parts. See
   <link linkend="skin-hpotmeter">hpotmeter</link> for details.
   </para>
 
@@ -399,14 +399,14 @@ blocks.
     <literal>phases</literal> - the image to be used for the
     different phases of the hpotmeter. A special value of <literal>NULL</literal>
     can be used if you want no such image. The image must be divided into
-    <literal>numphases</literal> parts vertically like this:
+    <literal>numphases</literal> parts below each other (resp. side by side for vpotmeter) like this:
     <informalfigure><screen>
 +------------+
-|  phase #1  |
+|  phase #1  |                vpotmeter only:
 +------------+
-|  phase #2  |
-+------------+
-     ...
+|  phase #2  |                +------------+------------+     +------------+
++------------+                |  phase #1  |  phase #2  | ... |  phase #n  |
+     ...                      +------------+------------+     +------------+
 +------------+
 |  phase #n  |
 +------------+<!--

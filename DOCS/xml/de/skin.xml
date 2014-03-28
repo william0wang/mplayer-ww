@@ -90,14 +90,14 @@
             </para>
             <para>
               Ein <emphasis role="bold">Button</emphasis> besitzt drei Zustände (gedrückt,
-              losgelassen, deaktiviert), deshalb muss seine Grafik vertikal in drei Teile
-              getrennt werden. Siehe Eintrag <link linkend="skin-button">Button</link>
+              losgelassen, deaktiviert), deshalb muss seine Grafik in drei untereinander liegende Teile
+              aufgeteilt werden. Siehe Eintrag <link linkend="skin-button">Button</link>
               für mehr Details.
             </para>
             <para>
               Ein <emphasis role="bold">Potentiometer</emphasis> (hauptsächlich für
               die Suchleiste und die Lautstärke-/Balance-Regler) kann durch die Aufteilung
-              der Grafik in verschiedene untereinander liegende Teile
+              der Grafik in verschiedene Teile
               eine beliebige Anzahl von Phasen haben. Siehe
               <link linkend="skin-hpotmeter">hpotmeter</link> für Details.
             </para>
@@ -473,18 +473,18 @@ end
                   <literal>phases</literal> - die für die verschiedenen Phasen
                   zu verwendende Grafik des hpotmeter. Ein spezieller Wert von <literal>NULL</literal>
                   kann benutzt werden, wenn du keine solche Grafik anwenden willst. Die Grafik muss
-                  vertikal in <literal>numphases</literal> Teile wie folgt aufgeteilt werden:
+                  in <literal>numphases</literal> untereinander (bzw. für vpotmeter nebeneinander) liegende Teile wie folgt aufgeteilt werden:
                 </para>
                 <informalfigure>
                   <screen>
 +------------+
-|  phase #1  |
+|  Phase #1  |                Nur für vpotmeter:
 +------------+
-|  phase #2  |
+|  Phase #2  |                +------------+------------+     +------------+
++------------+                |  Phase #1  |  Phase #2  | ... |  Phase #n  |
+     ...                      +------------+------------+     +------------+
 +------------+
-     ...
-+------------+
-|  phase #n  |
+|  Phase #n  |
 +------------+<!--
                   --></screen>
                 </informalfigure>
