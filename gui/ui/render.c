@@ -34,9 +34,6 @@
 
 #define DLABEL_DELAY 2500   // in milliseconds
 
-static char *image_buffer;
-static int drawbuf_width;
-
 /**
  * @brief Convert #guiInfo member Filename.
  *
@@ -357,17 +354,16 @@ MMMM_SS:        snprintf(trans, sizeof(trans), "%04d:%02d", t / 60, t % 60);
     return translation;
 }
 
-static void PutImage(guiImage *img, int x, int y, int parts, int index)
+static void PutImage(int x, int y, uint32_t *drawbuf, int drawbuf_width, guiImage *img, int parts, int index)
 {
     int i, ix, iy;
-    uint32_t *pixels, *drawbuf;
+    uint32_t *pixels;
     register uint32_t yc, pixel;
 
     if (!img || (img->Image == NULL))
         return;
 
     i       = img->Width * (img->Height / parts) * index;
-    drawbuf = (uint32_t *)image_buffer;
     pixels  = (uint32_t *)img->Image;
 
     yc = y * drawbuf_width;
@@ -386,12 +382,13 @@ static void PutImage(guiImage *img, int x, int y, int parts, int index)
 
 void RenderAll(wsWindow *window, guiItem *items, int nrItems, char *drawbuf)
 {
+    uint32_t *db;
     guiItem *item;
     guiImage *image = NULL;
-    int i, index;
+    int dw, i, index;
 
-    image_buffer  = drawbuf;
-    drawbuf_width = window->Width;
+    db = (uint32_t *)drawbuf;
+    dw = window->Width;
 
     for (i = 0; i < nrItems + 1; i++) {
         item = &items[i];
@@ -413,24 +410,24 @@ void RenderAll(wsWindow *window, guiItem *items, int nrItems, char *drawbuf)
         switch (item->type) {
         case itButton:
 
-            PutImage(&item->Bitmap, item->x, item->y, 3, index);
+            PutImage(item->x, item->y, db, dw, &item->Bitmap, 3, index);
             break;
 
         case itPimage:
 
-            PutImage(&item->Bitmap, item->x, item->y, item->numphases, (item->numphases - 1) * (item->value / 100.0));
+            PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * (item->value / 100.0));
             break;
 
         case itHPotmeter:
 
-            PutImage(&item->Bitmap, item->x, item->y, item->numphases, (item->numphases - 1) * (item->value / 100.0));
-            PutImage(&item->Mask, item->x + (item->width - item->pwidth) * (item->value / 100.0), item->y, 3, index);
+            PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * (item->value / 100.0));
+            PutImage(item->x + (item->width - item->pwidth) * (item->value / 100.0), item->y, db, dw, &item->Mask, 3, index);
             break;
 
         case itVPotmeter:
 
-            PutImage(&item->Bitmap, item->x, item->y, item->numphases, (item->numphases - 1) * (item->value / 100.0));
-            PutImage(&item->Mask, item->x, item->y + (item->height - item->pheight) * (1.0 - item->value / 100.0), 3, index);
+            PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * (item->value / 100.0));
+            PutImage(item->x, item->y + (item->height - item->pheight) * (1.0 - item->value / 100.0), db, dw, &item->Mask, 3, index);
             break;
 
         case itSLabel:
@@ -441,7 +438,7 @@ void RenderAll(wsWindow *window, guiItem *items, int nrItems, char *drawbuf)
             image = fntTextRender(item, 0, item->label);
 
             if (image)
-                PutImage(image, item->x, item->y, 1, 0);
+                PutImage(item->x, item->y, db, dw, image, 1, 0);
 
             break;
 
@@ -482,7 +479,7 @@ void RenderAll(wsWindow *window, guiItem *items, int nrItems, char *drawbuf)
         }
 
             if (image)
-                PutImage(image, item->x, item->y, 1, 0);
+                PutImage(item->x, item->y, db, dw, image, 1, 0);
 
             break;
         }
