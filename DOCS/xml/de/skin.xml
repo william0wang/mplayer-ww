@@ -1412,7 +1412,7 @@ image = font.png
 
       <listitem>
         <para>
-          Es sollte eine Datei namens <filename>VERSION</filename>
+          Es muss eine Datei namens <filename>VERSION</filename>
           mit nicht mehr als der Versionsnummer des Skins in einer einzigen
           Zeile geben (z.B. 1.0).
         </para>
@@ -1429,18 +1429,19 @@ image = font.png
 
       <listitem>
         <para>
-          Für Skin-Elemente sollten die richtigen Größen in der skin-Datei
+          Für Skin-Elemente sollen die richtigen Größen in der skin-Datei
           deklariert sein. Ist dies nicht der Fall, kannst du außerhalb
-          z.B. eines Buttons klicken und trotzdem einen Klick innerhalb
-          seiner Fläche auslösen und diesen dennoch nicht auslösen.
+          z. B. eines Buttons klicken und ihn trotzdem auslösen oder ein
+          Klick innerhalb seiner Fläche löst dennoch nichts aus.
         </para>
       </listitem>
 
       <listitem>
         <para>
-          Die <filename>skin</filename>-Datei sollte sauber
-          aussehen und keine Tabs enthalten. Mit sauber aussehen ist
-          gemeint, dass die Zahlen ordentlich in Reihe stehen.
+          Die <filename>skin</filename>-Datei sollte ordentlich formatiert
+          aussehen und keine Tabs enthalten. Mit "ordentlich formatiert" ist
+          gemeint, dass Zahlen in Spalten ausgerichtet sind und Definitionen
+          entsprechend eingerückt sind.
         </para>
       </listitem>
     </itemizedlist>

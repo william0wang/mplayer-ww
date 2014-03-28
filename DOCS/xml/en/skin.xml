@@ -1195,7 +1195,7 @@ it satisfies all the criteria listed below since version 1.5.
 </para></listitem>
 
 <listitem><para>
-  There should be a file <filename>VERSION</filename>
+  There must be a file <filename>VERSION</filename>
   with nothing more than the version number of the skin on a single
   line (e.g. 1.0).
 </para></listitem>
@@ -1208,7 +1208,7 @@ it satisfies all the criteria listed below since version 1.5.
 </para></listitem>
 
 <listitem><para>
-  Skin elements should have the right sizes declared
+  Skin elements shall have the right sizes declared
   in the skin file. If this is not the case you can click outside of
   e.g. a button and still trigger it or click inside its area and not
   trigger it.
@@ -1217,7 +1217,8 @@ it satisfies all the criteria listed below since version 1.5.
 <listitem><para>
   The <filename>skin</filename> file should be
   prettyprinted and not contain tabs. Prettyprinted means that the
-  numbers should line up neatly in columns.
+  numbers should line up neatly in columns
+  and definitions should be indented appropriately.
 </para></listitem>
 </itemizedlist>
 
