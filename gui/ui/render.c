@@ -23,6 +23,7 @@
 
 #include "render.h"
 #include "gui/interface.h"
+#include "gui/app/gui.h"
 #include "gui/skin/font.h"
 #include "gui/util/string.h"
 
@@ -354,27 +355,44 @@ MMMM_SS:        snprintf(trans, sizeof(trans), "%04d:%02d", t / 60, t % 60);
     return translation;
 }
 
-static void PutImage(int x, int y, uint32_t *drawbuf, int drawbuf_width, guiImage *img, int parts, int index)
+static void PutImage(int x, int y, uint32_t *drawbuf, int drawbuf_width, guiImage *img, int parts, int index, int below)
 {
-    int i, ix, iy;
+    register int i, iw, ic, yc;
+    register uint32_t pixel;
+    int xlimit, ylimit, ix, iy;
     uint32_t *pixels;
-    register uint32_t yc, pixel;
 
     if (!img || (img->Image == NULL))
         return;
 
-    i      = img->Width * (img->Height / parts) * index;
+    if (below) {
+        i      = img->Width * (img->Height / parts) * index;
+        xlimit = x + img->Width;
+        ylimit = y + img->Height / parts;
+    } else {
+        i      = (img->Width / parts) * index;
+        xlimit = x + img->Width / parts;
+        ylimit = y + img->Height;
+
+        iw = img->Width;
+    }
+
     pixels = (uint32_t *)img->Image;
 
     yc = y * drawbuf_width;
 
-    for (iy = y; iy < (int)(y + img->Height / parts); iy++) {
-        for (ix = x; ix < (int)(x + img->Width); ix++) {
+    for (iy = y; iy < ylimit; iy++) {
+        ic = i;
+
+        for (ix = x; ix < xlimit; ix++) {
             pixel = pixels[i++];
 
             if (!IS_TRANSPARENT(pixel))
                 drawbuf[yc + ix] = pixel;
         }
+
+        if (!below)
+            i = ic + iw;
 
         yc += drawbuf_width;
     }
@@ -410,24 +428,24 @@ void RenderAll(wsWindow *window, guiItem *items, int nrItems, char *drawbuf)
         switch (item->type) {
         case itButton:
 
-            PutImage(item->x, item->y, db, dw, &item->Bitmap, 3, index);
+            PutImage(item->x, item->y, db, dw, &item->Bitmap, 3, index, True);
             break;
 
         case itPimage:
 
-            PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * (item->value / 100.0));
+            PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * (item->value / 100.0), True);
             break;
 
         case itHPotmeter:
 
-            PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * (item->value / 100.0));
-            PutImage(item->x + (item->width - item->pwidth) * (item->value / 100.0), item->y, db, dw, &item->Mask, 3, index);
+            PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * (item->value / 100.0), True);
+            PutImage(item->x + (item->width - item->pwidth) * (item->value / 100.0), item->y, db, dw, &item->Mask, 3, index, True);
             break;
 
         case itVPotmeter:
 
-            PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * (item->value / 100.0));
-            PutImage(item->x, item->y + (item->height - item->pheight) * (1.0 - item->value / 100.0), db, dw, &item->Mask, 3, index);
+            PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * (item->value / 100.0), False);
+            PutImage(item->x, item->y + (item->height - item->pheight) * (1.0 - item->value / 100.0), db, dw, &item->Mask, 3, index, True);
             break;
 
         case itSLabel:
@@ -438,7 +456,7 @@ void RenderAll(wsWindow *window, guiItem *items, int nrItems, char *drawbuf)
             image = fntTextRender(item, 0, item->label);
 
             if (image)
-                PutImage(item->x, item->y, db, dw, image, 1, 0);
+                PutImage(item->x, item->y, db, dw, image, 1, 0, True);
 
             break;
 
@@ -479,7 +497,7 @@ void RenderAll(wsWindow *window, guiItem *items, int nrItems, char *drawbuf)
         }
 
             if (image)
-                PutImage(item->x, item->y, db, dw, image, 1, 0);
+                PutImage(item->x, item->y, db, dw, image, 1, 0, True);
 
             break;
         }
