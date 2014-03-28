@@ -598,10 +598,10 @@ static int item_menu(char *in)
  */
 static int item_hpotmeter(char *in)
 {
-    unsigned char pfname[256];
+    unsigned char bfname[256];
     unsigned char phfname[256];
     unsigned char buf[512];
-    int pwidth, pheight, ph, d, x, y, w, h, message;
+    int bwidth, bheight, num, d, x, y, w, h, message;
     guiItem *item;
 
     if (!window_item("h/v potmeter"))
@@ -612,11 +612,11 @@ static int item_hpotmeter(char *in)
     if (in_window("menu"))
         return 1;
 
-    cutStr(in, pfname, ',', 0);
-    pwidth  = cutInt(in, ',', 1);
-    pheight = cutInt(in, ',', 2);
+    cutStr(in, bfname, ',', 0);
+    bwidth  = cutInt(in, ',', 1);
+    bheight = cutInt(in, ',', 2);
     cutStr(in, phfname, ',', 3);
-    ph = cutInt(in, ',', 4);
+    num = cutInt(in, ',', 4);
     d  = cutInt(in, ',', 5);
     x  = cutInt(in, ',', 6);
     y  = cutInt(in, ',', 7);
@@ -635,8 +635,8 @@ static int item_hpotmeter(char *in)
         skin_legacy("evSetURL", buf);
 
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    h/v potmeter image: %s %d,%d %dx%d\n", phfname, x, y, w, h);
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     button image: %s %dx%d\n", pfname, pwidth, pheight);
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     numphases: %d, default: %d%%\n", ph, d);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     button image: %s %dx%d\n", bfname, bwidth, bheight);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     numphases: %d, default: %d%%\n", num, d);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     message: %s (#%d)\n", buf, message);
 
     item = next_item();
@@ -649,9 +649,9 @@ static int item_hpotmeter(char *in)
     item->y         = y;
     item->width     = w;
     item->height    = h;
-    item->pwidth    = pwidth;
-    item->pheight   = pheight;
-    item->numphases = ph;
+    item->pwidth    = bwidth;
+    item->pheight   = bheight;
+    item->numphases = num;
     item->value     = (float)d;
     item->message   = message;
     item->pressed   = btnReleased;
@@ -670,9 +670,9 @@ static int item_hpotmeter(char *in)
 
     item->Mask.Image = NULL;
 
-    if (strcmp(pfname, "NULL") != 0) {
+    if (strcmp(bfname, "NULL") != 0) {
         av_strlcpy(buf, path, sizeof(buf));
-        av_strlcat(buf, pfname, sizeof(buf));
+        av_strlcat(buf, bfname, sizeof(buf));
 
         if (skinImageRead(buf, &item->Mask) != 0)
             return 1;
@@ -743,7 +743,7 @@ static int item_pimage(char *in)
 {
     unsigned char phfname[256];
     unsigned char buf[512];
-    int ph, d, x, y, w, h, message;
+    int num, d, x, y, w, h, message;
     guiItem *item;
 
     if (!window_item("pimage"))
@@ -755,7 +755,7 @@ static int item_pimage(char *in)
         return 1;
 
     cutStr(in, phfname, ',', 0);
-    ph = cutInt(in, ',', 1);
+    num = cutInt(in, ',', 1);
     d  = cutInt(in, ',', 2);
     x  = cutInt(in, ',', 3);
     y  = cutInt(in, ',', 4);
@@ -774,7 +774,7 @@ static int item_pimage(char *in)
         skin_legacy("evSetURL", buf);
 
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    pimage image: %s %d,%d %dx%d\n", phfname, x, y, w, h);
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     numphases: %d, default: %d%%\n", ph, d);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     numphases: %d, default: %d%%\n", num, d);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     message: %s (#%d)\n", buf, message);
 
     item = next_item();
@@ -787,7 +787,7 @@ static int item_pimage(char *in)
     item->y         = y;
     item->width     = w;
     item->height    = h;
-    item->numphases = ph;
+    item->numphases = num;
     item->value     = (float)d;
     item->message   = message;
 
