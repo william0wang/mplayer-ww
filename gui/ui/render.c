@@ -16,6 +16,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+/**
+ * @file
+ * @brief GUI rendering
+ */
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -359,6 +364,19 @@ MMMM_SS:        snprintf(trans, sizeof(trans), "%04d:%02d", t / 60, t % 60);
     return translation;
 }
 
+/**
+ * @brief Put a part of a #guiImage image into a (window's) draw buffer.
+ *
+ * @param x x position where to start in the draw buffer
+ * @param y y position where to start in the draw buffer
+ * @param drawbuf draw buffer where the image should be put in
+ * @param drawbuf_width width of the draw buffer
+ * @param img image (containing several phases, i.e. image parts)
+ * @param parts number of parts in the image
+ * @param index index of the part of the image to be drawn
+ * @param below flag indicating whether the image parts are arranged
+ *              below each other or side by side
+ */
 static void PutImage(int x, int y, uint32_t *drawbuf, int drawbuf_width, guiImage *img, int parts, int index, int below)
 {
     register int i, ic, yc;
@@ -400,6 +418,15 @@ static void PutImage(int x, int y, uint32_t *drawbuf, int drawbuf_width, guiImag
     }
 }
 
+/**
+ * @brief Render all GUI items in a window, i.e. copy the respective images
+ *        into the draw buffer.
+ *
+ * @param window pointer to a ws window structure of the window to be rendered
+ * @param items pointer to the array of items
+ * @param till maximum index in use for the @a items, i.e. number of last item in array
+ * @param drawbuf pointer to the @a window's draw buffer
+ */
 void RenderAll(wsWindow *window, guiItem *items, int till, char *drawbuf)
 {
     uint32_t *db;
