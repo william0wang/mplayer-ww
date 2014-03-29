@@ -33,7 +33,11 @@
 #include "osdep/timer.h"
 #include "stream/stream.h"
 
-#define DLABEL_DELAY 2500   // in milliseconds
+/**
+ * @brief Time in milliseconds a scrolling dlabel stops
+ *        when reaching the left margin until scrolling starts over
+ */
+#define DLABEL_DELAY 2500
 
 /**
  * @brief Convert #guiInfo member Filename.
