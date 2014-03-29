@@ -483,7 +483,7 @@ void RenderAll(wsWindow *window, guiItem *items, int till, char *drawbuf)
                 l    = (item->textwidth ? item->textwidth : item->width);
                 x    = (l ? l - ((d - DLABEL_DELAY) / 20) % l - 1 : 0);
                 c[0] = *item->text;
-                c[1] = '\0';
+                c[1] = 0;
 
                 if (x < (fntTextWidth(item->fontid, c) + 1) >> 1) {
                     item->starttime = GetTimerMS(); // stop again
