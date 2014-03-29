@@ -22,6 +22,6 @@
 #include "gui/app/app.h"
 #include "gui/wm/ws.h"
 
-void RenderAll(wsWindow *window, guiItem *items, int nrItems, char *drawbuf);
+void RenderAll(wsWindow *window, guiItem *items, int till, char *drawbuf);
 
 #endif /* MPLAYER_GUI_RENDER_H */

@@ -396,7 +396,7 @@ static void PutImage(int x, int y, uint32_t *drawbuf, int drawbuf_width, guiImag
     }
 }
 
-void RenderAll(wsWindow *window, guiItem *items, int nrItems, char *drawbuf)
+void RenderAll(wsWindow *window, guiItem *items, int till, char *drawbuf)
 {
     uint32_t *db;
     guiItem *item;
@@ -406,7 +406,7 @@ void RenderAll(wsWindow *window, guiItem *items, int nrItems, char *drawbuf)
     db = (uint32_t *)drawbuf;
     dw = window->Width;
 
-    for (i = 0; i < nrItems + 1; i++) {
+    for (i = 0; i <= till; i++) {
         item = &items[i];
 
         switch (item->pressed) {
