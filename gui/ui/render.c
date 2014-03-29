@@ -461,6 +461,7 @@ void RenderAll(wsWindow *window, guiItem *items, int till, char *drawbuf)
             break;
 
         case itDLabel:
+
             t = TranslateVariables(item->label);
 
             if (!item->text || (strcmp(item->text, t) != 0)) {
@@ -474,7 +475,7 @@ void RenderAll(wsWindow *window, guiItem *items, int till, char *drawbuf)
             d = GetTimerMS() - item->starttime;
 
             if (d < DLABEL_DELAY)
-                x = item->last_x;                     // don't scroll yet
+                x = item->last_x;                   // don't scroll yet
             else {
                 int l;
                 char c[2];
@@ -485,8 +486,8 @@ void RenderAll(wsWindow *window, guiItem *items, int till, char *drawbuf)
                 c[1] = '\0';
 
                 if (x < (fntTextWidth(item->fontid, c) + 1) >> 1) {
-                    item->starttime = GetTimerMS();   // stop again
-                    item->last_x    = x;              // at current x pos
+                    item->starttime = GetTimerMS(); // stop again
+                    item->last_x    = x;            // at current x pos
                 }
             }
 
