@@ -401,7 +401,9 @@ void RenderAll(wsWindow *window, guiItem *items, int till, char *drawbuf)
     uint32_t *db;
     guiItem *item;
     guiImage *image = NULL;
-    int dw, i, index;
+    int dw, i, index, x;
+    char *t;
+    unsigned int d;
 
     db = (uint32_t *)drawbuf;
     dw = window->Width;
@@ -459,10 +461,7 @@ void RenderAll(wsWindow *window, guiItem *items, int till, char *drawbuf)
             break;
 
         case itDLabel:
-        {
-            int x;
-            unsigned int d;
-            char *t = TranslateVariables(item->label);
+            t = TranslateVariables(item->label);
 
             if (!item->text || (strcmp(item->text, t) != 0)) {
                 free(item->text);
@@ -492,7 +491,6 @@ void RenderAll(wsWindow *window, guiItem *items, int till, char *drawbuf)
             }
 
             image = fntTextRender(item, x, t);
-        }
 
             if (image)
                 PutImage(item->x, item->y, db, dw, image, 1, 0, True);
