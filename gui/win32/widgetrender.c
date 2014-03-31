@@ -132,7 +132,7 @@ static void stringreplace(char *dest, const char *what, const char *format, ... 
  *
  * @return pointer to @a fname buffer
  */
-char *TranslateFilename (int how, char *fname, size_t maxlen)
+static char *TranslateFilename (int how, char *fname, size_t maxlen)
 {
     char *p;
     size_t len;
