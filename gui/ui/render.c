@@ -470,13 +470,13 @@ void RenderAll(wsWindow *window, guiItem *items, int till, char *drawbuf)
         case itHPotmeter:
 
             PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * item->value / 100.0, True);
-            PutImage(item->x + (item->width - item->pwidth) * item->value / 100.0, item->y, db, dw, &item->Mask, 3, index, True);
+            PutImage(item->x + (item->width - item->pbwidth) * item->value / 100.0, item->y, db, dw, &item->Mask, 3, index, True);
             break;
 
         case itVPotmeter:
 
             PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * item->value / 100.0, False);
-            PutImage(item->x, item->y + (item->height - item->pheight) * (1.0 - item->value / 100.0), db, dw, &item->Mask, 3, index, True);
+            PutImage(item->x, item->y + (item->height - item->pbheight) * (1.0 - item->value / 100.0), db, dw, &item->Mask, 3, index, True);
             break;
 
         case itSLabel:

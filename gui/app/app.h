@@ -129,7 +129,7 @@ typedef struct {
     int align;
     char *label;
 
-    int pwidth, pheight;
+    int pbwidth, pbheight;
     int numphases;
     float value;
 

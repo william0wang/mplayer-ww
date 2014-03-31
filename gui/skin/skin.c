@@ -649,8 +649,8 @@ static int item_hpotmeter(char *in)
     item->y         = y;
     item->width     = w;
     item->height    = h;
-    item->pwidth    = bwidth;
-    item->pheight   = bheight;
+    item->pbwidth   = bwidth;
+    item->pbheight  = bheight;
     item->numphases = num;
     item->value     = (float)d;
     item->message   = message;
