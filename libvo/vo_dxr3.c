@@ -41,8 +41,6 @@
 #include "fastmemcpy.h"
 
 #include "video_out.h"
-#define NO_DRAW_SLICE
-#include "video_out_internal.h"
 #include "libmpcodecs/vf.h"
 #include "aspect.h"
 #include "sub/spuenc.h"
@@ -54,6 +52,9 @@
 #include "x11_common.h"
 #endif
 #include "libavutil/avstring.h"
+
+#define NO_DRAW_SLICE
+#include "video_out_internal.h"
 
 #define SPU_SUPPORT
 
