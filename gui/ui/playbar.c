@@ -55,9 +55,9 @@ unsigned int GetTimerMS( void );
 unsigned int GetTimer( void );
 
 unsigned char * playbarDrawBuffer = NULL;
-int		playbarVisible = False;
-int  		playbarLength = 0;
-int		uiPlaybarFade = 0;
+int             playbarVisible = False;
+int             playbarLength = 0;
+int             uiPlaybarFade = 0;
 
 static void uiPlaybarDraw( void )
 {
@@ -79,26 +79,26 @@ static void uiPlaybarDraw( void )
    case 1: // fade in
         playbarLength--;
         if ( guiApp.videoWindow.Height - guiApp.playbar.height >= playbarLength )
-	 {
-	  playbarLength=guiApp.videoWindow.Height - guiApp.playbar.height;
-	  uiPlaybarFade=0;
-	  wsMouseVisibility(&guiApp.videoWindow, wsShowMouseCursor);
-	 }
+         {
+          playbarLength=guiApp.videoWindow.Height - guiApp.playbar.height;
+          uiPlaybarFade=0;
+          wsMouseVisibility(&guiApp.videoWindow, wsShowMouseCursor);
+         }
         wsWindowMove( &guiApp.playbarWindow,True,x,playbarLength );
-	break;
+        break;
    case 2: // fade out
-	playbarLength+=10;
-	if ( playbarLength > guiApp.videoWindow.Height )
-	 {
-	  playbarLength=guiApp.videoWindow.Height;
-	  uiPlaybarFade=0;
-	  playbarVisible=False;
+        playbarLength+=10;
+        if ( playbarLength > guiApp.videoWindow.Height )
+         {
+          playbarLength=guiApp.videoWindow.Height;
+          uiPlaybarFade=0;
+          playbarVisible=False;
           wsMouseVisibility(&guiApp.videoWindow, wsHideMouseCursor);
           wsWindowVisibility( &guiApp.playbarWindow,wsHideWindow );
-	  return;
-	 }
+          return;
+         }
         wsWindowMove( &guiApp.playbarWindow,True,x,playbarLength );
-	break;
+        break;
   }
 
 /* render */
@@ -122,10 +122,10 @@ static void uiPlaybarMouse( int Button, int X, int Y, int RX, int RY )
  static int     itemtype = 0;
         int     i;
         guiItem * item = NULL;
-	float   value = 0.0f;
+        float   value = 0.0f;
 
  static int     SelectedItem = -1;
-	int     currentselected = -1;
+        int     currentselected = -1;
 
  for ( i=0;i <= guiApp.IndexOfPlaybarItems;i++ )
    if ( ( guiApp.playbarItems[i].pressed != btnDisabled )&&
@@ -143,50 +143,50 @@ static void uiPlaybarMouse( int Button, int X, int Y, int RX, int RY )
         break;
    case wsRRMouseButton:
         gtkShow( ivShowPopUpMenu,NULL );
-	break;
+        break;
 /* --- */
    case wsPLMouseButton:
-	gtkShow( ivHidePopUpMenu,NULL );
+        gtkShow( ivHidePopUpMenu,NULL );
         SelectedItem=currentselected;
         if ( SelectedItem == -1 ) break; // yeees, i'm move the fucking window
         item=&guiApp.playbarItems[SelectedItem];
-	itemtype=item->type;
-	item->pressed=btnPressed;
+        itemtype=item->type;
+        item->pressed=btnPressed;
 
-	switch( item->type )
-	 {
-	  case itButton:
-	       if ( ( SelectedItem > -1 ) &&
-	         ( ( ( item->message == evPlaySwitchToPause && item->message == evPauseSwitchToPlay ) ) ||
-		 ( ( item->message == evPauseSwitchToPlay && item->message == evPlaySwitchToPause ) ) ) )
-		 { item->pressed=btnDisabled; }
-	       break;
-	 }
+        switch( item->type )
+         {
+          case itButton:
+               if ( ( SelectedItem > -1 ) &&
+                 ( ( ( item->message == evPlaySwitchToPause && item->message == evPauseSwitchToPlay ) ) ||
+                 ( ( item->message == evPauseSwitchToPlay && item->message == evPlaySwitchToPause ) ) ) )
+                 { item->pressed=btnDisabled; }
+               break;
+         }
 
-	break;
+        break;
    case wsRLMouseButton:
         if ( SelectedItem != -1 )   // NOTE TO MYSELF: only if itButton, itHPotmeter or itVPotmeter
          {
           item=&guiApp.playbarItems[SelectedItem];
           item->pressed=btnReleased;
          }
-	if ( currentselected == - 1 || SelectedItem == -1 ) { itemtype=0; break; }
-	SelectedItem=-1;
-	value=0;
+        if ( currentselected == - 1 || SelectedItem == -1 ) { itemtype=0; break; }
+        SelectedItem=-1;
+        value=0;
 
-	switch( itemtype )
-	 {
-	  case itHPotmeter:
-	       value=100.0 * ( X - item->x ) / item->width;
-	       break;
-	  case itVPotmeter:
-	       value=100.0 - 100.0 * ( Y - item->y ) / item->height;
-	       break;
-	 }
-	uiEvent( item->message,value );
+        switch( itemtype )
+         {
+          case itHPotmeter:
+               value=100.0 * ( X - item->x ) / item->width;
+               break;
+          case itVPotmeter:
+               value=100.0 - 100.0 * ( Y - item->y ) / item->height;
+               break;
+         }
+        uiEvent( item->message,value );
 
-	itemtype=0;
-	break;
+        itemtype=0;
+        break;
 /* --- */
    case wsP5MouseButton: value=-2.5f; goto rollerhandled;
    case wsP4MouseButton: value= 2.5f;
@@ -199,27 +199,27 @@ rollerhandled:
             item->value+=value;
             uiEvent( item->message,item->value );
            }
-	 }
-	break;
+         }
+        break;
 /* --- */
    case wsMoveMouse:
         item=&guiApp.playbarItems[SelectedItem];
-	switch ( itemtype )
-	 {
-	  case itPRMButton:
-	       if (guiApp.menuIsPresent) guiApp.menuWindow.MouseHandler( 0,RX,RY,0,0 );
-	       break;
-	  case itVPotmeter:
-	       item->value=100.0 - 100.0 * ( Y - item->y ) / item->height;
-	       goto potihandled;
-	  case itHPotmeter:
-	       item->value=100.0 * ( X - item->x ) / item->width;
+        switch ( itemtype )
+         {
+          case itPRMButton:
+               if (guiApp.menuIsPresent) guiApp.menuWindow.MouseHandler( 0,RX,RY,0,0 );
+               break;
+          case itVPotmeter:
+               item->value=100.0 - 100.0 * ( Y - item->y ) / item->height;
+               goto potihandled;
+          case itHPotmeter:
+               item->value=100.0 * ( X - item->x ) / item->width;
 potihandled:
-	       if ( item->value > 100.0f ) item->value=100.0f;
-	       if ( item->value < 0.0f ) item->value=0.0f;
-	       uiEvent( item->message,item->value );
-	       break;
-	 }
+               if ( item->value > 100.0f ) item->value=100.0f;
+               if ( item->value < 0.0f ) item->value=0.0f;
+               uiEvent( item->message,item->value );
+               break;
+         }
         break;
   }
 }

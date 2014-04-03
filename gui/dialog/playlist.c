@@ -126,55 +126,55 @@ static void plButtonReleased( GtkButton * button,gpointer user_data )
  {
   case 1: // ok
        {
-	int i;
-	plItem curr, * item, * old;
-	item = listMgr( PLAYLIST_ITEM_GET_CURR,0 );
-	if (item)
-	 {
-	  curr.path = gstrdup(item->path);
-	  curr.name = gstrdup(item->name);
-	 }
-	else
-	 {
-	  curr.path = NULL;
-	  curr.name = NULL;
-	 }
-	listMgr( PLAYLIST_DELETE,0 );
-	for ( i=0;i<NrOfSelected;i++ )
-	 {
-	  char * text[2];
-	  item=calloc( 1,sizeof( plItem ) );
-	  gtk_clist_get_text( GTK_CLIST( CLSelected ),i,2,&text[0] );
-	  gtk_clist_get_text( GTK_CLIST( CLSelected ),i,3,&text[1] );
-	  item->name = strdup( text[0] );
-	  item->path = strdup( text[1] );
-	  listMgr( PLAYLIST_ITEM_APPEND,item );
-	 }
-	item = listMgr( PLAYLIST_GET,0 );
-	if ( item )
-	 {
-	  if ( guiInfo.Playing )
-	   {
-	    old = listMgr( PLAYLIST_ITEM_FIND,&curr );
-	    if ( old )
-	     {
-	      listMgr( PLAYLIST_ITEM_SET_CURR,old );
-	      guiInfo.Track = (uintptr_t) listMgr( PLAYLIST_ITEM_GET_POS,old );
-	      item = NULL;
-	     }
-	   }
-	  if ( item )
-	   {
-	    uiSetFile( item->path,item->name,STREAMTYPE_FILE );
-	    guiInfo.MediumChanged = GUI_MEDIUM_NEW;
-	    guiInfo.PlaylistNext = !guiInfo.Playing;
-	    guiInfo.Track = 1;
-	   }
-	 }
-	else if (isPlaylistStreamtype && !guiInfo.Playing) uiUnsetFile();
-	guiInfo.Tracks = (uintptr_t) listMgr( PLAYLIST_ITEM_GET_POS,0 );
-	free(curr.path);
-	free(curr.name);
+        int i;
+        plItem curr, * item, * old;
+        item = listMgr( PLAYLIST_ITEM_GET_CURR,0 );
+        if (item)
+         {
+          curr.path = gstrdup(item->path);
+          curr.name = gstrdup(item->name);
+         }
+        else
+         {
+          curr.path = NULL;
+          curr.name = NULL;
+         }
+        listMgr( PLAYLIST_DELETE,0 );
+        for ( i=0;i<NrOfSelected;i++ )
+         {
+          char * text[2];
+          item=calloc( 1,sizeof( plItem ) );
+          gtk_clist_get_text( GTK_CLIST( CLSelected ),i,2,&text[0] );
+          gtk_clist_get_text( GTK_CLIST( CLSelected ),i,3,&text[1] );
+          item->name = strdup( text[0] );
+          item->path = strdup( text[1] );
+          listMgr( PLAYLIST_ITEM_APPEND,item );
+         }
+        item = listMgr( PLAYLIST_GET,0 );
+        if ( item )
+         {
+          if ( guiInfo.Playing )
+           {
+            old = listMgr( PLAYLIST_ITEM_FIND,&curr );
+            if ( old )
+             {
+              listMgr( PLAYLIST_ITEM_SET_CURR,old );
+              guiInfo.Track = (uintptr_t) listMgr( PLAYLIST_ITEM_GET_POS,old );
+              item = NULL;
+             }
+           }
+          if ( item )
+           {
+            uiSetFile( item->path,item->name,STREAMTYPE_FILE );
+            guiInfo.MediumChanged = GUI_MEDIUM_NEW;
+            guiInfo.PlaylistNext = !guiInfo.Playing;
+            guiInfo.Track = 1;
+           }
+         }
+        else if (isPlaylistStreamtype && !guiInfo.Playing) uiUnsetFile();
+        guiInfo.Tracks = (uintptr_t) listMgr( PLAYLIST_ITEM_GET_POS,0 );
+        free(curr.path);
+        free(curr.name);
        }
   case 0: // cancel
        NrOfSelected=NrOfEntrys=0;
@@ -186,30 +186,30 @@ static void plButtonReleased( GtkButton * button,gpointer user_data )
        break;
   case 2: // remove
        {
-	int i; int j;
+        int i; int j;
 
-	gtk_signal_handler_block( GTK_OBJECT( CLSelected ),sigSel );
-	gtk_signal_handler_block( GTK_OBJECT( CLSelected ),sigUnsel );
-	gtk_signal_handler_block( GTK_OBJECT( CLSelected ),sigEvent );
+        gtk_signal_handler_block( GTK_OBJECT( CLSelected ),sigSel );
+        gtk_signal_handler_block( GTK_OBJECT( CLSelected ),sigUnsel );
+        gtk_signal_handler_block( GTK_OBJECT( CLSelected ),sigEvent );
 
         gtk_clist_freeze( GTK_CLIST( CLSelected ) );
         i = 0;
         while ( i<NrOfSelected )
         {
-  	 if ( CLListSelected[i] )
-	  {
-	   gtk_clist_remove( GTK_CLIST( CLSelected ),i );
-	   NrOfSelected--;
-	   for ( j=i;j<NrOfSelected;j++ )
-		CLListSelected[j] = CLListSelected[j+1];
-	  }
-  	 else i++;
+         if ( CLListSelected[i] )
+          {
+           gtk_clist_remove( GTK_CLIST( CLSelected ),i );
+           NrOfSelected--;
+           for ( j=i;j<NrOfSelected;j++ )
+                CLListSelected[j] = CLListSelected[j+1];
+          }
+         else i++;
         }
-	gtk_clist_thaw( GTK_CLIST( CLSelected ) );
+        gtk_clist_thaw( GTK_CLIST( CLSelected ) );
 
-	gtk_signal_handler_unblock( GTK_OBJECT( CLSelected ),sigSel );
-	gtk_signal_handler_unblock( GTK_OBJECT( CLSelected ),sigUnsel );
-	gtk_signal_handler_unblock( GTK_OBJECT( CLSelected ),sigEvent );
+        gtk_signal_handler_unblock( GTK_OBJECT( CLSelected ),sigSel );
+        gtk_signal_handler_unblock( GTK_OBJECT( CLSelected ),sigUnsel );
+        gtk_signal_handler_unblock( GTK_OBJECT( CLSelected ),sigEvent );
 
        }
        break;
@@ -224,23 +224,23 @@ static void plButtonReleased( GtkButton * button,gpointer user_data )
          {
           if ( CLFileSelected[i] )
            {
-	    NrOfSelected++;
-	    p=realloc( CLListSelected,NrOfSelected * sizeof( int ) );
-	    if ( !p ) NrOfSelected--;
-	    else
-	     {
-	      CLListSelected=p;
-	      CLListSelected[NrOfSelected - 1]=False;
-	      gtk_clist_get_text( GTK_CLIST( CLFiles ),i,0,&itext[0] );
-	      gtk_clist_get_text( GTK_CLIST( CLFiles ),i,1,&itext[1] );
-	      text[0][0]=itext[0]; text[0][1]=g_filename_display_name( current_path );
-	      text[0][2]=itext[1]; text[0][3]=current_path;
-	      gtk_clist_append( GTK_CLIST( CLSelected ),text[0] );
-	      g_free( text[0][1] );
-	     }
-	   }
-	 }
-	gtk_clist_thaw( GTK_CLIST( CLSelected ) );
+            NrOfSelected++;
+            p=realloc( CLListSelected,NrOfSelected * sizeof( int ) );
+            if ( !p ) NrOfSelected--;
+            else
+             {
+              CLListSelected=p;
+              CLListSelected[NrOfSelected - 1]=False;
+              gtk_clist_get_text( GTK_CLIST( CLFiles ),i,0,&itext[0] );
+              gtk_clist_get_text( GTK_CLIST( CLFiles ),i,1,&itext[1] );
+              text[0][0]=itext[0]; text[0][1]=g_filename_display_name( current_path );
+              text[0][2]=itext[1]; text[0][3]=current_path;
+              gtk_clist_append( GTK_CLIST( CLSelected ),text[0] );
+              g_free( text[0][1] );
+             }
+           }
+         }
+        gtk_clist_thaw( GTK_CLIST( CLSelected ) );
        }
        break;
  }
@@ -303,10 +303,10 @@ static gboolean plEvent ( GtkWidget * widget,
 
 static int check_for_subdir( gchar * path )
 {
- DIR 	       * dir;
+ DIR           * dir;
  struct dirent * dirent;
  struct stat     statbuf;
- gchar 	       * npath;
+ gchar         * npath;
 
  if ( (dir=opendir( path )) )
   {
@@ -330,13 +330,13 @@ static void plCTree( GtkCTree * ctree,GtkCTreeNode * parent_node,gpointer user_d
 {
  GtkCTreeNode  * node;
  DirNodeType   * DirNode;
- gchar 		   * text, * utf8name = NULL;
- gchar 		   * dummy = "dummy";
- int     	 	 subdir = True;
- DIR   		   * dir = NULL;
+ gchar             * text, * utf8name = NULL;
+ gchar             * dummy = "dummy";
+ int                     subdir = True;
+ DIR               * dir = NULL;
  struct dirent * dirent;
- gchar  	   * path;
- struct 		 stat statbuf;
+ gchar             * path;
+ struct                  stat statbuf;
 
  (void) user_data;
 
@@ -354,19 +354,19 @@ static void plCTree( GtkCTree * ctree,GtkCTreeNode * parent_node,gpointer user_d
       {
        path=calloc( 1,strlen( DirNode->path ) + strlen( dirent->d_name ) + 2 );
        if ( !strcmp( current_path,"/" ) ) sprintf( path,"/%s",dirent->d_name );
-	else sprintf( path,"%s/%s",current_path,dirent->d_name );
+        else sprintf( path,"%s/%s",current_path,dirent->d_name );
        text=dirent->d_name;
        g_free( utf8name );
        utf8name=g_filename_display_name( text );
 
        if ( stat( path,&statbuf ) != -1 && S_ISDIR( statbuf.st_mode ) && dirent->d_name[0] != '.' )
-	{
-	 DirNode=malloc( sizeof( DirNodeType ) ); DirNode->scaned=False; DirNode->path=strdup( path );
-	 subdir=check_for_subdir( path );
-	 node=gtk_ctree_insert_node( ctree,parent_node,NULL,&utf8name,4,pxOpenedBook,msOpenedBook,pxClosedBook,msClosedBook,!subdir,FALSE );
-	 gtk_ctree_node_set_row_data_full( ctree,node,DirNode,NULL );
-	 if ( subdir ) gtk_ctree_insert_node( ctree,node,NULL,&dummy,4,NULL,NULL,NULL,NULL,FALSE,FALSE );
-	}
+        {
+         DirNode=malloc( sizeof( DirNodeType ) ); DirNode->scaned=False; DirNode->path=strdup( path );
+         subdir=check_for_subdir( path );
+         node=gtk_ctree_insert_node( ctree,parent_node,NULL,&utf8name,4,pxOpenedBook,msOpenedBook,pxClosedBook,msClosedBook,!subdir,FALSE );
+         gtk_ctree_node_set_row_data_full( ctree,node,DirNode,NULL );
+         if ( subdir ) gtk_ctree_insert_node( ctree,node,NULL,&dummy,4,NULL,NULL,NULL,NULL,FALSE,FALSE );
+        }
        free( path ); path=NULL;
       }
      closedir( dir );
@@ -381,11 +381,11 @@ static void plCTree( GtkCTree * ctree,GtkCTreeNode * parent_node,gpointer user_d
 
 static void scan_dir( char * path )
 {
- DIR   		   * dir = NULL;
- char		   * curr;
+ DIR               * dir = NULL;
+ char              * curr;
  struct dirent * dirent;
- struct 		 stat statbuf;
- char 		   * text[1][3]; text[0][2]="";
+ struct                  stat statbuf;
+ char              * text[1][3]; text[0][2]="";
 
  gtk_clist_clear( GTK_CLIST( CLFiles ) );
  if ( (dir=opendir( path )) )
@@ -393,17 +393,17 @@ static void scan_dir( char * path )
    NrOfEntrys=0;
    while( (dirent=readdir( dir )) )
     {
-	 curr=calloc( 1,strlen( path ) + strlen( dirent->d_name ) + 3 ); sprintf( curr,"%s/%s",path,dirent->d_name );
-	 if ( stat( curr,&statbuf ) != -1 && ( S_ISREG( statbuf.st_mode ) || S_ISLNK( statbuf.st_mode ) ) )
-	  {
-	   text[0][0]=g_filename_display_name( dirent->d_name );
-	   text[0][1]=dirent->d_name;
-	   gtk_clist_append( GTK_CLIST( CLFiles ), text[0] );
-	   g_free( text[0][0] );
-	   NrOfEntrys++;
-	  }
-	 free( curr );
-	}
+         curr=calloc( 1,strlen( path ) + strlen( dirent->d_name ) + 3 ); sprintf( curr,"%s/%s",path,dirent->d_name );
+         if ( stat( curr,&statbuf ) != -1 && ( S_ISREG( statbuf.st_mode ) || S_ISLNK( statbuf.st_mode ) ) )
+          {
+           text[0][0]=g_filename_display_name( dirent->d_name );
+           text[0][1]=dirent->d_name;
+           gtk_clist_append( GTK_CLIST( CLFiles ), text[0] );
+           g_free( text[0][0] );
+           NrOfEntrys++;
+          }
+         free( curr );
+        }
    closedir( dir );
    gtk_clist_sort( GTK_CLIST( CLFiles ) );
   }
@@ -429,18 +429,18 @@ static void plCTRow(GtkCList * clist, gint row, gint column, GdkEvent * event, g
 
 static GtkWidget * CreatePlaylist( void )
 {
-  GtkWidget 	* vbox1;
-  GtkWidget 	* hbox1;
-  GtkWidget 	* scrolledwindow1;
-  GtkWidget 	* vbox2;
-  GtkWidget 	* scrolledwindow2;
-  GtkWidget 	* scrolledwindow3;
-  GtkWidget 	* hbuttonbox1;
+  GtkWidget     * vbox1;
+  GtkWidget     * hbox1;
+  GtkWidget     * scrolledwindow1;
+  GtkWidget     * vbox2;
+  GtkWidget     * scrolledwindow2;
+  GtkWidget     * scrolledwindow3;
+  GtkWidget     * hbuttonbox1;
   GtkAccelGroup * accel_group;
-  GdkColor 	  transparent = { 0,0,0,0 };
-  gchar 	* root = "/";
-  gchar 	* dummy = "dummy";
-  DirNodeType 	* DirNode;
+  GdkColor        transparent = { 0,0,0,0 };
+  gchar         * root = "/";
+  gchar         * dummy = "dummy";
+  DirNodeType   * DirNode;
   plItem        * last;
 
   accel_group=gtk_accel_group_new();
@@ -612,12 +612,12 @@ void ShowPlaylist( void )
        {
         DirNodeType * DirNode;
         gtk_ctree_select( GTK_CTREE( CTDirTree ),node );
-	DirNode=gtk_ctree_node_get_row_data( GTK_CTREE( CTDirTree ),node );
-	current_path=DirNode->path;
+        DirNode=gtk_ctree_node_get_row_data( GTK_CTREE( CTDirTree ),node );
+        current_path=DirNode->path;
         scan_dir( DirNode->path );
-	free( CLFileSelected );
-	CLFileSelected=calloc( 1,NrOfEntrys * sizeof( int ) );
-	break;
+        free( CLFileSelected );
+        CLFileSelected=calloc( 1,NrOfEntrys * sizeof( int ) );
+        break;
        }
     } while( pos );
    free( tpath );

@@ -107,7 +107,7 @@ static void uiMainMouse( int Button,int X,int Y,int RX,int RY )
  switch ( Button )
   {
    case wsPMMouseButton:
-	  gtkShow( ivHidePopUpMenu,NULL );
+          gtkShow( ivHidePopUpMenu,NULL );
           uiMenuShow( RX,RY );
           itemtype=itPRMButton;
           break;
@@ -116,7 +116,7 @@ static void uiMainMouse( int Button,int X,int Y,int RX,int RY )
           break;
 
    case wsPLMouseButton:
-	  gtkShow( ivHidePopUpMenu,NULL );
+          gtkShow( ivHidePopUpMenu,NULL );
           sx=X; sy=Y; boxMoved=True; itemtype=itPLMButton;
           SelectedItem=currentselected;
           if ( SelectedItem == -1 ) break;
@@ -150,7 +150,7 @@ static void uiMainMouse( int Button,int X,int Y,int RX,int RY )
             case itHPotmeter:
                  value=100.0 * ( X - item->x ) / item->width;
                  break;
-	    case itVPotmeter:
+            case itVPotmeter:
                  value=100.0 - 100.0 * ( Y - item->y ) / item->height;
                  break;
            }
@@ -215,12 +215,12 @@ static void uiMainKey( int KeyCode,int Type,int Key )
     {
      // NOTE TO MYSELF: This is only for the Acer AirKey V keyboard.
    /*case wsXFMMPrev:     msg=evPrev;              break;
-     case wsXFMMStop:	  msg=evStop;              break;
-     case wsXFMMPlay:	  msg=evPlaySwitchToPause; break;
-     case wsXFMMNext:	  msg=evNext;	           break;
-     case wsXFMMVolUp:	  msg=evIncVolume;         break;
+     case wsXFMMStop:     msg=evStop;              break;
+     case wsXFMMPlay:     msg=evPlaySwitchToPause; break;
+     case wsXFMMNext:     msg=evNext;              break;
+     case wsXFMMVolUp:    msg=evIncVolume;         break;
      case wsXFMMVolDown:  msg=evDecVolume;         break;
-     case wsXFMMMute: 	  msg=evMute;	           break;*/
+     case wsXFMMMute:     msg=evMute;              break;*/
     }
   }
   else
@@ -238,11 +238,11 @@ static void uiMainKey( int KeyCode,int Type,int Key )
       case wsXF86Next:         msg=evNext; break;
       case wsXF86Media:        msg=evLoad; break;
       case wsEscape:
-    	    if ( guiInfo.VideoWindow && guiInfo.Playing && guiApp.videoWindow.isFullScreen )
-	     {
-	      uiEvent( evNormalSize,0 );
-	      return;
-	     }
+            if ( guiInfo.VideoWindow && guiInfo.Playing && guiApp.videoWindow.isFullScreen )
+             {
+              uiEvent( evNormalSize,0 );
+              return;
+             }
       default:          vo_x11_putkey( Key ); return;
      }
    }
@@ -276,25 +276,25 @@ static void uiMainDND(int num,char** files)
 
       /* check if it is a subtitle file */
       {
-	char* ext = strrchr(str,'.');
-	if (ext) {
-	  static char supported[] = "utf/sub/srt/smi/rt//txt/ssa/aqt/";
-	  char* type;
-	  int len;
-	  if((len=strlen(++ext)) && (type=strstr(supported,ext)) &&\
-	     (type-supported)%4 == 0 && *(type+len) == '/'){
-	    /* handle subtitle file */
-	    nfree(subtitles);
-	    subtitles = str;
-	    continue;
-	  }
-	}
+        char* ext = strrchr(str,'.');
+        if (ext) {
+          static char supported[] = "utf/sub/srt/smi/rt//txt/ssa/aqt/";
+          char* type;
+          int len;
+          if((len=strlen(++ext)) && (type=strstr(supported,ext)) &&\
+             (type-supported)%4 == 0 && *(type+len) == '/'){
+            /* handle subtitle file */
+            nfree(subtitles);
+            subtitles = str;
+            continue;
+          }
+        }
       }
 
       /* clear playlist */
       if (file == NULL) {
-	file = files[f];
-	listMgr(PLAYLIST_DELETE,0);
+        file = files[f];
+        listMgr(PLAYLIST_DELETE,0);
       }
 
       item = calloc(1,sizeof(plItem));
@@ -304,13 +304,13 @@ static void uiMainDND(int num,char** files)
       /* FIXME: decompose file name ? */
       /* yes -- Pontscho */
       if ( s ) {
-	*s=0; s++;
-	item->name = gstrdup( s );
-	item->path = gstrdup( str );
+        *s=0; s++;
+        item->name = gstrdup( s );
+        item->path = gstrdup( str );
       } else {
-	// NOTE TO MYSELF: this shouldn't happen, make sure we have a full path
-	item->name = strdup(str);
-	item->path = strdup(".");
+        // NOTE TO MYSELF: this shouldn't happen, make sure we have a full path
+        item->name = strdup(str);
+        item->path = strdup(".");
       }
       listMgr(PLAYLIST_ITEM_APPEND,item);
     } else {

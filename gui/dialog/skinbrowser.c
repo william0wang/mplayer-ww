@@ -54,13 +54,13 @@ static void prButton( GtkButton * button,gpointer user_data )
   switch ( GPOINTER_TO_INT(user_data) )
    {
     case 0: // cancel
-	if ( strcmp( sbSelectedSkin,gtkOldSkin ) ) uiChangeSkin( gtkOldSkin );
-	break;
+      if ( strcmp( sbSelectedSkin,gtkOldSkin ) ) uiChangeSkin( gtkOldSkin );
+      break;
    case 1: // ok
-	uiChangeSkin( sbSelectedSkin );   // NOTE TO MYSELF: skin already changed!
-	free( skinName );
-	skinName=strdup( sbSelectedSkin );
-	break;
+      uiChangeSkin( sbSelectedSkin );   // NOTE TO MYSELF: skin already changed!
+      free( skinName );
+      skinName=strdup( sbSelectedSkin );
+      break;
   }
  }
  gtk_widget_destroy( SkinBrowser );

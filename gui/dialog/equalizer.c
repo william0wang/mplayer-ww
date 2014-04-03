@@ -168,7 +168,7 @@ static gboolean eqVScaleMotion( GtkWidget * widget,GdkEventMotion  * event,gpoin
   {
    case 1: mplayer( MPLAYER_SET_CONTRAST,VContrastadj->value,0 );      break;
    case 2: mplayer( MPLAYER_SET_BRIGHTNESS,VBrightnessadj->value,0 );  break;
-   case 3: mplayer( MPLAYER_SET_HUE,VHueadj->value,0 );	           break;
+   case 3: mplayer( MPLAYER_SET_HUE,VHueadj->value,0 );                break;
    case 4: mplayer( MPLAYER_SET_SATURATION,VSaturationadj->value,0 );  break;
   }
 
@@ -186,25 +186,25 @@ static void eqButtonReleased( GtkButton * button,gpointer user_data )
         if ( EquConfig ) gtk_widget_destroy( EquConfig );
         break;
    case 1:
-	if ( gtk_notebook_get_current_page( GTK_NOTEBOOK( Notebook ) ) == 0 )
-	 {
-	  if ( !guiInfo.Playing || !gtkEnableAudioEqualizer ) break;
-	  mplayer( MPLAYER_SET_EQUALIZER,0,NULL );
-	  eqSetBands( Channel );
-	 }
-	 else
-	  {
-	   if ( !guiInfo.Playing ) break;
-	   mplayer( MPLAYER_SET_CONTRAST,0,0 );
-	   mplayer( MPLAYER_SET_BRIGHTNESS,0,0 );
-	   mplayer( MPLAYER_SET_HUE,0,0 );
-	   mplayer( MPLAYER_SET_SATURATION,0,0 );
-	   eqSetBands( Channel );
-	  }
-	break;
+        if ( gtk_notebook_get_current_page( GTK_NOTEBOOK( Notebook ) ) == 0 )
+         {
+          if ( !guiInfo.Playing || !gtkEnableAudioEqualizer ) break;
+          mplayer( MPLAYER_SET_EQUALIZER,0,NULL );
+          eqSetBands( Channel );
+         }
+         else
+          {
+           if ( !guiInfo.Playing ) break;
+           mplayer( MPLAYER_SET_CONTRAST,0,0 );
+           mplayer( MPLAYER_SET_BRIGHTNESS,0,0 );
+           mplayer( MPLAYER_SET_HUE,0,0 );
+           mplayer( MPLAYER_SET_SATURATION,0,0 );
+           eqSetBands( Channel );
+          }
+        break;
    case 2:
-	ShowEquConfig();
-	break;
+        ShowEquConfig();
+        break;
   }
 }
 
