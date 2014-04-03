@@ -30,6 +30,7 @@
 #include "gui/skin/font.h"
 #include "gui/skin/skin.h"
 #include "gui/util/mem.h"
+#include "gui/util/misc.h"
 #include "gui/wm/ws.h"
 
 #include "help_mp.h"
@@ -196,7 +197,7 @@ rollerhandled:
           item=&guiApp.playbarItems[currentselected];
           if ( ( item->type == itHPotmeter )||( item->type == itVPotmeter ) )
            {
-            item->value+=value;
+            item->value=constrain(item->value + value);
             uiEvent( item->message,item->value );
            }
          }
@@ -210,13 +211,12 @@ rollerhandled:
                if (guiApp.menuIsPresent) guiApp.menuWindow.MouseHandler( 0,RX,RY,0,0 );
                break;
           case itVPotmeter:
-               item->value=100.0 - 100.0 * ( Y - item->y ) / item->height;
+               value=100.0 - 100.0 * ( Y - item->y ) / item->height;
                goto potihandled;
           case itHPotmeter:
-               item->value=100.0 * ( X - item->x ) / item->width;
+               value=100.0 * ( X - item->x ) / item->width;
 potihandled:
-               if ( item->value > 100.0f ) item->value=100.0f;
-               if ( item->value < 0.0f ) item->value=0.0f;
+               item->value=constrain(value);
                uiEvent( item->message,item->value );
                break;
          }

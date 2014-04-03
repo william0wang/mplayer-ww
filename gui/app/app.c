@@ -24,6 +24,7 @@
 #include "app.h"
 #include "gui.h"
 #include "gui/skin/font.h"
+#include "gui/util/misc.h"
 
 #include "libavutil/common.h"
 
@@ -190,25 +191,13 @@ void btnModify(int event, float value)
 
     for (i = 0; i <= guiApp.IndexOfMainItems; i++)
         if (guiApp.mainItems[i].message == event)
-            if (hasValue(guiApp.mainItems[i])) {
-                if (value < 0.0f)
-                    value = 0.0f;
-                if (value > 100.0f)
-                    value = 100.0f;
-
-                guiApp.mainItems[i].value = value;
-            }
+            if (hasValue(guiApp.mainItems[i]))
+                guiApp.mainItems[i].value = constrain(value);
 
     for (i = 0; i <= guiApp.IndexOfPlaybarItems; i++)
         if (guiApp.playbarItems[i].message == event)
-            if (hasValue(guiApp.playbarItems[i])) {
-                if (value < 0.0f)
-                    value = 0.0f;
-                if (value > 100.0f)
-                    value = 100.0f;
-
-                guiApp.playbarItems[i].value = value;
-            }
+            if (hasValue(guiApp.playbarItems[i]))
+                guiApp.playbarItems[i].value = constrain(value);
 }
 
 /**

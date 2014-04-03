@@ -47,3 +47,20 @@ char *fgetstr(char *str, int size, FILE *file)
 
     return s;
 }
+
+/**
+ * @brief Constrain a @a value to be in the range of 0 to 100.
+ *
+ * @param value value to be checked
+ *
+ * @return a value in the range of 0 to 100
+ */
+float constrain(float value)
+{
+    if (value < 0.0f)
+        return 0.0f;
+    if (value > 100.0f)
+        return 100.0f;
+
+    return value;
+}
