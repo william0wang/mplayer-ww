@@ -21,6 +21,7 @@
  * @brief String utilities
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -316,27 +317,4 @@ void setddup(char **old, const char *dir, const char *name)
     *old = malloc(strlen(dir) + strlen(name) + 2);
     if (*old)
         sprintf(*old, "%s/%s", dir, name);
-}
-
-/**
- * @brief Read characters from @a file.
- *
- * @param str pointer to a buffer to receive the read characters
- * @param size number of characters read at the most (including a terminating null-character)
- * @param file file to read from
- *
- * @return str (success) or NULL (error)
- *
- * @note Reading stops with an end-of-line character or at end of file.
- */
-char *fgetstr(char *str, int size, FILE *file)
-{
-    char *s;
-
-    s = fgets(str, size, file);
-
-    if (s)
-        s[strcspn(s, "\n\r")] = 0;
-
-    return s;
 }

@@ -29,6 +29,7 @@
 #include "font.h"
 #include "skin.h"
 #include "gui/util/mem.h"
+#include "gui/util/misc.h"
 #include "gui/util/string.h"
 
 #include "mp_msg.h"

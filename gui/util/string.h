@@ -20,7 +20,6 @@
 #define MPLAYER_GUI_STRING_H
 
 #include <stddef.h>
-#include <stdio.h>
 
 /**
  * @brief Wraps #cutString():
@@ -32,7 +31,6 @@
 int cutInt(char *in, char sep, int num);
 void cutString(char *in, char *out, char sep, int num, size_t maxout);
 char *decomment(char *in);
-char *fgetstr(char *str, int size, FILE *file);
 char *gstrchr(const char *str, int c);
 int gstrcmp(const char *a, const char *b);
 char *gstrdup(const char *str);

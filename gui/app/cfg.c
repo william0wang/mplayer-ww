@@ -24,6 +24,7 @@
 #include "gui.h"
 #include "gui/interface.h"
 #include "gui/util/list.h"
+#include "gui/util/misc.h"
 #include "gui/util/string.h"
 
 #include "config.h"
