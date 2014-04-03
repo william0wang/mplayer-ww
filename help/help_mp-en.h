@@ -710,6 +710,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_MSG_SkinCfgNotFound "Skin '%s' not found.\n"
 #define MSGTR_GUI_MSG_SkinCfgSelectedNotFound "Selected skin '%s' not found, trying skin 'default'...\n"
 #define MSGTR_GUI_MSG_SkinErrorBitmap16Bit "Color depth of bitmap %s is 16 bits or less which is not supported.\n"
+#define MSGTR_GUI_MSG_SkinErrorDefault "Default (%d) out of range\n"
 #define MSGTR_GUI_MSG_SkinErrorItem "This item is not supported by '%s'.\n"
 #define MSGTR_GUI_MSG_SkinErrorMessage "Error in skin config file at line %d: %s"
 #define MSGTR_GUI_MSG_SkinErrorNumphases "The number of phases must not be zero.\n"

@@ -625,6 +625,11 @@ static int item_hpotmeter(char *in)
     h   = cutInt(in, ',', 9);
     cutStr(in, buf, ',', 10);
 
+    if (d < 0 || d > 100) {
+        skin_error(MSGTR_GUI_MSG_SkinErrorDefault, d);
+        return 1;
+    }
+
     message = appFindMessage(buf);
 
     if (message == -1) {
@@ -768,6 +773,11 @@ static int item_pimage(char *in)
     w   = cutInt(in, ',', 5);
     h   = cutInt(in, ',', 6);
     cutStr(in, buf, ',', 7);
+
+    if (d < 0 || d > 100) {
+        skin_error(MSGTR_GUI_MSG_SkinErrorDefault, d);
+        return 1;
+    }
 
     message = appFindMessage(buf);
 
