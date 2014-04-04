@@ -49,6 +49,7 @@ char *skinDirInData;
 static guiItems *skin;
 
 static int linenumber;
+static unsigned char currItem[32];
 static unsigned char path[512];
 
 static unsigned char currWinName[32];
@@ -182,7 +183,7 @@ static guiItem *next_item(void)
 static int item_section(char *in)
 {
     if (skin) {
-        skin_error(MSGTR_GUI_MSG_SkinErrorItem, "section");
+        skin_error(MSGTR_GUI_MSG_SkinErrorItem, currItem);
         return 1;
     }
 
@@ -193,7 +194,7 @@ static int item_section(char *in)
         return 1;
     }
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]  section: %s\n", in);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]  %s: %s\n", currItem, in);
 
     return 0;
 }
@@ -221,10 +222,10 @@ static int item_end(char *in)
         name  = "section";
     }
 
-    if (!section_item("end"))
+    if (!section_item(currItem))
         return 1;
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]  %send (%s)\n", space, name);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]  %s%s (%s)\n", space, currItem, name);
 
     if (currWinName[0]) {
         currWinName[0] = 0;
@@ -248,11 +249,11 @@ static int item_end(char *in)
  */
 static int item_window(char *in)
 {
-    if (!section_item("window"))
+    if (!section_item(currItem))
         return 1;
 
     if (currWinName[0]) {
-        skin_error(MSGTR_GUI_MSG_SkinErrorItem, "window");
+        skin_error(MSGTR_GUI_MSG_SkinErrorItem, currItem);
         return 1;
     }
 
@@ -287,7 +288,7 @@ static int item_window(char *in)
 
     av_strlcpy(currWinName, in, sizeof(currWinName));
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]   window: %s\n", currWinName);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]   %s: %s\n", currItem, currWinName);
 
     return 0;
 }
@@ -309,7 +310,7 @@ static int item_base(char *in)
     int w = 0, h = 0;
     int is_video, is_bar, is_menu;
 
-    if (!window_item("base"))
+    if (!window_item(currItem))
         return 1;
 
     is_video = (strcmp(currWinName, "video") == 0);
@@ -388,7 +389,7 @@ static int item_base(char *in)
  */
 static int item_background(char *in)
 {
-    if (!window_item("background"))
+    if (!window_item(currItem))
         return 1;
 
     if (in_window("main"))
@@ -402,7 +403,7 @@ static int item_background(char *in)
     currWin->G = cutInt(in, ',', 1);
     currWin->B = cutInt(in, ',', 2);
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    background color: #%02x%02x%02x\n", currWin->R, currWin->G, currWin->B);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    %s color: #%02x%02x%02x\n", currItem, currWin->R, currWin->G, currWin->B);
 
     return 0;
 }
@@ -424,7 +425,7 @@ static int item_button(char *in)
     char msg[32];
     guiItem *item;
 
-    if (!window_item("button"))
+    if (!window_item(currItem))
         return 1;
 
     if (in_window("video"))
@@ -449,7 +450,7 @@ static int item_button(char *in)
     else
         skin_legacy("evSetURL", msg);
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    button image: %s %d,%d\n", fname, x, y);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    %s image: %s %d,%d\n", currItem, fname, x, y);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     message: %s (#%d)\n", msg, message);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     size: %dx%d\n", w, h);
 
@@ -496,9 +497,9 @@ static int item_button(char *in)
 static int item_selected(char *in)
 {
     unsigned char file[512];
-    guiItem *currItem;
+    guiItem *item;
 
-    if (!window_item("selected"))
+    if (!window_item(currItem))
         return 1;
 
     if (in_window("main"))
@@ -508,21 +509,21 @@ static int item_selected(char *in)
     if (in_window("playbar"))
         return 1;
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    image selected: %s\n", in);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    image %s: %s\n", currItem, in);
 
-    currItem       = &skin->menuSelected;
-    currItem->type = itBase;
+    item       = &skin->menuSelected;
+    item->type = itBase;
 
     av_strlcpy(file, path, sizeof(file));
     av_strlcat(file, in, sizeof(file));
 
-    if (skinImageRead(file, &currItem->Bitmap) != 0)
+    if (skinImageRead(file, &item->Bitmap) != 0)
         return 1;
 
-    currItem->width  = currItem->Bitmap.Width;
-    currItem->height = currItem->Bitmap.Height;
+    item->width  = item->Bitmap.Width;
+    item->height = item->Bitmap.Height;
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     bitmap: %dx%d\n", currItem->width, currItem->height);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     bitmap: %dx%d\n", item->width, item->height);
 
     return 0;
 }
@@ -542,7 +543,7 @@ static int item_menu(char *in)
     char msg[32];
     guiItem *item;
 
-    if (!window_item("menu"))
+    if (!window_item(currItem))
         return 1;
 
     if (in_window("main"))
@@ -605,7 +606,7 @@ static int parse_potmeter(guiItem *item, char *in)
     unsigned char buf[512];
     int bwidth, bheight, num, d, x, y, w, h, message;
 
-    if (!window_item("h/v potmeter"))
+    if (!window_item(currItem))
         return 1;
 
     if (in_window("video"))
@@ -640,7 +641,7 @@ static int parse_potmeter(guiItem *item, char *in)
     else
         skin_legacy("evSetURL", buf);
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    h/v potmeter image: %s %d,%d %dx%d\n", phfname, x, y, w, h);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    %s image: %s %d,%d %dx%d\n", currItem, phfname, x, y, w, h);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     button image: %s %dx%d\n", bfname, bwidth, bheight);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     numphases: %d, default: %d%%\n", num, d);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     message: %s (#%d)\n", buf, message);
@@ -670,7 +671,7 @@ static int parse_potmeter(guiItem *item, char *in)
         if (skinImageRead(buf, &item->Bitmap) != 0)
             return 1;
 
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     (potmeter bitmap: %ux%u)\n", item->Bitmap.Width, item->Bitmap.Height);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     (%s bitmap: %ux%u)\n", currItem, item->Bitmap.Width, item->Bitmap.Height);
     }
 
     item->Mask.Image = NULL;
@@ -750,7 +751,7 @@ static int item_potmeter(char *in)
     char param[256];
 
     // legacy
-    skin_legacy("potmeter", "hpotmeter");
+    skin_legacy(currItem, "hpotmeter");
 
     snprintf(param, sizeof(param), "NULL,0,0,%s", in);
 
@@ -773,7 +774,7 @@ static int item_pimage(char *in)
     int num, d, x, y, w, h, message;
     guiItem *item;
 
-    if (!window_item("pimage"))
+    if (!window_item(currItem))
         return 1;
 
     if (in_window("video"))
@@ -805,7 +806,7 @@ static int item_pimage(char *in)
     else
         skin_legacy("evSetURL", buf);
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    pimage image: %s %d,%d %dx%d\n", phfname, x, y, w, h);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    %s image: %s %d,%d %dx%d\n", currItem, phfname, x, y, w, h);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     numphases: %d, default: %d%%\n", num, d);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     message: %s (#%d)\n", buf, message);
 
@@ -856,7 +857,7 @@ static int item_font(char *in)
 {
     char fnt[256];
 
-    if (!window_item("font"))
+    if (!window_item(currItem))
         return 1;
 
     if (in_window("video"))
@@ -887,7 +888,7 @@ static int item_font(char *in)
         return 1;
     }
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    font: %s (#%d)\n", fnt, fntFindID(fnt));
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    %s: %s (#%d)\n", currItem, fnt, fntFindID(fnt));
 
     return 0;
 }
@@ -908,7 +909,7 @@ static int item_slabel(char *in)
     char txt[256];
     guiItem *item;
 
-    if (!window_item("slabel"))
+    if (!window_item(currItem))
         return 1;
 
     if (in_window("video"))
@@ -922,7 +923,7 @@ static int item_slabel(char *in)
     cutStr(in, txt, ',', 3);
     cutStr(txt, txt, '"', 1);
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    slabel: \"%s\"\n", txt);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    %s: \"%s\"\n", currItem, txt);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     pos: %d,%d\n", x, y);
 
     id = fntFindID(fnt);
@@ -971,7 +972,7 @@ static int item_dlabel(char *in)
     char txt[256];
     guiItem *item;
 
-    if (!window_item("dlabel"))
+    if (!window_item(currItem))
         return 1;
 
     if (in_window("video"))
@@ -990,7 +991,7 @@ static int item_dlabel(char *in)
     // legacy
     skin_legacy("$l", txt);
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    dlabel: \"%s\"\n", txt);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    %s: \"%s\"\n", currItem, txt);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     pos: %d,%d\n", x, y);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     width: %d, align: %d\n", w, a);
 
@@ -1036,7 +1037,7 @@ static int item_dlabel(char *in)
  */
 static int item_decoration(char *in)
 {
-    if (!window_item("decoration"))
+    if (!window_item(currItem))
         return 1;
 
     if (in_window("video"))
@@ -1055,7 +1056,7 @@ static int item_decoration(char *in)
 
     skin->mainDecoration = (strcmp(in, "enable") == 0);
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    decoration: %s\n", in);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    %s: %s\n", currItem, in);
 
     return 0;
 }
@@ -1151,7 +1152,6 @@ int skinRead(char *sname)
     char *skinfname;
     FILE *skinfile;
     unsigned char line[256];
-    unsigned char item[32];
     unsigned char param[256];
     unsigned int i;
 
@@ -1184,12 +1184,12 @@ int skinRead(char *sname)
         if (!*line)
             continue;
 
-        cutStr(line, item, '=', 0);
+        cutStr(line, currItem, '=', 0);
         cutStr(line, param, '=', 1);
-        strlower(item);
+        strlower(currItem);
 
         for (i = 0; i < FF_ARRAY_ELEMS(skinItem); i++) {
-            if (!strcmp(item, skinItem[i].name)) {
+            if (!strcmp(currItem, skinItem[i].name)) {
                 if (skinItem[i].func(param) != 0) {
                     fclose(skinfile);
                     return -2;
@@ -1199,7 +1199,7 @@ int skinRead(char *sname)
         }
 
         if (i == FF_ARRAY_ELEMS(skinItem)) {
-            skin_error(MSGTR_GUI_MSG_SkinUnknownItem, item);
+            skin_error(MSGTR_GUI_MSG_SkinUnknownItem, currItem);
             fclose(skinfile);
             return -2;
         }
