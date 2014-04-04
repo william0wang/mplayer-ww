@@ -589,21 +589,21 @@ static int item_menu(char *in)
 }
 
 /**
- * @brief Parse a @a hpotmeter definition.
+ * @brief Parse a hpotmeter or vpotmeter definition.
  *
- *        Syntax: hpotmeter=button,bwidth,bheight,phases,numphases,default,x,y,width,height,message
+ *        Parameters: button,bwidth,bheight,phases,numphases,default,x,y,width,height,message
  *
+ * @param item pointer to item to store the parameters in
  * @param in definition to be analyzed
  *
  * @return 0 (ok) or 1 (error)
  */
-static int item_hpotmeter(char *in)
+static int parse_potmeter(guiItem *item, char *in)
 {
     unsigned char bfname[256];
     unsigned char phfname[256];
     unsigned char buf[512];
     int bwidth, bheight, num, d, x, y, w, h, message;
-    guiItem *item;
 
     if (!window_item("h/v potmeter"))
         return 1;
@@ -645,12 +645,6 @@ static int item_hpotmeter(char *in)
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     numphases: %d, default: %d%%\n", num, d);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     message: %s (#%d)\n", buf, message);
 
-    item = next_item();
-
-    if (!item)
-        return 1;
-
-    item->type      = itHPotmeter;
     item->x         = x;
     item->y         = y;
     item->width     = w;
@@ -695,6 +689,29 @@ static int item_hpotmeter(char *in)
 }
 
 /**
+ * @brief Parse a @a hpotmeter definition.
+ *
+ *        Syntax: hpotmeter=button,bwidth,bheight,phases,numphases,default,x,y,width,height,message
+ *
+ * @param in definition to be analyzed
+ *
+ * @return 0 (ok) or 1 (error)
+ */
+static int item_hpotmeter(char *in)
+{
+    guiItem *item;
+
+    item = next_item();
+
+    if (!item)
+        return 1;
+
+    item->type = itHPotmeter;
+
+    return parse_potmeter(item, in);
+}
+
+/**
  * @brief Parse a @a vpotmeter definition.
  *
  *        Syntax: vpotmeter=button,bwidth,bheight,phases,numphases,default,x,y,width,height,message
@@ -705,17 +722,16 @@ static int item_hpotmeter(char *in)
  */
 static int item_vpotmeter(char *in)
 {
-    int r;
     guiItem *item;
 
-    r = item_hpotmeter(in);
+    item = next_item();
 
-    if (r == 0) {
-        item       = &currWinItems[*currWinItemIdx];
-        item->type = itVPotmeter;
-    }
+    if (!item)
+        return 1;
 
-    return r;
+    item->type = itVPotmeter;
+
+    return parse_potmeter(item, in);
 }
 
 /**
