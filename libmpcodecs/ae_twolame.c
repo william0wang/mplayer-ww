@@ -168,7 +168,7 @@ int mpae_init_twolame(audio_encoder_t *encoder)
 	ctx = calloc(1, sizeof(mpae_twolame_ctx));
 	if(ctx == NULL)
 	{
-		mp_msg(MSGT_MENCODER, MSGL_ERR, "ae_twolame, couldn't alloc a %d bytes context, exiting\n", sizeof(mpae_twolame_ctx));
+		mp_msg(MSGT_MENCODER, MSGL_ERR, "ae_twolame, couldn't alloc context, exiting\n");
 		return 0;
 	}
 
