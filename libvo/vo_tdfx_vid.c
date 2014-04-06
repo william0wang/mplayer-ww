@@ -267,6 +267,7 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
   case IMGFMT_BGR32:
     if(use_overlay)
       mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_TDFXVID_NonNativeOverlayFormatNeedConversion);
+    /* Fallthrough */
   case IMGFMT_BGR15:
   case IMGFMT_BGR16:
     src_bpp = (IMGFMT_BGR_DEPTH(format)+7)/8;
@@ -277,6 +278,7 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
     buffer_stride[0] = ((src_width+1)/2)*2;
     buffer_stride[1] = buffer_stride[2] = buffer_stride[0]/2;
     src_fmt = TDFX_VID_FORMAT_YUY2;
+    /* TODO: is src_bpp == 2 really correct?? */
   case IMGFMT_YUY2:
   case IMGFMT_UYVY:
     src_bpp = 2;
