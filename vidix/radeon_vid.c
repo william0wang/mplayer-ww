@@ -3394,7 +3394,7 @@ static int set_gr_key( void )
 		besr.graphics_key_clr=0;
 	}
 #ifdef RAGE128
-	besr.graphics_key_msk=(1<<dbpp)-1;
+	besr.graphics_key_msk=(1ull<<dbpp)-1;
 	besr.ckey_cntl = VIDEO_KEY_FN_TRUE|GRAPHIC_KEY_FN_NE|CMP_MIX_AND;
 #else
 	besr.graphics_key_msk=besr.graphics_key_clr;
