@@ -269,7 +269,7 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
       mp_msg(MSGT_VO,MSGL_INFO, MSGTR_LIBVO_TDFXVID_NonNativeOverlayFormatNeedConversion);
   case IMGFMT_BGR15:
   case IMGFMT_BGR16:
-    src_bpp = ((format & 0x3F)+7)/8;
+    src_bpp = (IMGFMT_BGR_DEPTH(format)+7)/8;
     break;
   case IMGFMT_YV12:
   case IMGFMT_I420:
