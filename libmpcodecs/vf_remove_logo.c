@@ -533,7 +533,7 @@ static pgm_structure * load_pgm(const char * file_name)
   int maximum_greyscale_value;
   FILE * input;
   int pnm_number;
-  pgm_structure * new_pgm = safe_malloc (sizeof(pgm_structure));
+  pgm_structure * new_pgm = safe_malloc (sizeof(*new_pgm));
   char * write_position;
   char * end_position;
   int image_size; /* width * height */
@@ -553,11 +553,11 @@ static pgm_structure * load_pgm(const char * file_name)
   if (maximum_greyscale_value >= 256) REMOVE_LOGO_LOAD_PGM_ERROR_MESSAGE("[vf]remove_logo: Only 1 byte per pixel (pgm) or 1 byte per color value (ppm) are supported.\n");
   load_pgm_skip(input);
 
-  new_pgm->pixel = safe_malloc (new_pgm->width * new_pgm->height);
+  image_size = new_pgm->width * new_pgm->height;
+  new_pgm->pixel = safe_malloc (image_size);
 
   /* Load the pixels. */
   /* Note: I am aware that fgetc(input) isn't the fastest way of doing things, but it is quite compact and the code only runs once when the filter is initialized.*/
-  image_size = new_pgm->width * new_pgm->height;
   end_position = new_pgm->pixel + image_size;
   for (write_position = new_pgm->pixel; write_position < end_position; write_position++)
   {
@@ -599,7 +599,7 @@ err_out:
 static pgm_structure * generate_half_size_image(vf_instance_t * vf, pgm_structure * input_image)
 {
   int x, y;
-  pgm_structure * new_pgm = safe_malloc (sizeof(pgm_structure));
+  pgm_structure * new_pgm = safe_malloc (sizeof(*new_pgm));
   int has_anything_changed = 1;
   int current_pass;
   int max_mask_size;
@@ -607,7 +607,7 @@ static pgm_structure * generate_half_size_image(vf_instance_t * vf, pgm_structur
 
   new_pgm->width = input_image->width / 2;
   new_pgm->height = input_image->height / 2;
-  new_pgm->pixel = safe_malloc (sizeof(unsigned char) * new_pgm->width * new_pgm->height);
+  new_pgm->pixel = safe_malloc (new_pgm->width * new_pgm->height);
 
   /* Copy over the image data, using the average of 4 pixels for to calculate each downsampled pixel. */
   for (y = 0; y < new_pgm->height; y++)
