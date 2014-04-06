@@ -2649,6 +2649,10 @@ EOF
   generic)
     arch='generic'
     ;;
+  arc)
+    arch='arc'
+    iproc='arc'
+    ;;
 
   *)
     echo "The architecture of your CPU ($host_arch) is not supported by this configure script"
