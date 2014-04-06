@@ -157,6 +157,8 @@ static demuxer_t* demux_open_rawdv(demuxer_t* demuxer)
 
    //read params from this frame
    dv_decoder=dv_decoder_new(TRUE,TRUE,FALSE);
+   if (!dv_decoder)
+	   goto err_out;
    dv_decoder->quality=DV_QUALITY_BEST;
 
    if (dv_parse_header(dv_decoder, dv_frame) == -1)
