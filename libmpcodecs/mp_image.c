@@ -240,7 +240,7 @@ mp_image_t* new_mp_image(int w,int h){
 void free_mp_image(mp_image_t* mpi){
     if(!mpi) return;
     if(mpi->flags&MP_IMGFLAG_ALLOCATED){
-        /* becouse we allocate the whole image in once */
+        /* because we allocate the whole image at once */
         av_free(mpi->planes[0]);
         if (mpi->flags & MP_IMGFLAG_RGB_PALETTE)
             av_free(mpi->planes[1]);
