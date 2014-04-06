@@ -553,7 +553,7 @@ static pgm_structure * load_pgm(const char * file_name)
   if (maximum_greyscale_value >= 256) REMOVE_LOGO_LOAD_PGM_ERROR_MESSAGE("[vf]remove_logo: Only 1 byte per pixel (pgm) or 1 byte per color value (ppm) are supported.\n");
   load_pgm_skip(input);
 
-  new_pgm->pixel = safe_malloc (sizeof(unsigned char) * new_pgm->width * new_pgm->height);
+  new_pgm->pixel = safe_malloc (new_pgm->width * new_pgm->height);
 
   /* Load the pixels. */
   /* Note: I am aware that fgetc(input) isn't the fastest way of doing things, but it is quite compact and the code only runs once when the filter is initialized.*/
