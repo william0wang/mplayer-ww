@@ -100,7 +100,12 @@ char *p=tgetstr(id,&term_p);
   if(!p) return;
   if(getch2_key_db>=MAX_KEYS) return;
   getch2_keys[getch2_key_db].len=strlen(p);
-  strncpy(getch2_keys[getch2_key_db].chars,p,8);
+  if (getch2_keys[getch2_key_db].len >= sizeof(getch2_keys[getch2_key_db].chars))
+  {
+    printf("Key string entry more than 7 characters, ignoring\n");
+    return;
+  }
+  strcpy(getch2_keys[getch2_key_db].chars,p);
   getch2_keys[getch2_key_db].code=code;
   ++getch2_key_db;
 /*  printf("%s=%s\n",id,p); */
