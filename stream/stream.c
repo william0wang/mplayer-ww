@@ -219,19 +219,19 @@ static stream_t* open_stream_plugin(const stream_info_t* sinfo, const char* file
 
 
 stream_t* open_stream_full(const char* filename,int mode, char** options, int* file_format) {
-  int i,j,l,r;
-  const stream_info_t* sinfo;
-  stream_t* s;
-  char *redirected_url = NULL;
+  int i,j;
 
   for(i = 0 ; auto_open_streams[i] ; i++) {
-    sinfo = auto_open_streams[i];
+    const stream_info_t *sinfo = auto_open_streams[i];
     for(j = 0 ; sinfo->protocols[j] ; j++) {
-      l = strlen(sinfo->protocols[j]);
+      int l = strlen(sinfo->protocols[j]);
       // l == 0 => Don't do protocol matching (ie network and filenames)
       if((l == 0 && !strstr(filename, "://")) ||
          ((strncasecmp(sinfo->protocols[j],filename,l) == 0) &&
 		      (strncmp("://",filename+l,3) == 0))) {
+	int r;
+	char *redirected_url = NULL;
+	stream_t* s;
 	*file_format = DEMUXER_TYPE_UNKNOWN;
 	s = open_stream_plugin(sinfo,filename,mode,options,file_format,&r,
 				&redirected_url);
