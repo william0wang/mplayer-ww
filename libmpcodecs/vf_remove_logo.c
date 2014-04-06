@@ -553,6 +553,9 @@ static pgm_structure * load_pgm(const char * file_name)
   if (maximum_greyscale_value >= 256) REMOVE_LOGO_LOAD_PGM_ERROR_MESSAGE("[vf]remove_logo: Only 1 byte per pixel (pgm) or 1 byte per color value (ppm) are supported.\n");
   load_pgm_skip(input);
 
+  if (new_pgm->width <= 0 || new_pgm->width > 0x7fff ||
+      new_pgm->height <= 0 || new_pgm->height > 0x7fff)
+    REMOVE_LOGO_LOAD_PGM_ERROR_MESSAGE("[vf]remove_logo: Invalid PGM dimensions.\n");
   image_size = new_pgm->width * new_pgm->height;
   new_pgm->pixel = safe_malloc (image_size);
 
