@@ -578,6 +578,7 @@ static int cddb_read_parse(HTTP_header_t *http_hdr, cddb_data_t *cddb_data)
         // do a sanity check
         if (http_hdr->body_size < (unsigned int)(ptr2 - ptr)) {
             mp_msg(MSGT_DEMUX, MSGL_ERR, MSGTR_MPDEMUX_CDDB_UnexpectedFIXME);
+            free(ptr);
             return -1;
         }
         cddb_data->xmcd_file                            = ptr;
