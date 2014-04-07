@@ -1,4 +1,4 @@
-// Synced with help_mp-en.h rev. 36987
+// Synced with help_mp-en.h rev. 37121
 //
 // Translated by JRaSH <jrash06@gmail.com>
 
@@ -710,8 +710,10 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_MSG_SkinCfgNotFound "未找到界面外观‘%s’。\n"
 #define MSGTR_GUI_MSG_SkinCfgSelectedNotFound "未找到选定的界面外观‘%s’，尝试使用‘default’参数...\n"
 #define MSGTR_GUI_MSG_SkinErrorBitmap16Bit "位图 %s 的颜色精度小于等于 16 比特，因而无法支持。\n"
+#define MSGTR_GUI_MSG_SkinErrorDefault "默认值（%d）超出范围\n"
 #define MSGTR_GUI_MSG_SkinErrorItem "该项目‘%s’不支持。\n"
 #define MSGTR_GUI_MSG_SkinErrorMessage "界面外观配置文件错误，行 %d：%s"
+#define MSGTR_GUI_MSG_SkinErrorNumphases "步骤数不可为零。\n"
 #define MSGTR_GUI_MSG_SkinErrorSection "没有指定‘%s’的区域。\n"
 #define MSGTR_GUI_MSG_SkinErrorWindow "没有指定‘%s’的窗口。\n"
 #define MSGTR_GUI_MSG_SkinFileNotFound "未找到界面外观文件 %s。\n"
