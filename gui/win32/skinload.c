@@ -393,12 +393,6 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
         mywidget->y = mywidget->wy = atoi(findnextstring(temp, desc, &base));
         mywidget->wwidth = atoi(findnextstring(temp, desc, &base));
         mywidget->wheight = atoi(findnextstring(temp, desc, &base));
-        if (mywidget->bitmap[0] == NULL || mywidget->width == 0 || mywidget->height == 0)
-        {
-            mywidget->bitmap[0] = mywidget->bitmap[1];
-            mywidget->width = mywidget->wwidth;
-            mywidget->height = mywidget->wheight;
-        }
         findnextstring(temp, desc, &base);
         mywidget->msg = evNone;
         for (i=0; i<evBoxs; i++)
@@ -420,6 +414,12 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
                 mywidget->phases, mywidget->value,
                 mywidget->wx, mywidget->wy, mywidget->wwidth, mywidget->wwidth,
                 mywidget->msg);
+        if (mywidget->bitmap[0] == NULL || mywidget->width == 0 || mywidget->height == 0)
+        {
+            mywidget->bitmap[0] = mywidget->bitmap[1];
+            mywidget->width = mywidget->wwidth;
+            mywidget->height = mywidget->wheight;
+        }
     }
     else if(!strncmp(desc, "pimage", 6))
     {
