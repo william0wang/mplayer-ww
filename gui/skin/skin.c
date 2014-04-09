@@ -626,11 +626,6 @@ static int parse_potmeter(guiItem *item, char *in)
     h   = cutInt(in, ',', 9);
     cutStr(in, buf, ',', 10);
 
-    if (d < 0 || d > 100) {
-        skin_error(MSGTR_GUI_MSG_SkinErrorDefault, d);
-        return 1;
-    }
-
     message = appFindMessage(buf);
 
     if (message == -1) {
@@ -640,6 +635,11 @@ static int parse_potmeter(guiItem *item, char *in)
     // legacy
     else
         skin_legacy("evSetURL", buf);
+
+    if (d < 0 || d > 100) {
+        skin_error(MSGTR_GUI_MSG_SkinErrorDefault, d);
+        return 1;
+    }
 
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    %s image: %s %d,%d %dx%d\n", currItem, phfname, x, y, w, h);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     button image: %s %dx%d\n", bfname, bwidth, bheight);
@@ -791,11 +791,6 @@ static int item_pimage(char *in)
     h   = cutInt(in, ',', 6);
     cutStr(in, buf, ',', 7);
 
-    if (d < 0 || d > 100) {
-        skin_error(MSGTR_GUI_MSG_SkinErrorDefault, d);
-        return 1;
-    }
-
     message = appFindMessage(buf);
 
     if (message == -1) {
@@ -805,6 +800,11 @@ static int item_pimage(char *in)
     // legacy
     else
         skin_legacy("evSetURL", buf);
+
+    if (d < 0 || d > 100) {
+        skin_error(MSGTR_GUI_MSG_SkinErrorDefault, d);
+        return 1;
+    }
 
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    %s image: %s %d,%d %dx%d\n", currItem, phfname, x, y, w, h);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     numphases: %d, default: %d%%\n", num, d);
