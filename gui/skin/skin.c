@@ -306,8 +306,7 @@ static int item_base(char *in)
 {
     unsigned char fname[256];
     unsigned char file[512];
-    int x, y;
-    int w = 0, h = 0;
+    int x, y, w, h;
     int is_video, is_bar, is_menu;
 
     if (!window_item(currItem))
