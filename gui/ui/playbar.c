@@ -166,7 +166,7 @@ static void uiPlaybarMouse( int Button, int X, int Y, int RX, int RY )
 
         break;
    case wsRLMouseButton:
-        if ( SelectedItem != -1 )   // NOTE TO MYSELF: only if itButton, itHPotmeter or itVPotmeter
+        if ( SelectedItem != -1 )   // NOTE TO MYSELF: only if hasButton
          {
           item=&guiApp.playbarItems[SelectedItem];
           item->pressed=btnReleased;
