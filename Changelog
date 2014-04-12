@@ -41,6 +41,9 @@ MPlayer
       entries in the skin configuration file
     * New symbol character (r) and new dynamic label variables ($D, $U, $P)
     * New items (pimage, rpotmeter)
+    * Updated skins (avifile, Blue, Blue-small, Clearlooks, Corelian,
+      disappearer, mentalic, mplayer_red, nativeRed, neutron, phony, plastic,
+      slim, softgrip, standard, trium, tvisor, xanim)
 
   1.1: "We gave up on 1.0"
 
