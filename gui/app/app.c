@@ -21,6 +21,8 @@
  * @brief GUI application helpers
  */
 
+#include <math.h>
+
 #include "app.h"
 #include "gui.h"
 #include "gui/skin/font.h"
@@ -177,6 +179,31 @@ guiItem *appFindItem(int event)
             return &item[i];
 
     return NULL;
+}
+
+/**
+ * @brief Calculate the radian of a point inside the visual representation
+ *        of an item.
+ *
+ * @param item pointer to the item
+ * @param x x position of the point
+ * @param y y position of the point
+ *
+ * @return radian of the point
+ *
+ * @note The return value is a @a clockwise radian.
+ */
+double appRadian(guiItem *item, int x, int y)
+{
+    double tx, ty;
+
+    // transform the center to (0,0)
+    tx = x - item->width / 2.0;
+    ty = y - item->height / 2.0;
+
+    // the y-axis is upside down and must be mirrored
+    // the x-axis is being mirrored for a clockwise radian
+    return (tx == 0.0 && ty == 0.0 ? 0.0 : atan2(-ty, -tx) + M_PI);
 }
 
 /**

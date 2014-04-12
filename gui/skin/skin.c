@@ -21,6 +21,7 @@
  * @brief Skin parser
  */
 
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -35,6 +36,7 @@
 
 #include "help_mp.h"
 #include "mp_msg.h"
+#include "libavutil/attributes.h"
 #include "libavutil/avstring.h"
 #include "libavutil/common.h"
 
@@ -589,12 +591,14 @@ static int item_menu(char *in)
 }
 
 /**
- * @brief Parse a hpotmeter or vpotmeter definition.
+ * @brief Parse a hpotmeter, vpotmeter or rpotmeter definition.
  *
- *        Parameters: button,bwidth,bheight,phases,numphases,default,x,y,width,height,message
+ *        Parameters: button,bwidth,bheight,phases,numphases,[x0,y0,x1,y1,]default,x,y,width,height,message
  *
  * @param item pointer to item to store the parameters in
  * @param in definition to be analyzed
+ *
+ * @note item->type is already available.
  *
  * @return 0 (ok) or 1 (error)
  */
@@ -603,6 +607,7 @@ static int parse_potmeter(guiItem *item, char *in)
     unsigned char bfname[256];
     unsigned char phfname[256];
     unsigned char buf[512];
+    int i = 0, av_uninit(x0), av_uninit(y0), av_uninit(x1), av_uninit(y1);
     int bwidth, bheight, num, d, x, y, w, h, message;
 
     if (!window_item(currItem))
@@ -613,17 +618,25 @@ static int parse_potmeter(guiItem *item, char *in)
     if (in_window("menu"))
         return 1;
 
-    cutStr(in, bfname, ',', 0);
-    bwidth  = cutInt(in, ',', 1);
-    bheight = cutInt(in, ',', 2);
-    cutStr(in, phfname, ',', 3);
-    num = cutInt(in, ',', 4);
-    d   = cutInt(in, ',', 5);
-    x   = cutInt(in, ',', 6);
-    y   = cutInt(in, ',', 7);
-    w   = cutInt(in, ',', 8);
-    h   = cutInt(in, ',', 9);
-    cutStr(in, buf, ',', 10);
+    cutStr(in, bfname, ',', i++);
+    bwidth  = cutInt(in, ',', i++);
+    bheight = cutInt(in, ',', i++);
+    cutStr(in, phfname, ',', i++);
+    num = cutInt(in, ',', i++);
+
+    if (item->type == itRPotmeter) {
+        x0 = cutInt(in, ',', i++);
+        y0 = cutInt(in, ',', i++);
+        x1 = cutInt(in, ',', i++);
+        y1 = cutInt(in, ',', i++);
+    }
+
+    d = cutInt(in, ',', i++);
+    x = cutInt(in, ',', i++);
+    y = cutInt(in, ',', i++);
+    w = cutInt(in, ',', i++);
+    h = cutInt(in, ',', i++);
+    cutStr(in, buf, ',', i++);
 
     message = appFindMessage(buf);
 
@@ -655,6 +668,19 @@ static int parse_potmeter(guiItem *item, char *in)
     item->value     = (float)d;
     item->message   = message;
     item->pressed   = btnReleased;
+
+    if (item->type == itRPotmeter) {
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     start: %d,%d / stop: %d,%d\n", x0, y0, x1, y1);
+
+        item->zeropoint = appRadian(item, x0, y0);
+        item->arclength = appRadian(item, x1, y1) - item->zeropoint;
+
+        if (item->arclength < 0.0)
+            item->arclength += 2 * M_PI;
+        // else check if radians of (x0,y0) and (x1,y1) only differ below threshold
+        else if (item->arclength < 0.05)
+            item->arclength = 2 * M_PI;
+    }
 
     item->Bitmap.Image = NULL;
 
@@ -730,6 +756,29 @@ static int item_vpotmeter(char *in)
         return 1;
 
     item->type = itVPotmeter;
+
+    return parse_potmeter(item, in);
+}
+
+/**
+ * @brief Parse a @a rpotmeter definition.
+ *
+ *        Syntax: rpotmeter=button,bwidth,bheight,phases,numphases,x0,y0,x1,y1,default,x,y,width,height,message
+ *
+ * @param in definition to be analyzed
+ *
+ * @return 0 (ok) or 1 (error)
+ */
+static int item_rpotmeter(char *in)
+{
+    guiItem *item;
+
+    item = next_item();
+
+    if (!item)
+        return 1;
+
+    item->type = itRPotmeter;
 
     return parse_potmeter(item, in);
 }
@@ -1075,6 +1124,7 @@ static _item skinItem[] = {
     { "menu",       item_menu       },
     { "pimage",     item_pimage     },
     { "potmeter",   item_potmeter   }, // legacy
+    { "rpotmeter",  item_rpotmeter  },
     { "section",    item_section    },
     { "selected",   item_selected   },
     { "slabel",     item_slabel     },

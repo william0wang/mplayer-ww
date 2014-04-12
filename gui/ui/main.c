@@ -18,6 +18,7 @@
 
 /* main window */
 
+#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/stat.h>
@@ -95,10 +96,13 @@ static void uiMainMouse( int Button,int X,int Y,int RX,int RY )
  static int     itemtype = 0;
         int     i;
         guiItem * item = NULL;
+ static double  prev_point;
+        double  point;
         float   value = 0.0f;
 
  static int     SelectedItem = -1;
         int     currentselected = -1;
+ static int     endstop;
 
  for ( i=0;i <= guiApp.IndexOfMainItems;i++ )
   if ( ( guiApp.mainItems[i].pressed != btnDisabled )&&
@@ -135,6 +139,13 @@ static void uiMainMouse( int Button,int X,int Y,int RX,int RY )
                   { item->pressed=btnDisabled; }
                  break;
            }*/
+          if ( itemtype == itRPotmeter )
+           {
+            prev_point=appRadian( item, X - item->x, Y - item->y ) - item->zeropoint;
+            if ( prev_point < 0.0 ) prev_point+=2*M_PI;
+            if ( prev_point <= item->arclength ) endstop=False;
+            else endstop=STOPPED_AT_0 + STOPPED_AT_100;   // block movement
+           }
           break;
    case wsRLMouseButton:
           boxMoved=False;
@@ -154,6 +165,12 @@ static void uiMainMouse( int Button,int X,int Y,int RX,int RY )
             case itVPotmeter:
                  value=100.0 - 100.0 * ( Y - item->y ) / item->height;
                  break;
+            case itRPotmeter:
+                 if ( endstop ) { itemtype=0; return; }
+                 point=appRadian( item, X - item->x, Y - item->y ) - item->zeropoint;
+                 if ( point < 0.0 ) point+=2*M_PI;
+                 value=100.0 * point / item->arclength;
+                 break;
            }
           uiEvent( item->message,value );
           itemtype=0;
@@ -170,7 +187,7 @@ rollerhandled:
           if (currentselected != - 1)
            {
             item=&guiApp.mainItems[currentselected];
-            if ( ( item->type == itHPotmeter )||( item->type == itVPotmeter ) )
+            if ( ( item->type == itHPotmeter )||( item->type == itVPotmeter )||( item->type == itRPotmeter ) )
              {
               item->value=constrain(item->value + value);
               uiEvent( item->message,item->value );
@@ -189,6 +206,45 @@ rollerhandled:
             case itPRMButton:
                  if (guiApp.menuIsPresent) guiApp.menuWindow.MouseHandler( 0,RX,RY,0,0 );
                  break;
+            case itRPotmeter:
+                 point=appRadian( item, X - item->x, Y - item->y ) - item->zeropoint;
+                 if ( point < 0.0 ) point+=2*M_PI;
+                 if ( item->arclength < 2 * M_PI )
+                 /* a potmeter with separated 0% and 100% positions */
+                  {
+                   value=item->value;
+                   if ( point - prev_point > M_PI )
+                   /* turned beyond the 0% position */
+                    {
+                     if ( !endstop )
+                      {
+                       endstop=STOPPED_AT_0;
+                       value=0.0f;
+                      }
+                    }
+                   else if ( prev_point - point > M_PI )
+                   /* turned back from beyond the 0% position */
+                    {
+                     if ( endstop == STOPPED_AT_0 ) endstop=False;
+                    }
+                   else if ( prev_point <= item->arclength && point > item->arclength )
+                   /* turned beyond the 100% position */
+                    {
+                     if ( !endstop )
+                      {
+                       endstop=STOPPED_AT_100;
+                       value=100.0f;
+                      }
+                    }
+                   else if ( prev_point > item->arclength && point <= item->arclength )
+                   /* turned back from beyond the 100% position */
+                    {
+                     if ( endstop == STOPPED_AT_100 ) endstop=False;
+                    }
+                  }
+                 if ( !endstop ) value=100.0 * point / item->arclength;
+                 prev_point=point;
+                 goto potihandled;
             case itVPotmeter:
                  value=100.0 - 100.0 * ( Y - item->y ) / item->height;
                  goto potihandled;

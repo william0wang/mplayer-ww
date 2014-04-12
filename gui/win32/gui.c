@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include <math.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <shlobj.h>
@@ -115,6 +116,19 @@ LPSTR acp (LPCSTR utf8)
     }
 
     return "?";
+}
+
+double appRadian (widget *item, int x, int y)
+{
+  double tx, ty;
+
+  // transform the center to (0,0)
+  tx = x - item->wwidth / 2.0;
+  ty = y - item->wheight / 2.0;
+
+  // the y-axis is upside down and must be mirrored
+  // the x-axis is being mirrored for a clockwise radian
+  return (tx == 0.0 && ty == 0.0 ? 0.0 : atan2(-ty, -tx) + M_PI);
 }
 
 static void console_toggle(gui_t *gui)
@@ -304,10 +318,10 @@ static void updatedisplay(gui_t *gui, HWND hwnd)
 
     if(!hwnd) return;
 
-    /* load all hpotmeters vpotmeters pimages */
+    /* load all hpotmeters vpotmeters rpotmeters pimages */
     for(i=0; i<gui->skin->widgetcount; i++)
     {
-        if(gui->skin->widgets[i]->type == tyHpotmeter || gui->skin->widgets[i]->type == tyVpotmeter || gui->skin->widgets[i]->type == tyPimage)
+        if(gui->skin->widgets[i]->type == tyHpotmeter || gui->skin->widgets[i]->type == tyVpotmeter || gui->skin->widgets[i]->type == tyRpotmeter || gui->skin->widgets[i]->type == tyPimage)
         {
             if(gui->skin->widgets[i]->msg == evSetVolume)
                 gui->skin->widgets[i]->value = guiInfo.Volume;
@@ -695,6 +709,8 @@ static LRESULT CALLBACK VideoProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
 /* Window Proc for the gui Window */
 static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    static double prev_point;
+    static int endstop;
     gui_t *gui = (gui_t *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
     /* Avoid processing when then window doesn't match gui mainwindow */
@@ -833,6 +849,14 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                 renderwidget(gui->skin, get_drawground(hWnd), gui->activewidget, 0);
                 RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
                 handlemsg(hWnd, gui->activewidget->msg);
+
+                if(gui->activewidget->type == tyRpotmeter)
+                {
+                    prev_point = appRadian(gui->activewidget, gui->mousewx, gui->mousewy) - gui->activewidget->zeropoint;
+                    if(prev_point < 0.0) prev_point += 2 * M_PI;
+                    if(prev_point <= gui->activewidget->arclength) endstop=FALSE;
+                    else endstop=STOPPED_AT_0 + STOPPED_AT_100;   // block movement
+                }
             }
             break;
         }
@@ -942,8 +966,49 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                         item->y = GET_Y_LPARAM(lParam) - gui->mousewy;
                         item->value = 100.0 - 100.0 * (item->y - item->wy) / (item->wheight - item->height);
                     }
+                    if(item->type == tyRpotmeter)
+                    {
+                        double point;
 
-                    if((item->type == tyHpotmeter) || (item->type == tyVpotmeter))
+                        point = appRadian(item, GET_X_LPARAM(lParam) - gui->activewidget->x, GET_Y_LPARAM(lParam) - gui->activewidget->y) - item->zeropoint;
+                        if(point < 0.0) point += 2 * M_PI;
+                        if(item->arclength < 2 * M_PI)
+                        /* a potmeter with separated 0% and 100% positions */
+                        {
+                            if(point - prev_point > M_PI)
+                            /* turned beyond the 0% position */
+                            {
+                                if(!endstop)
+                                {
+                                    endstop = STOPPED_AT_0;
+                                    item->value = 0.0f;
+                                }
+                            }
+                            else if(prev_point - point > M_PI)
+                            /* turned back from beyond the 0% position */
+                            {
+                                if(endstop == STOPPED_AT_0) endstop = FALSE;
+                            }
+                            else if(prev_point <= item->arclength && point > item->arclength)
+                            /* turned beyond the 100% position */
+                            {
+                                if (!endstop)
+                                {
+                                    endstop = STOPPED_AT_100;
+                                    item->value = 100.0f;
+                                }
+                            }
+                            else if(prev_point > item->arclength && point <= item->arclength)
+                            /* turned back from beyond the 100% position */
+                            {
+                                if(endstop == STOPPED_AT_100) endstop = FALSE;
+                            }
+                        }
+                        if(!endstop) item->value = 100.0 * point / item->arclength;
+                        prev_point = point;
+                    }
+
+                    if((item->type == tyHpotmeter) || (item->type == tyVpotmeter) || (item->type == tyRpotmeter))
                     {
                         /* Bound checks */
                         if(item->value > 100.0f)

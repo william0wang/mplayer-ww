@@ -19,6 +19,14 @@
 #ifndef MPLAYER_GUI_UI_H
 #define MPLAYER_GUI_UI_H
 
+/// End stops of a rotary potentiometer (::itRPotmeter)
+enum
+{
+  NOT_STOPPED,
+  STOPPED_AT_0,
+  STOPPED_AT_100
+};
+
 extern unsigned char * menuDrawBuffer;
 extern int             mainVisible;
 

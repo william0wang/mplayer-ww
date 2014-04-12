@@ -25,12 +25,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <inttypes.h>
+#include <math.h>
 #include <windows.h>
 
 #include "mp_msg.h"
 #include "help_mp.h"
 #include "cpudetect.h"
 #include "libswscale/swscale.h"
+#include "libavutil/attributes.h"
+#include "libavutil/common.h"
 #include "libavutil/imgutils.h"
 #include "gui.h"
 #include "gui/util/mem.h"
@@ -364,12 +367,13 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
               (mywidget->bitmap[0]) ? mywidget->bitmap[0]->name : NULL,
                mywidget->x, mywidget->y, mywidget->width, mywidget->height, mywidget->msg);
     }
-    else if(!strncmp(desc, "hpotmeter", 9) || !strncmp(desc, "vpotmeter", 9) || /* legacy */ !strncmp(desc, "potmeter", 8))
+    else if(!strncmp(desc, "hpotmeter", 9) || !strncmp(desc, "vpotmeter", 9) || !strncmp(desc, "rpotmeter", 9) || /* legacy */ !strncmp(desc, "potmeter", 8))
     {
         int base = counttonextchar(desc, '=') + 1;
-        int i;
+        int i, av_uninit(x0), av_uninit(y0), av_uninit(x1), av_uninit(y1);
         /* hpotmeter = button, bwidth, bheight, phases, numphases, default, X, Y, width, height, message */
         if(!strncmp(desc, "vpotmeter", 9)) mywidget->type = tyVpotmeter;
+        else if(!strncmp(desc, "rpotmeter", 9)) mywidget->type = tyRpotmeter;
         else mywidget->type = tyHpotmeter;
         if (*desc == 'p')
         {
@@ -388,6 +392,15 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
         }
         mywidget->bitmap[1] = pngRead(skin, findnextstring(temp, desc, &base));
         mywidget->phases = atoi(findnextstring(temp, desc, &base));
+
+        if (*desc == 'r')
+        {
+            x0 = atoi(findnextstring(temp, desc, &base));
+            y0 = atoi(findnextstring(temp, desc, &base));
+            x1 = atoi(findnextstring(temp, desc, &base));
+            y1 = atoi(findnextstring(temp, desc, &base));
+        }
+
         mywidget->value = atof(findnextstring(temp, desc, &base));
         mywidget->x = mywidget->wx = atoi(findnextstring(temp, desc, &base));
         mywidget->y = mywidget->wy = atoi(findnextstring(temp, desc, &base));
@@ -406,17 +419,37 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
                 break;
             }
         }
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [ITEM] %s %s %i %i %s %i %f %i %i %i %i msg %i\n",
-                (mywidget->type == tyHpotmeter) ? "[HPOTMETER]" : "[VPOTMETER]",
+        if (*desc == 'r')
+        {
+            mywidget->zeropoint = appRadian(mywidget, x0, y0);
+            mywidget->arclength = appRadian(mywidget, x1, y1) - mywidget->zeropoint;
+
+            if (mywidget->arclength < 0.0) mywidget->arclength += 2 * M_PI;
+            // else check if radians of (x0,y0) and (x1,y1) only differ below threshold
+            else if (mywidget->arclength < 0.05) mywidget->arclength = 2 * M_PI;
+        }
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [ITEM] %s %s %i %i %s %i ",
+                (mywidget->type == tyHpotmeter) ? "[HPOTMETER]" : (mywidget->type == tyVpotmeter) ? "[VPOTMETER]" : "[RPOTMETER]",
                 (mywidget->bitmap[0]) ? mywidget->bitmap[0]->name : NULL,
                 mywidget->width, mywidget->height,
                 (mywidget->bitmap[1]) ? mywidget->bitmap[1]->name : NULL,
-                mywidget->phases, mywidget->value,
+                mywidget->phases);
+        if (*desc == 'r')
+            mp_msg(MSGT_GPLAYER, MSGL_DBG2, "%i,%i %i,%i ", x0, y0, x1, y1);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "%f %i %i %i %i msg %i\n", mywidget->value,
                 mywidget->wx, mywidget->wy, mywidget->wwidth, mywidget->wwidth,
                 mywidget->msg);
         if (mywidget->bitmap[0] == NULL || mywidget->width == 0 || mywidget->height == 0)
         {
             mywidget->bitmap[0] = mywidget->bitmap[1];
+            mywidget->width = mywidget->wwidth;
+            mywidget->height = mywidget->wheight;
+        }
+        if (*desc == 'r')
+        {
+            mywidget->maxwh = FFMAX(mywidget->width, mywidget->height);
+
+            // clickedinsidewidget() checks with width/height, so set it
             mywidget->width = mywidget->wwidth;
             mywidget->height = mywidget->wheight;
         }

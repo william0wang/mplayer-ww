@@ -377,13 +377,23 @@ blocks.
   <anchor id="skin-vpotmeter"/>vpotmeter = button, bwidth, bheight, phases, numphases, default, X, Y, width, height, message
   </literal></term>
   <listitem><para>
-  Place a horizontal (hpotmeter) or vertical (vpotmeter) potmeter of
+  </para></listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><literal>
+  <anchor id="skin-rpotmeter"/>rpotmeter = button, bwidth, bheight, phases, numphases, x<subscript>0</subscript>, y<subscript>0</subscript>, x<subscript>1</subscript>, y<subscript>1</subscript>, default, X, Y, width, height, message
+  </literal></term>
+  <listitem><para>
+  Place a horizontal (<literal>hpotmeter</literal>), vertical (<literal>vpotmeter</literal>) or rotary (<literal>rpotmeter</literal>) potmeter of
   <literal>width</literal> * <literal>height</literal> size at position
   <literal>X,Y</literal>. The image can be divided into different parts for the
   different phases of the potmeter (for example, you can have a pot for volume
   control that turns from green to red while its value changes from the minimum
-  to the maximum.). <literal>hpotmeter</literal> can have a button that can be
-  dragged horizontally. The parameters are:
+  to the maximum). All potentiometers can have a button that can be dragged
+  with a <literal>hpotmeter</literal> and <literal>vpotmeter</literal>. A
+  <literal>rpotmeter</literal> can be spun even without a button. The
+  parameters are:
   <itemizedlist>
   <listitem><para>
     <literal>button</literal> - the image to be used for the
@@ -397,9 +407,10 @@ blocks.
   </para></listitem>
   <listitem><para>
     <literal>phases</literal> - the image to be used for the
-    different phases of the hpotmeter. A special value of <literal>NULL</literal>
+    different phases of the potentiometer. A special value of <literal>NULL</literal>
     can be used if you want no such image. The image must be divided into
-    <literal>numphases</literal> parts below each other (resp. side by side for vpotmeter) like this:
+    <literal>numphases</literal> parts below each other (resp. side by side
+    for <literal>vpotmeter</literal>) like this:
     <informalfigure><screen>
 +------------+
 |  phase #1  |                vpotmeter only:
@@ -417,19 +428,31 @@ blocks.
     <literal>phases</literal> image
   </para></listitem>
   <listitem><para>
-    <literal>default</literal> - default value for hpotmeter
+    <literal>x<subscript>0</subscript></literal>,
+    <literal>y<subscript>0</subscript></literal> and
+    <literal>x<subscript>1</subscript></literal>,
+    <literal>y<subscript>1</subscript></literal> - position of the 0% start
+    point and 100% stop point for the potentiometer <emphasis role="bold">(<literal>rpotmeter</literal> only)</emphasis></para>
+    <para>The first coordinate <literal>x<subscript>0</subscript>,y<subscript>0</subscript></literal>
+    defines the 0% start point (on the edge of the potentiometer) in the
+    image for phase #1 and the second coordinate <literal>x<subscript>1</subscript>,y<subscript>1</subscript></literal>
+    the 100% stop point in the image for phase #n - in other words, the
+    coordinates of the tip of the mark on the potentiometer in the two
+    individual images.</para></listitem>
+  <listitem><para>
+    <literal>default</literal> - default value for the potentiometer
     (in the range <literal>0</literal> to <literal>100</literal>)
   </para></listitem>
   <listitem><para>
-    <literal>X</literal>, <literal>Y</literal> - position for the hpotmeter
+    <literal>X</literal>, <literal>Y</literal> - position for the potentiometer
   </para></listitem>
   <listitem><para>
     <literal>width</literal>, <literal>height</literal> - width and height
-    of the <literal>hpotmeter</literal>
+    of the potentiometer
   </para></listitem>
   <listitem><para>
     <literal>message</literal> - the message to be generated when the
-    value of <literal>hpotmeter</literal> is changed
+    value of the potentiometer is changed
   </para></listitem>
   </itemizedlist>
   </para></listitem>

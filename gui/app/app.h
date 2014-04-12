@@ -102,6 +102,7 @@ enum {
     itDLabel,
     itHPotmeter,
     itVPotmeter,
+    itRPotmeter,
     itPimage,
     itMenu,
     itPLMButton = 100,
@@ -132,6 +133,7 @@ typedef struct {
     int pbwidth, pbheight;
     int numphases;
     float value;
+    double zeropoint, arclength;
 
     int message;
 
@@ -180,6 +182,7 @@ extern guiItems guiApp;
 guiItem *appFindItem(int event);
 int appFindMessage(const char *name);
 void appFreeStruct(void);
+double appRadian(guiItem *item, int x, int y);
 void btnModify(int event, float value);
 void btnSet(int event, int state);
 void btnValue(int event, float *value);

@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 #include <windows.h>
 
 #include "gui/util/bitmap.h"
@@ -34,6 +35,7 @@
 #include "access_mpcontext.h"
 #include "help_mp.h"
 #include "libavutil/avstring.h"
+#include "libavutil/common.h"
 #include "stream/stream.h"
 
 #define MAX_LABELSIZE 250
@@ -409,11 +411,13 @@ void renderwidget(skin_t *skin, image *dest, widget *item, int state)
     if(!dest) return;
     if((item->type == tyButton) || (item->type == tyHpotmeter) || (item->type == tyVpotmeter) || (item->type == tyPimage))
         img = item->bitmap[0];
+    if(item->type == tyRpotmeter)
+        img = item->bitmap[1];
 
     if(!img) return;
 
     y = item->y;
-    if(item->type == tyPimage || /* legacy (potmeter) */ (item->type == tyHpotmeter && item->width == item->wwidth))
+    if(item->type == tyPimage || /* legacy (potmeter) */ (item->type == tyHpotmeter && item->width == item->wwidth) || item->type == tyRpotmeter)
     {
         height = img->height / item->phases;
         y =  height * (int)(item->value * item->phases / 100);
@@ -430,13 +434,20 @@ void renderwidget(skin_t *skin, image *dest, widget *item, int state)
     if(item->type == tyButton)
         render(skin->desktopbpp, dest, find_background(skin,item), item->x, item->y, item->x, item->y, img->width, height, 1);
 
-    if((item->type == tyHpotmeter) || (item->type == tyVpotmeter) || (item->type == tyPimage))
+    if((item->type == tyHpotmeter) || (item->type == tyVpotmeter) || (item->type == tyRpotmeter) || (item->type == tyPimage))
     {
         if(item->type == tyVpotmeter)
         {
             /* repaint the area behind the slider */
             render(skin->desktopbpp, dest, find_background(skin, item), item->wx, item->wy, item->wx, item->wy, item->width, item->wheight, 1);
             item->y = (100 - item->value) * (item->wheight-item->height) / 100 + item->wy;
+        }
+        else if(item->type == tyRpotmeter)
+        {
+            /* repaint the area behind the rpotmeter */
+            render(skin->desktopbpp, dest, find_background(skin, item), item->wx, item->wy, item->wx, item->wy, item->wwidth, item->wheight, 1);
+            item->x = item->wx;
+            item->y = item->wy;
         }
         else
         {
@@ -446,4 +457,31 @@ void renderwidget(skin_t *skin, image *dest, widget *item, int state)
         }
     }
     render(skin->desktopbpp, dest, img, item->x, item->y, 0, y, img->width, height, 1);
+
+    /* rpotmeter button */
+    if(item->type == tyRpotmeter && item->bitmap[0] != item->bitmap[1])
+    {
+        img = item->bitmap[0];
+
+        if(img)
+        {
+            double radius, radian;
+            int ix, iy;
+
+            // keep the button inside the potmeter outline
+            radius = (FFMIN(item->wwidth, item->wheight) - item->maxwh) / 2.0;
+
+            radian = item->value / 100.0 * item->arclength + item->zeropoint;
+
+            // coordinates plus a correction for a non-square item
+            // (remember: both axes are mirrored, we have a clockwise radian)
+            ix = item->wx + radius * (1 + cos(radian)) + FFMAX(0, (item->wwidth - item->wheight) / 2.0) + 0.5;
+            iy = item->wy + radius * (1 + sin(radian)) + FFMAX(0, (item->wheight - item->wwidth) / 2.0) + 0.5;
+
+            height = img->height / 3;
+            y = state * height;
+
+            render(skin->desktopbpp, dest, img, ix, iy, 0, y, img->width, height, 1);
+        }
+    }
 }

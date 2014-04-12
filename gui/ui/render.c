@@ -21,6 +21,7 @@
  * @brief GUI rendering
  */
 
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,6 +36,7 @@
 #include "access_mpcontext.h"
 #include "help_mp.h"
 #include "libavutil/avstring.h"
+#include "libavutil/common.h"
 #include "osdep/timer.h"
 #include "stream/stream.h"
 
@@ -477,6 +479,29 @@ void RenderAll(wsWindow *window, guiItem *items, int till, char *drawbuf)
 
             PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * item->value / 100.0, False);
             PutImage(item->x, item->y + (item->height - item->pbheight) * (1.0 - item->value / 100.0), db, dw, &item->Mask, 3, index, True);
+            break;
+
+        case itRPotmeter:
+
+            PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * item->value / 100.0, True);
+
+            if (item->Mask.Image) {
+                double radius, radian;
+                int y;
+
+                // keep the button inside the potmeter outline
+                radius = (FFMIN(item->width, item->height) - FFMAX(item->pbwidth, item->pbheight)) / 2.0;
+
+                radian = item->value / 100.0 * item->arclength + item->zeropoint;
+
+                // coordinates plus a correction for a non-square item
+                // (remember: both axes are mirrored, we have a clockwise radian)
+                x = radius * (1 + cos(radian)) + FFMAX(0, (item->width - item->height) / 2.0) + 0.5;
+                y = radius * (1 + sin(radian)) + FFMAX(0, (item->height - item->width) / 2.0) + 0.5;
+
+                PutImage(item->x + x, item->y + y, db, dw, &item->Mask, 3, index, True);
+            }
+
             break;
 
         case itSLabel:

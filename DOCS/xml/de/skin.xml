@@ -444,15 +444,28 @@ end
             </literal>
           </term>
           <listitem>
+            <para></para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>
+            <literal>
+              <anchor id="skin-rpotmeter"/>rpotmeter = button, bwidth, bheight, phases, numphases, x<subscript>0</subscript>, y<subscript>0</subscript>, x<subscript>1</subscript>, y<subscript>1</subscript>, default, X, Y, width, height, message
+            </literal>
+          </term>
+          <listitem>
             <para>
-              Platziere einen horizontal (hpotmeter) oder vertikal (vpotmeter) Potentiometer mit
+              Platziere ein horizontales (<literal>hpotmeter</literal>), vertikales (<literal>vpotmeter</literal>) oder drehbares (<literal>rpotmeter</literal>) Potentiometer
               der Größe <literal>width</literal> * <literal>height</literal> an Position
               <literal>X,Y</literal>. Die Grafik kann in unterschiedliche Teile für die
               verschiedenen Phasen des Potentiometers aufgeteilt werden (du kannst zum Beispiel
               eines für die Lautstärkeregelung haben, das von rot nach grün wechselt, während sich
               sein Wert vom Minimum zum Maximum ändert.).
-              <literal>hpotmeter</literal> kann einen Button besitzen, der horizontal gezogen
-              werden kann. Die Parameter sind:
+              Alle Potentiometer können einen Button besitzen, der bei einem
+              <literal>hpotmeter</literal> und <literal>vpotmeter</literal>
+              gezogen werden kann. Ein <literal>rpotmeter</literal> kann auch
+              ohne Button gedreht werden. Die Parameter sind:
             </para>
             <itemizedlist>
               <listitem>
@@ -471,9 +484,11 @@ end
               <listitem>
                 <para>
                   <literal>phases</literal> - die für die verschiedenen Phasen
-                  zu verwendende Grafik des hpotmeter. Ein spezieller Wert von <literal>NULL</literal>
+                  zu verwendende Grafik des Potentiometers. Ein spezieller Wert von <literal>NULL</literal>
                   kann benutzt werden, wenn du keine solche Grafik anwenden willst. Die Grafik muss
-                  in <literal>numphases</literal> untereinander (bzw. für vpotmeter nebeneinander) liegende Teile wie folgt aufgeteilt werden:
+                  in <literal>numphases</literal> untereinander (bzw. für
+                  <literal>vpotmeter</literal> nebeneinander) liegende Teile
+                  wie folgt aufgeteilt werden:
                 </para>
                 <informalfigure>
                   <screen>
@@ -497,25 +512,44 @@ end
               </listitem>
               <listitem>
                 <para>
-                  <literal>default</literal> - Standardwert für hpotmeter
+                  <literal>x<subscript>0</subscript></literal>,
+                  <literal>y<subscript>0</subscript></literal> und
+                  <literal>x<subscript>1</subscript></literal>,
+                  <literal>y<subscript>1</subscript></literal> - Position des
+                  0%-Start-Punkts und 100%-Stopp-Punkts des Potentiometers
+                  <emphasis role="bold">(nur für <literal>rpotmeter</literal>)</emphasis>
+                </para>
+                <para>
+                  Die erste Koordinate <literal>x<subscript>0</subscript>,y<subscript>0</subscript></literal>
+                  definiert den 0%-Start-Punkt (auf dem Rand des
+                  Potentiometer) in der Grafik für Phase #1 und die zweite
+                  Koordinate <literal>x<subscript>1</subscript>,y<subscript>1</subscript></literal>
+                  den 100%-Stopp-Punkt in der Grafik für Phase #n - mit
+                  anderen Worten: die Koordinaten der Spitze der Markierung
+                  auf dem Potentiometer in den beiden einzelnen Grafiken.
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <literal>default</literal> - Voreinstellung des Potentiometers
                   (im Bereich <literal>0</literal> bis <literal>100</literal>)
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <literal>X</literal>, <literal>Y</literal> - Position fürs hpotmeter
+                  <literal>X</literal>, <literal>Y</literal> - Position des Potentiometers
                 </para>
               </listitem>
               <listitem>
                 <para>
                   <literal>width</literal>, <literal>height</literal> - Breite und Höhe
-                  des <literal>hpotmeter</literal>
+                  des Potentiometers
                 </para>
               </listitem>
               <listitem>
                 <para>
                   <literal>message</literal> - die Nachricht, die erzeugt werden soll,
-                  wenn der Wert des <literal>hpotmeter</literal> geändert wird
+                  wenn der Wert des Potentiometers geändert wird
                 </para>
               </listitem>
             </itemizedlist>

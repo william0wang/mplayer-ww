@@ -61,12 +61,15 @@ typedef struct
     int width, height;              /* width and height of the button */
     int wwidth, wheight;            /* width and height of the widget */
     // ---
+    int maxwh;
     // ---
     int msg, msg2;
     int pressed, tmp;
     int key, key2;
     int phases;
     float value;
+    double zeropoint;
+    double arclength;
     image *bitmap[2];               /* Associated image(s) in imagepool */
     // ---
     font_t *font;
@@ -121,6 +124,7 @@ skin_t *loadskin(char *skindir, int desktopbpp);
 #define tyMenu          6
 #define tySlabel        7
 #define tyDlabel        8
+#define tyRpotmeter     9
 
 /* --- Window types --- */
 

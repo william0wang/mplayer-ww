@@ -48,9 +48,9 @@
 #define isInside(x, y, tx, ty, bx, by) ((x) > (tx) && (y) > (ty) && (x) < (bx) && (y) < (by))
 
 /// Check whether #guiItem @a item has a button (and thus a pressed state).
-#define hasButton(item) (item.type == itButton || item.type == itHPotmeter || item.type == itVPotmeter)
+#define hasButton(item) (item.type == itButton || item.type == itHPotmeter || item.type == itVPotmeter || item.type == itRPotmeter)
 
 /// Check whether #guiItem @a item utilizes member 'value'
-#define hasValue(item) (item.type == itHPotmeter || item.type == itVPotmeter || item.type == itPimage)
+#define hasValue(item) (item.type == itHPotmeter || item.type == itVPotmeter || item.type == itRPotmeter || item.type == itPimage)
 
 #endif /* MPLAYER_GUI_GUI_H */

@@ -40,7 +40,7 @@ MPlayer
     * Console message with information on deprecated (but still supported)
       entries in the skin configuration file
     * New symbol character (r) and new dynamic label variables ($D, $U, $P)
-    * New item: pimage
+    * New items (pimage, rpotmeter)
 
   1.1: "We gave up on 1.0"
 
