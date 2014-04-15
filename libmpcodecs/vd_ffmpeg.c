@@ -477,9 +477,6 @@ static int init(sh_video_t *sh){
         avctx->bits_per_coded_sample= sh->bih->biBitCount;
 
     set_dr_slice_settings(avctx, lavc_codec);
-    if(lavc_codec->capabilities & CODEC_CAP_HWACCEL)
-        // HACK around badly placed checks in mpeg_mc_decode_init
-        set_format_params(avctx, PIX_FMT_XVMC_MPEG2_IDCT);
     avctx->thread_count = lavc_param_threads;
     avctx->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
     avctx->refcounted_frames = 1;
@@ -751,17 +748,10 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
 #if CONFIG_XVMC
     if(IMGFMT_IS_XVMC(mpi->imgfmt)) {
         struct xvmc_pix_fmt *render = mpi->priv; //same as data[2]
-        if(!avctx->xvmc_acceleration) {
-            mp_msg(MSGT_DECVIDEO, MSGL_INFO, MSGTR_MPCODECS_McGetBufferShouldWorkOnlyWithXVMC);
-            assert(0);
-            exit(1);
-//            return -1;//!!fixme check error conditions in ffmpeg
-        }
         if(!(mpi->flags & MP_IMGFLAG_DIRECT)) {
             mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_MPCODECS_OnlyBuffersAllocatedByVoXvmcAllowed);
             assert(0);
-            exit(1);
-//            return -1;//!!fixme check error conditions in ffmpeg
+            return -1;//!!fixme check error conditions in ffmpeg
         }
         if(mp_msg_test(MSGT_DECVIDEO, MSGL_DBG5))
             mp_msg(MSGT_DECVIDEO, MSGL_DBG5, "vd_ffmpeg::get_buffer (xvmc render=%p)\n", render);
