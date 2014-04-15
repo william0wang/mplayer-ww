@@ -7235,7 +7235,7 @@ echocheck "Xvid"
 if test "$_xvid" = auto ; then
   _xvid=no
   for ld_tmp in "-lxvidcore" "-lxvidcore $ld_pthread" ; do
-    statement_check xvid.h 'xvid_global(0, 0, 0, 0)' $ld_tmp &&
+    statement_check xvid.h 'xvid_plugin_ssim_t xs; xvid_global(0, 0, 0, 0)' $ld_tmp &&
       extra_ldflags="$extra_ldflags $ld_tmp" && _xvid=yes && break
   done
 fi
