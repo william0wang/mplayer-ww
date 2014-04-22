@@ -1076,7 +1076,7 @@ void wsWindowBackground(wsWindow *win, int r, int g, int b)
         break;
 
     default:
-        ;
+        break;
     }
 
     if (r == -1 && g == -1 && b == -1) {

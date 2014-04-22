@@ -458,6 +458,7 @@ play:
         case 1:
         default:
             aspect = -1;
+            break;
         }
 
         snprintf(cmd, sizeof(cmd), "pausing_keep switch_ratio %f", aspect);
