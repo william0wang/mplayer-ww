@@ -630,13 +630,13 @@ GtkWidget * CreatePopUpMenu( void )
     D=AddMenuCheckItem( window1, (const char*)aspect43_xpm, AspectMenu,"4:3", a43, evSetAspect + ( 3 << 16 ) );
     F=AddMenuCheckItem( window1, (const char*)aspect235_xpm, AspectMenu,MSGTR_GUI_235To1, a235, evSetAspect + ( 4 << 16 ) );
 
-  if ( !guiInfo.Playing )
-   {
-    gtk_widget_set_sensitive( H,FALSE );
-    gtk_widget_set_sensitive( N,FALSE );
-    gtk_widget_set_sensitive( D,FALSE );
-    gtk_widget_set_sensitive( F,FALSE );
-   }
+    if ( !guiInfo.Playing )
+     {
+      gtk_widget_set_sensitive( H,FALSE );
+      gtk_widget_set_sensitive( N,FALSE );
+      gtk_widget_set_sensitive( D,FALSE );
+      gtk_widget_set_sensitive( F,FALSE );
+     }
    }
 
   if ( guiInfo.VideoWindow )
@@ -655,13 +655,13 @@ GtkWidget * CreatePopUpMenu( void )
     D=AddMenuCheckItem( window1, (const char*)double_xpm, Menu,MSGTR_GUI_SizeDouble,b2,evDoubleSize );
     N=AddMenuCheckItem( window1, (const char*)normal_xpm, Menu,MSGTR_GUI_SizeNormal"      ",b1,evNormalSize );
     H=AddMenuCheckItem( window1, (const char*)half_xpm, Menu,MSGTR_GUI_SizeHalf,b_half,evHalfSize );
-  if ( !guiInfo.Playing )
-   {
-    gtk_widget_set_sensitive( H,FALSE );
-    gtk_widget_set_sensitive( N,FALSE );
-    gtk_widget_set_sensitive( D,FALSE );
-    gtk_widget_set_sensitive( F,FALSE );
-   }
+    if ( !guiInfo.Playing )
+     {
+      gtk_widget_set_sensitive( H,FALSE );
+      gtk_widget_set_sensitive( N,FALSE );
+      gtk_widget_set_sensitive( D,FALSE );
+      gtk_widget_set_sensitive( F,FALSE );
+     }
    }
 
   AddSeparator( Menu );
