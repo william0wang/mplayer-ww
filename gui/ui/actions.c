@@ -705,8 +705,8 @@ void uiUnsetFile(void)
 /**
  * @brief Unset media information.
  *
- * @param totals whether to unset number of chapters and angles (#True) or
- *               just track, chapter and angle (#False) as well
+ * @param totals whether to additionally unset number of chapters and angles (#True)
+ *               or just track, chapter and angle (#False)
  */
 void uiUnsetMedia(int totals)
 {
