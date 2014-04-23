@@ -37,6 +37,8 @@ MPlayer
 
     GUI:
     * Support for TV/DVB
+    * Various improvements of the context menu and the preferences dialog
+    * Revision of the user interface texts
     * Console message with information on deprecated (but still supported)
       entries in the skin configuration file
     * New symbol character (r) and new dynamic label variables ($D, $U, $P)
