@@ -281,13 +281,13 @@ static void add_vf(const char *vf)
         int i = 0;
 
         while (vf_settings[i].name) {
-            if (strcmp(vf_settings[i++].name, vf) == 0) {
-                i = -1;
+            if (strcmp(vf_settings[i].name, vf) == 0)
                 break;
-            }
+
+            i++;
         }
 
-        if (i != -1) {
+        if (!vf_settings[i].name) {
             void *settings = realloc(vf_settings, (i + 2) * sizeof(m_obj_settings_t));
 
             if (!settings)
