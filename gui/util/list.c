@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include "list.h"
+#include "mem.h"
 #include "string.h"
 #include "gui/app/gui.h"
 
@@ -269,14 +270,11 @@ void *listMgr(int cmd, void *data)
 }
 
 /**
- * @brief Set string list to @a entry.
+ * @brief Free a string list.
  *
  * @param list pointer to the string list
- * @param entry the new (and only) element of the list
- *
- * @note Actually, a new list will be created and the old list will be freed.
  */
-void listSet(char ***list, const char *entry)
+void listFree(char ***list)
 {
     if (*list) {
         char **l = *list;
@@ -286,8 +284,21 @@ void listSet(char ***list, const char *entry)
             l++;
         }
 
-        free(*list);
+        nfree(*list);
     }
+}
+
+/**
+ * @brief Set string list to @a entry.
+ *
+ * @param list pointer to the string list
+ * @param entry the new (and only) element of the list
+ *
+ * @note Actually, a new list will be created and the old list will be freed.
+ */
+void listSet(char ***list, const char *entry)
+{
+    listFree(list);
 
     *list = malloc(2 * sizeof(char *));
 
