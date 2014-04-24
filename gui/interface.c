@@ -275,7 +275,7 @@ void guiDone(void)
     mp_msg(MSGT_GPLAYER, MSGL_V, "GUI done.\n");
 }
 
-static void add_vf(char *str)
+static void add_vf(const char *vf)
 {
     void *p;
 
@@ -283,7 +283,7 @@ static void add_vf(char *str)
         int i = 0;
 
         while (vf_settings[i].name) {
-            if (!gstrcmp(vf_settings[i++].name, str)) {
+            if (!gstrcmp(vf_settings[i++].name, vf)) {
                 i = -1;
                 break;
             }
@@ -296,18 +296,18 @@ static void add_vf(char *str)
                 return;
 
             vf_settings = p;
-            vf_settings[i].name     = strdup(str);
+            vf_settings[i].name     = strdup(vf);
             vf_settings[i].attribs  = NULL;
             vf_settings[i + 1].name = NULL;
         }
     } else {
         vf_settings = malloc(2 * sizeof(m_obj_settings_t));
-        vf_settings[0].name    = strdup(str);
+        vf_settings[0].name    = strdup(vf);
         vf_settings[0].attribs = NULL;
         vf_settings[1].name    = NULL;
     }
 
-    mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_AddingVideoFilter, str);
+    mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_AddingVideoFilter, vf);
 }
 
 /**
