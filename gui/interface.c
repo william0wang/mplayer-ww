@@ -299,10 +299,13 @@ static void add_vf(const char *vf)
             memset(&vf_settings[i + 1], 0, sizeof(m_obj_settings_t));
         }
     } else {
-        vf_settings = malloc(2 * sizeof(m_obj_settings_t));
+        vf_settings = calloc(2, sizeof(m_obj_settings_t));
+
+        if (!vf_settings)
+            return;
+
         vf_settings[0].name    = strdup(vf);
         vf_settings[0].attribs = NULL;
-        vf_settings[1].name    = NULL;
     }
 
     mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_AddingVideoFilter, vf);
