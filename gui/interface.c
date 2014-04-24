@@ -131,6 +131,33 @@ static void add_vf(const char *vf, const char *const *argvf)
     mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_AddingVideoFilter, vf);
 }
 
+/**
+ * @brief Get a video filter's array of parameter/value pairs.
+ *
+ * @param vf video filter in question
+ *
+ * @return pointer to the array of parameter/value pairs
+ */
+static char **get_vf(const char *vf)
+{
+    char **attribs = NULL;
+
+    if (vf_settings) {
+        int i = 0;
+
+        while (vf_settings[i].name) {
+            if (strcmp(vf_settings[i].name, vf) == 0) {
+                attribs = vf_settings[i].attribs;
+                break;
+            }
+
+            i++;
+        }
+    }
+
+    return attribs;
+}
+
 /* MPlayer -> GUI */
 
 /**
