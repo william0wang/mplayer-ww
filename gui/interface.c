@@ -294,8 +294,8 @@ static void add_vf(const char *vf, const char *const *argvf)
                 return;
 
             vf_settings = settings;
-            vf_settings[i].name     = strdup(vf);
-            vf_settings[i].attribs  = listDup(argvf);
+            vf_settings[i].name    = strdup(vf);
+            vf_settings[i].attribs = listDup(argvf);
             memset(&vf_settings[i + 1], 0, sizeof(m_obj_settings_t));
         }
     } else {
