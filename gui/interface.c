@@ -275,7 +275,7 @@ void guiDone(void)
     mp_msg(MSGT_GPLAYER, MSGL_V, "GUI done.\n");
 }
 
-static void add_vf(const char *vf)
+static void add_vf(const char *vf, const char *const *argvf)
 {
     if (vf_settings) {
         int i = 0;
@@ -295,7 +295,7 @@ static void add_vf(const char *vf)
 
             vf_settings = settings;
             vf_settings[i].name     = strdup(vf);
-            vf_settings[i].attribs  = NULL;
+            vf_settings[i].attribs  = listDup(argvf);
             memset(&vf_settings[i + 1], 0, sizeof(m_obj_settings_t));
         }
     } else {
@@ -305,7 +305,7 @@ static void add_vf(const char *vf)
             return;
 
         vf_settings[0].name    = strdup(vf);
-        vf_settings[0].attribs = NULL;
+        vf_settings[0].attribs = listDup(argvf);
     }
 
     mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_AddingVideoFilter, vf);
@@ -505,10 +505,10 @@ int gui(int what, void *data)
         if (video_driver_list && !gstrcmp(video_driver_list[0], "dxr3"))
             if (guiInfo.StreamType != STREAMTYPE_DVD && guiInfo.StreamType != STREAMTYPE_VCD)
                 if (gtkVfLAVC)
-                    add_vf("lavc");
+                    add_vf("lavc", NULL);
 
         if (gtkVfPP)
-            add_vf("pp");
+            add_vf("pp", NULL);
 
         /* audio opts */
 
