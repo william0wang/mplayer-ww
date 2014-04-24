@@ -350,6 +350,36 @@ void listRepl(char ***list, const char *search, const char *replace)
 }
 
 /**
+ * @brief Duplicate a string list (by allocating new memory).
+ *
+ * @note The list must be NULL-terminated.
+ *
+ * @param list string list to be duplicated
+ *
+ * @return duplicated list
+ */
+char **listDup(const char *const *list)
+{
+    char **dup = NULL;
+
+    if (list) {
+        int i = 0;
+
+        while (list[i])
+            i++;
+
+        dup = calloc(i + 1, sizeof(char *));
+
+        if (dup) {
+            while (--i >= 0)
+                dup[i] = strdup(list[i]);
+        }
+    }
+
+    return dup;
+}
+
+/**
  * @brief Append or insert a file to the playlist.
  *
  * @param what file to be added
