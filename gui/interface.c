@@ -296,7 +296,7 @@ static void add_vf(const char *vf)
             vf_settings = settings;
             vf_settings[i].name     = strdup(vf);
             vf_settings[i].attribs  = NULL;
-            vf_settings[i + 1].name = NULL;
+            memset(&vf_settings[i + 1], 0, sizeof(m_obj_settings_t));
         }
     } else {
         vf_settings = malloc(2 * sizeof(m_obj_settings_t));
