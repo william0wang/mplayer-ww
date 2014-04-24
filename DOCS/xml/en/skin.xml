@@ -1087,6 +1087,12 @@ menu entries.
   Set the video window to its original aspect ratio.
   </para></listitem>
 </varlistentry>
+<varlistentry>
+  <term><emphasis role="bold">evSetRotation</emphasis></term>
+  <listitem><para>
+  Set the video to its original orientation.
+  </para></listitem>
+</varlistentry>
 </variablelist>
 
 <variablelist>

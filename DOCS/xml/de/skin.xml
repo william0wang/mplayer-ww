@@ -1292,6 +1292,14 @@ image = font.png
           </para>
         </listitem>
       </varlistentry>
+      <varlistentry>
+        <term><emphasis role="bold">evSetRotation</emphasis></term>
+        <listitem>
+          <para>
+            Bringe das Video in seine Originalorientierung.
+          </para>
+        </listitem>
+      </varlistentry>
     </variablelist>
 
     <variablelist>

@@ -466,6 +466,31 @@ play:
 
         break;
 
+    case evSetRotation:
+
+        switch (iparam) {
+        case 90:
+            guiInfo.Rotation = 1;
+            break;
+
+        case -90:
+            guiInfo.Rotation = 2;
+            break;
+
+        case 180:
+            guiInfo.Rotation = 8;
+            break;
+
+        case 0:
+        default:
+            guiInfo.Rotation = -1;
+            break;
+        }
+
+        guiInfo.MediumChanged = GUI_MEDIUM_SAME;
+
+        break;
+
 /* timer events */
     case ivRedraw:
     {

@@ -103,6 +103,8 @@ typedef struct {
     int VideoWidth;
     int VideoHeight;
 
+    int Rotation;
+
     char *CodecName;
 
     int StreamType;

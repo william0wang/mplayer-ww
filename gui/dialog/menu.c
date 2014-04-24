@@ -98,6 +98,11 @@
 #include "pixmaps/tv.xpm"
 #endif
 #include "pixmaps/empty1px.xpm"
+#include "pixmaps/rotate.xpm"
+#include "pixmaps/rotate0.xpm"
+#include "pixmaps/rotate180.xpm"
+#include "pixmaps/rotate90ccw.xpm"
+#include "pixmaps/rotate90cw.xpm"
 
 int gtkPopupMenu;
 int gtkPopupMenuParam;
@@ -442,6 +447,7 @@ GtkWidget * DVDChapterMenu;
 GtkWidget * DVDAudioLanguageMenu;
 GtkWidget * DVDSubtitleLanguageMenu;
 GtkWidget * AspectMenu;
+GtkWidget * RotationMenu;
 GtkWidget * VCDSubMenu;
 GtkWidget * VCDTitleMenu;
 GtkWidget * CDSubMenu;
@@ -614,8 +620,26 @@ GtkWidget * CreatePopUpMenu( void )
 
   if ( guiInfo.VideoWindow )
    {
-    int a11 = False, a169 = False, a43 = False, a235 = False;
     AddSeparator( Menu );
+    RotationMenu=AddSubMenu( window1, (const char*)rotate_xpm, Menu,MSGTR_GUI_Rotation );
+    N=AddMenuCheckItem( window1, (const char*)rotate0_xpm, RotationMenu,MSGTR_GUI__none_, guiInfo.Rotation == -1, evSetRotation );
+    D=AddMenuCheckItem( window1, (const char*)rotate90cw_xpm, RotationMenu,MSGTR_GUI_Rotation90CW, guiInfo.Rotation == 1, evSetRotation + ( 90 << 16 ) );
+    F=AddMenuCheckItem( window1, (const char*)rotate90ccw_xpm, RotationMenu,MSGTR_GUI_Rotation90CCW, guiInfo.Rotation == 2, evSetRotation + ( -90 << 16 ) );
+    H=AddMenuCheckItem( window1, (const char*)rotate180_xpm, RotationMenu,MSGTR_GUI_Rotation180, guiInfo.Rotation == 8, evSetRotation + ( 180 << 16 ) );
+
+    if ( !guiInfo.Playing )
+     {
+      gtk_widget_set_sensitive( N,FALSE );
+      gtk_widget_set_sensitive( D,FALSE );
+      gtk_widget_set_sensitive( F,FALSE );
+      gtk_widget_set_sensitive( H,FALSE );
+     }
+   }
+
+  if ( guiInfo.VideoWindow )
+   {
+    int a11 = False, a169 = False, a43 = False, a235 = False;
+
     if (movie_aspect == -1.0f) a11 = True;
     else
      {

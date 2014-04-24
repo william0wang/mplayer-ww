@@ -194,6 +194,7 @@ static void remove_vf(char *vf)
  */
 void guiInit(void)
 {
+    char **argvf;
     int ret;
     plItem *playlist;
 
@@ -225,6 +226,9 @@ void guiInit(void)
     gtkASS.use_margins   = ass_use_margins;
     gtkASS.top_margin    = ass_top_margin;
     gtkASS.bottom_margin = ass_bottom_margin;
+
+    argvf = get_vf("rotate");
+    guiInfo.Rotation = (argvf && argvf[1] ? atoi(argvf[1]) : -1);
 
     /* initialize graphical user interfaces */
 
@@ -575,6 +579,36 @@ int gui(int what, void *data)
 
         if (gtkVfPP)
             add_vf("pp", NULL);
+
+        switch (guiInfo.Rotation) {
+            static const char *argvf[] = { "_oldargs_", NULL, NULL };
+
+        case -1:
+            remove_vf("rotate");
+            remove_vf("flip");
+            remove_vf("mirror");
+            break;
+
+        case 1:
+            argvf[1] = "1";
+            add_vf("rotate", argvf);
+            remove_vf("flip");
+            remove_vf("mirror");
+            break;
+
+        case 2:
+            argvf[1] = "2";
+            add_vf("rotate", argvf);
+            remove_vf("flip");
+            remove_vf("mirror");
+            break;
+
+        case 8:
+            remove_vf("rotate");
+            add_vf("flip", NULL);
+            add_vf("mirror", NULL);
+            break;
+        }
 
         /* audio opts */
 

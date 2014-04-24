@@ -55,6 +55,7 @@ enum {
     evFullScreen,
     evNormalSize,
     evSetAspect,
+    evSetRotation,
     evIncVolume,
     evDecVolume,
     evSetVolume,

@@ -81,6 +81,7 @@ static const evName evNames[] =
     {   evFullScreen,           "evFullScreen"          },
     {   evNormalSize,           "evNormalSize"          },
     {   evSetAspect,            "evSetAspect"           },
+    {   evSetRotation,          "evSetRotation"         },
     {   evIncVolume,            "evIncVolume"           },
     {   evDecVolume,            "evDecVolume"           },
     {   evSetVolume,            "evSetVolume"           },

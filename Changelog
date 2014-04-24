@@ -46,6 +46,8 @@ MPlayer
     * Updated skins (avifile, Blue, Blue-small, Clearlooks, Corelian,
       disappearer, mentalic, mplayer_red, nativeRed, neutron, phony, plastic,
       slim, softgrip, standard, trium, tvisor, xanim)
+    * Video can be rotated
+    * New GUI message: evSetRotation
 
   1.1: "We gave up on 1.0"
 
