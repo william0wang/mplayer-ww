@@ -703,6 +703,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_MSG_PlaybackNeedsRestart "You need to restart playback for some options to take effect."
 #define MSGTR_GUI_MSG_RemoteDisplay "Remote display, disabling X shared memory.\n"
 #define MSGTR_GUI_MSG_RemovingSubtitle "Removing subtitle.\n"
+#define MSGTR_GUI_MSG_RemovingVideoFilter "Removing video filter '%s'.\n"
 #define MSGTR_GUI_MSG_SkinBitmapConversionError "24 bit to 32 bit conversion error in %s\n"
 #define MSGTR_GUI_MSG_SkinBitmapNotFound "Bitmap %s not found.\n"
 #define MSGTR_GUI_MSG_SkinBitmapPngReadError "PNG read error in %s\n"

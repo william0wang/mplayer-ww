@@ -912,6 +912,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_MSG_PlaybackNeedsRestart "Manche Optionen werden erst nach einem Neustart der Wiedergabe wirksam."
 #define MSGTR_GUI_MSG_RemoteDisplay "Fernes Display, X Shared Memory wird deaktiviert.\n"
 #define MSGTR_GUI_MSG_RemovingSubtitle "Untertitel werden entfernt.\n"
+#define MSGTR_GUI_MSG_RemovingVideoFilter "Videofilter '%s' wird entfernt.\n"
 #define MSGTR_GUI_MSG_SkinBitmapConversionError "24-bpp-zu-32-bpp-Konvertierungsfehler in %s\n"
 #define MSGTR_GUI_MSG_SkinBitmapNotFound "Bitmap %s nicht gefunden.\n"
 #define MSGTR_GUI_MSG_SkinBitmapPngReadError "PNG-Lesefehler in %s\n"

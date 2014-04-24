@@ -158,6 +158,35 @@ static char **get_vf(const char *vf)
     return attribs;
 }
 
+/**
+ * @brief Remove a video filter.
+ *
+ * @param vf video filter to be removed
+ */
+static void remove_vf(char *vf)
+{
+    if (vf_settings) {
+        int i = 0;
+
+        while (vf_settings[i].name) {
+            if (strcmp(vf_settings[i].name, vf) == 0) {
+                mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_RemovingVideoFilter, vf);
+
+                free(vf_settings[i].name);
+                listFree(&vf_settings[i].attribs);
+
+                do
+                    memcpy(&vf_settings[i], &vf_settings[i + 1], sizeof(m_obj_settings_t));
+                while (vf_settings[++i].name);
+
+                break;
+            }
+
+            i++;
+        }
+    }
+}
+
 /* MPlayer -> GUI */
 
 /**
