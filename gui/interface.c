@@ -277,8 +277,6 @@ void guiDone(void)
 
 static void add_vf(const char *vf)
 {
-    void *p;
-
     if (vf_settings) {
         int i = 0;
 
@@ -290,12 +288,12 @@ static void add_vf(const char *vf)
         }
 
         if (i != -1) {
-            p = realloc(vf_settings, (i + 2) * sizeof(m_obj_settings_t));
+            void *settings = realloc(vf_settings, (i + 2) * sizeof(m_obj_settings_t));
 
-            if (!p)
+            if (!settings)
                 return;
 
-            vf_settings = p;
+            vf_settings = settings;
             vf_settings[i].name     = strdup(vf);
             vf_settings[i].attribs  = NULL;
             vf_settings[i + 1].name = NULL;
