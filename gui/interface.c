@@ -287,7 +287,10 @@ static void add_vf(const char *vf, const char *const *argvf)
             i++;
         }
 
-        if (!vf_settings[i].name) {
+        if (vf_settings[i].name) {
+            listFree(&vf_settings[i].attribs);
+            vf_settings[i].attribs = listDup(argvf);
+        } else {
             void *settings = realloc(vf_settings, (i + 2) * sizeof(m_obj_settings_t));
 
             if (!settings)
