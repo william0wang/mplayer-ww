@@ -281,7 +281,7 @@ static void add_vf(const char *vf)
         int i = 0;
 
         while (vf_settings[i].name) {
-            if (strcmp(vf_settings[i].name, vf) == 0) {
+            if (strcmp(vf_settings[i++].name, vf) == 0) {
                 i = -1;
                 break;
             }
