@@ -28,7 +28,7 @@
 /**
  * @brief Read characters from @a file.
  *
- * @param str pointer to a buffer to receive the read characters
+ * @param str memory location of a buffer to receive the read characters
  * @param size number of characters read at the most (including a terminating null-character)
  * @param file file to read from
  *

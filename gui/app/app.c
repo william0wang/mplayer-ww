@@ -252,7 +252,7 @@ void btnSet(int event, int state)
  * @brief Retrieve the value of the (main) item belonging to an event.
  *
  * @param event event
- * @param value pointer to a variable to store the value (if event has been found)
+ * @param value memory location to store the value (if event has been found)
  */
 void btnValue(int event, float *value)
 {

@@ -103,8 +103,7 @@ static int linenumber;
  * @brief Print a legacy information on an entry.
  *
  * @param old identifier (and deprecated entry)
- * @param data pointer to additional data necessary for checking and
- *             to print the information on @a old
+ * @param data string necessary for checking and to print the information on @a old
  */
 static void skin_legacy (const char *old, const char *data)
 {

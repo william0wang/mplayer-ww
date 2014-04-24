@@ -66,7 +66,7 @@ static const char *fExist(const char *fname)
  * @brief Read and decode a PNG file into bitmap data.
  *
  * @param fname filename (with path)
- * @param img pointer suitable to store the image data
+ * @param img memory location to store the image data
  *
  * @return 0 (ok), 1 (decoding error), 2 (open error), 3 (file too big),
  *                 4 (out of memory), 5 (read error), 6 (avcodec alloc error)
@@ -230,7 +230,7 @@ static int convert_ARGB(guiImage *img)
  * @brief Read a PNG file.
  *
  * @param fname filename (with path, but may lack extension)
- * @param img pointer suitable to store the image data
+ * @param img memory location to store the image data
  *
  * @return 0 (ok), -1 (color depth too low), -2 (not accessible),
  *                 -5 (#pngRead() error) or -8 (#convert_ARGB() error)

@@ -47,7 +47,7 @@ static urlItem *urlList;
  *         pointer to current list item (ITEM command) or
  *         NULL (DELETE or unknown command)
  *
- * @note PLAYLIST_ITEM_GET_POS returns the position number as pointer
+ * @note PLAYLIST_ITEM_GET_POS returns the position number as pointer value
  *       (if @a data is NULL the last position number, i.e. number of items),
  *       and position 0 means "not found"
  */
@@ -269,9 +269,9 @@ void *listMgr(int cmd, void *data)
 }
 
 /**
- * @brief Set list to @a entry.
+ * @brief Set string list to @a entry.
  *
- * @param list pointer to the char pointer list
+ * @param list pointer to the string list
  * @param entry the new (and only) element of the list
  *
  * @note Actually, a new list will be created and the old list will be freed.
@@ -298,11 +298,11 @@ void listSet(char ***list, const char *entry)
 }
 
 /**
- * @brief Replace the first element in list that starts with @a search.
+ * @brief Replace the first element in a string list that starts with @a search.
  *
  * @note If no such element is found, @a replace will be appended.
  *
- * @param list pointer to the char pointer list
+ * @param list pointer to the string list
  * @param search element to search
  * @param replace replacement element
  */

@@ -63,8 +63,7 @@ static guiItem *currWinItems;
  * @brief Print a legacy information on an entry.
  *
  * @param old identifier (and deprecated entry)
- * @param data pointer to additional data necessary for checking and
- *             to print the information on @a old
+ * @param data string necessary for checking and to print the information on @a old
  */
 static void skin_legacy(const char *old, const char *data)
 {
@@ -595,7 +594,7 @@ static int item_menu(char *in)
  *
  *        Parameters: button,bwidth,bheight,phases,numphases,[x0,y0,x1,y1,]default,x,y,width,height,message
  *
- * @param item pointer to item to store the parameters in
+ * @param item memory location of an item to store the parameters in
  * @param in definition to be analyzed
  *
  * @note item->type is already available.
@@ -1136,7 +1135,7 @@ static _item skinItem[] = {
  * @brief Read a skin @a image file.
  *
  * @param fname filename (with path)
- * @param img pointer suitable to store the image data
+ * @param img memory location to store the image data
  *
  * @return return code of #bpRead()
  */

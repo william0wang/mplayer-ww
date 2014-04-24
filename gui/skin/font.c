@@ -213,9 +213,9 @@ int fntFindID(char *name)
 }
 
 /**
- * @brief Get the #bmpFont::Fnt index of the character @a *str points to.
+ * @brief Get the #bmpFont::Fnt index of the character @a str points to.
  *
- *        Move pointer @a *str to the character according to @a direction
+ *        Move pointer @a str to the character according to @a direction
  *        afterwards.
  *
  * @param id font ID

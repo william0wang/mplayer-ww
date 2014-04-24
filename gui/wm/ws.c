@@ -954,7 +954,7 @@ void wsWindowShape(wsWindow *win, char *data)
  *
  * @param display display
  * @param Win window
- * @param icon pointer to the icons
+ * @param icon pointer to the icon collection
  */
 void wsWindowIcon(Display *display, Window Win, guiIcon_t *icon)
 {

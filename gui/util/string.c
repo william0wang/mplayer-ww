@@ -173,7 +173,7 @@ char *decomment(char *in)
  * @brief Extract a part of a string delimited by a separator character.
  *
  * @param in string to be analyzed
- * @param out pointer suitable to store the extracted part
+ * @param out memory location of a buffer suitable to store the extracted part
  * @param sep separator character
  * @param num number of separator characters to be skipped before extraction starts
  * @param maxout maximum length of extracted part (including the trailing null byte)
@@ -215,7 +215,7 @@ int cutInt(char *in, char sep, int num)
 }
 
 /**
- * @brief A strchr() that can handle NULL pointers.
+ * @brief A strchr() that can handle NULL pointer arguments.
  *
  * @param str string to examine
  * @param c character to find
@@ -231,7 +231,7 @@ char *gstrchr(const char *str, int c)
 }
 
 /**
- * @brief A strcmp() that can handle NULL pointers.
+ * @brief A strcmp() that can handle NULL pointer arguments.
  *
  * @param a string to be compared
  * @param b string which is compared
@@ -249,7 +249,7 @@ int gstrcmp(const char *a, const char *b)
 }
 
 /**
- * @brief A strncmp() that can handle NULL pointers.
+ * @brief A strncmp() that can handle NULL pointer arguments.
  *
  * @param a string to be compared
  * @param b string which is compared
@@ -290,7 +290,7 @@ char *gstrdup(const char *str)
  *
  *        The string is duplicated by calling #gstrdup().
  *
- * @param old pointer to a variable suitable to store the new pointer
+ * @param old memory location to store the new pointer
  * @param str string to be duplicated
  *
  * @note @a *old is freed prior to the assignment.
@@ -305,7 +305,7 @@ void setdup(char **old, const char *str)
  * @brief Assign a newly allocated string
  *        containing the path created from a directory and a filename.
  *
- * @param old pointer to a variable suitable to store the new pointer
+ * @param old memory location to store the new pointer
  * @param dir directory
  * @param name filename
  *

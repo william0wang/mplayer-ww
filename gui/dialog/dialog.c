@@ -59,8 +59,8 @@ static int gtkInitialized;
  *
  * @param theme theme to load the icon from
  * @param size size of the icon to load
- * @param gdkIcon location to store a pointer to the created pixmap
- * @param gdkIconMask location to store a pointer to the created mask
+ * @param gdkIcon memory location to store a pointer to the created pixmap
+ * @param gdkIconMask memory location to store a pointer to the created mask
  *
  * @return #True (ok) or #False (error)
  */

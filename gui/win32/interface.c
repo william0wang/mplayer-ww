@@ -93,9 +93,9 @@ mixer_t *mixer = NULL;
 /**
  * @brief Convert a Windows style path to a file name into an Unix style one.
  *
- * @param filename pointer to the file path to be converted
+ * @param filename file path string to be converted
  *
- * @return pointer to the converted file path
+ * @return converted file path string
  */
 static char *unix_name (char *win_filename)
 {
@@ -129,9 +129,9 @@ static char *unix_name (char *win_filename)
 /**
  * @brief Convert a Windows style device name into an Unix style one.
  *
- * @param device pointer to the device name to be converted
+ * @param device device name to be converted
  *
- * @return pointer to the converted device name
+ * @return converted device name
  */
 static char *unix_device (char *device)
 {

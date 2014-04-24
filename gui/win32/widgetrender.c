@@ -129,10 +129,10 @@ static void stringreplace(char *dest, const char *what, const char *format, ... 
  * @param how 0 (cut file path and extension),
  *            1 (additionally, convert lower case) or
  *            2 (additionally, convert upper case)
- * @param fname pointer to a buffer to receive the converted Filename
- * @param maxlen size of @a fname buffer
+ * @param fname memory location of a buffer to receive the converted Filename
+ * @param maxlen size of the @a fname buffer
  *
- * @return pointer to @a fname buffer
+ * @return pointer to the @a fname buffer
  */
 static char *TranslateFilename (int how, char *fname, size_t maxlen)
 {

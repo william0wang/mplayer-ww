@@ -52,10 +52,10 @@
  * @param how 0 (cut file path and extension),
  *            1 (additionally, convert lower case) or
  *            2 (additionally, convert upper case)
- * @param fname pointer to a buffer to receive the converted Filename
- * @param maxlen size of @a fname buffer
+ * @param fname memory location of a buffer to receive the converted Filename
+ * @param maxlen size of the @a fname buffer
  *
- * @return pointer to @a fname buffer
+ * @return pointer to the @a fname buffer
  */
 static char *TranslateFilename(int how, char *fname, size_t maxlen)
 {
@@ -427,7 +427,7 @@ static void PutImage(int x, int y, uint32_t *drawbuf, int drawbuf_width, guiImag
  * @param window pointer to a ws window structure of the window to be rendered
  * @param items pointer to the array of items
  * @param till maximum index in use for the @a items, i.e. number of last item in array
- * @param drawbuf pointer to the @a window's draw buffer
+ * @param drawbuf memory location of the @a window's draw buffer
  */
 void RenderAll(wsWindow *window, guiItem *items, int till, char *drawbuf)
 {
