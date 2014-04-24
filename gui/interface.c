@@ -85,6 +85,52 @@ static void set_fontconfig(void)
     font_fontconfig = (font_name && strchr(font_name, '/') ? -1 : orig_fontconfig);
 }
 
+/**
+ * @brief Add a video filter
+ *        (or change the parameter/value pairs of an existing one).
+ *
+ * @param vf video filter to be added or changed
+ * @param argvf pointer to an array of (new) parameter/value pairs
+ */
+static void add_vf(const char *vf, const char *const *argvf)
+{
+    if (vf_settings) {
+        int i = 0;
+
+        while (vf_settings[i].name) {
+            if (strcmp(vf_settings[i].name, vf) == 0)
+                break;
+
+            i++;
+        }
+
+        if (vf_settings[i].name) {
+            listFree(&vf_settings[i].attribs);
+            vf_settings[i].attribs = listDup(argvf);
+        } else {
+            void *settings = realloc(vf_settings, (i + 2) * sizeof(m_obj_settings_t));
+
+            if (!settings)
+                return;
+
+            vf_settings = settings;
+            vf_settings[i].name    = strdup(vf);
+            vf_settings[i].attribs = listDup(argvf);
+            memset(&vf_settings[i + 1], 0, sizeof(m_obj_settings_t));
+        }
+    } else {
+        vf_settings = calloc(2, sizeof(m_obj_settings_t));
+
+        if (!vf_settings)
+            return;
+
+        vf_settings[0].name    = strdup(vf);
+        vf_settings[0].attribs = listDup(argvf);
+    }
+
+    mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_AddingVideoFilter, vf);
+}
+
 /* MPlayer -> GUI */
 
 /**
@@ -273,45 +319,6 @@ void guiDone(void)
     }
 
     mp_msg(MSGT_GPLAYER, MSGL_V, "GUI done.\n");
-}
-
-static void add_vf(const char *vf, const char *const *argvf)
-{
-    if (vf_settings) {
-        int i = 0;
-
-        while (vf_settings[i].name) {
-            if (strcmp(vf_settings[i].name, vf) == 0)
-                break;
-
-            i++;
-        }
-
-        if (vf_settings[i].name) {
-            listFree(&vf_settings[i].attribs);
-            vf_settings[i].attribs = listDup(argvf);
-        } else {
-            void *settings = realloc(vf_settings, (i + 2) * sizeof(m_obj_settings_t));
-
-            if (!settings)
-                return;
-
-            vf_settings = settings;
-            vf_settings[i].name    = strdup(vf);
-            vf_settings[i].attribs = listDup(argvf);
-            memset(&vf_settings[i + 1], 0, sizeof(m_obj_settings_t));
-        }
-    } else {
-        vf_settings = calloc(2, sizeof(m_obj_settings_t));
-
-        if (!vf_settings)
-            return;
-
-        vf_settings[0].name    = strdup(vf);
-        vf_settings[0].attribs = listDup(argvf);
-    }
-
-    mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_AddingVideoFilter, vf);
 }
 
 /**
