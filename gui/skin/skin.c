@@ -584,8 +584,6 @@ static int item_menu(char *in)
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]    item #%d: %d,%d %dx%d\n", *currWinItemIdx, x, y, w, h);
     mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[skin]     message: %s (#%d)\n", msg, message);
 
-    item->Bitmap.Image = NULL;
-
     return 0;
 }
 
