@@ -353,7 +353,7 @@ static void uiMainDND(int num,char** files)
         listMgr(PLAYLIST_DELETE,0);
       }
 
-      item = calloc(1,sizeof(plItem));
+      item = calloc(1,sizeof(*item));
 
       s = strrchr( str,'/' );
 

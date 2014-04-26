@@ -294,7 +294,7 @@ void cfg_read(void)
             if (!*line)
                 continue;
 
-            item = calloc(1, sizeof(plItem));
+            item = calloc(1, sizeof(*item));
 
             if (!item) {
                 gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_MemAllocFailed);
@@ -329,7 +329,7 @@ void cfg_read(void)
             if (!*line)
                 continue;
 
-            item = calloc(1, sizeof(urlItem));
+            item = calloc(1, sizeof(*item));
 
             if (!item) {
                 gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_MemAllocFailed);

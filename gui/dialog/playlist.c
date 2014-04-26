@@ -143,7 +143,7 @@ static void plButtonReleased( GtkButton * button,gpointer user_data )
         for ( i=0;i<NrOfSelected;i++ )
          {
           char * text[2];
-          item=calloc( 1,sizeof( plItem ) );
+          item=calloc( 1,sizeof( *item ) );
           gtk_clist_get_text( GTK_CLIST( CLSelected ),i,2,&text[0] );
           gtk_clist_get_text( GTK_CLIST( CLSelected ),i,3,&text[1] );
           item->name = strdup( text[0] );
@@ -361,7 +361,7 @@ static void plCTree( GtkCTree * ctree,GtkCTreeNode * parent_node,gpointer user_d
 
        if ( stat( path,&statbuf ) != -1 && S_ISDIR( statbuf.st_mode ) && dirent->d_name[0] != '.' )
         {
-         DirNode=malloc( sizeof( DirNodeType ) ); DirNode->scaned=False; DirNode->path=strdup( path );
+         DirNode=malloc( sizeof( *DirNode ) ); DirNode->scaned=False; DirNode->path=strdup( path );
          subdir=check_for_subdir( path );
          node=gtk_ctree_insert_node( ctree,parent_node,NULL,&utf8name,4,pxOpenedBook,msOpenedBook,pxClosedBook,msClosedBook,!subdir,FALSE );
          gtk_ctree_node_set_row_data_full( ctree,node,DirNode,NULL );
@@ -479,7 +479,7 @@ static GtkWidget * CreatePlaylist( void )
   if ( !pxClosedBook ) pxClosedBook=gdk_pixmap_create_from_xpm_d( Playlist->window,&msClosedBook,&transparent,(gchar **)open2_xpm );
 
   parent=gtk_ctree_insert_node( GTK_CTREE( CTDirTree ),NULL,NULL,&root,4,pxOpenedBook,msOpenedBook,pxClosedBook,msClosedBook,FALSE,FALSE );
-  DirNode=malloc( sizeof( DirNodeType ) );
+  DirNode=malloc( sizeof( *DirNode ) );
   DirNode->scaned=False; DirNode->path=strdup( root );
   gtk_ctree_node_set_row_data_full(GTK_CTREE( CTDirTree ),parent,DirNode,NULL );
   sibling=gtk_ctree_insert_node( GTK_CTREE( CTDirTree ),parent,NULL,&dummy,4,NULL,NULL,NULL,NULL,TRUE,TRUE );

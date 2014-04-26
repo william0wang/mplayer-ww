@@ -407,7 +407,7 @@ int add_to_gui_playlist(const char *what, int how)
     else
         strcpy(path, ".");
 
-    item = calloc(1, sizeof(plItem));
+    item = calloc(1, sizeof(*item));
 
     if (!item) {
         free(path);

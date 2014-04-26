@@ -108,7 +108,7 @@ static void add_vf(const char *vf, const char *const *argvf)
             listFree(&vf_settings[i].attribs);
             vf_settings[i].attribs = listDup(argvf);
         } else {
-            void *settings = realloc(vf_settings, (i + 2) * sizeof(m_obj_settings_t));
+            void *settings = realloc(vf_settings, (i + 2) * sizeof(*vf_settings));
 
             if (!settings)
                 return;
@@ -119,7 +119,7 @@ static void add_vf(const char *vf, const char *const *argvf)
             memset(&vf_settings[i + 1], 0, sizeof(m_obj_settings_t));
         }
     } else {
-        vf_settings = calloc(2, sizeof(m_obj_settings_t));
+        vf_settings = calloc(2, sizeof(*vf_settings));
 
         if (!vf_settings)
             return;
