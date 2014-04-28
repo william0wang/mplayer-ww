@@ -116,7 +116,7 @@ static void add_vf(const char *vf, const char *const *argvf)
             vf_settings = settings;
             vf_settings[i].name    = strdup(vf);
             vf_settings[i].attribs = listDup(argvf);
-            memset(&vf_settings[i + 1], 0, sizeof(m_obj_settings_t));
+            memset(&vf_settings[i + 1], 0, sizeof(*vf_settings));
         }
     } else {
         vf_settings = calloc(2, sizeof(*vf_settings));
@@ -176,7 +176,7 @@ static void remove_vf(char *vf)
                 listFree(&vf_settings[i].attribs);
 
                 do
-                    memcpy(&vf_settings[i], &vf_settings[i + 1], sizeof(m_obj_settings_t));
+                    memcpy(&vf_settings[i], &vf_settings[i + 1], sizeof(*vf_settings));
                 while (vf_settings[++i].name);
 
                 break;
