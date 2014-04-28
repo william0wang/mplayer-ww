@@ -170,14 +170,19 @@ static void remove_vf(char *vf)
 
         while (vf_settings[i].name) {
             if (strcmp(vf_settings[i].name, vf) == 0) {
+                int j;
+
                 mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_RemovingVideoFilter, vf);
 
                 free(vf_settings[i].name);
                 listFree(&vf_settings[i].attribs);
 
-                do
-                    memcpy(&vf_settings[i], &vf_settings[i + 1], sizeof(*vf_settings));
-                while (vf_settings[++i].name);
+                j = i + 1;
+
+                while (vf_settings[j].name)
+                    j++;
+
+                memmove(&vf_settings[i], &vf_settings[i + 1], (j - i) * sizeof(*vf_settings));
 
                 break;
             }
