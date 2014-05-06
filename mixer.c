@@ -129,7 +129,12 @@ void mixer_getbothvolume(mixer_t *mixer, float *b)
 
 void mixer_mute(mixer_t *mixer)
 {
- if (mixer->muted) mixer_setvolume(mixer, mixer->last_l, mixer->last_r);
+ if (mixer->muted) {
+  // unmuting to volume 0 makes no sense
+  if (mixer->last_l == 0) mixer->last_l = 100;
+  if (mixer->last_r == 0) mixer->last_r = 100;
+  mixer_setvolume(mixer, mixer->last_l, mixer->last_r);
+ }
   else
    {
     mixer_getvolume(mixer, &mixer->last_l, &mixer->last_r);
