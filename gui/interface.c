@@ -810,7 +810,7 @@ int gui(int what, void *data)
         sh_audio = data;
 
         if (sh_audio) {
-            guiInfo.AudioChannels = sh_audio->channels;
+            guiInfo.AudioChannels    = sh_audio->channels;
             guiInfo.AudioPassthrough = (gstrcmp(sh_audio->ad_driver->info->short_name, "hwac3") == 0);
         } else {
             guiInfo.AudioChannels    = 0;
