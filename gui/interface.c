@@ -405,7 +405,6 @@ int gui(int what, void *data)
     int idata = (intptr_t)data, msg, state;
     stream_t *stream = NULL;
     sh_audio_t *sh_audio;
-    const ad_functions_t *ad;
     mixer_t *mixer;
     float l, r, b;
     plItem *next = NULL;
@@ -812,8 +811,7 @@ int gui(int what, void *data)
 
         if (sh_audio) {
             guiInfo.AudioChannels = sh_audio->channels;
-            ad = sh_audio->ad_driver;
-            guiInfo.AudioPassthrough = (gstrcmp(ad->info->short_name, "hwac3") == 0);
+            guiInfo.AudioPassthrough = (gstrcmp(sh_audio->ad_driver->info->short_name, "hwac3") == 0);
         } else {
             guiInfo.AudioChannels    = 0;
             guiInfo.AudioPassthrough = False;

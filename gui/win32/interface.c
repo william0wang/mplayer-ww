@@ -562,7 +562,6 @@ int gui(int what, void *data)
     int idata = (intptr_t) data;
     stream_t *stream;
     sh_audio_t *sh_audio;
-    const ad_functions_t *ad;
 #ifdef CONFIG_DVDREAD
     dvd_priv_t *dvdp;
 #endif
@@ -628,8 +627,7 @@ int gui(int what, void *data)
             if (sh_audio)
             {
                 guiInfo.AudioChannels = sh_audio->channels;
-                ad = sh_audio->ad_driver;
-                guiInfo.AudioPassthrough = (gstrcmp(ad->info->short_name, "hwac3") == 0);
+                guiInfo.AudioPassthrough = (gstrcmp(sh_audio->ad_driver->info->short_name, "hwac3") == 0);
             }
             else
             {
