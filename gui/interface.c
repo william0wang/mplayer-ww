@@ -811,12 +811,13 @@ int gui(int what, void *data)
         sh_audio = data;
 
         if (sh_audio) {
+            guiInfo.AudioChannels = sh_audio->channels;
         ad = sh_audio->ad_driver;
         guiInfo.AudioPassthrough = (gstrcmp(ad->info->short_name, "hwac3") == 0);
-        } else
+        } else {
+            guiInfo.AudioChannels    = 0;
             guiInfo.AudioPassthrough = False;
-
-        guiInfo.AudioChannels = (sh_audio ? sh_audio->channels : 0);
+        }
 
         if (guiInfo.AudioPassthrough)
             btnSet(evSetVolume, btnDisabled);

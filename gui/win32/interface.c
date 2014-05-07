@@ -627,12 +627,15 @@ int gui(int what, void *data)
             sh_audio = data;
             if (sh_audio)
             {
+                guiInfo.AudioChannels = sh_audio->channels;
             ad = sh_audio->ad_driver;
             guiInfo.AudioPassthrough = (gstrcmp(ad->info->short_name, "hwac3") == 0);
             }
             else
+            {
+                guiInfo.AudioChannels = 0;
                 guiInfo.AudioPassthrough = FALSE;
-            guiInfo.AudioChannels = sh_audio ? sh_audio->channels : 0;
+            }
             if (sh_audio && !guiInfo.sh_video) guiInfo.VideoWindow = FALSE;
             if(IsWindowVisible(mygui->videowindow) && !guiInfo.VideoWindow)
                 ShowWindow(mygui->videowindow, SW_HIDE);
