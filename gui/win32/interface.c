@@ -625,8 +625,13 @@ int gui(int what, void *data)
         case GUI_SET_AUDIO:
         {
             sh_audio = data;
+            if (sh_audio)
+            {
             ad = sh_audio->ad_driver;
             guiInfo.AudioPassthrough = (gstrcmp(ad->info->short_name, "hwac3") == 0);
+            }
+            else
+                guiInfo.AudioPassthrough = FALSE;
             guiInfo.AudioChannels = sh_audio ? sh_audio->channels : 0;
             if (sh_audio && !guiInfo.sh_video) guiInfo.VideoWindow = FALSE;
             if(IsWindowVisible(mygui->videowindow) && !guiInfo.VideoWindow)
