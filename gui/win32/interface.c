@@ -628,13 +628,14 @@ int gui(int what, void *data)
             {
                 guiInfo.AudioChannels = sh_audio->channels;
                 guiInfo.AudioPassthrough = (gstrcmp(sh_audio->ad_driver->info->short_name, "hwac3") == 0);
+
+                if (!guiInfo.sh_video) guiInfo.VideoWindow = FALSE;
             }
             else
             {
                 guiInfo.AudioChannels = 0;
                 guiInfo.AudioPassthrough = FALSE;
             }
-            if (sh_audio && !guiInfo.sh_video) guiInfo.VideoWindow = FALSE;
             if(IsWindowVisible(mygui->videowindow) && !guiInfo.VideoWindow)
                 ShowWindow(mygui->videowindow, SW_HIDE);
             break;

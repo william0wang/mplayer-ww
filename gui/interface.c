@@ -812,6 +812,12 @@ int gui(int what, void *data)
         if (sh_audio) {
             guiInfo.AudioChannels    = sh_audio->channels;
             guiInfo.AudioPassthrough = (gstrcmp(sh_audio->ad_driver->info->short_name, "hwac3") == 0);
+
+            if (!guiInfo.sh_video) {
+                guiInfo.VideoWindow = False;
+                guiInfo.VideoWidth  = 0;
+                guiInfo.VideoHeight = 0;
+            }
         } else {
             guiInfo.AudioChannels    = 0;
             guiInfo.AudioPassthrough = False;
@@ -821,12 +827,6 @@ int gui(int what, void *data)
             btnSet(evSetVolume, btnDisabled);
         if (guiInfo.AudioChannels < 2 || guiInfo.AudioPassthrough)
             btnSet(evSetBalance, btnDisabled);
-
-        if (sh_audio && !guiInfo.sh_video) {
-            guiInfo.VideoWindow = False;
-            guiInfo.VideoWidth  = 0;
-            guiInfo.VideoHeight = 0;
-        }
 
         if (last_balance < 0.0f) {
             uiEvent(ivSetVolume, guiInfo.Volume);
