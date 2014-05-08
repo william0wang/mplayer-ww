@@ -111,7 +111,7 @@ static int pngRead(const char *fname, guiImage *img)
     }
 
     avctx = avcodec_alloc_context3(NULL);
-    frame = avcodec_alloc_frame();
+    frame = av_frame_alloc();
 
     if (!(avctx && frame)) {
         av_free(frame);
