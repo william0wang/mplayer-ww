@@ -1393,7 +1393,15 @@ if(sh_audio){
 		}
 	    }
 	}
-	if(len<=0) { if (!mux_a->buffer_len && !sh_audio->a_out_buffer_len && sh_audio->ds->eof) at_eof |= 2; break; } // EOF?
+	if(len<=0) {
+	    // EOF?
+	    if (!sh_audio->a_out_buffer_len && sh_audio->ds->eof) {
+		if (mux_a->buffer_len)
+	           mp_msg(MSGT_MENCODER, MSGL_WARN, "Audio data left in buffer at end of file. Probably bug in audio encoder, please report.");
+	        at_eof |= 2;
+	    }
+	    break;
+	}
 	muxer_write_chunk(mux_a,len,AVIIF_KEYFRAME, MP_NOPTS_VALUE, MP_NOPTS_VALUE);
 	a_muxer_time = adjusted_muxer_time(mux_a); // update after muxing
 	if(!mux_a->h.dwSampleSize && a_muxer_time>0)
