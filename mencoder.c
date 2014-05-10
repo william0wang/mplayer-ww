@@ -1310,7 +1310,7 @@ if(sh_audio){
     // get audio:
     while(force_audio || a_muxer_time-audio_preload<v_muxer_time){
         float tottime;
-	int len=0;
+	int bytes_to_mux=0;
 	force_audio = 0;
 
 	ptimer_start = GetTimerMS();
@@ -1330,6 +1330,7 @@ if(sh_audio){
 	{
 		if(mux_a->h.dwSampleSize) /* CBR */
 		{
+			int len;
 			if(aencoder->set_decoded_len)
 			{
 				len = mux_a->h.dwSampleSize*(int)(mux_a->h.dwRate*tottime);
@@ -1341,22 +1342,20 @@ if(sh_audio){
 			len = dec_audio(sh_audio, aencoder->decode_buffer, len);
 			mux_a->buffer_len += aencoder->encode(aencoder, mux_a->buffer + mux_a->buffer_len,
 				len <= 0 && sh_audio->ds->eof ? NULL : aencoder->decode_buffer, len, mux_a->buffer_size-mux_a->buffer_len);
-			if(mux_a->buffer_len < mux_a->wf->nBlockAlign)
-				len = 0;
-			else
-				len = mux_a->wf->nBlockAlign*(mux_a->buffer_len/mux_a->wf->nBlockAlign);
+			if(mux_a->buffer_len >= mux_a->wf->nBlockAlign)
+				bytes_to_mux = mux_a->wf->nBlockAlign*(mux_a->buffer_len/mux_a->wf->nBlockAlign);
 		}
 		else	/* VBR */
 		{
 			int sz = 0;
 			while(1)
 			{
-				len = 0;
+				int len;
 				if(! sz)
 					sz = aencoder->get_frame_size(aencoder);
 				if(sz > 0 && mux_a->buffer_len >= sz)
 				{
-					len = sz;
+					bytes_to_mux = sz;
 					break;
 				}
 				len = dec_audio(sh_audio,aencoder->decode_buffer, aencoder->decode_buffer_size);
@@ -1376,24 +1375,25 @@ if(sh_audio){
 	}
 	else {
 	if(mux_a->h.dwSampleSize){
+	    int len;
 	    switch(mux_a->codec){
 	    case ACODEC_COPY: // copy
 		len=mux_a->wf->nAvgBytesPerSec*tottime;
 		len/=mux_a->h.dwSampleSize;if(len<1) len=1;
 		len*=mux_a->h.dwSampleSize;
-		len=demux_read_data(sh_audio->ds,mux_a->buffer,len);
+		bytes_to_mux=demux_read_data(sh_audio->ds,mux_a->buffer,len);
 		break;
 	    }
 	} else {
 	    // VBR - encode/copy an audio frame
 	    switch(mux_a->codec){
 	    case ACODEC_COPY: // copy
-		len=ds_get_packet(sh_audio->ds,(unsigned char**) &mux_a->buffer);
+		bytes_to_mux=ds_get_packet(sh_audio->ds,(unsigned char**) &mux_a->buffer);
 		break;
 		}
 	    }
 	}
-	if(len<=0) {
+	if(bytes_to_mux<=0) {
 	    // EOF?
 	    if (!sh_audio->a_out_buffer_len && sh_audio->ds->eof) {
 		if (mux_a->buffer_len)
@@ -1402,13 +1402,13 @@ if(sh_audio){
 	    }
 	    break;
 	}
-	muxer_write_chunk(mux_a,len,AVIIF_KEYFRAME, MP_NOPTS_VALUE, MP_NOPTS_VALUE);
+	muxer_write_chunk(mux_a,bytes_to_mux,AVIIF_KEYFRAME, MP_NOPTS_VALUE, MP_NOPTS_VALUE);
 	a_muxer_time = adjusted_muxer_time(mux_a); // update after muxing
 	if(!mux_a->h.dwSampleSize && a_muxer_time>0)
 	    mux_a->wf->nAvgBytesPerSec=0.5f+(double)mux_a->size/a_muxer_time; // avg bps (VBR)
-	if(mux_a->buffer_len>=len){
-	    mux_a->buffer_len-=len;
-	    memmove(mux_a->buffer,mux_a->buffer+len,mux_a->buffer_len);
+	if(mux_a->buffer_len>=bytes_to_mux){
+	    mux_a->buffer_len-=bytes_to_mux;
+	    memmove(mux_a->buffer,mux_a->buffer+bytes_to_mux,mux_a->buffer_len);
 	}
 
 
