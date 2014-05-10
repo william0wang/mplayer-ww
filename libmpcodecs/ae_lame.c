@@ -136,7 +136,9 @@ static int get_frame_size(audio_encoder_t *encoder)
 static int encode_lame(audio_encoder_t *encoder, uint8_t *dest, void *src, int len, int max_size)
 {
     int n = 0;
-    if(encoder->params.channels == 1)
+    if (!src)
+        n = lame_encode_flush(lame, dest, max_size);
+    else if (encoder->params.channels == 1)
         n = lame_encode_buffer(lame, (short *)src, (short *)src, len/2, dest, max_size);
     else
         n = lame_encode_buffer_interleaved(lame,(short *)src, len/4, dest, max_size);

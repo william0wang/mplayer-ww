@@ -1340,7 +1340,7 @@ if(sh_audio){
 
 			len = dec_audio(sh_audio, aencoder->decode_buffer, len);
 			mux_a->buffer_len += aencoder->encode(aencoder, mux_a->buffer + mux_a->buffer_len,
-				aencoder->decode_buffer, len, mux_a->buffer_size-mux_a->buffer_len);
+				len <= 0 && sh_audio->ds->eof ? NULL : aencoder->decode_buffer, len, mux_a->buffer_size-mux_a->buffer_len);
 			if(mux_a->buffer_len < mux_a->wf->nBlockAlign)
 				len = 0;
 			else
@@ -1362,10 +1362,13 @@ if(sh_audio){
 				len = dec_audio(sh_audio,aencoder->decode_buffer, aencoder->decode_buffer_size);
 				if(len <= 0)
 				{
-					len = 0;
-					break;
-				}
-				len = aencoder->encode(aencoder, mux_a->buffer + mux_a->buffer_len, aencoder->decode_buffer, len, mux_a->buffer_size-mux_a->buffer_len);
+					// try flushing encoder
+					if (sh_audio->ds->eof)
+						len = aencoder->encode(aencoder, mux_a->buffer + mux_a->buffer_len, NULL, 0, mux_a->buffer_size-mux_a->buffer_len);
+					if (len <= 0)
+						break;
+				} else
+					len = aencoder->encode(aencoder, mux_a->buffer + mux_a->buffer_len, aencoder->decode_buffer, len, mux_a->buffer_size-mux_a->buffer_len);
 				mux_a->buffer_len += len;
 			}
 	    }

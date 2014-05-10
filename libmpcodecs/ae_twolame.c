@@ -112,6 +112,9 @@ static int encode_twolame(audio_encoder_t *encoder, uint8_t *dest, void *src, in
 	mpae_twolame_ctx *ctx = encoder->priv;
 	int ret_size = 0, r2;
 
+	if (!src)
+		return twolame_encode_flush(ctx->twolame_ctx, dest, max_size);
+
 	len /= (2*encoder->params.channels);
 	ret_size = twolame_encode_buffer_interleaved(ctx->twolame_ctx, src, len, dest, max_size);
 	r2 = mp_decode_mp3_header(dest);
