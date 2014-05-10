@@ -1373,24 +1373,16 @@ if(sh_audio){
 	    }
 	    if (v_muxer_time == 0) mux_a->h.dwInitialFrames++;
 	}
-	else {
+	else if (mux_a->codec == ACODEC_COPY) {
 	if(mux_a->h.dwSampleSize){
 	    int len;
-	    switch(mux_a->codec){
-	    case ACODEC_COPY: // copy
 		len=mux_a->wf->nAvgBytesPerSec*tottime;
 		len/=mux_a->h.dwSampleSize;if(len<1) len=1;
 		len*=mux_a->h.dwSampleSize;
 		bytes_to_mux=demux_read_data(sh_audio->ds,mux_a->buffer,len);
-		break;
-	    }
 	} else {
 	    // VBR - encode/copy an audio frame
-	    switch(mux_a->codec){
-	    case ACODEC_COPY: // copy
 		bytes_to_mux=ds_get_packet(sh_audio->ds,(unsigned char**) &mux_a->buffer);
-		break;
-		}
 	    }
 	}
 	if(bytes_to_mux<=0) {
