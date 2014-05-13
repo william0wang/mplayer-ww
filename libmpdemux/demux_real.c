@@ -744,6 +744,10 @@ got_audio:
         if ((priv->intl_id[demuxer->audio->id] == mmioFOURCC('I', 'n', 't', '4')) ||
             (priv->intl_id[demuxer->audio->id] == mmioFOURCC('g', 'e', 'n', 'r')) ||
             (priv->intl_id[demuxer->audio->id] == mmioFOURCC('s', 'i', 'p', 'r'))) {
+            if (!priv->audio_buf) {
+                priv->audio_buf = calloc(priv->sub_packet_h[demuxer->audio->id], priv->audiopk_size[demuxer->audio->id]);
+                priv->audio_timestamp = calloc(priv->sub_packet_h[demuxer->audio->id], sizeof(double));
+            }
             sps = priv->sub_packet_size[demuxer->audio->id];
             sph = priv->sub_packet_h[demuxer->audio->id];
             cfs = priv->coded_framesize[demuxer->audio->id];
@@ -1078,8 +1082,6 @@ if((unsigned)rm_stream_id<MAX_STREAMS){
 	sh_audio_t *sh = demuxer->a_streams[mp_stream_id];
 	demuxer->audio->id=mp_stream_id;
 	demuxer->audio->sh=sh;
-	priv->audio_buf = calloc(priv->sub_packet_h[demuxer->audio->id], priv->audiopk_size[demuxer->audio->id]);
-	priv->audio_timestamp = calloc(priv->sub_packet_h[demuxer->audio->id], sizeof(double));
         mp_msg(MSGT_DEMUX,MSGL_V,"Auto-selected RM audio ID = %d (rm id %d)\n",mp_stream_id, rm_stream_id);
 	goto got_audio;
     }
@@ -1509,8 +1511,6 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 
 		    if(demuxer->audio->id==stream_id){
 			demuxer->audio->sh=sh;
-        	priv->audio_buf = calloc(priv->sub_packet_h[demuxer->audio->id], priv->audiopk_size[demuxer->audio->id]);
-        	priv->audio_timestamp = calloc(priv->sub_packet_h[demuxer->audio->id], sizeof(double));
 		    }
 
 		    ++a_streams;
