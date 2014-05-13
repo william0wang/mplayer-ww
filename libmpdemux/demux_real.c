@@ -1505,12 +1505,9 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    if (priv->is_multirate && ((demuxer->audio->id == -1) ||
 		                               ((demuxer->audio->id >= 0) && priv->a_bitrate && (bitrate > priv->a_bitrate)))) {
 			    demuxer->audio->id = stream_id;
+			    demuxer->audio->sh = sh;
 			    priv->a_bitrate = bitrate;
 			    mp_msg(MSGT_DEMUX,MSGL_DBG2,"Multirate autoselected audio id %d with bitrate %d\n", stream_id, bitrate);
-		    }
-
-		    if(demuxer->audio->id==stream_id){
-			demuxer->audio->sh=sh;
 		    }
 
 		    ++a_streams;
@@ -1533,10 +1530,6 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    sh->wf->nBlockAlign = 0;//frame_size;
 		    sh->wf->cbSize = 0;
 		    sh->wf->wFormatTag = sh->format = mmioFOURCC('a','d','u',0x55);
-
-		    if(demuxer->audio->id==stream_id){
-			    demuxer->audio->sh=sh;
-		    }
 
 		    ++a_streams;
 	  } else if (strstr(mimet,"x-ralf-mpeg4")) {
@@ -1675,12 +1668,9 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    if (priv->is_multirate && ((demuxer->video->id == -1) ||
 		                               ((demuxer->video->id >= 0) && priv->v_bitrate && (bitrate > priv->v_bitrate)))) {
 			    demuxer->video->id = stream_id;
+			    demuxer->video->sh = sh;
 			    priv->v_bitrate = bitrate;
 			    mp_msg(MSGT_DEMUX,MSGL_DBG2,"Multirate autoselected video id %d with bitrate %d\n", stream_id, bitrate);
-		    }
-
-		    if(demuxer->video->id==stream_id){
-			demuxer->video->sh=sh;
 		    }
 
 		    ++v_streams;
