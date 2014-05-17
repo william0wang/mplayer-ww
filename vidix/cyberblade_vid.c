@@ -44,6 +44,7 @@
 #include "dha.h"
 #include "pci_ids.h"
 #include "pci_names.h"
+#include "mp_msg.h"
 
 #include "cyberblade_regs.h"
 
@@ -119,7 +120,7 @@ static int cyberblade_probe(int verbose, int force)
 	err = pci_scan(lst,&num_pci);
 	if(err)
 	{
-		printf("[cyberblade] Error occurred during pci scan: %s\n",strerror(err));
+		mp_msg(MSGT_VO, MSGL_STATUS, "[cyberblade] Error occurred during pci scan: %s\n",strerror(err));
 		return err;
 	}
 	else
@@ -136,11 +137,11 @@ static int cyberblade_probe(int verbose, int force)
 					continue;
 				dname = pci_device_name(VENDOR_TRIDENT, lst[i].device);
 				dname = dname ? dname : "Unknown chip";
-				printf("[cyberblade] Found chip: %s\n", dname);
+				mp_msg(MSGT_VO, MSGL_STATUS, "[cyberblade] Found chip: %s\n", dname);
 #if 0
                                 if ((lst[i].command & PCI_COMMAND_IO) == 0)
 				{
-					printf("[cyberblade] Device is disabled, ignoring\n");
+					mp_msg(MSGT_VO, MSGL_STATUS, "[cyberblade] Device is disabled, ignoring\n");
 					continue;
 				}
 #endif
@@ -152,7 +153,7 @@ static int cyberblade_probe(int verbose, int force)
 		}
 	}
 
-	if(err && verbose) printf("[cyberblade] Can't find chip\n");
+	if(err && verbose) mp_msg(MSGT_VO, MSGL_STATUS, "[cyberblade] Can't find chip\n");
 		return err;
 }
 
@@ -464,8 +465,8 @@ static int cyberblade_config_playback(vidix_playback_t *info)
 		}
                 VWinStart=(VTotal-VSync)-8;
 
-		printf("[cyberblade] HTotal: 0x%x, HSStart: 0x%x\n",HTotal,HSync);
-		printf("  VTotal: 0x%x, VStart: 0x%x\n",VTotal,VSync);
+		mp_msg(MSGT_VO, MSGL_STATUS, "[cyberblade] HTotal: 0x%x, HSStart: 0x%x\n",HTotal,HSync);
+		mp_msg(MSGT_VO, MSGL_STATUS, "[cyberblade] VTotal: 0x%x, VStart: 0x%x\n",VTotal,VSync);
 		tx1=HWinStart+info->dest.x;
 		ty1=VWinStart+info->dest.y;
 		tx2=tx1+info->dest.w;

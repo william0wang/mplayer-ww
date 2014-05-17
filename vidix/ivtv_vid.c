@@ -43,6 +43,7 @@
 #include "dha.h"
 #include "pci_ids.h"
 #include "pci_names.h"
+#include "mp_msg.h"
 
 #define VIDIX_STATIC ivtv_
 
@@ -235,22 +236,22 @@ int ivtv_probe(int verbose, int force)
 	char yuv_device_name[] = "/dev/videoXXX\0";
 
 	if(verbose)
-		printf(IVTV_MSG"probe\n");
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"probe\n");
 
 	ivtv_verbose = verbose;
 
 	err = pci_scan(lst, &num_pci);
 	if(err)	{
-		printf(IVTV_MSG"Error occured during pci scan: %s\n", strerror(err));
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Error occured during pci scan: %s\n", strerror(err));
 		return err;
 	}
 
 	if(ivtv_verbose)
-		printf(IVTV_MSG"Found %d pci devices\n", num_pci);
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Found %d pci devices\n", num_pci);
 
 	for(i = 0; i < num_pci; i++) {
 		if(2 == ivtv_verbose)
-			printf(IVTV_MSG"Found chip [%04X:%04X] '%s' '%s'\n"
+			mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Found chip [%04X:%04X] '%s' '%s'\n"
 				,lst[i].vendor
 				,lst[i].device
 				,pci_vendor_name(lst[i].vendor)
@@ -260,14 +261,14 @@ int ivtv_probe(int verbose, int force)
 			{
 			case DEVICE_INTERNEXT_ITVC15_MPEG_2_ENCODER:
 				if(ivtv_verbose)
-					printf(IVTV_MSG"Found PVR 350\n");
+					mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Found PVR 350\n");
 				goto card_found;
 			}
 		}
 	}
 
 	if(ivtv_verbose)
-		printf(IVTV_MSG"Can't find chip\n");
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Can't find chip\n");
 	return ENXIO;
 
 card_found:
@@ -282,15 +283,15 @@ card_found:
 	fbdev = open(device_name, O_RDWR);
 	if(-1 != fbdev) {
 		if(ioctl(fbdev, FBIOGET_VSCREENINFO, &vinfo) < 0) {
-			printf(IVTV_MSG"Unable to read screen info\n");
+			mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Unable to read screen info\n");
 			close(fbdev);
 			return ENXIO;
 		} else {
 			fb_width = vinfo.xres;
 			fb_height = vinfo.yres;
 			if(2 == ivtv_verbose) {
-				printf(IVTV_MSG"framebuffer width : %3.0f\n",fb_width);
-				printf(IVTV_MSG"framebuffer height: %3.0f\n",fb_height);
+				mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"framebuffer width : %3.0f\n",fb_width);
+				mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"framebuffer height: %3.0f\n",fb_height);
 			}
 		}
 		if(NULL != (alpha = getenv("VIDIXIVTVALPHA"))) {
@@ -299,7 +300,7 @@ card_found:
 			}
 		}
 	} else {
-		printf(IVTV_MSG"Failed to open /dev/fb%u\n", fb_number);
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Failed to open /dev/fb%u\n", fb_number);
 		return ENXIO;
 	}
 
@@ -309,11 +310,11 @@ card_found:
 		yuvdev = open(yuv_device_name, O_RDWR);
 		if(-1 != yuvdev) {
 			if(ivtv_verbose)
-				printf(IVTV_MSG"YUV device found /dev/video%u\n", yuv_device);
+				mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"YUV device found /dev/video%u\n", yuv_device);
 			goto yuv_found;
 		} else {
 			if(ivtv_verbose)
-				printf(IVTV_MSG"YUV device not found: /dev/video%u\n", yuv_device);
+				mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"YUV device not found: /dev/video%u\n", yuv_device);
 		}
 	} while(yuv_device-- > yuv_device_number);
 	return ENXIO;
@@ -322,14 +323,14 @@ yuv_found:
 	if(0 == alpha_disable) {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,22)
 		if(ioctl(fbdev, IVTVFB_IOCTL_GET_STATE, &fb_state_old) < 0) {
-			printf(IVTV_MSG"Unable to read fb state\n");
+			mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Unable to read fb state\n");
 			close(yuvdev);
 			close(fbdev);
 			return ENXIO;
 		} else {
 			if(ivtv_verbose) {
-				printf(IVTV_MSG"old alpha : %ld\n",fb_state_old.alpha);
-				printf(IVTV_MSG"old status: 0x%lx\n",fb_state_old.status);
+				mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"old alpha : %ld\n",fb_state_old.alpha);
+				mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"old status: 0x%lx\n",fb_state_old.status);
 			}
 			fb_state_hide.alpha = 0;
 			fb_state_hide.status = fb_state_old.status | IVTVFB_STATUS_GLOBAL_ALPHA;
@@ -338,13 +339,13 @@ yuv_found:
 		memset(&format_old, 0, sizeof(format_old));
 		format_old.type = format_hide.type = V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY;
 		if(ioctl(yuvdev, VIDIOC_G_FMT , &format_old) < 0) {
-			printf(IVTV_MSG"Unable to read fb state\n");
+			mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Unable to read fb state\n");
 			close(yuvdev);
 			close(fbdev);
 			return ENXIO;
 		} else {
 			if(ivtv_verbose) {
-				printf(IVTV_MSG"old alpha : %d\n",format_old.fmt.win.global_alpha);
+				mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"old alpha : %d\n",format_old.fmt.win.global_alpha);
 			}
 			memcpy(&format_hide, &format_old, sizeof(format_old));
 			format_hide.fmt.win.global_alpha = 0;
@@ -358,17 +359,17 @@ yuv_found:
 int ivtv_init(const char *args)
 {
 	if(ivtv_verbose)
-		printf(IVTV_MSG"init\n");
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"init\n");
 
 	if (!probed) {
 		if(ivtv_verbose)
-			printf(IVTV_MSG"Driver was not probed but is being initialized\n");
+			mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Driver was not probed but is being initialized\n");
 		return EINTR;
 	}
 	outbuf = malloc((IVTVMAXHEIGHT * IVTVMAXWIDTH) + (IVTVMAXHEIGHT * IVTVMAXWIDTH / 2));
 	if(NULL == outbuf) {
 		if(ivtv_verbose)
-			printf(IVTV_MSG"Not enough memory availabe!\n");
+			mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Not enough memory availabe!\n");
 		return EINTR;
 	}
 	return 0;
@@ -377,7 +378,7 @@ int ivtv_init(const char *args)
 void ivtv_destroy(void)
 {
 	if(ivtv_verbose)
-		printf(IVTV_MSG"destroy\n");
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"destroy\n");
 	if(-1 != yuvdev)
 		close(yuvdev);
 	if(-1 != fbdev)
@@ -389,7 +390,7 @@ void ivtv_destroy(void)
 int ivtv_get_caps(vidix_capability_t *to)
 {
 	if(ivtv_verbose)
-		printf(IVTV_MSG"GetCap\n");
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"GetCap\n");
 	memcpy(to, &ivtv_cap, sizeof(vidix_capability_t));
 	return 0;
 }
@@ -399,7 +400,7 @@ int ivtv_query_fourcc(vidix_fourcc_t *to)
 	int supports = 0;
 
 	if(ivtv_verbose)
-		printf(IVTV_MSG"query fourcc (%x)\n", to->fourcc);
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"query fourcc (%x)\n", to->fourcc);
 
 	switch(to->fourcc)
 	{
@@ -422,12 +423,12 @@ int ivtv_query_fourcc(vidix_fourcc_t *to)
 int ivtv_config_playback(vidix_playback_t *info)
 {
 	if(ivtv_verbose)
-		printf(IVTV_MSG"config playback\n");
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"config playback\n");
 
 	if(2 == ivtv_verbose){
-		printf(IVTV_MSG"src : x:%d y:%d w:%d h:%d\n",
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"src : x:%d y:%d w:%d h:%d\n",
 			info->src.x, info->src.y, info->src.w, info->src.h);
-		printf(IVTV_MSG"dest: x:%d y:%d w:%d h:%d\n",
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"dest: x:%d y:%d w:%d h:%d\n",
 			info->dest.x, info->dest.y, info->dest.w, info->dest.h);
 	}
 
@@ -445,7 +446,7 @@ int ivtv_config_playback(vidix_playback_t *info)
 	info->offset.v = info->offset.u + ((info->src.w * info->src.h)/4);
 	info->dga_addr = memBase = malloc(info->num_frames*info->frame_size);
 	if(ivtv_verbose)
-		printf(IVTV_MSG"frame_size: %d, dga_addr: %p\n",
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"frame_size: %d, dga_addr: %p\n",
 	info->frame_size, info->dga_addr);
 	return 0;
 }
@@ -453,18 +454,18 @@ int ivtv_config_playback(vidix_playback_t *info)
 int ivtv_playback_on(void)
 {
 	if(ivtv_verbose)
-		printf(IVTV_MSG"playback on\n");
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"playback on\n");
 
 	if(0 == alpha_disable) {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,22)
 		if (-1 != fbdev) {
 			if (ioctl(fbdev, IVTVFB_IOCTL_SET_STATE, &fb_state_hide) < 0)
-				printf (IVTV_MSG"Failed to set fb state\n");
+				mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Failed to set fb state\n");
 		}
 #else
 		if (-1 != yuvdev) {
 			if (ioctl(yuvdev, VIDIOC_S_FMT, &format_hide) < 0)
-				printf (IVTV_MSG"Failed to set fb state\n");
+				mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Failed to set fb state\n");
 		}
 #endif
 	}
@@ -474,18 +475,18 @@ int ivtv_playback_on(void)
 int ivtv_playback_off(void)
 {
 	if(ivtv_verbose)
-		printf(IVTV_MSG"playback off\n");
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"playback off\n");
 
 	if(0 == alpha_disable) {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,22)
 		if (-1 != fbdev) {
 			if (ioctl(fbdev, IVTVFB_IOCTL_SET_STATE, &fb_state_old) < 0)
-				printf (IVTV_MSG"Failed to restore fb state\n");
+				mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Failed to restore fb state\n");
 		}
 #else
 		if (-1 != yuvdev) {
 			if (ioctl(yuvdev, VIDIOC_S_FMT, &format_old) < 0)
-				printf (IVTV_MSG"Failed to restore fb state\n");
+				mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Failed to restore fb state\n");
 		}
 #endif
 	}
@@ -541,7 +542,7 @@ int ivtv_frame_sel(unsigned int frame)
 #else
 	if(ioctl(yuvdev, IVTV_IOC_DMA_FRAME, &args) == -1) {
 #endif
-		printf("Ioctl IVTV_IOC_DMA_FRAME returned failed Error\n");
+		mp_msg(MSGT_VO, MSGL_STATUS, IVTV_MSG"Ioctl IVTV_IOC_DMA_FRAME returned failed Error\n");
 	}
 	return 0;
 }

@@ -36,6 +36,7 @@
 #include "dha.h"
 #include "pci_ids.h"
 #include "pci_names.h"
+#include "mp_msg.h"
 
 #include "unichrome_regs.h"
 
@@ -298,7 +299,7 @@ uc_ovl_map_qwfetch (uint32_t format, int sw)
       fetch = (ALIGN_TO (sw << 2, 16) >> 4) + 1;
       break;
     default:
-      printf ("[unichrome] Unexpected pixelformat!");
+      mp_msg(MSGT_VO, MSGL_STATUS, "[unichrome] Unexpected pixelformat!");
       break;
     }
 
@@ -338,7 +339,7 @@ uc_ovl_map_format (uint32_t format)
     case IMGFMT_BGR32:
       return V1_RGB32;
     default:
-      printf ("[unichrome] Unexpected pixelformat!");
+      mp_msg(MSGT_VO, MSGL_STATUS, "[unichrome] Unexpected pixelformat!");
       return V1_YUV422;
     }
 }
@@ -464,7 +465,7 @@ unichrome_probe (int verbose, int force)
   err = pci_scan (lst, &num_pci);
   if (err)
     {
-      printf ("[unichrome] Error occurred during pci scan: %s\n",
+      mp_msg(MSGT_VO, MSGL_STATUS, "[unichrome] Error occurred during pci scan: %s\n",
 	      strerror (err));
       return err;
     }
@@ -482,10 +483,10 @@ unichrome_probe (int verbose, int force)
 		continue;
 	      dname = pci_device_name (VENDOR_VIA2, lst[i].device);
 	      dname = dname ? dname : "Unknown chip";
-	      printf ("[unichrome] Found chip: %s\n", dname);
+	      mp_msg(MSGT_VO, MSGL_STATUS, "[unichrome] Found chip: %s\n", dname);
 	      if ((lst[i].command & PCI_COMMAND_IO) == 0)
 		{
-		  printf ("[unichrome] Device is disabled, ignoring\n");
+		  mp_msg(MSGT_VO, MSGL_STATUS, "[unichrome] Device is disabled, ignoring\n");
 		  continue;
 		}
 	      uc_cap.device_id = lst[i].device;
@@ -497,7 +498,7 @@ unichrome_probe (int verbose, int force)
     }
 
   if (err && verbose)
-    printf ("[unichrome] Can't find chip\n");
+    mp_msg(MSGT_VO, MSGL_STATUS, "[unichrome] Can't find chip\n");
   return err;
 }
 
@@ -810,7 +811,7 @@ unichrome_config_playback (vidix_playback_t * info)
   if ((src_w > 4096) || (src_h > 4096) ||
       (src_w < 32) || (src_h < 1) || (pitch > 0x1fff))
     {
-      printf ("[unichrome] Layer size out of bounds\n");
+      mp_msg(MSGT_VO, MSGL_STATUS, "[unichrome] Layer size out of bounds\n");
     }
 
   /* Calculate offsets */

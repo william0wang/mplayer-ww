@@ -58,6 +58,7 @@
 #include "dha.h"
 #include "pci_ids.h"
 #include "pci_names.h"
+#include "mp_msg.h"
 
 #ifdef __MINGW32__
 #define ENOTSUP 134
@@ -344,7 +345,7 @@ case 3:
 static int mga_frame_select(unsigned int frame)
 {
     mga_next_frame = frame;
-    if (mga_verbose>1) printf("[mga] frameselect: %d\n", mga_next_frame);
+    if (mga_verbose>1) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] frameselect: %d\n", mga_next_frame);
 #if MGA_ALLOW_IRQ
     if (mga_irq == -1)
 #endif
@@ -539,12 +540,12 @@ if(!restore){
 
 	if (mga_verbose > 1)
 	{
-	    printf("[mga] wrote BES registers\n");
-	    printf("[mga] BESCTL = 0x%08x\n",
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[mga] wrote BES registers\n");
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[mga] BESCTL = 0x%08x\n",
 			readl(mga_mmio_base + BESCTL));
-	    printf("[mga] BESGLOBCTL = 0x%08x\n",
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[mga] BESGLOBCTL = 0x%08x\n",
 			readl(mga_mmio_base + BESGLOBCTL));
-	    printf("[mga] BESSTATUS= 0x%08x\n",
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[mga] BESSTATUS= 0x%08x\n",
 			readl(mga_mmio_base + BESSTATUS));
 	}
 #ifdef CRTC2
@@ -554,7 +555,7 @@ if(!restore){
 	// disable CRTC2 acording to specs
 	writel(cregs.c2misc, mga_mmio_base + C2MISC);
 
-	if (mga_verbose > 1) printf("[mga] c2offset = %d\n",cregs.c2offset);
+	if (mga_verbose > 1) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] c2offset = %d\n",cregs.c2offset);
 
 	writel(cregs.c2offset, mga_mmio_base + C2OFFSET);
 	writel(cregs.c2startadd0, mga_mmio_base + C2STARTADD0);
@@ -643,7 +644,7 @@ static int mga_config_playback(vidix_playback_t *config)
 
     if ((config->num_frames < 1) || (config->num_frames > 4))
     {
-	printf("[mga] illegal num_frames: %d, setting to %d\n",
+	mp_msg(MSGT_VO, MSGL_STATUS, "[mga] illegal num_frames: %d, setting to %d\n",
 	    config->num_frames, MGA_DEFAULT_FRAMES);
 	config->num_frames = MGA_DEFAULT_FRAMES;
     }
@@ -658,12 +659,12 @@ static int mga_config_playback(vidix_playback_t *config)
     config->dest.pitch.y=32;
     config->dest.pitch.u=config->dest.pitch.v=32;
 
-    if (mga_verbose) printf("[mga] Setting up a %dx%d-%dx%d video window (src %dx%d) format %X\n",
+    if (mga_verbose) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] Setting up a %dx%d-%dx%d video window (src %dx%d) format %X\n",
            dw, dh, x, y, sw, sh, config->fourcc);
 
     if ((sw < 4) || (sh < 4) || (dw < 4) || (dh < 4))
     {
-        printf("[mga] Invalid src/dest dimensions\n");
+        mp_msg(MSGT_VO, MSGL_STATUS, "[mga] Invalid src/dest dimensions\n");
         return EINVAL;
     }
 
@@ -683,7 +684,7 @@ static int mga_config_playback(vidix_playback_t *config)
 	    config->frame_size = ((sw + 31) & ~31) * sh * 2;
 	    break;
 	default:
-	    printf("[mga] Unsupported pixel format: %x\n", config->fourcc);
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[mga] Unsupported pixel format: %x\n", config->fourcc);
 	    return ENOTSUP;
     }
 
@@ -705,11 +706,11 @@ static int mga_config_playback(vidix_playback_t *config)
     mga_src_base = (mga_ram_size*0x100000-config->num_frames*config->frame_size);
     if (mga_src_base < 0)
     {
-    	printf("[mga] not enough memory for frames!\n");
+    	mp_msg(MSGT_VO, MSGL_STATUS, "[mga] not enough memory for frames!\n");
     	return EFAULT;
     }
     mga_src_base &= (~0xFFFF); /* 64k boundary */
-    if (mga_verbose > 1) printf("[mga] YUV buffer base: %#x\n", mga_src_base);
+    if (mga_verbose > 1) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] YUV buffer base: %#x\n", mga_src_base);
 
     config->dga_addr = mga_mem_base + mga_src_base;
 
@@ -1047,7 +1048,7 @@ switch(config->fourcc){
 
 static int mga_playback_on(void)
 {
-    if (mga_verbose) printf("[mga] playback on\n");
+    if (mga_verbose) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] playback on\n");
 
     vid_src_ready = 1;
     if(vid_overlay_on)
@@ -1066,7 +1067,7 @@ static int mga_playback_on(void)
 
 static int mga_playback_off(void)
 {
-    if (mga_verbose) printf("[mga] playback off\n");
+    if (mga_verbose) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] playback off\n");
 
     vid_src_ready = 0;
 #if MGA_ALLOW_IRQ
@@ -1086,7 +1087,7 @@ static int mga_probe(int verbose,int force)
 	unsigned int i, num_pci;
 	int err;
 
-	if (verbose) printf("[mga] probe\n");
+	if (verbose) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] probe\n");
 
 	mga_verbose = verbose;
 
@@ -1095,43 +1096,43 @@ static int mga_probe(int verbose,int force)
 	err = pci_scan(lst, &num_pci);
 	if (err)
 	{
-	    printf("[mga] Error occurred during pci scan: %s\n", strerror(err));
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[mga] Error occurred during pci scan: %s\n", strerror(err));
 	    return err;
 	}
 
 	if (mga_verbose)
-	    printf("[mga] found %d pci devices\n", num_pci);
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[mga] found %d pci devices\n", num_pci);
 
 	for (i = 0; i < num_pci; i++)
 	{
 	    if (mga_verbose > 1)
-		printf("[mga] pci[%d] vendor: %d device: %d\n",
+		mp_msg(MSGT_VO, MSGL_STATUS, "[mga] pci[%d] vendor: %d device: %d\n",
 		    i, lst[i].vendor, lst[i].device);
 	    if (lst[i].vendor == VENDOR_MATROX)
 	    {
 #if 0
 		if ((lst[i].command & PCI_COMMAND_IO) == 0)
 		{
-			printf("[mga] Device is disabled, ignoring\n");
+			mp_msg(MSGT_VO, MSGL_STATUS, "[mga] Device is disabled, ignoring\n");
 			continue;
 		}
 #endif
 		switch(lst[i].device)
 		{
 		    case DEVICE_MATROX_MGA_G550_AGP:
-			printf("[mga] Found MGA G550\n");
+			mp_msg(MSGT_VO, MSGL_STATUS, "[mga] Found MGA G550\n");
 			is_g400 = 1;
 			goto card_found;
 		    case DEVICE_MATROX_MGA_G400_G450:
-			printf("[mga] Found MGA G400/G450\n");
+			mp_msg(MSGT_VO, MSGL_STATUS, "[mga] Found MGA G400/G450\n");
 			is_g400 = 1;
 			goto card_found;
 		    case DEVICE_MATROX_MGA_G200_AGP:
-			printf("[mga] Found MGA G200 AGP\n");
+			mp_msg(MSGT_VO, MSGL_STATUS, "[mga] Found MGA G200 AGP\n");
 			is_g400 = 0;
 			goto card_found;
 		    case DEVICE_MATROX_MGA_G200:
-			printf("[mga] Found MGA G200 PCI\n");
+			mp_msg(MSGT_VO, MSGL_STATUS, "[mga] Found MGA G200 PCI\n");
 			is_g400 = 0;
 			goto card_found;
 		}
@@ -1140,7 +1141,7 @@ static int mga_probe(int verbose,int force)
 
 	if (is_g400 == -1)
 	{
-		if (verbose) printf("[mga] Can't find chip\n");
+		if (verbose) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] Can't find chip\n");
 		return ENXIO;
 	}
 
@@ -1158,37 +1159,37 @@ static int mga_init(void)
     unsigned int card_option = 0;
     int err;
 
-    if (mga_verbose) printf("[mga] init\n");
+    if (mga_verbose) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] init\n");
 
     mga_vid_in_use = 0;
 
-    printf("Matrox MGA G200/G400/G450 YUV Video interface v2.01 (c) Aaron Holtzman & A'rpi\n");
+    mp_msg(MSGT_VO, MSGL_STATUS, "[mga] Matrox MGA G200/G400/G450 YUV Video interface v2.01 (c) Aaron Holtzman & A'rpi\n");
 #ifdef CRTC2
-    printf("Driver compiled with TV-out (second-head) support\n");
+    mp_msg(MSGT_VO, MSGL_STATUS, "[mga] Driver compiled with TV-out (second-head) support\n");
 #endif
 
     if (!probed)
     {
-	printf("[mga] driver was not probed but is being initializing\n");
+	mp_msg(MSGT_VO, MSGL_STATUS, "[mga] driver was not probed but is being initializing\n");
 	return EINTR;
     }
 
 #ifdef MGA_PCICONFIG_MEMDETECT
     pci_config_read(pci_info.bus, pci_info.card, pci_info.func,
         0x40, 4, &card_option);
-    if (mga_verbose > 1) printf("[mga] OPTION word: 0x%08X  mem: 0x%02X  %s\n", card_option,
+    if (mga_verbose > 1) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] OPTION word: 0x%08X  mem: 0x%02X  %s\n", card_option,
     	(card_option>>10)&0x17, ((card_option>>14)&1)?"SGRAM":"SDRAM");
 #endif
 
     if (mga_ram_size)
     {
-    	printf("[mga] RAMSIZE forced to %d MB\n", mga_ram_size);
+    	mp_msg(MSGT_VO, MSGL_STATUS, "[mga] RAMSIZE forced to %d MB\n", mga_ram_size);
     }
     else
     {
 #ifdef MGA_MEMORY_SIZE
         mga_ram_size = MGA_MEMORY_SIZE;
-        printf("[mga] hard-coded RAMSIZE is %d MB\n", (unsigned int) mga_ram_size);
+        mp_msg(MSGT_VO, MSGL_STATUS, "[mga] hard-coded RAMSIZE is %d MB\n", (unsigned int) mga_ram_size);
 #else
         if (is_g400)
 	{
@@ -1205,7 +1206,7 @@ static int mga_init(void)
 	        case 0x12:  mga_ram_size = 16; break;
 	        default:
 	    	    mga_ram_size = 16;
-		    printf("[mga] Couldn't detect RAMSIZE, assuming 16MB!\n");
+		    mp_msg(MSGT_VO, MSGL_STATUS, "[mga] Couldn't detect RAMSIZE, assuming 16MB!\n");
 	    }
 	}
 	else
@@ -1216,7 +1217,7 @@ static int mga_init(void)
 	    }
 	}
 
-        printf("[mga] detected RAMSIZE is %d MB\n", (unsigned int) mga_ram_size);
+        mp_msg(MSGT_VO, MSGL_STATUS, "[mga] detected RAMSIZE is %d MB\n", (unsigned int) mga_ram_size);
 #endif
     }
 
@@ -1224,42 +1225,42 @@ static int mga_init(void)
     {
 	if ((mga_ram_size < 4) || (mga_ram_size > 64))
 	{
-	    printf("[mga] invalid RAMSIZE: %d MB\n", mga_ram_size);
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[mga] invalid RAMSIZE: %d MB\n", mga_ram_size);
 	    return EINVAL;
 	}
     }
 
-    if (mga_verbose > 1) printf("[mga] hardware addresses: mmio: %#x, framebuffer: %#x\n",
+    if (mga_verbose > 1) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] hardware addresses: mmio: %#x, framebuffer: %#x\n",
         pci_info.base1, pci_info.base0);
 
     mga_mmio_base = map_phys_mem(pci_info.base1,0x4000);
     mga_mem_base = map_phys_mem(pci_info.base0,mga_ram_size*1024*1024);
 
-    if (mga_verbose > 1) printf("[mga] MMIO at %p, IRQ: %d, framebuffer: %p\n",
+    if (mga_verbose > 1) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] MMIO at %p, IRQ: %d, framebuffer: %p\n",
         mga_mmio_base, mga_irq, mga_mem_base);
     err = mtrr_set_type(pci_info.base0,mga_ram_size*1024*1024,MTRR_TYPE_WRCOMB);
-    if(!err) printf("[mga] Set write-combining type of video memory\n");
+    if(!err) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] Set write-combining type of video memory\n");
 #if MGA_ALLOW_IRQ
     if (mga_irq != -1)
     {
     	int tmp = request_irq(mga_irq, mga_handle_irq, SA_INTERRUPT | SA_SHIRQ, "Syncfb Time Base", &mga_irq);
     	if (tmp)
 	{
-    	    printf("syncfb (mga): cannot register irq %d (Err: %d)\n", mga_irq, tmp);
+    	    mp_msg(MSGT_VO, MSGL_STATUS, "[mga] syncfb (mga): cannot register irq %d (Err: %d)\n", mga_irq, tmp);
     	    mga_irq=-1;
 	}
 	else
 	{
-	    printf("syncfb (mga): registered irq %d\n", mga_irq);
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[mga] syncfb (mga): registered irq %d\n", mga_irq);
 	}
     }
     else
     {
-	printf("syncfb (mga): No valid irq was found\n");
+	mp_msg(MSGT_VO, MSGL_STATUS, "[mga] syncfb (mga): No valid irq was found\n");
 	mga_irq=-1;
     }
 #else
-	printf("syncfb (mga): IRQ disabled in mga_vid.c\n");
+	mp_msg(MSGT_VO, MSGL_STATUS, "[mga] syncfb (mga): IRQ disabled in mga_vid.c\n");
 	mga_irq=-1;
 #endif
 
@@ -1268,7 +1269,7 @@ static int mga_init(void)
 
 static void mga_destroy(void)
 {
-    if (mga_verbose) printf("[mga] destroy\n");
+    if (mga_verbose) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] destroy\n");
 
     /* FIXME turn off BES */
     vid_src_ready = 0;
@@ -1291,7 +1292,7 @@ static void mga_destroy(void)
 
 static int mga_query_fourcc(vidix_fourcc_t *to)
 {
-    if (mga_verbose) printf("[mga] query fourcc (%x)\n", to->fourcc);
+    if (mga_verbose) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] query fourcc (%x)\n", to->fourcc);
 
     switch(to->fourcc)
     {
@@ -1336,7 +1337,7 @@ static int mga_set_eq( const vidix_video_eq_t * eq)
     /* contrast and brightness control isn't supported on G200 - alex */
     if (!is_g400)
     {
-	if (mga_verbose) printf("[mga] equalizer isn't supported with G200\n");
+	if (mga_verbose) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] equalizer isn't supported with G200\n");
 	return ENOTSUP;
     }
 
@@ -1363,7 +1364,7 @@ static int mga_get_eq( vidix_video_eq_t * eq)
     /* contrast and brightness control isn't supported on G200 - alex */
     if (!is_g400)
     {
-	if (mga_verbose) printf("[mga] equalizer isn't supported with G200\n");
+	if (mga_verbose) mp_msg(MSGT_VO, MSGL_STATUS, "[mga] equalizer isn't supported with G200\n");
 	return ENOTSUP;
     }
 
@@ -1371,7 +1372,7 @@ static int mga_get_eq( vidix_video_eq_t * eq)
     eq->contrast = (signed short int)(regs.beslumactl & 0xFFFF) * 1000 / 128 - 1000;
     eq->cap = VEQ_CAP_BRIGHTNESS | VEQ_CAP_CONTRAST;
 
-    printf("MGA GET_EQ: br=%d c=%d  \n",eq->brightness,eq->contrast);
+    mp_msg(MSGT_VO, MSGL_STATUS, "MGA GET_EQ: br=%d c=%d  \n",eq->brightness,eq->contrast);
 
     return 0;
 }

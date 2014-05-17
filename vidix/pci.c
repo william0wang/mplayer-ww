@@ -53,6 +53,7 @@
 
 #include "dha.h"
 #include "config.h"
+#include "mp_msg.h"
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
@@ -710,7 +711,7 @@ int pci_config_read(unsigned char bus, unsigned char dev, unsigned char func,
 
     if (len != 4)
     {
-	fprintf(stderr,"pci_config_read: Reading non-dword not supported!\n");
+	mp_msg(MSGT_VO, MSGL_ERR, "[pci] pci_config_read: Reading non-dword not supported!\n");
 	return ENOTSUP;
     }
 

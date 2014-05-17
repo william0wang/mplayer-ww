@@ -36,6 +36,7 @@
 #include "dha.h"
 #include "pci_ids.h"
 #include "pci_names.h"
+#include "mp_msg.h"
 
 #include "sis_bridge.h"
 #include "sis_regs.h"
@@ -251,7 +252,7 @@ static int sis_probe(int verbose, int force)
     force = force;
     err = pci_scan(lst, &num_pci);
     if (err) {
-	printf("[SiS] Error occurred during pci scan: %s\n", strerror(err));
+	mp_msg(MSGT_VO, MSGL_STATUS, "[SiS] Error occurred during pci scan: %s\n", strerror(err));
 	return err;
     } else {
 	err = ENXIO;
@@ -265,7 +266,7 @@ static int sis_probe(int verbose, int force)
 		dname = pci_device_name(VENDOR_SIS, lst[i].device);
 		dname = dname ? dname : "Unknown chip";
 		if (sis_verbose > 0)
-		    printf("[SiS] Found chip: %s (0x%X)\n",
+		    mp_msg(MSGT_VO, MSGL_STATUS, "[SiS] Found chip: %s (0x%X)\n",
 			   dname, lst[i].device);
 		sis_device_id = sis_cap.device_id = lst[i].device;
 		err = 0;
@@ -312,8 +313,8 @@ static int sis_probe(int verbose, int force)
 			}
 			if (sis_has_two_overlays) {
 			    if (sis_verbose > 0)
-				printf
-				    ("[SiS] detected M650/651 with 2 overlays\n");
+				mp_msg(MSGT_VO, MSGL_STATUS,
+				    "[SiS] detected M650/651 with 2 overlays\n");
 			}
 			disable_app_io();
 		    }
@@ -328,7 +329,7 @@ static int sis_probe(int verbose, int force)
 	}
     }
     if (err && sis_verbose) {
-	printf("[SiS] Can't find chip\n");
+	mp_msg(MSGT_VO, MSGL_STATUS, "[SiS] Can't find chip\n");
     } else {
 	sis_probed = 1;
     }
@@ -342,13 +343,13 @@ static int sis_init(void)
     char *env_overlay_crt;
 
     if (!sis_probed) {
-	printf("[SiS] driver was not probed but is being initialized\n");
+	mp_msg(MSGT_VO, MSGL_STATUS, "[SiS] driver was not probed but is being initialized\n");
 	return EINTR;
     }
 
     if (enable_app_io() != 0)
     {
-      printf("[SiS] can't enable register I/O\n");
+      mp_msg(MSGT_VO, MSGL_STATUS, "[SiS] can't enable register I/O\n");
       return EINTR;
     }
 
@@ -387,8 +388,8 @@ static int sis_init(void)
 	if (crt == 1 || crt == 2) {
 	    sis_overlay_on_crt1 = (crt == 1);
 	    if (sis_verbose > 0) {
-		printf
-		    ("[SiS] override: using overlay on CRT%d from VIDIX_CRT\n",
+		mp_msg(MSGT_VO, MSGL_STATUS,
+		    "[SiS] override: using overlay on CRT%d from VIDIX_CRT\n",
 		     crt);
 	    }
 	}
@@ -485,7 +486,7 @@ static void set_disptype_regs(void)
     switch (sis_displaymode) {
     case DISPMODE_SINGLE1:	/* TW: CRT1 only */
 	if (sis_verbose > 2) {
-	    printf("[SiS] Setting up overlay on CRT1\n");
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[SiS] Setting up overlay on CRT1\n");
 	}
 	if (sis_has_two_overlays) {
 	    setsrregmask(0x06, 0x00, 0xc0);
@@ -497,7 +498,7 @@ static void set_disptype_regs(void)
 	break;
     case DISPMODE_SINGLE2:	/* TW: CRT2 only */
 	if (sis_verbose > 2) {
-	    printf("[SiS] Setting up overlay on CRT2\n");
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[SiS] Setting up overlay on CRT2\n");
 	}
 	if (sis_has_two_overlays) {
 	    setsrregmask(0x06, 0x80, 0xc0);
@@ -510,7 +511,7 @@ static void set_disptype_regs(void)
     case DISPMODE_MIRROR:	/* TW: CRT1 + CRT2 */
     default:
 	if (sis_verbose > 2) {
-	    printf("[SiS] Setting up overlay on CRT1 AND CRT2!\n");
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[SiS] Setting up overlay on CRT1 AND CRT2!\n");
 	}
 	setsrregmask(0x06, 0x80, 0xc0);
 	setsrregmask(0x32, 0x80, 0xc0);
@@ -1028,7 +1029,7 @@ static void set_overlay(SISOverlayPtr pOverlay, int index)
 	watchdog = WATCHDOG_DELAY;
 	while ((!pOverlay->VBlankActiveFunc()) && --watchdog);
 	if (!watchdog && sis_verbose > 0) {
-	    printf("[SiS]: timed out waiting for vertical retrace\n");
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[SiS]: timed out waiting for vertical retrace\n");
 	}
     }
 

@@ -38,6 +38,7 @@
 #include "dha.h"
 #include "pci_ids.h"
 #include "pci_names.h"
+#include "mp_msg.h"
 
 #include "mach64.h"
 
@@ -291,7 +292,7 @@ static int mach64_get_vert_stretch(void)
     int yres= mach64_get_yres();
 
     if(!supports_lcd_v_stretch){
-        if(verbosity > 0) printf("[mach64] vertical stretching not supported\n");
+        if(verbosity > 0) mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] vertical stretching not supported\n");
         return 1<<16;
     }
 
@@ -314,7 +315,7 @@ static int mach64_get_vert_stretch(void)
 
     OUTREG(LCD_INDEX, lcd_index);
 
-    if(verbosity > 0) printf("[mach64] vertical stretching factor= %d\n", ret);
+    if(verbosity > 0) mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] vertical stretching factor= %d\n", ret);
 
     return ret;
 }
@@ -337,19 +338,19 @@ static void mach64_vid_make_default(void)
 static void mach64_vid_dump_regs( void )
 {
   size_t i;
-  printf("[mach64] *** Begin of DRIVER variables dump ***\n");
-  printf("[mach64] mach64_mmio_base=%p\n",mach64_mmio_base);
-  printf("[mach64] mach64_mem_base=%p\n",mach64_mem_base);
-  printf("[mach64] mach64_overlay_off=%08X\n",mach64_overlay_offset);
-  printf("[mach64] mach64_ram_size=%08X\n",mach64_ram_size);
-  printf("[mach64] video mode: %ux%u@%u\n",mach64_get_xres(),mach64_get_yres(),mach64_vid_get_dbpp());
-  printf("[mach64] *** Begin of OV0 registers dump ***\n");
+  mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] *** Begin of DRIVER variables dump ***\n");
+  mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] mach64_mmio_base=%p\n",mach64_mmio_base);
+  mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] mach64_mem_base=%p\n",mach64_mem_base);
+  mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] mach64_overlay_off=%08X\n",mach64_overlay_offset);
+  mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] mach64_ram_size=%08X\n",mach64_ram_size);
+  mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] video mode: %ux%u@%u\n",mach64_get_xres(),mach64_get_yres(),mach64_vid_get_dbpp());
+  mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] *** Begin of OV0 registers dump ***\n");
   for(i=0;i<sizeof(vregs)/sizeof(video_registers_t);i++)
   {
 	mach64_wait_for_idle();
-	printf("[mach64] %s = %08X\n",vregs[i].sname,INREG(vregs[i].name));
+	mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] %s = %08X\n",vregs[i].sname,INREG(vregs[i].name));
   }
-  printf("[mach64] *** End of OV0 registers dump ***\n");
+  mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] *** End of OV0 registers dump ***\n");
 }
 
 
@@ -414,7 +415,7 @@ static int mach64_probe(int verbose,int force)
   err = pci_scan(lst,&num_pci);
   if(err)
   {
-    printf("[mach64] Error occurred during pci scan: %s\n",strerror(err));
+    mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] Error occurred during pci scan: %s\n",strerror(err));
     return err;
   }
   else
@@ -430,19 +431,19 @@ static int mach64_probe(int verbose,int force)
 	if(idx == -1 && force == PROBE_NORMAL) continue;
 	dname = pci_device_name(VENDOR_ATI,lst[i].device);
 	dname = dname ? dname : "Unknown chip";
-	printf("[mach64] Found chip: %s\n",dname);
+	mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] Found chip: %s\n",dname);
 #if 0
 	if ((lst[i].command & PCI_COMMAND_IO) == 0)
 	{
-		printf("[mach64] Device is disabled, ignoring\n");
+		mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] Device is disabled, ignoring\n");
 		continue;
 	}
 #endif
 	if(force > PROBE_NORMAL)
 	{
-	    printf("[mach64] Driver was forced. Was found %sknown chip\n",idx == -1 ? "un" : "");
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] Driver was forced. Was found %sknown chip\n",idx == -1 ? "un" : "");
 	    if(idx == -1)
-		printf("[mach64] Assuming it as Mach64\n");
+		mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] Assuming it as Mach64\n");
 	}
 	mach64_cap.device_id = lst[i].device;
 	err = 0;
@@ -452,7 +453,7 @@ static int mach64_probe(int verbose,int force)
       }
     }
   }
-  if(err && verbose) printf("[mach64] Can't find chip\n");
+  if(err && verbose) mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] Can't find chip\n");
   return err;
 }
 
@@ -472,7 +473,7 @@ static int mach64_init(void)
   int err;
   if(!probed)
   {
-    printf("[mach64] Driver was not probed but is being initializing\n");
+    mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] Driver was not probed but is being initializing\n");
     return EINTR;
   }
 
@@ -485,9 +486,9 @@ static int mach64_init(void)
   mach64_ram_size *= 0x400; /* KB -> bytes */
   if((mach64_mem_base = map_phys_mem(pci_info.base0,mach64_ram_size))==(void *)-1) return ENOMEM;
   memset(&besr,0,sizeof(bes_registers_t));
-  printf("[mach64] Video memory = %uMb\n",mach64_ram_size/0x100000);
+  mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] Video memory = %uMb\n",mach64_ram_size/0x100000);
   err = mtrr_set_type(pci_info.base0,mach64_ram_size,MTRR_TYPE_WRCOMB);
-  if(!err) printf("[mach64] Set write-combining type of video memory\n");
+  if(!err) mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] Set write-combining type of video memory\n");
 
   /* save this */
   mach64_wait_for_idle();
@@ -508,8 +509,8 @@ static int mach64_init(void)
 
 	if(INREG(SCALER_BUF0_OFFSET_U)) 	supports_planar=1;
   }
-  if(supports_planar)	printf("[mach64] Planar YUV formats are supported :)\n");
-  else			printf("[mach64] Planar YUV formats are not supported :(\n");
+  if(supports_planar)	mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] Planar YUV formats are supported :)\n");
+  else			mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] Planar YUV formats are not supported :(\n");
 
   if(   mach64_cap.device_id==DEVICE_ATI_RAGE_MOBILITY_P_M
      || mach64_cap.device_id==DEVICE_ATI_RAGE_MOBILITY_P_M2
@@ -768,7 +769,7 @@ static int mach64_vid_init_video( vidix_playback_t *config )
     besr.fourcc = config->fourcc;
     ecp = (INPLL(PLL_VCLK_CNTL) & PLL_ECP_DIV) >> 4;
 
-    if(verbosity > 0) printf("[mach64] ecp: %d\n", ecp);
+    if(verbosity > 0) mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] ecp: %d\n", ecp);
     v_inc = src_h * mach64_get_vert_stretch();
 
     if(mach64_is_interlace()) v_inc<<=1;
@@ -921,7 +922,7 @@ static int mach64_frame_sel(unsigned int frame)
     uint32_t off[6];
     int i;
     int last_frame= (frame-1+num_mach64_buffers) % num_mach64_buffers;
-//printf("Selecting frame %d\n", frame);
+//mp_msg(MSGT_VO, MSGL_STATUS, "Selecting frame %d\n", frame);
     /*
     buf3-5 always should point onto second buffer for better
     deinterlacing and TV-in

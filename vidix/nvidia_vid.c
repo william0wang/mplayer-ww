@@ -39,6 +39,7 @@
 #include "pci_names.h"
 #include "libavutil/common.h"
 #include "mpbswap.h"
+#include "mp_msg.h"
 
 
 static pciinfo_t pci_info;
@@ -332,10 +333,10 @@ static int nv_probe(int verbose, int force){
     int err;
 
     if (force)
-	    printf("[nvidia_vid]: warning: forcing not supported yet!\n");
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid]: warning: forcing not supported yet!\n");
     err = pci_scan(lst,&num_pci);
     if(err){
-	printf("[nvidia_vid] Error occurred during pci scan: %s\n",strerror(err));
+	mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] Error occurred during pci scan: %s\n",strerror(err));
 	return err;
     }
     else {
@@ -349,9 +350,9 @@ static int nv_probe(int verbose, int force){
 		    continue;
 		dname = pci_device_name(lst[i].vendor, lst[i].device);
 		dname = dname ? dname : "Unknown chip";
-		printf("[nvidia_vid] Found chip: %s\n", dname);
+		mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] Found chip: %s\n", dname);
 		if ((lst[i].command & PCI_COMMAND_IO) == 0){
-			printf("[nvidia_vid] Device is disabled, ignoring\n");
+			mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] Device is disabled, ignoring\n");
 			continue;
 		}
 		nvidia_cap.device_id = lst[i].device;
@@ -361,7 +362,7 @@ static int nv_probe(int verbose, int force){
 	    }
 	}
     }
-    if(err && verbose) printf("[nvidia_vid] Can't find chip\n");
+    if(err && verbose) mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] Can't find chip\n");
     return err;
 }
 
@@ -534,7 +535,7 @@ static void  rivatv_enable_PMEDIA (struct rivatv_info *info){
 	/* NV3 (0x10100010): NV03_PMC_ENABLE_PMEDIA, NV03_PMC_ENABLE_PFB, NV03_PMC_ENABLE_PVIDEO */
 
 	if ((reg & 0x10100010) != 0x10100010) {
-		printf("PVIDEO and PFB disabled, enabling...\n");
+		mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] PVIDEO and PFB disabled, enabling...\n");
 		VID_OR32 (info->chip.PMC, 0x000200, 0x10100010);
 	}
 
@@ -637,7 +638,7 @@ static void rivatv_overlay_colorkey (rivatv_info* info, unsigned int chromakey){
 #endif
 		break;
 	}
-	//printf("[nvidia_vid] depth=%d %08X \n", info->depth, chromakey);
+	//mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] depth=%d %08X \n", info->depth, chromakey);
     switch (info->chip.arch) {
 	  case NV_ARCH_10:
 	  case NV_ARCH_20:
@@ -884,7 +885,7 @@ static int nv_init(void){
   info = calloc(1,sizeof(rivatv_info));
   info->control_base = map_phys_mem(pci_info.base0, 0x00C00000 + 0x00008000);
   info->chip.arch =  nvidia_card_ids[find_chip(pci_info.device)].arch;
-  printf("[nvidia_vid] arch %x register base %p\n",info->chip.arch,info->control_base);
+  mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] arch %x register base %p\n",info->chip.arch,info->control_base);
   info->chip.PFIFO  = (uint32_t *) (info->control_base + 0x00002000);
   info->chip.FIFO   = (uint32_t *) (info->control_base + 0x00800000);
   info->chip.PMC    = (uint32_t *) (info->control_base + 0x00000000);
@@ -943,16 +944,16 @@ static int nv_init(void){
 	}
   }
 
-  printf("[nvidia_vid] detected memory size %u MB\n",(uint32_t)(info->chip.fbsize /1024/1024));
+  mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] detected memory size %u MB\n",(uint32_t)(info->chip.fbsize /1024/1024));
 
   if ((mtrr = mtrr_set_type(pci_info.base1, info->chip.fbsize, MTRR_TYPE_WRCOMB))!= 0)
-	  printf("[nvidia_vid] unable to setup MTRR: %s\n", strerror(mtrr));
+	  mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] unable to setup MTRR: %s\n", strerror(mtrr));
   else
-	  printf("[nvidia_vid] MTRR set up\n");
+	  mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] MTRR set up\n");
 
   nv_getscreenproperties(info);
-  if(!info->depth)printf("[nvidia_vid] text mode: %ux%u\n",info->screen_x,info->screen_y);
-  else printf("[nvidia_vid] video mode: %ux%u@%u\n",info->screen_x,info->screen_y, info->depth);
+  if(!info->depth) mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] text mode: %ux%u\n",info->screen_x,info->screen_y);
+  else mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] video mode: %ux%u@%u\n",info->screen_x,info->screen_y, info->depth);
 
 
   rivatv_enable_PMEDIA(info);
@@ -1001,7 +1002,7 @@ static int nv_query_fourcc(vidix_fourcc_t *to){
 
 static int nv_config_playback(vidix_playback_t *vinfo){
     uint32_t i;
-//    printf("called %s\n", __FUNCTION__);
+//    mp_msg(MSGT_VO, MSGL_STATUS, "called %s\n", __FUNCTION__);
     if (! is_supported_fourcc(vinfo->fourcc))
 	    return ENOSYS;
 
@@ -1014,7 +1015,7 @@ static int nv_config_playback(vidix_playback_t *vinfo){
     info->wy = vinfo->dest.y;
     info->format = vinfo->fourcc;
 
-    printf("[nvidia_vid] setting up a %dx%d-%dx%d video window (src %dx%d), format 0x%X\n",
+    mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] setting up a %dx%d-%dx%d video window (src %dx%d), format 0x%X\n",
 		    info->d_width, info->d_height, info->wx, info->wy, info->width, info->height, vinfo->fourcc);
 
 
@@ -1040,7 +1041,7 @@ static int nv_config_playback(vidix_playback_t *vinfo){
     info->num_frames = vinfo->num_frames= (info->chip.fbsize - info->picture_offset)/vinfo->frame_size;
     if(vinfo->num_frames > MAX_FRAMES)vinfo->num_frames = MAX_FRAMES;
 //    vinfo->num_frames = 1;
-//    printf("[nvidia_vid] Number of frames %i\n",vinfo->num_frames);
+//    mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] Number of frames %i\n",vinfo->num_frames);
     for(i=0;i <vinfo->num_frames;i++)vinfo->offsets[i] = vinfo->frame_size*i;
     return 0;
 }
@@ -1059,19 +1060,19 @@ static int nv_set_gkeys( const vidix_grkey_t * grkey){
   if (grkey->ckey.op == CKEY_FALSE)
   {
     info->use_colorkey = 0;
-    printf("[nvidia_vid] colorkeying disabled\n");
+    mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] colorkeying disabled\n");
   }
   else {
   info->use_colorkey = 1;
   info->vidixcolorkey = ((grkey->ckey.red<<16)|(grkey->ckey.green<<8)|grkey->ckey.blue);
-  printf("[nvidia_vid] set colorkey 0x%x\n",info->vidixcolorkey);
+  mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] set colorkey 0x%x\n",info->vidixcolorkey);
   }
   if(info->d_width && info->d_height)rivatv_overlay_start(info,0);
   return 0;
 }
 
 static int nv_frame_sel(unsigned int frame){
-//  printf("selecting buffer %d\n", frame);
+//  mp_msg(MSGT_VO, MSGL_STATUS, "selecting buffer %d\n", frame);
   rivatv_overlay_start(info, frame);
   if (info->num_frames >= 1)
 	  info->cur_frame = frame/*(frame+1)%info->num_frames*/;
@@ -1129,20 +1130,20 @@ VDXDriver nvidia_drv = {
 
 int main(int argc,char* argv[]){
   if(nv_probe(0,0)){
-        printf("no supported chip found\n");
+        mp_msg(MSGT_VO, MSGL_STATUS, "no supported chip found\n");
         return 1;
   }
   if(nv_init()){
-	printf("could not init\n");
+	mp_msg(MSGT_VO, MSGL_STATUS, "could not init\n");
 	return 1;
   }
   if(info->chip.arch >= NV_ARCH_10){
-    printf("NV_PVIDEO_BASE (0x900) 0x%x\n",VID_RD32(info->chip.PVIDEO, 0x900));
-    printf("NV_PVIDEO_LIMIT (0x908) 0x%x\n",VID_RD32(info->chip.PVIDEO, 0x908));
-    printf("NV_PVIDEO_OFFSET (0x920) 0x%x\n",VID_RD32(info->chip.PVIDEO, 0x920));
-    printf("NV_PVIDEO_FORMAT (0x958) 0x%x\n",VID_RD32(info->chip.PVIDEO, 0x958));
-    printf("NV_PVIDEO_STOP (0x704) 0x%x\n",VID_RD32(info->chip.PVIDEO, 0x704));
-    printf("NV_PVIDEO_BUFFER (0x700) 0x%x\n",VID_RD32(info->chip.PVIDEO, 0x700));
+    mp_msg(MSGT_VO, MSGL_STATUS, "NV_PVIDEO_BASE (0x900) 0x%x\n",VID_RD32(info->chip.PVIDEO, 0x900));
+    mp_msg(MSGT_VO, MSGL_STATUS, "NV_PVIDEO_LIMIT (0x908) 0x%x\n",VID_RD32(info->chip.PVIDEO, 0x908));
+    mp_msg(MSGT_VO, MSGL_STATUS, "NV_PVIDEO_OFFSET (0x920) 0x%x\n",VID_RD32(info->chip.PVIDEO, 0x920));
+    mp_msg(MSGT_VO, MSGL_STATUS, "NV_PVIDEO_FORMAT (0x958) 0x%x\n",VID_RD32(info->chip.PVIDEO, 0x958));
+    mp_msg(MSGT_VO, MSGL_STATUS, "NV_PVIDEO_STOP (0x704) 0x%x\n",VID_RD32(info->chip.PVIDEO, 0x704));
+    mp_msg(MSGT_VO, MSGL_STATUS, "NV_PVIDEO_BUFFER (0x700) 0x%x\n",VID_RD32(info->chip.PVIDEO, 0x700));
   }
 
   nv_destroy();

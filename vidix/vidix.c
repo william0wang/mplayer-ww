@@ -43,6 +43,7 @@
 #include "drivers.h"
 #include "libavutil/common.h"
 #include "mpbswap.h"
+#include "mp_msg.h"
 
 VDXContext *vdlOpen(const char *name,unsigned cap,int verbose)
 {
@@ -62,30 +63,30 @@ VDXContext *vdlOpen(const char *name,unsigned cap,int verbose)
   }
 
   if (verbose)
-    printf ("vidixlib: will use %s driver\n", ctx->drv->name);
+    mp_msg(MSGT_VO, MSGL_STATUS, "[vidixlib] Will use %s driver\n", ctx->drv->name);
 
   if (!ctx->drv || !ctx->drv->init)
   {
     if (verbose)
-      printf ("vidixlib: Can't init driver\n");
+      mp_msg(MSGT_VO, MSGL_STATUS, "[vidixlib] Can't init driver\n");
     free (ctx);
     return NULL;
   }
 
   if (verbose)
-    printf ("vidixlib: Attempt to initialize driver at: %p\n",
+    mp_msg(MSGT_VO, MSGL_STATUS, "[vidixlib] Attempt to initialize driver at: %p\n",
             ctx->drv->init);
 
   if (ctx->drv->init () !=0)
   {
     if (verbose)
-      printf ("vidixlib: Can't init driver\n");
+      mp_msg(MSGT_VO, MSGL_STATUS, "[vidixlib] Can't init driver\n");
     free (ctx);
     return NULL;
   }
 
   if (verbose)
-    printf("vidixlib: '%s'successfully loaded\n", ctx->drv->name);
+    mp_msg(MSGT_VO, MSGL_STATUS, "[vidixlib] '%s'successfully loaded\n", ctx->drv->name);
 
   return ctx;
 }

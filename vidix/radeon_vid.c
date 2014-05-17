@@ -40,6 +40,7 @@
 #include "fourcc.h"
 #include "dha.h"
 #include "radeon.h"
+#include "mp_msg.h"
 
 #if !defined(RAGE128) && defined(CONFIG_X11)
 #include <X11/Xlib.h>
@@ -57,7 +58,7 @@ static uint32_t firegl_shift = 0;
 #endif
 #endif
 
-#define RADEON_ASSERT(msg) printf(RADEON_MSG"################# FATAL:"msg);
+#define RADEON_ASSERT(msg) mp_msg(MSGT_VO, MSGL_ERR, RADEON_MSG"################# FATAL:"msg);
 
 #define VERBOSE_LEVEL 0
 static int verbosity = 0;
@@ -1189,13 +1190,13 @@ static void probe_fireGL_driver(void) {
       if (!strcmp(extlist[i], "ATIFGLRXDRI")) ext_fglrx = 1;
     }
     if (ext_fgl) {
-      printf(RADEON_MSG" ATI FireGl driver detected");
+      mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" ATI FireGl driver detected");
       firegl_shift = 0x500000;
       if (!ext_fglrx) {
-        printf(", but DRI seems not to be activated\n");
-        printf(RADEON_MSG" Output may not work correctly, check your DRI configration!");
+        mp_msg(MSGT_VO, MSGL_STATUS, ", but DRI seems not to be activated\n");
+        mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Output may not work correctly, check your DRI configration!");
       }
-      printf("\n");
+      mp_msg(MSGT_VO, MSGL_STATUS, "\n");
     }
   }
 }
@@ -1210,7 +1211,7 @@ static int radeon_probe(int verbose, int force)
   err = pci_scan(lst,&num_pci);
   if(err)
   {
-    printf(RADEON_MSG" Error occurred during pci scan: %s\n",strerror(err));
+    mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Error occurred during pci scan: %s\n",strerror(err));
     return err;
   }
   else
@@ -1226,23 +1227,23 @@ static int radeon_probe(int verbose, int force)
 	if(idx == -1 && force == PROBE_NORMAL) continue;
 	dname = pci_device_name(VENDOR_ATI,lst[i].device);
 	dname = dname ? dname : "Unknown chip";
-	printf(RADEON_MSG" Found chip: %s\n",dname);
+	mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Found chip: %s\n",dname);
 #if 0
         if ((lst[i].command & PCI_COMMAND_IO) == 0)
         {
-          printf("[radeon] Device is disabled, ignoring\n");
+          mp_msg(MSGT_VO, MSGL_STATUS, "[radeon] Device is disabled, ignoring\n");
           continue;
         }
 #endif
 	memset(&besr,0,sizeof(bes_registers_t));
 	if(force > PROBE_NORMAL)
 	{
-	    printf(RADEON_MSG" Driver was forced. Was found %sknown chip\n",idx == -1 ? "un" : "");
+	    mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Driver was forced. Was found %sknown chip\n",idx == -1 ? "un" : "");
 	    if(idx == -1)
 #ifdef RAGE128
-		printf(RADEON_MSG" Assuming it as Rage128\n");
+		mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Assuming it as Rage128\n");
 #else
-		printf(RADEON_MSG" Assuming it as Radeon1\n");
+		mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Assuming it as Radeon1\n");
 #endif
 	    besr.chip_flags=R_100|R_OVL_SHIFT;
 	}
@@ -1258,7 +1259,7 @@ static int radeon_probe(int verbose, int force)
       }
     }
   }
-  if(err && verbose) printf(RADEON_MSG" Can't find chip\n");
+  if(err && verbose) mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Can't find chip\n");
   return err;
 }
 
@@ -1334,7 +1335,7 @@ static int radeon_init(void)
 
   if(!probed)
   {
-    printf(RADEON_MSG" Driver was not probed but is being initializing\n");
+    mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Driver was not probed but is being initializing\n");
     return EINTR;
   }
   if((radeon_mmio_base = map_phys_mem(pci_info.base2,0xFFFF))==(void *)-1) return ENOMEM;
@@ -1347,13 +1348,13 @@ static int radeon_init(void)
       (def_cap.device_id == DEVICE_ATI_RADEON_MOBILITY_M6 ||
        def_cap.device_id == DEVICE_ATI_RADEON_MOBILITY_M62))
   {
-      printf(RADEON_MSG" Working around buggy Radeon Mobility M6 (0 vs. 8MB ram)\n");
+      mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Working around buggy Radeon Mobility M6 (0 vs. 8MB ram)\n");
       radeon_ram_size = 8192*1024;
   }
   else if (radeon_ram_size == 0 &&
            (def_cap.device_id == DEVICE_ATI_RS482_RADEON_XPRESS))
   {
-      printf(RADEON_MSG" Working around buggy RS482 Radeon Xpress 200 Memory Detection\n");
+      mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Working around buggy RS482 Radeon Xpress 200 Memory Detection\n");
       radeon_ram_size = (INREG(CONFIG_MEMSIZE) + 0x100000) << 2;
       radeon_ram_size &=  CONFIG_MEMSIZE_MASK;
   }
@@ -1363,15 +1364,15 @@ static int radeon_init(void)
       (def_cap.device_id == DEVICE_ATI_RAGE_MOBILITY_M3 ||
        def_cap.device_id == DEVICE_ATI_RAGE_MOBILITY_M32))
   {
-      printf(RADEON_MSG" Working around Rage Mobility M3 (0 vs. 8MB ram)\n");
+      mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Working around Rage Mobility M3 (0 vs. 8MB ram)\n");
       radeon_ram_size = 8192*1024;
   }
 #endif
   if((radeon_mem_base = map_phys_mem(pci_info.base0,radeon_ram_size))==(void *)-1) return ENOMEM;
   radeon_vid_make_default();
-  printf(RADEON_MSG" Video memory = %uMb\n",radeon_ram_size/0x100000);
+  mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Video memory = %uMb\n",radeon_ram_size/0x100000);
   err = mtrr_set_type(pci_info.base0,radeon_ram_size,MTRR_TYPE_WRCOMB);
-  if(!err) printf(RADEON_MSG" Set write-combining type of video memory\n");
+  if(!err) mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Set write-combining type of video memory\n");
 #ifndef RAGE128
   {
     memset(&rinfo,0,sizeof(rinfo_t));
@@ -1379,11 +1380,11 @@ static int radeon_init(void)
 
     radeon_get_moninfo(&rinfo);
 	if(rinfo.hasCRTC2) {
-	    printf(RADEON_MSG" DVI port has %s monitor connected\n",GET_MON_NAME(rinfo.dviDispType));
-	    printf(RADEON_MSG" CRT port has %s monitor connected\n",GET_MON_NAME(rinfo.crtDispType));
+	    mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" DVI port has %s monitor connected\n",GET_MON_NAME(rinfo.dviDispType));
+	    mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" CRT port has %s monitor connected\n",GET_MON_NAME(rinfo.crtDispType));
 	}
 	else
-	    printf(RADEON_MSG" CRT port has %s monitor connected\n",GET_MON_NAME(rinfo.crtDispType));
+	    mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" CRT port has %s monitor connected\n",GET_MON_NAME(rinfo.crtDispType));
   }
 #endif
   save_regs();
@@ -1461,17 +1462,17 @@ static double H_scale_ratio;
 static void radeon_vid_dump_regs( void )
 {
   size_t i;
-  printf(RADEON_MSG"*** Begin of DRIVER variables dump ***\n");
-  printf(RADEON_MSG"radeon_mmio_base=%p\n",radeon_mmio_base);
-  printf(RADEON_MSG"radeon_mem_base=%p\n",radeon_mem_base);
-  printf(RADEON_MSG"radeon_overlay_off=%08X\n",radeon_overlay_off);
-  printf(RADEON_MSG"radeon_ram_size=%08X\n",radeon_ram_size);
-  printf(RADEON_MSG"video mode: %ux%u@%u\n",radeon_get_xres(),radeon_get_yres(),radeon_vid_get_dbpp());
-  printf(RADEON_MSG"H_scale_ratio=%8.2f\n",H_scale_ratio);
-  printf(RADEON_MSG"*** Begin of OV0 registers dump ***\n");
+  mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG"*** Begin of DRIVER variables dump ***\n");
+  mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG"radeon_mmio_base=%p\n",radeon_mmio_base);
+  mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG"radeon_mem_base=%p\n",radeon_mem_base);
+  mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG"radeon_overlay_off=%08X\n",radeon_overlay_off);
+  mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG"radeon_ram_size=%08X\n",radeon_ram_size);
+  mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG"video mode: %ux%u@%u\n",radeon_get_xres(),radeon_get_yres(),radeon_vid_get_dbpp());
+  mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG"H_scale_ratio=%8.2f\n",H_scale_ratio);
+  mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG"*** Begin of OV0 registers dump ***\n");
   for(i=0;i<sizeof(vregs)/sizeof(video_registers_t);i++)
-	printf(RADEON_MSG"%s = %08X\n",vregs[i].sname,INREG(vregs[i].name));
-  printf(RADEON_MSG"*** End of OV0 registers dump ***\n");
+	mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG"%s = %08X\n",vregs[i].sname,INREG(vregs[i].name));
+  mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG"*** End of OV0 registers dump ***\n");
 }
 
 static void radeon_vid_stop_video( void )
@@ -1580,7 +1581,7 @@ static void radeon_vid_display_video( void )
     OUTREG(OV0_FOUR_TAP_COEF_4,besr.four_tap_coeff[4]);
     if(besr.swap_uv) OUTREG(OV0_TEST,INREG(OV0_TEST)|OV0_SWAP_UV);
     OUTREG(OV0_REG_LOAD_CNTL,		0);
-    if(verbosity > VERBOSE_LEVEL) printf(RADEON_MSG"we wanted: scaler=%08X\n",bes_flags);
+    if(verbosity > VERBOSE_LEVEL) mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG"we wanted: scaler=%08X\n",bes_flags);
     if(verbosity > VERBOSE_LEVEL) radeon_vid_dump_regs();
 }
 

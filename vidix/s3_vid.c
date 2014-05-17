@@ -36,6 +36,7 @@
 #include "dha.h"
 #include "pci_ids.h"
 #include "pci_names.h"
+#include "mp_msg.h"
 
 #include "s3_regs.h"
 
@@ -507,7 +508,7 @@ static void S3GetScrProp (struct s3_info *info)
   info->screen_y |= (VGAIN8 (vgaCRReg) & 0x40) << 3;
   ++info->screen_y;
 
-  printf ("[s3_vid] x = %d, y = %d, bpp = %d\n", info->screen_x, info->screen_y, info->bpp);
+  mp_msg(MSGT_VO, MSGL_STATUS, "[s3_vid] x = %d, y = %d, bpp = %d\n", info->screen_x, info->screen_y, info->bpp);
 }
 
 static void S3StreamsOff (void)
@@ -552,11 +553,11 @@ static int s3_probe (int verbose, int force)
   int err;
 
   if (force)
-    printf ("[s3_vid] Warning: forcing not supported yet!\n");
+    mp_msg(MSGT_VO, MSGL_STATUS, "[s3_vid] Warning: forcing not supported yet!\n");
   err = pci_scan (lst, &num_pci);
   if (err)
   {
-    printf ("[s3_vid] Error occurred during pci scan: %s\n", strerror (err));
+    mp_msg(MSGT_VO, MSGL_STATUS, "[s3_vid] Error occurred during pci scan: %s\n", strerror (err));
     return err;
   }
   else
@@ -573,11 +574,11 @@ static int s3_probe (int verbose, int force)
           continue;
         dname = pci_device_name (lst[i].vendor, lst[i].device);
         dname = dname ? dname : "Unknown chip";
-        printf ("[s3_vid] Found chip: %s\n", dname);
+        mp_msg(MSGT_VO, MSGL_STATUS, "[s3_vid] Found chip: %s\n", dname);
         // FIXME: whats wrong here?
         if ((lst[i].command & PCI_COMMAND_IO) == 0)
         {
-          printf ("[s3_vid] Device is disabled, ignoring\n");
+          mp_msg(MSGT_VO, MSGL_STATUS, "[s3_vid] Device is disabled, ignoring\n");
           continue;
         }
         s3_cap.device_id = lst[i].device;
@@ -588,7 +589,7 @@ static int s3_probe (int verbose, int force)
     }
   }
   if (err && verbose)
-    printf ("[s3_vid] Can't find chip\n");
+    mp_msg(MSGT_VO, MSGL_STATUS, "[s3_vid] Can't find chip\n");
   return err;
 }
 
@@ -686,7 +687,7 @@ static int s3_init (void)
     break;
   }
 
-  printf ("[s3_vid] VideoRam = %d\n", videoRam);
+  mp_msg(MSGT_VO, MSGL_STATUS, "[s3_vid] VideoRam = %d\n", videoRam);
   info->chip.fbsize = videoRam * 1024;
 
   if (info->chip.arch <= S3_SAVAGE3D)
@@ -695,9 +696,9 @@ static int s3_init (void)
     mtrr = mtrr_set_type (pci_info.base1, info->chip.fbsize, MTRR_TYPE_WRCOMB);
 
   if (mtrr != 0)
-    printf ("[s3_vid] Unable to setup MTRR: %s\n", strerror (mtrr));
+    mp_msg(MSGT_VO, MSGL_STATUS, "[s3_vid] Unable to setup MTRR: %s\n", strerror (mtrr));
   else
-    printf ("[s3_vid] MTRR set up\n");
+    mp_msg(MSGT_VO, MSGL_STATUS, "[s3_vid] MTRR set up\n");
 
   S3GetScrProp (info);
   S3StreamsOn ();
@@ -767,13 +768,13 @@ static int s3_set_gkeys (const vidix_grkey_t * grkey)
   {
     info->use_colorkey = 0;
     info->vidixcolorkey = 0;
-    printf ("[s3_vid] Colorkeying disabled\n");
+    mp_msg(MSGT_VO, MSGL_STATUS, "[s3_vid] Colorkeying disabled\n");
   }
   else
   {
     info->use_colorkey = 1;
     info->vidixcolorkey = ((grkey->ckey.red << 16) | (grkey->ckey.green << 8) | grkey->ckey.blue);
-    printf ("[s3_vid] Set colorkey 0x%x\n", info->vidixcolorkey);
+    mp_msg(MSGT_VO, MSGL_STATUS, "[s3_vid] Set colorkey 0x%x\n", info->vidixcolorkey);
   }
   if (S3SetColorKey)
     S3SetColorKey ();
@@ -858,7 +859,7 @@ static int s3_config_playback (vidix_playback_t * vinfo)
   info->picture_offset = info->screen_x * info->screen_y * (info->bpp >> 3);
   if (info->picture_offset > (info->chip.fbsize - vinfo->frame_size))
   {
-    printf ("[s3_vid] Not enough memory for overlay\n");
+    mp_msg(MSGT_VO, MSGL_STATUS, "[s3_vid] Not enough memory for overlay\n");
     return -1;
   }
 
@@ -869,7 +870,7 @@ static int s3_config_playback (vidix_playback_t * vinfo)
 
   if (info->video_base == NULL)
   {
-    printf ("[s3_vid] errno = %s\n", strerror (errno));
+    mp_msg(MSGT_VO, MSGL_STATUS, "[s3_vid] errno = %s\n", strerror (errno));
     return -1;
   }
 

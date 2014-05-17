@@ -29,6 +29,7 @@
 #include "drivers.h"
 #include "libavutil/common.h"
 #include "mpbswap.h"
+#include "mp_msg.h"
 #include "config.h"
 
 VDXDriver *first_driver = NULL;
@@ -111,7 +112,7 @@ static int vidix_probe_driver (VDXContext *ctx, VDXDriver *drv,
   vidix_capability_t vid_cap;
 
   if (verbose)
-    printf ("vidixlib: PROBING: %s\n", drv->name);
+    mp_msg(MSGT_VO, MSGL_STATUS, "[vidixlib] PROBING: %s\n", drv->name);
 
   if (!drv->probe || drv->probe (verbose, PROBE_NORMAL) != 0)
     return 0;
@@ -122,13 +123,13 @@ static int vidix_probe_driver (VDXContext *ctx, VDXDriver *drv,
   if ((vid_cap.type & cap) != cap)
   {
     if (verbose)
-      printf ("vidixlib: Found %s but has no required capability\n",
+      mp_msg(MSGT_VO, MSGL_STATUS, "[vidixlib] Found %s but has no required capability\n",
               drv->name);
      return 0;
   }
 
   if (verbose)
-    printf ("vidixlib: %s probed o'k\n", drv->name);
+    mp_msg(MSGT_VO, MSGL_STATUS, "[vidixlib] %s probed o'k\n", drv->name);
 
   ctx->drv = drv;
   return 1;
@@ -138,14 +139,14 @@ static void vidix_list_drivers (void)
 {
   VDXDriver *drv;
 
-  printf ("Available VIDIX drivers:\n");
+  mp_msg(MSGT_VO, MSGL_STATUS, "[vidixlib] Available VIDIX drivers:\n");
 
   drv = first_driver;
   while (drv)
   {
     vidix_capability_t cap;
     drv->get_caps (&cap);
-    printf (" * %s - %s\n", drv->name, cap.name);
+    mp_msg(MSGT_VO, MSGL_STATUS, "[vidixlib]  * %s - %s\n", drv->name, cap.name);
     drv = drv->next;
   }
 }
@@ -187,7 +188,7 @@ int vidix_find_driver (VDXContext *ctx, const char *name,
   }
 
   if (verbose)
-    printf ("vidixlib: No suitable driver can be found.\n");
+    mp_msg(MSGT_VO, MSGL_STATUS, "[vidixlib] No suitable driver can be found.\n");
   ctx->drv = NULL;
   return 0;
 }

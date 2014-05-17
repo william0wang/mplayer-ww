@@ -42,6 +42,7 @@
 #include "config.h"
 #include "vidix.h"
 #include "fourcc.h"
+#include "mp_msg.h"
 
 #include "dha.h"
 
@@ -283,29 +284,29 @@ static int sh_veu_probe(int verbose, int force)
     fb_fd = ret;
 
     if (fbi.bpp != 16) {
-        printf("sh_veu: only 16bpp supported\n");
+        mp_msg(MSGT_VO, MSGL_STATUS, "[sh_veu] only 16bpp supported\n");
         return -1;
     }
 
     ret = locate_uio_device("VEU", &uio_dev);
     if (ret < 0) {
-        printf("sh_veu: unable to locate matching UIO device\n");
+        mp_msg(MSGT_VO, MSGL_STATUS, "[sh_veu] unable to locate matching UIO device\n");
         return ret;
     }
 
     ret = setup_uio_map(&uio_dev, 0, &uio_mmio);
     if (ret < 0) {
-        printf("sh_veu: cannot setup MMIO\n");
+        mp_msg(MSGT_VO, MSGL_STATUS, "[sh_veu] cannot setup MMIO\n");
         return ret;
     }
 
     ret = setup_uio_map(&uio_dev, 1, &uio_mem);
     if (ret < 0) {
-        printf("sh_veu: cannot setup contiguous memory\n");
+        mp_msg(MSGT_VO, MSGL_STATUS, "[sh_veu] cannot setup contiguous memory\n");
         return ret;
     }
 
-    printf("sh_veu: Using %s at %s on %lux%lu %ldbpp /dev/fb0\n",
+    mp_msg(MSGT_VO, MSGL_STATUS, "[sh_veu] Using %s at %s on %lux%lu %ldbpp /dev/fb0\n",
            uio_dev.name, uio_dev.path,
            fbi.width, fbi.height, fbi.bpp);
 
@@ -568,7 +569,7 @@ static int sh_veu_config_playback(vidix_playback_t *info)
         info->num_frames = VID_PLAY_MAXFRAMES;
 
     if (!info->num_frames) {
-        printf("sh_veu: %d is not enough memory for %d bytes frame\n",
+        mp_msg(MSGT_VO, MSGL_STATUS, "[sh_veu] %d is not enough memory for %d bytes frame\n",
                (int)uio_mem.size, (int)info->frame_size);
         return ENOMEM;
     }
@@ -581,13 +582,13 @@ static int sh_veu_config_playback(vidix_playback_t *info)
 
     my_info = *info;
 
-    printf("sh_veu: %d frames * %d bytes, total size = %d\n",
+    mp_msg(MSGT_VO, MSGL_STATUS, "[sh_veu] %d frames * %d bytes, total size = %d\n",
            (int)info->num_frames, (int)info->frame_size,
            (int)uio_mem.size);
 
     sh_veu_setup_planes(info, &_src, &_dst);
 
-    printf("sh_veu: %dx%d->%dx%d@%dx%d -> %dx%d->%dx%d@%dx%d \n",
+    mp_msg(MSGT_VO, MSGL_STATUS, "[sh_veu] %dx%d->%dx%d@%dx%d -> %dx%d->%dx%d@%dx%d \n",
            (int)info->src.w, (int)info->src.h,
            (int)info->dest.w, (int)info->dest.h,
            (int)info->dest.x, (int)info->dest.y,

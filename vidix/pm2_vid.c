@@ -33,6 +33,7 @@
 #include "dha.h"
 #include "pci_ids.h"
 #include "pci_names.h"
+#include "mp_msg.h"
 
 #include "glint_regs.h"
 
@@ -40,8 +41,8 @@
 #define PM2_VIDMEM 6
 
 #if 0
-#define TRACE_ENTER() fprintf(stderr, "%s: enter\n", __FUNCTION__)
-#define TRACE_EXIT() fprintf(stderr, "%s: exit\n", __FUNCTION__)
+#define TRACE_ENTER() mp_msg(MSGT_VO, MSGL_DBG2, "[pm2] %s: enter\n", __FUNCTION__)
+#define TRACE_EXIT() mp_msg(MSGT_VO, MSGL_DBG2, "[pm2] %s: exit\n", __FUNCTION__)
 #else
 #define TRACE_ENTER()
 #define TRACE_EXIT()
@@ -101,7 +102,7 @@ static int pm2_probe(int verbose, int force)
     err = pci_scan(lst,&num_pci);
     if(err)
     {
-	printf("[pm2] Error occurred during pci scan: %s\n",strerror(err));
+	mp_msg(MSGT_VO, MSGL_STATUS, "[pm2] Error occurred during pci scan: %s\n",strerror(err));
 	return err;
     }
     else
@@ -116,21 +117,21 @@ static int pm2_probe(int verbose, int force)
 		continue;
 	    dname = pci_device_name(lst[i].vendor, lst[i].device);
 	    dname = dname ? dname : "Unknown chip";
-	    printf("[pm2] Found chip: %s\n", dname);
+	    mp_msg(MSGT_VO, MSGL_STATUS, "[pm2] Found chip: %s\n", dname);
 	    pm2_cap.device_id = lst[i].device;
 	    err = 0;
 	    memcpy(&pci_info, &lst[i], sizeof(pciinfo_t));
 	    break;
 	}
     }
-    if(err && verbose) printf("[pm2] Can't find chip.\n");
+    if(err && verbose) mp_msg(MSGT_VO, MSGL_STATUS, "[pm2] Can't find chip.\n");
     return err;
 }
 
 #define PRINT_REG(reg)							\
 {									\
     long _foo = READ_REG(reg);						\
-    printf("[pm2] " #reg " (%x) = %#lx (%li)\n", reg, _foo, _foo);	\
+    mp_msg(MSGT_VO, MSGL_STATUS, "[pm2] " #reg " (%x) = %#lx (%li)\n", reg, _foo, _foo);	\
 }
 
 static int pm2_init(void)
