@@ -333,6 +333,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
       s->samples_standing = s->bytes_standing / bps;
       s->output_overlap   = NULL;
     } else {
+      int old_overlap = s->bytes_overlap;
       s->samples_overlap  = frames_overlap * nch;
       s->bytes_overlap    = frames_overlap * nch * bps;
       s->bytes_standing   = s->bytes_stride - s->bytes_overlap;
@@ -343,7 +344,10 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
         mp_msg(MSGT_AFILTER, MSGL_FATAL, "[scaletempo] Out of memory\n");
         return AF_ERROR;
       }
-      memset(s->buf_overlap, 0, s->bytes_overlap);
+      // not necessarily correct, but keeping old data if possible
+      // avoids clicks when changing speed.
+      if (s->bytes_overlap != old_overlap)
+        memset(s->buf_overlap, 0, s->bytes_overlap);
       if (use_int) {
         int32_t* pb = s->table_blend;
         int64_t blend = 0;
