@@ -282,9 +282,14 @@ static int dec_audio(sh_audio_t *sh_audio,unsigned char* buffer,int total){
     int size=0;
     int at_eof=0;
     while(size<total && !at_eof){
+	int res;
 	int len=total-size;
 		if(len>MAX_OUTBURST) len=MAX_OUTBURST;
-		if (mp_decode_audio(sh_audio, len) < 0)
+		res = mp_decode_audio(sh_audio, len);
+		if (res == -2)
+		    mp_msg(MSGT_MENCODER, MSGL_FATAL, "Audio format change detected!\n"
+		           "MEncoder currently cannot handle format changes - patches welcome!\n");
+		if (res < 0)
                     at_eof = 1;
 		if(len>sh_audio->a_out_buffer_len) len=sh_audio->a_out_buffer_len;
 		fast_memcpy(buffer+size,sh_audio->a_out_buffer,len);
