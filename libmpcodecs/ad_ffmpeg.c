@@ -190,6 +190,7 @@ static int init(sh_audio_t *sh_audio)
       default:
           return 0;
   }
+  setup_format(sh_audio, sh_audio->context);
   return 1;
 }
 
