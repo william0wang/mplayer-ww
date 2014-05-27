@@ -571,6 +571,7 @@ Advanced options:
   --enable-sse4             enable SSE4 [autodetect]
   --enable-sse42            enable SSE4.2 [autodetect]
   --enable-avx              enable AVX [autodetect]
+  --enable-avx2             enable AVX2 [autodetect]
   --enable-xop              enable XOP [autodetect]
   --enable-fma3             enable FMA3 [autodetect]
   --enable-shm              enable shm [autodetect]
@@ -630,6 +631,7 @@ _ssse3=auto
 _sse4_1=auto
 _sse4_2=auto
 _avx=auto
+_avx2=auto
 _xop=auto
 _fma3=auto
 _cmov=auto
@@ -1423,6 +1425,8 @@ for ac_option do
   --disable-sse42) _sse4_2=no;;
   --enable-avx) _avx=yes;;
   --disable-avx) _avx=no;;
+  --enable-avx2) _avx2=yes;;
+  --disable-avx2) _avx2=no;;
   --enable-xop) _xop=yes;;
   --disable-xop) _xop=no;;
   --enable-fma3) _fma3=yes;;
@@ -1991,6 +1995,7 @@ EOF
   extcheck $_sse4_1   "sse4_1"   "pmaxsb %%xmm0, %%xmm0"
   extcheck $_sse4_2   "sse4_2"   "pcmpgtq %%xmm0, %%xmm0"
   extcheck $_avx      "avx"      "vpabsw %%xmm0, %%xmm0"
+  extcheck $_avx2     "avx2"     "vextracti128 $0, %%ymm0, %%xmm0"
   extcheck $_xop      "xop"      "vpmacsdd %%xmm0, %%xmm1, %%xmm2, %%xmm3"
   extcheck $_fma3     "fma3"     "vfmadd132ps %%ymm0, %%ymm1, %%ymm2"
   extcheck $_cmov     "cmov"     "cmovb %%eax,  %%ebx"
@@ -2676,6 +2681,7 @@ if test "$_runtime_cpudetection" = yes ; then
     test "$_sse4_1"   != no && _sse4_1=yes
     test "$_sse4_2"   != no && _sse4_2=yes
     test "$_avx"      != no && _avx=yes
+    test "$_avx2"     != no && _avx2=yes
     test "$_xop"      != no && _xop=yes
     test "$_fma3"     != no && _fma3=yes
     test "$_mtrr"     != no && _mtrr=yes
@@ -3178,7 +3184,7 @@ if arm ; then
   echores "$_iwmmxt"
 fi
 
-cpuexts_all='ALTIVEC XOP AVX FMA3 MMX MMX2 MMXEXT AMD3DNOW AMD3DNOWEXT SSE SSE2 SSE3 SSSE3 SSE4 SSE42 FAST_CMOV I686 FAST_CLZ ARMV5TE ARMV6 ARMV6T2 VFP VFPV3 NEON IWMMXT MMI VIS MVI'
+cpuexts_all='ALTIVEC XOP AVX AVX2 FMA3 MMX MMX2 MMXEXT AMD3DNOW AMD3DNOWEXT SSE SSE2 SSE3 SSSE3 SSE4 SSE42 FAST_CMOV I686 FAST_CLZ ARMV5TE ARMV6 ARMV6T2 VFP VFPV3 NEON IWMMXT MMI VIS MVI'
 test "$_altivec"   = yes && cpuexts="ALTIVEC $cpuexts"
 test "$_mmx"       = yes && cpuexts="MMX $cpuexts"
 test "$_mmxext"    = yes && cpuexts="MMX2 $cpuexts"
@@ -3192,6 +3198,7 @@ test "$_ssse3"     = yes && cpuexts="SSSE3 $cpuexts"
 test "$_sse4_1"    = yes && cpuexts="SSE4 $cpuexts"
 test "$_sse4_2"    = yes && cpuexts="SSE42 $cpuexts"
 test "$_avx"       = yes && cpuexts="AVX $cpuexts"
+test "$_avx2"      = yes && cpuexts="AVX2 $cpuexts"
 test "$_xop"       = yes && cpuexts="XOP $cpuexts"
 test "$_fma3"      = yes && cpuexts="FMA3 $cpuexts"
 test "$_cmov"      = yes && cpuexts="I686 $cpuexts"
