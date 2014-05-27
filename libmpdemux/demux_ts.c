@@ -2715,8 +2715,12 @@ static int fill_packet(demuxer_t *demuxer, demux_stream_t *ds, demux_packet_t **
 	}
 	if(*dp)
 	{
+		double stream_pts = MP_NOPTS_VALUE;
 		ret = *dp_offset;
 		resize_demux_packet(*dp, ret);	//shrinked to the right size
+		if (ds == demuxer->video &&
+		    stream_control(demuxer->stream, STREAM_CTRL_GET_CURRENT_TIME, (void *)&stream_pts) != STREAM_UNSUPPORTED)
+			(*dp)->stream_pts = stream_pts;
 		ds_add_packet(ds, *dp);
 		mp_msg(MSGT_DEMUX, MSGL_DBG2, "ADDED %d  bytes to %s fifo, PTS=%.3f\n", ret, (ds == demuxer->audio ? "audio" : (ds == demuxer->video ? "video" : "sub")), (*dp)->pts);
 		if(si)
