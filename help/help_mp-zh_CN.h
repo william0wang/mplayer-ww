@@ -1,4 +1,4 @@
-// Synced with help_mp-en.h rev. 37121
+// Synced with help_mp-en.h rev. 37177
 //
 // Translated by JRaSH <jrash06@gmail.com>
 
@@ -703,6 +703,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_MSG_PlaybackNeedsRestart "有些选项只有重新播放后才能生效。"
 #define MSGTR_GUI_MSG_RemoteDisplay "远程显示界面，禁用 X 共享内存模式。\n"
 #define MSGTR_GUI_MSG_RemovingSubtitle "移除字幕中。\n"
+#define MSGTR_GUI_MSG_RemovingVideoFilter "移除视频滤镜‘%s’。\n"
 #define MSGTR_GUI_MSG_SkinBitmapConversionError "%s 中的数据执行 24 比特至 32 比特转换出错\n"
 #define MSGTR_GUI_MSG_SkinBitmapNotFound "未找到位图文件 %s\n"
 #define MSGTR_GUI_MSG_SkinBitmapPngReadError "%s 中的 PNG 数据读取错误\n"
@@ -769,6 +770,10 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_RearLeft "后左"
 #define MSGTR_GUI_RearRight "后右"
 #define MSGTR_GUI_Remove "删除"
+#define MSGTR_GUI_Rotation "旋转"
+#define MSGTR_GUI_Rotation180 "180°"
+#define MSGTR_GUI_Rotation90CCW "逆时针 90°"
+#define MSGTR_GUI_Rotation90CW "顺时针 90°"
 #define MSGTR_GUI_Saturation "饱和度"
 #define MSGTR_GUI_SaveWindowPositions "保存窗口位置"
 #define MSGTR_GUI_ScaleMode "缩放模式"
