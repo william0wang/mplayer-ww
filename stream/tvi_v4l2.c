@@ -495,6 +495,7 @@ static int getstd(priv_t *priv)
     return 0;
 }
 
+#if HAVE_CLOCK_GETTIME
 /*
 ** Gets current timestamp, using specified clock id.
 ** @return number of microseconds.
@@ -505,6 +506,18 @@ static long long get_curr_timestamp(int clk_id)
     clock_gettime(clk_id, &ts);
     return (long long)ts.tv_sec * 1000000 + ts.tv_nsec / 1000;
 }
+#else
+/*
+** Gets current timestamp, using system time.
+** @return number of microseconds.
+*/
+static long long get_curr_timestamp(int clk_id)
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (long long)tv.tv_sec * 1000000 + tv.tv_usec;
+}
+#endif
 
 /***********************************************************************\
  *                                                                     *
@@ -1549,8 +1562,13 @@ static int start(priv_t *priv)
             return 0;
         }
         priv->map[i].len = priv->map[i].buf.length;
+#ifdef HAVE_CLOCK_GETTIME
         priv->clk_id = (priv->map[i].buf.flags & V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC)
                            ? CLOCK_MONOTONIC : CLOCK_REALTIME;
+#else
+        if (priv->map[i].buf.flags & V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC)
+            mp_msg(MSGT_TV, MSGL_WARN, "MPlayer compiled without clock_gettime() that is needed to handle monotone video timestamps from the kernel. Expect desync.\n");
+#endif
         /* count up to make sure this is correct everytime */
         priv->mapcount++;
 
