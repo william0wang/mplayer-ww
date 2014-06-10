@@ -63,6 +63,11 @@ known issues:
 #include "tv.h"
 #include "audio_in.h"
 
+// flag introduced in kernel 3.10
+#ifndef V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC
+#define V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC 0x2000
+#endif
+
 #define info tvi_info_v4l2
 static tvi_handle_t *tvi_init_v4l2(tv_param_t* tv_param);
 /* information about this file */
@@ -109,8 +114,10 @@ typedef struct priv {
     struct map                  *map;
     int                         mapcount;
     int                         frames;
-    volatile long long          first_frame;
-    long long                   curr_frame;
+    volatile long long          first_frame; ///< number of useconds
+    long long                   curr_frame;  ///< usec, using kernel timestamps
+    int                         clk_id;      /**< clk_id from clock_gettime
+                                                  used in frame timestamps */
     /* audio video interleaving ;-) */
     volatile int                streamon;
     pthread_t                   audio_grabber_thread;
@@ -486,6 +493,17 @@ static int getstd(priv_t *priv)
         }
     } while (priv->standard.id != id);
     return 0;
+}
+
+/*
+** Gets current timestamp, using specified clock id.
+** @return number of microseconds.
+*/
+static long long get_curr_timestamp(int clk_id)
+{
+    struct timespec ts;
+    clock_gettime(clk_id, &ts);
+    return (long long)ts.tv_sec * 1000000 + ts.tv_nsec / 1000;
 }
 
 /***********************************************************************\
@@ -1531,6 +1549,8 @@ static int start(priv_t *priv)
             return 0;
         }
         priv->map[i].len = priv->map[i].buf.length;
+        priv->clk_id = (priv->map[i].buf.flags & V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC)
+                           ? CLOCK_MONOTONIC : CLOCK_REALTIME;
         /* count up to make sure this is correct everytime */
         priv->mapcount++;
 
@@ -1834,13 +1854,11 @@ static void read_doublespeed(priv_t *priv)
 static void *audio_grabber(void *data)
 {
     priv_t *priv = (priv_t*)data;
-    struct timeval tv;
     int i, audio_skew_ptr = 0;
     long long current_time, prev_skew = 0, prev_skew_uncorr = 0;
-    long long start_time_avg;
+    long long start_time_avg, curr_timestamp;
 
-    gettimeofday(&tv, NULL);
-    start_time_avg = priv->audio_start_time = (long long)1e6*tv.tv_sec + tv.tv_usec;
+    start_time_avg = priv->audio_start_time = get_curr_timestamp(priv->clk_id);
     audio_in_start_capture(&priv->audio_in);
     for (i = 0; i < priv->aud_skew_cnt; i++)
         priv->audio_skew_buffer[i] = 0;
@@ -1858,21 +1876,19 @@ static void *audio_grabber(void *data)
         pthread_mutex_lock(&priv->skew_mutex);
         if (priv->first_frame == 0) {
             // there is no first frame yet (unlikely to happen)
-            gettimeofday(&tv, NULL);
-            start_time_avg = priv->audio_start_time = (long long)1e6*tv.tv_sec + tv.tv_usec;
+            start_time_avg = priv->audio_start_time = get_curr_timestamp(priv->clk_id);
 //            fprintf(stderr, "warning - first frame not yet available!\n");
             pthread_mutex_unlock(&priv->skew_mutex);
             continue;
         }
         pthread_mutex_unlock(&priv->skew_mutex);
 
-        gettimeofday(&tv, NULL);
-
         priv->audio_recv_blocks_total++;
-        current_time = (long long)1e6*tv.tv_sec + tv.tv_usec - priv->audio_start_time;
+        curr_timestamp = get_curr_timestamp(priv->clk_id);
+        current_time = curr_timestamp - priv->audio_start_time;
 
         if (priv->audio_recv_blocks_total < priv->aud_skew_cnt*2) {
-            start_time_avg += (long long)1e6*tv.tv_sec + tv.tv_usec - priv->audio_usecs_per_block*priv->audio_recv_blocks_total;
+            start_time_avg += curr_timestamp - priv->audio_usecs_per_block*priv->audio_recv_blocks_total;
             priv->audio_start_time = start_time_avg/(priv->audio_recv_blocks_total+1);
         }
 
