@@ -4174,6 +4174,14 @@ statement_check_broken stddef.h sys/time.h 'struct timeval tv; gettimeofday(&tv,
 echores "$gettimeofday"
 
 
+echocheck "clock_gettime()"
+clock_gettime=no
+def_clock_gettime='#undef HAVE_CLOCK_GETTIME'
+statement_check_broken stddef.h time.h 'struct timespec tp; clock_gettime(CLOCK_MONOTONIC, &tp)' -lrt &&
+    { clock_gettime=yes ; def_clock_gettime='#define HAVE_CLOCK_GETTIME 1' ; extra_ldflags="$extra_ldflags -lrt" ; }
+echores "$clock_gettime"
+
+
 echocheck "glob()"
 # glob_win disables a Windows-specific glob() replacement.
 glob=yes
@@ -8835,6 +8843,7 @@ $def_winsock2_h
 /* system functions */
 $def_gethostbyname2
 $def_gettimeofday
+$def_clock_gettime
 $def_glob
 $def_langinfo
 $def_map_memalign
