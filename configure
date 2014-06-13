@@ -9244,6 +9244,7 @@ $def_truncf
 #define CONFIG_SHARED 0
 #define CONFIG_SMALL 0
 #define CONFIG_SWSCALE_ALPHA 1
+#define SWS_MAX_FILTER_SIZE 256
 #define CONFIG_VAAPI 0
 
 #define HAVE_ALIGNED_STACK 1
