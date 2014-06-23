@@ -8678,6 +8678,7 @@ CONFIG_LPC     = yes
 CONFIG_LSP     = yes
 CONFIG_LZO     = yes
 CONFIG_MDCT    = yes
+CONFIG_MPEG_ER = yes
 CONFIG_MPEGAUDIODSP = yes
 CONFIG_MPEGVIDEO    = yes
 CONFIG_MPEGVIDEOENC = yes
@@ -9299,6 +9300,7 @@ $def_truncf
 #define CONFIG_LPC 1
 #define CONFIG_LZO 1
 #define CONFIG_MDCT 1
+#define CONFIG_MPEG_ER 1
 #define CONFIG_MPEGVIDEO 1
 #define CONFIG_RDFT 1
 #define CONFIG_RIFFDEC 1
