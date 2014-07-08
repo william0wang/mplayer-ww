@@ -21,18 +21,12 @@
  * @brief String utilities
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "string.h"
-#include "gui/interface.h"
 #include "gui/app/gui.h"
-
-#include "access_mpcontext.h"
-#include "config.h"
-#include "help_mp.h"
-#include "libavutil/avstring.h"
-#include "stream/stream.h"
 
 /**
  * @brief Convert a string to lower case.
@@ -49,7 +43,30 @@ char *strlower(char *in)
 
     while (*p) {
         if (*p >= 'A' && *p <= 'Z')
-            *p += 'a' - 'A';
+            *p += 0x20;
+
+        p++;
+    }
+
+    return in;
+}
+
+/**
+ * @brief Convert a string to upper case.
+ *
+ * @param string to be converted
+ *
+ * @return converted string
+ *
+ * @note Only characters from a to z will be converted and this is an in-place conversion.
+ */
+char *strupper(char *in)
+{
+    char *p = in;
+
+    while (*p) {
+        if (*p >= 'a' && *p <= 'z')
+            *p -= 0x20;
 
         p++;
     }
@@ -153,7 +170,52 @@ char *decomment(char *in)
 }
 
 /**
- * @brief A strchr() that can handle NULL pointers.
+ * @brief Extract a part of a string delimited by a separator character.
+ *
+ * @param in string to be analyzed
+ * @param out memory location of a buffer suitable to store the extracted part
+ * @param sep separator character
+ * @param num number of separator characters to be skipped before extraction starts
+ * @param maxout maximum length of extracted part (including the trailing null byte)
+ */
+void cutString(char *in, char *out, char sep, int num, size_t maxout)
+{
+    int n;
+    unsigned int i, c;
+
+    for (c = 0, n = 0, i = 0; in[i]; i++) {
+        if (in[i] == sep)
+            n++;
+        if (n >= num && in[i] != sep && c + 1 < maxout)
+            out[c++] = in[i];
+        if (n >= num && in[i + 1] == sep)
+            break;
+    }
+
+    if (c < maxout)
+        out[c] = 0;
+}
+
+/**
+ * @brief Extract a numeric part of a string delimited by a separator character.
+ *
+ * @param in string to be analyzed
+ * @param sep separator character
+ * @param num number of separator characters to be skipped before extraction starts
+ *
+ * @return extracted number (numeric part)
+ */
+int cutInt(char *in, char sep, int num)
+{
+    char tmp[64];
+
+    cutStr(in, tmp, sep, num);
+
+    return atoi(tmp);
+}
+
+/**
+ * @brief A strchr() that can handle NULL pointer arguments.
  *
  * @param str string to examine
  * @param c character to find
@@ -169,7 +231,7 @@ char *gstrchr(const char *str, int c)
 }
 
 /**
- * @brief A strcmp() that can handle NULL pointers.
+ * @brief A strcmp() that can handle NULL pointer arguments.
  *
  * @param a string to be compared
  * @param b string which is compared
@@ -187,7 +249,7 @@ int gstrcmp(const char *a, const char *b)
 }
 
 /**
- * @brief A strncmp() that can handle NULL pointers.
+ * @brief A strncmp() that can handle NULL pointer arguments.
  *
  * @param a string to be compared
  * @param b string which is compared
@@ -228,7 +290,7 @@ char *gstrdup(const char *str)
  *
  *        The string is duplicated by calling #gstrdup().
  *
- * @param old pointer to a variable suitable to store the new pointer
+ * @param old memory location to store the new pointer
  * @param str string to be duplicated
  *
  * @note @a *old is freed prior to the assignment.
@@ -243,7 +305,7 @@ void setdup(char **old, const char *str)
  * @brief Assign a newly allocated string
  *        containing the path created from a directory and a filename.
  *
- * @param old pointer to a variable suitable to store the new pointer
+ * @param old memory location to store the new pointer
  * @param dir directory
  * @param name filename
  *
@@ -255,134 +317,4 @@ void setddup(char **old, const char *dir, const char *name)
     *old = malloc(strlen(dir) + strlen(name) + 2);
     if (*old)
         sprintf(*old, "%s/%s", dir, name);
-}
-
-/**
- * @brief Convert #guiInfo member Filename.
- *
- * @param how 0 (cut file path and extension),
- *            1 (additionally, convert lower case) or
- *            2 (additionally, convert upper case)
- * @param fname pointer to a buffer to receive the converted Filename
- * @param maxlen size of @a fname buffer
- *
- * @return pointer to @a fname buffer
- */
-char *TranslateFilename(int how, char *fname, size_t maxlen)
-{
-    char *p;
-    size_t len;
-    stream_t *stream;
-
-    switch (guiInfo.StreamType) {
-    case STREAMTYPE_FILE:
-
-        if (guiInfo.Filename && *guiInfo.Filename) {
-            p = strrchr(guiInfo.Filename,
-#if HAVE_DOS_PATHS
-                        '\\');
-#else
-                        '/');
-#endif
-
-            if (p)
-                av_strlcpy(fname, p + 1, maxlen);
-            else
-                av_strlcpy(fname, guiInfo.Filename, maxlen);
-
-            len = strlen(fname);
-
-            if (len > 3 && fname[len - 3] == '.')
-                fname[len - 3] = 0;
-            else if (len > 4 && fname[len - 4] == '.')
-                fname[len - 4] = 0;
-            else if (len > 5 && fname[len - 5] == '.')
-                fname[len - 5] = 0;
-        } else
-            av_strlcpy(fname, MSGTR_NoFileLoaded, maxlen);
-
-        break;
-
-    case STREAMTYPE_STREAM:
-
-        av_strlcpy(fname, guiInfo.Filename, maxlen);
-        break;
-
-    case STREAMTYPE_CDDA:
-
-        snprintf(fname, maxlen, MSGTR_Title, guiInfo.Track);
-        break;
-
-    case STREAMTYPE_VCD:
-
-        snprintf(fname, maxlen, MSGTR_Title, guiInfo.Track - 1);
-        break;
-
-    case STREAMTYPE_DVD:
-
-        if (guiInfo.Chapter)
-            snprintf(fname, maxlen, MSGTR_Chapter, guiInfo.Chapter);
-        else
-            av_strlcpy(fname, MSGTR_NoChapter, maxlen);
-
-        break;
-
-    case STREAMTYPE_TV:
-    case STREAMTYPE_DVB:
-
-        p      = MSGTR_NoChannelName;
-        stream = mpctx_get_stream(guiInfo.mpcontext);
-
-        if (stream)
-            stream_control(stream, STREAM_CTRL_GET_CURRENT_CHANNEL, &p);
-
-        av_strlcpy(fname, p, maxlen);
-        break;
-
-    default:
-
-        av_strlcpy(fname, MSGTR_NoMediaOpened, maxlen);
-        break;
-    }
-
-    if (how) {
-        p = fname;
-
-        while (*p) {
-            char t = 0;
-
-            if (how == 1 && *p >= 'A' && *p <= 'Z')
-                t = 32;
-            if (how == 2 && *p >= 'a' && *p <= 'z')
-                t = -32;
-
-            *p = *p + t;
-            p++;
-        }
-    }
-
-    return fname;
-}
-
-/**
- * @brief Read characters from @a file.
- *
- * @param str pointer to a buffer to receive the read characters
- * @param size number of characters read at the most (including a terminating null-character)
- * @param file file to read from
- *
- * @return str (success) or NULL (error)
- *
- * @note Reading stops with an end-of-line character or at end of file.
- */
-char *fgetstr(char *str, int size, FILE *file)
-{
-    char *s;
-
-    s = fgets(str, size, file);
-
-    if (s)
-        s[strcspn(s, "\n\r")] = 0;
-
-    return s;
 }

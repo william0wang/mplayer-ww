@@ -31,7 +31,7 @@
 .\" Title
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "2014-01-23" "The MPlayer Project" "The Movie Player"
+.TH MPlayer 1 "2014-02-13" "The MPlayer Project" "The Movie Player"
 .
 .SH NAME
 mplayer  \- movie player
@@ -638,7 +638,7 @@ font_autoscale
 font_blur
 .RB ( subfont-blur ") (FreeType only),"
 font_encoding
-.RB ( subfont-encoding ") (FreeType only),"
+.RB ( subfont-encoding ),
 font_factor
 .RB ( ffactor ),
 font_name
@@ -2585,7 +2585,7 @@ With Fontconfig, this option determines the Fontconfig font pattern.
 .
 .TP
 .B \-fontconfig (fontconfig only)
-Enables the usage of fontconfig managed fonts.
+Enables the usage of fontconfig managed fonts (default: autodetect).
 .br
 .I NOTE:
 By default fontconfig is used for libass-rendered subtitles and not used for
@@ -2902,11 +2902,13 @@ proportional to movie diagonal (default)
 Sets the font blur radius (default: 2).
 .
 .TP
-.B \-subfont\-encoding <value> (FreeType only)
+.B \-subfont\-encoding <value>
 Sets the font encoding.
 When set to 'unicode', all the glyphs from the font file will be rendered and
-unicode will be used (default: unicode). (For other values than 'unicode'
-your system has to support iconv(3) in order for this to work.)
+unicode will be used (default: unicode). (Without FreeType, setting any other
+value than 'unicode' will disable unicode glyphs rendering for font.desc
+files. With FreeType and for other values than 'unicode' your system has to
+support iconv(3) in order for this to work.)
 .
 .TP
 .B \-subfont\-osd\-scale <0\-100> (FreeType only)
@@ -4356,6 +4358,8 @@ Might be faster on some cards.
 Use experimental unsharp masking with 3x3 support and a default strength of 0.5 (see filter-strength).
 .IPs 5
 Use experimental unsharp masking with 5x5 support and a default strength of 0.5 (see filter-strength).
+.IPs 64
+Use nearest-neighbor scaling.
 .RE
 .IPs cscale=<n>
 Select the scaling function to use for chrominance scaling.
@@ -7936,13 +7940,16 @@ decimation (ugly).
 .RE
 .
 .TP
-.B screenshot
+.B screenshot=prefix
 Allows acquiring screenshots of the movie using slave mode
 commands that can be bound to keypresses.
 See the slave mode documentation and the INTERACTIVE CONTROL
 section for details.
-Files named 'shotNNNN.png' will be saved in the working directory,
+By default files named 'shotNNNN.png' will be saved in the working directory,
 using the first available number \- no files will be overwritten.
+Specify a prefix to change the name or location, e.g.
+\-vf screenshot=shots/now will save the files in the directory
+shots with nowNNNN.png as name.
 The filter has no overhead when not used and accepts an arbitrary
 colorspace, so it is safe to add it to the configuration file.
 Make sure that the screenshot filter is added after all other filters

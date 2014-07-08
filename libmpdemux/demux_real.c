@@ -744,6 +744,10 @@ got_audio:
         if ((priv->intl_id[demuxer->audio->id] == mmioFOURCC('I', 'n', 't', '4')) ||
             (priv->intl_id[demuxer->audio->id] == mmioFOURCC('g', 'e', 'n', 'r')) ||
             (priv->intl_id[demuxer->audio->id] == mmioFOURCC('s', 'i', 'p', 'r'))) {
+            if (!priv->audio_buf) {
+                priv->audio_buf = calloc(priv->sub_packet_h[demuxer->audio->id], priv->audiopk_size[demuxer->audio->id]);
+                priv->audio_timestamp = calloc(priv->sub_packet_h[demuxer->audio->id], sizeof(double));
+            }
             sps = priv->sub_packet_size[demuxer->audio->id];
             sph = priv->sub_packet_h[demuxer->audio->id];
             cfs = priv->coded_framesize[demuxer->audio->id];
@@ -1077,10 +1081,7 @@ if((unsigned)rm_stream_id<MAX_STREAMS){
     if(demuxer->audio->id==-1 && demuxer->a_streams[mp_stream_id]){
 	sh_audio_t *sh = demuxer->a_streams[mp_stream_id];
 	demuxer->audio->id=mp_stream_id;
-	sh->ds=demuxer->audio;
 	demuxer->audio->sh=sh;
-	priv->audio_buf = calloc(priv->sub_packet_h[demuxer->audio->id], priv->audiopk_size[demuxer->audio->id]);
-	priv->audio_timestamp = calloc(priv->sub_packet_h[demuxer->audio->id], sizeof(double));
         mp_msg(MSGT_DEMUX,MSGL_V,"Auto-selected RM audio ID = %d (rm id %d)\n",mp_stream_id, rm_stream_id);
 	goto got_audio;
     }
@@ -1088,7 +1089,6 @@ if((unsigned)rm_stream_id<MAX_STREAMS){
     if(demuxer->video->id==-1 && demuxer->v_streams[mp_stream_id]){
 	sh_video_t *sh = demuxer->v_streams[mp_stream_id];
 	demuxer->video->id=mp_stream_id;
-	sh->ds=demuxer->video;
 	demuxer->video->sh=sh;
         mp_msg(MSGT_DEMUX,MSGL_V,"Auto-selected RM video ID = %d (rm id %d)\n",mp_stream_id, rm_stream_id);
 	goto got_video;
@@ -1313,11 +1313,10 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    sh_audio_t *sh = new_sh_audio(demuxer, aid, NULL);
 		    char buf[128]; /* for codec name */
 		    int frame_size;
-		    int sub_packet_size;
-		    int sub_packet_h;
+		    int sub_packet_size = 0;
+		    int sub_packet_h = 0;
 		    int version;
-		    int flavor;
-		    int coded_frame_size;
+		    int coded_frame_size = 0;
 		    int codecdata_length;
 		    int i;
 		    char *buft;
@@ -1381,7 +1380,7 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    stream_skip(demuxer->stream, 2); /* version (4 or 5) */
 		    hdr_size = stream_read_dword(demuxer->stream); // header size
 		    mp_msg(MSGT_DEMUX,MSGL_V,"header size: %d\n", hdr_size);
-		    flavor = stream_read_word(demuxer->stream);/* codec flavor id */
+		    stream_skip(demuxer->stream, 2);/* codec flavor id */
 		    coded_frame_size = stream_read_dword(demuxer->stream);/* needed by codec */
 		    mp_msg(MSGT_DEMUX,MSGL_V,"coded_frame_size: %d\n", coded_frame_size);
 		    stream_skip(demuxer->stream, 4); // big number
@@ -1506,15 +1505,9 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    if (priv->is_multirate && ((demuxer->audio->id == -1) ||
 		                               ((demuxer->audio->id >= 0) && priv->a_bitrate && (bitrate > priv->a_bitrate)))) {
 			    demuxer->audio->id = stream_id;
+			    demuxer->audio->sh = sh;
 			    priv->a_bitrate = bitrate;
 			    mp_msg(MSGT_DEMUX,MSGL_DBG2,"Multirate autoselected audio id %d with bitrate %d\n", stream_id, bitrate);
-		    }
-
-		    if(demuxer->audio->id==stream_id){
-			sh->ds=demuxer->audio;
-			demuxer->audio->sh=sh;
-        	priv->audio_buf = calloc(priv->sub_packet_h[demuxer->audio->id], priv->audiopk_size[demuxer->audio->id]);
-        	priv->audio_timestamp = calloc(priv->sub_packet_h[demuxer->audio->id], sizeof(double));
 		    }
 
 		    ++a_streams;
@@ -1537,11 +1530,6 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    sh->wf->nBlockAlign = 0;//frame_size;
 		    sh->wf->cbSize = 0;
 		    sh->wf->wFormatTag = sh->format = mmioFOURCC('a','d','u',0x55);
-
-		    if(demuxer->audio->id==stream_id){
-			    sh->ds=demuxer->audio;
-			    demuxer->audio->sh=sh;
-		    }
 
 		    ++a_streams;
 	  } else if (strstr(mimet,"x-ralf-mpeg4")) {
@@ -1680,13 +1668,9 @@ static demuxer_t* demux_open_real(demuxer_t* demuxer)
 		    if (priv->is_multirate && ((demuxer->video->id == -1) ||
 		                               ((demuxer->video->id >= 0) && priv->v_bitrate && (bitrate > priv->v_bitrate)))) {
 			    demuxer->video->id = stream_id;
+			    demuxer->video->sh = sh;
 			    priv->v_bitrate = bitrate;
 			    mp_msg(MSGT_DEMUX,MSGL_DBG2,"Multirate autoselected video id %d with bitrate %d\n", stream_id, bitrate);
-		    }
-
-		    if(demuxer->video->id==stream_id){
-			sh->ds=demuxer->video;
-			demuxer->video->sh=sh;
 		    }
 
 		    ++v_streams;
@@ -1848,15 +1832,39 @@ header_end:
     // detect streams:
     if(demuxer->video->id==-1 && v_streams>0){
 	// find the valid video stream:
-	if(!ds_fill_buffer(demuxer->video)){
-          mp_msg(MSGT_DEMUXER,MSGL_INFO,"RM: " MSGTR_MissingVideoStream);
-	}
+	ds_fill_buffer(demuxer->video);
     }
     if(demuxer->audio->id==-1 && a_streams>0){
 	// find the valid audio stream:
 	if(!ds_fill_buffer(demuxer->audio)){
           mp_msg(MSGT_DEMUXER,MSGL_INFO,"RM: " MSGTR_MissingAudioStream);
 	}
+    }
+    if(demuxer->video->id==-1 && v_streams>0){
+	// try video once more in case there were too many audio packets first.
+	demuxer->video->eof = 0;
+	demuxer->video->fill_count = 0;
+	if(!ds_fill_buffer(demuxer->video)){
+          mp_msg(MSGT_DEMUXER,MSGL_INFO,"RM: " MSGTR_MissingVideoStream);
+	}
+    }
+    if(demuxer->video->id==-1 && v_streams>0){
+        // worst case just select the first
+        int i;
+        for (i = 0; i < MAX_V_STREAMS; i++)
+            if (demuxer->v_streams[i]) {
+                demuxer->video->id = i;
+                demuxer->video->sh = demuxer->v_streams[i];
+            }
+    }
+    if(demuxer->audio->id==-1 && a_streams>0){
+        // worst case just select the first
+        int i;
+        for (i = 0; i < MAX_A_STREAMS; i++)
+            if (demuxer->a_streams[i]) {
+                demuxer->audio->id = i;
+                demuxer->audio->sh = demuxer->a_streams[i];
+            }
     }
 
     if(demuxer->video->sh){

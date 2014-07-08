@@ -1079,8 +1079,7 @@ extern void *pm3_reg_base;
 
 #define RAMDAC_DELAY(x) do {					\
 	int delay = x;						\
-	unsigned char tmp;					\
-	while(delay--){tmp = READ_REG(PM3InFIFOSpace);};	\
+	while(delay--){READ_REG(PM3InFIFOSpace);};		\
 } while(0)
 
 #define SLOW_WRITE_REG(v,r)			\

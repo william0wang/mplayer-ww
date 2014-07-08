@@ -541,14 +541,14 @@ static demuxer_t* demux_open_avi(demuxer_t* demuxer){
     mp_msg(MSGT_DEMUX,MSGL_ERR,"AVI: " MSGTR_MissingVideoStreamBug);
     return NULL;
   }
-  sh_video=d_video->sh;sh_video->ds=d_video;
+  sh_video=d_video->sh;
   if(d_audio->id!=-2){
     mp_msg(MSGT_DEMUX,MSGL_V,"AVI: Searching for audio stream (id:%d)\n",d_audio->id);
     if(!priv->audio_streams || !try_ds_fill(demuxer, d_audio)){
       mp_msg(MSGT_DEMUX,MSGL_INFO,"AVI: " MSGTR_MissingAudioStream);
       d_audio->sh=sh_audio=NULL;
     } else {
-      sh_audio=d_audio->sh;sh_audio->ds=d_audio;
+      sh_audio=d_audio->sh;
     }
   }
 

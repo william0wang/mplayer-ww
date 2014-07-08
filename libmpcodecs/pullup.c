@@ -86,7 +86,7 @@ static int licomb_y_mmx(unsigned char *a, unsigned char *b, int s)
 
         "2: \n\t"
 
-        "movq (%%"REG_D"), %%mm0 \n\t"
+        "movq (%%"REG_S"), %%mm0 \n\t"
         "movq (%%"REG_D"), %%mm1 \n\t"
         "punpcklbw %%mm7, %%mm0 \n\t"
         "movq (%%"REG_D",%%"REG_a"), %%mm2 \n\t"

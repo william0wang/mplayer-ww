@@ -21,9 +21,12 @@
  * @brief GUI application helpers
  */
 
+#include <math.h>
+
 #include "app.h"
 #include "gui.h"
 #include "gui/skin/font.h"
+#include "gui/util/misc.h"
 
 #include "libavutil/common.h"
 
@@ -72,6 +75,7 @@ static const evName evNames[] = {
     { evFullScreen,        "evFullScreen"        },
     { evNormalSize,        "evNormalSize"        },
     { evSetAspect,         "evSetAspect"         },
+    { evSetRotation,       "evSetRotation"       },
     { evIncVolume,         "evIncVolume"         },
     { evDecVolume,         "evDecVolume"         },
     { evSetVolume,         "evSetVolume"         },
@@ -179,77 +183,86 @@ guiItem *appFindItem(int event)
 }
 
 /**
- * @brief Modify the state (i.e. set a new value) to the item belonging to an event.
+ * @brief Calculate the radian of a point inside the visual representation
+ *        of an item.
+ *
+ * @param item pointer to the item
+ * @param x x position of the point
+ * @param y y position of the point
+ *
+ * @return radian of the point
+ *
+ * @note The return value is a @a clockwise radian.
+ */
+double appRadian(guiItem *item, int x, int y)
+{
+    double tx, ty;
+
+    // transform the center to (0,0)
+    tx = x - item->width / 2.0;
+    ty = y - item->height / 2.0;
+
+    // the y-axis is upside down and must be mirrored
+    // the x-axis is being mirrored for a clockwise radian
+    return (tx == 0.0 && ty == 0.0 ? 0.0 : atan2(-ty, -tx) + M_PI);
+}
+
+/**
+ * @brief Modify the value of the item belonging to an event.
  *
  * @param event event
- * @param state new value
+ * @param value new value
  */
-void btnModify(int event, float state)
+void btnModify(int event, float value)
 {
     int i;
 
-    for (i = 0; i <= guiApp.IndexOfMainItems; i++) {
-        if (guiApp.mainItems[i].message == event) {
-            switch (guiApp.mainItems[i].type) {
-            case itButton:
+    for (i = 0; i <= guiApp.IndexOfMainItems; i++)
+        if (guiApp.mainItems[i].message == event)
+            if (hasValue(guiApp.mainItems[i]))
+                guiApp.mainItems[i].value = constrain(value);
 
-                guiApp.mainItems[i].pressed = (int)state;
-                break;
-
-            case itPotmeter:
-            case itVPotmeter:
-            case itHPotmeter:
-
-                if (state < 0.0f)
-                    state = 0.0f;
-                if (state > 100.0f)
-                    state = 100.0f;
-
-                guiApp.mainItems[i].value = state;
-                break;
-            }
-        }
-    }
-
-    for (i = 0; i <= guiApp.IndexOfPlaybarItems; i++) {
-        if (guiApp.playbarItems[i].message == event) {
-            switch (guiApp.playbarItems[i].type) {
-            case itButton:
-
-                guiApp.playbarItems[i].pressed = (int)state;
-                break;
-
-            case itPotmeter:
-            case itVPotmeter:
-            case itHPotmeter:
-
-                if (state < 0.0f)
-                    state = 0.0f;
-                if (state > 100.0f)
-                    state = 100.0f;
-
-                guiApp.playbarItems[i].value = state;
-                break;
-            }
-        }
-    }
+    for (i = 0; i <= guiApp.IndexOfPlaybarItems; i++)
+        if (guiApp.playbarItems[i].message == event)
+            if (hasValue(guiApp.playbarItems[i]))
+                guiApp.playbarItems[i].value = constrain(value);
 }
 
 /**
  * @brief Set the @a pressed state (i.e. a new value) to the item belonging to an event.
  *
  * @param event event
- * @param set new value
+ * @param state new state
  */
-void btnSet(int event, int set)
+void btnSet(int event, int state)
 {
     int i;
 
     for (i = 0; i <= guiApp.IndexOfMainItems; i++)
         if (guiApp.mainItems[i].message == event)
-            guiApp.mainItems[i].pressed = set;
+            if (hasButton(guiApp.mainItems[i]))
+                guiApp.mainItems[i].pressed = state;
 
     for (i = 0; i <= guiApp.IndexOfPlaybarItems; i++)
         if (guiApp.playbarItems[i].message == event)
-            guiApp.playbarItems[i].pressed = set;
+            if (hasButton(guiApp.playbarItems[i]))
+                guiApp.playbarItems[i].pressed = state;
+}
+
+/**
+ * @brief Retrieve the value of the (main) item belonging to an event.
+ *
+ * @param event event
+ * @param value memory location to store the value (if event has been found)
+ */
+void btnValue(int event, float *value)
+{
+    int i;
+
+    for (i = 0; i <= guiApp.IndexOfMainItems; i++)
+        if (guiApp.mainItems[i].message == event)
+            if (hasValue(guiApp.mainItems[i]) && hasButton(guiApp.mainItems[i])) {
+                *value = guiApp.mainItems[i].value;
+                return;
+            }
 }

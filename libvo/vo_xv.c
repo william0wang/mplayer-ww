@@ -423,7 +423,7 @@ static uint32_t draw_image(mp_image_t * mpi)
     if (mpi->flags & MP_IMGFLAG_DIRECT)
     {
         // direct rendering:
-        current_buf = (int) (mpi->priv);        // hack!
+        current_buf = (intptr_t)mpi->priv;        // hack!
         return VO_TRUE;
     }
     if (mpi->flags & MP_IMGFLAG_DRAW_CALLBACK)
@@ -508,7 +508,7 @@ static uint32_t get_image(mp_image_t * mpi)
             }
         }
         mpi->flags |= MP_IMGFLAG_DIRECT;
-        mpi->priv = (void *) current_buf;
+        mpi->priv = (void *)(intptr_t)current_buf;
 //      printf("mga: get_image() SUCCESS -> Direct Rendering ENABLED\n");
         return VO_TRUE;
     }

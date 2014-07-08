@@ -66,7 +66,7 @@ static const char *fExist(const char *fname)
  * @brief Read and decode a PNG file into bitmap data.
  *
  * @param fname filename (with path)
- * @param img pointer suitable to store the image data
+ * @param img memory location to store the image data
  *
  * @return 0 (ok), 1 (decoding error), 2 (open error), 3 (file too big),
  *                 4 (out of memory), 5 (read error), 6 (avcodec alloc error)
@@ -111,7 +111,7 @@ static int pngRead(const char *fname, guiImage *img)
     }
 
     avctx = avcodec_alloc_context3(NULL);
-    frame = avcodec_alloc_frame();
+    frame = av_frame_alloc();
 
     if (!(avctx && frame)) {
         av_free(frame);
@@ -162,8 +162,8 @@ static int pngRead(const char *fname, guiImage *img)
         img->ImageSize = bpl * img->Height;
 
         mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] file: %s\n", fname);
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap]  size: %lux%lu, color depth: %u\n", img->Width, img->Height, img->Bpp);
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap]  image size: %lu\n", img->ImageSize);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap]  size: %ux%u, color depth: %u\n", img->Width, img->Height, img->Bpp);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap]  image size: %u\n", img->ImageSize);
 
         img->Image = malloc(img->ImageSize);
 
@@ -193,8 +193,8 @@ static int pngRead(const char *fname, guiImage *img)
  */
 static int convert_ARGB(guiImage *img)
 {
-    char *orgImage;
-    unsigned long i, c;
+    unsigned char *orgImage;
+    unsigned int i, c;
 
     if (img->Bpp == 24) {
         orgImage = img->Image;
@@ -205,11 +205,11 @@ static int convert_ARGB(guiImage *img)
 
         if (!img->Image) {
             free(orgImage);
-            mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] not enough memory: %lu\n", img->ImageSize);
+            mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] not enough memory: %u\n", img->ImageSize);
             return False;
         }
 
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] 32 bpp conversion size: %lu\n", img->ImageSize);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] 32 bpp conversion size: %u\n", img->ImageSize);
 
         for (i = 0, c = 0; i < img->ImageSize; i += 4, c += 3)
             *(uint32_t *)&img->Image[i] = ALPHA_OPAQUE | AV_RB24(&orgImage[c]);
@@ -230,7 +230,7 @@ static int convert_ARGB(guiImage *img)
  * @brief Read a PNG file.
  *
  * @param fname filename (with path, but may lack extension)
- * @param img pointer suitable to store the image data
+ * @param img memory location to store the image data
  *
  * @return 0 (ok), -1 (color depth too low), -2 (not accessible),
  *                 -5 (#pngRead() error) or -8 (#convert_ARGB() error)
@@ -286,8 +286,8 @@ void bpFree(guiImage *img)
 int bpRenderMask(const guiImage *in, guiImage *out)
 {
     uint32_t *buf;
-    unsigned long x, y;
-    unsigned long i = 0, c = 0;
+    unsigned int x, y;
+    unsigned int i = 0, c = 0;
     unsigned char tmp = 0, b = 1;
     int shaped = 0;
 
@@ -298,7 +298,7 @@ int bpRenderMask(const guiImage *in, guiImage *out)
     out->Image     = calloc(1, out->ImageSize);
 
     if (!out->Image) {
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] not enough memory: %lu\n", out->ImageSize);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] not enough memory: %u\n", out->ImageSize);
         return False;
     }
 
@@ -333,7 +333,7 @@ int bpRenderMask(const guiImage *in, guiImage *out)
     if (!shaped)
         bpFree(out);
 
-    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] 1 bpp conversion size: %lu\n", out->ImageSize);
+    mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[bitmap] 1 bpp conversion size: %u\n", out->ImageSize);
 
     return True;
 }

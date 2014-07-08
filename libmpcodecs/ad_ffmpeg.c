@@ -127,7 +127,10 @@ static int init(sh_audio_t *sh_audio)
 	lavc_context->bits_per_coded_sample = sh_audio->wf->wBitsPerSample;
     }
     lavc_context->channel_layout = sh_audio->channel_layout;
-    lavc_context->request_channels = audio_output_channels;
+    if (audio_output_channels == 1)
+        lavc_context->request_channel_layout = AV_CH_LAYOUT_MONO;
+    else if (audio_output_channels == 2)
+        lavc_context->request_channel_layout = AV_CH_LAYOUT_STEREO;
     lavc_context->codec_tag = sh_audio->format; //FOURCC
     lavc_context->codec_id = lavc_codec->id; // not sure if required, imho not --A'rpi
 
@@ -187,6 +190,7 @@ static int init(sh_audio_t *sh_audio)
       default:
           return 0;
   }
+  setup_format(sh_audio, sh_audio->context);
   return 1;
 }
 
@@ -310,7 +314,7 @@ static int decode_audio(sh_audio_t *sh_audio,unsigned char *buf,int minlen,int m
 {
     unsigned char *start=NULL;
     int y,len=-1, got_frame;
-    AVFrame *frame = avcodec_alloc_frame();
+    AVFrame *frame = av_frame_alloc();
 
     if (!frame)
         return AVERROR(ENOMEM);
@@ -373,6 +377,6 @@ static int decode_audio(sh_audio_t *sh_audio,unsigned char *buf,int minlen,int m
             break;
     }
 
-  av_free(frame);
+  av_frame_free(&frame);
   return len;
 }

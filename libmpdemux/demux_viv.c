@@ -629,7 +629,6 @@ static demuxer_t* demux_open_vivo(demuxer_t* demuxer){
 
 		/* insert as stream */
 		demuxer->video->sh=sh;
-		sh->ds=demuxer->video;
 		demuxer->video->id=0;
 
 		/* disable seeking */
@@ -729,7 +728,6 @@ if (demuxer->audio->id >= -1){
 /*sound_ok:*/
 		/* insert as stream */
 		demuxer->audio->sh=sh;
-		sh->ds=demuxer->audio;
 		demuxer->audio->id=1;
 nosound:
 		return demuxer;

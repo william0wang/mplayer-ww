@@ -103,16 +103,14 @@ static int cmd_filter(mp_cmd_t* cmd, int paused, struct vf_priv_s * priv) {
     return 1;
   }
   case MP_CMD_SET_MENU : {
-    char* menu = cmd->args[0].v.s;
-    menu_t* l = priv->current;
-    priv->current = menu_open(menu);
-    if(!priv->current) {
-      mp_msg(MSGT_GLOBAL,MSGL_WARN,MSGTR_LIBMENU_FailedToOpenMenu,menu);
-      priv->current = l;
-      priv->current->show = 0;
+    const char *menu = cmd->args[0].v.s;
+    menu_t *new = menu_open(menu);
+    priv->current->show = new != NULL;
+    if (new) {
+      new->parent = priv->current;
+      priv->current = new;
     } else {
-      priv->current->show = 1;
-      priv->current->parent = l;
+      mp_msg(MSGT_GLOBAL,MSGL_WARN,MSGTR_LIBMENU_FailedToOpenMenu,menu);
     }
     return 1;
   }

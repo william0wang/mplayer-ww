@@ -84,6 +84,7 @@ char * sub_osd_names_short[] ={ "", "|>", "||", "[]", "<<" , ">>", "", "", "", "
 //static int vo_font_loaded=-1;
 font_desc_t* vo_font=NULL;
 font_desc_t* sub_font=NULL;
+char *subtitle_font_encoding = NULL;
 
 unsigned char* vo_osd_text=NULL;
 void* vo_osd_teletext_page=NULL;

@@ -22,13 +22,21 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <ctype.h>
+#include <math.h>
 #include <windows.h>
 
 #include "gui/util/bitmap.h"
 #include "gui/util/string.h"
 #include "gui/interface.h"
 #include "gui.h"
+
+#include "access_mpcontext.h"
+#include "help_mp.h"
+#include "libavutil/avstring.h"
+#include "libavutil/common.h"
+#include "stream/stream.h"
 
 #define MAX_LABELSIZE 250
 
@@ -115,6 +123,89 @@ static void stringreplace(char *dest, const char *what, const char *format, ... 
     }
 }
 
+/**
+ * @brief Convert #guiInfo member Filename.
+ *
+ * @param how 0 (cut file path and extension),
+ *            1 (additionally, convert lower case) or
+ *            2 (additionally, convert upper case)
+ * @param fname memory location of a buffer to receive the converted Filename
+ * @param maxlen size of the @a fname buffer
+ *
+ * @return pointer to the @a fname buffer
+ */
+static char *TranslateFilename (int how, char *fname, size_t maxlen)
+{
+    char *p;
+    size_t len;
+    stream_t *stream;
+
+    switch (guiInfo.StreamType)
+    {
+        case STREAMTYPE_FILE:
+
+            if (guiInfo.Filename && *guiInfo.Filename)
+            {
+                p = strrchr(guiInfo.Filename, '\\');
+
+                if (p) av_strlcpy(fname, p + 1, maxlen);
+                else av_strlcpy(fname, guiInfo.Filename, maxlen);
+
+                len = strlen(fname);
+
+                if (len > 3 && fname[len - 3] == '.') fname[len - 3] = 0;
+                else if (len > 4 && fname[len - 4] == '.') fname[len - 4] = 0;
+                else if (len > 5 && fname[len - 5] == '.') fname[len - 5] = 0;
+            }
+            else av_strlcpy(fname, MSGTR_GUI_MSG_NoFileLoaded, maxlen);
+
+            break;
+
+        case STREAMTYPE_STREAM:
+
+            av_strlcpy(fname, guiInfo.Filename, maxlen);
+            break;
+
+        case STREAMTYPE_CDDA:
+
+            snprintf(fname, maxlen, MSGTR_GUI_TitleN, guiInfo.Track);
+            break;
+
+        case STREAMTYPE_VCD:
+
+            snprintf(fname, maxlen, MSGTR_GUI_TitleN, guiInfo.Track - 1);
+            break;
+
+        case STREAMTYPE_DVD:
+
+            if (guiInfo.Chapter) snprintf(fname, maxlen, MSGTR_GUI_ChapterN, guiInfo.Chapter);
+            else av_strlcpy(fname, MSGTR_GUI_NoChapter, maxlen);
+
+            break;
+
+        case STREAMTYPE_TV:
+        case STREAMTYPE_DVB:
+
+            p = MSGTR_GUI_NoChannelName;
+            stream = mpctx_get_stream(guiInfo.mpcontext);
+
+            if (stream) stream_control(stream, STREAM_CTRL_GET_CURRENT_CHANNEL, &p);
+
+            av_strlcpy(fname, p, maxlen);
+            break;
+
+        default:
+
+            av_strlcpy(fname, MSGTR_GUI_MSG_NoMediaOpened, maxlen);
+            break;
+    }
+
+    if (how == 1) strlower(fname);
+    if (how == 2) strupper(fname);
+
+    return fname;
+}
+
 /* replaces the chars with special meaning with the associated data from the player info struct */
 static char *generatetextfromlabel(widget *item)
 {
@@ -138,10 +229,12 @@ static char *generatetextfromlabel(widget *item)
     stringreplace(text, "$7", "%.4i:%.2i", guiInfo.RunningTime / 60, guiInfo.RunningTime % 60);
     stringreplace(text, "$8", "%i:%.2i:%.2i", guiInfo.ElapsedTime / 3600,
                  (guiInfo.ElapsedTime / 60) % 60, guiInfo.ElapsedTime % 60);
-    stringreplace(text, "$v", "%3.2f", guiInfo.Volume);
+    stringreplace(text, "$v", "%3.2f%%", guiInfo.Volume);
     stringreplace(text, "$V", "%3.1f", guiInfo.Volume);
-    stringreplace(text, "$b", "%3.2f", guiInfo.Balance);
+    stringreplace(text, "$U", "%3.0f", guiInfo.Volume);
+    stringreplace(text, "$b", "%3.2f%%", guiInfo.Balance);
     stringreplace(text, "$B", "%3.1f", guiInfo.Balance);
+    stringreplace(text, "$D", "%3.0f", guiInfo.Balance);
     stringreplace(text, "$t", "%.2i", guiInfo.Track);
     stringreplace(text, "$o", "%s", acp(TranslateFilename(0, tmp, sizeof(tmp))));
     stringreplace(text, "$x", "%i", guiInfo.VideoWidth);
@@ -149,22 +242,34 @@ static char *generatetextfromlabel(widget *item)
     stringreplace(text, "$C", "%s", guiInfo.sh_video ? codecname : "");
     stringreplace(text, "$$", "$");
 
-    if(!strcmp(text, "$p") || !strcmp(text, "$s") || !strcmp(text, "$e"))
+    if(guiInfo.Playing == GUI_STOP)
     {
-        if(guiInfo.Playing == GUI_STOP) stringreplace(text, NULL, "s");
-        else if(guiInfo.Playing == GUI_PLAY) stringreplace(text, NULL, "p");
-        else if(guiInfo.Playing == GUI_PAUSE) stringreplace(text, NULL, "e");
+        stringreplace(text, "$P", "s");
+        stringreplace(text, "$s", "s");
+    }
+    else if(guiInfo.Playing == GUI_PLAY)
+    {
+        stringreplace(text, "$P", "p");
+        stringreplace(text, "$p", "p");
+    }
+    else if(guiInfo.Playing == GUI_PAUSE)
+    {
+        stringreplace(text, "$P", "e");
+        stringreplace(text, "$e", "e");
     }
 
     if(guiInfo.AudioChannels == 0) stringreplace(text, "$a", "n");
     else if(guiInfo.AudioChannels == 1) stringreplace(text, "$a", "m");
-    else stringreplace(text, "$a", "t");
+    else if(guiInfo.AudioChannels == 2) stringreplace(text, "$a", (guiInfo.AudioPassthrough ? "r" : "t"));
+    else stringreplace(text, "$a", "r");
 
-    if(guiInfo.StreamType == 0)
+    if(guiInfo.StreamType == STREAMTYPE_FILE)
         stringreplace(text, "$T", "f");
     else if(guiInfo.StreamType == STREAMTYPE_DVD || guiInfo.StreamType == STREAMTYPE_DVDNAV)
         stringreplace(text, "$T", "d");
-    else stringreplace(text, "$T", "u");
+    else if(guiInfo.StreamType == STREAMTYPE_STREAM)
+        stringreplace(text, "$T", "u");
+    else stringreplace(text, "$T", " ");
 
     stringreplace(text, "$f", acp(TranslateFilename(1, tmp, sizeof(tmp))));
     stringreplace(text, "$F", acp(TranslateFilename(2, tmp, sizeof(tmp))));
@@ -304,13 +409,15 @@ void renderwidget(skin_t *skin, image *dest, widget *item, int state)
     int y;
 
     if(!dest) return;
-    if((item->type == tyButton) || (item->type == tyHpotmeter) || (item->type == tyPotmeter))
+    if((item->type == tyButton) || (item->type == tyHpotmeter) || (item->type == tyVpotmeter) || (item->type == tyPimage))
         img = item->bitmap[0];
+    if(item->type == tyRpotmeter)
+        img = item->bitmap[1];
 
     if(!img) return;
 
     y = item->y;
-    if(item->type == tyPotmeter)
+    if(item->type == tyPimage || /* legacy (potmeter) */ (item->type == tyHpotmeter && item->width == item->wwidth) || item->type == tyRpotmeter)
     {
         height = img->height / item->phases;
         y =  height * (int)(item->value * item->phases / 100);
@@ -327,18 +434,54 @@ void renderwidget(skin_t *skin, image *dest, widget *item, int state)
     if(item->type == tyButton)
         render(skin->desktopbpp, dest, find_background(skin,item), item->x, item->y, item->x, item->y, img->width, height, 1);
 
-    if((item->type == tyHpotmeter) || (item->type == tyPotmeter))
+    if((item->type == tyHpotmeter) || (item->type == tyVpotmeter) || (item->type == tyRpotmeter) || (item->type == tyPimage))
     {
-        /* repaint the area behind the slider */
-        render(skin->desktopbpp, dest, find_background(skin, item), item->wx, item->wy, item->wx, item->wy, item->wwidth, item->height, 1);
-        item->x = item->value * (item->wwidth-item->width) / 100 + item->wx;
-        if((item->x + item->width) > (item->wx + item->wwidth))
-            item->x = item->wx + item->wwidth - item->width;
-        if(item->x < item->wx)
+        if(item->type == tyVpotmeter)
+        {
+            /* repaint the area behind the slider */
+            render(skin->desktopbpp, dest, find_background(skin, item), item->wx, item->wy, item->wx, item->wy, item->width, item->wheight, 1);
+            item->y = (100 - item->value) * (item->wheight-item->height) / 100 + item->wy;
+        }
+        else if(item->type == tyRpotmeter)
+        {
+            /* repaint the area behind the rpotmeter */
+            render(skin->desktopbpp, dest, find_background(skin, item), item->wx, item->wy, item->wx, item->wy, item->wwidth, item->wheight, 1);
             item->x = item->wx;
-        /* workaround for blue */
-        if(item->type == tyHpotmeter)
-            height = (item->height < img->height / 3) ? item->height : img->height / 3;
+            item->y = item->wy;
+        }
+        else
+        {
+            /* repaint the area behind the slider */
+            render(skin->desktopbpp, dest, find_background(skin, item), item->wx, item->wy, item->wx, item->wy, item->wwidth, item->height, 1);
+            item->x = item->value * (item->wwidth-item->width) / 100 + item->wx;
+        }
     }
     render(skin->desktopbpp, dest, img, item->x, item->y, 0, y, img->width, height, 1);
+
+    /* rpotmeter button */
+    if(item->type == tyRpotmeter && item->bitmap[0] != item->bitmap[1])
+    {
+        img = item->bitmap[0];
+
+        if(img)
+        {
+            double radius, radian;
+            int ix, iy;
+
+            // keep the button inside the potmeter outline
+            radius = (FFMIN(item->wwidth, item->wheight) - item->maxwh) / 2.0;
+
+            radian = item->value / 100.0 * item->arclength + item->zeropoint;
+
+            // coordinates plus a correction for a non-square item
+            // (remember: both axes are mirrored, we have a clockwise radian)
+            ix = item->wx + radius * (1 + cos(radian)) + FFMAX(0, (item->wwidth - item->wheight) / 2.0) + 0.5;
+            iy = item->wy + radius * (1 + sin(radian)) + FFMAX(0, (item->wheight - item->wwidth) / 2.0) + 0.5;
+
+            height = img->height / 3;
+            y = state * height;
+
+            render(skin->desktopbpp, dest, img, ix, iy, 0, y, img->width, height, 1);
+        }
+    }
 }

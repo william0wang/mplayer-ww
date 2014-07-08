@@ -56,7 +56,6 @@
 #define HAVE_FREETYPE21
 #endif
 
-char *subtitle_font_encoding = NULL;
 float text_font_scale_factor = 3.5;
 float osd_font_scale_factor = 4.0;
 float subtitle_font_radius = 2.0;

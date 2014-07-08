@@ -90,6 +90,7 @@ int auto_threads = 1;
 typedef struct {
     AVCodecContext *avctx;
     AVFrame *pic;
+    AVFrame *refcount_frame;
     enum AVPixelFormat pix_fmt;
     int do_slices;
     int do_dr1;
@@ -338,10 +339,9 @@ static int init(sh_video_t *sh){
 
     init_avcodec();
 
-    ctx = sh->context = malloc(sizeof(vd_ffmpeg_ctx));
+    ctx = sh->context = calloc(1, sizeof(*ctx));
     if (!ctx)
         return 0;
-    memset(ctx, 0, sizeof(vd_ffmpeg_ctx));
 
     lavc_codec = avcodec_find_decoder_by_name(sh->codec->dll);
     if(!lavc_codec){
@@ -393,7 +393,7 @@ static int init(sh_video_t *sh){
 
     ctx->ip_count= ctx->b_count= 0;
 
-    ctx->pic = avcodec_alloc_frame();
+    ctx->pic = av_frame_alloc();
     ctx->avctx = avcodec_alloc_context3(lavc_codec);
     avctx = ctx->avctx;
     avctx->opaque = sh;
@@ -532,11 +532,9 @@ static int init(sh_video_t *sh){
         avctx->bits_per_coded_sample= sh->bih->biBitCount;
 
     set_dr_slice_settings(avctx, lavc_codec);
-    if(lavc_codec->capabilities & CODEC_CAP_HWACCEL)
-        // HACK around badly placed checks in mpeg_mc_decode_init
-        set_format_params(avctx, PIX_FMT_XVMC_MPEG2_IDCT);
     avctx->thread_count = lavc_param_threads;
     avctx->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
+    avctx->refcounted_frames = 1;
 
     /* open it */
     if (avcodec_open2(avctx, lavc_codec, &opts) < 0) {
@@ -557,14 +555,18 @@ static void uninit(sh_video_t *sh){
     vd_ffmpeg_ctx *ctx = sh->context;
     AVCodecContext *avctx = ctx->avctx;
 
-    if(lavc_param_vstats && avctx->coded_frame){
+    if (ctx->refcount_frame) {
+        av_frame_unref(ctx->refcount_frame);
+        ctx->refcount_frame = NULL;
+    }
+    if(lavc_param_vstats){
         int i;
-        for(i=1; i<32; i++){
+        for(i=0; i<32; i++){
             mp_msg(MSGT_DECVIDEO, MSGL_INFO, "QP: %d, count: %d\n", i, ctx->qp_stat[i]);
         }
         mp_msg(MSGT_DECVIDEO, MSGL_INFO, MSGTR_MPCODECS_ArithmeticMeanOfQP,
-            ctx->qp_sum / avctx->coded_frame->coded_picture_number,
-            1.0/(ctx->inv_qp_sum / avctx->coded_frame->coded_picture_number)
+            ctx->qp_sum / avctx->frame_number,
+            1.0/(ctx->inv_qp_sum / avctx->frame_number)
             );
     }
 
@@ -801,17 +803,10 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
 #if CONFIG_XVMC
     if(IMGFMT_IS_XVMC(mpi->imgfmt)) {
         struct xvmc_pix_fmt *render = mpi->priv; //same as data[2]
-        if(!avctx->xvmc_acceleration) {
-            mp_msg(MSGT_DECVIDEO, MSGL_INFO, MSGTR_MPCODECS_McGetBufferShouldWorkOnlyWithXVMC);
-            assert(0);
-            exit(1);
-//            return -1;//!!fixme check error conditions in ffmpeg
-        }
         if(!(mpi->flags & MP_IMGFLAG_DIRECT)) {
             mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_MPCODECS_OnlyBuffersAllocatedByVoXvmcAllowed);
             assert(0);
-            exit(1);
-//            return -1;//!!fixme check error conditions in ffmpeg
+            return -1;//!!fixme check error conditions in ffmpeg
         }
         if(mp_msg_test(MSGT_DECVIDEO, MSGL_DBG5))
             mp_msg(MSGT_DECVIDEO, MSGL_DBG5, "vd_ffmpeg::get_buffer (xvmc render=%p)\n", render);
@@ -940,6 +935,10 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
     int dr1= ctx->do_dr1;
     AVPacket pkt;
 
+    if (ctx->refcount_frame) {
+        av_frame_unref(ctx->refcount_frame);
+        ctx->refcount_frame = NULL;
+    }
     if(data && len<=0) return NULL; // skipped frame
 
 //ffmpeg interlace (mpeg2) bug have been fixed. no need of -noslices
@@ -993,6 +992,7 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
         ctx->palette_sent = 1;
     }
     ret = avcodec_decode_video2(avctx, pic, &got_picture, &pkt);
+    ctx->refcount_frame = pic;
     pkt.data = NULL;
     pkt.size = 0;
     av_packet_free_side_data(&pkt);
@@ -1010,10 +1010,9 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
         static long long int all_len=0;
         static int frame_number=0;
         static double all_frametime=0.0;
-        AVFrame *pic= avctx->coded_frame;
         double quality=0.0;
 
-        if(!pic) break;
+        if(!got_picture) break;
 
         if(!fvstats) {
             time_t today2;
@@ -1036,11 +1035,13 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
             int x, y;
             int w = ((avctx->width  << lavc_param_lowres)+15) >> 4;
             int h = ((avctx->height << lavc_param_lowres)+15) >> 4;
-            int8_t *q = pic->qscale_table;
+            int qstride;
+            int dummy;
+            int8_t *q = av_frame_get_qp_table(pic, &qstride, &dummy);
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++)
-                    quality += (double)*(q+x);
-                q += pic->qstride;
+                    quality += q[x];
+                q += qstride;
             }
             quality /= w * h;
         }
@@ -1072,7 +1073,7 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
 
         ctx->qp_stat[(int)(quality+0.5)]++;
         ctx->qp_sum += quality;
-        ctx->inv_qp_sum += 1.0/(double)quality;
+        ctx->inv_qp_sum += 1.0/FFMAX(quality, 1);
 
         break;
     }
@@ -1133,10 +1134,8 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
         swap_palette(mpi->planes[1]);
 #endif
 /* to comfirm with newer lavc style */
-    mpi->qscale =pic->qscale_table;
-    mpi->qstride=pic->qstride;
+    mpi->qscale = av_frame_get_qp_table(pic, &mpi->qstride, &mpi->qscale_type);
     mpi->pict_type=pic->pict_type;
-    mpi->qscale_type= pic->qscale_type;
     mpi->fields = MP_IMGFIELD_ORDERED;
     if(pic->interlaced_frame) mpi->fields |= MP_IMGFIELD_INTERLACED;
     if(pic->top_field_first ) mpi->fields |= MP_IMGFIELD_TOP_FIRST;

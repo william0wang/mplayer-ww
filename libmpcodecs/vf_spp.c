@@ -42,6 +42,8 @@
 #include "libavutil/intreadwrite.h"
 #include "libavcodec/avcodec.h"
 #include "libavcodec/dsputil.h"
+#include "libavcodec/idctdsp.h"
+#include "libavcodec/fdctdsp.h"
 
 #undef fprintf
 #undef free
@@ -101,6 +103,8 @@ struct vf_priv_s {
         int16_t *temp;
         AVCodecContext *avctx;
         DSPContext dsp;
+        IDCTDSPContext idsp;
+        FDCTDSPContext fdsp;
         char *non_b_qp;
 };
 
@@ -415,9 +419,9 @@ static void filter(struct vf_priv_s *p, uint8_t *dst, uint8_t *src, int dst_stri
                                 const int y1= y + offset[i+count-1][1];
                                 const int index= x1 + y1*stride;
                                 p->dsp.get_pixels(block, p->src + index, stride);
-                                p->dsp.fdct(block);
-                                requantize(block2, block, qp, p->dsp.idct_permutation);
-                                p->dsp.idct(block2);
+                                p->fdsp.fdct(block);
+                                requantize(block2, block, qp, p->idsp.idct_permutation);
+                                p->idsp.idct(block2);
                                 add_block(p->temp + index, stride, block2);
                         }
                 }
@@ -581,6 +585,8 @@ static int vf_open(vf_instance_t *vf, char *args){
 
     vf->priv->avctx= avcodec_alloc_context3(NULL);
     ff_dsputil_init(&vf->priv->dsp, vf->priv->avctx);
+    ff_idctdsp_init(&vf->priv->idsp, vf->priv->avctx);
+    ff_fdctdsp_init(&vf->priv->fdsp, vf->priv->avctx);
 
     vf->priv->log2_count= 3;
 

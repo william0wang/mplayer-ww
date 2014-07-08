@@ -30,7 +30,7 @@
 
 typedef struct {
     int x, y;     // location
-    int sx, sy;   // size
+    int w, h;     // size
 } fntChar;
 
 typedef struct {

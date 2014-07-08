@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include <math.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <shlobj.h>
@@ -117,6 +118,19 @@ LPSTR acp (LPCSTR utf8)
     return "?";
 }
 
+double appRadian (widget *item, int x, int y)
+{
+  double tx, ty;
+
+  // transform the center to (0,0)
+  tx = x - item->wwidth / 2.0;
+  ty = y - item->wheight / 2.0;
+
+  // the y-axis is upside down and must be mirrored
+  // the x-axis is being mirrored for a clockwise radian
+  return (tx == 0.0 && ty == 0.0 ? 0.0 : atan2(-ty, -tx) + M_PI);
+}
+
 static void console_toggle(gui_t *gui)
 {
     if (console_state)
@@ -187,7 +201,7 @@ static void display_about_box(HWND hWnd)
 {
     char about_msg[512];
     snprintf(about_msg, sizeof(about_msg), MP_TITLE "\n" COPYRIGHT, MPlayer);
-    MessageBox(hWnd, about_msg, acp(MSGTR_About), MB_OK);
+    MessageBox(hWnd, about_msg, acp(MSGTR_GUI_AboutMPlayer), MB_OK);
 }
 
 static image *get_drawground(HWND hwnd)
@@ -304,10 +318,10 @@ static void updatedisplay(gui_t *gui, HWND hwnd)
 
     if(!hwnd) return;
 
-    /* load all potmeters hpotmeters */
+    /* load all hpotmeters vpotmeters rpotmeters pimages */
     for(i=0; i<gui->skin->widgetcount; i++)
     {
-        if(gui->skin->widgets[i]->type == tyHpotmeter || gui->skin->widgets[i]->type == tyPotmeter)
+        if(gui->skin->widgets[i]->type == tyHpotmeter || gui->skin->widgets[i]->type == tyVpotmeter || gui->skin->widgets[i]->type == tyRpotmeter || gui->skin->widgets[i]->type == tyPimage)
         {
             if(gui->skin->widgets[i]->msg == evSetVolume)
                 gui->skin->widgets[i]->value = guiInfo.Volume;
@@ -432,7 +446,7 @@ static LRESULT CALLBACK VideoProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                     BROWSEINFO bi;
                     LPITEMIDLIST pidl;
                     memset(&bi, 0, sizeof(BROWSEINFO));
-                    bi.lpszTitle = acp(MSGTR_DirectorySelect);
+                    bi.lpszTitle = acp(MSGTR_GUI_WIN32_DirectoryList":");
                     pidl = SHBrowseForFolder(&bi);
                     if (SHGetPathFromIDList(pidl, path))
                     {
@@ -629,11 +643,11 @@ static LRESULT CALLBACK VideoProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
             rect_height = rd.bottom - rd.top;
 
             /* maintain our aspect ratio */
-            tmpheight = ((float)rect_width/video_aspect);
+            tmpheight = rect_width/video_aspect;
             tmpheight += tmpheight % 2;
             if(tmpheight > rect_height)
             {
-                rect_width = ((float)rect_height*video_aspect);
+                rect_width = rect_height*video_aspect;
                 rect_width += rect_width % 2;
             }
             else rect_height = tmpheight;
@@ -695,6 +709,8 @@ static LRESULT CALLBACK VideoProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
 /* Window Proc for the gui Window */
 static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    static double prev_point;
+    static int endstop;
     gui_t *gui = (gui_t *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
     /* Avoid processing when then window doesn't match gui mainwindow */
@@ -825,7 +841,7 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
             gui->mousey = GET_Y_LPARAM(lParam);
             /* inside a widget */
             gui->activewidget = clickedinsidewidget(gui, get_windowtype(hWnd), gui->mousex, gui->mousey);
-            if(gui->activewidget)
+            if(gui->activewidget && gui->activewidget->type != tyPimage)
             {
                 gui->activewidget->pressed = 1;
                 gui->mousewx = gui->mousex - gui->activewidget->x;
@@ -833,6 +849,14 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                 renderwidget(gui->skin, get_drawground(hWnd), gui->activewidget, 0);
                 RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
                 handlemsg(hWnd, gui->activewidget->msg);
+
+                if(gui->activewidget->type == tyRpotmeter)
+                {
+                    prev_point = appRadian(gui->activewidget, gui->mousewx, gui->mousewy) - gui->activewidget->zeropoint;
+                    if(prev_point < 0.0) prev_point += 2 * M_PI;
+                    if(prev_point <= gui->activewidget->arclength) endstop=FALSE;
+                    else endstop=STOPPED_AT_0 + STOPPED_AT_100;   // block movement
+                }
             }
             break;
         }
@@ -926,16 +950,65 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
 
                     if(item->type == tyHpotmeter)
                     {
-                        item->x = GET_X_LPARAM(lParam) - gui->mousewx;
-                        item->value = (float)((float)((item->x - item->wx) * 100.0f) / (float)(item->wwidth - item->width));
+                        int wd = item->wwidth - item->width;
+
+                        if (wd == 0)   // legacy (potmeter)
+                        {
+                            item->x = GET_X_LPARAM(lParam);
+                            wd = item->wwidth;
+                        }
+                        else item->x = GET_X_LPARAM(lParam) - gui->mousewx;
+
+                        item->value = 100.0 * (item->x - item->wx) / wd;
                     }
-                    if(item->type == tyPotmeter)
+                    if(item->type == tyVpotmeter)
                     {
-                        gui->mousewx = GET_X_LPARAM(lParam) - gui->activewidget->x;
-                        item->value = (float) (gui->mousewx * 100.0f) / (float) item->wwidth;
+                        item->y = GET_Y_LPARAM(lParam) - gui->mousewy;
+                        item->value = 100.0 - 100.0 * (item->y - item->wy) / (item->wheight - item->height);
+                    }
+                    if(item->type == tyRpotmeter)
+                    {
+                        double point;
+
+                        point = appRadian(item, GET_X_LPARAM(lParam) - gui->activewidget->x, GET_Y_LPARAM(lParam) - gui->activewidget->y) - item->zeropoint;
+                        if(point < 0.0) point += 2 * M_PI;
+                        if(item->arclength < 2 * M_PI)
+                        /* a potmeter with separated 0% and 100% positions */
+                        {
+                            if(point - prev_point > M_PI)
+                            /* turned beyond the 0% position */
+                            {
+                                if(!endstop)
+                                {
+                                    endstop = STOPPED_AT_0;
+                                    item->value = 0.0f;
+                                }
+                            }
+                            else if(prev_point - point > M_PI)
+                            /* turned back from beyond the 0% position */
+                            {
+                                if(endstop == STOPPED_AT_0) endstop = FALSE;
+                            }
+                            else if(prev_point <= item->arclength && point > item->arclength)
+                            /* turned beyond the 100% position */
+                            {
+                                if (!endstop)
+                                {
+                                    endstop = STOPPED_AT_100;
+                                    item->value = 100.0f;
+                                }
+                            }
+                            else if(prev_point > item->arclength && point <= item->arclength)
+                            /* turned back from beyond the 100% position */
+                            {
+                                if(endstop == STOPPED_AT_100) endstop = FALSE;
+                            }
+                        }
+                        if(!endstop) item->value = 100.0 * point / item->arclength;
+                        prev_point = point;
                     }
 
-                    if((item->type == tyPotmeter) || (item->type == tyHpotmeter) || (item->type == tyVpotmeter))
+                    if((item->type == tyHpotmeter) || (item->type == tyVpotmeter) || (item->type == tyRpotmeter))
                     {
                         /* Bound checks */
                         if(item->value > 100.0f)
@@ -944,15 +1017,15 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                             item->value = 0.0f;
 
                         if(item->msg == evSetVolume)
-                            guiInfo.Volume = (float) item->value;
+                            guiInfo.Volume = item->value;
                         else if(item->msg == evSetMoviePosition)
-                            guiInfo.Position = (float) item->value;
+                            guiInfo.Position = item->value;
                         else if(item->msg == evSetBalance)
                         {
                             /* make the range for 50% a bit bigger, because the sliders for balance usually suck */
                             if((item->value - 50.0f < 1.5f) && (item->value - 50.0f > -1.5f))
                                 item->value = 50.0f;
-                            guiInfo.Balance = (float) item->value;
+                            guiInfo.Balance = item->value;
                         }
                         updatedisplay(gui, hWnd);
                         handlemsg(hWnd, item->msg);
@@ -986,7 +1059,7 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                     BROWSEINFO bi;
                     LPITEMIDLIST pidl;
                     memset(&bi, 0, sizeof(BROWSEINFO));
-                    bi.lpszTitle = acp(MSGTR_DirectorySelect);
+                    bi.lpszTitle = acp(MSGTR_GUI_WIN32_DirectoryList":");
                     pidl = SHBrowseForFolder(&bi);
                     if (SHGetPathFromIDList(pidl, path))
                     {
@@ -1198,51 +1271,51 @@ static void create_menu(gui_t *gui)
     gui->diskmenu = CreatePopupMenu();
     gui->menu=CreatePopupMenu();
     gui->trayplaymenu = CreatePopupMenu();
-    AppendMenu(gui->menu, MF_STRING | MF_POPUP, (UINT_PTR) gui->trayplaymenu, acp(MSGTR_MENU_Open));
-    AppendMenu(gui->trayplaymenu, MF_STRING, IDFILE_OPEN, acp(MSGTR_MENU_PlayFile));
-    AppendMenu(gui->trayplaymenu, MF_STRING, IDURL_OPEN, acp(MSGTR_MENU_PlayURL));
-    AppendMenu(gui->trayplaymenu, MF_STRING, IDDIR_OPEN, acp(MSGTR_MENU_PlayDirectory));
+    AppendMenu(gui->menu, MF_STRING | MF_POPUP, (UINT_PTR) gui->trayplaymenu, acp(MSGTR_GUI_Open));
+    AppendMenu(gui->trayplaymenu, MF_STRING, IDFILE_OPEN, acp(MSGTR_GUI_File"..."));
+    AppendMenu(gui->trayplaymenu, MF_STRING, IDURL_OPEN, acp(MSGTR_GUI_URL"..."));
+    AppendMenu(gui->trayplaymenu, MF_STRING, IDDIR_OPEN, acp(MSGTR_GUI_Directory"..."));
     AppendMenu(gui->menu, MF_SEPARATOR, 0, 0);
-    AppendMenu(gui->menu, MF_STRING | MF_POPUP, (UINT_PTR) gui->diskmenu, acp(MSGTR_MENU_PlayDisc));
+    AppendMenu(gui->menu, MF_STRING | MF_POPUP, (UINT_PTR) gui->diskmenu, acp(MSGTR_GUI_Play));
     AppendMenu(gui->menu, MF_SEPARATOR, 0, 0);
-    AppendMenu(gui->menu, MF_STRING, IDSUBTITLE_OPEN, acp(MSGTR_MENU_LoadSubtitle));
-    AppendMenu(gui->menu, MF_STRING, ID_SKINBROWSER, acp(MSGTR_MENU_SkinBrowser));
+    AppendMenu(gui->menu, MF_STRING, IDSUBTITLE_OPEN, acp(MSGTR_GUI_Subtitle"..."));
+    AppendMenu(gui->menu, MF_STRING, ID_SKINBROWSER, acp(MSGTR_GUI_SkinBrowser));
     AppendMenu(gui->menu, MF_SEPARATOR, 0, 0);
-    AppendMenu(gui->menu, MF_STRING, ID_PREFS, acp(MSGTR_MENU_Preferences));
-    AppendMenu(gui->menu, MF_STRING, ID_CONSOLE, acp(MSGTR_MENU_DebugConsole));
-    AppendMenu(gui->menu, MF_STRING, ID_ONLINEHELP, acp(MSGTR_MENU_OnlineHelp));
-    AppendMenu(gui->menu, MF_STRING, IDHELP_ABOUT, acp(MSGTR_MENU_AboutMPlayer));
+    AppendMenu(gui->menu, MF_STRING, ID_PREFS, acp(MSGTR_GUI_Preferences));
+    AppendMenu(gui->menu, MF_STRING, ID_CONSOLE, acp(MSGTR_GUI_WIN32_DebugConsole));
+    AppendMenu(gui->menu, MF_STRING, ID_ONLINEHELP, acp(MSGTR_GUI_WIN32_OnlineHelp));
+    AppendMenu(gui->menu, MF_STRING, IDHELP_ABOUT, acp(MSGTR_GUI_AboutMPlayer));
     AppendMenu(gui->menu, MF_SEPARATOR, 0, 0);
-    AppendMenu(gui->menu, MF_STRING, IDEXIT, acp(MSGTR_MENU_Exit));
+    AppendMenu(gui->menu, MF_STRING, IDEXIT, acp(MSGTR_GUI_Quit));
 }
 
 static void create_traymenu(gui_t *gui)
 {
     gui->traymenu = CreatePopupMenu();
     gui->trayplaybackmenu = CreatePopupMenu();
-    AppendMenu(gui->traymenu, MF_STRING | MF_POPUP, (UINT_PTR) gui->trayplaymenu, acp(MSGTR_MENU_Open));
+    AppendMenu(gui->traymenu, MF_STRING | MF_POPUP, (UINT_PTR) gui->trayplaymenu, acp(MSGTR_GUI_Open));
     AppendMenu(gui->traymenu, MF_SEPARATOR, 0, 0);
-    AppendMenu(gui->traymenu, MF_STRING | MF_POPUP, (UINT_PTR) gui->trayplaybackmenu, acp(MSGTR_MENU_Playing));
-    AppendMenu(gui->trayplaybackmenu, MF_STRING, ID_SEEKB, acp(MSGTR_MENU_SeekBack));
-    AppendMenu(gui->trayplaybackmenu, MF_STRING, ID_PTRACK, acp(MSGTR_MENU_PrevStream));
-    AppendMenu(gui->trayplaybackmenu, MF_STRING, ID_PLAY, acp(MSGTR_MENU_Play "/" MSGTR_MENU_Pause));
-    AppendMenu(gui->trayplaybackmenu, MF_STRING, ID_STOP, acp(MSGTR_MENU_Stop));
-    AppendMenu(gui->trayplaybackmenu, MF_STRING, ID_NTRACK, acp(MSGTR_MENU_NextStream));
-    AppendMenu(gui->trayplaybackmenu, MF_STRING, ID_SEEKF, acp(MSGTR_MENU_SeekForw));
+    AppendMenu(gui->traymenu, MF_STRING | MF_POPUP, (UINT_PTR) gui->trayplaybackmenu, acp(MSGTR_GUI_Playback));
+    AppendMenu(gui->trayplaybackmenu, MF_STRING, ID_SEEKB, acp(MSGTR_GUI_WIN32_SeekBackwards));
+    AppendMenu(gui->trayplaybackmenu, MF_STRING, ID_PTRACK, acp(MSGTR_GUI_Previous));
+    AppendMenu(gui->trayplaybackmenu, MF_STRING, ID_PLAY, acp(MSGTR_GUI_Play "/" MSGTR_GUI_Pause));
+    AppendMenu(gui->trayplaybackmenu, MF_STRING, ID_STOP, acp(MSGTR_GUI_Stop));
+    AppendMenu(gui->trayplaybackmenu, MF_STRING, ID_NTRACK, acp(MSGTR_GUI_Next));
+    AppendMenu(gui->trayplaybackmenu, MF_STRING, ID_SEEKF, acp(MSGTR_GUI_WIN32_SeekForwards));
     AppendMenu(gui->traymenu, MF_SEPARATOR, 0, 0);
-    AppendMenu(gui->traymenu, MF_STRING, ID_MUTE, acp(MSGTR_MENU_Mute));
+    AppendMenu(gui->traymenu, MF_STRING, ID_MUTE, acp(MSGTR_GUI_Mute));
     AppendMenu(gui->traymenu, MF_SEPARATOR, 0, 0);
-    AppendMenu(gui->traymenu, MF_STRING, IDSUBTITLE_OPEN, acp(MSGTR_MENU_LoadSubtitle));
-    AppendMenu(gui->traymenu, MF_STRING, ID_PLAYLIST, acp(MSGTR_MENU_PlayList));
+    AppendMenu(gui->traymenu, MF_STRING, IDSUBTITLE_OPEN, acp(MSGTR_GUI_Subtitle));
+    AppendMenu(gui->traymenu, MF_STRING, ID_PLAYLIST, acp(MSGTR_GUI_Playlist));
     AppendMenu(gui->traymenu, MF_SEPARATOR, 0, 0);
-    AppendMenu(gui->traymenu, MF_STRING, ID_SHOWHIDE, acp(MSGTR_MENU_ShowHide));
+    AppendMenu(gui->traymenu, MF_STRING, ID_SHOWHIDE, acp(MSGTR_GUI_WIN32_ShowHide));
     AppendMenu(gui->traymenu, MF_SEPARATOR, 0, 0);
-    AppendMenu(gui->traymenu, MF_STRING, ID_PREFS, acp(MSGTR_MENU_Preferences));
-    AppendMenu(gui->traymenu, MF_STRING, ID_CONSOLE, acp(MSGTR_MENU_DebugConsole));
-    AppendMenu(gui->traymenu, MF_STRING, ID_ONLINEHELP, acp(MSGTR_MENU_OnlineHelp));
-    AppendMenu(gui->traymenu, MF_STRING, IDHELP_ABOUT, acp(MSGTR_MENU_AboutMPlayer));
+    AppendMenu(gui->traymenu, MF_STRING, ID_PREFS, acp(MSGTR_GUI_Preferences));
+    AppendMenu(gui->traymenu, MF_STRING, ID_CONSOLE, acp(MSGTR_GUI_WIN32_DebugConsole));
+    AppendMenu(gui->traymenu, MF_STRING, ID_ONLINEHELP, acp(MSGTR_GUI_WIN32_OnlineHelp));
+    AppendMenu(gui->traymenu, MF_STRING, IDHELP_ABOUT, acp(MSGTR_GUI_AboutMPlayer));
     AppendMenu(gui->traymenu, MF_SEPARATOR, 0, 0);
-    AppendMenu(gui->traymenu, MF_STRING, IDEXIT, acp(MSGTR_MENU_Exit));
+    AppendMenu(gui->traymenu, MF_STRING, IDEXIT, acp(MSGTR_GUI_Quit));
 }
 
 static void create_videomenu(gui_t *gui)
@@ -1251,33 +1324,33 @@ static void create_videomenu(gui_t *gui)
     gui->dvdmenu = CreatePopupMenu();
     gui->aspectmenu = CreatePopupMenu();
     gui->subtitlemenu = CreatePopupMenu();
-    AppendMenu(gui->videomenu, MF_STRING | MF_POPUP, (UINT_PTR) gui->trayplaymenu, acp(MSGTR_MENU_Open));
+    AppendMenu(gui->videomenu, MF_STRING | MF_POPUP, (UINT_PTR) gui->trayplaymenu, acp(MSGTR_GUI_Open));
     AppendMenu(gui->videomenu, MF_SEPARATOR, 0, 0);
-    AppendMenu(gui->videomenu, MF_STRING, ID_SEEKB, acp(MSGTR_MENU_SeekBack));
-    AppendMenu(gui->videomenu, MF_STRING, ID_PTRACK, acp(MSGTR_MENU_PrevStream));
-    AppendMenu(gui->videomenu, MF_STRING, ID_PLAY, acp(MSGTR_MENU_Play "/" MSGTR_MENU_Pause));
-    AppendMenu(gui->videomenu, MF_STRING, ID_STOP, acp(MSGTR_MENU_Stop));
-    AppendMenu(gui->videomenu, MF_STRING, ID_NTRACK, acp(MSGTR_MENU_NextStream));
-    AppendMenu(gui->videomenu, MF_STRING, ID_SEEKF, acp(MSGTR_MENU_SeekForw));
+    AppendMenu(gui->videomenu, MF_STRING, ID_SEEKB, acp(MSGTR_GUI_WIN32_SeekBackwards));
+    AppendMenu(gui->videomenu, MF_STRING, ID_PTRACK, acp(MSGTR_GUI_Previous));
+    AppendMenu(gui->videomenu, MF_STRING, ID_PLAY, acp(MSGTR_GUI_Play "/" MSGTR_GUI_Pause));
+    AppendMenu(gui->videomenu, MF_STRING, ID_STOP, acp(MSGTR_GUI_Stop));
+    AppendMenu(gui->videomenu, MF_STRING, ID_NTRACK, acp(MSGTR_GUI_Next));
+    AppendMenu(gui->videomenu, MF_STRING, ID_SEEKF, acp(MSGTR_GUI_WIN32_SeekForwards));
     AppendMenu(gui->videomenu, MF_SEPARATOR, 0, 0);
-    AppendMenu(gui->videomenu, MF_STRING, ID_FULLSCREEN, acp(MSGTR_MENU_FullScreen));
-    AppendMenu(gui->videomenu, MF_STRING, ID_MUTE, acp(MSGTR_MENU_Mute));
+    AppendMenu(gui->videomenu, MF_STRING, ID_FULLSCREEN, acp(MSGTR_GUI_SizeFullscreen));
+    AppendMenu(gui->videomenu, MF_STRING, ID_MUTE, acp(MSGTR_GUI_Mute));
     AppendMenu(gui->videomenu, MF_SEPARATOR, 0, 0);
-    AppendMenu(gui->videomenu, MF_STRING | MF_POPUP, (UINT_PTR) gui->aspectmenu, acp(MSGTR_MENU_AspectRatio));
-    AppendMenu(gui->videomenu, MF_STRING | MF_POPUP, (UINT_PTR) gui->subtitlemenu, acp(MSGTR_MENU_Subtitles));
+    AppendMenu(gui->videomenu, MF_STRING | MF_POPUP, (UINT_PTR) gui->aspectmenu, acp(MSGTR_GUI_AspectRatio));
+    AppendMenu(gui->videomenu, MF_STRING | MF_POPUP, (UINT_PTR) gui->subtitlemenu, acp(MSGTR_GUI_Subtitles));
 #ifdef CONFIG_DVDREAD
-    AppendMenu(gui->videomenu, MF_STRING | MF_POPUP, (UINT_PTR) gui->dvdmenu, acp(MSGTR_MENU_DVD));
-    AppendMenu(gui->dvdmenu, MF_STRING | MF_GRAYED, ID_CHAPTERSEL, acp(MSGTR_SelectTitleChapter));
+    AppendMenu(gui->videomenu, MF_STRING | MF_POPUP, (UINT_PTR) gui->dvdmenu, acp(MSGTR_GUI_DVD));
+    AppendMenu(gui->dvdmenu, MF_STRING | MF_GRAYED, ID_CHAPTERSEL, acp(MSGTR_GUI_WIN32_SelectTitleChapter"..."));
 #endif
-    AppendMenu(gui->subtitlemenu, MF_STRING, IDSUB_TOGGLE, acp(MSGTR_MENU_SubtitlesOnOff));
-    AppendMenu(gui->subtitlemenu, MF_STRING, IDSUB_CYCLE, acp(MSGTR_MENU_SubtitleLanguages));
+    AppendMenu(gui->subtitlemenu, MF_STRING, IDSUB_TOGGLE, acp(MSGTR_GUI_WIN32_SubtitleOnOff));
+    AppendMenu(gui->subtitlemenu, MF_STRING, IDSUB_CYCLE, acp(MSGTR_GUI_Subtitles));
     AppendMenu(gui->aspectmenu, MF_STRING, ID_ASPECT1, "16:9");
     AppendMenu(gui->aspectmenu, MF_STRING, ID_ASPECT2, "4:3");
-    AppendMenu(gui->aspectmenu, MF_STRING, ID_ASPECT3, acp(MSGTR_MENU_235));
+    AppendMenu(gui->aspectmenu, MF_STRING, ID_ASPECT3, acp(MSGTR_GUI_235To1));
     AppendMenu(gui->aspectmenu, MF_SEPARATOR, 0, 0);
-    AppendMenu(gui->aspectmenu, MF_STRING, ID_ASPECT4, acp(MSGTR_MENU_Original));
+    AppendMenu(gui->aspectmenu, MF_STRING, ID_ASPECT4, acp(MSGTR_GUI_Original));
     AppendMenu(gui->videomenu, MF_SEPARATOR, 0, 0);
-    AppendMenu(gui->videomenu, MF_STRING, IDEXIT, acp(MSGTR_MENU_Exit));
+    AppendMenu(gui->videomenu, MF_STRING, IDEXIT, acp(MSGTR_GUI_Quit));
 }
 
 static void maketransparent(HWND hwnd, COLORREF crTransparent)
@@ -1462,7 +1535,7 @@ int create_videowindow(gui_t *gui)
     DragAcceptFiles(gui->videowindow, TRUE);
 
     if(video_window)
-        WinID = gui->videowindow;
+        WinID = (INT_PTR) gui->videowindow;
     ShowWindow(gui->videowindow, SW_SHOW);
     UpdateWindow(gui->videowindow);
     return 0;

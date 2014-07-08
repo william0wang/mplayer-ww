@@ -30,6 +30,8 @@
 #define vid_fourcc(a,b,c,d)\
         (((unsigned)(a)<<0)|((unsigned)(b)<<8)|((unsigned)(c)<<16)|((unsigned)(d)<<24))
 
+#define IMGFMT_IS_RGB(f) ((f & vid_fourcc(0xff,0xff,0xff, 0)) == vid_fourcc('R','G','B', 0))
+
 /* RGB fourcc */
 #define IMGFMT_RGB332  vid_fourcc('R','G','B','1') /*  8  RGB-3-3-2     */
 #define IMGFMT_RGB555  vid_fourcc('R','G','B','O') /* 16  RGB-5-5-5     */

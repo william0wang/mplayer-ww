@@ -95,7 +95,7 @@ int mp_input_joystick_read(int fd) {
   int l=0;
 
   while((unsigned int)l < sizeof(struct js_event)) {
-    int r = read(fd,&ev+l,sizeof(struct js_event)-l);
+    int r = read(fd,((char*)&ev)+l,sizeof(struct js_event)-l);
     if(r <= 0) {
       if(errno == EINTR)
 	continue;

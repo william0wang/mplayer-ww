@@ -735,28 +735,69 @@ static subtitle *sub_read_line_rt(stream_t *st,subtitle *current, int utf16) {
     char line[LINE_LEN+1];
     int a1,a2,a3,a4,b1,b2,b3,b4;
     char *p=NULL,*next=NULL;
-    int len,plen;
+    int plen;
 
     while (!current->text[0]) {
+	int match = 0;
 	if (!stream_read_line (st, line, LINE_LEN, utf16)) return NULL;
 	//TODO: it seems that format of time is not easily determined, it may be 1:12, 1:12.0 or 0:1:12.0
 	//to describe the same moment in time. Maybe there are even more formats in use.
+	//This probably should be changed to do something nicer than
+	//"brute-forcing" a long list of format strings.
 	//if ((len=sscanf (line, "<Time Begin=\"%d:%d:%d.%d\" End=\"%d:%d:%d.%d\"",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4)) < 8)
-	plen=a1=a2=a3=a4=b1=b2=b3=b4=0;
-	if (
-	((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d.%d\" %*[Ee]nd=\"%d.%d\"%*[^<]<clear/>%n",&a3,&a4,&b3,&b4,&plen)) < 4) &&
-	((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d.%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a3,&a4,&b2,&b3,&b4,&plen)) < 5) &&
-	((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d\" %*[Ee]nd=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&b2,&b3,&plen)) < 4) &&
-	((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&b2,&b3,&b4,&plen)) < 5) &&
-//	((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\" %*[Ee]nd=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&b2,&b3,&plen)) < 5) &&
-	((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&b2,&b3,&b4,&plen)) < 6) &&
-	((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d:%d.%d\" %*[Ee]nd=\"%d:%d:%d.%d\"%*[^<]<clear/>%n",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4,&plen)) < 8) &&
+	if (!match) {
+		plen=a1=a2=a3=a4=b1=b2=b3=b4=0;
+		match = sscanf(line, "<%*[tT]ime %*[bB]egin=\"%d.%d\" %*[Ee]nd=\"%d.%d\"%*[^<]<clear/>%n",&a3,&a4,&b3,&b4,&plen) >= 4;
+		match &= plen > 0;
+	}
+	if (!match) {
+		plen=a1=a2=a3=a4=b1=b2=b3=b4=0;
+		match = sscanf(line, "<%*[tT]ime %*[bB]egin=\"%d.%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a3,&a4,&b2,&b3,&b4,&plen) >= 5;
+		match &= plen > 0;
+	}
+	if (!match) {
+		plen=a1=a2=a3=a4=b1=b2=b3=b4=0;
+		match = sscanf(line, "<%*[tT]ime %*[bB]egin=\"%d:%d\" %*[Ee]nd=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&b2,&b3,&plen) >= 4;
+		match &= plen > 0;
+	}
+	if (!match) {
+		plen=a1=a2=a3=a4=b1=b2=b3=b4=0;
+		match = sscanf(line, "<%*[tT]ime %*[bB]egin=\"%d:%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&b2,&b3,&b4,&plen) >= 5;
+		match &= plen > 0;
+	}
+//	sscanf(line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\" %*[Ee]nd=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&b2,&b3,&plen) >= 5
+	if (!match) {
+		plen=a1=a2=a3=a4=b1=b2=b3=b4=0;
+		match = sscanf(line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&b2,&b3,&b4,&plen) >= 6;
+		match &= plen > 0;
+	}
+	if (!match) {
+		plen=a1=a2=a3=a4=b1=b2=b3=b4=0;
+		match = sscanf(line, "<%*[tT]ime %*[bB]egin=\"%d:%d:%d.%d\" %*[Ee]nd=\"%d:%d:%d.%d\"%*[^<]<clear/>%n",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4,&plen) >= 8;
+		match &= plen > 0;
+	}
 	//now try it without end time
-	((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d.%d\"%*[^<]<clear/>%n",&a3,&a4,&plen)) < 2) &&
-	((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&plen)) < 2) &&
-	((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&plen)) < 3) &&
-	((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d:%d.%d\"%*[^<]<clear/>%n",&a1,&a2,&a3,&a4,&plen)) < 4)
-	)
+	if (!match) {
+		plen=a1=a2=a3=a4=b1=b2=b3=b4=0;
+		match = sscanf(line, "<%*[tT]ime %*[bB]egin=\"%d.%d\"%*[^<]<clear/>%n",&a3,&a4,&plen) >= 2;
+		match &= plen > 0;
+	}
+	if (!match) {
+		plen=a1=a2=a3=a4=b1=b2=b3=b4=0;
+		match = sscanf(line, "<%*[tT]ime %*[bB]egin=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&plen) >= 2;
+		match &= plen > 0;
+	}
+	if (!match) {
+		plen=a1=a2=a3=a4=b1=b2=b3=b4=0;
+		match = sscanf(line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&plen) >= 3;
+		match &= plen > 0;
+	}
+	if (!match) {
+		plen=a1=a2=a3=a4=b1=b2=b3=b4=0;
+		match = sscanf(line, "<%*[tT]ime %*[bB]egin=\"%d:%d:%d.%d\"%*[^<]<clear/>%n",&a1,&a2,&a3,&a4,&plen) >= 4;
+		match &= plen > 0;
+	}
+	if (!match)
 	    continue;
 	current->start = a1*360000+a2*6000+a3*100+a4/10;
 	current->end   = b1*360000+b2*6000+b3*100+b4/10;
@@ -1359,12 +1400,12 @@ void	subcp_close (void)
 	}
 }
 
-subtitle* subcp_recode (subtitle *sub)
+void subcp_recode (subtitle *sub)
 {
 	int l=sub->lines;
 	size_t ileft, oleft;
 	char *op, *ip, *ot;
-	if(icdsc == (iconv_t)(-1)) return sub;
+	if(icdsc == (iconv_t)(-1)) return;
 
 	while (l){
 		ip = sub->text[--l];
@@ -1391,7 +1432,7 @@ subtitle* subcp_recode (subtitle *sub)
 		free (sub->text[l]);
 		sub->text[l] = ot;
 	}
-	return sub;
+	return;
 }
 #endif
 
@@ -1409,6 +1450,8 @@ int do_fribid_log2vis(int charset, const char *in, FriBidiChar *logical, FriBidi
   len = fribidi_remove_bidi_marks(visual, len, NULL, NULL, NULL);
   return len;
 }
+#endif
+
 
 /**
  * Do conversion necessary for right-to-left language support via fribidi.
@@ -1416,15 +1459,16 @@ int do_fribid_log2vis(int charset, const char *in, FriBidiChar *logical, FriBidi
  * @param sub_utf8 whether the subtitle is encoded in UTF-8
  * @param from first new subtitle, all lines before this are assumed to be already converted
  */
-static subtitle* sub_fribidi (subtitle *sub, int sub_utf8, int from)
+static int sub_fribidi (subtitle *sub, int av_unused sub_utf8, int av_unused from)
 {
+#ifdef CONFIG_FRIBIDI
   FriBidiChar logical[LINE_LEN+1], visual[LINE_LEN+1]; // Hopefully these two won't smash the stack
   char        *ip      = NULL, *op     = NULL;
   size_t len,orig_len;
   int l=sub->lines;
   int char_set_num;
   if (!flip_hebrew)
-    return sub;
+    return 1;
   fribidi_set_mirroring(1);
   fribidi_set_reorder_nsm(0);
 
@@ -1454,14 +1498,16 @@ static subtitle* sub_fribidi (subtitle *sub, int sub_utf8, int from)
     }
   }
   if (!from && l){
-    for (l = sub->lines; l;)
-      free (sub->text[--l]);
-    return ERR;
+    for (l = sub->lines; l; --l) {
+      free (sub->text[l]);
+      sub->text[l] = NULL;
+    }
+    sub->lines = 0;
+    return 0;
   }
-  return sub;
-}
-
 #endif
+  return 1;
+}
 
 static void adjust_subs_time(subtitle* sub, float subtime, float fps, int block,
                              int sub_num, int sub_uses_time) {
@@ -1673,10 +1719,7 @@ sub_data* sub_read_file (const char *filename, float fps) {
 			}
 			sub = ERR;
         }
-#ifdef CONFIG_FRIBIDI
-	if (sub!=ERR) sub=sub_fribidi(sub,sub_utf8,0);
-#endif
-	if ( sub == ERR )
+	if ( sub == ERR || !sub_fribidi(sub,sub_utf8,0))
 	 {
 #ifdef CONFIG_ICONV
           subcp_close();
@@ -2749,9 +2792,7 @@ void sub_add_text(subtitle *sub, const char *txt, int len, double endpts, int st
   int double_newline = 1; // ignore newlines at the beginning
   int i, pos;
   char *buf;
-#ifdef CONFIG_FRIBIDI
-  int orig_lines = sub->lines;
-#endif
+  int av_unused orig_lines = sub->lines;
   if (sub->lines >= SUB_MAX_TEXT) return;
   pos = 0;
   buf = malloc(MAX_SUBLINE + 1);
@@ -2818,10 +2859,8 @@ void sub_add_text(subtitle *sub, const char *txt, int len, double endpts, int st
             sub->endpts[sub->lines]);
     free(sub->text[sub->lines]);
   }
-#ifdef CONFIG_FRIBIDI
   if (strip_markup)
-  sub = sub_fribidi(sub, sub_utf8, orig_lines);
-#endif
+    sub_fribidi(sub, sub_utf8, orig_lines);
 }
 
 #define MP_NOPTS_VALUE (-1LL<<63)

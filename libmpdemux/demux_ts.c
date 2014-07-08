@@ -355,7 +355,6 @@ static void ts_add_stream(demuxer_t * demuxer, ES_stream_t *es)
 		{
 			sh->needs_parsing = 1;
 			sh->format = IS_AUDIO(es->type) ? es->type : es->subtype;
-			sh->ds = demuxer->audio;
 
 			priv->ts.streams[es->pid].id = priv->last_aid;
 			priv->ts.streams[es->pid].sh = sh;
@@ -378,7 +377,6 @@ static void ts_add_stream(demuxer_t * demuxer, ES_stream_t *es)
 		if(sh)
 		{
 			sh->format = IS_VIDEO(es->type) ? es->type : es->subtype;
-			sh->ds = demuxer->video;
 
 			priv->ts.streams[es->pid].id = priv->last_vid;
 			priv->ts.streams[es->pid].sh = sh;
@@ -1055,7 +1053,6 @@ static demuxer_t *demux_open_ts(demuxer_t * demuxer)
 		ts_add_stream(demuxer, priv->ts.pids[params.vpid]);
 		sh_video = priv->ts.streams[params.vpid].sh;
 		demuxer->video->id = priv->ts.streams[params.vpid].id;
-		sh_video->ds = demuxer->video;
 		sh_video->format = params.vtype;
 		demuxer->video->sh = sh_video;
 	}
@@ -1068,7 +1065,6 @@ static demuxer_t *demux_open_ts(demuxer_t * demuxer)
 		ts_add_stream(demuxer, priv->ts.pids[params.apid]);
 		sh_audio = priv->ts.streams[params.apid].sh;
 		demuxer->audio->id = priv->ts.streams[params.apid].id;
-		sh_audio->ds = demuxer->audio;
 		sh_audio->format = params.atype;
 		demuxer->audio->sh = sh_audio;
 	}
@@ -2719,8 +2715,12 @@ static int fill_packet(demuxer_t *demuxer, demux_stream_t *ds, demux_packet_t **
 	}
 	if(*dp)
 	{
+		double stream_pts = MP_NOPTS_VALUE;
 		ret = *dp_offset;
 		resize_demux_packet(*dp, ret);	//shrinked to the right size
+		if (ds == demuxer->video &&
+		    stream_control(demuxer->stream, STREAM_CTRL_GET_CURRENT_TIME, (void *)&stream_pts) != STREAM_UNSUPPORTED)
+			(*dp)->stream_pts = stream_pts;
 		ds_add_packet(ds, *dp);
 		mp_msg(MSGT_DEMUX, MSGL_DBG2, "ADDED %d  bytes to %s fifo, PTS=%.3f\n", ret, (ds == demuxer->audio ? "audio" : (ds == demuxer->video ? "video" : "sub")), (*dp)->pts);
 		if(si)

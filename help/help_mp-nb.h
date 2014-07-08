@@ -3,44 +3,54 @@
 
 // ========================= MPlayer hjelp ===========================
 
-static const char help_text[]=
-"Bruk:    mplayer [valg] [sti/]filnavn\n"
-"\n"
-"Valg:\n"
-" -vo <drv[:dev]> velg video-ut driver og enhet (se '-vo help' for liste)\n"
-" -ao <drv[:dev]> velg lyd-ut driver og enhet (se '-ao help' for liste)\n"
 #ifdef CONFIG_VCD
-" vcd://<sporno>   spill VCD (video cd) spor fra enhet i stedet for fil\n"
+#define MSGTR_HelpVCD " vcd://<sporno>   spill VCD (video cd) spor fra enhet i stedet for fil\n"
+#else
+#define MSGTR_HelpVCD
 #endif
+
 #ifdef CONFIG_DVDREAD
-" dvd://<tittelno> spill DVD tittel/spor fra enhet i stedet for fil\n"
+#define MSGTR_HelpDVD " dvd://<tittelno> spill DVD tittel/spor fra enhet i stedet for fil\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -ss <timepos>   søk til gitt (sekunder eller hh:mm:ss) posisjon\n"
-" -nosound        ikke spill av lyd\n"
-" -channels <n>   målnummer for lyd output kanaler\n"
-" -fs -vm -zoom   fullskjerm avspillings valg (fullscr,vidmode chg,softw.scale)\n"
-" -x <x> -y <y>   skaler bildet til <x> * <y> oppløsning [hvis -vo driver støtter det!]\n"
-" -sub <fil>      spesifiser hvilken subtitle fil som skal brukes (se også -subfps, -subdelay)\n"
-" -vid x -aid y   spesifiser hvilken video (x) og lyd (y) stream som skal spilles av\n"
-" -fps x -srate y spesifiser video (x fps) og lyd (y Hz) hastiget\n"
-" -pp <quality>   slå på etterbehandlingsfilter (0-4 for DivX, 0-63 for mpeg)\n"
-" -nobps          bruk alternativ A-V sync metode for AVI filer (kan være nyttig!)\n"
-" -framedrop      slå på bilde-dropping (for trege maskiner)\n"
-" -wid <window id> bruk eksisterende vindu for video output (nytting med plugger!)\n"
+
+#define MSGTR_Help \
+"Bruk:    mplayer [valg] [sti/]filnavn\n"\
+"\n"\
+"Valg:\n"\
+" -vo <drv[:dev]> velg video-ut driver og enhet (se '-vo help' for liste)\n"\
+" -ao <drv[:dev]> velg lyd-ut driver og enhet (se '-ao help' for liste)\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -ss <timepos>   søk til gitt (sekunder eller hh:mm:ss) posisjon\n"\
+" -nosound        ikke spill av lyd\n"\
+" -channels <n>   målnummer for lyd output kanaler\n"\
+" -fs -vm -zoom   fullskjerm avspillings valg (fullscr,vidmode chg,softw.scale)\n"\
+" -x <x> -y <y>   skaler bildet til <x> * <y> oppløsning [hvis -vo driver støtter det!]\n"\
+" -sub <fil>      spesifiser hvilken subtitle fil som skal brukes (se også -subfps, -subdelay)\n"\
+" -vid x -aid y   spesifiser hvilken video (x) og lyd (y) stream som skal spilles av\n"\
+" -fps x -srate y spesifiser video (x fps) og lyd (y Hz) hastiget\n"\
+" -pp <quality>   slå på etterbehandlingsfilter (0-4 for DivX, 0-63 for mpeg)\n"\
+" -nobps          bruk alternativ A-V sync metode for AVI filer (kan være nyttig!)\n"\
+" -framedrop      slå på bilde-dropping (for trege maskiner)\n"\
+" -wid <window id> bruk eksisterende vindu for video output (nytting med plugger!)\n"\
+"\n"\
+"Tastatur:\n"\
+" <- eller ->       søk bakover/fremover 10 sekunder\n"\
+" opp eller ned     søk bakover/fremover 1 minutt\n"\
+" < or >            søk bakover/fremover i playlisten\n"\
+" p eller MELLOMROM pause filmen (trykk en tast for å fortsette)\n"\
+" q eller ESC       stopp avspilling og avslutt programmet\n"\
+" + eller -         juster lyd-forsinkelse med +/- 0.1 sekund\n"\
+" o                 gå gjennom OSD modi:  ingen / søkelinje / søkelinje+tidsvisning\n"\
+" * eller /         øk eller mink volumet (trykk 'm' for å velge master/pcm)\n"\
+" z or x            juster undertittelens forsinkelse med +/- 0.1 sekund\n"\
+"\n"\
+" * * * SE PÅ MANSIDE FOR DETALJER, FLERE (AVANSERTE) VALG OG TASTER! * * *\n"\
 "\n"
-"Tastatur:\n"
-" <- eller ->       søk bakover/fremover 10 sekunder\n"
-" opp eller ned     søk bakover/fremover 1 minutt\n"
-" < or >            søk bakover/fremover i playlisten\n"
-" p eller MELLOMROM pause filmen (trykk en tast for å fortsette)\n"
-" q eller ESC       stopp avspilling og avslutt programmet\n"
-" + eller -         juster lyd-forsinkelse med +/- 0.1 sekund\n"
-" o                 gå gjennom OSD modi:  ingen / søkelinje / søkelinje+tidsvisning\n"
-" * eller /         øk eller mink volumet (trykk 'm' for å velge master/pcm)\n"
-" z or x            juster undertittelens forsinkelse med +/- 0.1 sekund\n"
-"\n"
-" * * * SE PÅ MANSIDE FOR DETALJER, FLERE (AVANSERTE) VALG OG TASTER! * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer messages ===========================
 
@@ -94,15 +104,11 @@ static const char help_text[]=
 #define MSGTR_CdDevNotfound "CD-ROM enhet '%s' ikke funnet!\n"
 #define MSGTR_ErrTrackSelect "Feil under valg av VCD spor!"
 #define MSGTR_ReadSTDIN "Leser fra stdin...\n"
-#define MSGTR_UnableOpenURL "Kan ikke åpne URL: %s\n"
-#define MSGTR_ConnToServer "Koblet til server: %s\n"
 #define MSGTR_FileNotFound "Finner ikke filen: '%s'\n"
 
 #define MSGTR_CantOpenDVD "Kan ikke åpne DVD enhet: %s (%s)\n"
 #define MSGTR_DVDnumTitles "Det er %d titler på denne DVD.\n"
 #define MSGTR_DVDinvalidTitle "Ugyldig DVD tittelnummer: %d\n"
-#define MSGTR_DVDnumChapters "Det er %d kapitler i denne DVD tittelen.\n"
-#define MSGTR_DVDinvalidChapter "Ugyldig DVD kapittelnummer: %d\n"
 #define MSGTR_DVDnumAngles "Det er %d vinkler i denne DVD tittelen.\n"
 #define MSGTR_DVDinvalidAngle "Ugyldig DVD vinkel nummer: %d\n"
 #define MSGTR_DVDnoIFO "Kan ikke åpne IFO filen for DVD tittel %d.\n"
@@ -115,7 +121,6 @@ static const char help_text[]=
 #define MSGTR_TooManyVideoInBuffer "\nDEMUXER: For mange (%d i %d bytes) video pakker i bufferen!\n"
 #define MSGTR_MaybeNI "(kanskje du spiller av en ikke-interleaved stream/fil eller codec'en feilet)\n"
 #define MSGTR_Detected_XXX_FileFormat "Detekterte %s filformat!\n"
-#define MSGTR_InvalidMPEGES "Ugyldig MPEG-ES stream??? kontakt utvikleren, det kan være en feil :(\n"
 #define MSGTR_FormatNotRecognized "======== Beklager, dette filformatet er ikke gjenkjent/støttet ===============\n"\
                                   "=== Hvis det er en AVI, ASF eller MPEG stream, kontakt utvikleren! ===\n"
 #define MSGTR_MissingVideoStream "Ingen video stream funnet!\n"
@@ -161,77 +166,56 @@ static const char help_text[]=
 #define MSGTR_LIRCcfgerr "Feil under lesing av lirc konfigurasjonsfil %s!\n"
 
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
-// --- labels ---
-#define MSGTR_About "Om"
-#define MSGTR_FileSelect "Åpne fil..."
-#define MSGTR_SubtitleSelect "Velg teksting..."
-#define MSGTR_OtherSelect "Velg..."
-#define MSGTR_PlayList "Spilleliste"
-#define MSGTR_SkinBrowser "Velg skin"
-
-// --- buttons ---
-#define MSGTR_Ok "Ok"
-#define MSGTR_Cancel "Avbryt"
-#define MSGTR_Add "Legg til"
-#define MSGTR_Remove "Fjern"
-
-// --- error messages ---
-#define MSGTR_NEMDB "Beklager, ikke nok minne til tegnebuffer."
-#define MSGTR_NEMFMR "Beklager, ikke nok minne til meny rendering."
-
-// --- skin loader error messages
-#define MSGTR_SKIN_ERRORMESSAGE "[skin] feil i skin konfigurasjonsfil linje %d: %s"
-#define MSGTR_SKIN_BITMAP_16bit  "16 bits eller minde bitmap ikke støttet (%s).\n"
-#define MSGTR_SKIN_BITMAP_FileNotFound  "finner ikke filen (%s)\n"
-#define MSGTR_SKIN_BITMAP_PNGReadError "PNG lesefeil (%s)\n"
-#define MSGTR_SKIN_BITMAP_ConversionError "24 bit til 32 bit konverteringsfeil (%s)\n"
-#define MSGTR_SKIN_UnknownMessage "ukjent beskjed: %s\n"
-#define MSGTR_SKIN_NotEnoughMemory "ikke nok minne\n"
-#define MSGTR_SKIN_FONT_TooManyFontsDeclared "for mange skrifttyper deklarert\n"
-#define MSGTR_SKIN_FONT_FontFileNotFound "skrifttypefil ikke funnet\n"
-#define MSGTR_SKIN_FONT_FontImageNotFound "skrifttype image fil ikke funnet\n"
-#define MSGTR_SKIN_FONT_NonExistentFont "ikke-ekstisterende skrifttype identifikasjon (%s)\n"
-#define MSGTR_SKIN_UnknownParameter "ukjent parameter (%s)\n"
-#define MSGTR_SKIN_SKINCFG_SkinNotFound "Skin ikke funnet (%s).\n"
-#define MSGTR_SKIN_LABEL "Skins:"
-
-
-// --- gtk menus
-#define MSGTR_MENU_AboutMPlayer "Om MPlayer"
-#define MSGTR_MENU_Open "Åpne..."
-#define MSGTR_MENU_PlayFile "Spill file..."
-#define MSGTR_MENU_PlayVCD "Spill VCD..."
-#define MSGTR_MENU_PlayDVD "Spill DVD..."
-#define MSGTR_MENU_PlayURL "Spill URL..."
-#define MSGTR_MENU_LoadSubtitle "Last tekst..."
-#define MSGTR_MENU_Playing "Spiller"
-#define MSGTR_MENU_Play "Spill"
-#define MSGTR_MENU_Pause "Pause"
-#define MSGTR_MENU_Stop "Stopp"
-#define MSGTR_MENU_NextStream "Neste stream"
-#define MSGTR_MENU_PrevStream "Forrige stream"
-#define MSGTR_MENU_Size "Størrelse"
-#define MSGTR_MENU_NormalSize "Normal størrelse"
-#define MSGTR_MENU_DoubleSize "Dobbel størrelse"
-#define MSGTR_MENU_FullScreen "Fullskjerm"
-#define MSGTR_MENU_DVD "DVD"
-#define MSGTR_MENU_VCD "VCD"
-#define MSGTR_MENU_PlayDisc "Spill Plate..."
-#define MSGTR_MENU_ShowDVDMenu "Vis DVD meny"
-#define MSGTR_MENU_Titles "Titler"
-#define MSGTR_MENU_Title "Titel %2d"
-#define MSGTR_MENU_None "(ingen)"
-#define MSGTR_MENU_Chapters "Kapittel"
-#define MSGTR_MENU_Chapter "Kapittel %2d"
-#define MSGTR_MENU_AudioLanguages "Lyd språk"
-#define MSGTR_MENU_SubtitleLanguages "Tekst språk"
-#define MSGTR_MENU_SkinBrowser "Skin velger"
-#define MSGTR_MENU_Preferences "Preferanser"
-#define MSGTR_MENU_Exit "Avslutt"
-
-// --- messagebox
-#define MSGTR_MSGBOX_LABEL_FatalError "fatal feil..."
-#define MSGTR_MSGBOX_LABEL_Error "fail..."
-#define MSGTR_MSGBOX_LABEL_Warning "advarsel..."
+#define MSGTR_GUI_AboutMPlayer "Om MPlayer"
+#define MSGTR_GUI_Add "Legg til"
+#define MSGTR_GUI_AudioTracks "Lyd språk"
+#define MSGTR_GUI_AvailableSkins "Skins"
+#define MSGTR_GUI_Cancel "Avbryt"
+#define MSGTR_GUI_ChapterNN "Kapittel %2d"
+#define MSGTR_GUI_Chapters "Kapittel"
+#define MSGTR_GUI_DVD "DVD"
+#define MSGTR_GUI_Error "fail..."
+#define MSGTR_GUI_ErrorFatal "fatal feil..."
+#define MSGTR_GUI_File "Spill file"
+#define MSGTR_GUI_MSG_MemoryErrorWindow "Beklager, ikke nok minne til tegnebuffer."
+#define MSGTR_GUI_MSG_SkinBitmapConversionError "24 bit til 32 bit konverteringsfeil (%s)\n"
+#define MSGTR_GUI_MSG_SkinBitmapNotFound "finner ikke filen (%s)\n"
+#define MSGTR_GUI_MSG_SkinBitmapPngReadError "PNG lesefeil (%s)\n"
+#define MSGTR_GUI_MSG_SkinCfgNotFound "Skin ikke funnet (%s).\n"
+#define MSGTR_GUI_MSG_SkinErrorBitmap16Bit "16 bits eller minde bitmap ikke støttet (%s).\n"
+#define MSGTR_GUI_MSG_SkinErrorMessage "[skin] feil i skin konfigurasjonsfil linje %d: %s"
+#define MSGTR_GUI_MSG_SkinFontFileNotFound "skrifttypefil ikke funnet\n"
+#define MSGTR_GUI_MSG_SkinFontImageNotFound "skrifttype image fil ikke funnet\n"
+#define MSGTR_GUI_MSG_SkinFontNotFound "ikke-ekstisterende skrifttype identifikasjon (%s)\n"
+#define MSGTR_GUI_MSG_SkinMemoryError "ikke nok minne\n"
+#define MSGTR_GUI_MSG_SkinTooManyFonts "for mange skrifttyper deklarert\n"
+#define MSGTR_GUI_MSG_SkinUnknownMessage "ukjent beskjed: %s\n"
+#define MSGTR_GUI_MSG_SkinUnknownParameter "ukjent parameter (%s)\n"
+#define MSGTR_GUI_Next "Neste stream"
+#define MSGTR_GUI__none_ "(ingen)"
+#define MSGTR_GUI_Ok "Ok"
+#define MSGTR_GUI_Open "Åpne..."
+#define MSGTR_GUI_Pause "Pause"
+#define MSGTR_GUI_Play "Spill"
+#define MSGTR_GUI_Playback "Spiller"
+#define MSGTR_GUI_Playlist "Spilleliste"
+#define MSGTR_GUI_Preferences "Preferanser"
+#define MSGTR_GUI_Previous "Forrige stream"
+#define MSGTR_GUI_Quit "Avslutt"
+#define MSGTR_GUI_Remove "Fjern"
+#define MSGTR_GUI_SelectFile "Åpne fil..."
+#define MSGTR_GUI_SelectSubtitle "Velg teksting..."
+#define MSGTR_GUI_SizeDouble "Dobbel størrelse"
+#define MSGTR_GUI_SizeFullscreen "Fullskjerm"
+#define MSGTR_GUI_SizeNormal "Normal størrelse"
+#define MSGTR_GUI_SkinBrowser "Skin velger"
+#define MSGTR_GUI_Stop "Stopp"
+#define MSGTR_GUI_Subtitle "Tekst"
+#define MSGTR_GUI_Subtitles "Tekster"
+#define MSGTR_GUI_TitleNN "Titel %2d"
+#define MSGTR_GUI_Titles "Titler"
+#define MSGTR_GUI_URL "Spill URL"
+#define MSGTR_GUI_VCD "VCD"
+#define MSGTR_GUI_Warning "advarsel..."

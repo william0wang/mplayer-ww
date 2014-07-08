@@ -18,6 +18,7 @@
 
 /* main window */
 
+#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/stat.h>
@@ -32,6 +33,7 @@
 #include "gui/skin/skin.h"
 #include "gui/util/list.h"
 #include "gui/util/mem.h"
+#include "gui/util/misc.h"
 #include "gui/util/string.h"
 #include "gui/wm/ws.h"
 #include "gui/wm/wsxdnd.h"
@@ -78,6 +80,7 @@ static void uiMainDraw( void )
   {
    btnModify( evSetMoviePosition,guiInfo.Position );
    btnModify( evSetVolume,guiInfo.Volume );
+   btnModify( evSetBalance,guiInfo.Balance );
 
    fast_memcpy( mainDrawBuffer,guiApp.main.Bitmap.Image,guiApp.main.Bitmap.ImageSize );
    RenderAll( &guiApp.mainWindow,guiApp.mainItems,guiApp.IndexOfMainItems,mainDrawBuffer );
@@ -93,10 +96,13 @@ static void uiMainMouse( int Button,int X,int Y,int RX,int RY )
  static int     itemtype = 0;
         int     i;
         guiItem * item = NULL;
+ static double  prev_point;
+        double  point;
         float   value = 0.0f;
 
  static int     SelectedItem = -1;
         int     currentselected = -1;
+ static int     endstop;
 
  for ( i=0;i <= guiApp.IndexOfMainItems;i++ )
   if ( ( guiApp.mainItems[i].pressed != btnDisabled )&&
@@ -106,7 +112,7 @@ static void uiMainMouse( int Button,int X,int Y,int RX,int RY )
  switch ( Button )
   {
    case wsPMMouseButton:
-	  gtkShow( ivHidePopUpMenu,NULL );
+          gtkShow( ivHidePopUpMenu,NULL );
           uiMenuShow( RX,RY );
           itemtype=itPRMButton;
           break;
@@ -115,7 +121,7 @@ static void uiMainMouse( int Button,int X,int Y,int RX,int RY )
           break;
 
    case wsPLMouseButton:
-	  gtkShow( ivHidePopUpMenu,NULL );
+          gtkShow( ivHidePopUpMenu,NULL );
           sx=X; sy=Y; boxMoved=True; itemtype=itPLMButton;
           SelectedItem=currentselected;
           if ( SelectedItem == -1 ) break;
@@ -133,10 +139,17 @@ static void uiMainMouse( int Button,int X,int Y,int RX,int RY )
                   { item->pressed=btnDisabled; }
                  break;
            }*/
+          if ( itemtype == itRPotmeter )
+           {
+            prev_point=appRadian( item, X - item->x, Y - item->y ) - item->zeropoint;
+            if ( prev_point < 0.0 ) prev_point+=2*M_PI;
+            if ( prev_point <= item->arclength ) endstop=False;
+            else endstop=STOPPED_AT_0 + STOPPED_AT_100;   // block movement
+           }
           break;
    case wsRLMouseButton:
           boxMoved=False;
-          if ( SelectedItem != -1 )   // NOTE TO MYSELF: only if itButton, itHPotmeter or itVPotmeter
+          if ( SelectedItem != -1 )   // NOTE TO MYSELF: only if hasButton
            {
             item=&guiApp.mainItems[SelectedItem];
             item->pressed=btnReleased;
@@ -146,16 +159,17 @@ static void uiMainMouse( int Button,int X,int Y,int RX,int RY )
           value=0;
           switch( itemtype )
            {
-            case itPotmeter:
             case itHPotmeter:
-                 btnModify( item->message,(float)( X - item->x ) / item->width * 100.0 );
-		 uiEvent( item->message,item->value );
-                 value=item->value;
+                 value=100.0 * ( X - item->x ) / item->width;
                  break;
-	    case itVPotmeter:
-                 btnModify( item->message, ( 1.0 - (float)( Y - item->y ) / item->height) * 100.0 );
-		 uiEvent( item->message,item->value );
-                 value=item->value;
+            case itVPotmeter:
+                 value=100.0 - 100.0 * ( Y - item->y ) / item->height;
+                 break;
+            case itRPotmeter:
+                 if ( endstop ) { itemtype=0; return; }
+                 point=appRadian( item, X - item->x, Y - item->y ) - item->zeropoint;
+                 if ( point < 0.0 ) point+=2*M_PI;
+                 value=100.0 * point / item->arclength;
                  break;
            }
           uiEvent( item->message,value );
@@ -173,10 +187,9 @@ rollerhandled:
           if (currentselected != - 1)
            {
             item=&guiApp.mainItems[currentselected];
-            if ( ( item->type == itHPotmeter )||( item->type == itVPotmeter )||( item->type == itPotmeter ) )
+            if ( ( item->type == itHPotmeter )||( item->type == itVPotmeter )||( item->type == itRPotmeter ) )
              {
-              item->value+=value;
-              btnModify( item->message,item->value );
+              item->value=constrain(item->value + value);
               uiEvent( item->message,item->value );
              }
            }
@@ -193,17 +206,52 @@ rollerhandled:
             case itPRMButton:
                  if (guiApp.menuIsPresent) guiApp.menuWindow.MouseHandler( 0,RX,RY,0,0 );
                  break;
-            case itPotmeter:
-                 item->value=(float)( X - item->x ) / item->width * 100.0;
+            case itRPotmeter:
+                 point=appRadian( item, X - item->x, Y - item->y ) - item->zeropoint;
+                 if ( point < 0.0 ) point+=2*M_PI;
+                 if ( item->arclength < 2 * M_PI )
+                 /* a potmeter with separated 0% and 100% positions */
+                  {
+                   value=item->value;
+                   if ( point - prev_point > M_PI )
+                   /* turned beyond the 0% position */
+                    {
+                     if ( !endstop )
+                      {
+                       endstop=STOPPED_AT_0;
+                       value=0.0f;
+                      }
+                    }
+                   else if ( prev_point - point > M_PI )
+                   /* turned back from beyond the 0% position */
+                    {
+                     if ( endstop == STOPPED_AT_0 ) endstop=False;
+                    }
+                   else if ( prev_point <= item->arclength && point > item->arclength )
+                   /* turned beyond the 100% position */
+                    {
+                     if ( !endstop )
+                      {
+                       endstop=STOPPED_AT_100;
+                       value=100.0f;
+                      }
+                    }
+                   else if ( prev_point > item->arclength && point <= item->arclength )
+                   /* turned back from beyond the 100% position */
+                    {
+                     if ( endstop == STOPPED_AT_100 ) endstop=False;
+                    }
+                  }
+                 if ( !endstop ) value=100.0 * point / item->arclength;
+                 prev_point=point;
                  goto potihandled;
             case itVPotmeter:
-                 item->value=(1.0 - (float)( Y - item->y ) / item->height) * 100.0;
+                 value=100.0 - 100.0 * ( Y - item->y ) / item->height;
                  goto potihandled;
             case itHPotmeter:
-                 item->value=(float)( X - item->x ) / item->width * 100.0;
+                 value=100.0 * ( X - item->x ) / item->width;
 potihandled:
-                 if ( item->value > 100.0f ) item->value=100.0f;
-                 if ( item->value < 0.0f ) item->value=0.0f;
+                 item->value=constrain(value);
                  uiEvent( item->message,item->value );
                  break;
            }
@@ -223,12 +271,12 @@ static void uiMainKey( int KeyCode,int Type,int Key )
     {
      // NOTE TO MYSELF: This is only for the Acer AirKey V keyboard.
    /*case wsXFMMPrev:     msg=evPrev;              break;
-     case wsXFMMStop:	  msg=evStop;              break;
-     case wsXFMMPlay:	  msg=evPlaySwitchToPause; break;
-     case wsXFMMNext:	  msg=evNext;	           break;
-     case wsXFMMVolUp:	  msg=evIncVolume;         break;
+     case wsXFMMStop:     msg=evStop;              break;
+     case wsXFMMPlay:     msg=evPlaySwitchToPause; break;
+     case wsXFMMNext:     msg=evNext;              break;
+     case wsXFMMVolUp:    msg=evIncVolume;         break;
      case wsXFMMVolDown:  msg=evDecVolume;         break;
-     case wsXFMMMute: 	  msg=evMute;	           break;*/
+     case wsXFMMMute:     msg=evMute;              break;*/
     }
   }
   else
@@ -246,11 +294,11 @@ static void uiMainKey( int KeyCode,int Type,int Key )
       case wsXF86Next:         msg=evNext; break;
       case wsXF86Media:        msg=evLoad; break;
       case wsEscape:
-    	    if ( guiInfo.VideoWindow && guiInfo.Playing && guiApp.videoWindow.isFullScreen )
-	     {
-	      uiEvent( evNormalSize,0 );
-	      return;
-	     }
+            if ( guiInfo.VideoWindow && guiInfo.Playing && guiApp.videoWindow.isFullScreen )
+             {
+              uiEvent( evNormalSize,0 );
+              return;
+             }
       default:          vo_x11_putkey( Key ); return;
      }
    }
@@ -284,45 +332,45 @@ static void uiMainDND(int num,char** files)
 
       /* check if it is a subtitle file */
       {
-	char* ext = strrchr(str,'.');
-	if (ext) {
-	  static char supported[] = "utf/sub/srt/smi/rt//txt/ssa/aqt/";
-	  char* type;
-	  int len;
-	  if((len=strlen(++ext)) && (type=strstr(supported,ext)) &&\
-	     (type-supported)%4 == 0 && *(type+len) == '/'){
-	    /* handle subtitle file */
-	    nfree(subtitles);
-	    subtitles = str;
-	    continue;
-	  }
-	}
+        char* ext = strrchr(str,'.');
+        if (ext) {
+          static char supported[] = "utf/sub/srt/smi/rt//txt/ssa/aqt/";
+          char* type;
+          int len;
+          if((len=strlen(++ext)) && (type=strstr(supported,ext)) &&\
+             (type-supported)%4 == 0 && *(type+len) == '/'){
+            /* handle subtitle file */
+            nfree(subtitles);
+            subtitles = str;
+            continue;
+          }
+        }
       }
 
       /* clear playlist */
       if (file == NULL) {
-	file = files[f];
-	listMgr(PLAYLIST_DELETE,0);
+        file = files[f];
+        listMgr(PLAYLIST_DELETE,0);
       }
 
-      item = calloc(1,sizeof(plItem));
+      item = calloc(1,sizeof(*item));
 
       s = strrchr( str,'/' );
 
       /* FIXME: decompose file name ? */
       /* yes -- Pontscho */
       if ( s ) {
-	*s=0; s++;
-	item->name = gstrdup( s );
-	item->path = gstrdup( str );
+        *s=0; s++;
+        item->name = gstrdup( s );
+        item->path = gstrdup( str );
       } else {
-	// NOTE TO MYSELF: this shouldn't happen, make sure we have a full path
-	item->name = strdup(str);
-	item->path = strdup(".");
+        // NOTE TO MYSELF: this shouldn't happen, make sure we have a full path
+        item->name = strdup(str);
+        item->path = strdup(".");
       }
       listMgr(PLAYLIST_ITEM_APPEND,item);
     } else {
-      mp_msg( MSGT_GPLAYER,MSGL_WARN,MSGTR_NotAFile,str );
+      mp_msg( MSGT_GPLAYER,MSGL_WARN,MSGTR_GUI_MSG_NotAFile1,str );
     }
     free( str );
   }
@@ -345,7 +393,7 @@ void uiMainInit (void)
 
   if (!mainDrawBuffer)
   {
-    gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_NEMDB);
+    gmp_msg(MSGT_GPLAYER, MSGL_FATAL, "[main] " MSGTR_GUI_MSG_MemoryErrorWindow);
     mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
   }
 

@@ -45,7 +45,6 @@ typedef struct
 typedef struct
 {
     char *name;
-    char *id;
     image *image;
     unsigned int charcount;
     char_t **chars;
@@ -62,12 +61,15 @@ typedef struct
     int width, height;              /* width and height of the button */
     int wwidth, wheight;            /* width and height of the widget */
     // ---
+    int maxwh;
     // ---
     int msg, msg2;
     int pressed, tmp;
     int key, key2;
     int phases;
     float value;
+    double zeropoint;
+    double arclength;
     image *bitmap[2];               /* Associated image(s) in imagepool */
     // ---
     font_t *font;
@@ -118,10 +120,11 @@ skin_t *loadskin(char *skindir, int desktopbpp);
 #define tyButton        2
 #define tyHpotmeter     3
 #define tyVpotmeter     4
-#define tyPotmeter      5
+#define tyPimage        5
 #define tyMenu          6
 #define tySlabel        7
 #define tyDlabel        8
+#define tyRpotmeter     9
 
 /* --- Window types --- */
 
@@ -165,6 +168,7 @@ enum
   evFullScreen,
   evNormalSize,
   evSetAspect,
+  evSetRotation,
   evIncVolume,
   evDecVolume,
   evSetVolume,
@@ -193,6 +197,8 @@ enum
   ivSetDVDAudio,
   ivSetDVDSubtitle,
   ivPlayDVD,
+  ivSetVolume,
+  ivSetBalance,
   ivShowPopUpMenu,
   ivHidePopUpMenu,
   ivRedraw

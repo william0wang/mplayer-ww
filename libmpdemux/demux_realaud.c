@@ -174,7 +174,6 @@ static demuxer_t* demux_open_ra(demuxer_t* demuxer)
 	demuxer->priv = ra_priv;
 	sh = new_sh_audio(demuxer, 0, NULL);
 	demuxer->audio->id = 0;
-	sh->ds=demuxer->audio;
 	demuxer->audio->sh = sh;
 
 	ra_priv->version = stream_read_word(demuxer->stream);

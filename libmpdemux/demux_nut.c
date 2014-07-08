@@ -117,7 +117,7 @@ static demuxer_t * demux_open_nut(demuxer_t * demuxer) {
 			int j;
 			mp_msg(MSGT_DEMUX, MSGL_INFO, MSGTR_AudioID, "nut", i);
 
-			sh_audio->wf= wf; sh_audio->ds = demuxer->audio;
+			sh_audio->wf= wf;
 			sh_audio->audio.dwSampleSize = 0; // FIXME
 			sh_audio->audio.dwScale = s[i].time_base.num;
 			sh_audio->audio.dwRate = s[i].time_base.den;
@@ -154,7 +154,6 @@ static demuxer_t * demux_open_nut(demuxer_t * demuxer) {
 			mp_msg(MSGT_DEMUX, MSGL_INFO, MSGTR_VideoID, "nut", i);
 
 			sh_video->bih = bih;
-			sh_video->ds = demuxer->video;
 			sh_video->disp_w = s[i].width;
 			sh_video->disp_h = s[i].height;
 			sh_video->video.dwScale = s[i].time_base.num;

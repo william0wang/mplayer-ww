@@ -1138,7 +1138,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
     mp_msg(MSGT_RADIO,MSGL_V,"\n");
 
     if(priv->driver)
-        mp_msg(MSGT_RADIO, MSGL_INFO, priv->driver->info);
+        mp_msg(MSGT_RADIO, MSGL_INFO, "%s", priv->driver->info);
     else{
         mp_msg(MSGT_RADIO, MSGL_INFO, MSGTR_RADIO_DriverUnknownStr,priv->radio_param->driver);
         close_s(stream);

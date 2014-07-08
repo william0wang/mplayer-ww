@@ -130,7 +130,6 @@ static demuxer_t *demux_mpc_open(demuxer_t* demuxer) {
   demuxer->priv = priv;
   demuxer->audio->id = 0;
   demuxer->audio->sh = sh_audio;
-  sh_audio->ds = demuxer->audio;
   sh_audio->samplerate = sh_audio->wf->nSamplesPerSec;
   sh_audio->i_bps = sh_audio->wf->nAvgBytesPerSec;
   sh_audio->audio.dwSampleSize = 0;

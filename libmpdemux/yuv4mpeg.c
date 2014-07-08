@@ -412,7 +412,7 @@ int y4m_parse_stream_tags(char *s, y4m_stream_info_t *i)
 
 static int y4m_parse_frame_tags(char *s, y4m_frame_info_t *i)
 {
-  char *token, *value;
+  char *token;
   char tag;
   int err;
 
@@ -422,7 +422,6 @@ static int y4m_parse_frame_tags(char *s, y4m_frame_info_t *i)
        token = strtok(NULL, Y4M_DELIM)) {
     if (token[0] == '\0') continue;   /* skip empty strings */
     tag = token[0];
-    value = token + 1;
     switch (tag) {
     case 'X':  /* 'X' meta-tag */
       if ((err = y4m_xtag_add(&(i->x_tags), token)) != Y4M_OK) return err;

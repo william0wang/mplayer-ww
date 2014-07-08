@@ -20,9 +20,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#if HAVE_MALLOC_H
-#include <malloc.h>
-#endif
 #include <string.h>
 #include <inttypes.h>
 
@@ -44,13 +41,14 @@
 struct vf_priv_s {
     int frameno;
     char fname[256];
+    char *prefix;
     /// shot stores current screenshot mode:
     /// 0: don't take screenshots
     /// 1: take single screenshot, reset to 0 afterwards
     /// 2: take screenshots of each frame
     int shot, store_slices;
-    int dw, dh, stride;
-    uint8_t *buffer;
+    int dw, dh;
+    AVFrame *pic;
     struct SwsContext *ctx;
     AVCodecContext *avctx;
     uint8_t *outbuffer;
@@ -63,11 +61,7 @@ static void draw_slice(struct vf_instance *vf, unsigned char** src,
                        int* stride, int w,int h, int x, int y)
 {
     if (vf->priv->store_slices) {
-        uint8_t *dst[MP_MAX_PLANES] = {NULL};
-        int dst_stride[MP_MAX_PLANES] = {0};
-        dst_stride[0] = vf->priv->stride;
-        dst[0] = vf->priv->buffer;
-        sws_scale(vf->priv->ctx, src, stride, y, h, dst, dst_stride);
+        sws_scale(vf->priv->ctx, src, stride, y, h, vf->priv->pic->data, vf->priv->pic->linesize);
     }
     vf_next_draw_slice(vf,src,stride,w,h,x,y);
 }
@@ -77,19 +71,18 @@ static int config(struct vf_instance *vf,
                   unsigned int flags, unsigned int outfmt)
 {
     int res;
+    if (vf->priv->ctx) sws_freeContext(vf->priv->ctx);
     vf->priv->ctx=sws_getContextFromCmdLine(width, height, outfmt,
                                  d_width, d_height, IMGFMT_RGB24);
 
-    vf->priv->outbuffer_size = d_width * d_height * 3 * 2;
-    vf->priv->outbuffer = realloc(vf->priv->outbuffer, vf->priv->outbuffer_size);
+    av_fast_malloc(&vf->priv->outbuffer, &vf->priv->outbuffer_size, d_width * d_height * 3 * 2);
     vf->priv->avctx->width = d_width;
     vf->priv->avctx->height = d_height;
     vf->priv->dw = d_width;
     vf->priv->dh = d_height;
-    vf->priv->stride = (3*vf->priv->dw+15)&~15;
+    vf->priv->pic->linesize[0] = (3*vf->priv->dw+15)&~15;
 
-    free(vf->priv->buffer); // probably reconfigured
-    vf->priv->buffer = NULL;
+    av_freep(&vf->priv->pic->data[0]); // probably reconfigured
 
     res = vf_next_config(vf,width,height,d_width,d_height,flags,outfmt);
     // Our draw_slice only works properly if the
@@ -102,9 +95,8 @@ static void write_png(struct vf_priv_s *priv)
 {
     char *fname = priv->fname;
     FILE * fp;
-    AVFrame pic;
     AVPacket pkt;
-    int got_packet = 0;
+    int res, got_pkt;
 
     fp = fopen (fname, "wb");
     if (fp == NULL) {
@@ -115,11 +107,9 @@ static void write_png(struct vf_priv_s *priv)
     av_init_packet(&pkt);
     pkt.data = priv->outbuffer;
     pkt.size = priv->outbuffer_size;
-    
-    pic.data[0] = priv->buffer;
-    pic.linesize[0] = priv->stride;
-    if(!avcodec_encode_video2(priv->avctx, &pkt, &pic, &got_packet) && got_packet)
-        fwrite(pkt.data, pkt.size, 1, fp);
+    res = avcodec_encode_video2(priv->avctx, &pkt, priv->pic, &got_pkt);
+    if (res >= 0 && got_pkt && pkt.size > 0)
+        fwrite(priv->outbuffer, pkt.size, 1, fp);
 
     fclose (fp);
 }
@@ -127,8 +117,7 @@ static void write_png(struct vf_priv_s *priv)
 static int fexists(char *fname)
 {
     struct stat dummy;
-    if (stat(fname, &dummy) == 0) return 1;
-    else return 0;
+    return stat(fname, &dummy) == 0;
 }
 
 #define MAX_FILEPATH_LEN 240
@@ -183,15 +172,10 @@ static void gen_fname(struct vf_priv_s* priv)
 
 static void scale_image(struct vf_priv_s* priv, mp_image_t *mpi)
 {
-    uint8_t *dst[MP_MAX_PLANES] = {NULL};
-    int dst_stride[MP_MAX_PLANES] = {0};
+    if (!priv->pic->data[0])
+        priv->pic->data[0] = av_malloc(priv->pic->linesize[0]*priv->dh);
 
-    dst_stride[0] = priv->stride;
-    if (!priv->buffer)
-        priv->buffer = av_malloc(dst_stride[0]*priv->dh);
-
-    dst[0] = priv->buffer;
-    sws_scale(priv->ctx, mpi->planes, mpi->stride, 0, priv->dh, dst, dst_stride);
+    sws_scale(priv->ctx, mpi->planes, mpi->stride, 0, priv->dh, priv->pic->data, priv->pic->linesize);
 }
 
 static void start_slice(struct vf_instance *vf, mp_image_t *mpi)
@@ -201,8 +185,8 @@ static void start_slice(struct vf_instance *vf, mp_image_t *mpi)
         mpi->type, mpi->flags, mpi->width, mpi->height);
     if (vf->priv->shot) {
         vf->priv->store_slices = 1;
-        if (!vf->priv->buffer)
-            vf->priv->buffer = av_malloc(vf->priv->stride*vf->priv->dh);
+        if (!vf->priv->pic->data[0])
+            vf->priv->pic->data[0] = av_malloc(vf->priv->pic->linesize[0]*vf->priv->dh);
     }
 
 }
@@ -227,7 +211,7 @@ static void get_image(struct vf_instance *vf, mp_image_t *mpi)
 
     mpi->flags|=MP_IMGFLAG_DIRECT;
 
-    mpi->priv=(void*)vf->dmpi;
+    mpi->priv=vf->dmpi;
 }
 
 static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
@@ -250,8 +234,7 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
     }
 
     if(vf->priv->shot) {
-        if (vf->priv->shot==1)
-            vf->priv->shot=0;
+        vf->priv->shot &= ~1;
         gen_fname(vf->priv);
         if (vf->priv->fname[0]) {
             if (!vf->priv->store_slices)
@@ -272,13 +255,9 @@ static int control (vf_instance_t *vf, int request, void *data)
      **/
     if(request==VFCTRL_SCREENSHOT) {
         if (data && *(int*)data) { // repeated screenshot mode
-            if (vf->priv->shot==2)
-                vf->priv->shot=0;
-            else
-                vf->priv->shot=2;
+            vf->priv->shot ^= 2;
         } else { // single screenshot
-            if (!vf->priv->shot)
-                vf->priv->shot=1;
+            vf->priv->shot |= 1;
         }
         return CONTROL_TRUE;
     }
@@ -320,8 +299,10 @@ static void uninit(vf_instance_t *vf)
     avcodec_close(vf->priv->avctx);
     av_freep(&vf->priv->avctx);
     if(vf->priv->ctx) sws_freeContext(vf->priv->ctx);
-    av_free(vf->priv->buffer);
-    free(vf->priv->outbuffer);
+    av_freep(&vf->priv->pic->data[0]);
+    av_frame_free(&vf->priv->pic);
+    av_freep(&vf->priv->outbuffer);
+    free(vf->priv->prefix);
     free(vf->priv);
 }
 
@@ -335,13 +316,9 @@ static int vf_open(vf_instance_t *vf, char *args)
     // vf->draw_slice=draw_slice;
     // vf->get_image=get_image;
     vf->uninit=uninit;
-    vf->priv=malloc(sizeof(struct vf_priv_s));
-    vf->priv->frameno=0;
-    vf->priv->shot=0;
-    vf->priv->store_slices=0;
-    vf->priv->buffer=0;
-    vf->priv->outbuffer=0;
-    vf->priv->ctx=0;
+    vf->priv = calloc(1, sizeof(struct vf_priv_s));
+    vf->priv->pic = av_frame_alloc();
+    vf->priv->prefix = strdup(args ? args : "shot");
     vf->priv->avctx = avcodec_alloc_context3(NULL);
 
     if (args) {

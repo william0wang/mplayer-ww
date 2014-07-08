@@ -274,7 +274,6 @@ static int demux_xmms_open(demuxer_t* demuxer) {
     demuxer->audio->id = 0;
     demuxer->audio->sh = sh_audio;
     demuxer->priv=priv;
-    sh_audio->ds = demuxer->audio;
 
     xmms_output_plugin.init();
     ip->output = &xmms_output_plugin;

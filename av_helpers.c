@@ -124,7 +124,7 @@ int lavc_encode_audio(AVCodecContext *ctx, void *src, int src_len, void *dst, in
     int n;
     int got;
     AVPacket pkt;
-    AVFrame *frame = avcodec_alloc_frame();
+    AVFrame *frame = av_frame_alloc();
     if ((ctx->channels == 6 || ctx->channels == 5) &&
         (isac3 || !strcmp(ctx->codec->name,"libfaac"))) {
         reorder_channel_nch(src, AF_CHANNEL_LAYOUT_MPLAYER_DEFAULT,
@@ -153,7 +153,7 @@ int lavc_encode_audio(AVCodecContext *ctx, void *src, int src_len, void *dst, in
     n = avcodec_fill_audio_frame(frame, ctx->channels, ctx->sample_fmt, src, src_len, 1);
     if (n < 0) return 0;
     n = avcodec_encode_audio2(ctx, &pkt, frame, &got);
-    avcodec_free_frame(&frame);
+    av_frame_free(&frame);
     if (planar) av_free(src);
     if (n < 0) return n;
     return got ? pkt.size : 0;

@@ -33,7 +33,7 @@
 .\" Titel
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "23.01.2014" "Das MPlayer Projekt"
+.TH MPlayer 1 "13.02.2014" "Das MPlayer Projekt"
 .
 .SH NAME
 mplayer  \- Movie Player
@@ -654,7 +654,7 @@ font_autoscale
 font_blur
 .RB ( subfont-blur ") (nur mit FreeType),"
 font_encoding
-.RB ( subfont-encoding ") (nur mit FreeType),"
+.RB ( subfont-encoding ),
 font_factor
 .RB ( ffactor ),
 font_name
@@ -2323,8 +2323,8 @@ Matroska-Spuren verwendet.
 Du möchtest vielleicht auch \-embeddedfonts verwenden.
 .br
 .I ANMERKUNG:
-Wenn fontconfig eincompiliert wurde, schaltet \-ass automatisch \-fontconfig
-ein, wenn dies nicht mit \-nofontconfig anders angegeben wurde.
+Im Gegensatz zum normalen OSD verwendet libass fontconfig automatisch. Um
+dies auszuschalten, verwende \-nofontconfig.
 .
 .TP
 .B \-ass\-border\-color <Wert>
@@ -2512,12 +2512,14 @@ Bei Fontconfig gibt diese Option das Fontconfig-Schriftmuster an.
 .
 .TP
 .B \-fontconfig (nur bei fontconfig)
-Ermöglicht die Benutzung von Schriften, die von fontconfig verwaltet werden.
+Ermöglicht die Benutzung von Schriften, die von fontconfig verwaltet werden
+(Standard: automatische Erkennung).
 .br
 .I ANMERKUNG:
-Standardmäßig wird fontconfig für durch libass gerenderte Untertitel
-verwendet, nicht jedoch für das OSD. Mit \-nofontconfig wird es überhaupt
-nicht verwendet, d. h. nur dann funktionieren \-font und \-subfont mit einem
+Für durch libass gerenderte Untertitel wird fontconfig automatisch
+verwendet, nicht jedoch für das OSD. Mit \-fontconfig wird es sowohl für
+libass als auch das OSD verwendet, mit \-nofontconfig dagegen überhaupt
+nicht, d. h. nur dann funktionieren \-font und \-subfont mit einem
 angegebenen Dateinamen.
 .
 .TP
@@ -2812,12 +2814,13 @@ proportional zur Diagonale des Films (Standard)
 Setzt den Verwischradius für die Schriften (Standard: 2).
 .
 .TP
-.B \-subfont\-encoding <Wert> (nur bei FreeType)
+.B \-subfont\-encoding <Wert>
 Setzt die Schriftcodierung.
-Wenn 'unicode' angegeben wird, so werden alle Zeichen der Schriftdatei
-gerendert, und Unicode wird benutzt werden (Standard: unicode). (Für andere
-Werte als 'unicode' muss dein System iconv(3) unterstützen, um zu
-funktionieren.)
+Wenn 'unicode' angegeben wird, werden alle Zeichen der Schriftdatei
+gerendert und Unicode wird benutzt werden (Standard: unicode). (Ohne FreeType
+bewirkt jeder andere Wert, dass keine Unicode-Zeichen aus font.desc\-Dateien
+gerendert werden. Mit FreeType und für andere Werte als 'unicode' muss dein
+System iconv(3) unterstützen, um zu funktionieren.)
 .
 .TP
 .B \-subfont\-osd\-scale <0\-100> (nur bei FreeType)
@@ -7685,14 +7688,17 @@ Die Option fd weist den Filter an, die geforderte Skalierung immer auszuführen
 .RE
 .
 .TP
-.B screenshot
+.B screenshot=Präfix
 Erlaubt das Erstellen von Schnappschüssen des Videos mit Hilfe
 von Slave-Kommandos, die an Tasten gebunden werden können.
 Siehe Dokumentation des Slave-Modus und den Abschnitt INTERAKTIVE STEUERUNG
 für Details.
-Es werden Dateien mit dem Namen 'shotNNNN.png' im aktuellen Verzeichnis
+Standardmäßig werden Dateien mit dem Namen 'shotNNNN.png' im aktuellen Verzeichnis
 abgelegt, NNNN entspricht hierbei der ersten verfügbaren Nummer \- keine Datei
 wird überschrieben.
+Durch Angabe eines Präfixes lassen sich Name und Verzeichnis ändern, so
+werden z. B. mit \-vf screenshot=shots/now Dateien mit Namen nowNNNN.png im
+Verzeichnis shots abgelegt.
 Der Filter führt zu keiner Mehrbelastung, solange er nicht benutzt wird und
 akzeptiert beliebige Farbräume, es ist also ungefährlich ihn in die
 Konfigurationsdatei mit aufzunehmen.

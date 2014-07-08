@@ -1,3 +1,4 @@
+MPLAYER_COV_OPTS="--enable-xvmc --enable-menu --enable-gui --enable-mga --enable-bl --enable-joystick --enable-radio --enable-s3fb --enable-tdfxfb --enable-tdfxvid --enable-wii --yasm=nasm"
 rm -rf cov-int MPlayer.tgz
 make distclean
 svn up

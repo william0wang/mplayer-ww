@@ -43,7 +43,7 @@ struct playlist_t
     void (*moveup_track)(playlist_t* playlist, int number);
     void (*movedown_track)(playlist_t* playlist, int number);
     void (*dump_playlist)(playlist_t* playlist);
-    void (*sort_playlist)(playlist_t* playlist, int opt);
+    void (*sort_playlist)(/*playlist_t* playlist, int opt*/);
     void (*clear_playlist)(playlist_t* playlist);
     void (*free_playlist)(playlist_t* playlist);
 };
