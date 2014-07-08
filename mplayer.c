@@ -3920,6 +3920,8 @@ int main(int argc, char *argv[])
     else
         guiCommand(CMD_INIT_WINDOW, 0);
 
+    set_io_priority();
+
     /* Display what configure line was used */
     mp_msg(MSGT_CPLAYER, MSGL_V, "Configuration: " CONFIGURATION "\n");
 

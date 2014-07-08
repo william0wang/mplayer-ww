@@ -34,6 +34,7 @@ typedef enum {
 int win_init(int argc,char** argv);
 void win_uninit(int);
 int detect_vo_system(void);
+int set_io_priority(void);
 int initStatus(void);
 int getStatusNum(void);
 char * getNameById(int id);
