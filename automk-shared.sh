@@ -35,5 +35,6 @@ if [ -d "/usr/local/ffmpeg-ww/bin" ] ; then
 	cp -f -p /usr/local/ffmpeg-ww/bin/avcodec-*.dll ./release/
 	cp -f -p /usr/local/ffmpeg-ww/bin/avformat-*.dll ./release/
 	cp -f -p /usr/local/ffmpeg-ww/bin/postproc-*.dll ./release/
+  cp -f -p /usr/local/ffmpeg-ww/bin/swresample-*.dll ./release/
 fi
 
