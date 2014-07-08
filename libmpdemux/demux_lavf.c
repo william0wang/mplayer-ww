@@ -54,7 +54,6 @@ static unsigned int opt_analyzeduration = 0;
 static char *opt_format;
 static char *opt_cryptokey;
 static char *opt_avopt = NULL;
-static int not_correct_pts = 0;
 static int is_matroska_format = 0;
 extern int is_mpegts_format;
 extern int is_rar_stream;
@@ -233,6 +232,7 @@ static const char * const preferred_list[] = {
     "gxf",
     "nut",
     "nuv",
+    "matroska,webm",
     "mov,mp4,m4a,3gp,3g2,mj2",
     "mpc",
     "mpc8",
@@ -598,7 +598,6 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
 
     priv->avfc= avfc;
 
-	not_correct_pts = 0;
 	is_matroska_format = 0;
 
     if(avformat_find_stream_info(avfc, NULL) < 0){
@@ -609,14 +608,8 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
     while((t = av_dict_get(avfc->metadata, "", t, AV_DICT_IGNORE_SUFFIX)))
         demux_info_add(demuxer, t->key, t->value);
 
-	if(!strcmp("mov,mp4,m4a,3gp,3g2,mj2", priv->avif->name)) {
-        t = av_dict_get(avfc->metadata, "major_brand", NULL, 0);
-		if(t && !strncmp("3gp", t->value, 3)) 
-			not_correct_pts = 1;
-	} else if(!strcmp("matroska,webm", priv->avif->name)) {
+	if(!strcmp("matroska,webm", priv->avif->name)) {
 		is_matroska_format = 1;
-	} else if(!strcmp("flv", priv->avif->name)) {
-		not_correct_pts = 1;
 	}
 
     for(i=0; i < avfc->nb_chapters; i++) {
@@ -759,8 +752,6 @@ static int demux_lavf_control(demuxer_t *demuxer, int cmd, void *arg)
 
     switch (cmd) {
         case DEMUXER_CTRL_CORRECT_PTS:
-            if (not_correct_pts)
-                return DEMUXER_CTRL_NOTIMPL;
 	    return DEMUXER_CTRL_OK;
         case DEMUXER_CTRL_GET_TIME_LENGTH:
 	    if (priv->avfc->duration == 0 || priv->avfc->duration == AV_NOPTS_VALUE)
