@@ -94,7 +94,7 @@ static void uiVideoMouse( int Button,int X,int Y,int RX,int RY )
             case wsPMMouseButton:
                    if (guiApp.menuIsPresent) guiApp.menuWindow.MouseHandler( 0,RX,RY,0,0 );
                    break;
-	    default: uiPlaybarShow( Y ); break;
+            default: uiPlaybarShow( Y ); break;
            }
           break;
    case wsRLMouseButton:
@@ -103,7 +103,7 @@ static void uiVideoMouse( int Button,int X,int Y,int RX,int RY )
             // NOTE TO MYSELF: this doesn't work, fix later with wsWindowLayer()?
             if( videoVisible++%2 ) wsWindowRaiseTop( wsDisplay,guiApp.mainWindow.WindowID );
              else wsWindowRaiseTop( wsDisplay,guiApp.videoWindow.WindowID );
-	   }
+           }
           msButton=0;
           mplVideoMoved=0;
           break;

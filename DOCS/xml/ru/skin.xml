@@ -99,8 +99,7 @@
   <emphasis role="bold">Ползунок</emphasis> (в основном используется для полосы перемещения
   и управления громкостью/балансом) может иметь любое количество положений, задаваемых делением
   его изображения на различные части одна под другой. Смотрите
-  <link linkend="skin-hpotmeter">hpotmeter</link> и
-  <link linkend="skin-potmeter">potmeter</link> для подробностей.
+  <link linkend="skin-hpotmeter">hpotmeter</link> для подробностей.
   </para>
 
   <para>
@@ -334,6 +333,21 @@ end
 <variablelist>
 <varlistentry>
   <term><literal>
+  <anchor id="skin-decoration"/>decoration = enable|disable
+  </literal></term>
+  <listitem>
+  <para>
+  Включает или выключает декорации главного окна, осуществляемые window manager . По-умолчанию
+  <emphasis role="bold">disable</emphasis>.
+  </para>
+  <note><para>
+  Это не работает для окна отображения, в этом нет надобности.
+  </para></note>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><literal>
   <anchor id="skin-main-base"/>base = image, X, Y
   </literal></term>
   <listitem>
@@ -374,21 +388,6 @@ end
 +------------+<!--
   --></screen>
   </informalfigure>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
-  <anchor id="skin-decoration"/>decoration = enable|disable
-  </literal></term>
-  <listitem>
-  <para>
-  Включает или выключает декорации главного окна, осуществляемые window manager . По-умолчанию
-  <emphasis role="bold">disable</emphasis>.
-  </para>
-  <note><para>
-  Это не работает для окна отображения, в этом нет надобности.
-  </para></note>
   </listitem>
 </varlistentry>
 
@@ -464,21 +463,6 @@ end
 
 <varlistentry>
   <term><literal>
-  <anchor id="skin-potmeter"/>potmeter = phases, numphases, default, X, Y, width, height, message
-  </literal></term>
-  <listitem><para>
-  <literal>hpotmeter</literal> без кнопки.
-  (Я предполагаю, что это означает повернутый вокруг,
-  но он реагирует только на перетаскивание по горизонтали.) Для описания параметров смотрите
-  <link linkend="skin-hpotmeter">hpotmeter</link>.
-  <literal>phases</literal> может быть равен <literal>NULL</literal>, но это совершенно
-  бесполезно, поскольку вы не сможете определить в каком положении
-  находится <literal>potmeter</literal>.
-  </para></listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
   <anchor id="skin-font"/>font = fontfile, fontid
   </literal></term>
   <listitem><para>
@@ -515,8 +499,8 @@ end
   Если отображаемый текст шире этого значения, он будет скроллироваться,
   иначе он выравнивается в пределах указанного пространства в соответствии со
   значением параметра
-  <literal>align</literal>: <literal>0</literal> - вправо,
-  <literal>1</literal> - по центру, <literal>2</literal> - влево.
+  <literal>align</literal>: <literal>0</literal> - влево,
+  <literal>1</literal> - по центру, <literal>2</literal> - вправо.
   </para>
   <para>
   Отображаемый текст задается параметром <literal>text</literal>: Он должен быть
@@ -569,7 +553,11 @@ end
   </row>
   <row>
     <entry>$V</entry>
-    <entry>кромкость в формате <emphasis>xxx.xx</emphasis></entry>
+    <entry>кромкость в формате <emphasis>xxx.x</emphasis></entry>
+  </row>
+  <row>
+    <entry>$U</entry>
+    <entry>кромкость в формате <emphasis>xxx</emphasis></entry>
   </row>
   <row>
     <entry>$b</entry>
@@ -577,7 +565,11 @@ end
   </row>
   <row>
     <entry>$B</entry>
-    <entry>баланс в формате <emphasis>xxx.xx</emphasis></entry>
+    <entry>баланс в формате <emphasis>xxx.x</emphasis></entry>
+  </row>
+  <row>
+    <entry>$D</entry>
+    <entry>баланс в формате <emphasis>xxx</emphasis></entry>
   </row>
   <row>
     <entry>$$</entry>

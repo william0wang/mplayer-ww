@@ -24,6 +24,7 @@
 
 /// MessageBox types
 enum {
+    MSGBOX_INFORMATION,
     MSGBOX_WARNING,
     MSGBOX_ERROR,
     MSGBOX_FATAL

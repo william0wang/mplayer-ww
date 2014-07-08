@@ -21,6 +21,7 @@
  * @brief User interface actions
  */
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -44,14 +45,14 @@
 #include "m_property.h"
 #include "mixer.h"
 #include "mp_core.h"
+#include "mp_fifo.h"
 #include "mp_msg.h"
 #include "mpcommon.h"
 #include "mplayer.h"
 #include "input/input.h"
 #include "libmpdemux/demuxer.h"
 #include "libvo/video_out.h"
-#include "libvo/wskeys.h"
-#include "libvo/x11_common.h"
+#include "osdep/keycodes.h"
 #include "osdep/timer.h"
 #include "stream/stream.h"
 #include "sub/sub.h"
@@ -92,7 +93,7 @@ static void MediumPrepare(int type)
 
 void uiEvent(int ev, float param)
 {
-    int iparam     = (int)param, osd;
+    int iparam     = (int)param;
     mixer_t *mixer = mpctx_get_mixer(guiInfo.mpcontext);
     float aspect;
     char cmd[40];
@@ -198,8 +199,8 @@ play:
                 if (!guiInfo.Track)
                     guiInfo.Track = 1;
 
-                guiInfo.NewPlay      = GUI_FILE_NEW;
-                guiInfo.PlaylistNext = !guiInfo.Playing;
+                guiInfo.MediumChanged = GUI_MEDIUM_NEW;
+                guiInfo.PlaylistNext  = !guiInfo.Playing;
 
                 break;
 
@@ -212,7 +213,7 @@ play:
                 if (!guiInfo.Track)
                     guiInfo.Track = (guiInfo.StreamType == STREAMTYPE_VCD ? 2 : 1);
 
-                guiInfo.NewPlay = GUI_FILE_SAME;
+                guiInfo.MediumChanged = GUI_MEDIUM_SAME;
 
                 break;
             }
@@ -305,15 +306,16 @@ play:
         break;
 
     case evSetMoviePosition:
-        uiAbsSeek(param);
+        guiInfo.Position = param;
+        uiAbsSeek(guiInfo.Position);
         break;
 
     case evIncVolume:
-        vo_x11_putkey(wsGrayMul);
+        mplayer_put_key(KEY_VOLUME_UP);
         break;
 
     case evDecVolume:
-        vo_x11_putkey(wsGrayDiv);
+        mplayer_put_key(KEY_VOLUME_DOWN);
         break;
 
     case evMute:
@@ -321,34 +323,39 @@ play:
         break;
 
     case evSetVolume:
+    case ivSetVolume:
         guiInfo.Volume = param;
         {
-            float l = guiInfo.Volume * ((100.0 - guiInfo.Balance) / 50.0);
-            float r = guiInfo.Volume * ((guiInfo.Balance) / 50.0);
+            float l = guiInfo.Volume * (100.0 - guiInfo.Balance) / 50.0;
+            float r = guiInfo.Volume * guiInfo.Balance / 50.0;
             mixer_setvolume(mixer, FFMIN(l, guiInfo.Volume), FFMIN(r, guiInfo.Volume));
         }
+
+        if (ev == ivSetVolume)
+            break;
 
         if (osd_level) {
             osd_visible = (GetTimerMS() + 1000) | 1;
             vo_osd_progbar_type  = OSD_VOLUME;
-            vo_osd_progbar_value = ((guiInfo.Volume) * 256.0) / 100.0;
+            vo_osd_progbar_value = guiInfo.Volume * 256.0 / 100.0;
             vo_osd_changed(OSDTYPE_PROGBAR);
         }
 
         break;
 
     case evSetBalance:
+    case ivSetBalance:
         guiInfo.Balance = param;
         mixer_setbalance(mixer, (guiInfo.Balance - 50.0) / 50.0);     // transform 0..100 to -1..1
-        osd       = osd_level;
-        osd_level = 0;
-        uiEvent(evSetVolume, guiInfo.Volume);
-        osd_level = osd;
+        uiEvent(ivSetVolume, guiInfo.Volume);
+
+        if (ev == ivSetBalance)
+            break;
 
         if (osd_level) {
             osd_visible = (GetTimerMS() + 1000) | 1;
             vo_osd_progbar_type  = OSD_BALANCE;
-            vo_osd_progbar_value = ((guiInfo.Balance) * 256.0) / 100.0;
+            vo_osd_progbar_value = guiInfo.Balance * 256.0 / 100.0;
             vo_osd_changed(OSDTYPE_PROGBAR);
         }
 
@@ -451,10 +458,36 @@ play:
         case 1:
         default:
             aspect = -1;
+            break;
         }
 
         snprintf(cmd, sizeof(cmd), "pausing_keep switch_ratio %f", aspect);
         mp_input_queue_cmd(mp_input_parse_cmd(cmd));
+
+        break;
+
+    case evSetRotation:
+
+        switch (iparam) {
+        case 90:
+            guiInfo.Rotation = 1;
+            break;
+
+        case -90:
+            guiInfo.Rotation = 2;
+            break;
+
+        case 180:
+            guiInfo.Rotation = 8;
+            break;
+
+        case 0:
+        default:
+            guiInfo.Rotation = -1;
+            break;
+        }
+
+        guiInfo.MediumChanged = GUI_MEDIUM_SAME;
 
         break;
 
@@ -606,7 +639,7 @@ void uiChangeSkin(char *name)
 
     if (skinRead(name) != 0) {
         if (skinRead(skinName) != 0) {
-            gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_SKIN_SKINCFG_SkinCfgError, skinName);
+            gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_GUI_MSG_SkinCfgError, skinName);
             mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
         }
     }
@@ -651,10 +684,12 @@ void uiChangeSkin(char *name)
 
     /* */
 
-    btnModify(evSetVolume, guiInfo.Volume);
-    btnModify(evSetBalance, guiInfo.Balance);
-    btnModify(evSetMoviePosition, guiInfo.Position);
-    btnSet(evFullScreen, (guiApp.videoWindow.isFullScreen ? btnPressed : btnReleased));
+    if (guiInfo.AudioPassthrough)
+        btnSet(evSetVolume, btnDisabled);
+    if (guiInfo.AudioChannels < 2 || guiInfo.AudioPassthrough)
+        btnSet(evSetBalance, btnDisabled);
+
+    btnSet(evFullScreen, guiApp.videoWindow.isFullScreen ? btnPressed : btnReleased);
 
     wsWindowLayer(wsDisplay, guiApp.mainWindow.WindowID, guiApp.videoWindow.isFullScreen);
     wsWindowLayer(wsDisplay, guiApp.menuWindow.WindowID, guiApp.videoWindow.isFullScreen);
@@ -695,15 +730,16 @@ void uiUnsetFile(void)
 /**
  * @brief Unset media information.
  *
- * @param totals whether to unset number of chapters and angles (#True) or
- *               just track, chapter and angle (#False) as well
+ * @param totals whether to additionally unset number of chapters and angles (#True)
+ *               or just track, chapter and angle (#False)
  */
 void uiUnsetMedia(int totals)
 {
-    guiInfo.VideoWidth    = 0;
-    guiInfo.VideoHeight   = 0;
-    guiInfo.AudioChannels = 0;
-    guiInfo.RunningTime   = 0;
+    guiInfo.VideoWidth       = 0;
+    guiInfo.VideoHeight      = 0;
+    guiInfo.AudioChannels    = 0;
+    guiInfo.AudioPassthrough = False;
+    guiInfo.RunningTime      = 0;
 
     if (totals) {
         guiInfo.Chapters = 0;
@@ -745,7 +781,7 @@ void uiCurr(void)
         if (curr) {
             uiSetFile(curr->path, curr->name, STREAMTYPE_FILE);
             guiInfo.PlaylistNext = False;
-            guiInfo.Track = (int)listMgr(PLAYLIST_ITEM_GET_POS, curr);
+            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, curr);
             break;
         }
 
@@ -815,7 +851,7 @@ void uiPrev(void)
         if (prev) {
             uiSetFile(prev->path, prev->name, STREAMTYPE_FILE);
             guiInfo.PlaylistNext = !guiInfo.Playing;
-            guiInfo.Track = (int)listMgr(PLAYLIST_ITEM_GET_POS, prev);
+            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, prev);
             break;
         }
 
@@ -883,7 +919,7 @@ void uiNext(void)
         if (next) {
             uiSetFile(next->path, next->name, STREAMTYPE_FILE);
             guiInfo.PlaylistNext = !guiInfo.Playing;
-            guiInfo.Track = (int)listMgr(PLAYLIST_ITEM_GET_POS, next);
+            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
             break;
         }
 

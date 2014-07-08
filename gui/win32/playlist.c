@@ -115,7 +115,7 @@ static void movedown_track(playlist_t *playlist, int number)
     playlist->tracks[number - 1] = tmp;
 }
 
-static void sort_playlist(playlist_t *playlist, int opt) {}
+static void sort_playlist(/*playlist_t *playlist, int opt*/) {}
 
 static void clear_playlist(playlist_t *playlist)
 {

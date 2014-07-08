@@ -39,7 +39,7 @@ extern int use_gui;             // this is defined in mplayer.c
 
 /// gui() instructions
 enum {
-    GUI_END_FILE,
+    GUI_END_PLAY,
     GUI_HANDLE_X_EVENT,
     GUI_PREPARE,
     GUI_REDRAW,
@@ -48,9 +48,9 @@ enum {
     GUI_SETUP_VIDEO_WINDOW,
     GUI_SET_AUDIO,
     GUI_SET_CONTEXT,
-    GUI_SET_MIXER,
     GUI_SET_STATE,
     GUI_SET_STREAM,
+    GUI_SET_VOLUME_BALANCE,
     GUI_SET_VIDEO
 };
 
@@ -68,14 +68,15 @@ enum {
 //@}
 
 //@{
-/// NewPlay reason
-#define GUI_FILE_SAME 1
-#define GUI_FILE_NEW  2
+/// MediumChanged reason
+#define GUI_MEDIUM_SAME 1
+#define GUI_MEDIUM_NEW  2
 //@}
 
 /// mplayer() instructions
 enum {
     MPLAYER_EXIT_GUI,
+    MPLAYER_LOAD_FONT,
     MPLAYER_SET_AUTO_QUALITY,
     MPLAYER_SET_BRIGHTNESS,
     MPLAYER_SET_CONTRAST,
@@ -102,10 +103,14 @@ typedef struct {
     int VideoWidth;
     int VideoHeight;
 
+    int Rotation;
+
     char *CodecName;
 
     int StreamType;
     int AudioChannels;
+
+    int AudioPassthrough;
 
     int AudioStreams;
     stream_language_t AudioStream[32];
@@ -133,7 +138,7 @@ typedef struct {
     float Volume;
     float Balance;
 
-    int NewPlay;              // public, read access by MPlayer
+    int MediumChanged;        // public, read access by MPlayer
     int PlaylistNext;
 } guiInterface_t;
 
@@ -150,7 +155,6 @@ int guiPlaylist(int what, play_tree_t *playtree, m_config_t *config, int enqueue
 /// @name GUI -> MPlayer
 //@{
 void mplayer(int what, float value, void *data);
-void mplayerLoadFont(void);
 void mplayerLoadSubtitle(const char *name);
 void gmp_msg(int mod, int lev, const char *format, ...);
 //@}

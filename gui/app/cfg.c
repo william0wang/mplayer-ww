@@ -24,6 +24,7 @@
 #include "gui.h"
 #include "gui/interface.h"
 #include "gui/util/list.h"
+#include "gui/util/misc.h"
 #include "gui/util/string.h"
 
 #include "config.h"
@@ -226,8 +227,8 @@ static const m_option_t gui_opts[] = {
     { "font_factor",                 &font_factor,             CONF_TYPE_FLOAT,       CONF_RANGE,  0.0,   10.0,       NULL },
     { "font_name",                   &font_name,               CONF_TYPE_STRING,      0,           0,     0,          NULL },
 
-#ifdef CONFIG_FREETYPE
     { "font_encoding",               &subtitle_font_encoding,  CONF_TYPE_STRING,      0,           0,     0,          NULL },
+#ifdef CONFIG_FREETYPE
     { "font_text_scale",             &text_font_scale_factor,  CONF_TYPE_FLOAT,       CONF_RANGE,  0.0,   100.0,      NULL },
     { "font_osd_scale",              &osd_font_scale_factor,   CONF_TYPE_FLOAT,       CONF_RANGE,  0.0,   100.0,      NULL },
     { "font_blur",                   &subtitle_font_radius,    CONF_TYPE_FLOAT,       CONF_RANGE,  0.0,   8.0,        NULL },
@@ -238,8 +239,8 @@ static const m_option_t gui_opts[] = {
 #ifdef CONFIG_ASS
     { "ass_enabled",                 &ass_enabled,             CONF_TYPE_FLAG,        0,           0,     1,          NULL },
     { "ass_use_margins",             &ass_use_margins,         CONF_TYPE_FLAG,        0,           0,     1,          NULL },
-    { "ass_top_margin",              &ass_top_margin,          CONF_TYPE_INT,         CONF_RANGE,  0,     512,        NULL },
-    { "ass_bottom_margin",           &ass_bottom_margin,       CONF_TYPE_INT,         CONF_RANGE,  0,     512,        NULL },
+    { "ass_top_margin",              &ass_top_margin,          CONF_TYPE_INT,         CONF_RANGE,  0,     2000,       NULL },
+    { "ass_bottom_margin",           &ass_bottom_margin,       CONF_TYPE_INT,         CONF_RANGE,  0,     2000,       NULL },
 #endif
 
     { NULL,                          NULL,                     0,                     0,           0,     0,          NULL }
@@ -293,7 +294,7 @@ void cfg_read(void)
             if (!*line)
                 continue;
 
-            item = calloc(1, sizeof(plItem));
+            item = calloc(1, sizeof(*item));
 
             if (!item) {
                 gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_MemAllocFailed);
@@ -328,7 +329,7 @@ void cfg_read(void)
             if (!*line)
                 continue;
 
-            item = calloc(1, sizeof(urlItem));
+            item = calloc(1, sizeof(*item));
 
             if (!item) {
                 gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_MemAllocFailed);
@@ -379,7 +380,7 @@ void cfg_write(void)
             char *val = m_option_print(opts, opts->p);
 
             if (val == (char *)-1) {
-                gmp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_UnableToSaveOption, opts->name);
+                gmp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_GUI_MSG_UnableToSaveOption, opts->name);
                 val = NULL;
             }
 

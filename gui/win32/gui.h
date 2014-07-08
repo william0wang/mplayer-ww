@@ -107,6 +107,7 @@ int create_videowindow(gui_t *gui);
 int parse_filename(char *file, play_tree_t *playtree, m_config_t *mconfig, int clear);
 void capitalize(char *fname);
 LPSTR acp(LPCSTR utf8);
+double appRadian(widget *item, int x, int y);
 
 void renderinfobox(skin_t *skin, window_priv_t *priv);
 void renderwidget(skin_t *skin, image *dest, widget *item, int state);

@@ -104,6 +104,7 @@ const char *vo_format_name(int format)
     case IMGFMT_422P: return "Planar 422P";
     case IMGFMT_422A: return "Planar 422P with alpha";
     case IMGFMT_411P: return "Planar 411P";
+    case IMGFMT_440P: return "Planar 440P";
     case IMGFMT_NV12: return "Planar NV12";
     case IMGFMT_NV21: return "Planar NV21";
     case IMGFMT_HM12: return "Planar NV12 Macroblock";
@@ -224,7 +225,10 @@ int mp_get_chroma_shift(int format, int *x_shift, int *y_shift, int *component_b
     case IMGFMT_NV21:
         xs = 1;
         ys = 1;
+        // TODO: allowing this though currently breaks
+        // things all over the place.
         err = 1;
+        break;
     default:
         err = 1;
         break;

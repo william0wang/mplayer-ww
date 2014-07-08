@@ -18,6 +18,7 @@
 
 /* playbar window */
 
+#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/stat.h>
@@ -30,6 +31,7 @@
 #include "gui/skin/font.h"
 #include "gui/skin/skin.h"
 #include "gui/util/mem.h"
+#include "gui/util/misc.h"
 #include "gui/wm/ws.h"
 
 #include "help_mp.h"
@@ -55,9 +57,9 @@ unsigned int GetTimerMS( void );
 unsigned int GetTimer( void );
 
 unsigned char * playbarDrawBuffer = NULL;
-int		playbarVisible = False;
-int  		playbarLength = 0;
-int		uiPlaybarFade = 0;
+int             playbarVisible = False;
+int             playbarLength = 0;
+int             uiPlaybarFade = 0;
 
 static void uiPlaybarDraw( void )
 {
@@ -79,26 +81,26 @@ static void uiPlaybarDraw( void )
    case 1: // fade in
         playbarLength--;
         if ( guiApp.videoWindow.Height - guiApp.playbar.height >= playbarLength )
-	 {
-	  playbarLength=guiApp.videoWindow.Height - guiApp.playbar.height;
-	  uiPlaybarFade=0;
-	  vo_mouse_autohide=False;
-	 }
+         {
+          playbarLength=guiApp.videoWindow.Height - guiApp.playbar.height;
+          uiPlaybarFade=0;
+          wsMouseVisibility(&guiApp.videoWindow, wsShowMouseCursor);
+         }
         wsWindowMove( &guiApp.playbarWindow,True,x,playbarLength );
-	break;
+        break;
    case 2: // fade out
-	playbarLength+=10;
-	if ( playbarLength > guiApp.videoWindow.Height )
-	 {
-	  playbarLength=guiApp.videoWindow.Height;
-	  uiPlaybarFade=0;
-	  playbarVisible=False;
-          vo_mouse_autohide=True;
+        playbarLength+=10;
+        if ( playbarLength > guiApp.videoWindow.Height )
+         {
+          playbarLength=guiApp.videoWindow.Height;
+          uiPlaybarFade=0;
+          playbarVisible=False;
+          wsMouseVisibility(&guiApp.videoWindow, wsHideMouseCursor);
           wsWindowVisibility( &guiApp.playbarWindow,wsHideWindow );
-	  return;
-	 }
+          return;
+         }
         wsWindowMove( &guiApp.playbarWindow,True,x,playbarLength );
-	break;
+        break;
   }
 
 /* render */
@@ -106,8 +108,9 @@ static void uiPlaybarDraw( void )
   {
    btnModify( evSetMoviePosition,guiInfo.Position );
    btnModify( evSetVolume,guiInfo.Volume );
+   btnModify( evSetBalance,guiInfo.Balance );
 
-   vo_mouse_autohide=False;
+   wsMouseVisibility(&guiApp.videoWindow, wsShowMouseCursor);
 
    fast_memcpy( playbarDrawBuffer,guiApp.playbar.Bitmap.Image,guiApp.playbar.Bitmap.ImageSize );
    RenderAll( &guiApp.playbarWindow,guiApp.playbarItems,guiApp.IndexOfPlaybarItems,playbarDrawBuffer );
@@ -121,10 +124,13 @@ static void uiPlaybarMouse( int Button, int X, int Y, int RX, int RY )
  static int     itemtype = 0;
         int     i;
         guiItem * item = NULL;
-	float   value = 0.0f;
+ static double  prev_point;
+        double  point;
+        float   value = 0.0f;
 
  static int     SelectedItem = -1;
-	int     currentselected = -1;
+        int     currentselected = -1;
+ static int     endstop;
 
  for ( i=0;i <= guiApp.IndexOfPlaybarItems;i++ )
    if ( ( guiApp.playbarItems[i].pressed != btnDisabled )&&
@@ -142,55 +148,62 @@ static void uiPlaybarMouse( int Button, int X, int Y, int RX, int RY )
         break;
    case wsRRMouseButton:
         gtkShow( ivShowPopUpMenu,NULL );
-	break;
+        break;
 /* --- */
    case wsPLMouseButton:
-	gtkShow( ivHidePopUpMenu,NULL );
+        gtkShow( ivHidePopUpMenu,NULL );
         SelectedItem=currentselected;
         if ( SelectedItem == -1 ) break; // yeees, i'm move the fucking window
         item=&guiApp.playbarItems[SelectedItem];
-	itemtype=item->type;
-	item->pressed=btnPressed;
+        itemtype=item->type;
+        item->pressed=btnPressed;
 
-	switch( item->type )
-	 {
-	  case itButton:
-	       if ( ( SelectedItem > -1 ) &&
-	         ( ( ( item->message == evPlaySwitchToPause && item->message == evPauseSwitchToPlay ) ) ||
-		 ( ( item->message == evPauseSwitchToPlay && item->message == evPlaySwitchToPause ) ) ) )
-		 { item->pressed=btnDisabled; }
-	       break;
-	 }
+        switch( item->type )
+         {
+          case itButton:
+               if ( ( SelectedItem > -1 ) &&
+                 ( ( ( item->message == evPlaySwitchToPause && item->message == evPauseSwitchToPlay ) ) ||
+                 ( ( item->message == evPauseSwitchToPlay && item->message == evPlaySwitchToPause ) ) ) )
+                 { item->pressed=btnDisabled; }
+               break;
+          case itRPotmeter:
+               prev_point=appRadian( item, X - item->x, Y - item->y ) - item->zeropoint;
+               if ( prev_point < 0.0 ) prev_point+=2*M_PI;
+               if ( prev_point <= item->arclength ) endstop=False;
+               else endstop=STOPPED_AT_0 + STOPPED_AT_100;   // block movement
+               break;
+         }
 
-	break;
+        break;
    case wsRLMouseButton:
-        if ( SelectedItem != -1 )   // NOTE TO MYSELF: only if itButton, itHPotmeter or itVPotmeter
+        if ( SelectedItem != -1 )   // NOTE TO MYSELF: only if hasButton
          {
           item=&guiApp.playbarItems[SelectedItem];
           item->pressed=btnReleased;
          }
-	if ( currentselected == - 1 || SelectedItem == -1 ) { itemtype=0; break; }
-	SelectedItem=-1;
-	value=0;
+        if ( currentselected == - 1 || SelectedItem == -1 ) { itemtype=0; break; }
+        SelectedItem=-1;
+        value=0;
 
-	switch( itemtype )
-	 {
-	  case itPotmeter:
-	  case itHPotmeter:
-	       btnModify( item->message,(float)( X - item->x ) / item->width * 100.0 );
-	       uiEvent( item->message,item->value );
-	       value=item->value;
-	       break;
-	  case itVPotmeter:
-	       btnModify( item->message, ( 1.0 - (float)( Y - item->y ) / item->height) * 100.0 );
-	       uiEvent( item->message,item->value );
-	       value=item->value;
-	       break;
-	 }
-	uiEvent( item->message,value );
+        switch( itemtype )
+         {
+          case itHPotmeter:
+               value=100.0 * ( X - item->x ) / item->width;
+               break;
+          case itVPotmeter:
+               value=100.0 - 100.0 * ( Y - item->y ) / item->height;
+               break;
+          case itRPotmeter:
+               if ( endstop ) { itemtype=0; return; }
+               point=appRadian( item, X - item->x, Y - item->y ) - item->zeropoint;
+               if ( point < 0.0 ) point+=2*M_PI;
+               value=100.0 * point / item->arclength;
+               break;
+         }
+        uiEvent( item->message,value );
 
-	itemtype=0;
-	break;
+        itemtype=0;
+        break;
 /* --- */
    case wsP5MouseButton: value=-2.5f; goto rollerhandled;
    case wsP4MouseButton: value= 2.5f;
@@ -198,36 +211,70 @@ rollerhandled:
         if (currentselected != - 1)
          {
           item=&guiApp.playbarItems[currentselected];
-          if ( ( item->type == itHPotmeter )||( item->type == itVPotmeter )||( item->type == itPotmeter ) )
+          if ( ( item->type == itHPotmeter )||( item->type == itVPotmeter )||( item->type == itRPotmeter ) )
            {
-            item->value+=value;
-            btnModify( item->message,item->value );
+            item->value=constrain(item->value + value);
             uiEvent( item->message,item->value );
            }
-	 }
-	break;
+         }
+        break;
 /* --- */
    case wsMoveMouse:
         item=&guiApp.playbarItems[SelectedItem];
-	switch ( itemtype )
-	 {
-	  case itPRMButton:
-	       if (guiApp.menuIsPresent) guiApp.menuWindow.MouseHandler( 0,RX,RY,0,0 );
-	       break;
-	  case itPotmeter:
-	       item->value=(float)( X - item->x ) / item->width * 100.0;
-	       goto potihandled;
-	  case itVPotmeter:
-	       item->value=(1.0 - (float)( Y - item->y ) / item->height) * 100.0;
-	       goto potihandled;
-	  case itHPotmeter:
-	       item->value=(float)( X - item->x ) / item->width * 100.0;
+        switch ( itemtype )
+         {
+          case itPRMButton:
+               if (guiApp.menuIsPresent) guiApp.menuWindow.MouseHandler( 0,RX,RY,0,0 );
+               break;
+          case itRPotmeter:
+               point=appRadian( item, X - item->x, Y - item->y ) - item->zeropoint;
+               if ( point < 0.0 ) point+=2*M_PI;
+               if ( item->arclength < 2 * M_PI )
+               /* a potmeter with separated 0% and 100% positions */
+                {
+                 value=item->value;
+                 if ( point - prev_point > M_PI )
+                 /* turned beyond the 0% position */
+                  {
+                   if ( !endstop )
+                    {
+                     endstop=STOPPED_AT_0;
+                     value=0.0f;
+                    }
+                  }
+                 else if ( prev_point - point > M_PI )
+                 /* turned back from beyond the 0% position */
+                  {
+                   if ( endstop == STOPPED_AT_0 ) endstop=False;
+                  }
+                 else if ( prev_point <= item->arclength && point > item->arclength )
+                 /* turned beyond the 100% position */
+                  {
+                   if ( !endstop )
+                    {
+                     endstop=STOPPED_AT_100;
+                     value=100.0f;
+                    }
+                  }
+                 else if ( prev_point > item->arclength && point <= item->arclength )
+                 /* turned back from beyond the 100% position */
+                  {
+                   if ( endstop == STOPPED_AT_100 ) endstop=False;
+                  }
+                }
+               if ( !endstop ) value=100.0 * point / item->arclength;
+               prev_point=point;
+               goto potihandled;
+          case itVPotmeter:
+               value=100.0 - 100.0 * ( Y - item->y ) / item->height;
+               goto potihandled;
+          case itHPotmeter:
+               value=100.0 * ( X - item->x ) / item->width;
 potihandled:
-	       if ( item->value > 100.0f ) item->value=100.0f;
-	       if ( item->value < 0.0f ) item->value=0.0f;
-	       uiEvent( item->message,item->value );
-	       break;
-	 }
+               item->value=constrain(value);
+               uiEvent( item->message,item->value );
+               break;
+         }
         break;
   }
 }
@@ -238,7 +285,7 @@ void uiPlaybarInit( void )
 
  if ( ( playbarDrawBuffer = malloc( guiApp.playbar.Bitmap.ImageSize ) ) == NULL )
   {
-   gmp_msg( MSGT_GPLAYER,MSGL_FATAL,MSGTR_NEMDB );
+   gmp_msg( MSGT_GPLAYER,MSGL_FATAL,"[playbar] " MSGTR_GUI_MSG_MemoryErrorWindow );
    mplayer( MPLAYER_EXIT_GUI, EXIT_ERROR, 0 );
   }
 

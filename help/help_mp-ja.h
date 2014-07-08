@@ -5,45 +5,55 @@
 
 // ========================= MPlayer help ===========================
 
-static const char help_text[]=
-"使い方:   mplayer [オプション] [url|パス/]ファイル名\n"
-"\n"
-"基本的なオプション: (man page に全て網羅されています)\n"
-" -vo <drv[:dev]>  映像出力ドライバ及びデバイスを選択します ('-vo help'で一覧表示されます)\n"
-" -ao <drv[:dev]>  音声出力ドライバ及びデバイスを選択します ('-ao help'で一覧表示されます)\n"
 #ifdef CONFIG_VCD
-" vcd://<trackno>   play VCD (Video CD) track from device instead of plain file\n"
+#define MSGTR_HelpVCD " vcd://<trackno>   play VCD (Video CD) track from device instead of plain file\n"
+#else
+#define MSGTR_HelpVCD
 #endif
+
 #ifdef CONFIG_DVDREAD
-" dvd://<titleno>   play DVD title from device instead of plain file\n"
-" -alang/-slang    DVDの 音声/サブタイトル 言語設定 (2文字のカントリーコードで指定)\n"
+#define MSGTR_HelpDVD " dvd://<titleno>   play DVD title from device instead of plain file\n"\
+                      " -alang/-slang    DVDの 音声/サブタイトル 言語設定 (2文字のカントリーコードで指定)\n"
+#else
+#define MSGTR_HelpDVD
 #endif
-" -ss <timepos>    timeposに与えられた場所から再生します(seconds or hh:mm:ss)\n"
-" -nosound         音声出力を抑止します\n"
-" -fs              フルスクリーン表示します(もしくは -vm, -zoom, 詳細はmanにあります)\n"
-" -x <x> -y <y>    表示サイズを指定します (一緒に次のオプションを利用下さい -vm or -zoom)\n"
-" -sub <file>      利用する subtitle ファイルを選択する(-subfps, -subdelay も御覧下さい)\n"
-" -playlist <file> playlistファイルを選択する\n"
-" -vid x -aid y    select video (x) and audio (y) stream to play\n"
-" -fps x -srate y  change video (x fps) and audio (y Hz) rate\n"
-" -pp <quality>    postprocessing filterを有効にする (詳細は man page にあります)\n"
-" -framedrop       frame droppingを有効にする (低速なマシン向きです)\n"
+
+#define MSGTR_Help \
+"使い方:   mplayer [オプション] [url|パス/]ファイル名\n"\
+"\n"\
+"基本的なオプション: (man page に全て網羅されています)\n"\
+" -vo <drv[:dev]>  映像出力ドライバ及びデバイスを選択します ('-vo help'で一覧表示されます)\n"\
+" -ao <drv[:dev]>  音声出力ドライバ及びデバイスを選択します ('-ao help'で一覧表示されます)\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -ss <timepos>    timeposに与えられた場所から再生します(seconds or hh:mm:ss)\n"\
+" -nosound         音声出力を抑止します\n"\
+" -fs              フルスクリーン表示します(もしくは -vm, -zoom, 詳細はmanにあります)\n"\
+" -x <x> -y <y>    表示サイズを指定します (一緒に次のオプションを利用下さい -vm or -zoom)\n"\
+" -sub <file>      利用する subtitle ファイルを選択する(-subfps, -subdelay も御覧下さい)\n"\
+" -playlist <file> playlistファイルを選択する\n"\
+" -vid x -aid y    select video (x) and audio (y) stream to play\n"\
+" -fps x -srate y  change video (x fps) and audio (y Hz) rate\n"\
+" -pp <quality>    postprocessing filterを有効にする (詳細は man page にあります)\n"\
+" -framedrop       frame droppingを有効にする (低速なマシン向きです)\n"\
+"\n"\
+"基本的なコマンド: (man pageに全て網羅されています。事前にinput.confも確認して下さい)\n"\
+" <-  or  ->       10秒単位で前後にシークします\n"\
+" up or down       1分単位で前後にシークします\n"\
+" pgup or pgdown   10分単位で前後にシークします\n"\
+" < or >           プレイリストを元に前後のファイルに遷移します\n"\
+" p or SPACE       再生を静止します(何かボタンを押下すると再生を開始します)\n"\
+" q or ESC         再生を静止し、プログラムを停止します\n"\
+" + or -           音声を 0.1 秒単位で早めたり遅れさせたり調整する\n"\
+" o                cycle OSD mode:  none / seekbar / seekbar + timer\n"\
+" * or /           PCM 音量を上げたり下げたりする\n"\
+" z or x           subtitleを 0.1 秒単位で早めたり遅れさせたり調整する\n"\
+" r or t           subtitleの位置を上げたり下げたり調整する, -vfオプションも確認して下さい\n"\
+"\n"\
+" * * * man pageに詳細がありますので、確認して下さい。さらに高度で進んだオプションやキーも記載してます * * *\n"\
 "\n"
-"基本的なコマンド: (man pageに全て網羅されています。事前にinput.confも確認して下さい)\n"
-" <-  or  ->       10秒単位で前後にシークします\n"
-" up or down       1分単位で前後にシークします\n"
-" pgup or pgdown   10分単位で前後にシークします\n"
-" < or >           プレイリストを元に前後のファイルに遷移します\n"
-" p or SPACE       再生を静止します(何かボタンを押下すると再生を開始します)\n"
-" q or ESC         再生を静止し、プログラムを停止します\n"
-" + or -           音声を 0.1 秒単位で早めたり遅れさせたり調整する\n"
-" o                cycle OSD mode:  none / seekbar / seekbar + timer\n"
-" * or /           PCM 音量を上げたり下げたりする\n"
-" z or x           subtitleを 0.1 秒単位で早めたり遅れさせたり調整する\n"
-" r or t           subtitleの位置を上げたり下げたり調整する, -vfオプションも確認して下さい\n"
-"\n"
-" * * * man pageに詳細がありますので、確認して下さい。さらに高度で進んだオプションやキーも記載してます * * *\n"
-"\n";
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer messages ===========================
 
@@ -153,19 +163,14 @@ static const char help_text[]=
 // open.c, stream.c:
 #define MSGTR_CdDevNotfound "CD-ROM デバイス '%s' が存在しません.\n"
 #define MSGTR_ReadSTDIN "標準入力から読み込んでいます...\n"
-#define MSGTR_UnableOpenURL "指定されたURLを読み込めません: %s\n"
-#define MSGTR_ConnToServer "サーバに接続中: %s\n"
 #define MSGTR_FileNotFound "ファイルが存在しません: '%s'\n"
 
 #define MSGTR_SMBInitError "libsmbclient の初期化失敗: %d\n"
 #define MSGTR_SMBFileNotFound "ローカルエリアネットワークから開くことが出来ませんでした: '%s'\n"
-#define MSGTR_SMBNotCompiled "MPlayer はSMB reading support を無効にしてコンパイルされています\n"
 
 #define MSGTR_CantOpenDVD "DVDデバイスを開くことが出来ませんでした: %s (%s)\n"
 #define MSGTR_DVDnumTitles "このDVDには %d タイトル記録されています.\n"
 #define MSGTR_DVDinvalidTitle "不正な DVD タイトル番号です: %d\n"
-#define MSGTR_DVDnumChapters "このDVDは %d キャプターあります.\n"
-#define MSGTR_DVDinvalidChapter "不正なDVDキャプター番号ですr: %d\n"
 #define MSGTR_DVDnumAngles "このDVDには %d アングルあります.\n"
 #define MSGTR_DVDinvalidAngle "不正なDVDアングル番号です: %d\n"
 #define MSGTR_DVDnoIFO "Cannot open the IFO file for DVD title %d.\n"
@@ -184,7 +189,6 @@ static const char help_text[]=
 #define MSGTR_TooManyAudioInBuffer "\nバッファに多過ぎる音声パケットが与えられてます: (%d in %d bytes).\n"
 #define MSGTR_TooManyVideoInBuffer "\nバッファに多過ぎる映像パケットが与えられてます: (%d in %d bytes).\n"
 #define MSGTR_Detected_XXX_FileFormat "%s ファイルフォーマットと判断.\n"
-#define MSGTR_DetectedAudiofile "音声ファイルと判断.\n"
 #define MSGTR_FormatNotRecognized "============ このファイルフォーマットは サポートしていません =============\n"\
                                   "======= もしこのファイルが AVI、ASF、MPEGなら作成者に連絡して下さい ======\n"
 #define MSGTR_MissingVideoStream "映像ストリームが存在しません.\n"
@@ -203,7 +207,6 @@ static const char help_text[]=
 #define MSGTR_MOVcomprhdr "MOV: 圧縮されたヘッダ(Compressed headers)をサポートするには ZLIB が必要です\n"
 #define MSGTR_MOVvariableFourCC "MOV: 警告: Variable FOURCC detected!?\n"
 #define MSGTR_MOVtooManyTrk "MOV: 警告: too many tracks"
-#define MSGTR_DetectedTV "TV detected! ;-)\n"
 #define MSGTR_ErrorOpeningOGGDemuxer "ogg demuxer を開くことが出来ません.\n"
 #define MSGTR_CannotOpenAudioStream "音声ストリームを開くことが出来ません: %s\n"
 #define MSGTR_CannotOpenSubtitlesStream "サブタイトルストリームを開くことが出来ません: %s\n"
@@ -254,154 +257,122 @@ static const char help_text[]=
 
 // vd.c
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
-// --- labels ---
-#define MSGTR_About "アバウト"
-#define MSGTR_FileSelect "ファイル選択 ..."
-#define MSGTR_SubtitleSelect "サブタイトル選択 ..."
-#define MSGTR_OtherSelect "選択 ..."
-#define MSGTR_FontSelect "フォント選択 ..."
-#define MSGTR_PlayList "プレイリスト"
-#define MSGTR_Equalizer "エコライザー"
-#define MSGTR_SkinBrowser "スキンブラウザ"
-#define MSGTR_Preferences "設定"
-#define MSGTR_NoMediaOpened "メディアが開かれていません."
-#define MSGTR_NoChapter "キャプターがありません"
-#define MSGTR_Chapter "キャプター %d"
-#define MSGTR_NoFileLoaded "ファイルが読み込まれていません."
-
-// --- buttons ---
-#define MSGTR_Ok "OK"
-#define MSGTR_Cancel "キャンセル"
-#define MSGTR_Add "追加"
-#define MSGTR_Remove "削除"
-#define MSGTR_Clear "クリア"
-#define MSGTR_Config "設定"
-#define MSGTR_ConfigDriver "ドライバ設定"
-#define MSGTR_Browse "ブラウズ"
-
-// --- error messages ---
-#define MSGTR_NEMDB "描画に必要なバッファを確保するためのメモリが足りません."
-#define MSGTR_NEMFMR "メニューを描画に必要なメモリが足りません."
-
-// --- skin loader error messages
-#define MSGTR_SKIN_ERRORMESSAGE "[skin] エラー: スキン設定ファイル %d 行: %s"
-#define MSGTR_SKIN_BITMAP_16bit  "16 ビット以下の解消度はサポートされていません (%s).\n"
-#define MSGTR_SKIN_BITMAP_FileNotFound  "ファイルが存在しません (%s)\n"
-#define MSGTR_SKIN_BITMAP_PNGReadError "png 読み込みエラー (%s)\n"
-#define MSGTR_SKIN_BITMAP_ConversionError "24bitから32bitへの変換エラー (%s)\n"
-#define MSGTR_SKIN_UnknownMessage "未知のメッセージ: %s\n"
-#define MSGTR_SKIN_NotEnoughMemory "メモリが不足しています\n"
-#define MSGTR_SKIN_FONT_FontFileNotFound "フォントファイルが存在しません\n"
-#define MSGTR_SKIN_FONT_FontImageNotFound "フォントイメージファイルが存在しません\n"
-#define MSGTR_SKIN_UnknownParameter "未知のパラメータ(%s)\n"
-#define MSGTR_SKIN_SKINCFG_SkinNotFound "スキンが存在しません( %s ).\n"
-#define MSGTR_SKIN_LABEL "スキン:"
-
-// --- gtk menus
-#define MSGTR_MENU_AboutMPlayer "MPlayerについて"
-#define MSGTR_MENU_Open "開く ..."
-#define MSGTR_MENU_PlayFile "ファイル再生 ..."
-#define MSGTR_MENU_PlayVCD "VCD 再生 ..."
-#define MSGTR_MENU_PlayDVD "DVD 再生 ..."
-#define MSGTR_MENU_PlayURL "URL 再生 ..."
-#define MSGTR_MENU_LoadSubtitle "サブタイトル読み込み ..."
-#define MSGTR_MENU_DropSubtitle "サブタイトル破棄 ..."
-#define MSGTR_MENU_Playing "現在のファイル"
-#define MSGTR_MENU_Play "再生"
-#define MSGTR_MENU_Pause "一時停止"
-#define MSGTR_MENU_Stop "停止"
-#define MSGTR_MENU_NextStream "次のストリーム"
-#define MSGTR_MENU_PrevStream "前のストリーム"
-#define MSGTR_MENU_Size "サイズ"
-#define MSGTR_MENU_NormalSize "通常サイズ"
-#define MSGTR_MENU_DoubleSize "2倍サイズ"
-#define MSGTR_MENU_FullScreen "フルスクリーン"
-#define MSGTR_MENU_DVD "DVD"
-#define MSGTR_MENU_VCD "VCD"
-#define MSGTR_MENU_PlayDisc "ディスク再生 ..."
-#define MSGTR_MENU_ShowDVDMenu "DVD メニューの表示"
-#define MSGTR_MENU_Titles "タイトル"
-#define MSGTR_MENU_Title "タイトル %2d"
-#define MSGTR_MENU_None "(無し)"
-#define MSGTR_MENU_AudioLanguages "音声言語"
-#define MSGTR_MENU_SubtitleLanguages "サブタイトル言語"
-#define MSGTR_MENU_SkinBrowser "スキンブラウザ"
-#define MSGTR_MENU_Exit "終了 "
-#define MSGTR_MENU_Mute "消音"
-#define MSGTR_MENU_Original "オリジナル"
-#define MSGTR_MENU_Track "トラック %d"
-#define MSGTR_MENU_VideoTrack "映像トラック"
-
-// --- equalizer
-#define MSGTR_EQU_Audio "音声"
-#define MSGTR_EQU_Video "映像"
-#define MSGTR_EQU_Contrast "明暗: "
-#define MSGTR_EQU_Brightness "光度: "
-#define MSGTR_EQU_Front_Left "前方 左"
-#define MSGTR_EQU_Front_Right "前方 右"
-#define MSGTR_EQU_Back_Left "後方 左"
-#define MSGTR_EQU_Back_Right "後方 右"
-#define MSGTR_EQU_Center "中央"
-#define MSGTR_EQU_Bass "バス"
-#define MSGTR_EQU_All "All"
-#define MSGTR_EQU_Channel1 "チャンネル 1:"
-#define MSGTR_EQU_Channel2 "チャンネル 2:"
-#define MSGTR_EQU_Channel3 "チャンネル 3:"
-#define MSGTR_EQU_Channel4 "チャンネル 4:"
-#define MSGTR_EQU_Channel5 "チャンネル 5:"
-#define MSGTR_EQU_Channel6 "チャンネル 6:"
-
-// --- playlist
-#define MSGTR_PLAYLIST_Path "パス"
-#define MSGTR_PLAYLIST_Selected "選択されたファイル"
-#define MSGTR_PLAYLIST_Files "ファイル"
-#define MSGTR_PLAYLIST_DirectoryTree "ディレクトリツリー"
-
-// --- preferences
-#define MSGTR_PREFERENCES_SubtitleOSD "サブタイトル & OSD"
-#define MSGTR_PREFERENCES_Codecs "コーデック & demuxer"
-#define MSGTR_PREFERENCES_Misc "Misc"
-
-#define MSGTR_PREFERENCES_None "無し"
-#define MSGTR_PREFERENCES_AvailableDrivers "有効なドライバ:"
-#define MSGTR_PREFERENCES_EnableEqualizer "イコライザーの有効"
-#define MSGTR_PREFERENCES_DoubleBuffer "double buffering 有効"
-#define MSGTR_PREFERENCES_DirectRender "direct rendering 有効"
-#define MSGTR_PREFERENCES_FrameDrop "frame dropping 有効"
-#define MSGTR_PREFERENCES_HFrameDrop "HARD frame dropping (危険です) 有効"
-#define MSGTR_PREFERENCES_Subtitle "サブタイトル:"
-#define MSGTR_PREFERENCES_SUB_Delay "Delay: "
-#define MSGTR_PREFERENCES_SUB_FPS "FPS:"
-#define MSGTR_PREFERENCES_SUB_POS "位置: "
-#define MSGTR_PREFERENCES_SUB_AutoLoad "subtitle 自動読み込み無効"
-#define MSGTR_PREFERENCES_SUB_MPSUB "与えられたサブタイトルをMPLayerのサブタイトルフォーマットに変換"
-#define MSGTR_PREFERENCES_Font "フォント:"
-#define MSGTR_PREFERENCES_PostProcess "postprocessing 有効"
-#define MSGTR_PREFERENCES_NI "non-interleaved AVI パーサ使用"
-#define MSGTR_PREFERENCES_IDX "必要ならindex tableの再構築"
-#define MSGTR_PREFERENCES_VideoCodecFamily "映像コーデック:"
-#define MSGTR_PREFERENCES_AudioCodecFamily "音声コーデック:"
-#define MSGTR_PREFERENCES_FRAME_OSD_Level "OSD レベル"
-#define MSGTR_PREFERENCES_FRAME_Subtitle "サブタイトル"
-#define MSGTR_PREFERENCES_FRAME_Font "フォント"
-#define MSGTR_PREFERENCES_FRAME_Cache "キャッシュ"
-#define MSGTR_PREFERENCES_DXR3_VENC "Video エンコーダ:"
-#define MSGTR_PREFERENCES_DXR3_LAVC "LAVC (FFmpeg)使用"
-#define MSGTR_PREFERENCES_FontEncoding1 "ユニコード"
-#define MSGTR_PREFERENCES_FontEncoding "エンコーディング:"
-#define MSGTR_PREFERENCES_Cache "キャッシュ on/off"
-#define MSGTR_PREFERENCES_CacheSize "キャッシュサイズ: "
-#define MSGTR_PREFERENCES_LoadFullscreen "開始時にフルスクリーン"
-#define MSGTR_PREFERENCES_SaveWinPos "ウィンドウ位置を保持"
-#define MSGTR_PREFERENCES_XSCREENSAVER "XScreenSaverをストップ"
-#define MSGTR_PREFERENCES_PlayBar "プレイバー有効"
-#define MSGTR_PREFERENCES_CDROMDevice "CD-ROM デバイス:"
-#define MSGTR_PREFERENCES_DVDDevice "DVD デバイス:"
-#define MSGTR_PREFERENCES_FPS "Movie FPS:"
-
-// --- messagebox
-#define MSGTR_MSGBOX_LABEL_FatalError "致命的エラー!"
-#define MSGTR_MSGBOX_LABEL_Error "エラー"
-#define MSGTR_MSGBOX_LABEL_Warning "警告"
+#define MSGTR_GUI_AboutMPlayer "MPlayerについて"
+#define MSGTR_GUI_Add "追加"
+#define MSGTR_GUI_Audio "音声"
+#define MSGTR_GUI_AudioTracks "音声言語"
+#define MSGTR_GUI_AvailableDrivers "有効なドライバ:"
+#define MSGTR_GUI_AvailableSkins "スキン"
+#define MSGTR_GUI_Bass "バス"
+#define MSGTR_GUI_Brightness "光度"
+#define MSGTR_GUI_Browse "ブラウズ"
+#define MSGTR_GUI_Cache "キャッシュ"
+#define MSGTR_GUI_CacheSize "キャッシュサイズ"
+#define MSGTR_GUI_Cancel "キャンセル"
+#define MSGTR_GUI_Center "中央"
+#define MSGTR_GUI_Channel1 "チャンネル 1"
+#define MSGTR_GUI_Channel2 "チャンネル 2"
+#define MSGTR_GUI_Channel3 "チャンネル 3"
+#define MSGTR_GUI_Channel4 "チャンネル 4"
+#define MSGTR_GUI_Channel5 "チャンネル 5"
+#define MSGTR_GUI_Channel6 "チャンネル 6"
+#define MSGTR_GUI_ChannelAll "All"
+#define MSGTR_GUI_ChapterN "キャプター %d"
+#define MSGTR_GUI_Clear "クリア"
+#define MSGTR_GUI_CodecFamilyAudio "音声コーデック"
+#define MSGTR_GUI_CodecFamilyVideo "映像コーデック"
+#define MSGTR_GUI_Configure "設定"
+#define MSGTR_GUI_ConfigureDriver "ドライバ設定"
+#define MSGTR_GUI_Contrast "明暗"
+#define MSGTR_GUI_CpUnicode "ユニコード"
+#define MSGTR_GUI_Delay "Delay"
+#define MSGTR_GUI_Demuxers_Codecs "コーデック & demuxer"
+#define MSGTR_GUI_DeviceCDROM "CD-ROM デバイス"
+#define MSGTR_GUI_DeviceDVD "DVD デバイス"
+#define MSGTR_GUI_Directory "パス"
+#define MSGTR_GUI_DirectoryTree "ディレクトリツリー"
+#define MSGTR_GUI_DropSubtitle "サブタイトル破棄 ..."
+#define MSGTR_GUI_DVD "DVD"
+#define MSGTR_GUI_EnableCache "キャッシュ on/off"
+#define MSGTR_GUI_EnableDirectRendering "direct rendering 有効"
+#define MSGTR_GUI_EnableDoubleBuffering "double buffering 有効"
+#define MSGTR_GUI_EnableEqualizer "イコライザーの有効"
+#define MSGTR_GUI_EnableFrameDropping "frame dropping 有効"
+#define MSGTR_GUI_EnableFrameDroppingIntense "HARD frame dropping (危険です) 有効"
+#define MSGTR_GUI_EnablePlaybar "プレイバー有効"
+#define MSGTR_GUI_EnablePostProcessing "postprocessing 有効"
+#define MSGTR_GUI_Encoding "エンコーディング"
+#define MSGTR_GUI_Equalizer "エコライザー"
+#define MSGTR_GUI_Error "エラー"
+#define MSGTR_GUI_ErrorFatal "致命的エラー!"
+#define MSGTR_GUI_File "ファイル再生 "
+#define MSGTR_GUI_Files "ファイル"
+#define MSGTR_GUI_Font "フォント"
+#define MSGTR_GUI_FrameRate "FPS"
+#define MSGTR_GUI_FrontLeft "前方 左"
+#define MSGTR_GUI_FrontRight "前方 右"
+#define MSGTR_GUI_Lavc "LAVC (FFmpeg)使用"
+#define MSGTR_GUI_Miscellaneous "Misc"
+#define MSGTR_GUI_MSG_MemoryErrorWindow "描画に必要なバッファを確保するためのメモリが足りません."
+#define MSGTR_GUI_MSG_NoFileLoaded "ファイルが読み込まれていません."
+#define MSGTR_GUI_MSG_NoMediaOpened "メディアが開かれていません."
+#define MSGTR_GUI_MSG_SkinBitmapConversionError "24bitから32bitへの変換エラー (%s)\n"
+#define MSGTR_GUI_MSG_SkinBitmapNotFound "ファイルが存在しません (%s)\n"
+#define MSGTR_GUI_MSG_SkinBitmapPngReadError "png 読み込みエラー (%s)\n"
+#define MSGTR_GUI_MSG_SkinCfgNotFound "スキンが存在しません( %s ).\n"
+#define MSGTR_GUI_MSG_SkinErrorBitmap16Bit "16 ビット以下の解消度はサポートされていません (%s).\n"
+#define MSGTR_GUI_MSG_SkinErrorMessage "[skin] エラー: スキン設定ファイル %d 行: %s"
+#define MSGTR_GUI_MSG_SkinFontFileNotFound "フォントファイルが存在しません\n"
+#define MSGTR_GUI_MSG_SkinFontImageNotFound "フォントイメージファイルが存在しません\n"
+#define MSGTR_GUI_MSG_SkinMemoryError "メモリが不足しています\n"
+#define MSGTR_GUI_MSG_SkinUnknownMessage "未知のメッセージ: %s\n"
+#define MSGTR_GUI_MSG_SkinUnknownParameter "未知のパラメータ(%s)\n"
+#define MSGTR_GUI_Mute "消音"
+#define MSGTR_GUI_Next "次のストリーム"
+#define MSGTR_GUI_NoChapter "キャプターがありません"
+#define MSGTR_GUI__none_ "(無し)"
+#define MSGTR_GUI_NonInterleavedParser "non-interleaved AVI パーサ使用"
+#define MSGTR_GUI_Ok "OK"
+#define MSGTR_GUI_Open "開く ..."
+#define MSGTR_GUI_Original "オリジナル"
+#define MSGTR_GUI_OsdLevel "OSD レベル"
+#define MSGTR_GUI_OSD_Subtitles "サブタイトル & OSD"
+#define MSGTR_GUI_Pause "一時停止"
+#define MSGTR_GUI_Play "再生"
+#define MSGTR_GUI_Playback "現在のファイル"
+#define MSGTR_GUI_Playlist "プレイリスト"
+#define MSGTR_GUI_Position "位置"
+#define MSGTR_GUI_Preferences "設定"
+#define MSGTR_GUI_Previous "前のストリーム"
+#define MSGTR_GUI_Quit "終了 "
+#define MSGTR_GUI_RearLeft "後方 左"
+#define MSGTR_GUI_RearRight "後方 右"
+#define MSGTR_GUI_Remove "削除"
+#define MSGTR_GUI_SaveWindowPositions "ウィンドウ位置を保持"
+#define MSGTR_GUI_SeekingInBrokenMedia "必要ならindex tableの再構築"
+#define MSGTR_GUI_SelectedFiles "選択されたファイル"
+#define MSGTR_GUI_SelectFile "ファイル選択 ..."
+#define MSGTR_GUI_SelectFont "フォント選択 ..."
+#define MSGTR_GUI_SelectSubtitle "サブタイトル選択 ..."
+#define MSGTR_GUI_SizeDouble "2倍サイズ"
+#define MSGTR_GUI_SizeFullscreen "フルスクリーン"
+#define MSGTR_GUI_SizeNormal "通常サイズ"
+#define MSGTR_GUI_SkinBrowser "スキンブラウザ"
+#define MSGTR_GUI_StartFullscreen "開始時にフルスクリーン"
+#define MSGTR_GUI_Stop "停止"
+#define MSGTR_GUI_Subtitle "サブタイトル"
+#define MSGTR_GUI_SubtitleAutomaticLoad "subtitle 自動読み込み無効"
+#define MSGTR_GUI_SubtitleConvertMpsub "与えられたサブタイトルをMPLayerのサブタイトルフォーマットに変換"
+#define MSGTR_GUI_Subtitles "サブタイトル言語"
+#define MSGTR_GUI_TitleNN "タイトル %2d"
+#define MSGTR_GUI_Titles "タイトル"
+#define MSGTR_GUI_TrackN "トラック %d"
+#define MSGTR_GUI_TurnOffXScreenSaver "XScreenSaverをストップ"
+#define MSGTR_GUI_URL "URL 再生 "
+#define MSGTR_GUI_VCD "VCD"
+#define MSGTR_GUI_Video "映像"
+#define MSGTR_GUI_VideoEncoder "Video エンコーダ"
+#define MSGTR_GUI_VideoTracks "映像トラック"
+#define MSGTR_GUI_Warning "警告"

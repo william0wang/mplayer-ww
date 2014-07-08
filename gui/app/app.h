@@ -55,6 +55,7 @@ enum {
     evFullScreen,
     evNormalSize,
     evSetAspect,
+    evSetRotation,
     evIncVolume,
     evDecVolume,
     evSetVolume,
@@ -81,6 +82,8 @@ enum {
     ivSetDVDAudio,
     ivSetDVDSubtitle,
     ivPlayDVD,
+    ivSetVolume,
+    ivSetBalance,
     ivShowPopUpMenu,
     ivHidePopUpMenu,
     ivRedraw
@@ -100,7 +103,8 @@ enum {
     itDLabel,
     itHPotmeter,
     itVPotmeter,
-    itPotmeter,
+    itRPotmeter,
+    itPimage,
     itMenu,
     itPLMButton = 100,
     itPRMButton
@@ -127,9 +131,10 @@ typedef struct {
     int align;
     char *label;
 
-    int pwidth, pheight;
+    int pbwidth, pbheight;
     int numphases;
     float value;
+    double zeropoint, arclength;
 
     int message;
 
@@ -178,7 +183,9 @@ extern guiItems guiApp;
 guiItem *appFindItem(int event);
 int appFindMessage(const char *name);
 void appFreeStruct(void);
-void btnModify(int event, float state);
-void btnSet(int event, int set);
+double appRadian(guiItem *item, int x, int y);
+void btnModify(int event, float value);
+void btnSet(int event, int state);
+void btnValue(int event, float *value);
 
 #endif /* MPLAYER_GUI_APP_H */

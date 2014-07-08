@@ -86,8 +86,7 @@ Actuellement, trois fenêtres doivent être décorées: la
   Un <emphasis role="bold">podomètre</emphasis> (principalement utilisé pour la
   barre d'avancement et le contrôle du volume/balance) peut posséder n'importe quel
   nombre d'états en empilant ces images, verticalement. Voir
-  <link linkend="skin-hpotmeter">hpotmeter</link> et
-  <link linkend="skin-potmeter">potmeter</link> pour plus de détails.
+  <link linkend="skin-hpotmeter">hpotmeter</link> pour plus de détails.
 </para><para>
   Les <emphasis role="bold">labels</emphasis> sont un peu particuliers : les
   caractères nécessaires pour les dessiner sont récupérés depuis un fichier image,
@@ -302,6 +301,19 @@ et '<literal>window = playbar</literal>' ... '<literal>end</literal>'.
 <variablelist>
 <varlistentry>
   <term><literal>
+  <anchor id="skin-decoration"/>decoration = enable|disable
+  </literal></term>
+  <listitem><para>
+Active (enable) ou désactive (disable) la décoration du gestionnaire de fenêtre
+pour la fenêtre principale. <emphasis role="bold">disable</emphasis> par défaut.
+    </para>
+    <note><para>Cela ne fonctionne pas pour la fenêtre d'affichage, il n'y en a pas
+    besoin.</para></note>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><literal>
   <anchor id="skin-main-base"/>base = image, X, Y
   </literal></term>
   <listitem><para>
@@ -339,19 +351,6 @@ trois états empilés verticalement (pour les trois états du bouton), comme cec
 +------------+
 </screen>
 </informalfigure>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
-  <anchor id="skin-decoration"/>decoration = enable|disable
-  </literal></term>
-  <listitem><para>
-Active (enable) ou désactive (disable) la décoration du gestionnaire de fenêtre
-pour la fenêtre principale. <emphasis role="bold">disable</emphasis> par défaut.
-    </para>
-    <note><para>Cela ne fonctionne pas pour la fenêtre d'affichage, il n'y en a pas
-    besoin.</para></note>
   </listitem>
 </varlistentry>
 
@@ -425,19 +424,6 @@ horizontalement.
 
 <varlistentry>
   <term><literal>
-  <anchor id="skin-potmeter"/>potmeter = phases, numphases, default, X, Y, largeur, hauteur, message
-  </literal></term>
-  <listitem><para>
-Un <literal>hpotmeter</literal> sans bouton. (je suppose qu'il est censé tourner
-en rond, mais il réagit uniquement aux tractions horizontales.) Pour une
-description de ses paramètres lisez <link linkend="skin-hpotmeter">hpotmeter</link>.
-Ses <literal>phases</literal> peuvent être fixées à <literal>NULL</literal>, mais ce n'est
-pas vraiment utile, puisque vous ne pouvez pas voir son niveau.
-    </para></listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
   <anchor id="skin-font"/>font = fontfile, fontid
   </literal></term>
   <listitem><para>
@@ -474,8 +460,8 @@ dynamique parce que son texte est rafraîchi périodiquement. La longueur maximu
 label est définie par <literal>longueur</literal> (sa hauteur dépend de la hauteur
 des caractères). Si le texte a afficher dépasse cette longueur il sera scrollé, ou
 bien aligné dans l'espace spécifié par la valeur du paramètre
-<literal>align</literal>: <literal>0</literal> pour droite,
-<literal>1</literal> pour centre, et <literal>2</literal> pour gauche.
+<literal>align</literal>: <literal>0</literal> pour gauche,
+<literal>1</literal> pour centre, et <literal>2</literal> pour droite.
 </para>
 <para>
 Le texte à afficher est donné par <literal>texte</literal>: il doit être écrit
@@ -528,7 +514,11 @@ Vous pouvez utiliser les variables suivantes dans le texte:
 </row>
 <row>
 <entry>$V</entry>
-<entry>volume au format <emphasis>xxx.xx</emphasis></entry>
+<entry>volume au format <emphasis>xxx.x</emphasis></entry>
+</row>
+<row>
+<entry>$U</entry>
+<entry>volume au format <emphasis>xxx</emphasis></entry>
 </row>
 <row>
 <entry>$b</entry>
@@ -536,7 +526,11 @@ Vous pouvez utiliser les variables suivantes dans le texte:
 </row>
 <row>
 <entry>$B</entry>
-<entry>balance au format <emphasis>xxx.xx</emphasis></entry>
+<entry>balance au format <emphasis>xxx.x</emphasis></entry>
+</row>
+<row>
+<entry>$D</entry>
+<entry>balance au format <emphasis>xxx</emphasis></entry>
 </row>
 <row>
 <entry>$$</entry>

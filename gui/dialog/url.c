@@ -74,14 +74,14 @@ static void button_clicked(GtkButton *button, gpointer user_data)
                 listMgr(PLAYLIST_DELETE, 0);
                 add_to_gui_playlist(str, PLAYLIST_ITEM_APPEND);
 
-                item = calloc(1, sizeof(urlItem));
+                item = calloc(1, sizeof(*item));
 
                 if (item) {
                     item->url = str;
                     listMgr(URLLIST_ITEM_ADD, item);
                 }
 
-                guiInfo.NewPlay = GUI_FILE_NEW;
+                guiInfo.MediumChanged = GUI_MEDIUM_NEW;
                 uiEvent(evPlay, 0);
             }
         }
@@ -104,7 +104,7 @@ static GtkWidget *CreateURLDialog(void)
 
     URLDialog = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_widget_set_usize(URLDialog, 384, -1);
-    gtk_window_set_title(GTK_WINDOW(URLDialog), MSGTR_Network);
+    gtk_window_set_title(GTK_WINDOW(URLDialog), MSGTR_GUI_NetworkStreaming);
     gtk_window_set_position(GTK_WINDOW(URLDialog), GTK_WIN_POS_CENTER);
     gtk_window_set_wmclass(GTK_WINDOW(URLDialog), "Network", MPlayer);
 
@@ -130,8 +130,8 @@ static GtkWidget *CreateURLDialog(void)
     gtk_button_box_set_layout(GTK_BUTTON_BOX(hbuttonbox1), GTK_BUTTONBOX_END);
     gtk_button_box_set_spacing(GTK_BUTTON_BOX(hbuttonbox1), 10);
 
-    Ok     = gtkAddButton(MSGTR_Ok, hbuttonbox1);
-    Cancel = gtkAddButton(MSGTR_Cancel, hbuttonbox1);
+    Ok     = gtkAddButton(MSGTR_GUI_Ok, hbuttonbox1);
+    Cancel = gtkAddButton(MSGTR_GUI_Cancel, hbuttonbox1);
 
     geometry.max_width  = gdk_screen_get_width(gtk_widget_get_screen(URLDialog));
     geometry.max_height = -1;

@@ -25,11 +25,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <inttypes.h>
+#include <math.h>
 #include <windows.h>
 
 #include "mp_msg.h"
+#include "help_mp.h"
 #include "cpudetect.h"
 #include "libswscale/swscale.h"
+#include "libavutil/attributes.h"
+#include "libavutil/common.h"
 #include "libavutil/imgutils.h"
 #include "gui.h"
 #include "gui/util/mem.h"
@@ -77,6 +81,7 @@ static const evName evNames[] =
     {   evFullScreen,           "evFullScreen"          },
     {   evNormalSize,           "evNormalSize"          },
     {   evSetAspect,            "evSetAspect"           },
+    {   evSetRotation,          "evSetRotation"         },
     {   evIncVolume,            "evIncVolume"           },
     {   evDecVolume,            "evDecVolume"           },
     {   evSetVolume,            "evSetVolume"           },
@@ -92,6 +97,36 @@ static const evName evNames[] =
 };
 
 static const int evBoxs = sizeof(evNames) / sizeof(evName);
+
+static int linenumber;
+
+/**
+ * @brief Print a legacy information on an entry.
+ *
+ * @param old identifier (and deprecated entry)
+ * @param data string necessary for checking and to print the information on @a old
+ */
+static void skin_legacy (const char *old, const char *data)
+{
+    const char *p;
+
+    if (strcmp(old, "fontid") == 0)
+    {
+        p = strchr(data, ',');
+
+        if (p) mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, p, "font = fontfile");
+    }
+    else if (strcmp(old, "$l") == 0)
+    {
+        p = strstr(old, data);
+
+        if (p && (p == data || p[-1] != '$')) mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, old, "$p");
+    }
+    else if (strcmp(old, "evSetURL") == 0 && strcmp(data, old) == 0)
+        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, old, "evLoadURL");
+    else if (strcmp(old, "sub") == 0 || strcmp(old, "potmeter") == 0)
+        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_SkinLegacy, linenumber, old, data);
+}
 
 static char *geteventname(int event)
 {
@@ -233,7 +268,6 @@ static void freeskin(skin_t *skin)
         unsigned int x;
 
         nfree(skin->fonts[i]->name);
-        nfree(skin->fonts[i]->id);
 
         for (x=0; x<skin->fonts[i]->charcount; x++)
             nfree(skin->fonts[i]->chars[x]);
@@ -321,6 +355,9 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
         {
             if(!strcmp(temp, evNames[i].name))
             {
+                // legacy
+                skin_legacy("evSetURL", temp);
+
                 mywidget->msg = evNames[i].msg;
                 break;
             }
@@ -330,18 +367,40 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
               (mywidget->bitmap[0]) ? mywidget->bitmap[0]->name : NULL,
                mywidget->x, mywidget->y, mywidget->width, mywidget->height, mywidget->msg);
     }
-    else if(!strncmp(desc, "hpotmeter", 9) || !strncmp(desc, "vpotmeter", 9))
+    else if(!strncmp(desc, "hpotmeter", 9) || !strncmp(desc, "vpotmeter", 9) || !strncmp(desc, "rpotmeter", 9) || /* legacy */ !strncmp(desc, "potmeter", 8))
     {
         int base = counttonextchar(desc, '=') + 1;
-        int i;
+        int i, av_uninit(x0), av_uninit(y0), av_uninit(x1), av_uninit(y1);
         /* hpotmeter = button, bwidth, bheight, phases, numphases, default, X, Y, width, height, message */
-        if(!strncmp(desc, "hpotmeter", 9)) mywidget->type = tyHpotmeter;
-        else mywidget->type = tyVpotmeter;
-        mywidget->bitmap[0] = pngRead(skin, findnextstring(temp, desc, &base));
-        mywidget->width = atoi(findnextstring(temp, desc, &base));
-        mywidget->height = atoi(findnextstring(temp, desc, &base));
+        if(!strncmp(desc, "vpotmeter", 9)) mywidget->type = tyVpotmeter;
+        else if(!strncmp(desc, "rpotmeter", 9)) mywidget->type = tyRpotmeter;
+        else mywidget->type = tyHpotmeter;
+        if (*desc == 'p')
+        {
+            mywidget->bitmap[0] = NULL;
+            mywidget->width = 0;
+            mywidget->height = 0;
+
+            // legacy
+            skin_legacy("potmeter", "hpotmeter");
+        }
+        else
+        {
+            mywidget->bitmap[0] = pngRead(skin, findnextstring(temp, desc, &base));
+            mywidget->width = atoi(findnextstring(temp, desc, &base));
+            mywidget->height = atoi(findnextstring(temp, desc, &base));
+        }
         mywidget->bitmap[1] = pngRead(skin, findnextstring(temp, desc, &base));
         mywidget->phases = atoi(findnextstring(temp, desc, &base));
+
+        if (*desc == 'r')
+        {
+            x0 = atoi(findnextstring(temp, desc, &base));
+            y0 = atoi(findnextstring(temp, desc, &base));
+            x1 = atoi(findnextstring(temp, desc, &base));
+            y1 = atoi(findnextstring(temp, desc, &base));
+        }
+
         mywidget->value = atof(findnextstring(temp, desc, &base));
         mywidget->x = mywidget->wx = atoi(findnextstring(temp, desc, &base));
         mywidget->y = mywidget->wy = atoi(findnextstring(temp, desc, &base));
@@ -353,25 +412,54 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
         {
             if(!strcmp(temp, evNames[i].name))
             {
+                // legacy
+                skin_legacy("evSetURL", temp);
+
                 mywidget->msg = evNames[i].msg;
                 break;
             }
         }
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [ITEM] %s %s %i %i %s %i %f %i %i %i %i msg %i\n",
-                (mywidget->type == tyHpotmeter) ? "[HPOTMETER]" : "[VPOTMETER]",
+        if (*desc == 'r')
+        {
+            mywidget->zeropoint = appRadian(mywidget, x0, y0);
+            mywidget->arclength = appRadian(mywidget, x1, y1) - mywidget->zeropoint;
+
+            if (mywidget->arclength < 0.0) mywidget->arclength += 2 * M_PI;
+            // else check if radians of (x0,y0) and (x1,y1) only differ below threshold
+            else if (mywidget->arclength < 0.05) mywidget->arclength = 2 * M_PI;
+        }
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [ITEM] %s %s %i %i %s %i ",
+                (mywidget->type == tyHpotmeter) ? "[HPOTMETER]" : (mywidget->type == tyVpotmeter) ? "[VPOTMETER]" : "[RPOTMETER]",
                 (mywidget->bitmap[0]) ? mywidget->bitmap[0]->name : NULL,
                 mywidget->width, mywidget->height,
                 (mywidget->bitmap[1]) ? mywidget->bitmap[1]->name : NULL,
-                mywidget->phases, mywidget->value,
+                mywidget->phases);
+        if (*desc == 'r')
+            mp_msg(MSGT_GPLAYER, MSGL_DBG2, "%i,%i %i,%i ", x0, y0, x1, y1);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "%f %i %i %i %i msg %i\n", mywidget->value,
                 mywidget->wx, mywidget->wy, mywidget->wwidth, mywidget->wwidth,
                 mywidget->msg);
+        if (mywidget->bitmap[0] == NULL || mywidget->width == 0 || mywidget->height == 0)
+        {
+            mywidget->bitmap[0] = mywidget->bitmap[1];
+            mywidget->width = mywidget->wwidth;
+            mywidget->height = mywidget->wheight;
+        }
+        if (*desc == 'r')
+        {
+            mywidget->maxwh = FFMAX(mywidget->width, mywidget->height);
+
+            // clickedinsidewidget() checks with width/height, so set it
+            mywidget->width = mywidget->wwidth;
+            mywidget->height = mywidget->wheight;
+        }
     }
-    else if(!strncmp(desc, "potmeter", 8))
+    else if(!strncmp(desc, "pimage", 6))
     {
         int base = counttonextchar(desc, '=') + 1;
         int i;
-        /* potmeter = phases, numphases, default, X, Y, width, height, message */
-        mywidget->type = tyPotmeter;
+        /* pimage = phases, numphases, default, X, Y, width, height, message */
+        mywidget->type = tyPimage;
         mywidget->bitmap[0] = pngRead(skin, findnextstring(temp, desc, &base));
         mywidget->phases = atoi(findnextstring(temp, desc, &base));
         mywidget->value = atof(findnextstring(temp, desc, &base));
@@ -385,11 +473,14 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
         {
             if(!strcmp(temp, evNames[i].name))
             {
+                // legacy
+                skin_legacy("evSetURL", temp);
+
                 mywidget->msg=evNames[i].msg;
                 break;
             }
         }
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [ITEM] [POTMETER] %s %i %i %i %f %i %i msg %i\n",
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [ITEM] [PIMAGE] %s %i %i %i %f %i %i msg %i\n",
                 (mywidget->bitmap[0]) ? mywidget->bitmap[0]->name : NULL,
                 mywidget->width, mywidget->height,
                 mywidget->phases, mywidget->value,
@@ -412,6 +503,9 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
         {
             if(!strcmp(temp, evNames[i].name))
             {
+                // legacy
+                skin_legacy("evSetURL", temp);
+
                 mywidget->msg = evNames[i].msg;
                 break;
             }
@@ -421,7 +515,7 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
     }
     else if(!strncmp(desc, "selected", 8))
     {
-        win->base->bitmap[1] = pngRead(skin, (char *) desc + 9);
+        win->base->bitmap[1] = pngRead(skin, desc + 9);
         mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [ITEM] [BASE] added image %s\n", win->base->bitmap[1]->name);
     }
     else if(!strncmp(desc, "slabel",6))
@@ -465,6 +559,10 @@ static void addwidget(skin_t *skin, window *win, const char *desc)
             }
         }
         mywidget->label=strdup(findnextstring(temp, desc, &base));
+
+        // legacy
+        skin_legacy("$l", mywidget->label);
+
         mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [ITEM] [DLABEL] %i %i %i %i %s \"%s\"\n",
                mywidget->x, mywidget->y, mywidget->length, mywidget->align, mywidget->font->name, mywidget->label);
     }
@@ -477,7 +575,6 @@ static void loadfonts(skin_t* skin)
     for (x=0; x<skin->fontcount; x++)
     {
         FILE *fp;
-        int linenumber=0;
         char *filename;
         char *tmp = calloc(1, MAX_LINESIZE);
         char *desc = calloc(1, MAX_LINESIZE);
@@ -496,7 +593,6 @@ static void loadfonts(skin_t* skin)
             int pos = 0;
             unsigned int i;
             fgets(tmp, MAX_LINESIZE, fp);
-            linenumber++;
             memset(desc, 0, MAX_LINESIZE);
             for (i=0; i<strlen(tmp); i++)
             {
@@ -551,12 +647,13 @@ skin_t* loadskin(char* skindir, int desktopbpp)
 {
     FILE *fp;
     int reachedendofwindow = FALSE;
-    int linenumber = 0;
     skin_t *skin = calloc(1, sizeof(skin_t));
     char *filename;
     char *tmp = calloc(1, MAX_LINESIZE);
     char *desc = calloc(1, MAX_LINESIZE);
     window* mywindow = NULL;
+
+    linenumber = 0;
 
     /* setup funcs */
     skin->freeskin = freeskin;
@@ -619,10 +716,12 @@ skin_t* loadskin(char* skindir, int desktopbpp)
             mywindow = skin->windows[(skin->windowcount) - 1] = calloc(1, sizeof(window));
             mywindow->name = strdup(desc + 7);
             if(!strncmp(desc + 7, "main", 4)) mywindow->type = wiMain;
-            else if(!strncmp(desc+7, "video", 5) || !strncmp(desc+7, "sub", 3))   // legacy
+            else if(!strncmp(desc+7, "video", 5) || /* legacy */ !strncmp(desc+7, "sub", 3))
             {
                 mywindow->type = wiVideo;
                 mywindow->decoration = TRUE;
+                // legacy
+                if (desc[7] == 's') skin_legacy("sub", "video");
             }
             else if(!strncmp(desc + 7, "menu", 4)) mywindow->type = wiMenu;
             else if(!strncmp(desc + 7, "playbar", 7)) mywindow->type = wiPlaybar;
@@ -659,30 +758,20 @@ skin_t* loadskin(char* skindir, int desktopbpp)
         }
         else if(!strncmp(desc, "font", 4))
         {
-            unsigned int i;
             int id = 0;
             char temp[MAX_LINESIZE];
-            int base = counttonextchar(desc, '=')+1;
+            int base = counttonextchar(desc, '=') + 1;
             findnextstring(temp, desc, &base);
-            findnextstring(temp, desc, &base);
-            for (i=0; i<skin->fontcount; i++)
-                if(!strcmp(skin->fonts[i]->id, temp))
-                {
-                    id = i;
-                    break;
-                }
-            if(!id)
-            {
-                int base = counttonextchar(desc, '=') + 1;
-                findnextstring(temp, desc, &base);
-                id = skin->fontcount;
-                (skin->fontcount)++;
-                skin->fonts = realloc(skin->fonts, sizeof(font_t *) * skin->fontcount);
-                skin->fonts[id]=calloc(1, sizeof(font_t));
-                skin->fonts[id]->name = strdup(temp);
-                skin->fonts[id]->id = strdup(findnextstring(temp, desc, &base));
-            }
-            mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [FONT] id  \"%s\" name \"%s\"\n", skin->fonts[id]->name, skin->fonts[id]->id);
+            id = skin->fontcount;
+            (skin->fontcount)++;
+            skin->fonts = realloc(skin->fonts, sizeof(font_t *) * skin->fontcount);
+            skin->fonts[id]=calloc(1, sizeof(font_t));
+            skin->fonts[id]->name = strdup(temp);
+
+            // legacy
+            skin_legacy("fontid", desc);
+
+            mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[SKIN] [FONT] name \"%s\"\n", skin->fonts[id]->name);
         }
         else
             skin->addwidget(skin, mywindow, desc);

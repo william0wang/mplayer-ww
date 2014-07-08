@@ -42,7 +42,7 @@
 #include "mp_msg.h"
 #include "fastmemcpy.h"
 #include "video_out.h"
-#define NO_DRAW_FRAME
+#define NO_DRAW_SLICE
 #include "video_out_internal.h"
 #include "aspect.h"
 #include "sub/sub.h"

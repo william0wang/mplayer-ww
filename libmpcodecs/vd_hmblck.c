@@ -81,9 +81,14 @@ static int init(sh_video_t *sh){
 
     if(sh->format != IMGFMT_HM12) return 0;
 
-    if((sh->disp_w&31) != 0 || (sh->disp_h&31) != 0) {
+    if((sh->disp_w&15) != 0) {
         mp_msg(MSGT_DECVIDEO, MSGL_ERR,
-               "hmblck: Image size must be multiple of 32.\n");
+               "hmblck: Image width must be multiple of 16.\n");
+        return 0;
+    }
+    if((sh->disp_h&31) != 0) {
+        mp_msg(MSGT_DECVIDEO, MSGL_ERR,
+               "hmblck: Image height must be multiple of 32.\n");
         return 0;
     }
     return mpcodecs_config_vo(sh,sh->disp_w,sh->disp_h,sh->format);

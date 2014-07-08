@@ -17,6 +17,7 @@
  */
 
 #include <stdarg.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,6 +48,7 @@
 #include "input/input.h"
 #include "libaf/equalizer.h"
 #include "libavutil/common.h"
+#include "libmpcodecs/ad.h"
 #include "libmpcodecs/dec_audio.h"
 #include "libmpcodecs/dec_video.h"
 #include "libmpcodecs/vd.h"
@@ -54,6 +56,7 @@
 #include "libvo/video_out.h"
 #include "libvo/x11_common.h"
 #include "osdep/timer.h"
+#include "stream/stream.h"
 #ifdef CONFIG_DVDREAD
 #include "stream/stream_dvd.h"
 #endif
@@ -66,11 +69,128 @@
  */
 guiInterface_t guiInfo = {
     .StreamType   = STREAMTYPE_DUMMY,
+    .Volume       = 50.0f,
     .Balance      = 50.0f,
     .PlaylistNext = True
 };
 
 static int guiInitialized;
+static int orig_fontconfig;
+
+/**
+ * @brief Set option 'fontconfig' depending on #font_name.
+ */
+static void set_fontconfig(void)
+{
+    font_fontconfig = (font_name && strchr(font_name, '/') ? -1 : orig_fontconfig);
+}
+
+/**
+ * @brief Add a video filter
+ *        (or change the parameter/value pairs of an existing one).
+ *
+ * @param vf video filter to be added or changed
+ * @param argvf pointer to an array of (new) parameter/value pairs
+ */
+static void add_vf(const char *vf, const char *const *argvf)
+{
+    if (vf_settings) {
+        int i = 0;
+
+        while (vf_settings[i].name) {
+            if (strcmp(vf_settings[i].name, vf) == 0)
+                break;
+
+            i++;
+        }
+
+        if (vf_settings[i].name) {
+            listFree(&vf_settings[i].attribs);
+            vf_settings[i].attribs = listDup(argvf);
+        } else {
+            void *settings = realloc(vf_settings, (i + 2) * sizeof(*vf_settings));
+
+            if (!settings)
+                return;
+
+            vf_settings = settings;
+            vf_settings[i].name    = strdup(vf);
+            vf_settings[i].attribs = listDup(argvf);
+            memset(&vf_settings[i + 1], 0, sizeof(*vf_settings));
+        }
+    } else {
+        vf_settings = calloc(2, sizeof(*vf_settings));
+
+        if (!vf_settings)
+            return;
+
+        vf_settings[0].name    = strdup(vf);
+        vf_settings[0].attribs = listDup(argvf);
+    }
+
+    mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_AddingVideoFilter, vf);
+}
+
+/**
+ * @brief Get a video filter's array of parameter/value pairs.
+ *
+ * @param vf video filter in question
+ *
+ * @return pointer to the array of parameter/value pairs
+ */
+static char **get_vf(const char *vf)
+{
+    char **attribs = NULL;
+
+    if (vf_settings) {
+        int i = 0;
+
+        while (vf_settings[i].name) {
+            if (strcmp(vf_settings[i].name, vf) == 0) {
+                attribs = vf_settings[i].attribs;
+                break;
+            }
+
+            i++;
+        }
+    }
+
+    return attribs;
+}
+
+/**
+ * @brief Remove a video filter.
+ *
+ * @param vf video filter to be removed
+ */
+static void remove_vf(char *vf)
+{
+    if (vf_settings) {
+        int i = 0;
+
+        while (vf_settings[i].name) {
+            if (strcmp(vf_settings[i].name, vf) == 0) {
+                int j;
+
+                mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_RemovingVideoFilter, vf);
+
+                free(vf_settings[i].name);
+                listFree(&vf_settings[i].attribs);
+
+                j = i + 1;
+
+                while (vf_settings[j].name)
+                    j++;
+
+                memmove(&vf_settings[i], &vf_settings[i + 1], (j - i) * sizeof(*vf_settings));
+
+                break;
+            }
+
+            i++;
+        }
+    }
+}
 
 /* MPlayer -> GUI */
 
@@ -79,6 +199,7 @@ static int guiInitialized;
  */
 void guiInit(void)
 {
+    char **argvf;
     int ret;
     plItem *playlist;
 
@@ -111,6 +232,9 @@ void guiInit(void)
     gtkASS.top_margin    = ass_top_margin;
     gtkASS.bottom_margin = ass_bottom_margin;
 
+    argvf = get_vf("rotate");
+    guiInfo.Rotation = (argvf && argvf[1] ? atoi(argvf[1]) : -1);
+
     /* initialize graphical user interfaces */
 
     wsInit(mDisplay);
@@ -130,7 +254,7 @@ void guiInit(void)
     ret = skinRead(skinName);
 
     if (ret == -1 && strcmp(skinName, "default") != 0) {
-        mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_SKIN_SKINCFG_SelectedSkinNotFound, skinName);
+        mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_GUI_MSG_SkinCfgSelectedNotFound, skinName);
 
         skinName = strdup("default");
         ret      = skinRead(skinName);
@@ -138,11 +262,11 @@ void guiInit(void)
 
     switch (ret) {
     case -1:
-        gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_SKIN_SKINCFG_SkinNotFound, skinName);
+        gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_GUI_MSG_SkinCfgNotFound, skinName);
         mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
 
     case -2:
-        gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_SKIN_SKINCFG_SkinCfgError, skinName);
+        gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_GUI_MSG_SkinCfgError, skinName);
         mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
     }
 
@@ -173,11 +297,14 @@ void guiInit(void)
     uiPlaybarInit();
     uiMenuInit();
 
-    WinID = guiApp.videoWindow.WindowID;
+    WinID = (Window)guiApp.videoWindow.WindowID;
 
-    btnModify(evSetVolume, guiInfo.Volume);
-    btnModify(evSetBalance, guiInfo.Balance);
-    btnModify(evSetMoviePosition, guiInfo.Position);
+    btnValue(evSetVolume, &guiInfo.Volume);
+    btnValue(evSetBalance, &guiInfo.Balance);
+    btnValue(evSetMoviePosition, &guiInfo.Position);
+
+    if (guiInfo.Position)
+        uiEvent(evSetMoviePosition, guiInfo.Position);
 
     wsWindowVisibility(&guiApp.mainWindow, wsShowWindow);
 
@@ -200,7 +327,7 @@ void guiInit(void)
 
     if (playlist && !filename) {
         uiSetFile(playlist->path, playlist->name, STREAMTYPE_FILE);
-        guiInfo.Tracks = (int)listMgr(PLAYLIST_ITEM_GET_POS, 0);
+        guiInfo.Tracks = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, 0);
         guiInfo.Track  = 1;
         filename       = NULL; // don't start playing
     }
@@ -208,7 +335,8 @@ void guiInit(void)
     if (subdata)
         setdup(&guiInfo.SubtitleFilename, subdata->filename);
 
-    mplayerLoadFont();
+    orig_fontconfig = font_fontconfig;
+    set_fontconfig();
 
     guiInitialized = True;
 }
@@ -258,41 +386,6 @@ void guiDone(void)
     mp_msg(MSGT_GPLAYER, MSGL_V, "GUI done.\n");
 }
 
-static void add_vf(char *str)
-{
-    void *p;
-
-    if (vf_settings) {
-        int i = 0;
-
-        while (vf_settings[i].name) {
-            if (!gstrcmp(vf_settings[i++].name, str)) {
-                i = -1;
-                break;
-            }
-        }
-
-        if (i != -1) {
-            p = realloc(vf_settings, (i + 2) * sizeof(m_obj_settings_t));
-
-            if (!p)
-                return;
-
-            vf_settings = p;
-            vf_settings[i].name     = strdup(str);
-            vf_settings[i].attribs  = NULL;
-            vf_settings[i + 1].name = NULL;
-        }
-    } else {
-        vf_settings = malloc(2 * sizeof(m_obj_settings_t));
-        vf_settings[0].name    = strdup(str);
-        vf_settings[0].attribs = NULL;
-        vf_settings[1].name    = NULL;
-    }
-
-    mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_AddingVideoFilter, str);
-}
-
 /**
  * @brief Issue a command to the GUI.
  *
@@ -305,13 +398,15 @@ static void add_vf(char *str)
  */
 int gui(int what, void *data)
 {
+    static float last_balance = -1.0f;
 #ifdef CONFIG_DVDREAD
     dvd_priv_t *dvd;
 #endif
-    int msg, state;
+    int idata = (intptr_t)data, msg, state;
     stream_t *stream = NULL;
     sh_audio_t *sh_audio;
     mixer_t *mixer;
+    float l, r, b;
     plItem *next = NULL;
 
     switch (what) {
@@ -322,12 +417,12 @@ int gui(int what, void *data)
 
     case GUI_SET_STATE:
 
-        switch ((int)data) {
+        switch (idata) {
         case GUI_STOP:
         case GUI_PLAY:
 // if ( !gtkShowVideoWindow ) wsWindowVisibility( &guiApp.videoWindow,wsHideWindow );
         case GUI_PAUSE:
-            guiInfo.Playing = (int)data;
+            guiInfo.Playing = idata;
             break;
         }
 
@@ -349,9 +444,9 @@ int gui(int what, void *data)
 
     case GUI_RUN_COMMAND:
 
-        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[interface] GUI_RUN_COMMAND: %d\n", (int)data);
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[interface] GUI_RUN_COMMAND: %d\n", idata);
 
-        switch ((int)data) {
+        switch (idata) {
         case MP_CMD_VO_FULLSCREEN:
             uiEvent(evFullScreen, True);
             break;
@@ -392,7 +487,7 @@ int gui(int what, void *data)
         usec_sleep(20000);
         wsEvents();
 
-        if (guiInfo.NewPlay == GUI_FILE_NEW) {
+        if (guiInfo.MediumChanged == GUI_MEDIUM_NEW) {
             audio_id  = -1;
             video_id  = -1;
             dvdsub_id = -1;
@@ -457,28 +552,26 @@ int gui(int what, void *data)
 
             while (video_out_drivers[i++]) {
                 if (video_out_drivers[i - 1]->control(VOCTRL_GUISUPPORT, NULL) == VO_TRUE) {
-                    listSet(&video_driver_list, (char *)video_out_drivers[i - 1]->info->short_name);
+                    listSet(&video_driver_list, video_out_drivers[i - 1]->info->short_name);
                     break;
                 }
             }
         }
 
         if (!video_driver_list && !video_driver_list[0]) {
-            gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_IDFGCVD);
+            gmp_msg(MSGT_GPLAYER, MSGL_FATAL, MSGTR_GUI_MSG_VideoOutError);
             mplayer(MPLAYER_EXIT_GUI, EXIT_ERROR, 0);
         }
 
         {
             int i = 0;
 
-            guiInfo.VideoWindow = True;
+            guiInfo.VideoWindow = False;
 
             while (video_out_drivers[i++]) {
-                if (video_out_drivers[i - 1]->control(VOCTRL_GUISUPPORT, NULL) == VO_TRUE) {
-                    if ((video_driver_list && !gstrcmp(video_driver_list[0], (char *)video_out_drivers[i - 1]->info->short_name)) && (video_out_drivers[i - 1]->control(VOCTRL_GUI_NOWINDOW, NULL) == VO_TRUE)) {
-                        guiInfo.VideoWindow = False;
-                        break;
-                    }
+                if ((video_driver_list && !gstrcmp(video_driver_list[0], video_out_drivers[i - 1]->info->short_name)) && (video_out_drivers[i - 1]->control(VOCTRL_GUISUPPORT, NULL) == VO_TRUE)) {
+                    guiInfo.VideoWindow = True;
+                    break;
                 }
             }
         }
@@ -486,10 +579,40 @@ int gui(int what, void *data)
         if (video_driver_list && !gstrcmp(video_driver_list[0], "dxr3"))
             if (guiInfo.StreamType != STREAMTYPE_DVD && guiInfo.StreamType != STREAMTYPE_VCD)
                 if (gtkVfLAVC)
-                    add_vf("lavc");
+                    add_vf("lavc", NULL);
 
         if (gtkVfPP)
-            add_vf("pp");
+            add_vf("pp", NULL);
+
+        switch (guiInfo.Rotation) {
+            static const char *argvf[] = { "_oldargs_", NULL, NULL };
+
+        case -1:
+            remove_vf("rotate");
+            remove_vf("flip");
+            remove_vf("mirror");
+            break;
+
+        case 1:
+            argvf[1] = "1";
+            add_vf("rotate", argvf);
+            remove_vf("flip");
+            remove_vf("mirror");
+            break;
+
+        case 2:
+            argvf[1] = "2";
+            add_vf("rotate", argvf);
+            remove_vf("flip");
+            remove_vf("mirror");
+            break;
+
+        case 8:
+            remove_vf("rotate");
+            add_vf("flip", NULL);
+            add_vf("mirror", NULL);
+            break;
+        }
 
         /* audio opts */
 
@@ -572,7 +695,6 @@ int gui(int what, void *data)
             stream_dump_type = 6;
 
         gtkSubDumpMPSub = gtkSubDumpSrt = False;
-        mplayerLoadFont();
 
         /* misc */
 
@@ -584,12 +706,12 @@ int gui(int what, void *data)
 
         if (guiInfo.AudioFilename)
             audio_stream = gstrdup(guiInfo.AudioFilename);
-        else if (guiInfo.NewPlay == GUI_FILE_NEW)
+        else if (guiInfo.MediumChanged == GUI_MEDIUM_NEW)
             nfree(audio_stream);
 
 // audio_stream = NULL;
 
-        guiInfo.NewPlay = 0;
+        guiInfo.MediumChanged = False;
 
         ass_enabled       = gtkASS.enabled;
         ass_use_margins   = gtkASS.use_margins;
@@ -610,7 +732,7 @@ int gui(int what, void *data)
         switch (guiInfo.StreamType) {
         case STREAMTYPE_FILE:
         case STREAMTYPE_STREAM:
-            guiInfo.Tracks = (int)listMgr(PLAYLIST_ITEM_GET_POS, 0);
+            guiInfo.Tracks = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, 0);
             break;
 
         case STREAMTYPE_CDDA:
@@ -677,7 +799,7 @@ int gui(int what, void *data)
         btnSet(evSetMoviePosition, state);
 
         if (video_driver_list && !gstrcmp(video_driver_list[0], "dxr3") && (((demuxer_t *)mpctx_get_demuxer(guiInfo.mpcontext))->file_format != DEMUXER_TYPE_MPEG_PS) && !gtkVfLAVC) {
-            gtkMessageBox(MSGBOX_FATAL, MSGTR_NEEDLAVC);
+            gtkMessageBox(MSGBOX_FATAL, MSGTR_GUI_MSG_DXR3NeedsLavc);
             return False;
         }
 
@@ -687,15 +809,33 @@ int gui(int what, void *data)
 
         sh_audio = data;
 
-        guiInfo.AudioChannels = sh_audio ? sh_audio->channels : 0;
+        if (sh_audio) {
+            guiInfo.AudioChannels    = sh_audio->channels;
+            guiInfo.AudioPassthrough = (gstrcmp(sh_audio->ad_driver->info->short_name, "hwac3") == 0);
 
-        if (sh_audio && !guiInfo.sh_video) {
-            guiInfo.VideoWindow = False;
-            guiInfo.VideoWidth  = 0;
-            guiInfo.VideoHeight = 0;
+            if (!guiInfo.sh_video) {
+                guiInfo.VideoWindow = False;
+                guiInfo.VideoWidth  = 0;
+                guiInfo.VideoHeight = 0;
+            }
+        } else {
+            guiInfo.AudioChannels    = 0;
+            guiInfo.AudioPassthrough = False;
         }
 
-        gui(GUI_SET_MIXER, mpctx_get_mixer(guiInfo.mpcontext));
+        if (guiInfo.AudioPassthrough)
+            btnSet(evSetVolume, btnDisabled);
+        if (guiInfo.AudioChannels < 2 || guiInfo.AudioPassthrough)
+            btnSet(evSetBalance, btnDisabled);
+
+        if (last_balance < 0.0f) {
+            uiEvent(ivSetVolume, guiInfo.Volume);
+
+            if (guiInfo.AudioChannels == 2 && !guiInfo.AudioPassthrough)
+                uiEvent(ivSetBalance, guiInfo.Balance);
+
+            last_balance = guiInfo.Balance;
+        }
 
         if (gtkEnableAudioEqualizer) {
             equalizer_t eq;
@@ -717,7 +857,7 @@ int gui(int what, void *data)
         // ...without video there will be no call to GUI_SETUP_VIDEO_WINDOW
         if (!guiInfo.VideoWindow) {
             wsWindowVisibility(&guiApp.videoWindow, wsHideWindow);
-            btnSet(evFullScreen, (gtkLoadFullscreen ? btnPressed : btnReleased));
+            btnSet(evFullScreen, gtkLoadFullscreen ? btnPressed : btnReleased);
         }
 
         // ...option variable fullscreen determines whether MPlayer will handle
@@ -727,28 +867,19 @@ int gui(int what, void *data)
 
         break;
 
-    case GUI_SET_MIXER:
+    case GUI_SET_VOLUME_BALANCE:
 
         mixer = data;
 
-        if (mixer) {
-            float l, r, b;
-            static float last_balance = 50.0f;
+        mixer_getvolume(mixer, &l, &r);
+        guiInfo.Volume = FFMAX(l, r);
 
-            mixer_getvolume(mixer, &l, &r);
-            guiInfo.Volume = FFMAX(l, r);
-            btnModify(evSetVolume, guiInfo.Volume);
+        mixer_getbalance(mixer, &b);
+        guiInfo.Balance = (b + 1.0) * 50.0;   // transform -1..1 to 0..100
 
-            mixer_getbalance(mixer, &b);
-            guiInfo.Balance = (b + 1.0) * 50.0; // transform -1..1 to 0..100
-
-            if (guiInfo.Balance != last_balance) {
-                l = guiInfo.Volume * (100.0 - guiInfo.Balance) / 50.0;
-                r = guiInfo.Volume * guiInfo.Balance / 50.0;
-                mixer_setvolume(mixer, FFMIN(l, guiInfo.Volume), FFMIN(r, guiInfo.Volume));
-                btnModify(evSetBalance, guiInfo.Balance);
-                last_balance = guiInfo.Balance;
-            }
+        if (guiInfo.Balance != last_balance) {
+            uiEvent(ivSetVolume, guiInfo.Volume);
+            last_balance = guiInfo.Balance;
         }
 
         break;
@@ -780,9 +911,12 @@ int gui(int what, void *data)
         wsEvent(data);
         break;
 
-    case GUI_END_FILE:
+    case GUI_END_PLAY:
 
         guiInfo.sh_video = NULL;
+
+        btnSet(evSetVolume, btnReleased);
+        btnSet(evSetBalance, btnReleased);
 
         uiEvent(ivRedraw, True);
 
@@ -802,10 +936,10 @@ int gui(int what, void *data)
 
         if (next) {
             uiSetFile(next->path, next->name, STREAMTYPE_FILE);
-            guiInfo.NewPlay = GUI_FILE_NEW;
-            guiInfo.Track   = (int)listMgr(PLAYLIST_ITEM_GET_POS, next);
+            guiInfo.MediumChanged = GUI_MEDIUM_NEW;
+            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
         } else {
-            if (guiInfo.NewPlay == GUI_FILE_NEW)
+            if (guiInfo.MediumChanged == GUI_MEDIUM_NEW)
                 break;
 
             filename = NULL;
@@ -851,7 +985,7 @@ int gui(int what, void *data)
             } else {
                 wsWindowVisibility(&guiApp.videoWindow, wsHideWindow);
                 guiInfo.VideoWindow = False;
-                btnSet(evFullScreen, (gtkLoadFullscreen ? btnPressed : btnReleased));
+                btnSet(evFullScreen, gtkLoadFullscreen ? btnPressed : btnReleased);
             }
 
             gui(GUI_SET_STATE, (void *)GUI_STOP);
@@ -950,43 +1084,71 @@ void mplayer(int what, float value, void *data)
 
     case MPLAYER_SET_FONT_FACTOR:
         font_factor = value;
-        mplayerLoadFont();
+        mplayer(MPLAYER_LOAD_FONT, 0, 0);
         break;
 
     case MPLAYER_SET_FONT_OUTLINE:
         subtitle_font_thickness = 8.0 * value / 100.0;   // transform 0..100 to 0..8
-        mplayerLoadFont();
+        mplayer(MPLAYER_LOAD_FONT, 0, 0);
         break;
 
     case MPLAYER_SET_FONT_BLUR:
         subtitle_font_radius = 8.0 * value / 100.0;      // transform 0..100 to 0..8
-        mplayerLoadFont();
+        mplayer(MPLAYER_LOAD_FONT, 0, 0);
         break;
 
     case MPLAYER_SET_FONT_TEXTSCALE:
         text_font_scale_factor = value;
-        mplayerLoadFont();
+        mplayer(MPLAYER_LOAD_FONT, 0, 0);
         break;
 
     case MPLAYER_SET_FONT_OSDSCALE:
         osd_font_scale_factor = value;
-        mplayerLoadFont();
+        mplayer(MPLAYER_LOAD_FONT, 0, 0);
         break;
 
     case MPLAYER_SET_FONT_ENCODING:
         nfree(subtitle_font_encoding);
-        subtitle_font_encoding = gstrdup((char *)data);
-        mplayerLoadFont();
+        subtitle_font_encoding = gstrdup(data);
+        mplayer(MPLAYER_LOAD_FONT, 0, 0);
         break;
 
     case MPLAYER_SET_FONT_AUTOSCALE:
         subtitle_autoscale = (int)value;
-        mplayerLoadFont();
+        mplayer(MPLAYER_LOAD_FONT, 0, 0);
+        break;
+
+    case MPLAYER_LOAD_FONT:
+#ifdef CONFIG_FREETYPE
+        set_fontconfig();
+
+        force_load_font = 1;
+#else
+        free_font_desc(vo_font);
+
+        if (font_name) {
+            vo_font = read_font_desc(font_name, font_factor, 0);
+
+            if (!vo_font)
+                gmp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_CantLoadFont, font_name);
+        } else {
+            char *fname = get_path("font/font.desc");
+
+            setdup(&font_name, fname);
+            free(fname);
+            vo_font = read_font_desc(font_name, font_factor, 0);
+
+            if (!vo_font) {
+                setdup(&font_name, MPLAYER_DATADIR "/font/font.desc");
+                vo_font = read_font_desc(font_name, font_factor, 0);
+            }
+        }
+#endif
         break;
 
     case MPLAYER_SET_SUB_ENCODING:
         nfree(sub_cp);
-        sub_cp = gstrdup((char *)data);
+        sub_cp = gstrdup(data);
         break;
 
     case MPLAYER_SET_EXTRA_STEREO:
@@ -1017,22 +1179,22 @@ void mplayer(int what, float value, void *data)
 
     case MPLAYER_SET_CONTRAST:
         if (guiInfo.sh_video)
-            set_video_colors(guiInfo.sh_video, "contrast", (int)value);
+            set_video_colors(guiInfo.sh_video, "contrast", value);
         break;
 
     case MPLAYER_SET_BRIGHTNESS:
         if (guiInfo.sh_video)
-            set_video_colors(guiInfo.sh_video, "brightness", (int)value);
+            set_video_colors(guiInfo.sh_video, "brightness", value);
         break;
 
     case MPLAYER_SET_HUE:
         if (guiInfo.sh_video)
-            set_video_colors(guiInfo.sh_video, "hue", (int)value);
+            set_video_colors(guiInfo.sh_video, "hue", value);
         break;
 
     case MPLAYER_SET_SATURATION:
         if (guiInfo.sh_video)
-            set_video_colors(guiInfo.sh_video, "saturation", (int)value);
+            set_video_colors(guiInfo.sh_video, "saturation", value);
         break;
 
     case MPLAYER_SET_EQUALIZER:
@@ -1071,60 +1233,13 @@ void mplayer(int what, float value, void *data)
     }
 }
 
-void mplayerLoadFont(void)
-{
-#ifdef CONFIG_FREETYPE
-    load_font_ft(vo_image_width, vo_image_height, &vo_font, font_name, osd_font_scale_factor);
-#else
-    if (vo_font) {
-        int i;
-
-        free(vo_font->name);
-        free(vo_font->fpath);
-
-        for (i = 0; i < 16; i++) {
-            if (vo_font->pic_a[i]) {
-                free(vo_font->pic_a[i]->bmp);
-                free(vo_font->pic_a[i]->pal);
-            }
-        }
-
-        for (i = 0; i < 16; i++) {
-            if (vo_font->pic_b[i]) {
-                free(vo_font->pic_b[i]->bmp);
-                free(vo_font->pic_b[i]->pal);
-            }
-        }
-
-        free(vo_font);
-        vo_font = NULL;
-    }
-
-    if (font_name) {
-        vo_font = read_font_desc(font_name, font_factor, 0);
-
-        if (!vo_font)
-            gmp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_CantLoadFont, font_name);
-    } else {
-        font_name = gstrdup(get_path("font/font.desc"));
-        vo_font   = read_font_desc(font_name, font_factor, 0);
-
-        if (!vo_font) {
-            nfree(font_name);
-            font_name = gstrdup(MPLAYER_DATADIR "/font/font.desc");
-            vo_font   = read_font_desc(font_name, font_factor, 0);
-        }
-    }
-#endif
-}
-
 void mplayerLoadSubtitle(const char *name)
 {
     if (guiInfo.Playing == GUI_STOP)
         return;
 
     if (subdata) {
-        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_DeletingSubtitles);
+        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_RemovingSubtitle);
 
         sub_free(subdata);
         subdata = NULL;
@@ -1152,9 +1267,9 @@ void mplayerLoadSubtitle(const char *name)
     }
 
     if (name) {
-        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_LoadingSubtitles, name);
+        mp_msg(MSGT_GPLAYER, MSGL_INFO, MSGTR_GUI_MSG_LoadingSubtitle, name);
 
-        subdata = sub_read_file(name, (guiInfo.sh_video ? guiInfo.sh_video->fps : 0));
+        subdata = sub_read_file(name, guiInfo.sh_video ? guiInfo.sh_video->fps : 0);
 
         if (!subdata)
             gmp_msg(MSGT_GPLAYER, MSGL_ERR, MSGTR_CantLoadSub, name);
@@ -1183,7 +1298,7 @@ void gmp_msg(int mod, int lev, const char *format, ...)
     vsnprintf(msg, sizeof(msg), format, va);
     va_end(va);
 
-    mp_msg(mod, lev, msg);
+    mp_msg(mod, lev, "%s", msg);
 
     if (mp_msg_test(mod, lev))
         gtkMessageBox(MSGBOX_FATAL, msg);

@@ -21,10 +21,12 @@
  * @brief List management
  */
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "list.h"
+#include "mem.h"
 #include "string.h"
 #include "gui/app/gui.h"
 
@@ -46,13 +48,13 @@ static urlItem *urlList;
  *         pointer to current list item (ITEM command) or
  *         NULL (DELETE or unknown command)
  *
- * @note PLAYLIST_ITEM_GET_POS returns the position number as pointer
+ * @note PLAYLIST_ITEM_GET_POS returns the position number as pointer value
  *       (if @a data is NULL the last position number, i.e. number of items),
  *       and position 0 means "not found"
  */
 void *listMgr(int cmd, void *data)
 {
-    unsigned int pos;
+    uintptr_t pos;
     plItem *pdat  = (plItem *)data;
     urlItem *udat = (urlItem *)data;
 
@@ -127,8 +129,8 @@ void *listMgr(int cmd, void *data)
         pos = 0;
 
         if (plList) {
-            unsigned int i = 0;
-            plItem *item   = plList;
+            uintptr_t i  = 0;
+            plItem *item = plList;
 
             do {
                 i++;
@@ -268,14 +270,11 @@ void *listMgr(int cmd, void *data)
 }
 
 /**
- * @brief Set list to @a entry.
+ * @brief Free a string list.
  *
- * @param list pointer to the char pointer list
- * @param entry the new (and only) element of the list
- *
- * @note Actually, a new list will be created and the old list will be freed.
+ * @param list pointer to the string list
  */
-void listSet(char ***list, const char *entry)
+void listFree(char ***list)
 {
     if (*list) {
         char **l = *list;
@@ -285,8 +284,21 @@ void listSet(char ***list, const char *entry)
             l++;
         }
 
-        free(*list);
+        nfree(*list);
     }
+}
+
+/**
+ * @brief Set string list to @a entry.
+ *
+ * @param list pointer to the string list
+ * @param entry the new (and only) element of the list
+ *
+ * @note Actually, a new list will be created and the old list will be freed.
+ */
+void listSet(char ***list, const char *entry)
+{
+    listFree(list);
 
     *list = malloc(2 * sizeof(char *));
 
@@ -297,11 +309,11 @@ void listSet(char ***list, const char *entry)
 }
 
 /**
- * @brief Replace the first element in list that starts with @a search.
+ * @brief Replace the first element in a string list that starts with @a search.
  *
  * @note If no such element is found, @a replace will be appended.
  *
- * @param list pointer to the char pointer list
+ * @param list pointer to the string list
  * @param search element to search
  * @param replace replacement element
  */
@@ -338,6 +350,36 @@ void listRepl(char ***list, const char *search, const char *replace)
 }
 
 /**
+ * @brief Duplicate a string list (by allocating new memory).
+ *
+ * @note The list must be NULL-terminated.
+ *
+ * @param list string list to be duplicated
+ *
+ * @return duplicated list
+ */
+char **listDup(const char *const *list)
+{
+    char **dup = NULL;
+
+    if (list) {
+        int i = 0;
+
+        while (list[i])
+            i++;
+
+        dup = calloc(i + 1, sizeof(char *));
+
+        if (dup) {
+            while (--i >= 0)
+                dup[i] = strdup(list[i]);
+        }
+    }
+
+    return dup;
+}
+
+/**
  * @brief Append or insert a file to the playlist.
  *
  * @param what file to be added
@@ -365,7 +407,7 @@ int add_to_gui_playlist(const char *what, int how)
     else
         strcpy(path, ".");
 
-    item = calloc(1, sizeof(plItem));
+    item = calloc(1, sizeof(*item));
 
     if (!item) {
         free(path);

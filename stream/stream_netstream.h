@@ -91,36 +91,30 @@ static int net_read(int fd, char* buf, int len) {
 
 static mp_net_stream_packet_t* read_packet(int fd) {
   uint16_t len;
-  mp_net_stream_packet_t* pack = malloc(sizeof(mp_net_stream_packet_t));
+  mp_net_stream_packet_t* pack = calloc(1, PACKET_MAX_SIZE + 1);
 
-  if(!net_read(fd,(char*)pack,sizeof(mp_net_stream_packet_t))) {
-    free(pack);
-    return NULL;
-  }
+  if(!pack || !net_read(fd,(char*)pack,sizeof(mp_net_stream_packet_t)))
+    goto err_out;
   pack->len = le2me_16(pack->len);
 
   if(pack->len < sizeof(mp_net_stream_packet_t)) {
     mp_msg(MSGT_NETST,MSGL_WARN,"Got invalid packet (too small: %d)\n",pack->len);
-    free(pack);
-    return NULL;
+    goto err_out;
   }
   if(pack->len > PACKET_MAX_SIZE) {
     mp_msg(MSGT_NETST,MSGL_WARN,"Got invalid packet (too big: %d)\n",pack->len);
-    free(pack);
-    return NULL;
+    goto err_out;
   }
+  pack->len -= sizeof(mp_net_stream_packet_t);
   len = pack->len;
-  if(len > sizeof(mp_net_stream_packet_t)) {
-    pack = realloc(pack,len);
-    if(!pack) {
-      mp_msg(MSGT_NETST,MSGL_ERR,"Failed to get memory for the packet (%d bytes)\n",len);
-      return NULL;
-    }
-    if(!net_read(fd,pack->data,len - sizeof(mp_net_stream_packet_t)))
-      return NULL;
-  }
+  if(len > 0 && !net_read(fd,pack->data,len))
+    goto err_out;
   //  printf ("Read packet %d %d %d\n",fd,pack->cmd,pack->len);
   return pack;
+
+err_out:
+  free(pack);
+  return NULL;
 }
 
 static int net_write(int fd, char* buf, int len) {

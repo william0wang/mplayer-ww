@@ -2,6 +2,8 @@ MPlayer
 
     Decoders:
     * Hardware accelerated decoding on OS X via VDA.
+    * Internal libmpeg2 disabled by default, on the assumption
+      that nobody really needs it anymore.
 
     Other:
     * "run" slave/keybinding command now supports expanding properties
@@ -19,6 +21,9 @@ MPlayer
     * Support teletext and CC subtitles in WTV.
     * Support binding keys corresponding to non-ASCII characters.
     * Limited -endpos support for -dump*
+    * Danish messages header file renamed from help_mp-dk.h to help_mp-da.h
+      in order to comply with ISO 639 language code (configure language
+      options will now require da instead of dk)
 
     Ports:
     * Windows: support file names as UTF-8 in slave mode and passing
@@ -32,6 +37,17 @@ MPlayer
 
     GUI:
     * Support for TV/DVB
+    * Various improvements of the context menu and the preferences dialog
+    * Revision of the user interface texts
+    * Console message with information on deprecated (but still supported)
+      entries in the skin configuration file
+    * New symbol character (r) and new dynamic label variables ($D, $U, $P)
+    * New items (pimage, rpotmeter)
+    * Updated skins (avifile, Blue, Blue-small, Clearlooks, Corelian,
+      disappearer, mentalic, mplayer_red, nativeRed, neutron, phony, plastic,
+      slim, softgrip, standard, trium, tvisor, xanim)
+    * Video can be rotated
+    * New GUI message: evSetRotation
 
   1.1: "We gave up on 1.0"
 

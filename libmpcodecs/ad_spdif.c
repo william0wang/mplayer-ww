@@ -265,7 +265,7 @@ static int decode_audio(sh_audio_t *sh, unsigned char *buf,
             sh->pts       = pts;
             sh->pts_bytes = 0;
         }
-        ret = lavf_ctx->oformat->write_packet(lavf_ctx, &pkt);
+        ret = av_write_frame(lavf_ctx, &pkt);
         if (ret < 0)
             break;
     }

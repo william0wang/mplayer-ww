@@ -48,8 +48,7 @@ aktiválható).
   Egy <emphasis role="bold">potmeter</emphasis>nek (főként a kereső sáv és a
   hangerő/balansz állító) bármennyi fázisa lehet a képének egymás alatti
   tetszőleges feldarabolásával. Lásd a
-  <link linkend="skin-hpotmeter">hpotmeter</link>t és
-  <link linkend="skin-potmeter">potmeter</link>t a részletekért.
+  <link linkend="skin-hpotmeter">hpotmeter</link>t a részletekért.
   </para>
 
   <para>
@@ -303,6 +302,21 @@ blokkokban.
 <variablelist>
 <varlistentry>
   <term><literal>
+  <anchor id="skin-decoration"/>decoration = enable|disable
+  </literal></term>
+  <listitem>
+  <para>
+  Engedélyezi vagy letiltja a főablakban az ablakkezelő dekorációját.
+  Alapértelmezetten <emphasis role="bold">disable</emphasis>.
+  </para>
+  <note><para>
+  Ez nem működik a megjelenítő ablakban, nincs rá szükség.
+  </para></note>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><literal>
   <anchor id="skin-main-base"/>base = image, X, Y
   </literal></term>
   <listitem>
@@ -343,21 +357,6 @@ blokkokban.
 +-------------+<!--
   --></screen>
   </informalfigure>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
-  <anchor id="skin-decoration"/>decoration = enable|disable
-  </literal></term>
-  <listitem>
-  <para>
-  Engedélyezi vagy letiltja a főablakban az ablakkezelő dekorációját.
-  Alapértelmezetten <emphasis role="bold">disable</emphasis>.
-  </para>
-  <note><para>
-  Ez nem működik a megjelenítő ablakban, nincs rá szükség.
-  </para></note>
   </listitem>
 </varlistentry>
 
@@ -433,19 +432,6 @@ blokkokban.
 
 <varlistentry>
   <term><literal>
-  <anchor id="skin-potmeter"/>potmeter = phases, numphases, default, X, Y, width, height, message
-  </literal></term>
-  <listitem><para>
-  Egy <literal>hpotmeter</literal> gomb nélkül. (Gondolom a megfordítása volt az
-  eredeti cél, de csak a vízszintes vonszolásra reagál.) A paraméterek leírását
-  lásd a <link linkend="skin-hpotmeter">hpotmeter</link>-nél.
-  A <literal>phases</literal> lehet <literal>NULL</literal>, de ez eléggé haszontalan,
-  mivel akkor nem látod, hogy a <literal>potmeter</literal> hova van állítva.
-  </para></listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
   <anchor id="skin-font"/>font = fontfile, fontid
   </literal></term>
   <listitem><para>
@@ -483,8 +469,8 @@ blokkokban.
   egy karakter magasságával egyezik meg). Ha a megjelenítendő szöveg
   szélesebb ennél, scrollozva lesz,
   különben az <literal>align</literal> paraméter által megadott módon
-  pozícionálódik: <literal>0</literal> jobbra, <literal>1</literal>
-  középre, <literal>2</literal> balra igazítva.
+  pozícionálódik: <literal>0</literal> balra, <literal>1</literal>
+  középre, <literal>2</literal> jobbra igazítva.
   </para>
   <para>
   A megjelenítendő szöveget a <literal>text</literal> adja meg: dupla
@@ -537,7 +523,11 @@ blokkokban.
   </row>
   <row>
     <entry>$V</entry>
-    <entry>hangerő <emphasis>xxx.xx</emphasis> formátumban</entry>
+    <entry>hangerő <emphasis>xxx.x</emphasis> formátumban</entry>
+  </row>
+  <row>
+    <entry>$U</entry>
+    <entry>hangerő <emphasis>xxx</emphasis> formátumban</entry>
   </row>
   <row>
     <entry>$b</entry>
@@ -545,7 +535,11 @@ blokkokban.
   </row>
   <row>
     <entry>$B</entry>
-    <entry>balansz <emphasis>xxx.xx</emphasis> formátumban</entry>
+    <entry>balansz <emphasis>xxx.x</emphasis> formátumban</entry>
+  </row>
+  <row>
+    <entry>$D</entry>
+    <entry>balansz <emphasis>xxx</emphasis> formátumban</entry>
   </row>
   <row>
     <entry>$$</entry>

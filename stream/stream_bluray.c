@@ -198,6 +198,25 @@ static int bluray_stream_control(stream_t *s, int cmd, void *arg)
         return r ? 1 : STREAM_UNSUPPORTED;
     }
 
+    case STREAM_CTRL_GET_TIME_LENGTH: {
+        BLURAY_TITLE_INFO *ti = bd_get_title_info(b->bd, b->current_title, b->current_angle);
+        if (!ti)
+            return STREAM_UNSUPPORTED;
+        *(double *)arg = ti->duration / 90000.0;
+        return STREAM_OK;
+    }
+
+    case STREAM_CTRL_GET_CURRENT_TIME:
+        *(double *)arg = bd_tell_time(b->bd) / 90000.0;
+        return STREAM_OK;
+    case STREAM_CTRL_SEEK_TO_TIME: {
+        int64_t res = bd_seek_time(b->bd, *(double*)arg * 90000.0);
+        if (res < 0)
+            return STREAM_ERROR;
+        s->pos = res;
+        return 1;
+    }
+
     case STREAM_CTRL_GET_NUM_ANGLES: {
         BLURAY_TITLE_INFO *ti;
 
@@ -326,6 +345,8 @@ static int bluray_stream_open(stream_t *s, int mode,
                "ID_BLURAY_TITLE_%d_ANGLE=%d\n", i + 1, ti->angle_count);
         mp_msg(MSGT_IDENTIFY, MSGL_V,
                "ID_BLURAY_TITLE_%d_LENGTH=%d.%03d\n", i + 1, sec, msec);
+        mp_msg(MSGT_IDENTIFY, MSGL_V,
+               "ID_BLURAY_TITLE_%d_PLAYLIST=%05d\n", i + 1, ti->playlist);
 
         /* try to guess which title may contain the main movie */
         if (ti->duration > max_duration) {

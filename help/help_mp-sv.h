@@ -3,48 +3,55 @@
 // Helped by: Jan Knutar <jknutar AT nic DOT fi>
 // ========================= MPlayer hjälp ===========================
 
-static const char help_text[]=
-"Användning:   mplayer [argument] [url|sökväg/]filnamn\n"
-"\n"
-"Grundläggande argument: (komplett lista återfinns i `man mplayer`)\n"
-" -vo <drv[:enhet]>   välj video-ut drivrutin & enhet ('-vo help' för lista)\n"
-" -ao <drv[:enhet]>   välj audio-ut drivrutin & enhet ('-ao help' för lista)\n"
 #ifdef CONFIG_VCD
-" vcd://<spårnr>      spela (S)VCD (Super Video CD) spår (rå enhet, ingen montering)\n"
+#define MSGTR_HelpVCD " vcd://<spårnr>      spela (S)VCD (Super Video CD) spår (rå enhet, ingen montering)\n"
+#else
+#define MSGTR_HelpVCD
 #endif
-#ifdef CONFIG_DVDREAD
-" dvd://<titlenr>     spela DVD titel från enhet istället för ifrån en enkel fil\n"
-" -alang/-slang       välj DVD audio/textningsspråk (m.h.a. ett 2-teckens landskod)\n"
-#endif
-" -ss <tidpos>        sök till given position (sekunder eller hh:mm:ss)\n"
-" -nosound            spela inte upp ljud\n"
-" -fs                 fullskärmsuppspelning (eller -vm, -zoom, detaljer på manualsidan)\n"
-" -x <x> -y <y>       sätt skärmupplösning (för användning med -vm eller -zoom)\n"
-" -sub <fil>          specifiera textningsfil att använda (se också -subfps, -subdelay)\n"
-" -playlist <fil>     specifiera spellistefil\n"
-" -vid x -aid y       välj video (x) och audio (y) ström att spela\n"
-" -fps x -srate y     ändra video (x fps) och audio (y Hz) frekvens\n"
-" -pp <kvalité>       aktivera postredigeringsfilter (detaljer på manualsidan)\n"
-" -framedrop          aktivera reducering av antalet bildrutor (för långsamma maskiner)\n"
-"\n"
-"Grundläggande navigering: (komplett lista återfinns på manualsidan, läs även input.conf)\n"
-" <-  eller  ->       sök bakåt/framåt 10 sekunder\n"
-" upp eller ner       sök bakåt/framåt 1 minut\n"
-" pgup eller pgdown   sök bakåt/framåt 10 minuter\n"
-" < eller >           stega bakåt/framåt i spellistan\n"
-" p eller SPACE       pausa filmen (tryck på valfri tagent för att fortsätta)\n"
-" q eller ESC         stanna spelningen och avsluta programmet\n"
-" + eller -           ställ in audiofördröjning med ± 0.1 sekund\n"
-" o                   växla OSD läge:  ingen / lägesindikator / lägesindikator + tidtagare\n"
-" * eller /           öka eller sänk PCM-volym\n"
-" z eller x           ställ in textningsfördröjning med ± 0.1 sekund\n"
-" r or t              ställ in textningsposition upp/ner, se också '-vf expand'\n"
-"\n"
-" * * * LÄS MANUALEN FÖR FLER DETALJER, MER AVANCERADE ARGUMENT OCH KOMMANDON * * *\n"
-"\n";
 
-// libmpcodecs/ad_dvdpcm.c:
-#define MSGTR_SamplesWanted "Fler exempel på detta format behövs för att vidare öka support. Var vänlig kontakta utvecklarna.\n"
+#ifdef CONFIG_DVDREAD
+#define MSGTR_HelpDVD " dvd://<titlenr>     spela DVD titel från enhet istället för ifrån en enkel fil\n"\
+                      " -alang/-slang       välj DVD audio/textningsspråk (m.h.a. ett 2-teckens landskod)\n"
+#else
+#define MSGTR_HelpDVD
+#endif
+
+#define MSGTR_Help \
+"Användning:   mplayer [argument] [url|sökväg/]filnamn\n"\
+"\n"\
+"Grundläggande argument: (komplett lista återfinns i `man mplayer`)\n"\
+" -vo <drv[:enhet]>   välj video-ut drivrutin & enhet ('-vo help' för lista)\n"\
+" -ao <drv[:enhet]>   välj audio-ut drivrutin & enhet ('-ao help' för lista)\n"\
+MSGTR_HelpVCD \
+MSGTR_HelpDVD \
+" -ss <tidpos>        sök till given position (sekunder eller hh:mm:ss)\n"\
+" -nosound            spela inte upp ljud\n"\
+" -fs                 fullskärmsuppspelning (eller -vm, -zoom, detaljer på manualsidan)\n"\
+" -x <x> -y <y>       sätt skärmupplösning (för användning med -vm eller -zoom)\n"\
+" -sub <fil>          specifiera textningsfil att använda (se också -subfps, -subdelay)\n"\
+" -playlist <fil>     specifiera spellistefil\n"\
+" -vid x -aid y       välj video (x) och audio (y) ström att spela\n"\
+" -fps x -srate y     ändra video (x fps) och audio (y Hz) frekvens\n"\
+" -pp <kvalité>       aktivera postredigeringsfilter (detaljer på manualsidan)\n"\
+" -framedrop          aktivera reducering av antalet bildrutor (för långsamma maskiner)\n"\
+"\n"\
+"Grundläggande navigering: (komplett lista återfinns på manualsidan, läs även input.conf)\n"\
+" <-  eller  ->       sök bakåt/framåt 10 sekunder\n"\
+" upp eller ner       sök bakåt/framåt 1 minut\n"\
+" pgup eller pgdown   sök bakåt/framåt 10 minuter\n"\
+" < eller >           stega bakåt/framåt i spellistan\n"\
+" p eller SPACE       pausa filmen (tryck på valfri tagent för att fortsätta)\n"\
+" q eller ESC         stanna spelningen och avsluta programmet\n"\
+" + eller -           ställ in audiofördröjning med ± 0.1 sekund\n"\
+" o                   växla OSD läge:  ingen / lägesindikator / lägesindikator + tidtagare\n"\
+" * eller /           öka eller sänk PCM-volym\n"\
+" z eller x           ställ in textningsfördröjning med ± 0.1 sekund\n"\
+" r or t              ställ in textningsposition upp/ner, se också '-vf expand'\n"\
+"\n"\
+" * * * LÄS MANUALEN FÖR FLER DETALJER, MER AVANCERADE ARGUMENT OCH KOMMANDON * * *\n"\
+"\n"
+
+static const char help_text[] = MSGTR_Help;
 
 // ========================= MPlayer messages ===========================
 
@@ -137,42 +144,23 @@ static const char help_text[]=
 "  du rapporterar en trolig bugg.\n"
 #define MSGTR_LoadingConfig "Laddar konfiguration '%s'\n"
 #define MSGTR_AddedSubtitleFile "SUB: lade till textningsfil %d: %s \n"
-#define MSGTR_ErrorOpeningOutputFile "Fel vid öppning av fil [%s] för skrivning!\n"
 #define MSGTR_RTCDeviceNotOpenable "Misslyckades att öppna %s: %s (den borde vara läsbar av användaren.)\n"
 #define MSGTR_LinuxRTCInitErrorIrqpSet "'Linux RTC' initieringsfel i 'ioctl' rtc_irqp_set %lu: %s\n"
 #define MSGTR_IncreaseRTCMaxUserFreq "Försök lägg till \"echo %lu > /proc/sys/dev/rtc/max-user-freq\" till ditt systems uppstartningsscript.\n"
 #define MSGTR_LinuxRTCInitErrorPieOn "'Linux RTC init' fel i 'ioctl' [rtc_pie_on]: %s\n"
-#define MSGTR_UsingTimingType "Använder %s tidtagning.\n"
 #define MSGTR_Getch2InitializedTwice "VARNING: getch2_init anropad dubbelt!\n"
-#define MSGTR_DumpstreamFdUnavailable "Kan inte dumpa denna ström - ingen 'fd' tillgänglig.\n"
 #define MSGTR_CantOpenLibmenuFilterWithThisRootMenu "Kan inte öppna 'libmenu video filter' med rotmeny %s.\n"
 #define MSGTR_AudioFilterChainPreinitError "Fel vid förinitiering av audiofilter!\n"
 #define MSGTR_LinuxRTCReadError "'Linux RTC' läsfel: %s\n"
 #define MSGTR_SoftsleepUnderflow "Varning! Softsleep underflow!\n"
-#define MSGTR_DvdnavNullEvent "DVDNAV-händelse NULL?!\n"
-#define MSGTR_DvdnavHighlightEventBroken "DVDNAV-händelse: Highlight-händelse trasig\n" // FIXME highlight
-#define MSGTR_DvdnavEvent "DVDNAV-händelse Event: %s\n"
-#define MSGTR_DvdnavHighlightHide "DVDNAV-händelse: Highlight gömd\n"
-#define MSGTR_DvdnavStillFrame "######################################## DVDNAV-händelse: Fortfarande bildruta: %d sekunder\n"
-#define MSGTR_DvdnavNavStop "DVDNAV-händelse: Nav Stop\n" // FIXME Nav Stop?
-#define MSGTR_DvdnavNavNOP "DVDNAV-händelse: Nav NOP\n"
-#define MSGTR_DvdnavNavSpuStreamChangeVerbose "DVDNAV-händelse: 'Nav SPU'-strömningsändring: fysisk: %d/%d/%d logisk: %d\n"
-#define MSGTR_DvdnavNavSpuStreamChange "DVDNAV-händelse: 'Nav SPU'-strömningsändring: fysisk: %d logisk: %d\n"
-#define MSGTR_DvdnavNavAudioStreamChange "DVDNAV-händelse: 'Nav Audio'-strömningsändring: fysisk: %d logisk: %d\n"
-#define MSGTR_DvdnavNavVTSChange "DVDNAV-händelse: 'Nav VTS' ändrad\n"
-#define MSGTR_DvdnavNavCellChange "DVDNAV-händelse: 'Nav Cell' ändrad\n"
-#define MSGTR_DvdnavNavSpuClutChange "DVDNAV-händelse: 'Nav SPU CLUT' ändrad\n"
-#define MSGTR_DvdnavNavSeekDone "DVDNAV-händelse: 'Nav Seek' ändrad\n"
 /*
  * FIXME A lot of shorted words, not translating atm
  */
-#define MSGTR_MenuCall "Menyanrop\n"
 
 #define MSGTR_EdlOutOfMem "Kan inte allokera tillräckligt med minne för att hålla EDL-data.\n"
 #define MSGTR_EdlRecordsNo "Läst %d EDL-funtioner.\n"
 #define MSGTR_EdlQueueEmpty "Det är inga EDL-funktioner att ta hand om.\n"
 #define MSGTR_EdlCantOpenForWrite "Kan inte öppna EDL-fil [%s] för skrivning.\n"
-#define MSGTR_EdlCantOpenForRead "Kan inte öppna EDL-fil [%s] för läsning.\n"
 #define MSGTR_EdlNOsh_video "Kan inte använda EDL utan video, inaktiverar.\n"
 #define MSGTR_EdlNOValidLine "Icke godkänd EDL-rad: %s\n"
 #define MSGTR_EdlBadlyFormattedLine "Dåligt formaterad EDL-rad [%d]. Kastar bort.\n"
@@ -200,9 +188,7 @@ static const char help_text[]=
 #define MSGTR_OpenedStream "klart: format: %d  data: 0x%X - 0x%x\n"
 #define MSGTR_VCodecFramecopy "videocodec: framecopy (%dx%d %dbpp fourcc=%x)\n" // FIXME translate?
 #define MSGTR_ACodecFramecopy "audiocodec: framecopy (format=%x chans=%d rate=%d bits=%d B/s=%d sample-%d)\n" // -''-
-#define MSGTR_CBRPCMAudioSelected "CBR PCM audio valt\n"
 #define MSGTR_MP3AudioSelected "MP3 audio valt\n"
-#define MSGTR_CannotAllocateBytes "Kunde inte allokera %d byte\n"
 #define MSGTR_SettingAudioDelay "Sätter AUDIO DELAY till %5.3f\n"
 #define MSGTR_LimitingAudioPreload "Begränsar audioförinladdning till 0.4s\n" // preload?
 #define MSGTR_IncreasingAudioDensity "Höjer audiodensitet till 4\n"
@@ -313,7 +299,6 @@ static const char help_text[]=
 #define MSGTR_ErrorParsingCommandLine "fel vid tolkning av cmdline"
 #define MSGTR_VideoStreamRequired "Videoström är obligatoriskt!\n"
 #define MSGTR_ForcingInputFPS "'input fps' kommer att bli tolkad som %5.3f istället\n"
-#define MSGTR_RawvideoDoesNotSupportAudio "Ut-filformat RAWVIDEO stödjer inte audio - deaktiverar audio\n"
 #define MSGTR_DemuxerDoesntSupportNosound "Denna demuxer stödjer inte -nosound ännu.\n"
 #define MSGTR_MemAllocFailed "minnesallokering misslyckades"
 #define MSGTR_NoMatchingFilter "Kunde inte finna matchande filter/ao-format!\n"
@@ -400,7 +385,6 @@ static const char help_text[]=
 #define MSGTR_OutdatedCodecsConf "Denna codecs.conf är för gammal och inkompatibel med denna MPlayer version!" // release is more like 'släpp', sounds wrong, using version instead
 
 // fifo.c
-#define MSGTR_CannotMakePipe "Kan inte skapa en PIPE!\n" // FIXME make?
 
 // m_config.c
 #define MSGTR_SaveSlotTooOld "Allt för gammal sparningsslottar funna från nivå %d: %d !!!\n" // FIXME slot?
@@ -416,19 +400,14 @@ static const char help_text[]=
 #define MSGTR_CdDevNotfound "CD-ROM-enhet '%s' ej funnet.\n"
 #define MSGTR_ErrTrackSelect "Fel vid val av VCD-spår."
 #define MSGTR_ReadSTDIN "Läser från stdin...\n"
-#define MSGTR_UnableOpenURL "Oförmögen att öppna URL: %s\n"
-#define MSGTR_ConnToServer "Ansluten till server: %s\n"
 #define MSGTR_FileNotFound "Fil ej funnen: '%s'\n"
 
 #define MSGTR_SMBInitError "Kan inte initiera libsmbclient-bilioteket: %d\n"
 #define MSGTR_SMBFileNotFound "Kunde inte öppna från LAN: '%s'\n"
-#define MSGTR_SMBNotCompiled "MPlayer var inte kompilerad med SMB-lässtöd.\n"
 
 #define MSGTR_CantOpenDVD "Kunde inte öppna DVD-enhet: %s (%s)\n"
 #define MSGTR_DVDnumTitles "Det är %d titlar på denna DVD.\n"
 #define MSGTR_DVDinvalidTitle "Icke godkänt DVD-titelnummer: %d\n"
-#define MSGTR_DVDnumChapters "Der är %d kapitel på denna DVD-titel.\n"
-#define MSGTR_DVDinvalidChapter "Ej godkänt DVD-kapitelnummer: %d\n"
 #define MSGTR_DVDnumAngles "Det är %d vinkar på denna DVD-titel.\n"
 #define MSGTR_DVDinvalidAngle "Ej godkänd DVD-vinkelsnummer: %d\n"
 #define MSGTR_DVDnoIFO "Kan inte öppna IFO-fil för DVD-titel %d.\n"
@@ -443,8 +422,6 @@ static const char help_text[]=
                       "För AVI-filer, försök med att forcera icke-interleaved-lägen med -ni argumentet.\n" // FIXME non-interleaved
 #define MSGTR_SwitchToNi "\nSvårt interleaved AVI-fil detekterad, går över till '-ni'-läge...\n"
 #define MSGTR_Detected_XXX_FileFormat "%s filformat detekterat.\n"
-#define MSGTR_DetectedAudiofile "Audiofilformat detekterat.\n"
-#define MSGTR_InvalidMPEGES "Icke godkänd 'MPEG-ES'-ström??? Kontakta upphovsmannen, det kanske är en bugg :(\n" //FIXME author???
 #define MSGTR_FormatNotRecognized "================ Tyvärr, detta filformat är inte rekogniserbart/stött ==================\n"\
                                   "=== Om denna fil är en AVi, ASF eller MPEG-ström, var vänlig kontakta upphovsmannen! ===\n" //FIXME author???
 #define MSGTR_MissingVideoStream "Ingen videoström funnen.\n"
@@ -465,7 +442,6 @@ static const char help_text[]=
 #define MSGTR_MOVcomprhdr "MOV: filhuvudkomprimeringssupport kräver ZLIB!\n"
 #define MSGTR_MOVvariableFourCC "MOV: VARNING: Variabel FOURCC påvisad!?\n"
 #define MSGTR_MOVtooManyTrk "MOV: VARNING: allt förmånga spår"
-#define MSGTR_DetectedTV "TV påvisad! ;-)\n"
 #define MSGTR_ErrorOpeningOGGDemuxer "Oförmögen att öppna oggdemuxern.\n"
 #define MSGTR_CannotOpenAudioStream "Kan inte öppna audioström: %s\n"
 #define MSGTR_CannotOpenSubtitlesStream "Kan inte öppna textningsström: %s\n"
@@ -517,7 +493,6 @@ static const char help_text[]=
 #define MSGTR_CannotFindColorspace "Kunde inte hitta matchande färgrymder, t.o.m. vid insättning av 'scale' :(\n" // FIXME colorspace
 
 // vd.c
-#define MSGTR_CodecDidNotSet "VDec: Codec satt inte sh->disp_w samt sh->disp_h, försöker gå runt problemet.\n"
 #define MSGTR_CouldNotFindColorspace "Kunde inte finna matchande färgrymder - försöker åter med -vf scale...\n" // -''-
 #define MSGTR_MovieAspectIsSet "Movie-Aspect är %.2f:1 - prescaling till korrekt film-aspect.\n"
 #define MSGTR_MovieAspectUndefined "Film-Aspect är ej definerad - ingen prescaling kommer att äga rum.\n"
@@ -532,226 +507,186 @@ static const char help_text[]=
 #define MSGTR_NoVolume "[Mixer] Ingen volymkontroll tillgänglig.\n"
 
 
-// ====================== GUI messages/buttons ========================
+// ================================ GUI ================================
 
-// --- labels ---
-#define MSGTR_About "Om"
-#define MSGTR_FileSelect "Välj fil..."
-#define MSGTR_SubtitleSelect "Välj textning..."
-#define MSGTR_OtherSelect "Välj..."
-#define MSGTR_AudioFileSelect "Välj extern audiokanal..."
-#define MSGTR_FontSelect "Välj font..."
-// NOTE: If you change MSGTR_PlayList pleace see if it still fits MSGTR_MENU_PlayList
-#define MSGTR_PlayList "Spellista"
-#define MSGTR_Equalizer "Equalizer"
-#define MSGTR_SkinBrowser "Skinläsare"
-#define MSGTR_Network "Nätverksströmning..."
-// NOTE: If you change MSGTR_Preferences pleace see if it still fits MSGTR_MENU_Preferences
-#define MSGTR_Preferences "Inställningar"
-#define MSGTR_AudioPreferences "Audiodirvrutinskonfiguration"
-#define MSGTR_NoMediaOpened "Inget media öppnad"
-#define MSGTR_NoChapter "Inget kapitel"
-#define MSGTR_Chapter "Kapitel %d"
-#define MSGTR_NoFileLoaded "Ingen fil laddad"
-
-// --- buttons ---
-#define MSGTR_Ok "OK"
-#define MSGTR_Cancel "Avbryt"
-#define MSGTR_Add "Lägg till"
-#define MSGTR_Remove "Radera"
-#define MSGTR_Clear "Rensa"
-#define MSGTR_Config "Konfiguration"
-#define MSGTR_ConfigDriver "Konfigurera drivrution"
-#define MSGTR_Browse "Bläddra"
-
-// --- error messages ---
-#define MSGTR_NEMDB "Tyvärr, inte tillräckligt minne för ritbuffert."
-#define MSGTR_NEMFMR "Tyvärr, inte tillräckligt minne för menyrendering."
-#define MSGTR_IDFGCVD "Tyvärr, jag hittade inte en GUI-kompatibel video-ut-drivrutin."
-#define MSGTR_NEEDLAVC "Tyvärr, du kan inte spela icke-MPEG-filer med ditt DXR3/H+-enhet utan omkodning.\nVar god aktivera lavc i 'DXR3/H+'-konfigurationsboxen."
-
-// --- skin loader error messages
-#define MSGTR_SKIN_ERRORMESSAGE "[skin] fel i skinkonfigureringsfil på rad %d: %s"
-#define MSGTR_SKIN_BITMAP_16bit  "16-bitar eller lägre bitmappar stödjs inte (%s).\n"
-#define MSGTR_SKIN_BITMAP_FileNotFound  "fil ej funnen (%s)\n"
-#define MSGTR_SKIN_BITMAP_PNGReadError "PNG läsfel (%s)\n"
-#define MSGTR_SKIN_BITMAP_ConversionError "24-bitars till 32-bitars konverteringsfel (%s)\n"
-#define MSGTR_SKIN_UnknownMessage "okänt meddelande: %s\n"
-#define MSGTR_SKIN_NotEnoughMemory "ej tillräckligt minne\n"
-#define MSGTR_SKIN_FONT_TooManyFontsDeclared "Allt för många fonter deklarerade.\n"
-#define MSGTR_SKIN_FONT_FontFileNotFound "Fontfil ej funnen.\n"
-#define MSGTR_SKIN_FONT_FontImageNotFound "Fontbildsfil ej funnen.\n"
-#define MSGTR_SKIN_FONT_NonExistentFont "icke-existerande fontidentifkator (%s)\n"
-#define MSGTR_SKIN_UnknownParameter "okänd parameter (%s)\n"
-#define MSGTR_SKIN_SKINCFG_SkinNotFound "Skin ej funnen (%s).\n"
-#define MSGTR_SKIN_LABEL "Skin:"
-
-// --- gtk menus
-#define MSGTR_MENU_AboutMPlayer "Om MPlayer"
-#define MSGTR_MENU_Open "Öppna..."
-#define MSGTR_MENU_PlayFile "Spela fil..."
-#define MSGTR_MENU_PlayVCD "Spela VCD..."
-#define MSGTR_MENU_PlayDVD "Spela DVD..."
-#define MSGTR_MENU_PlayURL "Spela URL..."
-#define MSGTR_MENU_LoadSubtitle "Ladda textning..."
-#define MSGTR_MENU_DropSubtitle "Droppa textning..."
-#define MSGTR_MENU_LoadExternAudioFile "Ladda extern audiofil..."
-#define MSGTR_MENU_Playing "Spelar"
-#define MSGTR_MENU_Play "Spela"
-#define MSGTR_MENU_Pause "Pausa"
-#define MSGTR_MENU_Stop "Stopp"
-#define MSGTR_MENU_NextStream "Nästa ström"
-#define MSGTR_MENU_PrevStream "Föregående ström"
-#define MSGTR_MENU_Size "Storlek"
-#define MSGTR_MENU_NormalSize "Normal storlek"
-#define MSGTR_MENU_DoubleSize "Dubbel storlek"
-#define MSGTR_MENU_FullScreen "Fullskärm"
-#define MSGTR_MENU_DVD "DVD"
-#define MSGTR_MENU_VCD "VCD"
-#define MSGTR_MENU_PlayDisc "Öppnar disk..." // FIXME to open or is opening?
-#define MSGTR_MENU_ShowDVDMenu "Visa DVD-meny"
-#define MSGTR_MENU_Titles "Titlar"
-#define MSGTR_MENU_Title "Titel %2d"
-#define MSGTR_MENU_None "(ingen)"
-#define MSGTR_MENU_Chapters "Kapitel"
-#define MSGTR_MENU_Chapter "Kapitel %2d"
-#define MSGTR_MENU_AudioLanguages "Audiospråk"
-#define MSGTR_MENU_SubtitleLanguages "Textningsspråk"
-#define MSGTR_MENU_SkinBrowser "Skinläsare"
-#define MSGTR_MENU_Exit "Avsluta"
-#define MSGTR_MENU_Mute "Dämpa"
-#define MSGTR_MENU_Original "Orginal"
-#define MSGTR_MENU_AspectRatio "Aspect ratio" // FIXME translate?
-#define MSGTR_MENU_AudioTrack "Audiospår"
-#define MSGTR_MENU_Track "Spår %d"
-#define MSGTR_MENU_VideoTrack "Videospår"
-
-// --- equalizer
-// Note: If you change MSGTR_EQU_Audio please see if it still fits MSGTR_PREFERENCES_Audio
-#define MSGTR_EQU_Audio "Audio"
-// Note: If you change MSGTR_EQU_Video please see if it still fits MSGTR_PREFERENCES_Video
-#define MSGTR_EQU_Video "Video"
-#define MSGTR_EQU_Contrast "Kontrast: "
-#define MSGTR_EQU_Brightness "Ljusstyrka: "
-#define MSGTR_EQU_Hue "Hue: "
-#define MSGTR_EQU_Saturation "Saturation: "
-#define MSGTR_EQU_Front_Left "Vänster fram"
-#define MSGTR_EQU_Front_Right "Höger fram"
-#define MSGTR_EQU_Back_Left "Vänster bak"
-#define MSGTR_EQU_Back_Right "Höger bak"
-#define MSGTR_EQU_Center "Center"
-#define MSGTR_EQU_Bass "Bass"
-#define MSGTR_EQU_All "Allt"
-#define MSGTR_EQU_Channel1 "Kanal 1:"
-#define MSGTR_EQU_Channel2 "Kanal 2:"
-#define MSGTR_EQU_Channel3 "Kanal 3:"
-#define MSGTR_EQU_Channel4 "Kanal 4:"
-#define MSGTR_EQU_Channel5 "Kanal 5:"
-#define MSGTR_EQU_Channel6 "Kanal 6:"
-
-// --- playlist
-#define MSGTR_PLAYLIST_Path "Sökväg"
-#define MSGTR_PLAYLIST_Selected "Valda filer"
-#define MSGTR_PLAYLIST_Files "Filer"
-#define MSGTR_PLAYLIST_DirectoryTree "Katalogträd"
-
-// --- preferences
-#define MSGTR_PREFERENCES_SubtitleOSD "Textning & OSD"
-#define MSGTR_PREFERENCES_Codecs "Codecs & demuxer"
-// NOTE: If you change MSGTR_PREFERENCES_Misc see if it still fits MSGTR_PREFERENCES_FRAME_Misc
-#define MSGTR_PREFERENCES_Misc "Diverse"
-
-#define MSGTR_PREFERENCES_None "Inget"
-#define MSGTR_PREFERENCES_DriverDefault "standarddrivrutin"
-#define MSGTR_PREFERENCES_AvailableDrivers "Tillgängliga drivrutioner:"
-#define MSGTR_PREFERENCES_DoNotPlaySound "Spela inte upp ljud"
-#define MSGTR_PREFERENCES_NormalizeSound "Normalizera ljud"
-#define MSGTR_PREFERENCES_EnableEqualizer "AKtivera equalizer"
-#define MSGTR_PREFERENCES_ExtraStereo "Aktivera extra stereo"
-#define MSGTR_PREFERENCES_Coefficient "Koefficient:"
-#define MSGTR_PREFERENCES_AudioDelay "Audiofördröjning"
-#define MSGTR_PREFERENCES_DoubleBuffer "Aktivera double buffering"
-#define MSGTR_PREFERENCES_DirectRender "Aktivera direct rendering"
-#define MSGTR_PREFERENCES_FrameDrop "Aktivera frame dropping"
-#define MSGTR_PREFERENCES_HFrameDrop "Aktivera HÅRD frame dropping (dangerous)"
-#define MSGTR_PREFERENCES_Flip "Flippa bilden uppochner"
-#define MSGTR_PREFERENCES_Panscan "Panscan: "
-#define MSGTR_PREFERENCES_Subtitle "Textning:"
-#define MSGTR_PREFERENCES_SUB_Delay "Fördröjning: "
-#define MSGTR_PREFERENCES_SUB_FPS "FPS:"
-#define MSGTR_PREFERENCES_SUB_POS "Position: "
-#define MSGTR_PREFERENCES_SUB_AutoLoad "Deaktivera automatisk laddning av textning"
-#define MSGTR_PREFERENCES_SUB_MPSUB "Konvertera given text till MPlayers egna textningsformat"
-#define MSGTR_PREFERENCES_SUB_SRT "Konvertera given text till det tidbaserade SubViewer (SRT) formatet"
-#define MSGTR_PREFERENCES_SUB_Overlap "Aktivera textningsöverlappning"
-#define MSGTR_PREFERENCES_Font "Font:"
-#define MSGTR_PREFERENCES_PostProcess "Aktivera postprocessing"
-#define MSGTR_PREFERENCES_AutoQuality "Autokvalité: "
-#define MSGTR_PREFERENCES_NI "Använd non-interleaved AVI tolk"
-#define MSGTR_PREFERENCES_IDX "Återbygg indextabell, om så behövs"
-#define MSGTR_PREFERENCES_VideoCodecFamily "Videocodecfamilj:"
-#define MSGTR_PREFERENCES_AudioCodecFamily "Audiocodecfamilj:"
-#define MSGTR_PREFERENCES_FRAME_OSD_Level "OSD-nivå"
-#define MSGTR_PREFERENCES_FRAME_Subtitle "Textning"
-#define MSGTR_PREFERENCES_FRAME_Font "Font"
-#define MSGTR_PREFERENCES_FRAME_PostProcess "Postprocessing"
-#define MSGTR_PREFERENCES_FRAME_Cache "Cache"
-#define MSGTR_PREFERENCES_Audio_Device "Enhet:"
-#define MSGTR_PREFERENCES_Audio_Mixer "Mixer:"
-#define MSGTR_PREFERENCES_Audio_MixerChannel "Mixerkanal:"
-#define MSGTR_PREFERENCES_Message "Var god komihåg att du måste starta om uppspelning för att vissa ändringar ska ta effekt!"
-#define MSGTR_PREFERENCES_DXR3_VENC "Videoencoder:"
-#define MSGTR_PREFERENCES_DXR3_LAVC "ANvänd LAVC (FFmpeg)"
-#define MSGTR_PREFERENCES_FontEncoding1 "Unicode"
-#define MSGTR_PREFERENCES_FontEncoding2 "Västeuropeiska språk (ISO-8859-1)"
-#define MSGTR_PREFERENCES_FontEncoding3 "Västeuropeiska språk med Euro (ISO-8859-15)"
-#define MSGTR_PREFERENCES_FontEncoding4 "Slaviska/Centraleuropeiska språk (ISO-8859-2)"
-#define MSGTR_PREFERENCES_FontEncoding5 "Esperanto, Galician, Maltese, Turkiska (ISO-8859-3)" // FIXME Galician, Maltese
-#define MSGTR_PREFERENCES_FontEncoding6 "Äldre baltisk teckenuppsättning (ISO-8859-4)"
-#define MSGTR_PREFERENCES_FontEncoding7 "Kyrilliska (ISO-8859-5)"
-#define MSGTR_PREFERENCES_FontEncoding8 "Arabiska (ISO-8859-6)"
-#define MSGTR_PREFERENCES_FontEncoding9 "Modern grekiska (ISO-8859-7)"
-#define MSGTR_PREFERENCES_FontEncoding10 "Turkiska (ISO-8859-9)"
-#define MSGTR_PREFERENCES_FontEncoding11 "Baltiska (ISO-8859-13)"
-#define MSGTR_PREFERENCES_FontEncoding12 "Celtiska (ISO-8859-14)"
-#define MSGTR_PREFERENCES_FontEncoding13 "Hebrew teckenuppsättningar (ISO-8859-8)"
-#define MSGTR_PREFERENCES_FontEncoding14 "Ryska (KOI8-R)"
-#define MSGTR_PREFERENCES_FontEncoding15 "Ukrainska, Vitrysska (KOI8-U/RU)"
-#define MSGTR_PREFERENCES_FontEncoding16 "Enkel Kinesisk teckenuppsättning (CP936)"
-#define MSGTR_PREFERENCES_FontEncoding17 "Traditionell Kinesisk teckenuppsättning (BIG5)"
-#define MSGTR_PREFERENCES_FontEncoding18 "Japansk teckenuppsättning (SHIFT-JIS)"
-#define MSGTR_PREFERENCES_FontEncoding19 "Koreansk teckenuppsättning (CP949)"
-#define MSGTR_PREFERENCES_FontEncoding20 "Thailänsk teckenuppsättning (CP874)"
-#define MSGTR_PREFERENCES_FontEncoding21 "Kyrilliska Windown (CP1251)"
-#define MSGTR_PREFERENCES_FontEncoding22 "Slaviska/Centraleuropeiska Windows (CP1250)"
-#define MSGTR_PREFERENCES_FontNoAutoScale "Ingen autoskalning"
-#define MSGTR_PREFERENCES_FontPropWidth "Propotionellt mot filmbredd"
-#define MSGTR_PREFERENCES_FontPropHeight "Propotionellt mot filmhöjd"
-#define MSGTR_PREFERENCES_FontPropDiagonal "Propotionellt mot filmdiagonalen"
-#define MSGTR_PREFERENCES_FontEncoding "Kodning:"
-#define MSGTR_PREFERENCES_FontBlur "Blur:"
-#define MSGTR_PREFERENCES_FontOutLine "Outline:"
-#define MSGTR_PREFERENCES_FontTextScale "Textskalning:"
-#define MSGTR_PREFERENCES_FontOSDScale "OSDskalning:"
-#define MSGTR_PREFERENCES_Cache "Cache på/av"
-#define MSGTR_PREFERENCES_CacheSize "Cachestorlek: "
-#define MSGTR_PREFERENCES_LoadFullscreen "Starta i fullskärm"
-#define MSGTR_PREFERENCES_SaveWinPos "Spara fönsterposition"
-#define MSGTR_PREFERENCES_XSCREENSAVER "Stoppa XScreenSaver"
-#define MSGTR_PREFERENCES_PlayBar "Aktivera spelindikator"
-#define MSGTR_PREFERENCES_AutoSync "AutoSync på/av"
-#define MSGTR_PREFERENCES_AutoSyncValue "Autosync: "
-#define MSGTR_PREFERENCES_CDROMDevice "CD-ROM-enhet:"
-#define MSGTR_PREFERENCES_DVDDevice "DVD-enhet:"
-#define MSGTR_PREFERENCES_FPS "Film-FPS:"
-#define MSGTR_PREFERENCES_ShowVideoWindow "Visa videofönster när den är inaktiv"
-
-#define MSGTR_ABOUT_UHU "GUI-utveckling sponstrat av UHU Linux\n"
-
-// --- messagebox
-#define MSGTR_MSGBOX_LABEL_FatalError "Oöverkomligt fel!"
-#define MSGTR_MSGBOX_LABEL_Error "Fel!"
-#define MSGTR_MSGBOX_LABEL_Warning "Varning!"
+#define MSGTR_GUI_AboutMPlayer "Om MPlayer"
+#define MSGTR_GUI_Add "Lägg till"
+#define MSGTR_GUI_AspectRatio "Aspect ratio" // FIXME translate?
+#define MSGTR_GUI_Audio "Audio"
+#define MSGTR_GUI_AudioDelay "Audiofördröjning"
+#define MSGTR_GUI_AudioDriverConfiguration "Audiodirvrutinskonfiguration"
+#define MSGTR_GUI_AudioTrack "Ladda extern audiofil"
+#define MSGTR_GUI_AudioTracks "Audiospår"
+#define MSGTR_GUI_AvailableDrivers "Tillgängliga drivrutioner:"
+#define MSGTR_GUI_AvailableSkins "Skin"
+#define MSGTR_GUI_Bass "Bass"
+#define MSGTR_GUI_Blur "Blur"
+#define MSGTR_GUI_Brightness "Ljusstyrka"
+#define MSGTR_GUI_Browse "Bläddra"
+#define MSGTR_GUI_Cache "Cache"
+#define MSGTR_GUI_CacheSize "Cachestorlek"
+#define MSGTR_GUI_Cancel "Avbryt"
+#define MSGTR_GUI_Center "Center"
+#define MSGTR_GUI_Channel1 "Kanal 1"
+#define MSGTR_GUI_Channel2 "Kanal 2"
+#define MSGTR_GUI_Channel3 "Kanal 3"
+#define MSGTR_GUI_Channel4 "Kanal 4"
+#define MSGTR_GUI_Channel5 "Kanal 5"
+#define MSGTR_GUI_Channel6 "Kanal 6"
+#define MSGTR_GUI_ChannelAll "Allt"
+#define MSGTR_GUI_ChapterN "Kapitel %d"
+#define MSGTR_GUI_ChapterNN "Kapitel %2d"
+#define MSGTR_GUI_Chapters "Kapitel"
+#define MSGTR_GUI_Clear "Rensa"
+#define MSGTR_GUI_CodecFamilyAudio "Audiocodecfamilj"
+#define MSGTR_GUI_CodecFamilyVideo "Videocodecfamilj"
+#define MSGTR_GUI_Coefficient "Koefficient"
+#define MSGTR_GUI_Configure "Konfiguration"
+#define MSGTR_GUI_ConfigureDriver "Konfigurera drivrution"
+#define MSGTR_GUI_Contrast "Kontrast"
+#define MSGTR_GUI_Cp874 "Thailänsk teckenuppsättning (CP874)"
+#define MSGTR_GUI_Cp936 "Enkel Kinesisk teckenuppsättning (CP936)"
+#define MSGTR_GUI_Cp949 "Koreansk teckenuppsättning (CP949)"
+#define MSGTR_GUI_Cp1250 "Slaviska/Centraleuropeiska Windows (CP1250)"
+#define MSGTR_GUI_Cp1251 "Kyrilliska Windown (CP1251)"
+#define MSGTR_GUI_CpBIG5 "Traditionell Kinesisk teckenuppsättning (BIG5)"
+#define MSGTR_GUI_CpISO8859_1 "Västeuropeiska språk (ISO-8859-1)"
+#define MSGTR_GUI_CpISO8859_2 "Slaviska/Centraleuropeiska språk (ISO-8859-2)"
+#define MSGTR_GUI_CpISO8859_3 "Esperanto, Galician, Maltese, Turkiska (ISO-8859-3)" // FIXME Galician, Maltese
+#define MSGTR_GUI_CpISO8859_4 "Äldre baltisk teckenuppsättning (ISO-8859-4)"
+#define MSGTR_GUI_CpISO8859_5 "Kyrilliska (ISO-8859-5)"
+#define MSGTR_GUI_CpISO8859_6 "Arabiska (ISO-8859-6)"
+#define MSGTR_GUI_CpISO8859_7 "Modern grekiska (ISO-8859-7)"
+#define MSGTR_GUI_CpISO8859_8 "Hebrew teckenuppsättningar (ISO-8859-8)"
+#define MSGTR_GUI_CpISO8859_9 "Turkiska (ISO-8859-9)"
+#define MSGTR_GUI_CpISO8859_13 "Baltiska (ISO-8859-13)"
+#define MSGTR_GUI_CpISO8859_14 "Celtiska (ISO-8859-14)"
+#define MSGTR_GUI_CpISO8859_15 "Västeuropeiska språk med Euro (ISO-8859-15)"
+#define MSGTR_GUI_CpKOI8_R "Ryska (KOI8-R)"
+#define MSGTR_GUI_CpKOI8_U "Ukrainska, Vitrysska (KOI8-U/RU)"
+#define MSGTR_GUI_CpShiftJis "Japansk teckenuppsättning (SHIFT-JIS)"
+#define MSGTR_GUI_CpUnicode "Unicode"
+#define MSGTR_GUI_DefaultSetting "standarddrivrutin"
+#define MSGTR_GUI_Delay "Fördröjning"
+#define MSGTR_GUI_Demuxers_Codecs "Codecs & demuxer"
+#define MSGTR_GUI_Device "Enhet"
+#define MSGTR_GUI_DeviceCDROM "CD-ROM-enhet"
+#define MSGTR_GUI_DeviceDVD "DVD-enhet"
+#define MSGTR_GUI_Directory "Sökväg"
+#define MSGTR_GUI_DirectoryTree "Katalogträd"
+#define MSGTR_GUI_DropSubtitle "Droppa textning..."
+#define MSGTR_GUI_DVD "DVD"
+#define MSGTR_GUI_EnableAutomaticAVSync "AutoSync på/av"
+#define MSGTR_GUI_EnableCache "Cache på/av"
+#define MSGTR_GUI_EnableDirectRendering "Aktivera direct rendering"
+#define MSGTR_GUI_EnableDoubleBuffering "Aktivera double buffering"
+#define MSGTR_GUI_EnableEqualizer "AKtivera equalizer"
+#define MSGTR_GUI_EnableExtraStereo "Aktivera extra stereo"
+#define MSGTR_GUI_EnableFrameDropping "Aktivera frame dropping"
+#define MSGTR_GUI_EnableFrameDroppingIntense "Aktivera HÅRD frame dropping (dangerous)"
+#define MSGTR_GUI_EnablePlaybar "Aktivera spelindikator"
+#define MSGTR_GUI_EnablePostProcessing "Aktivera postprocessing"
+#define MSGTR_GUI_Encoding "Kodning"
+#define MSGTR_GUI_Equalizer "Equalizer"
+#define MSGTR_GUI_Error "Fel!"
+#define MSGTR_GUI_ErrorFatal "Oöverkomligt fel!"
+#define MSGTR_GUI_File "Spela fil"
+#define MSGTR_GUI_Files "Filer"
+#define MSGTR_GUI_Flip "Flippa bilden uppochner"
+#define MSGTR_GUI_Font "Font"
+#define MSGTR_GUI_FrameRate "FPS"
+#define MSGTR_GUI_FrontLeft "Vänster fram"
+#define MSGTR_GUI_FrontRight "Höger fram"
+#define MSGTR_GUI_HideVideoWindow "Visa videofönster när den är inaktiv"
+#define MSGTR_GUI_Hue "Hue"
+#define MSGTR_GUI_Lavc "ANvänd LAVC (FFmpeg)"
+#define MSGTR_GUI_MaximumUsageSpareCPU "Autokvalité"
+#define MSGTR_GUI_Miscellaneous "Diverse"
+#define MSGTR_GUI_Mixer "Mixer"
+#define MSGTR_GUI_MixerChannel "Mixerkanal"
+#define MSGTR_GUI_MSG_DXR3NeedsLavc "Tyvärr, du kan inte spela icke-MPEG-filer med ditt DXR3/H+-enhet utan omkodning.\nVar god aktivera lavc i 'DXR3/H+'-konfigurationsboxen."
+#define MSGTR_GUI_MSG_MemoryErrorWindow "Tyvärr, inte tillräckligt minne för ritbuffert."
+#define MSGTR_GUI_MSG_NoFileLoaded "Ingen fil laddad"
+#define MSGTR_GUI_MSG_NoMediaOpened "Inget media öppnad"
+#define MSGTR_GUI_MSG_PlaybackNeedsRestart "Var god komihåg att du måste starta om uppspelning för att vissa ändringar ska ta effekt!"
+#define MSGTR_GUI_MSG_SkinBitmapConversionError "24-bitars till 32-bitars konverteringsfel (%s)\n"
+#define MSGTR_GUI_MSG_SkinBitmapNotFound "fil ej funnen (%s)\n"
+#define MSGTR_GUI_MSG_SkinBitmapPngReadError "PNG läsfel (%s)\n"
+#define MSGTR_GUI_MSG_SkinCfgNotFound "Skin ej funnen (%s).\n"
+#define MSGTR_GUI_MSG_SkinErrorBitmap16Bit "16-bitar eller lägre bitmappar stödjs inte (%s).\n"
+#define MSGTR_GUI_MSG_SkinErrorMessage "[skin] fel i skinkonfigureringsfil på rad %d: %s"
+#define MSGTR_GUI_MSG_SkinFontFileNotFound "Fontfil ej funnen.\n"
+#define MSGTR_GUI_MSG_SkinFontImageNotFound "Fontbildsfil ej funnen.\n"
+#define MSGTR_GUI_MSG_SkinFontNotFound "icke-existerande fontidentifkator (%s)\n"
+#define MSGTR_GUI_MSG_SkinMemoryError "ej tillräckligt minne\n"
+#define MSGTR_GUI_MSG_SkinTooManyFonts "Allt för många fonter deklarerade.\n"
+#define MSGTR_GUI_MSG_SkinUnknownMessage "okänt meddelande: %s\n"
+#define MSGTR_GUI_MSG_SkinUnknownParameter "okänd parameter (%s)\n"
+#define MSGTR_GUI_MSG_VideoOutError "Tyvärr, jag hittade inte en GUI-kompatibel video-ut-drivrutin."
+#define MSGTR_GUI_Mute "Dämpa"
+#define MSGTR_GUI_NetworkStreaming "Nätverksströmning..."
+#define MSGTR_GUI_Next "Nästa ström"
+#define MSGTR_GUI_NoChapter "Inget kapitel"
+#define MSGTR_GUI__none_ "(ingen)"
+#define MSGTR_GUI_NonInterleavedParser "Använd non-interleaved AVI tolk"
+#define MSGTR_GUI_NormalizeSound "Normalizera ljud"
+#define MSGTR_GUI_Ok "OK"
+#define MSGTR_GUI_Open "Öppna..."
+#define MSGTR_GUI_Original "Orginal"
+#define MSGTR_GUI_OsdLevel "OSD-nivå"
+#define MSGTR_GUI_OSD_Subtitles "Textning & OSD"
+#define MSGTR_GUI_Outline "Outline"
+#define MSGTR_GUI_PanAndScan "Panscan"
+#define MSGTR_GUI_Pause "Pausa"
+#define MSGTR_GUI_Play "Spela"
+#define MSGTR_GUI_Playback "Spelar"
+#define MSGTR_GUI_Playlist "Spellista"
+#define MSGTR_GUI_Position "Position"
+#define MSGTR_GUI_PostProcessing "Postprocessing"
+#define MSGTR_GUI_Preferences "Inställningar"
+#define MSGTR_GUI_Previous "Föregående ström"
+#define MSGTR_GUI_Quit "Avsluta"
+#define MSGTR_GUI_RearLeft "Vänster bak"
+#define MSGTR_GUI_RearRight "Höger bak"
+#define MSGTR_GUI_Remove "Radera"
+#define MSGTR_GUI_Saturation "Saturation"
+#define MSGTR_GUI_SaveWindowPositions "Spara fönsterposition"
+#define MSGTR_GUI_ScaleMovieDiagonal "Propotionellt mot filmdiagonalen"
+#define MSGTR_GUI_ScaleMovieHeight "Propotionellt mot filmhöjd"
+#define MSGTR_GUI_ScaleMovieWidth "Propotionellt mot filmbredd"
+#define MSGTR_GUI_ScaleNo "Ingen autoskalning"
+#define MSGTR_GUI_SeekingInBrokenMedia "Återbygg indextabell, om så behövs"
+#define MSGTR_GUI_SelectAudioFile "Välj extern audiokanal..."
+#define MSGTR_GUI_SelectedFiles "Valda filer"
+#define MSGTR_GUI_SelectFile "Välj fil..."
+#define MSGTR_GUI_SelectFont "Välj font..."
+#define MSGTR_GUI_SelectSubtitle "Välj textning..."
+#define MSGTR_GUI_SizeDouble "Dubbel storlek"
+#define MSGTR_GUI_SizeFullscreen "Fullskärm"
+#define MSGTR_GUI_SizeNormal "Normal storlek"
+#define MSGTR_GUI_SizeOSD "OSDskalning"
+#define MSGTR_GUI_SizeSubtitles "Textskalning"
+#define MSGTR_GUI_SkinBrowser "Skinläsare"
+#define MSGTR_GUI_Sponsored "GUI-utveckling sponstrat av UHU Linux"
+#define MSGTR_GUI_StartFullscreen "Starta i fullskärm"
+#define MSGTR_GUI_Stop "Stopp"
+#define MSGTR_GUI_Subtitle "Textning"
+#define MSGTR_GUI_SubtitleAllowOverlap "Aktivera textningsöverlappning"
+#define MSGTR_GUI_SubtitleAutomaticLoad "Deaktivera automatisk laddning av textning"
+#define MSGTR_GUI_SubtitleConvertMpsub "Konvertera given text till MPlayers egna textningsformat"
+#define MSGTR_GUI_SubtitleConvertSrt "Konvertera given text till det tidbaserade SubViewer (SRT) formatet"
+#define MSGTR_GUI_Subtitles "Textning"
+#define MSGTR_GUI_SyncValue "Autosync"
+#define MSGTR_GUI_TitleNN "Titel %2d"
+#define MSGTR_GUI_Titles "Titlar"
+#define MSGTR_GUI_TrackN "Spår %d"
+#define MSGTR_GUI_TurnOffXScreenSaver "Stoppa XScreenSaver"
+#define MSGTR_GUI_URL "Spela URL"
+#define MSGTR_GUI_VCD "VCD"
+#define MSGTR_GUI_Video "Video"
+#define MSGTR_GUI_VideoEncoder "Videoencoder"
+#define MSGTR_GUI_VideoTracks "Videospår"
+#define MSGTR_GUI_Warning "Varning!"
 
 // ======================= VO Video Output drivers ========================
 
@@ -764,8 +699,6 @@ static const char help_text[]=
 #define MSGTR_VO_CantCreateFile "Oförmögen att skapa utfil."
 #define MSGTR_VO_DirectoryCreateSuccess "Ut-katalog skapad."
 #define MSGTR_VO_ValueOutOfRange "Värden utanför godkänd rymd"
-#define MSGTR_VO_NoValueSpecified "Inget värde angett."
-#define MSGTR_VO_UnknownSuboptions "Okänd suboption" // -''-
 
 // vo_jpeg.c
 #define MSGTR_VO_JPEG_ProgressiveJPEG "'Progressive JPEG' aktiverat."
@@ -782,7 +715,6 @@ static const char help_text[]=
 
 // vo_yuv4mpeg.c
 #define MSGTR_VO_YUV4MPEG_InterlacedHeightDivisibleBy4 "'Interlaced'-mode kräver bildhöjd som är delbar med 4." // FIXME interlaced?
-#define MSGTR_VO_YUV4MPEG_InterlacedLineBufAllocFail "Oförmögen att allokera linjebufferrt för interlaced-mode."
 #define MSGTR_VO_YUV4MPEG_WidthDivisibleBy2 "Bildbredd måste vara delbart med 2."
 #define MSGTR_VO_YUV4MPEG_OutFileOpenError "Kan inte få minnes- eller filhanterare att skriva till \"%s\"!"
 #define MSGTR_VO_YUV4MPEG_OutFileWriteError "Fel vid skrivning av bild till ut!" // FIXME output here?
@@ -870,9 +802,11 @@ static const char help_text[]=
 #define MSGTR_AO_SUN_RtscWriteFailed "[AO SUN] rtsc: skrivning misslyckades."
 #define MSGTR_AO_SUN_CantOpenAudioDev "[AO SUN] Kan inte öppna audioenhet %s, %s  -> inget ljud.\n"
 #define MSGTR_AO_SUN_UnsupSampleRate "[AO SUN] audio_setup: ditt kort hanterar inte %d kanaler, %s, %d Hz samplerate.\n" // FIXME samplerate
-#define MSGTR_AO_SUN_CantUseSelect "[AO SUN]\n   ***  Din ljudkortsenhet hanterar inte select()  ***\nKompilera om med '#undef HAVE_AUDIO_SELECT' i config.h !\n\n"
-#define MSGTR_AO_SUN_CantReopenReset "[AO SUN]\nFatalt fel: *** KAN INTE ÅTERÖPPNA / ÅTERSTÄLLA AUDIOENHET (%s) ***\n"
 
 // ao_plugin.c
 
-#define MSGTR_AO_PLUGIN_InvalidPlugin "[AO PLUGIN] icke godkänd plugin: %s\n" // FIXME plugin - translate?
+
+// ========================== LIBMPCODECS ===================================
+
+// libmpcodecs/ad_dvdpcm.c:
+#define MSGTR_SamplesWanted "Fler exempel på detta format behövs för att vidare öka support. Var vänlig kontakta utvecklarna.\n"

@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stddef.h>
 
 #include "config.h"
 #include "video_out.h"
@@ -281,7 +282,7 @@ extern void (GLAPIENTRY *mpglColorMask)(GLboolean, GLboolean, GLboolean, GLboole
 extern void (GLAPIENTRY *mpglGenBuffers)(GLsizei, GLuint *);
 extern void (GLAPIENTRY *mpglDeleteBuffers)(GLsizei, const GLuint *);
 extern void (GLAPIENTRY *mpglBindBuffer)(GLenum, GLuint);
-extern GLvoid* (GLAPIENTRY *mpglMapBuffer)(GLenum, GLenum);
+extern GLvoid* (GLAPIENTRY *mpglMapBufferRange)(GLenum, ptrdiff_t, ptrdiff_t, unsigned);
 extern GLboolean (GLAPIENTRY *mpglUnmapBuffer)(GLenum);
 extern void (GLAPIENTRY *mpglBufferData)(GLenum, intptr_t, const GLvoid *, GLenum);
 extern void (GLAPIENTRY *mpglCombinerParameterfv)(GLenum, const GLfloat *);

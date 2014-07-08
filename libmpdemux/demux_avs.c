@@ -288,7 +288,6 @@ static demuxer_t* demux_open_avs(demuxer_t* demuxer)
         if (demuxer->video->id == -1) demuxer->video->id = 0;
         if (demuxer->video->id == 0)
         demuxer->video->sh = sh_video;
-        sh_video->ds = demuxer->video;
 
         sh_video->disp_w = AVS->video_info->width;
         sh_video->disp_h = AVS->video_info->height;
@@ -329,7 +328,6 @@ static demuxer_t* demux_open_avs(demuxer_t* demuxer)
         if (demuxer->audio->id == -1) demuxer->audio->id = 0;
         if (demuxer->audio->id == 0)
         demuxer->audio->sh = sh_audio;
-        sh_audio->ds = demuxer->audio;
 
         sh_audio->wf = malloc(sizeof(*sh_audio->wf));
         sh_audio->wf->wFormatTag = sh_audio->format =

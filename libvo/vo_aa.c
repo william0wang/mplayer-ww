@@ -668,10 +668,6 @@ static int parse_suboptions(const char *arg) {
 static int preinit(const char *arg)
 {
     char * hidis = NULL;
-    struct stat sbuf;
-    int fd, vt, major, minor;
-    FILE * fp;
-    char fname[12];
 
     if(arg)
     {
@@ -683,12 +679,16 @@ static int preinit(const char *arg)
 
     hidis=aa_getfirst(&aa_displayrecommended);
     if ( hidis==NULL ){
+	struct stat sbuf;
+	char fname[12];
+	FILE *fp;
+	int fd, vt;
 	/* check /dev/vcsa<vt> */
 	/* check only, if no driver is explicit set */
 	fd = dup (fileno (stderr));
 	fstat (fd, &sbuf);
-	major = sbuf.st_rdev >> 8;
-	vt = minor = sbuf.st_rdev & 0xff;
+	// vt number stored in device minor
+	vt = sbuf.st_rdev & 0xff;
 	close (fd);
 	sprintf (fname, "/dev/vcsa%2.2i", vt);
 	fp = fopen (fname, "w+");

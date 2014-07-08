@@ -16,6 +16,12 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+/**
+ * @file
+ * @brief GUI rendering
+ */
+
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,347 +29,479 @@
 
 #include "render.h"
 #include "gui/interface.h"
+#include "gui/app/gui.h"
 #include "gui/skin/font.h"
 #include "gui/util/string.h"
 
 #include "access_mpcontext.h"
-#include "mixer.h"
+#include "help_mp.h"
 #include "libavutil/avstring.h"
+#include "libavutil/common.h"
 #include "osdep/timer.h"
 #include "stream/stream.h"
 
-#define DLABEL_DELAY 2500   // in milliseconds
+/**
+ * @brief Time in milliseconds a scrolling dlabel stops
+ *        when reaching the left margin until scrolling starts over
+ */
+#define DLABEL_DELAY 2500
 
-static char *image_buffer;
-static int image_width;
-
-static char *Translate(char *str)
+/**
+ * @brief Convert #guiInfo member Filename.
+ *
+ * @param how 0 (cut file path and extension),
+ *            1 (additionally, convert lower case) or
+ *            2 (additionally, convert upper case)
+ * @param fname memory location of a buffer to receive the converted Filename
+ * @param maxlen size of the @a fname buffer
+ *
+ * @return pointer to the @a fname buffer
+ */
+static char *TranslateFilename(int how, char *fname, size_t maxlen)
 {
-    static char trbuf[512];
-    char tmp[512];
+    char *p;
+    size_t len;
+    stream_t *stream;
+
+    switch (guiInfo.StreamType) {
+    case STREAMTYPE_FILE:
+
+        if (guiInfo.Filename && *guiInfo.Filename) {
+            p = strrchr(guiInfo.Filename, '/');
+
+            if (p)
+                av_strlcpy(fname, p + 1, maxlen);
+            else
+                av_strlcpy(fname, guiInfo.Filename, maxlen);
+
+            len = strlen(fname);
+
+            if (len > 3 && fname[len - 3] == '.')
+                fname[len - 3] = 0;
+            else if (len > 4 && fname[len - 4] == '.')
+                fname[len - 4] = 0;
+            else if (len > 5 && fname[len - 5] == '.')
+                fname[len - 5] = 0;
+        } else
+            av_strlcpy(fname, MSGTR_GUI_MSG_NoFileLoaded, maxlen);
+
+        break;
+
+    case STREAMTYPE_STREAM:
+
+        av_strlcpy(fname, guiInfo.Filename, maxlen);
+        break;
+
+    case STREAMTYPE_CDDA:
+
+        snprintf(fname, maxlen, MSGTR_GUI_TitleN, guiInfo.Track);
+        break;
+
+    case STREAMTYPE_VCD:
+
+        snprintf(fname, maxlen, MSGTR_GUI_TitleN, guiInfo.Track - 1);
+        break;
+
+    case STREAMTYPE_DVD:
+
+        if (guiInfo.Chapter)
+            snprintf(fname, maxlen, MSGTR_GUI_ChapterN, guiInfo.Chapter);
+        else
+            av_strlcpy(fname, MSGTR_GUI_NoChapter, maxlen);
+
+        break;
+
+    case STREAMTYPE_TV:
+    case STREAMTYPE_DVB:
+
+        p      = MSGTR_GUI_NoChannelName;
+        stream = mpctx_get_stream(guiInfo.mpcontext);
+
+        if (stream)
+            stream_control(stream, STREAM_CTRL_GET_CURRENT_CHANNEL, &p);
+
+        av_strlcpy(fname, p, maxlen);
+        break;
+
+    default:
+
+        av_strlcpy(fname, MSGTR_GUI_MSG_NoMediaOpened, maxlen);
+        break;
+    }
+
+    if (how == 1)
+        strlower(fname);
+    if (how == 2)
+        strupper(fname);
+
+    return fname;
+}
+
+/**
+ * @brief Translate all variables in the @a text.
+ *
+ * @param text text containing variables
+ *
+ * @return new text with all variables translated
+ */
+static char *TranslateVariables(const char *text)
+{
+    static char translation[512];
+    char trans[512];
     unsigned int i, c;
     int t;
-    mixer_t *mixer = NULL;
 
-    *trbuf = 0;
+    *translation = 0;
 
-    for (c = 0, i = 0; i < strlen(str); i++) {
-        if (str[i] != '$') {
-            if (c + 1 < sizeof(trbuf)) {
-                trbuf[c++] = str[i];
-                trbuf[c]   = 0;
+    for (c = 0, i = 0; i < strlen(text); i++) {
+        if (text[i] != '$') {
+            if (c + 1 < sizeof(translation)) {
+                translation[c++] = text[i];
+                translation[c]   = 0;
             }
         } else {
-            switch (str[++i]) {
-            case 't':
-                snprintf(tmp, sizeof(tmp), "%02d", guiInfo.Track);
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
+            switch (text[++i]) {
+            case '1':
+                t = guiInfo.ElapsedTime;
+HH_MM_SS:       snprintf(trans, sizeof(trans), "%02d:%02d:%02d", t / 3600, t / 60 % 60, t % 60);
+                av_strlcat(translation, trans, sizeof(translation));
                 break;
 
-            case 'o':
-                TranslateFilename(0, tmp, sizeof(tmp));
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
+            case '2':
+                t = guiInfo.ElapsedTime;
+MMMM_SS:        snprintf(trans, sizeof(trans), "%04d:%02d", t / 60, t % 60);
+                av_strlcat(translation, trans, sizeof(translation));
                 break;
 
-            case 'f':
-                TranslateFilename(1, tmp, sizeof(tmp));
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
+            case '3':
+                snprintf(trans, sizeof(trans), "%02d", guiInfo.ElapsedTime / 3600);
+                av_strlcat(translation, trans, sizeof(translation));
                 break;
 
-            case 'F':
-                TranslateFilename(2, tmp, sizeof(tmp));
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
+            case '4':
+                snprintf(trans, sizeof(trans), "%02d", guiInfo.ElapsedTime / 60 % 60);
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case '5':
+                snprintf(trans, sizeof(trans), "%02d", guiInfo.ElapsedTime % 60);
+                av_strlcat(translation, trans, sizeof(translation));
                 break;
 
             case '6':
                 t = guiInfo.RunningTime;
-                goto calclengthhhmmss;
-
-            case '1':
-                t = guiInfo.ElapsedTime;
-calclengthhhmmss:
-                snprintf(tmp, sizeof(tmp), "%02d:%02d:%02d", t / 3600, t / 60 % 60, t % 60);
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
-                break;
+                goto HH_MM_SS;
 
             case '7':
                 t = guiInfo.RunningTime;
-                goto calclengthmmmmss;
-
-            case '2':
-                t = guiInfo.ElapsedTime;
-calclengthmmmmss:
-                snprintf(tmp, sizeof(tmp), "%04d:%02d", t / 60, t % 60);
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
-                break;
-
-            case '3':
-                snprintf(tmp, sizeof(tmp), "%02d", guiInfo.ElapsedTime / 3600);
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
-                break;
-
-            case '4':
-                snprintf(tmp, sizeof(tmp), "%02d", (guiInfo.ElapsedTime / 60) % 60);
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
-                break;
-
-            case '5':
-                snprintf(tmp, sizeof(tmp), "%02d", guiInfo.ElapsedTime % 60);
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
-                break;
+                goto MMMM_SS;
 
             case '8':
-                snprintf(tmp, sizeof(tmp), "%01d:%02d:%02d", guiInfo.ElapsedTime / 3600, (guiInfo.ElapsedTime / 60) % 60, guiInfo.ElapsedTime % 60);
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
+                snprintf(trans, sizeof(trans), "%01d:%02d:%02d", guiInfo.ElapsedTime / 3600, (guiInfo.ElapsedTime / 60) % 60, guiInfo.ElapsedTime % 60);
+                av_strlcat(translation, trans, sizeof(translation));
                 break;
 
-            case 'v':
-                snprintf(tmp, sizeof(tmp), "%3.2f%%", guiInfo.Volume);
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
-                break;
+            case 'a':
+                switch (guiInfo.AudioChannels) {
+                case 0:
+                    av_strlcat(translation, "n", sizeof(translation));
+                    break;
 
-            case 'V':
-                snprintf(tmp, sizeof(tmp), "%3.1f", guiInfo.Volume);
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
+                case 1:
+                    av_strlcat(translation, "m", sizeof(translation));
+                    break;
+
+                case 2:
+                    av_strlcat(translation, guiInfo.AudioPassthrough ? "r" : "t", sizeof(translation));
+                    break;
+
+                default:
+                    av_strlcat(translation, "r", sizeof(translation));
+                    break;
+                }
                 break;
 
             case 'b':
-                snprintf(tmp, sizeof(tmp), "%3.2f%%", guiInfo.Balance);
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
+                snprintf(trans, sizeof(trans), "%3.2f%%", guiInfo.Balance);
+                av_strlcat(translation, trans, sizeof(translation));
                 break;
 
             case 'B':
-                snprintf(tmp, sizeof(tmp), "%3.1f", guiInfo.Balance);
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
-                break;
-
-            case 'x':
-                snprintf(tmp, sizeof(tmp), "%d", guiInfo.VideoWidth);
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
-                break;
-
-            case 'y':
-                snprintf(tmp, sizeof(tmp), "%d", guiInfo.VideoHeight);
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
+                snprintf(trans, sizeof(trans), "%3.1f", guiInfo.Balance);
+                av_strlcat(translation, trans, sizeof(translation));
                 break;
 
             case 'C':
-                snprintf(tmp, sizeof(tmp), "%s", guiInfo.CodecName ? guiInfo.CodecName : "");
-                av_strlcat(trbuf, tmp, sizeof(trbuf));
+                snprintf(trans, sizeof(trans), "%s", guiInfo.CodecName ? guiInfo.CodecName : "");
+                av_strlcat(translation, trans, sizeof(translation));
                 break;
 
-            case 's':
-                if (guiInfo.Playing == GUI_STOP)
-                    av_strlcat(trbuf, "s", sizeof(trbuf));
+            case 'D':
+                snprintf(trans, sizeof(trans), "%3.0f", guiInfo.Balance);
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'e':
+                if (guiInfo.Playing == GUI_PAUSE)
+                    av_strlcat(translation, "e", sizeof(translation));
+                break;
+
+            case 'f':
+                TranslateFilename(1, trans, sizeof(trans));
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'F':
+                TranslateFilename(2, trans, sizeof(trans));
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'o':
+                TranslateFilename(0, trans, sizeof(trans));
+                av_strlcat(translation, trans, sizeof(translation));
                 break;
 
             case 'l': // legacy
             case 'p':
                 if (guiInfo.Playing == GUI_PLAY)
-                    av_strlcat(trbuf, "p", sizeof(trbuf));
+                    av_strlcat(translation, "p", sizeof(translation));
                 break;
 
-            case 'e':
-                if (guiInfo.Playing == GUI_PAUSE)
-                    av_strlcat(trbuf, "e", sizeof(trbuf));
+            case 'P':
+                switch (guiInfo.Playing) {
+                case GUI_STOP:
+                    av_strlcat(translation, "s", sizeof(translation));
+                    break;
+
+                case GUI_PLAY:
+                    av_strlcat(translation, "p", sizeof(translation));
+                    break;
+
+                case GUI_PAUSE:
+                    av_strlcat(translation, "e", sizeof(translation));
+                    break;
+                }
                 break;
 
-            case 'a':
+            case 's':
+                if (guiInfo.Playing == GUI_STOP)
+                    av_strlcat(translation, "s", sizeof(translation));
+                break;
 
-                if (guiInfo.mpcontext)
-                    mixer = mpctx_get_mixer(guiInfo.mpcontext);
-
-                if (mixer && mixer->muted) {
-                    av_strlcat(trbuf, "n", sizeof(trbuf));
-                    break;
-                }
-
-                switch (guiInfo.AudioChannels) {
-                case 0:
-                    av_strlcat(trbuf, "n", sizeof(trbuf));
-                    break;
-
-                case 1:
-                    av_strlcat(trbuf, "m", sizeof(trbuf));
-                    break;
-
-                case 2:
-                    av_strlcat(trbuf, "t", sizeof(trbuf));
-                    break;
-                }
-
+            case 't':
+                snprintf(trans, sizeof(trans), "%02d", guiInfo.Track);
+                av_strlcat(translation, trans, sizeof(translation));
                 break;
 
             case 'T':
                 switch (guiInfo.StreamType) {
                 case STREAMTYPE_FILE:
-                    av_strlcat(trbuf, "f", sizeof(trbuf));
+                    av_strlcat(translation, "f", sizeof(translation));
                     break;
 
                 case STREAMTYPE_STREAM:
-                    av_strlcat(trbuf, "u", sizeof(trbuf));
+                    av_strlcat(translation, "u", sizeof(translation));
                     break;
 
                 case STREAMTYPE_CDDA:
-                    av_strlcat(trbuf, "a", sizeof(trbuf));
+                    av_strlcat(translation, "a", sizeof(translation));
                     break;
 
                 case STREAMTYPE_VCD:
-                    av_strlcat(trbuf, "v", sizeof(trbuf));
+                    av_strlcat(translation, "v", sizeof(translation));
                     break;
 
                 case STREAMTYPE_DVD:
-                    av_strlcat(trbuf, "d", sizeof(trbuf));
+                    av_strlcat(translation, "d", sizeof(translation));
                     break;
 
                 case STREAMTYPE_TV:
                 case STREAMTYPE_DVB:
-                    av_strlcat(trbuf, "b", sizeof(trbuf));
+                    av_strlcat(translation, "b", sizeof(translation));
                     break;
 
                 default:
-                    av_strlcat(trbuf, " ", sizeof(trbuf));
+                    av_strlcat(translation, " ", sizeof(translation));
                     break;
                 }
                 break;
 
+            case 'U':
+                snprintf(trans, sizeof(trans), "%3.0f", guiInfo.Volume);
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'v':
+                snprintf(trans, sizeof(trans), "%3.2f%%", guiInfo.Volume);
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'V':
+                snprintf(trans, sizeof(trans), "%3.1f", guiInfo.Volume);
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'x':
+                snprintf(trans, sizeof(trans), "%d", guiInfo.VideoWidth);
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
+            case 'y':
+                snprintf(trans, sizeof(trans), "%d", guiInfo.VideoHeight);
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
             case '$':
-                av_strlcat(trbuf, "$", sizeof(trbuf));
+                av_strlcat(translation, "$", sizeof(translation));
                 break;
 
             default:
                 continue;
             }
 
-            c = strlen(trbuf);
+            c = strlen(translation);
         }
     }
 
-    return trbuf;
+    return translation;
 }
 
-static void PutImage(guiImage *bf, int x, int y, int max, int ofs)
+/**
+ * @brief Put a part of a #guiImage image into a (window's) draw buffer.
+ *
+ * @param x x position where to start in the draw buffer
+ * @param y y position where to start in the draw buffer
+ * @param drawbuf draw buffer where the image should be put in
+ * @param drawbuf_width width of the draw buffer
+ * @param img image (containing several phases, i.e. image parts)
+ * @param parts number of parts in the image
+ * @param index index of the part of the image to be drawn
+ * @param below flag indicating whether the image parts are arranged
+ *              below each other or side by side
+ */
+static void PutImage(int x, int y, uint32_t *drawbuf, int drawbuf_width, guiImage *img, int parts, int index, int below)
 {
-    int i = 0, ix, iy;
-    uint32_t *buf = NULL;
-    uint32_t *drw = NULL;
-    register uint32_t tmp;
+    register int i, ic, yc;
+    register uint32_t pixel;
+    int xlimit, ylimit, ix, iy;
+    uint32_t *pixels;
 
-    /* register uint32_t yc; */
-
-    if (!bf || (bf->Image == NULL))
+    if (!img || !img->Image)
         return;
 
-    i   = bf->Width * (bf->Height / max) * ofs;
-    buf = (uint32_t *)image_buffer;
-    drw = (uint32_t *)bf->Image;
-
-#if 1
-    for (iy = y; iy < (int)(y + bf->Height / max); iy++)
-        for (ix = x; ix < (int)(x + bf->Width); ix++) {
-            tmp = drw[i++];
-
-            if (!IS_TRANSPARENT(tmp))
-                buf[iy * image_width + ix] = tmp;
-        }
-#else
-    yc = y * image_width;
-
-    for (iy = y; iy < (int)(y + bf->Height / max); iy++) {
-        for (ix = x; ix < (int)(x + bf->Width); ix++) {
-            tmp = drw[i++];
-
-            if (!IS_TRANSPARENT(tmp))
-                buf[yc + ix] = tmp;
-        }
-
-        yc += image_width;
+    if (below) {
+        i      = img->Width * (img->Height / parts) * index;
+        xlimit = x + img->Width;
+        ylimit = y + img->Height / parts;
+    } else {
+        i      = (img->Width / parts) * index;
+        xlimit = x + img->Width / parts;
+        ylimit = y + img->Height;
     }
-#endif
-}
 
-static void SimplePotmeterPutImage(guiImage *bf, int x, int y, float frac)
-{
-    int i = 0, w, r, ix, iy;
-    uint32_t *buf = NULL;
-    uint32_t *drw = NULL;
-    register uint32_t tmp;
+    pixels = (uint32_t *)img->Image;
 
-    if (!bf || (bf->Image == NULL))
-        return;
+    yc = y * drawbuf_width;
 
-    buf = (uint32_t *)image_buffer;
-    drw = (uint32_t *)bf->Image;
-    w   = bf->Width * frac;
-    r   = bf->Width - w;
+    for (iy = y; iy < ylimit; iy++) {
+        ic = i;
 
-    for (iy = y; iy < (int)(y + bf->Height); iy++) {
-        for (ix = x; ix < (int)(x + w); ix++) {
-            tmp = drw[i++];
+        for (ix = x; ix < xlimit; ix++) {
+            pixel = pixels[i++];
 
-            if (!IS_TRANSPARENT(tmp))
-                buf[iy * image_width + ix] = tmp;
+            if (!IS_TRANSPARENT(pixel))
+                drawbuf[yc + ix] = pixel;
         }
 
-        i += r;
+        if (!below)
+            i = ic + img->Width;
+
+        yc += drawbuf_width;
     }
 }
 
-void RenderAll(wsWindow *window, guiItem *Items, int nrItems, char *db)
+/**
+ * @brief Render all GUI items in a window, i.e. copy the respective images
+ *        into the draw buffer.
+ *
+ * @param window pointer to a ws window structure of the window to be rendered
+ * @param items pointer to the array of items
+ * @param till maximum index in use for the @a items, i.e. number of last item in array
+ * @param drawbuf memory location of the @a window's draw buffer
+ */
+void RenderAll(wsWindow *window, guiItem *items, int till, char *drawbuf)
 {
+    uint32_t *db;
     guiItem *item;
     guiImage *image = NULL;
-    int i, ofs;
+    int dw, i, index, x;
+    char *trans;
+    unsigned int d;
 
-    image_buffer = db;
-    image_width  = window->Width;
+    db = (uint32_t *)drawbuf;
+    dw = window->Width;
 
-    for (i = 0; i < nrItems + 1; i++) {
-        item = &Items[i];
+    for (i = 0; i <= till; i++) {
+        item = &items[i];
 
         switch (item->pressed) {
         case btnPressed:
-            ofs = 0;
+            index = 0;
             break;
 
         case btnReleased:
-            ofs = 1;
+            index = 1;
             break;
 
         default:
-            ofs = 2;
+            index = 2;
             break;
         }
 
         switch (item->type) {
         case itButton:
 
-            PutImage(&item->Bitmap, item->x, item->y, 3, ofs);
+            PutImage(item->x, item->y, db, dw, &item->Bitmap, 3, index, True);
             break;
 
-        case itPotmeter:
+        case itPimage:
 
-            if (item->numphases == 1)
-                SimplePotmeterPutImage(&item->Bitmap, item->x, item->y, item->value / 100.0);
-            else
-                PutImage(&item->Bitmap, item->x, item->y, item->numphases, (item->numphases - 1) * (item->value / 100.0));
-
+            PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * item->value / 100.0, True);
             break;
 
         case itHPotmeter:
 
-            if (item->numphases == 1)
-                SimplePotmeterPutImage(&item->Bitmap, item->x, item->y, item->value / 100.0);
-            else
-                PutImage(&item->Bitmap, item->x, item->y, item->numphases, (item->numphases - 1) * (item->value / 100.0));
-
-            PutImage(&item->Mask, item->x + (item->width - item->pwidth) * (item->value / 100.0), item->y, 3, ofs);
+            PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * item->value / 100.0, True);
+            PutImage(item->x + (item->width - item->pbwidth) * item->value / 100.0, item->y, db, dw, &item->Mask, 3, index, True);
             break;
 
         case itVPotmeter:
 
-            PutImage(&item->Bitmap, item->x, item->y, item->numphases, item->numphases * (1.0 - item->value / 100.0));
-            PutImage(&item->Mask, item->x, item->y + (item->height - item->pheight) * (1.0 - item->value / 100.0), 3, ofs);
+            PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * item->value / 100.0, False);
+            PutImage(item->x, item->y + (item->height - item->pbheight) * (1.0 - item->value / 100.0), db, dw, &item->Mask, 3, index, True);
+            break;
+
+        case itRPotmeter:
+
+            PutImage(item->x, item->y, db, dw, &item->Bitmap, item->numphases, (item->numphases - 1) * item->value / 100.0, True);
+
+            if (item->Mask.Image) {
+                double radius, radian;
+                int y;
+
+                // keep the button inside the potmeter outline
+                radius = (FFMIN(item->width, item->height) - FFMAX(item->pbwidth, item->pbheight)) / 2.0;
+
+                radian = item->value / 100.0 * item->arclength + item->zeropoint;
+
+                // coordinates plus a correction for a non-square item
+                // (remember: both axes are mirrored, we have a clockwise radian)
+                x = radius * (1 + cos(radian)) + FFMAX(0, (item->width - item->height) / 2.0) + 0.5;
+                y = radius * (1 + sin(radian)) + FFMAX(0, (item->height - item->width) / 2.0) + 0.5;
+
+                PutImage(item->x + x, item->y + y, db, dw, &item->Mask, 3, index, True);
+            }
+
             break;
 
         case itSLabel:
@@ -374,20 +512,18 @@ void RenderAll(wsWindow *window, guiItem *Items, int nrItems, char *db)
             image = fntTextRender(item, 0, item->label);
 
             if (image)
-                PutImage(image, item->x, item->y, 1, 0);
+                PutImage(item->x, item->y, db, dw, image, 1, 0, True);
 
             break;
 
         case itDLabel:
-        {
-            int x;
-            unsigned int d;
-            char *t = Translate(item->label);
 
-            if (!item->text || (strcmp(item->text, t) != 0)) {
+            trans = TranslateVariables(item->label);
+
+            if (!item->text || (strcmp(item->text, trans) != 0)) {
                 free(item->text);
-                item->text      = strdup(t);
-                item->textwidth = fntTextWidth(item->fontid, t);
+                item->text      = strdup(trans);
+                item->textwidth = fntTextWidth(item->fontid, trans);
                 item->starttime = GetTimerMS();
                 item->last_x    = 0;
             }
@@ -395,7 +531,7 @@ void RenderAll(wsWindow *window, guiItem *Items, int nrItems, char *db)
             d = GetTimerMS() - item->starttime;
 
             if (d < DLABEL_DELAY)
-                x = item->last_x;                     // don't scroll yet
+                x = item->last_x;                   // don't scroll yet
             else {
                 int l;
                 char c[2];
@@ -403,23 +539,22 @@ void RenderAll(wsWindow *window, guiItem *Items, int nrItems, char *db)
                 l    = (item->textwidth ? item->textwidth : item->width);
                 x    = (l ? l - ((d - DLABEL_DELAY) / 20) % l - 1 : 0);
                 c[0] = *item->text;
-                c[1] = '\0';
+                c[1] = 0;
 
                 if (x < (fntTextWidth(item->fontid, c) + 1) >> 1) {
-                    item->starttime = GetTimerMS();   // stop again
-                    item->last_x    = x;              // at current x pos
+                    item->starttime = GetTimerMS(); // stop again
+                    item->last_x    = x;            // at current x pos
                 }
             }
 
-            image = fntTextRender(item, x, t);
-        }
+            image = fntTextRender(item, x, trans);
 
             if (image)
-                PutImage(image, item->x, item->y, 1, 0);
+                PutImage(item->x, item->y, db, dw, image, 1, 0, True);
 
             break;
         }
     }
 
-    wsImageRender(window, db);
+    wsImageRender(window, drawbuf);
 }

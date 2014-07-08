@@ -243,7 +243,7 @@ static uint32_t svga_draw_image(mp_image_t *mpi){
 
     if(mpi->flags & MP_IMGFLAG_DIRECT){
         mp_msg(MSGT_VO,MSGL_DBG3, "vo_svga: drawing direct rendered surface\n");
-        cpage=(uint32_t)mpi->priv;
+        cpage=(uintptr_t)mpi->priv;
         assert((cpage>=0)&&(cpage<max_pages));
         return VO_TRUE; //it's already done
     }
@@ -703,7 +703,7 @@ static uint32_t get_image(mp_image_t *mpi){
             mpi->stride[0] = mode_stride;
             mpi->planes[0] = PageStore[page].vbase +
                              y_pos*mode_stride + (x_pos*mpi->bpp)/8;
-            mpi->priv=(void *)page;
+            mpi->priv=(void *)(uintptr_t)page;
             mp_msg(MSGT_VO,MSGL_DBG3, "vo_svga: direct render allocated! page=%d\n",page);
             return VO_TRUE;
         }

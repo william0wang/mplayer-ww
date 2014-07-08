@@ -576,7 +576,7 @@ static void print_file_properties(const MPContext *mpctx, const char *filename)
         mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_START_TIME=%.2f\n", start_pts);
     else
         mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_START_TIME=unknown\n");
-    mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_LENGTH=%.2f\n", demuxer_get_time_length(mpctx->demuxer));
+    mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_LENGTH=%.2f\n", mpctx->demuxer ? demuxer_get_time_length(mpctx->demuxer) : 0);
     mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_SEEKABLE=%d\n",
            mpctx->stream->seek && (!mpctx->demuxer || mpctx->demuxer->seekable));
     if (mpctx->demuxer) {
@@ -2114,15 +2114,12 @@ static void mp_dvdnav_reset_stream(MPContext *ctx)
         ctx->demuxer->stream_pts = MP_NOPTS_VALUE;
     }
 
-    if (ctx->sh_audio) {
-        // free audio packets and reset
-        ds_free_packs(ctx->d_audio);
-        audio_delay -= ctx->sh_audio->stream_delay;
-        ctx->delay   = -audio_delay;
-        ctx->audio_out->reset();
-        resync_audio_stream(ctx->sh_audio);
-    }
-
+    // This is necessary to make video start in sync after
+    // a still frame. But do not discard pending audio packets,
+    // that causes issues since this code is also called on
+    // title changes (which is possibly a bug in itself *sigh*),
+    // and thus cause tiny audio skips.
+    ctx->delay   = -audio_delay;
     audio_delay = 0.0f;
     mpctx->sub_counts[SUB_SOURCE_DEMUX] = mp_dvdnav_number_of_subs(mpctx->stream);
     if (dvdsub_lang && dvdsub_id == dvdsub_lang_id) {
@@ -3266,7 +3263,7 @@ int main(int argc, char *argv[])
     if (use_gui) {
         guiInit();
         gui(GUI_SET_CONTEXT, mpctx);
-        gui(GUI_SET_STATE, (void *)(filename ? GUI_PLAY : GUI_STOP));
+        gui(GUI_SET_STATE, (void *)(intptr_t)(filename ? GUI_PLAY : GUI_STOP));
     }
 #endif
 
@@ -3308,7 +3305,7 @@ play_next_file:
                 if (cmd->id == MP_CMD_GUI)
                     gui(GUI_RUN_MESSAGE, cmd->args[0].v.s);
                 else
-                    gui(GUI_RUN_COMMAND, (void *)cmd->id);
+                    gui(GUI_RUN_COMMAND, (void *)(intptr_t)cmd->id);
                 mp_cmd_free(cmd);
             }
         }
@@ -3662,6 +3659,10 @@ goto_enable_cache:
         int tmp = ts_prog;
         mp_property_do("switch_program", M_PROPERTY_SET, &tmp, mpctx);
     }
+
+    // select video stream
+    select_video(mpctx->demuxer, video_id);
+
     // select audio stream
     select_audio(mpctx->demuxer, audio_id, audio_lang);
 
@@ -3683,10 +3684,12 @@ goto_enable_cache:
         // disable other streams:
         if (mpctx->d_audio && mpctx->d_audio != ds) {
             ds_free_packs(mpctx->d_audio);
+            select_audio(mpctx->demuxer, -2, NULL);
             mpctx->d_audio->id = -2;
         }
         if (mpctx->d_video && mpctx->d_video != ds) {
             ds_free_packs(mpctx->d_video);
+            select_video(mpctx->demuxer, -2);
             mpctx->d_video->id = -2;
         }
         if (mpctx->d_sub && mpctx->d_sub != ds) {
@@ -3700,6 +3703,10 @@ goto_enable_cache:
             exit_player(EXIT_ERROR);
         }
         stream_dump_progress_start();
+
+        // force retry in case bad interleaving caused EOF before.
+        ds->fill_count = 0;
+        ds->eof = 0;
         while (!ds->eof) {
             unsigned char *start;
             double pts;
@@ -4143,6 +4150,9 @@ goto_enable_cache:
                     // clear highlight
                     if (vo_spudec)
                         spudec_apply_palette_crop(vo_spudec, 0, 0, 0, 0, 0);
+                    osd_set_nav_box(0, 0, 0, 0);
+                    vo_osd_changed(OSDTYPE_DVDNAV);
+                    vo_osd_changed(OSDTYPE_SPU);
                     if (mpctx->sh_video &&
                         stream_control(mpctx->demuxer->stream,
                                        STREAM_CTRL_GET_ASPECT_RATIO, &ar)
@@ -4242,13 +4252,13 @@ goto_enable_cache:
                 else if (mpctx->sh_audio)
                     guiInfo.ElapsedTime = playing_audio_pts(mpctx->sh_audio, mpctx->d_audio, mpctx->audio_out);
                 guiInfo.RunningTime = demuxer_get_time_length(mpctx->demuxer);
-                gui(GUI_SET_MIXER, &mpctx->mixer);
+                gui(GUI_SET_VOLUME_BALANCE, &mpctx->mixer);
                 gui(GUI_REDRAW, 0);
                 if (guiInfo.Playing == GUI_STOP)
                     break;                  // STOP
                 if (guiInfo.Playing == GUI_PAUSE)
                     mpctx->osd_function = OSD_PAUSE;
-                if (guiInfo.NewPlay)
+                if (guiInfo.MediumChanged)
                     goto goto_next_file;
 #ifdef CONFIG_DVDREAD
                 if (mpctx->stream->type == STREAMTYPE_DVD) {
@@ -4346,8 +4356,8 @@ goto_next_file:  // don't jump here after ao/vo/getch initialization!
 
 #ifdef CONFIG_GUI
     if (use_gui)
-        if (guiInfo.NewPlay != GUI_FILE_SAME)
-            gui(GUI_END_FILE, 0);
+        if (guiInfo.MediumChanged != GUI_MEDIUM_SAME)
+            gui(GUI_END_PLAY, 0);
 #endif
 
     if (

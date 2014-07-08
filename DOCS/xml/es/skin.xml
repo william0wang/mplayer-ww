@@ -103,8 +103,7 @@ con clic derecho).
   Un <emphasis role="bold">medidor</emphasis> (usado principalmente para la barra
   de búsqueda y el control de volumen/balance) puede tener cualquier número de fases
   dividiendo su imagen en diferentes partes unas debajo de otras. Vea
-  <link linkend="skin-hpotmeter">hpotmeter</link> y
-  <link linkend="skin-potmeter">potmeter</link> para detalles.
+  <link linkend="skin-hpotmeter">hpotmeter</link> para detalles.
 </para><para>
   <emphasis role="bold">Etiquetas</emphasis> son un poco especiales: Los caractere
   necesarios para pintarlas se toman de un archivo de imagen, y los caracteres en
@@ -324,6 +323,18 @@ y '<literal>window = playbar</literal>' ... '<literal>end</literal>'.
 <variablelist>
 <varlistentry>
   <term><literal>
+  <anchor id="skin-decoration"/>decoration = enable|disable
+  </literal></term>
+  <listitem><para>
+Activa o desactiva la decoración del administrador de ventanas para la
+ventana principal. Por defecto toma el valor <emphasis role="bold">disable</emphasis>.
+    </para>
+    <note><para>Esto no funciona para la ventana de reproducción, no lo necesita.</para></note>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><literal>
   <anchor id="skin-main-base"/>base = image, X, Y
   </literal></term>
   <listitem><para>
@@ -360,18 +371,6 @@ los posibles estados del botón), como esto:
 +--------------+
 </screen>
 </informalfigure>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
-  <anchor id="skin-decoration"/>decoration = enable|disable
-  </literal></term>
-  <listitem><para>
-Activa o desactiva la decoración del administrador de ventanas para la
-ventana principal. Por defecto toma el valor <emphasis role="bold">disable</emphasis>.
-    </para>
-    <note><para>Esto no funciona para la ventana de reproducción, no lo necesita.</para></note>
   </listitem>
 </varlistentry>
 
@@ -445,19 +444,6 @@ que se desplaze horizontalmente. Los parámetros son:
 
 <varlistentry>
   <term><literal>
-  <anchor id="skin-potmeter"/>potmeter = fases, numfases, defecto, X, Y, ancho, alto, mensaje
-  </literal></term>
-  <listitem><para>
-Un <literal>hpotmeter</literal> sin un botón. (Creo que está hecho para hacer una especie
-de botón que gire sobre sí mismo, pero reacciona a arrastre horizontal solamente). Para la
-descripción de los parámetros vea <link linkend="skin-hpotmeter">hpotmeter</link>.
-<literal>fases</literal> puede ser <literal>NULL</literal>, pero es poco útil,
-porque no le permite ver donde está establecido el valor del <literal>potmeter</literal>.
-    </para></listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><literal>
   <anchor id="skin-font"/>font = fontfile, fontid
   </literal></term>
   <listitem><para>
@@ -493,8 +479,8 @@ llama dinámica porque su texto es refrescado periódicamente. La longitud máxi
 etiqueta viene dada por <literal>width</literal> (su altura es la altura de un caracter).
 Si el texto que ha de ser mostrado es más ancho que esta, será desplazado,
 si no será alineado dentro del espacio especificado por el valor del parámetro
-<literal>align</literal>: <literal>0</literal> es para derecha,
-<literal>1</literal> para centrado, <literal>2</literal> para izquierda.
+<literal>align</literal>: <literal>0</literal> es para izquierda,
+<literal>1</literal> para centrado, <literal>2</literal> para derecha.
 </para>
 <para>
 El texto que ha de ser mostrado viene dado por <literal>text</literal>: Debe ser
@@ -547,7 +533,11 @@ texto). La etiqueta es mostrada usando la tipografía identificada por
 </row>
 <row>
 <entry>$V</entry>
-<entry>volumen en formato <emphasis>xxx.xx</emphasis></entry>
+<entry>volumen en formato <emphasis>xxx.x</emphasis></entry>
+</row>
+<row>
+<entry>$U</entry>
+<entry>volumen en formato <emphasis>xxx</emphasis></entry>
 </row>
 <row>
 <entry>$b</entry>
@@ -555,7 +545,11 @@ texto). La etiqueta es mostrada usando la tipografía identificada por
 </row>
 <row>
 <entry>$B</entry>
-<entry>balance en formato <emphasis>xxx.xx</emphasis></entry>
+<entry>balance en formato <emphasis>xxx.x</emphasis></entry>
+</row>
+<row>
+<entry>$D</entry>
+<entry>balance en formato <emphasis>xxx</emphasis></entry>
 </row>
 <row>
 <entry>$$</entry>

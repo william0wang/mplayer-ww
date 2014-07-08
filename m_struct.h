@@ -19,6 +19,8 @@
 #ifndef MPLAYER_M_STRUCT_H
 #define MPLAYER_M_STRUCT_H
 
+#include <stddef.h>
+
 /// \defgroup OptionsStruct Options struct
 /// \ingroup Options
 /// An API to manipulate structs using m_option.
@@ -52,7 +54,7 @@ typedef struct m_struct_st {
  *  \return The offset of the field in bytes.
  */
 #define M_ST_OFF(struct_type, member)    \
-    ((void*) &((struct_type*) 0)->member)
+    ((void*)offsetof(struct_type, member))
 
 /// Get a pointer to a struct field.
 /** \param struct_p Pointer to the struct.

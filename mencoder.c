@@ -303,9 +303,14 @@ static int dec_audio(sh_audio_t *sh_audio,unsigned char* buffer,int total){
     int size=0;
     int at_eof=0;
     while(size<total && !at_eof){
+	int res;
 	int len=total-size;
 		if(len>MAX_OUTBURST) len=MAX_OUTBURST;
-		if (mp_decode_audio(sh_audio, len) < 0)
+		res = mp_decode_audio(sh_audio, len);
+		if (res == -2)
+		    mp_msg(MSGT_MENCODER, MSGL_FATAL, "Audio format change detected!\n"
+		           "MEncoder currently cannot handle format changes - patches welcome!\n");
+		if (res < 0)
                     at_eof = 1;
 		if(len>sh_audio->a_out_buffer_len) len=sh_audio->a_out_buffer_len;
 		fast_memcpy(buffer+size,sh_audio->a_out_buffer,len);
@@ -322,7 +327,7 @@ static volatile int at_eof=0;
 static volatile int interrupted=0;
 
 static void exit_sighandler(int x){
-    at_eof=1;
+    at_eof=3;
     interrupted=2; /* 1 means error */
 }
 
@@ -748,10 +753,10 @@ if(stream->type==STREAMTYPE_DVDNAV){
     demux_program_t prog = { .progid = ts_prog };
     if (demux_control(demuxer, DEMUXER_CTRL_IDENTIFY_PROGRAM, &prog) != DEMUXER_CTRL_NOTIMPL) {
       audio_id = prog.aid; // switching is handled by select_audio below
-      video_id = prog.vid;
-      demuxer_switch_video(demuxer, video_id);
+      video_id = prog.vid; // switching is handled by select_video below
     }
   }
+  select_video(demuxer, video_id);
   select_audio(demuxer, audio_id, audio_lang);
 
   if (dvdsub_id == -1 && dvdsub_lang)
@@ -1289,7 +1294,7 @@ if (sh_audio && audio_delay != 0.) fixdelay(d_video, d_audio, mux_a, &frame_data
 // Just assume a seek. Also works if time stamps do not start with 0
 did_seek = 1;
 
-while(!at_eof){
+while(at_eof != 3){
 
     int blit_frame=0;
     float a_pts=0;
@@ -1297,9 +1302,11 @@ while(!at_eof){
     int skip_flag=0; // 1=skip  -1=duplicate
     double a_muxer_time;
     double v_muxer_time;
+    int force_audio = at_eof & 1;
 
     a_muxer_time = adjusted_muxer_time(mux_a);
     v_muxer_time = adjusted_muxer_time(mux_v);
+    at_eof = sh_audio ? 0 : 2;
 
     if((end_at.type == END_AT_SIZE && end_at.pos <= stream_tell(muxer->stream))  ||
        (end_at.type == END_AT_TIME && end_at.pos < v_muxer_time))
@@ -1325,7 +1332,7 @@ goto_redo_edl:
 
             result = edl_seek(next_edl_record, demuxer, d_audio, mux_a, &frame_data, mux_v->codec==VCODEC_COPY);
 
-            if (result == 2) { at_eof=1; break; } // EOF
+            if (result == 2) { at_eof=3; break; } // EOF
             else if (result == 0) edl_seeking = 0; // no seeking
             else { // sucess
                 did_seek = 1;
@@ -1357,9 +1364,10 @@ goto_redo_edl:
 
 if(sh_audio){
     // get audio:
-    while(a_muxer_time-audio_preload<v_muxer_time){
+    while(force_audio || a_muxer_time-audio_preload<v_muxer_time){
         float tottime;
-	int len=0;
+	int bytes_to_mux=0;
+	force_audio = 0;
 
 	ptimer_start = GetTimerMS();
 	// CBR - copy 0.5 sec of audio
@@ -1378,6 +1386,7 @@ if(sh_audio){
 	{
 		if(mux_a->h.dwSampleSize) /* CBR */
 		{
+			int len;
 			if(aencoder->set_decoded_len)
 			{
 				len = mux_a->h.dwSampleSize*(int)(mux_a->h.dwRate*tottime);
@@ -1388,64 +1397,66 @@ if(sh_audio){
 
 			len = dec_audio(sh_audio, aencoder->decode_buffer, len);
 			mux_a->buffer_len += aencoder->encode(aencoder, mux_a->buffer + mux_a->buffer_len,
-				aencoder->decode_buffer, len, mux_a->buffer_size-mux_a->buffer_len);
-			if(mux_a->buffer_len < mux_a->wf->nBlockAlign)
-				len = 0;
-			else
-				len = mux_a->wf->nBlockAlign*(mux_a->buffer_len/mux_a->wf->nBlockAlign);
+				len <= 0 && sh_audio->ds->eof ? NULL : aencoder->decode_buffer, len, mux_a->buffer_size-mux_a->buffer_len);
+			if(mux_a->buffer_len >= mux_a->wf->nBlockAlign)
+				bytes_to_mux = mux_a->wf->nBlockAlign*(mux_a->buffer_len/mux_a->wf->nBlockAlign);
 		}
 		else	/* VBR */
 		{
 			int sz = 0;
 			while(1)
 			{
-				len = 0;
+				int len;
 				if(! sz)
 					sz = aencoder->get_frame_size(aencoder);
 				if(sz > 0 && mux_a->buffer_len >= sz)
 				{
-					len = sz;
+					bytes_to_mux = sz;
 					break;
 				}
 				len = dec_audio(sh_audio,aencoder->decode_buffer, aencoder->decode_buffer_size);
 				if(len <= 0)
 				{
-					len = 0;
-					break;
-				}
-				len = aencoder->encode(aencoder, mux_a->buffer + mux_a->buffer_len, aencoder->decode_buffer, len, mux_a->buffer_size-mux_a->buffer_len);
+					// try flushing encoder
+					if (sh_audio->ds->eof)
+						len = aencoder->encode(aencoder, mux_a->buffer + mux_a->buffer_len, NULL, 0, mux_a->buffer_size-mux_a->buffer_len);
+					if (len <= 0)
+						break;
+				} else
+					len = aencoder->encode(aencoder, mux_a->buffer + mux_a->buffer_len, aencoder->decode_buffer, len, mux_a->buffer_size-mux_a->buffer_len);
 				mux_a->buffer_len += len;
 			}
 	    }
 	    if (v_muxer_time == 0) mux_a->h.dwInitialFrames++;
 	}
-	else {
+	else if (mux_a->codec == ACODEC_COPY) {
 	if(mux_a->h.dwSampleSize){
-	    switch(mux_a->codec){
-	    case ACODEC_COPY: // copy
+	    int len;
 		len=mux_a->wf->nAvgBytesPerSec*tottime;
 		len/=mux_a->h.dwSampleSize;if(len<1) len=1;
 		len*=mux_a->h.dwSampleSize;
-		len=demux_read_data(sh_audio->ds,mux_a->buffer,len);
-		break;
-	    }
+		bytes_to_mux=demux_read_data(sh_audio->ds,mux_a->buffer,len);
 	} else {
 	    // VBR - encode/copy an audio frame
-	    switch(mux_a->codec){
-	    case ACODEC_COPY: // copy
-		len=ds_get_packet(sh_audio->ds,(unsigned char**) &mux_a->buffer);
-		break;
-		}
+		bytes_to_mux=ds_get_packet(sh_audio->ds,(unsigned char**) &mux_a->buffer);
 	    }
 	}
-	if(len<=0) break; // EOF?
-	muxer_write_chunk(mux_a,len,AVIIF_KEYFRAME, MP_NOPTS_VALUE, MP_NOPTS_VALUE);
+	if(bytes_to_mux<=0) {
+	    // EOF?
+	    if (!sh_audio->a_out_buffer_len && sh_audio->ds->eof) {
+		if (mux_a->buffer_len)
+	           mp_msg(MSGT_MENCODER, MSGL_WARN, "Audio data left in buffer at end of file. Probably bug in audio encoder, please report.");
+	        at_eof |= 2;
+	    }
+	    break;
+	}
+	muxer_write_chunk(mux_a,bytes_to_mux,AVIIF_KEYFRAME, MP_NOPTS_VALUE, MP_NOPTS_VALUE);
 	a_muxer_time = adjusted_muxer_time(mux_a); // update after muxing
 	if(!mux_a->h.dwSampleSize && a_muxer_time>0)
 	    mux_a->wf->nAvgBytesPerSec=0.5f+(double)mux_a->size/a_muxer_time; // avg bps (VBR)
-	if(mux_a->buffer_len>=len){
-	    mux_a->buffer_len-=len;
-	    memmove(mux_a->buffer,mux_a->buffer+len,mux_a->buffer_len);
+	if(mux_a->buffer_len>=bytes_to_mux){
+	    mux_a->buffer_len-=bytes_to_mux;
+	    memmove(mux_a->buffer,mux_a->buffer+bytes_to_mux,mux_a->buffer_len);
 	}
 
 
@@ -1459,7 +1470,7 @@ if(sh_audio){
 
     if (!frame_data.already_read) {
         frame_data.in_size=video_read_frame(sh_video,&frame_data.frame_time,&frame_data.start,force_fps);
-        frame_data.flush = frame_data.in_size < 0 && d_video->eof &&
+        frame_data.flush = frame_data.in_size < 0 && d_video->eof && (at_eof & 2) &&
                            mux_v->codec != VCODEC_COPY &&
                            mux_v->codec != VCODEC_FRAMENO;
         if (frame_data.flush) {
@@ -1469,7 +1480,7 @@ if(sh_audio){
         sh_video->timer+=frame_data.frame_time;
     }
     frame_data.frame_time /= playback_speed;
-    if(frame_data.in_size<0){ at_eof=1; break; }
+    if(frame_data.in_size<0){ frame_data.already_read = 0; at_eof|=1; continue; }
     ++decoded_frameno;
 
     v_timer_corr-=frame_data.frame_time-(float)mux_v->h.dwScale/mux_v->h.dwRate;
@@ -1479,17 +1490,17 @@ if(demuxer2){	// 3-pass encoding, read control file (frameno.avi)
 	while(next_frameno<decoded_frameno){
 	    int* start;
 	    int len=ds_get_packet(demuxer2->video,(unsigned char**) &start);
-	    if(len<0){ at_eof=1;break;}
+	    if(len<0){ at_eof|=1;break;}
 	    if(len==0) --skip_flag; else  // duplicate
 	    if(len==4) next_frameno=start[0];
 	}
-    if(at_eof) break;
+    if(at_eof) continue;
 	skip_flag=next_frameno-decoded_frameno;
     // find next frame:
 	while(next_frameno<=decoded_frameno){
 	    int* start;
 	    int len=ds_get_packet(demuxer2->video,(unsigned char**) &start);
-	    if(len<0){ at_eof=1;break;}
+	    if(len<0){ at_eof|=1;break;}
 	    if(len==0) --skip_flag; else  // duplicate
 	    if(len==4) next_frameno=start[0];
 	}
@@ -1544,7 +1555,7 @@ default:
     void *decoded_frame = decode_video(sh_video,frame_data.start,frame_data.in_size,
                                        drop_frame, MP_NOPTS_VALUE, NULL);
     if (frame_data.flush && !decoded_frame)
-        at_eof = 1;
+        at_eof = 3;
     if (did_seek && sh_video->pts != MP_NOPTS_VALUE) {
         did_seek = 0;
         sub_offset = sh_video->pts;
@@ -1658,8 +1669,8 @@ if(sh_audio && !demuxer2){
 #endif
       if(!quiet) {
 	if( mp_msg_test(MSGT_STATUSLINE,MSGL_V) ) {
-		mp_msg(MSGT_STATUSLINE,MSGL_STATUS,"Pos:%6.1fs %6df (%2d%%) %3dfps Trem:%4dmin %3dmb  A-V:%5.3f [%d:%d] A/Vms %d/%d D/B/S %d/%d/%d \r",
-	    	v_muxer_time, decoded_frameno, (int)(p*100),
+		mp_msg(MSGT_STATUSLINE,MSGL_STATUS,"VPos:%6.1fs APos:%6.1fs %6df (%2d%%) %3dfps Trem:%4dmin %3dmb  A-V:%5.3f [%d:%d] A/Vms %d/%d D/B/S %d/%d/%d \r",
+	    	v_muxer_time, a_muxer_time, decoded_frameno, (int)(p*100),
 	    	(t>1) ? (int)(decoded_frameno/t+0.5) : 0,
 	    	(p>0.001) ? (int)((t/p-t)/60) : 0,
 	    	(p>0.001) ? (int)(stream_tell(muxer->stream)/p/1024/1024) : 0,
