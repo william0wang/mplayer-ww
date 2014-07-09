@@ -1931,33 +1931,29 @@ static void detect_theme(void)
 
 typedef IDirect3D9 * (WINAPI *ImpDirect3DCreate9)(UINT);
 typedef int * (WINAPI *D3DFullColorRangePtr)();
-typedef HANDLE (WINAPI *GetCurrentProcessPtr)();
-typedef LONG (WINAPI *NtSetInformationProcessPtr)(HANDLE, PROCESSINFOCLASS, PVOID, ULONG);
+typedef DWORD (WINAPI *GetCurrentProcessIdPtr)();
 
 int set_io_priority(void)
 {
+	char param[256];
 	if(is_win7) {
-		HANDLE process = 0;
 		HMODULE kernel32 = LoadLibraryA("kernel32.dll");
 		if (kernel32) {
-			GetCurrentProcessPtr pGetCurrentProcess = (GetCurrentProcessPtr) GetProcAddress(kernel32, "GetCurrentProcess");
-			if (pGetCurrentProcess) {
-				process = pGetCurrentProcess();
-			}
-		}
-
-    	mp_msg(MSGT_CPLAYER, MSGL_V, "process: %d\n", process);
-		if(process != 0) {
-			HMODULE ntdll = LoadLibraryA("ntdll.dll");
-			if (ntdll) {
-				NtSetInformationProcessPtr pNtSetInformationProcess = (NtSetInformationProcessPtr) GetProcAddress(ntdll, "NtSetInformationProcess");
-				if (pNtSetInformationProcess) {
-					ULONG ioPrio = 3;
-					LONG ret = pNtSetInformationProcess(process, ProcessIoPriority, &ioPrio, sizeof(ULONG));
-    				mp_msg(MSGT_CPLAYER, MSGL_V, "NtSetInformationProcess: %lu\n", ret);
+			GetCurrentProcessIdPtr pGetCurrentProcessId = (GetCurrentProcessIdPtr) GetProcAddress(kernel32, "GetCurrentProcessId");
+			if(pGetCurrentProcessId) {
+				DWORD pid = pGetCurrentProcessId();
+				if(pid > 0) {
+					char *exepath = get_path("tools\\MPlayerWWServiceStarter.exe");
+					if (GetFileAttributes(exepath) != 0xFFFFFFFF) {
+						sprintf(param, "%d", pid);
+						ShellExecute(0, NULL, exepath, param, NULL, SW_HIDE);
+					}
+					if(exepath)
+						free(exepath);
 				}
 			}
 		}
+
 	}
 
 	return 0;
