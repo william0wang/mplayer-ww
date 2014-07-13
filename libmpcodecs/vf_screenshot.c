@@ -76,9 +76,17 @@ static int config(struct vf_instance *vf,
                                  d_width, d_height, IMGFMT_RGB24);
 
     av_fast_malloc(&vf->priv->outbuffer, &vf->priv->outbuffer_size, d_width * d_height * 3 * 2);
-    vf->priv->avctx->width = d_width;
-    vf->priv->avctx->height = d_height;
-    vf->priv->avctx->compression_level = 0;
+    if (!vf->priv->avctx) {
+        vf->priv->avctx = avcodec_alloc_context3(NULL);
+        vf->priv->avctx->pix_fmt = PIX_FMT_RGB24;
+        vf->priv->avctx->width = d_width;
+        vf->priv->avctx->height = d_height;
+        vf->priv->avctx->compression_level = 0;
+        if (avcodec_open2(vf->priv->avctx, avcodec_find_encoder(AV_CODEC_ID_PNG), NULL)) {
+            mp_msg(MSGT_VFILTER, MSGL_FATAL, "Could not open libavcodec PNG encoder\n");
+            return 0;
+        }
+    }
     vf->priv->dw = d_width;
     vf->priv->dh = d_height;
     vf->priv->pic->linesize[0] = (3*vf->priv->dw+15)&~15;
@@ -284,11 +292,9 @@ static int vf_open(vf_instance_t *vf, char *args)
     vf->priv = calloc(1, sizeof(struct vf_priv_s));
     vf->priv->pic = av_frame_alloc();
     vf->priv->prefix = strdup(args ? args : "shot");
-    vf->priv->avctx = avcodec_alloc_context3(NULL);
-    vf->priv->avctx->pix_fmt = PIX_FMT_RGB24;
     avcodec_register_all();
-    if (avcodec_open2(vf->priv->avctx, avcodec_find_encoder(AV_CODEC_ID_PNG), NULL)) {
-        mp_msg(MSGT_VFILTER, MSGL_FATAL, "Could not open libavcodec PNG encoder\n");
+    if (!avcodec_find_encoder(AV_CODEC_ID_PNG)) {
+        mp_msg(MSGT_VFILTER, MSGL_FATAL, "Could not find libavcodec PNG encoder\n");
         return 0;
     }
     return 1;
