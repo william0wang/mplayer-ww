@@ -8674,6 +8674,7 @@ CONFIG_H264DSP = yes
 CONFIG_H264PRED= yes
 CONFIG_H264QPEL= yes
 CONFIG_HPELDSP = yes
+CONFIG_IIRFILTER = yes
 CONFIG_QPELDSP = yes
 CONFIG_HUFFYUVDSP = yes
 CONFIG_HUFFYUVENCDSP = yes
@@ -8731,6 +8732,7 @@ HAVE_SHM        = $_shm
 HAVE_W32THREADS = $_w32threads
 HAVE_THREADS    = $_threads
 HAVE_YASM       = $have_yasm
+INTRINSICS      = none
 
 CONFIG_LIBXVID = $_xvid_lavc
 $(mak_enable "$libavdecoders_all"  "$libavdecoders"  CONFIG)
@@ -9270,6 +9272,7 @@ $def_truncf
 #define HAVE_INLINE_ASM 1
 #define HAVE_INLINE_ASM_NONLOCAL_LABELS 1
 #define HAVE_INLINE_ASM_DIRECT_SYMBOL_REFS 1
+#define HAVE_INTRINSICS_NEON 0
 #define HAVE_ISATTY 0
 #define HAVE_LDBRX 0
 #define HAVE_LIBC_MSVCRT 0
