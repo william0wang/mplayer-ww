@@ -8700,6 +8700,7 @@ CONFIG_RIFFDEC = yes
 CONFIG_RIFFENC = yes
 CONFIG_RTPENC_CHAIN = yes
 CONFIG_SINEWIN = yes
+CONFIG_STARTCODE = yes
 CONFIG_VIDEODSP = yes
 CONFIG_VP3DSP  = yes
 
@@ -9330,6 +9331,7 @@ $def_truncf
 #define CONFIG_RDFT 1
 #define CONFIG_RIFFDEC 1
 #define CONFIG_RIFFENC 1
+#define CONFIG_STARTCODE 1
 #define CONFIG_VIDEODSP 1
 
 /* Use these registers in FFmpeg x86 inline asm. No proper detection yet. */
