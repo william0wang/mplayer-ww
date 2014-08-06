@@ -321,9 +321,6 @@ static void guiSetEvent(int event)
             if (guiInfo.Playing == GUI_STOP)
                 break;
 
-            if (guiInfo.Balance == 50.0f)
-                mixer_setvolume(mixer, guiInfo.Volume, guiInfo.Volume);
-
             l = guiInfo.Volume * (100.0 - guiInfo.Balance) / 50.0;
             r = guiInfo.Volume * guiInfo.Balance / 50.0;
 
