@@ -237,6 +237,20 @@ static int get_windowtype(HWND hwnd)
     return -1;
 }
 
+static void get_widgetvalue(skin_t *skin, int event, float *value)
+{
+    unsigned int i;
+
+    if (!skin) return;
+
+    for (i=0; i<skin->widgetcount; i++)
+        if (skin->widgets[i]->msg == event)
+        {
+            *value = skin->widgets[i]->value;
+            return;
+        }
+}
+
 static void uninit(gui_t *gui)
 {
     if(gui->skin) destroy_window(gui);
@@ -1658,6 +1672,17 @@ int create_window(gui_t *gui, char *skindir)
 
     /* enable drag and drop support */
     DragAcceptFiles(gui->mainwindow, TRUE);
+
+    /* set defaults */
+    gui->default_volume = 50.0f;
+    gui->default_balance = 50.0f;
+
+    /* get defaults from skin */
+    get_widgetvalue(gui->skin, evSetVolume, &gui->default_volume);
+    get_widgetvalue(gui->skin, evSetBalance, &gui->default_balance);
+    get_widgetvalue(gui->skin, evSetMoviePosition, &guiInfo.Position);
+
+    if (guiInfo.Position) gui->playercontrol(evSetMoviePosition);
 
     updatedisplay(gui, gui->mainwindow);
 

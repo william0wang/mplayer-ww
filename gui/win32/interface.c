@@ -537,6 +537,9 @@ void guiInit(void)
     /* Wait until the gui is created */
     while(!mygui) Sleep(100);
     mp_msg(MSGT_GPLAYER, MSGL_V, "[GUI] GUI thread started.\n");
+
+    guiInfo.Volume = mygui->default_volume;
+    guiInfo.Balance = mygui->default_balance;
 }
 
 void guiDone(void)
@@ -636,6 +639,8 @@ int gui(int what, void *data)
                 guiInfo.AudioChannels = 0;
                 guiInfo.AudioPassthrough = FALSE;
             }
+            guiSetEvent(evSetVolume);
+            guiSetEvent(evSetBalance);
             if(IsWindowVisible(mygui->videowindow) && !guiInfo.VideoWindow)
                 ShowWindow(mygui->videowindow, SW_HIDE);
             break;
