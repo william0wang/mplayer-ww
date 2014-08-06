@@ -333,7 +333,7 @@ static void guiSetEvent(int event)
                 mixer_getvolume(mixer, &l, &r);
                 if (r == l)
                 {
-                    mp_msg(MSGT_GPLAYER, MSGL_V, "[GUI] Mixer doesn't support balanced audio\n");
+                    mp_msg(MSGT_GPLAYER, MSGL_V, "[GUI] Mixer doesn't support unbalanced audio\n");
                     mixer_setvolume(mixer, guiInfo.Volume, guiInfo.Volume);
                     guiInfo.Balance = 50.0f;
                 }
