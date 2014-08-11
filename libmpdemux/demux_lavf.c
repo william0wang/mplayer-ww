@@ -148,7 +148,7 @@ static void list_formats(void) {
 }
 
 static int lavf_check_file(demuxer_t *demuxer){
-    AVProbeData avpd;
+    AVProbeData avpd = { 0 };
     lavf_priv_t *priv;
     int probe_data_size = 0;
     int read_size = INITIAL_PROBE_SIZE;
