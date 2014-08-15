@@ -260,7 +260,7 @@ static void set_dr_slice_settings(struct AVCodecContext *avctx, const AVCodec *l
     ctx->nonref_dr = 0;
     // TODO: fix and enable again. This currently causes issues when using filters
     // and seeking, usually failing with the "Ran out of numbered images" message,
-    // but bugzilla #2118 might be related as well.
+    // but ticket #2118 might be related as well.
     if (0 && lavc_codec->id == AV_CODEC_ID_H264) {
         ctx->do_dr1 = 1;
         ctx->nonref_dr = 1;
