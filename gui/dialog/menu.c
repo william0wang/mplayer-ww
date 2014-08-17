@@ -462,7 +462,7 @@ GtkWidget * CreatePopUpMenu( void )
  GtkWidget * H, * N, * D, * F;
  demuxer_t *demuxer = mpctx_get_demuxer(guiInfo.mpcontext);
  mixer_t *mixer = mpctx_get_mixer(guiInfo.mpcontext);
- int global_sub_size = mpctx_get_global_sub_size(guiInfo.mpcontext);
+ int subs = 0, sub_pos;
 
  Menu=gtk_menu_new();
  gtk_widget_realize (Menu);
@@ -733,13 +733,15 @@ GtkWidget * CreatePopUpMenu( void )
    }
 
   /* cheap subtitle switching for non-DVD streams */
-  if ( global_sub_size && guiInfo.StreamType != STREAMTYPE_DVD )
+
+  mpctx_get_global_sub_info(guiInfo.mpcontext, &subs, &sub_pos);
+
+  if ( subs && guiInfo.StreamType != STREAMTYPE_DVD )
    {
-    int pos, i, j, subs0 = guiInfo.mpcontext->sub_counts[SUB_SOURCE_SUBS], subs1 = guiInfo.mpcontext->sub_counts[SUB_SOURCE_VOBSUB];
-    pos = mpctx_get_global_sub_pos(guiInfo.mpcontext);
+    int i, j, subs0 = guiInfo.mpcontext->sub_counts[SUB_SOURCE_SUBS], subs1 = guiInfo.mpcontext->sub_counts[SUB_SOURCE_VOBSUB];
     SubMenu=AddSubMenu( window1, (const char*)subtitle_xpm, Menu, MSGTR_GUI_Subtitles );
-    AddMenuCheckItem( window1, (const char*)empty1px_xpm, SubMenu, MSGTR_GUI__none_, pos == -1, (-1 << 16) + ivSetSubtitle );
-    for ( i=0;i < global_sub_size;i++ )
+    AddMenuCheckItem( window1, (const char*)empty1px_xpm, SubMenu, MSGTR_GUI__none_, sub_pos == -1, (-1 << 16) + ivSetSubtitle );
+    for ( i=0;i < subs;i++ )
      {
       int ret = -1;
       char lng[32], tmp[64], *lang = NULL;
@@ -782,7 +784,7 @@ GtkWidget * CreatePopUpMenu( void )
        }
       if ( ret == 0 ) snprintf( tmp, sizeof(tmp), MSGTR_GUI_TrackN" - %s", i, GetLanguage( lng, GET_LANG_CHR ) );
       else snprintf( tmp, sizeof(tmp), MSGTR_GUI_TrackN, i );
-      AddMenuCheckItem( window1,(const char*)empty1px_xpm,SubMenu,tmp,pos == i,( i << 16 ) + ivSetSubtitle );
+      AddMenuCheckItem( window1,(const char*)empty1px_xpm,SubMenu,tmp,sub_pos == i,( i << 16 ) + ivSetSubtitle );
      }
    }
 

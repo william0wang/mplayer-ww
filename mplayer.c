@@ -360,14 +360,11 @@ void *mpctx_get_mixer(MPContext *mpctx)
     return &mpctx->mixer;
 }
 
-int mpctx_get_global_sub_size(MPContext *mpctx)
+void mpctx_get_global_sub_info(MPContext *mpctx, int *size, int *pos)
 {
-    return mpctx->global_sub_size;
-}
+    mp_property_do("sub", M_PROPERTY_GET, pos, mpctx);
 
-int mpctx_get_global_sub_pos(MPContext *mpctx)
-{
-    return mpctx->global_sub_pos;
+    if (size) *size = mpctx->global_sub_size;
 }
 
 int mpctx_get_osd_function(MPContext *mpctx)
