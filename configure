@@ -6441,6 +6441,7 @@ statement_check zlib.h 'inflate(0, Z_NO_FLUSH)' -lz && _zlib=yes
 if test "$_zlib" = yes ; then
   def_zlib='#define CONFIG_ZLIB 1'
   extra_ldflags="$extra_ldflags -lz"
+  extra_cflags="$extra_cflags -DZLIB_CONST"
   # necessary for vf_screenshot
   mplayer_encoders="$mplayer_encoders PNG_ENCODER"
 else
