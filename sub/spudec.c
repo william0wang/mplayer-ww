@@ -1426,9 +1426,9 @@ void spudec_packet_send(void *spu, packet_t *packet, double pts, double endpts)
 {
   packet->start_pts = 0;
   packet->end_pts = 0x7fffffff;
-  if (pts != MP_NOPTS_VALUE)
+  if (pts != MP_NOPTS_VALUE && pts < 0xffffffffu / 90000)
     packet->start_pts = pts * 90000;
-  if (endpts != MP_NOPTS_VALUE)
+  if (endpts != MP_NOPTS_VALUE && endpts < 0xffffffffu / 90000)
     packet->end_pts = endpts * 90000;
   spudec_queue_packet(spu, packet);
 }

@@ -130,7 +130,7 @@ int decode_avsub(struct sh_sub *sh, uint8_t **data, int *size,
     if (res < 0)
         return res;
     if (*pts != MP_NOPTS_VALUE) {
-        if (sub.end_display_time > sub.start_display_time)
+        if (sub.end_display_time > sub.start_display_time && sub.end_display_time < 0x7fffffff)
             *endpts = *pts + sub.end_display_time / 1000.0;
         *pts += sub.start_display_time / 1000.0;
     }
