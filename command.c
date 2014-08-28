@@ -155,7 +155,7 @@ static void update_global_sub_size(MPContext *mpctx)
 
     // update number of demuxer sub streams
     for (i = 0; i < MAX_S_STREAMS; i++)
-        if (mpctx->demuxer->s_streams[i])
+        if (mpctx->demuxer && mpctx->demuxer->s_streams[i])
             cnt++;
     if (cnt > mpctx->sub_counts[SUB_SOURCE_DEMUX])
         mpctx->sub_counts[SUB_SOURCE_DEMUX] = cnt;
@@ -168,7 +168,7 @@ static void update_global_sub_size(MPContext *mpctx)
     // update global_sub_pos if we auto-detected a demuxer sub
     if (mpctx->global_sub_pos == -1) {
         int sub_id = -1;
-        if (mpctx->demuxer->sub)
+        if (mpctx->demuxer && mpctx->demuxer->sub)
             sub_id = mpctx->demuxer->sub->id;
         if (sub_id < 0)
             sub_id = dvdsub_id;
