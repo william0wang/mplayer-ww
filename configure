@@ -644,6 +644,7 @@ _armv6=auto
 _armv6t2=auto
 _armvfp=auto
 vfpv3=auto
+setend=auto
 neon=auto
 armthumb=auto
 _iwmmxt=auto
@@ -3152,6 +3153,13 @@ if arm ; then
   fi
   echores "$vfpv3"
 
+  echocheck "ARM setend"
+  if test $setend = "auto" ; then
+    setend=no
+    inline_asm_check '"setend be"' && setend=yes
+  fi
+  echores "$setend"
+
   echocheck "softfloat ABI"
   softfloat=yes
   cpp_condition_check '' 'defined(__ARM_PCS_VFP) || (!defined(__ARM_PCS) && !defined(__SOFTFP__))' && softfloat=no
@@ -3190,7 +3198,7 @@ if arm ; then
   echores "$_iwmmxt"
 fi
 
-cpuexts_all='ALTIVEC XOP AVX AVX2 FMA3 FMA4 MMX MMX2 MMXEXT AMD3DNOW AMD3DNOWEXT SSE SSE2 SSE3 SSSE3 SSE4 SSE42 FAST_CMOV I686 FAST_CLZ ARMV5TE ARMV6 ARMV6T2 VFP VFPV3 NEON IWMMXT MMI VIS MVI'
+cpuexts_all='ALTIVEC XOP AVX AVX2 FMA3 FMA4 MMX MMX2 MMXEXT AMD3DNOW AMD3DNOWEXT SSE SSE2 SSE3 SSSE3 SSE4 SSE42 FAST_CMOV I686 FAST_CLZ ARMV5TE ARMV6 ARMV6T2 VFP VFPV3 SETEND NEON IWMMXT MMI VIS MVI'
 test "$_altivec"   = yes && cpuexts="ALTIVEC $cpuexts"
 test "$_mmx"       = yes && cpuexts="MMX $cpuexts"
 test "$_mmxext"    = yes && cpuexts="MMX2 $cpuexts"
@@ -3216,6 +3224,7 @@ test "$_armv6"     = yes && cpuexts="ARMV6 $cpuexts"
 test "$_armv6t2"   = yes && cpuexts="ARMV6T2 $cpuexts"
 test "$_armvfp"    = yes && cpuexts="VFP $cpuexts"
 test "$vfpv3"      = yes && cpuexts="VFPV3 $cpuexts"
+test "$setend"     = yes && cpuexts="SETEND $cpuexts"
 test "$neon"       = yes && cpuexts="NEON $cpuexts"
 test "$_iwmmxt"    = yes && cpuexts="IWMMXT $cpuexts"
 test "$_vis"       = yes && cpuexts="VIS $cpuexts"
