@@ -953,7 +953,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_NoChapter "Kein Kapitel"
 #define MSGTR_GUI_None "Keinen"
 #define MSGTR_GUI__none_ "(keine)"
-#define MSGTR_GUI_NonInterleavedParser "AVI-Parser ohne Interleaving verwenden"
+#define MSGTR_GUI_NonInterleavedParser "Parser ohne Interleaving verwenden"
 #define MSGTR_GUI_NormalizeSound "Ton normalisieren"
 #define MSGTR_GUI_Ok "OK"
 #define MSGTR_GUI_Open "Öffnen"
