@@ -3823,7 +3823,7 @@ goto_enable_cache:
                         // Ensure vo_pts is updated so that ao_pcm will not hang.
                         advance_timer(frame_time);
                         // only stop playing when audio is at end as well
-                        if (!mpctx->sh_audio || mpctx->d_audio->eof)
+                        if (!mpctx->sh_audio || (mpctx->d_audio->eof && !ds_fill_buffer(mpctx->d_audio)))
                             mpctx->eof = 1;
                     } else {
                         // might return with !eof && !blit_frame if !correct_pts
