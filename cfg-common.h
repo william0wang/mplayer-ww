@@ -406,7 +406,7 @@ const m_option_t common_opts[] = {
 
     {"edl", &edl_filename,  CONF_TYPE_STRING, 0, 0, 0, NULL},
 
-    // AVI specific: force non-interleaved mode
+    // force non-interleaved mode
     {"ni", &force_ni, CONF_TYPE_FLAG, 0, 0, 1, NULL},
     {"noni", &force_ni, CONF_TYPE_FLAG, 0, 1, 0, NULL},
 

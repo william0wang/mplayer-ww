@@ -722,7 +722,7 @@ int ds_fill_buffer(demux_stream_t *ds)
         // This needs to be enough for at least 1 second of packets
         // since libavformat mov demuxer does not try to interleave
         // with more than 1s precision.
-        if (ds->fill_count > 80)
+        if (!force_ni && ds->fill_count > 80)
             break;
         // avoid printing the "too many ..." message over and over
         if (ds->eof)

@@ -1843,9 +1843,12 @@ input file type (available: jpeg, png, tga, sgi)
 .PD 1
 .
 .TP
-.B \-ni (AVI only)
-Force usage of non-interleaved AVI parser (fixes playback
+.B \-ni
+Force treating files as non-interleaved.
+In particular forces usage of non-interleaved AVI parser (fixes playback
 of some bad AVI files).
+Can also help playing files that otherwise play audio
+and video alternating instead of at the same time.
 .
 .TP
 .B \-nobps (AVI only)
