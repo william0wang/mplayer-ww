@@ -8713,6 +8713,7 @@ CONFIG_SINEWIN = yes
 CONFIG_STARTCODE = yes
 CONFIG_VIDEODSP = yes
 CONFIG_VP3DSP  = yes
+CONFIG_WMA_FREQS = yes
 
 $mak_hardcoded_tables
 $mak_libavcodec_mpegaudio_hp
@@ -9343,6 +9344,7 @@ $def_truncf
 #define CONFIG_RIFFENC 1
 #define CONFIG_STARTCODE 1
 #define CONFIG_VIDEODSP 1
+#define CONFIG_WMA_FREQS 1
 
 /* Use these registers in FFmpeg x86 inline asm. No proper detection yet. */
 #ifndef MP_DEBUG
