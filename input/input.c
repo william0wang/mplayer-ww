@@ -1472,7 +1472,7 @@ mp_input_get_key_name(int key) {
       return key_names[i].name;
   }
 
-  if(isprint(key)) {
+  if(0 <= key && key <= 255 && isprint(key)) {
     snprintf(key_str,12,"%c",(char)key);
     return key_str;
   }
