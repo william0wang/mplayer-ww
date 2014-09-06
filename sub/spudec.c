@@ -254,7 +254,7 @@ static int spudec_alloc_image(spudec_handle_t *this, int stride, int height)
 static void pal2gray_alpha(const uint16_t *pal,
                            const uint8_t *src, int src_stride,
                            uint8_t *dst, uint8_t *dsta,
-                           int dst_stride, int w, int h)
+                           int dst_stride, int w, int h, int skip_stride)
 {
   int x, y;
   for (y = 0; y < h; y++) {
@@ -263,7 +263,10 @@ static void pal2gray_alpha(const uint16_t *pal,
       *dst++  = pixel;
       *dsta++ = pixel >> 8;
     }
-    for (; x < dst_stride; x++)
+    if (skip_stride) {
+      dst += dst_stride - w;
+      dsta += dst_stride - w;
+    } else for (; x < dst_stride; x++)
       *dsta++ = *dst++ = 0;
     src += src_stride;
   }
@@ -306,7 +309,7 @@ static int apply_palette_crop(spudec_handle_t *this,
   src = this->pal_image + crop_y * this->pal_width + crop_x;
   pal2gray_alpha(pal, src, this->pal_width,
                  this->image, this->aimage, stride,
-                 crop_w, crop_h);
+                 crop_w, crop_h, 0);
   this->width  = crop_w;
   this->height = crop_h;
   this->stride = stride;
@@ -1419,7 +1422,7 @@ void spudec_packet_fill(packet_t *packet,
       g8a8_pal[i] = (-alpha << 8) | gray;
   }
   pal2gray_alpha(g8a8_pal, pal_img, pal_stride,
-                 img, aimg, packet->stride, w, h);
+                 img, aimg, packet->stride, w, h, 1);
 }
 
 void spudec_packet_send(void *spu, packet_t *packet, double pts, double endpts)
