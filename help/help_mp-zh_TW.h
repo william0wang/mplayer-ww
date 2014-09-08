@@ -733,7 +733,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_Mixer "混音器"
 #define MSGTR_GUI_MixerChannel "混音通道"
 #define MSGTR_GUI_MSG_AddingVideoFilter "[GUI] 添加視頻過濾器: %s\n"
-#define MSGTR_GUI_MSG_aRtsBroken "新版 aRts 與 GTK 1.x 不兼容, 會使 GMPlayer 崩潰!"
 #define MSGTR_GUI_MSG_ColorDepthTooLow "抱歉, 色彩深度太低。\n"
 #define MSGTR_GUI_MSG_DragAndDropNothing "D&D: 没有任何東西返回!\n"
 #define MSGTR_GUI_MSG_DXR3NeedsLavc "抱歉, 不能用没有重編碼的 DXR3/H+ 設備播放 non-MPEG 文件\n請啟用 DXR3/H+ 配置盒中的 lavc。"

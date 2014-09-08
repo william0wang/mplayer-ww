@@ -687,7 +687,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_Mixer "Mixer"
 #define MSGTR_GUI_MixerChannel "Mixer channel"
 #define MSGTR_GUI_MSG_AddingVideoFilter "Adding video filter '%s'.\n"
-#define MSGTR_GUI_MSG_aRtsBroken "Newer aRts versions are incompatible with GTK 1.x and will crash GMPlayer!"
 #define MSGTR_GUI_MSG_ColorDepthTooLow "The color depth of the display is too low!\n"
 #define MSGTR_GUI_MSG_DragAndDropNothing "Drag and drop: Nothing returned!\n"
 #define MSGTR_GUI_MSG_DXR3NeedsLavc "You cannot play non-MPEG files with your DXR3/H+ device without reencoding.\nPlease enable lavc in the DXR3/H+ configuration box.\n"

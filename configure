@@ -328,7 +328,6 @@ Optional features:
   --disable-mencoder     disable MEncoder (A/V encoder) compilation [enable]
   --disable-mplayer      disable MPlayer compilation [enable]
   --enable-gui           enable GMPlayer compilation (GTK+ GUI) [disable]
-  --enable-gtk1          force using GTK+ 1.2 for the GUI [disable]
   --enable-termcap       use termcap database for key codes [autodetect]
   --enable-termios       use termios database for key codes [autodetect]
   --disable-iconv        disable iconv for encoding conversion [autodetect]
@@ -604,8 +603,6 @@ Use these options if autodetection fails:
   --with-xvmclib=NAME         adapter-specific library name (e.g. XvMCNVIDIA)
 
   --with-freetype-config=PATH path to freetype-config
-  --with-glib-config=PATH     path to glib*-config
-  --with-gtk-config=PATH      path to gtk*-config
   --with-sdl-config=PATH      path to sdl*-config
   --with-dvdnav-config=PATH   path to dvdnav-config, also disables internal dvdread and dvdnav
   --with-dvdread-config=PATH  path to dvdread-config, also disables internal dvdread and dvdnav
@@ -809,7 +806,6 @@ _lircc=auto
 _apple_remote=auto
 _apple_ir=auto
 _gui=no
-_gtk1=no
 _termcap=auto
 _termios=auto
 _3dfx=no
@@ -918,12 +914,6 @@ for ac_option do
     ;;
   --with-freetype-config=*)
     _freetypeconfig=$(option_value $ac_option)
-    ;;
-  --with-gtk-config=*)
-    _gtkconfig=$(option_value $ac_option)
-    ;;
-  --with-glib-config=*)
-    _glibconfig=$(option_value $ac_option)
     ;;
   --with-dvdnav-config=*)
     _dvdnavconfig=$(option_value $ac_option)
@@ -1299,8 +1289,6 @@ for ac_option do
   --disable-apple-ir)   _apple_ir=no    ;;
   --enable-gui)         _gui=yes        ;;
   --disable-gui)        _gui=no         ;;
-  --enable-gtk1)        _gtk1=yes       ;;
-  --disable-gtk1)       _gtk1=no        ;;
   --enable-termcap)     _termcap=yes    ;;
   --disable-termcap)    _termcap=no     ;;
   --enable-termios)     _termios=yes    ;;
@@ -7885,7 +7873,6 @@ EOF
     echores "$_xshape"
 
     # Check for GTK2
-    if test "$_gtk1" = no ; then
       echocheck "GTK+ version"
 
       if $_pkg_config gtk+-2.0 --exists ; then
@@ -7902,64 +7889,21 @@ EOF
           echores "$_glib"
 
           def_gui='#define CONFIG_GUI 1'
-          def_gtk2='#define CONFIG_GTK2 1'
         else
-          _gtk1=yes
-          echores "GLib 2 devel packages were not found, trying GTK+ 1.2"
+          die "GLib 2 devel packages were not found."
         fi
       else
-        _gtk1=yes
-        echores "GTK+ 2 devel packages were not found, trying GTK+ 1.2"
+        die "GTK+ 2 devel packages were not found."
       fi
-    fi
-
-    # Check for (old) GTK1
-    if test "$_gtk1" = yes ; then
-      echocheck "GTK+ version"
-
-      if test -z "$_gtkconfig" ; then
-        if ( gtk-config --version ) >/dev/null 2>&1 ; then
-          _gtkconfig="gtk-config"
-        elif ( gtk12-config --version ) >/dev/null 2>&1 ; then
-          _gtkconfig="gtk12-config"
-        else
-          die "The GUI requires GTK+ devel packages (which were not found)."
-        fi
-      fi
-      _gtk=$($_gtkconfig --version 2>&1)
-      extra_cflags="$extra_cflags $($_gtkconfig --cflags 2>&1)"
-      libs_mplayer="$libs_mplayer $($_gtkconfig --libs 2>&1)"
-      echores "$_gtk (using $_gtkconfig)"
-
-      # Check for (old) GLIB1
-      echocheck "GLib version"
-      if test -z "$_glibconfig" ; then
-        if ( glib-config --version ) >/dev/null 2>&1 ; then
-          _glibconfig="glib-config"
-        elif ( glib12-config --version ) >/dev/null 2>&1 ; then
-          _glibconfig="glib12-config"
-        else
-          die "The GUI requires GLib devel packages (which were not found)"
-        fi
-      fi
-      _glib=$($_glibconfig --version 2>&1)
-      libs_mplayer="$libs_mplayer $($_glibconfig --libs 2>&1)"
-      echores "$_glib (using $_glibconfig)"
-
-      def_gui='#define CONFIG_GUI 1'
-      def_gtk2='#undef CONFIG_GTK2'
-    fi
 
   else #if ! win32
     _gui_win32=yes
     libs_mplayer="$libs_mplayer -lcomdlg32 -lcomctl32 -lshell32 -lkernel32"
     def_gui='#define CONFIG_GUI 1'
-    def_gtk2='#undef CONFIG_GTK2'
   fi #if ! win32
 
 else #if test "$_gui"
   def_gui='#undef CONFIG_GUI'
-  def_gtk2='#undef CONFIG_GTK2'
 fi #if test "$_gui"
 # --------------- GUI specific tests end -------------------
 
@@ -8996,7 +8940,6 @@ $def_xmms
 
 /* GUI */
 $def_gui
-$def_gtk2
 $def_xshape
 
 

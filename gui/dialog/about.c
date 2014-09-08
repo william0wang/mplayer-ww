@@ -47,10 +47,8 @@ static GtkWidget * CreateAbout( void )
   GtkWidget     * AboutText;
   GtkWidget     * Ok;
 
-#ifdef CONFIG_GTK2
   GtkTextBuffer * AboutTextBuffer;
   GtkTextIter   iter;
-#endif /* CONFIG_GTK2 */
 
   GtkStyle      * pixmapstyle;
   GdkPixmap     * pixmapwid;
@@ -89,26 +87,16 @@ static GtkWidget * CreateAbout( void )
   gtk_box_pack_start( GTK_BOX( vbox ),scrolledwindow1,TRUE,TRUE,0 );
   gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scrolledwindow1 ),GTK_POLICY_AUTOMATIC,GTK_POLICY_AUTOMATIC );
 
-#ifdef CONFIG_GTK2
   AboutText = gtk_text_view_new();
   gtk_text_view_set_editable(GTK_TEXT_VIEW(AboutText), FALSE);
   gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(AboutText), FALSE);
   AboutTextBuffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (AboutText));
   gtk_text_buffer_get_iter_at_offset (AboutTextBuffer, &iter, 0);
-#else
-  AboutText=gtk_text_new( NULL,NULL );
-  gtk_text_set_editable(GTK_TEXT(AboutText), FALSE);
-#endif
   gtk_widget_show( AboutText );
   gtk_container_add( GTK_CONTAINER( scrolledwindow1 ),AboutText );
   snprintf(title, sizeof(title), MP_TITLE, MPlayer);
-#ifdef CONFIG_GTK2
   gtk_text_buffer_insert (AboutTextBuffer, &iter, title, -1);
   gtk_text_buffer_insert (AboutTextBuffer, &iter,
-#else
-  gtk_text_insert( GTK_TEXT( AboutText ),NULL,NULL,NULL, title, -1 );
-  gtk_text_insert( GTK_TEXT( AboutText ),NULL,NULL,NULL,
-#endif
     "\n"
     MSGTR_GUI_Sponsored":\n"
     "       http://www.uhulinux.hu/\n"

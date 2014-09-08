@@ -593,7 +593,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_Mixer "Мікшер"
 #define MSGTR_GUI_MixerChannel "Канал мікшеру"
 #define MSGTR_GUI_MSG_AddingVideoFilter "[GUI] Додаю відео фільтр: %s\n"
-#define MSGTR_GUI_MSG_aRtsBroken "Новіші версії aRts не сумісніз GTK 1.x та спричинять помилку GMPlayer!"
 #define MSGTR_GUI_MSG_ColorDepthTooLow "Вибачте, глибина кольору занизька.\n"
 #define MSGTR_GUI_MSG_DragAndDropNothing "D&D: Нічого не повернено!\n"
 #define MSGTR_GUI_MSG_DXR3NeedsLavc "Вибачте, ви не можете програвати не MPEG файли з вашим DXR3/H+ пристроєм без перекодування.\nВключіть lavc у нашалтунки DXR3/H+."

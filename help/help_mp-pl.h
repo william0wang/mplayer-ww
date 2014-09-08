@@ -716,7 +716,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_Mixer "Mixer"
 #define MSGTR_GUI_MixerChannel "Kanał Mixera"
 #define MSGTR_GUI_MSG_AddingVideoFilter "[GUI] Dodaję filtr video: %s\n"
-#define MSGTR_GUI_MSG_aRtsBroken "Nowsze wersje aRts nie są kompatybilne z GTK 1.x i spowodują błąd GMPlayer!"
 #define MSGTR_GUI_MSG_ColorDepthTooLow "Niestety paleta kolorów jest za mała.\n"
 #define MSGTR_GUI_MSG_DragAndDropNothing "D&D: Nic nie zwrócono!\n"
 #define MSGTR_GUI_MSG_DXR3NeedsLavc "Niestety, nie można odtwarzać plików innych niż MPEG przy użyciu urządzenia DXR3/H+ bez kowersji.\nProszę włączyć lavc w polu sterowania DXR3/H+."

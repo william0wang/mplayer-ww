@@ -113,9 +113,7 @@ void gtkInit(char *display_name)
 {
     int argc = 0;
     char *arg[3], **argv = arg;
-#ifdef CONFIG_GTK2
     char *env;
-#endif
     GtkIconTheme *theme;
     GdkPixmap *gdkIcon;
     GdkBitmap *gdkIconMask;
@@ -129,14 +127,12 @@ void gtkInit(char *display_name)
         arg[argc++] = display_name; // to open the requested display for the GUI, too.
     }
 
-#ifdef CONFIG_GTK2
     gtk_disable_setlocale();
 
     env = getenv("G_FILENAME_ENCODING");
 
     if ((!env && getenv("G_BROKEN_FILENAMES")) || (gstrncmp(env, "@locale", 7) == 0))
         mp_msg(MSGT_GPLAYER, MSGL_WARN, MSGTR_GUI_MSG_LocaleEncoding);
-#endif
 
     gtk_init(&argc, &argv);
     wsSetErrorHandler();      // GDK has just set its own handler

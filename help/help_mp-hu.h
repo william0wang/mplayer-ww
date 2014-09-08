@@ -611,7 +611,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_Mixer "Mixer"
 #define MSGTR_GUI_MixerChannel "Mixer csatorna"
 #define MSGTR_GUI_MSG_AddingVideoFilter "[GUI] Videó szűrő hozzáadása: %s\n"
-#define MSGTR_GUI_MSG_aRtsBroken "Az újabb aRts verziók inkompatibilisek a GTK 1.x-szel és összeomlasztják a GMPlayert!"
 #define MSGTR_GUI_MSG_ColorDepthTooLow "Bocs, a szín mélység túl kicsi.\n"
 #define MSGTR_GUI_MSG_DragAndDropNothing "D&D: Semmi sem jött vissza!\n"
 #define MSGTR_GUI_MSG_DXR3NeedsLavc "Nem MPEG fájl lejátszása nem lehetséges a DXR3/H+ hardverrel újrakódolás nélkül.\nKapcsold be a lavc opciót a DXR3/H+ konfigurációs panelen."
