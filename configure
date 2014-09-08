@@ -7876,24 +7876,38 @@ EOF
     echocheck "GTK+ version"
 
     if $_pkg_config gtk+-2.0 --exists ; then
-      _gtk=$($_pkg_config gtk+-2.0 --modversion 2>/dev/null)
+      _gtk=$($_pkg_config "gtk+-2.0 >= 2.4.0" --modversion 2>&1)
+      if [ $? -eq 0 ]; then
       extra_cflags="$extra_cflags $($_pkg_config gtk+-2.0 --cflags 2>/dev/null)"
       libs_mplayer="$libs_mplayer $($_pkg_config gtk+-2.0 --libs 2>/dev/null)"
       echores "$_gtk"
+      else
+        res_comment="too old"
+        echores "$($_pkg_config gtk+-2.0 --modversion 2>/dev/null)"
+        die "$_gtk"
+      fi
 
       # Check for GLIB2
       echocheck "GLib version"
       if $_pkg_config glib-2.0 --exists ; then
-        _glib=$($_pkg_config glib-2.0 --modversion 2>/dev/null)
+        _glib=$($_pkg_config "glib-2.0 >= 2.6.0" --modversion 2>&1)
+        if [ $? -eq 0 ]; then
         libs_mplayer="$libs_mplayer $($_pkg_config glib-2.0 --libs 2>/dev/null)"
         echores "$_glib"
+        else
+          res_comment="too old"
+          echores "$($_pkg_config glib-2.0 --modversion 2>/dev/null)"
+          die "$_glib"
+        fi
 
         def_gui='#define CONFIG_GUI 1'
       else
-        die "GLib 2 devel packages were not found."
+        echores "no"
+        die "GLib version 2 devel packages were not found (required for GUI)."
       fi
     else
-      die "GTK+ 2 devel packages were not found."
+      echores "no"
+      die "GTK+ version 2 devel packages were not found (required for GUI)."
     fi
 
   else #if ! win32
