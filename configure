@@ -7839,7 +7839,7 @@ if test "$_gui" = yes ; then
 
   if ! win32 ; then
     _gui_gtk=yes
-    test "$_x11" != yes && die "X11 support required for GUI compilation."
+    test "$_x11" != yes && die "The GUI requires X11."
 
     echocheck "XShape extension"
     if test "$_xshape" = auto ; then
