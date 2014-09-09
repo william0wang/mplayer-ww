@@ -7875,28 +7875,28 @@ EOF
     # Check for GTK2
     echocheck "GTK+ version"
 
-    if $_pkg_config gtk+-2.0 --exists ; then
-      _gtk=$($_pkg_config "gtk+-2.0 >= 2.4.0" --modversion 2>&1)
+    if $_pkg_config --exists gtk+-2.0 ; then
+      _gtk=$($_pkg_config --modversion "gtk+-2.0 >= 2.4.0" 2>&1)
       if [ $? -eq 0 ]; then
-        extra_cflags="$extra_cflags $($_pkg_config gtk+-2.0 --cflags 2>/dev/null)"
-        libs_mplayer="$libs_mplayer $($_pkg_config gtk+-2.0 --libs 2>/dev/null)"
+        extra_cflags="$extra_cflags $($_pkg_config --cflags gtk+-2.0 2>/dev/null)"
+        libs_mplayer="$libs_mplayer $($_pkg_config --libs gtk+-2.0 2>/dev/null)"
         echores "$_gtk"
       else
         res_comment="too old"
-        echores "$($_pkg_config gtk+-2.0 --modversion 2>/dev/null)"
+        echores "$($_pkg_config --modversion gtk+-2.0 2>/dev/null)"
         die "$_gtk"
       fi
 
       # Check for GLIB2
       echocheck "GLib version"
-      if $_pkg_config glib-2.0 --exists ; then
-        _glib=$($_pkg_config "glib-2.0 >= 2.6.0" --modversion 2>&1)
+      if $_pkg_config --exists glib-2.0 ; then
+        _glib=$($_pkg_config --modversion "glib-2.0 >= 2.6.0" 2>&1)
         if [ $? -eq 0 ]; then
-          libs_mplayer="$libs_mplayer $($_pkg_config glib-2.0 --libs 2>/dev/null)"
+          libs_mplayer="$libs_mplayer $($_pkg_config --libs glib-2.0 2>/dev/null)"
           echores "$_glib"
         else
           res_comment="too old"
-          echores "$($_pkg_config glib-2.0 --modversion 2>/dev/null)"
+          echores "$($_pkg_config --modversion glib-2.0 2>/dev/null)"
           die "$_glib"
         fi
 
