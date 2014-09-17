@@ -93,7 +93,9 @@ static int bluray_stream_seek(stream_t *s, int64_t pos)
     p = bd_seek(b->bd, pos);
     // bd_seek does not say what happens on errors,
     // so be extra paranoid.
-    if (p < 0 || p != pos) {
+    // bd_seek also does not seek exactly to the requested
+    // position, so allow for some fuzz.
+    if (p < 0 || p > pos || p + 20*1024*1024 < pos) {
         s->pos = bd_tell(b->bd);
         return 0;
     }
