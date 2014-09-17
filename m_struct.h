@@ -20,6 +20,7 @@
 #define MPLAYER_M_STRUCT_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 /// \defgroup OptionsStruct Options struct
 /// \ingroup Options
