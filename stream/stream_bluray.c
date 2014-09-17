@@ -219,7 +219,14 @@ static int bluray_stream_control(stream_t *s, int cmd, void *arg)
         *(double *)arg = bd_tell_time(b->bd) / 90000.0;
         return STREAM_OK;
     case STREAM_CTRL_SEEK_TO_TIME: {
-        int64_t res = bd_seek_time(b->bd, *(double*)arg * 90000.0);
+        int64_t res;
+        double target = *(double*)arg * 90000.0;
+        BLURAY_TITLE_INFO *ti = bd_get_title_info(b->bd, b->current_title, b->current_angle);
+        // clamp to ensure that out-of-bounds seeks do not simply do nothing.
+        target = FFMAX(target, 0);
+        if (ti && ti->duration > 1)
+            target = FFMIN(target, ti->duration - 1);
+        res = bd_seek_time(b->bd, target);
         if (res < 0)
             return STREAM_ERROR;
         s->pos = res;
