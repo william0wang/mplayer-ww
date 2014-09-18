@@ -2016,6 +2016,7 @@ def_fast_unaligned='#define HAVE_FAST_UNALIGNED 0'
 def_av_fast_unaligned='#define AV_HAVE_FAST_UNALIGNED 0'
 def_local_aligned_8='#define HAVE_LOCAL_ALIGNED_8 0'
 def_local_aligned_16='#define HAVE_LOCAL_ALIGNED_16 0'
+def_local_aligned_32='#define HAVE_LOCAL_ALIGNED_16 0'
 arch_all='X86 IA64 SPARC ARM AVR32 SH4 PPC ALPHA MIPS PA_RISC S390 S390X VAX BFIN XTENSA TOMI GENERIC AARCH64'
 subarch_all='X86_32 X86_64 PPC64'
 case "$host_arch" in
@@ -2026,6 +2027,7 @@ case "$host_arch" in
   def_av_fast_unaligned='#define AV_HAVE_FAST_UNALIGNED 1'
   def_local_aligned_8='#define HAVE_LOCAL_ALIGNED_8 1'
   def_local_aligned_16='#define HAVE_LOCAL_ALIGNED_16 1'
+  def_local_aligned_32='#define HAVE_LOCAL_ALIGNED_32 1'
   iproc=486
   proc=i486
 
@@ -2280,6 +2282,7 @@ case "$host_arch" in
     def_av_fast_unaligned='#define AV_HAVE_FAST_UNALIGNED 1'
     def_local_aligned_8='#define HAVE_LOCAL_ALIGNED_8 1'
     def_local_aligned_16='#define HAVE_LOCAL_ALIGNED_16 1'
+    def_local_aligned_32='#define HAVE_LOCAL_ALIGNED_32 1'
     def_fast_64bit='#define HAVE_FAST_64BIT 1'
     iproc='x86_64'
 
@@ -2415,6 +2418,12 @@ case "$host_arch" in
   arm*)
     arch='arm'
     iproc='arm'
+    def_fast_unaligned='#define HAVE_FAST_UNALIGNED 1'
+    def_av_fast_unaligned='#define AV_HAVE_FAST_UNALIGNED 1'
+    def_local_aligned_8='#define HAVE_LOCAL_ALIGNED_8 1'
+    def_local_aligned_16='#define HAVE_LOCAL_ALIGNED_16 1'
+    def_local_aligned_32='#define HAVE_LOCAL_ALIGNED_32 1'
+    test $_fast_clz = "auto" && _fast_clz=yes
     ;;
 
   avr32)
@@ -2437,6 +2446,7 @@ case "$host_arch" in
     def_av_fast_unaligned='#define AV_HAVE_FAST_UNALIGNED 1'
     def_local_aligned_8='#define HAVE_LOCAL_ALIGNED_8 1'
     def_local_aligned_16='#define HAVE_LOCAL_ALIGNED_16 1'
+    def_local_aligned_32='#define HAVE_LOCAL_ALIGNED_32 1'
     iproc='ppc'
 
     if test "$host_arch" = "ppc64" ; then
@@ -9156,6 +9166,7 @@ $def_gnu_as
 $def_ibm_asm
 $def_local_aligned_8
 $def_local_aligned_16
+$def_local_aligned_32
 $def_os2threads
 $def_pic
 $def_pthreads
@@ -9248,9 +9259,6 @@ $def_truncf
 #define HAVE_ISATTY 0
 #define HAVE_LDBRX 0
 #define HAVE_LIBC_MSVCRT 0
-#define HAVE_LOCAL_ALIGNED_8 1
-#define HAVE_LOCAL_ALIGNED_16 1
-#define HAVE_LOCAL_ALIGNED_32 1
 #define HAVE_LOCALTIME_R 0
 #define HAVE_MACH_MACH_TIME_H 0
 #define HAVE_MAPVIEWOFFILE 0
