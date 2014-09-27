@@ -178,7 +178,7 @@ DMO_VideoDecoder * DMO_VideoDecoder_Open(char* dllname, GUID* guid, BITMAPINFOHE
 
 	if (!this->m_pDMO_Filter)
 	{
-	    printf("Failed to create DMO filter\n");
+	    fprintf(stderr, "Failed to create DMO filter\n");
 	    return 0;
 	}
 
@@ -190,7 +190,7 @@ DMO_VideoDecoder * DMO_VideoDecoder_Open(char* dllname, GUID* guid, BITMAPINFOHE
 	    result = this->m_pDMO_Filter->m_pMedia->vt->SetOutputType(this->m_pDMO_Filter->m_pMedia, 0, &this->m_sDestType, DMO_SET_TYPEF_TEST_ONLY);
 	    if (result)
 	    {
-		printf("Decoder does not support upside-down RGB frames\n");
+		fprintf(stderr, "Decoder does not support upside-down RGB frames\n");
 		this->iv.m_obh.biHeight *= -1;
 		this->m_sVhdr2->bmiHeader.biHeight = this->iv.m_obh.biHeight;
 	    }
@@ -220,7 +220,7 @@ DMO_VideoDecoder * DMO_VideoDecoder_Open(char* dllname, GUID* guid, BITMAPINFOHE
 
 	    this->m_Caps = CAP_NONE;
 
-	    printf("Decoder supports the following formats: ");
+	    fprintf(stderr, "Decoder supports the following formats: ");
 	    for (c = check; c->bits; c++)
 	    {
 		this->m_sVhdr2->bmiHeader.biBitCount = c->bits;
@@ -232,16 +232,16 @@ DMO_VideoDecoder * DMO_VideoDecoder_Open(char* dllname, GUID* guid, BITMAPINFOHE
 		{
 		    this->m_Caps = (this->m_Caps | c->cap);
 		    if (c->name)
-			printf("%s ", c->name);
+			fprintf(stderr, "%s ", c->name);
 		    else
-			printf("%.4s ", (char*) &c->fcc);
+			fprintf(stderr, "%.4s ", (char*) &c->fcc);
 		}
 	    }
-	    printf("\n");
+	    fprintf(stderr, "\n");
 	}
 
 	if (this->m_Caps != CAP_NONE)
-	    printf("Decoder is capable of YUV output (flags 0x%x)\n", (int)this->m_Caps);
+	    fprintf(stderr, "Decoder is capable of YUV output (flags 0x%x)\n", (int)this->m_Caps);
 
 	this->m_sVhdr2->bmiHeader.biBitCount = 24;
 	this->m_sVhdr2->bmiHeader.biCompression = 0;
@@ -326,9 +326,9 @@ int DMO_VideoDecoder_DecodeInternal(DMO_VideoDecoder *this, const void* src, int
     {
         /* something for process */
 	if (result != S_FALSE)
-	    printf("ProcessInputError  r:0x%x=%d (keyframe: %d)\n", result, result, is_keyframe);
+	    fprintf(stderr, "ProcessInputError  r:0x%x=%d (keyframe: %d)\n", result, result, is_keyframe);
 	else
-	    printf("ProcessInputError  FALSE ?? (keyframe: %d)\n", is_keyframe);
+	    fprintf(stderr, "ProcessInputError  FALSE ?? (keyframe: %d)\n", is_keyframe);
 	return size;
     }
 
@@ -342,9 +342,9 @@ int DMO_VideoDecoder_DecodeInternal(DMO_VideoDecoder *this, const void* src, int
 						   1, &db, &status);
     //m_pDMO_Filter->m_pMedia->vt->Lock(m_pDMO_Filter->m_pMedia, 0);
     if ((unsigned)result == DMO_E_NOTACCEPTING)
-	printf("ProcessOutputError: Not accepting\n");
+	fprintf(stderr, "ProcessOutputError: Not accepting\n");
     else if (result)
-	printf("ProcessOutputError: r:0x%x=%d  %ld  stat:%ld\n", result, result, status, db.dwStatus);
+	fprintf(stderr, "ProcessOutputError: r:0x%x=%d  %ld  stat:%ld\n", result, result, status, db.dwStatus);
 
     ((IMediaBuffer*)db.pBuffer)->vt->Release((IUnknown*)db.pBuffer);
 
@@ -516,9 +516,9 @@ int DMO_VideoDecoder_SetDestFmt(DMO_VideoDecoder *this, int bits, unsigned int c
     if (result != 0)
     {
 	if (csp)
-	    printf("Warning: unsupported color space\n");
+	    fprintf(stderr, "Warning: unsupported color space\n");
 	else
-	    printf("Warning: unsupported bit depth\n");
+	    fprintf(stderr, "Warning: unsupported bit depth\n");
 
 	this->m_sDestType.lSampleSize = this->iv.m_decoder.biSizeImage;
 	memcpy(&(this->m_sVhdr2->bmiHeader), &this->iv.m_decoder, sizeof(this->iv.m_decoder));

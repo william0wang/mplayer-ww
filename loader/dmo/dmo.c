@@ -88,15 +88,15 @@ DMO_Filter* DMO_FilterCreate(const char* dllname, const GUID* id,
             /* query for some extra available interface */
 	    HRESULT r = object->vt->QueryInterface(object, &IID_IMediaObjectInPlace, (void*)&This->m_pInPlace);
             if (r == 0 && This->m_pInPlace)
-		printf("DMO dll supports InPlace - PLEASE REPORT to developer\n");
+		fprintf(stderr, "DMO dll supports InPlace - PLEASE REPORT to developer\n");
 	    r = object->vt->QueryInterface(object, &IID_IDMOVideoOutputOptimizations, (void*)&This->m_pOptim);
 	    if (r == 0 && This->m_pOptim)
 	    {
                 unsigned long flags;
 		r = This->m_pOptim->vt->QueryOperationModePreferences(This->m_pOptim, 0, &flags);
-		printf("DMO dll supports VO Optimizations %ld %lx\n", r, flags);
+		fprintf(stderr, "DMO dll supports VO Optimizations %ld %lx\n", r, flags);
 		if (flags & DMO_VOSF_NEEDS_PREVIOUS_SAMPLE)
-		    printf("DMO dll might use previous sample when requested\n");
+		    fprintf(stderr, "DMO dll might use previous sample when requested\n");
 	    }
 	}
 	object->vt->Release((IUnknown*)object);
@@ -159,7 +159,7 @@ DMO_Filter* DMO_FilterCreate(const char* dllname, const GUID* id,
     if (em)
     {
         DMO_Filter_Destroy(This);
-	printf("IMediaObject ERROR: %p  %s (0x%lx : %ld)\n", em, em ? em : "", hr, hr);
+	fprintf(stderr, "IMediaObject ERROR: %p  %s (0x%lx : %ld)\n", em, em ? em : "", hr, hr);
 	This = 0;
     }
     return This;
