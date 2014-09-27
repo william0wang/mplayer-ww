@@ -62,7 +62,7 @@ DMO_Filter* DMO_FilterCreate(const char* dllname, const GUID* id,
 	    em = "could not open DMO DLL";
 	    break;
 	}
-	func = (GETCLASS)GetProcAddress((unsigned)This->m_iHandle, "DllGetClassObject");
+	func = (GETCLASS)GetProcAddress(This->m_iHandle, "DllGetClassObject");
 	if (!func)
 	{
 	    em = "illegal or corrupt DMO DLL";
