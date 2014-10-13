@@ -386,6 +386,7 @@ Optional features:
   --enable-ass-internal  enable internal SSA/ASS subtitle support [autodetect]
   --disable-ass          disable SSA/ASS subtitle support [autodetect]
   --enable-rpath         enable runtime linker path for extra libs [disabled]
+  --disable-gnutls       disable GnuTLS [autodetect]
 
 Codecs:
   --enable-gif              enable GIF support [autodetect]
@@ -848,6 +849,7 @@ _enca=auto
 _inet6=auto
 _sctp=auto
 _gethostbyname2=auto
+_gnutls=auto
 _ftp=auto
 _musepack=no
 _vstream=auto
@@ -1349,6 +1351,8 @@ for ac_option do
   --disable-ass-internal) ass_internal=no  ;;
   --enable-rpath)       _rpath=yes      ;;
   --disable-rpath)      _rpath=no       ;;
+  --enable-gnutls)       _gnutls=yes    ;;
+  --disable-gnutls)      _gnutls=no     ;;
 
   --enable-fribidi)     _fribidi=yes    ;;
   --disable-fribidi)    _fribidi=no     ;;
@@ -4328,6 +4332,24 @@ else
   echores "no"
 fi
 
+
+echocheck "GnuTLS"
+if test "$_gnutls" = auto ; then
+  _gnutls=no
+  if $_pkg_config --exists gnutls ; then
+	  statement_check gnutls/gnutls.h 'gnutls_global_init()' $($_pkg_config --libs --cflags gnutls) &&
+      _gnutls=yes
+  fi
+fi
+if test "$_gnutls" = yes ; then
+  def_gnutls='#define CONFIG_GNUTLS 1'
+  libavprotocols="$libavprotocols HTTPS_PROTOCOL TLS_PROTOCOL"
+  extra_cflags="$extra_cflags $($_pkg_config --cflags gnutls)"
+  extra_ldflags="$extra_ldflags $($_pkg_config --libs gnutls)"
+else
+  def_gnutls='#define CONFIG_GNUTLS 0'
+fi
+echores "$_gnutls"
 
 echocheck "Samba support (libsmbclient)"
 if test "$_smb" = yes; then
@@ -8694,6 +8716,7 @@ CONFIG_AC3DSP   = yes
 CONFIG_BZLIB    = $bzlib
 CONFIG_CRYSTALHD= $crystalhd
 CONFIG_ENCODERS = yes
+CONFIG_GNUTLS   = $_gnutls
 CONFIG_GPL      = yes
 CONFIG_ICONV    = $_iconv
 CONFIG_MLIB     = $_mlib
@@ -9229,7 +9252,7 @@ $def_truncf
 #define CONFIG_FASTDIV 0
 #define CONFIG_FFSERVER 0
 #define CONFIG_FTRAPV 0
-#define CONFIG_GNUTLS 0
+$def_gnutls
 #define CONFIG_GPL 1
 #define CONFIG_GRAY 0
 #define CONFIG_LIBMODPLUG 0
