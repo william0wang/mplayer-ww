@@ -2564,6 +2564,9 @@ static int parse_pmt(ts_priv_t * priv, uint16_t progid, uint16_t pid, int is_sta
 			case 0x13:
 				pmt->es[idx].type = SL_SECTION;
 				break;
+			case 0x24:
+				pmt->es[idx].type = VIDEO_HEVC;
+				break;
 			case 0x80:
 				pmt->es[idx].type = AUDIO_PCM_BR;
 				break;
