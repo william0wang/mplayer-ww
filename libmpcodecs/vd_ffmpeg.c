@@ -609,14 +609,19 @@ static int init_vo(sh_video_t *sh, enum AVPixelFormat pix_fmt)
     const AVCodecContext *avctx = ctx->avctx;
     int width, height;
     int i;
+    int imgfmt = pixfmt2imgfmt2(pix_fmt, avctx->codec_id);
 
     // avoid initialization for formats not on the supported
     // list in the codecs.conf entry.
     for (i = 0; i < CODECS_MAX_OUTFMT; i++)
-        if (sh->codec->outfmt[i] == pixfmt2imgfmt2(pix_fmt, avctx->codec_id))
+        if (sh->codec->outfmt[i] == imgfmt)
             break;
-    if (i == CODECS_MAX_OUTFMT)
+    if (i == CODECS_MAX_OUTFMT) {
+        if (imgfmt)
+            mp_msg(MSGT_DECVIDEO, MSGL_WARN, "Unexpected decoder output format %s\n",
+                   vo_format_name(imgfmt));
         return -1;
+    }
 
     width = avctx->width;
     height = avctx->height;
