@@ -1,4 +1,4 @@
-// Synced with help_mp-en.h rev. 37177
+// Synced with help_mp-en.h rev. 37272
 //
 // Translated by JRaSH <jrash06@gmail.com>
 
@@ -743,7 +743,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_NoChapter "无章节"
 #define MSGTR_GUI_None "（无）"
 #define MSGTR_GUI__none_ "（无）"
-#define MSGTR_GUI_NonInterleavedParser "使用非交错的 AVI 解析器"
+#define MSGTR_GUI_NonInterleavedParser "使用非交错格式的文件解析器"
 #define MSGTR_GUI_NormalizeSound "音量规格化"
 #define MSGTR_GUI_Ok "确定"
 #define MSGTR_GUI_Open "打开"
