@@ -119,6 +119,7 @@ static const struct AVCodecTag mp_codecid_override_tags[] = {
 #endif
     { AV_CODEC_ID_G729,              MKTAG('G', '7', '2', '9') },
     { AV_CODEC_ID_H264,              MKTAG('H', '2', '6', '4') },
+    { AV_CODEC_ID_HEVC,              MKTAG('H', 'E', 'V', 'C') },
     { AV_CODEC_ID_MP3,               0x55 },
     { AV_CODEC_ID_MPEG4,             MKTAG('M', 'P', '4', 'V') },
 #if LIBAVUTIL_VERSION_MICRO >= 100
