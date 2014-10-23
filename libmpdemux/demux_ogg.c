@@ -37,6 +37,7 @@
 #include "demux_mov.h"
 #include "demux_ogg.h"
 
+#define FOURCC_OPUS   mmioFOURCC('o', 'p', 'u', 's')
 #define FOURCC_VORBIS mmioFOURCC('v', 'r', 'b', 's')
 #define FOURCC_SPEEX  mmioFOURCC('s', 'p', 'x', ' ')
 #define FOURCC_THEORA mmioFOURCC('t', 'h', 'e', 'o')
@@ -121,6 +122,7 @@ typedef struct ogg_stream {
     // Logical stream state
     ogg_stream_state stream;
     int hdr_packets;
+    int opus;
     int vorbis;
     int speex;
     int theora;
@@ -288,7 +290,7 @@ static unsigned char *demux_ogg_read_packet(ogg_stream_t *os, ogg_packet *pack,
             os->lastsize = blocksize;
             os->lastpos  = pack->granulepos;
         }
-    } else if (os->speex) {
+    } else if (os->speex || os->opus) {
         // whole packet (default)
 # ifdef CONFIG_OGGTHEORA
     } else if (os->theora) {
@@ -512,7 +514,7 @@ static int demux_ogg_add_packet(demux_stream_t *ds, ogg_stream_t *os,
         // (PACKET_TYPE_HEADER bit doesn't even exist for theora ?!)
         // We jump nothing for FLAC. Ain't this great? Packet contents have to be
         // handled differently for each and every stream type. The joy! The joy!
-        if (!os->flac && (*pack->packet & PACKET_TYPE_HEADER) &&
+        if (!os->opus && !os->flac && (*pack->packet & PACKET_TYPE_HEADER) &&
                 ds->sh &&
                 (ds != d->audio || ((sh_audio_t*)ds->sh)->format != FOURCC_VORBIS || os->hdr_packets >= NUM_VORBIS_HDR_PACKETS ) &&
                 (ds != d->video || (((sh_video_t*)ds->sh)->format != FOURCC_THEORA)))
@@ -864,6 +866,15 @@ int demux_ogg_open(demuxer_t *demuxer)
             n_audio++;
             mp_msg(MSGT_DEMUX, MSGL_INFO,
                    "[Ogg] stream %d: audio (Vorbis), -aid %d\n",
+                   ogg_d->num_sub, n_audio - 1);
+        } else if (pack.bytes >= 8 && !strncmp(pack.packet, "OpusHead", 8)) {
+            sh_a = new_sh_audio_aid(demuxer, ogg_d->num_sub, n_audio, NULL);
+            sh_a->format = FOURCC_OPUS;
+            ogg_d->subs[ogg_d->num_sub].opus = 1;
+            ogg_d->subs[ogg_d->num_sub].id   = n_audio;
+            n_audio++;
+            mp_msg(MSGT_DEMUX, MSGL_INFO,
+                   "[Ogg] stream %d: audio (Opus), -aid %d\n",
                    ogg_d->num_sub, n_audio - 1);
         } else if (pack.bytes >= 80 && !strncmp(pack.packet, "Speex", 5)) {
             sh_a = new_sh_audio_aid(demuxer, ogg_d->num_sub, n_audio, NULL);
@@ -1549,7 +1560,7 @@ static void demux_ogg_seek(demuxer_t *demuxer, float rel_seek_secs,
                     break;
                 }
             }
-            if (!precision && (is_keyframe || os->vorbis || os->speex)) {
+            if (!precision && (is_keyframe || os->vorbis || os->speex || os->opus)) {
                 if (sub_clear_text(&ogg_sub, MP_NOPTS_VALUE)) {
                     vo_sub = &ogg_sub;
                     vo_osd_changed(OSDTYPE_SUBTITLE);
