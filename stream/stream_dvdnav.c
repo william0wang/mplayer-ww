@@ -38,6 +38,13 @@
 #include "help_mp.h"
 #include "stream_dvd_common.h"
 
+#ifndef DVDNAV_FORMAT_AC3
+#define DVDNAV_FORMAT_AC3 DVD_AUDIO_FORMAT_AC3
+#define DVDNAV_FORMAT_DTS DVD_AUDIO_FORMAT_DTS
+#define DVDNAV_FORMAT_LPCM DVD_AUDIO_FORMAT_LPCM
+#define DVDNAV_FORMAT_MPEGAUDIO DVD_AUDIO_FORMAT_MPEG
+#endif
+
 /* state flags */
 typedef enum {
   NAV_FLAG_EOF                  = 1 << 0,  /* end of stream has been reached */
