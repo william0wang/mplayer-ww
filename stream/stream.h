@@ -324,6 +324,8 @@ static inline int stream_seek(stream_t *s, int64_t pos)
            "Invalid seek to negative position %"PRIx64"!\n", pos);
     pos = 0;
   }
+  if (s->buf_len == 0 && s->pos == pos)
+    return 1;
   if(pos<s->pos){
     int64_t x=pos-(s->pos-s->buf_len);
     if(x>=0){
