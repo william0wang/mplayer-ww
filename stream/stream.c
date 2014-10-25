@@ -359,10 +359,17 @@ int stream_fill_buffer(stream_t *s){
     return 0;
   s->buf_pos=0;
   s->buf_len=len;
+  while (s->buf_len < STREAM_BUFFER_MIN) {
+    assert(s->buf_len + STREAM_BUFFER_MIN < STREAM_BUFFER_SIZE);
+    len = stream_read_internal(s, s->buffer + s->buf_len, STREAM_BUFFER_MIN);
+    if (len <= 0)
+      break;
+    s->buf_len += len;
+  }
 //  printf("[%d]",len);fflush(stdout);
   if (s->capture_file)
     stream_capture_do(s);
-  return len;
+  return s->buf_len;
 }
 
 int stream_write_buffer(stream_t *s, unsigned char *buf, int len) {
