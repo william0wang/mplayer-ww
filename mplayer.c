@@ -3436,6 +3436,7 @@ goto_enable_cache:
             if (extract_embedded_fonts &&
                 att->name && att->type && att->data && att->data_size &&
                 (strcmp(att->type, "application/x-truetype-font") == 0 ||
+                 strcmp(att->type, "application/vnd.ms-opentype") == 0 ||
                  strcmp(att->type, "application/x-font") == 0))
                 ass_add_font(ass_library, att->name, att->data, att->data_size);
         }
