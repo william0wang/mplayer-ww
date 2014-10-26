@@ -3424,6 +3424,25 @@ else
 fi
 echores "$_mkstemp"
 
+echocheck "gmtime_r"
+_gmtime_r=no
+statement_check time.h 'gmtime_r(0, 0)' && _gmtime_r=yes
+if test "$_gmtime_r" = yes ; then
+  def_gmtime_r='#define HAVE_GMTIME_R 1'
+else
+  def_gmtime_r='#undef HAVE_GMTIME_R'
+fi
+echores "$_gmtime_r"
+
+echocheck "localtime_r"
+_localtime_r=no
+statement_check time.h 'localtime_r(0, 0)' && _localtime_r=yes
+if test "$_localtime_r" = yes ; then
+  def_localtime_r='#define HAVE_LOCALTIME_R 1'
+else
+  def_localtime_r='#undef HAVE_LOCALTIME_R'
+fi
+echores "$_localtime_r"
 
 echocheck "nanosleep"
 _nanosleep=no
@@ -8868,7 +8887,9 @@ $def_gethostbyname2
 $def_gettimeofday
 $def_clock_gettime
 $def_glob
+$def_gmtime_r
 $def_langinfo
+$def_localtime_r
 $def_map_memalign
 $def_memalign
 $def_nanosleep
@@ -9284,7 +9305,6 @@ $def_gnutls
 #define HAVE_ISATTY 0
 #define HAVE_LDBRX 0
 #define HAVE_LIBC_MSVCRT 0
-#define HAVE_LOCALTIME_R 0
 #define HAVE_MACH_MACH_TIME_H 0
 #define HAVE_MAPVIEWOFFILE 0
 #define HAVE_MIPSDSPR1 0
