@@ -4702,7 +4702,7 @@ fi
 if test "$_vda" = yes ; then
   def_vda='#define CONFIG_VDA 1'
   extra_ldflags="$extra_ldflags -framework CoreFoundation -framework VideoDecodeAcceleration -framework QuartzCore"
-  libavhwaccels="$libavhwaccels H264_VDA_HWACCEL"
+  libavhwaccels="$libavhwaccels H264_VDA_HWACCEL H264_VDA_OLD_HWACCEL"
 else
   def_vda='#define CONFIG_VDA 0'
   libavdecoders=$(filter_out_component decoder '[A-Z0-9]*_VDA')
