@@ -292,6 +292,14 @@ static void set_format_params(struct AVCodecContext *avctx,
         return;
     ctx->use_hwaccel = fmt == AV_PIX_FMT_VDPAU;
     imgfmt = pixfmt2imgfmt2(fmt, avctx->codec_id);
+    if (!ctx->use_hwaccel) {
+        av_freep(&avctx->hwaccel_context);
+    } else {
+        AVVDPAUContext *vdpc = avctx->hwaccel_context;
+        if (!vdpc)
+            avctx->hwaccel_context = vdpc = av_alloc_vdpaucontext();
+        vdpc->render2 = vdpau_render_wrapper;
+    }
     if (IMGFMT_IS_HWACCEL(imgfmt)) {
         ctx->do_dr1    = 1;
         ctx->nonref_dr = 0;
@@ -741,12 +749,7 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
 #if CONFIG_VDPAU
     if (ctx->use_hwaccel) {
         struct vdpau_render_state *render = mpi->priv;
-        AVVDPAUContext *vdpc;
         avctx->draw_horiz_band= NULL;
-        if (!avctx->hwaccel_context)
-            avctx->hwaccel_context = av_alloc_vdpaucontext();
-        vdpc = avctx->hwaccel_context;
-        vdpc->render2 = vdpau_render_wrapper;
         mpi->planes[3] = render->surface;
     }
 #endif
