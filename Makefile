@@ -43,28 +43,9 @@ SRCS_COMMON-$(CDDB)                  += stream/stream_cddb.c
 SRCS_COMMON-$(DVBIN)                 += stream/dvb_tune.c               \
                                         stream/stream_dvb.c
 SRCS_COMMON-$(DVDNAV)                += stream/stream_dvdnav.c
-SRCS_COMMON-$(DVDNAV_INTERNAL)       += libdvdnav/dvdnav.c              \
-                                        libdvdnav/highlight.c           \
-                                        libdvdnav/navigation.c          \
-                                        libdvdnav/read_cache.c          \
-                                        libdvdnav/remap.c               \
-                                        libdvdnav/searching.c           \
-                                        libdvdnav/settings.c            \
-                                        libdvdnav/vm/decoder.c          \
-                                        libdvdnav/vm/vm.c               \
-                                        libdvdnav/vm/vmcmd.c            \
 
 SRCS_COMMON-$(DVDREAD)               += stream/stream_dvd.c             \
                                         stream/stream_dvd_common.c
-SRCS_COMMON-$(DVDREAD_INTERNAL)      += libdvdread4/bitreader.c         \
-                                        libdvdread4/dvd_input.c         \
-                                        libdvdread4/dvd_reader.c        \
-                                        libdvdread4/dvd_udf.c           \
-                                        libdvdread4/ifo_print.c         \
-                                        libdvdread4/ifo_read.c          \
-                                        libdvdread4/md5.c               \
-                                        libdvdread4/nav_print.c         \
-                                        libdvdread4/nav_read.c          \
 
 SRCS_COMMON-$(FAAD)                  += libmpcodecs/ad_faad.c
 SRCS_COMMON-$(FASTMEMCPY)            += libvo/aclib.c
@@ -124,11 +105,6 @@ SRCS_COMMON-$(LIBDCA)                += libmpcodecs/ad_libdca.c
 SRCS_COMMON-$(LIBDV)                 += libmpcodecs/ad_libdv.c          \
                                         libmpcodecs/vd_libdv.c          \
                                         libmpdemux/demux_rawdv.c
-SRCS_COMMON-$(LIBDVDCSS_INTERNAL)    += libdvdcss/css.c                 \
-                                        libdvdcss/device.c              \
-                                        libdvdcss/error.c               \
-                                        libdvdcss/ioctl.c               \
-                                        libdvdcss/libdvdcss.c           \
 
 SRCS_COMMON-$(LIBMAD)                += libmpcodecs/ad_libmad.c
 
@@ -731,10 +707,6 @@ DIRS =  .                       \
 
 ALL_DIRS = $(DIRS)              \
            libass               \
-           libdvdcss            \
-           libdvdnav            \
-           libdvdnav/vm         \
-           libdvdread4          \
            libmpeg2             \
            tremor               \
 
@@ -861,10 +833,6 @@ mpcommon.o osdep/mplayer-rc.o gui/dialog/about.o gui/win32/gui.o: version.h
 osdep/mplayer-rc.o: osdep/mplayer.exe.manifest
 
 gui/%: CFLAGS += -Wno-strict-prototypes
-
-libdvdcss/%:   CFLAGS := $(CFLAGS_LIBDVDCSS) $(CFLAGS)
-libdvdnav/%:   CFLAGS := -Ilibdvdnav -DHAVE_CONFIG_H -DVERSION=\"MPlayer-custom\" $(CFLAGS)
-libdvdread4/%: CFLAGS := -Ilibdvdread4 $(CFLAGS_LIBDVDCSS_DVDREAD) $(CFLAGS)
 
 loader/%: CFLAGS += -fno-omit-frame-pointer $(CFLAGS_NO_OMIT_LEAF_FRAME_POINTER)
 #loader/%: CFLAGS += -Ddbg_printf=__vprintf -DTRACE=__vprintf -DDETAILED_OUT
