@@ -359,8 +359,6 @@ Optional features:
   --disable-bluray       disable Blu-ray support [autodetect]
   --disable-dvdnav       disable libdvdnav [autodetect]
   --disable-dvdread      disable libdvdread [autodetect]
-  --disable-dvdread-internal  disable internal libdvdread and libdvdnav [autodetect]
-  --disable-libdvdcss-internal  disable internal libdvdcss [autodetect]
   --disable-cdparanoia   disable cdparanoia [autodetect]
   --disable-cddb         disable cddb [autodetect]
   --disable-bitmap-font  disable bitmap font support [enable]
@@ -750,8 +748,6 @@ type dvdnav-config >/dev/null 2>&1 && _dvdnavconfig=dvdnav-config
 _dvdreadconfig="pkg-config dvdread"
 type dvdread-config >/dev/null 2>&1 && _dvdreadconfig=dvdread-config
 _dvdread=auto
-_dvdread_internal=auto
-_libdvdcss_internal=auto
 _xanim=auto
 _real=auto
 _live=auto
@@ -921,11 +917,9 @@ for ac_option do
     ;;
   --with-dvdnav-config=*)
     _dvdnavconfig=$(option_value $ac_option)
-    _dvdread_internal=no
     ;;
   --with-dvdread-config=*)
     _dvdreadconfig=$(option_value $ac_option)
-    _dvdread_internal=no
     ;;
 
   --extra-cflags=*)
@@ -1170,10 +1164,6 @@ for ac_option do
   --disable-bluray)     _bluray=no      ;;
   --enable-dvdread)     _dvdread=yes    ;;
   --disable-dvdread)    _dvdread=no     ;;
-  --enable-dvdread-internal)    _dvdread_internal=yes   ;;
-  --disable-dvdread-internal)   _dvdread_internal=no    ;;
-  --enable-libdvdcss-internal)  _libdvdcss_internal=yes ;;
-  --disable-libdvdcss-internal) _libdvdcss_internal=no  ;;
   --enable-dvdnav)      _dvdnav=yes     ;;
   --disable-dvdnav)     _dvdnav=no      ;;
   --enable-xanim)       _xanim=yes      ;;
@@ -6105,15 +6095,6 @@ fi
 echores "$_bluray"
 
 echocheck "dvdread"
-if test "$_dvdread_internal" = auto ; then
-  _dvdread_internal=no
-  if linux || freebsd || netbsd || openbsd || dragonfly || sunos || hpux ||
-     darwin || win32 || os2; then
-    _dvdread_internal=yes
-    _dvdread=yes
-    extra_cflags="-Ilibdvdread4 $extra_cflags"
-  fi
-fi
 if test "$_dvdread" = auto ; then
   _dvdread=no
   if test "$_dl" = yes; then
@@ -6123,102 +6104,19 @@ if test "$_dvdread" = auto ; then
       _dvdread=yes
       extra_cflags="$extra_cflags $_dvdreadcflags"
       extra_ldflags="$extra_ldflags $_dvdreadlibs"
-      res_comment="external"
     fi
   fi
 fi
 
-if test "$_dvdread_internal" = yes; then
+if test "$_dvdread" = yes; then
   def_dvdread='#define CONFIG_DVDREAD 1'
-  inputmodules="dvdread(internal) $inputmodules"
-  res_comment="internal"
-elif test "$_dvdread" = yes; then
-  def_dvdread='#define CONFIG_DVDREAD 1'
-  extra_ldflags="$extra_ldflags -ldvdread"
-  inputmodules="dvdread(external) $inputmodules"
-  res_comment="external"
+  extra_ldflags="$extra_ldflags"
+  inputmodules="dvdread $inputmodules"
 else
   def_dvdread='#undef CONFIG_DVDREAD'
   noinputmodules="dvdread $noinputmodules"
 fi
 echores "$_dvdread"
-
-
-echocheck "internal libdvdcss"
-def_broken_mkdir='#undef HAVE_BROKEN_MKDIR'
-def_dvdio='#undef DVD_STRUCT_IN_SYS_DVDIO_H'
-def_dvd='#undef DVD_STRUCT_IN_DVD_H'
-def_cdio='#undef DVD_STRUCT_IN_SYS_CDIO_H'
-def_cdrom='#undef DVD_STRUCT_IN_LINUX_CDROM_H'
-def_hpux_scsi_h='#undef HPUX_SCTL_IO'
-def_sol_scsi_h='#undef SOLARIS_USCSI'
-def_sys_uio_h='#undef HAVE_SYS_UIO_H'
-_dvdio=no
-_dvd=no
-_cdio=no
-_cdrom=no
-_sol_scsi_h=no
-_hpux_scsi_h=no
-if test "$_libdvdcss_internal" = auto && test "$_dvdread_internal" = yes ; then
-  _libdvdcss_internal=no
-  test -d libdvdcss && _libdvdcss_internal=yes
-
-  if header_check linux/cdrom.h ; then
-     _cdrom=yes
-     def_cdrom='#define DVD_STRUCT_IN_LINUX_CDROM_H 1'
-  # FreeBSD 8.1 has broken dvdio.h
-  elif header_check_broken sys/types.h sys/dvdio.h ; then
-    _dvdio=yes
-    def_dvdio='#define DVD_STRUCT_IN_SYS_DVDIO_H 1'
-  elif header_check dvd.h ; then
-    _dvd=yes
-    def_dvd='#define DVD_STRUCT_IN_DVD_H 1'
-  # at least OpenSolaris has a broken cdio.h
-  elif header_check_broken sys/types.h sys/cdio.h ; then
-    _cdio=yes
-    def_cdio='#define DVD_STRUCT_IN_SYS_CDIO_H 1'
-  fi
-
-  if sunos; then
-    header_check sys/scsi/scsi_types.h &&
-      header_check_broken sys/types.h sys/scsi/impl/uscsi.h &&
-        _sol_scsi_h=yes && def_sol_scsi_h='#define SOLARIS_USCSI 1'
-  elif hpux; then
-    # also used by AIX, but AIX does not support VCD and/or libdvdread
-    header_check sys/scsi.h && _hpux_scsi_h=yes &&
-      def_hpux_scsi_h='#define HPUX_SCTL_IO 1' ||
-      _libdvdcss_internal=no
-  fi
-
-  statement_check_broken stddef.h sys/stat.h 'mkdir(NULL, 0)' ||
-    def_broken_mkdir='#define HAVE_BROKEN_MKDIR 1'
-
-  header_check "sys/uio.h" &&
-    def_sys_uio_h='#define HAVE_SYS_UIO_H 1'
-
-fi
-if test "$_libdvdcss_internal" = yes ; then
-  if linux || netbsd || openbsd || wine ; then
-    def_dvd_linux='#define HAVE_LINUX_DVD_STRUCT 1'
-    openbsd && def_dvd_openbsd='#define HAVE_OPENBSD_DVD_STRUCT 1'
-  elif freebsd || dragonfly ; then
-    def_dvd_bsd='#define HAVE_BSD_DVD_STRUCT 1'
-  elif darwin ; then
-    def_dvd_darwin='#define DARWIN_DVD_IOCTL'
-    extra_ldflags="$extra_ldflags -framework IOKit -framework Carbon"
-  elif cygwin ; then
-    cflags_libdvdcss="-D_WIN32_IE=0x0500 -mwin32"
-  elif mingw32 ; then
-    cflags_libdvdcss="-D_WIN32_IE=0x0500"
-    libs_mplayer="$libs_mplayer -lshfolder"
-  fi
-  cflags_libdvdcss_dvdread="-Ilibdvdcss"
-  def_dvdcss="#define HAVE_DVDCSS_DVDCSS_H 1"
-  inputmodules="libdvdcss(internal) $inputmodules"
-else
-  noinputmodules="libdvdcss(internal) $noinputmodules"
-fi
-echores "$_libdvdcss_internal"
 
 
 echocheck "libcdio"
@@ -8142,22 +8040,7 @@ CFLAGS="$CFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE
 
 CXXFLAGS=" $CFLAGS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS"
 
-# This must be the last test to be performed. Any other tests following it
-# could fail due to linker errors. libdvdnavmini is intentionally not linked
-# against libdvdread (to permit MPlayer to use its own copy of the library).
-# So any compilation using the flags added here but not linking against
-# libdvdread can fail.
 echocheck "DVD support (libdvdnav)"
-dvdnav_internal=no
-if test "$_dvdnav" = auto ; then
-  if test "$_dvdread_internal" = yes ; then
-    _dvdnav=yes
-    dvdnav_internal=yes
-    res_comment="internal"
-  else
-    $_dvdnavconfig --version --minilibs >> $TMPLOG 2>&1 || _dvdnav=no
-  fi
-fi
 if test "$_dvdnav" = auto ; then
   _dvdnav=no
   _dvdnavdir=$($_dvdnavconfig --cflags)
@@ -8166,14 +8049,9 @@ if test "$_dvdnav" = auto ; then
 fi
 if test "$_dvdnav" = yes ; then
   def_dvdnav='#define CONFIG_DVDNAV 1'
-  if test "$dvdnav_internal" = yes ; then
-    cflags_libdvdnav="-Ilibdvdnav"
-    inputmodules="dvdnav(internal) $inputmodules"
-  else
-    extra_cflags="$extra_cflags $($_dvdnavconfig --cflags)"
-    extra_ldflags="$extra_ldflags $($_dvdnavconfig --minilibs)"
-    inputmodules="dvdnav $inputmodules"
-  fi
+  extra_cflags="$extra_cflags $($_dvdnavconfig --cflags)"
+  extra_ldflags="$extra_ldflags $($_dvdnavconfig --libs)"
+  inputmodules="dvdnav $inputmodules"
 else
   def_dvdnav='#undef CONFIG_DVDNAV'
   noinputmodules="dvdnav $noinputmodules"
