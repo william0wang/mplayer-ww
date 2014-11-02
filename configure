@@ -1839,6 +1839,10 @@ int main(void) {
 EOF
 if x86 ; then
   cc_check && host_arch=x86_64 || host_arch=i386
+  # Treat x32 as generic architecture without any optimizations.
+  if test "$host_arch" = 'i386' && cpp_condition_check '' 'defined(__x86_64__)'; then
+      host_arch=generic
+  fi
 fi
 if ppc ; then
   cc_check && host_arch=ppc64 || host_arch=ppc
@@ -3009,7 +3013,7 @@ if test "$_yasm" ; then
       esac
     fi
     YASMFLAGS="-f $objformat $yasmdefines"
-    yasm_check || die "yasm not found, use --yasm='' if you really want to compile without"
+    yasm_check || ! x86 || die "yasm not found, use --yasm='' if you really want to compile without"
     echo "CPU amdnop" > $TMPS
     yasm_check && yasm_features="cpunop"
   fi
