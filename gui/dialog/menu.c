@@ -49,6 +49,8 @@
 #include "libavutil/avstring.h"
 
 #include "pixmaps/about.xpm"
+#include "pixmaps/audio.xpm"
+#include "pixmaps/video.xpm"
 #include "pixmaps/half.xpm"
 #include "pixmaps/normal.xpm"
 #include "pixmaps/double.xpm"
@@ -91,8 +93,6 @@
 #include "pixmaps/playdvd.xpm"
 #include "pixmaps/chapter.xpm"
 #include "pixmaps/dolby.xpm"
-#include "pixmaps/audio.xpm"
-#include "pixmaps/video.xpm"
 #endif
 #ifdef CONFIG_TV
 #include "pixmaps/tv.xpm"
@@ -231,7 +231,6 @@ typedef struct
  const char * name;
 } Languages_t;
 
-#ifdef CONFIG_DVDREAD
 #define lng( a,b ) ( (int)(a) * 256 + b )
 static Languages_t Languages[] =
 {
@@ -405,10 +404,12 @@ static Languages_t Languages[] =
   { lng( 'z','u' ), "zul", "isiZulu"                         },
 };
 
+#ifdef CONFIG_DVDREAD
 static char * ChannelTypes[] =
   { "Dolby Digital","","Mpeg1","Mpeg2","PCM","","Digital Theatre System" };
 static char * ChannelNumbers[] =
   { "","Stereo","","","","5.1" };
+#endif
 
 enum
 {
@@ -438,10 +439,11 @@ static const char * GetLanguage( void *language, int type )
  return MSGTR_GUI_Unknown;
 }
 #undef lng
-#endif
 
 
+#ifdef CONFIG_DVDREAD
 static GtkWidget * DVDSubMenu;
+#endif
 GtkWidget * DVDTitleMenu;
 GtkWidget * DVDChapterMenu;
 GtkWidget * DVDAudioLanguageMenu;
