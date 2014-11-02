@@ -292,6 +292,7 @@ static void set_format_params(struct AVCodecContext *avctx,
         return;
     ctx->use_hwaccel = fmt == AV_PIX_FMT_VDPAU;
     imgfmt = pixfmt2imgfmt2(fmt, avctx->codec_id);
+#if CONFIG_VDPAU
     if (!ctx->use_hwaccel) {
         av_freep(&avctx->hwaccel_context);
     } else {
@@ -300,6 +301,7 @@ static void set_format_params(struct AVCodecContext *avctx,
             avctx->hwaccel_context = vdpc = av_alloc_vdpaucontext();
         vdpc->render2 = vdpau_render_wrapper;
     }
+#endif
     if (IMGFMT_IS_HWACCEL(imgfmt)) {
         ctx->do_dr1    = 1;
         ctx->nonref_dr = 0;
