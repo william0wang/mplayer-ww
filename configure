@@ -6101,15 +6101,13 @@ echores "$_bluray"
 echocheck "dvdread"
 if test "$_dvdread" = auto ; then
   _dvdread=no
-  if test "$_dl" = yes; then
     _dvdreadcflags=$($_dvdreadconfig --cflags 2> /dev/null)
     _dvdreadlibs=$($_dvdreadconfig --libs 2> /dev/null)
-    if header_check dvdread/dvd_reader.h $_dvdreadcflags $_dvdreadlibs $ld_dl ; then
+    if header_check dvdread/dvd_reader.h $_dvdreadcflags $_dvdreadlibs ; then
       _dvdread=yes
       extra_cflags="$extra_cflags $_dvdreadcflags"
       extra_ldflags="$extra_ldflags $_dvdreadlibs"
     fi
-  fi
 fi
 
 if test "$_dvdread" = yes; then
@@ -6117,6 +6115,7 @@ if test "$_dvdread" = yes; then
   extra_ldflags="$extra_ldflags"
   inputmodules="dvdread $inputmodules"
 else
+  _dvdnav=no
   def_dvdread='#undef CONFIG_DVDREAD'
   noinputmodules="dvdread $noinputmodules"
 fi
