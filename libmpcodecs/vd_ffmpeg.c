@@ -613,20 +613,25 @@ static void update_configuration(sh_video_t *sh, enum AVPixelFormat pix_fmt) {
     }
 }
 
+static int is_in_format_list(sh_video_t *sh, int imgfmt)
+{
+    int i;
+    for (i = 0; i < CODECS_MAX_OUTFMT; i++)
+        if (sh->codec->outfmt[i] == imgfmt)
+            return 1;
+    return 0;
+}
+
 static int init_vo(sh_video_t *sh, enum AVPixelFormat pix_fmt)
 {
     vd_ffmpeg_ctx *ctx = sh->context;
     const AVCodecContext *avctx = ctx->avctx;
     int width, height;
-    int i;
     int imgfmt = pixfmt2imgfmt2(pix_fmt, avctx->codec_id);
 
     // avoid initialization for formats not on the supported
     // list in the codecs.conf entry.
-    for (i = 0; i < CODECS_MAX_OUTFMT; i++)
-        if (sh->codec->outfmt[i] == imgfmt)
-            break;
-    if (i == CODECS_MAX_OUTFMT) {
+    if (!is_in_format_list(sh, imgfmt)) {
         if (imgfmt)
             mp_msg(MSGT_DECVIDEO, MSGL_WARN, "Unexpected decoder output format %s\n",
                    vo_format_name(imgfmt));
@@ -1119,7 +1124,7 @@ static enum AVPixelFormat get_format(struct AVCodecContext *avctx,
            (fmt[i] == AV_PIX_FMT_VDPAU_MPEG1 || fmt[i] == AV_PIX_FMT_VDPAU_MPEG2))
             continue;
         imgfmt = pixfmt2imgfmt2(fmt[i], avctx->codec_id);
-        if(!IMGFMT_IS_HWACCEL(imgfmt)) continue;
+        if(!IMGFMT_IS_HWACCEL(imgfmt) || !is_in_format_list(sh, imgfmt)) continue;
         mp_msg(MSGT_DECVIDEO, MSGL_V, MSGTR_MPCODECS_TryingPixfmt, i);
         if(init_vo(sh, fmt[i]) >= 0) {
             break;
