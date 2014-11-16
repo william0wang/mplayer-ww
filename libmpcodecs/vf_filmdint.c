@@ -449,7 +449,7 @@ block_metrics_3dnow(unsigned char *a, unsigned char *b, int as, int bs,
                     int lines, struct vf_priv_s *p, struct frame_stats *s)
 {
     struct metrics tm;
-#if !HAVE_AMD3DNOW
+#if !HAVE_AMD3DNOW_INLINE
     mp_msg(MSGT_VFILTER, MSGL_FATAL, "block_metrics_3dnow: internal error\n");
 #else
     static const unsigned long long ones = 0x0101010101010101ull;
@@ -478,7 +478,7 @@ block_metrics_mmx2(unsigned char *a, unsigned char *b, int as, int bs,
                    int lines, struct vf_priv_s *p, struct frame_stats *s)
 {
     struct metrics tm;
-#if !HAVE_MMX
+#if !HAVE_MMX_INLINE
     mp_msg(MSGT_VFILTER, MSGL_FATAL, "block_metrics_mmx2: internal error\n");
 #else
     static const unsigned long long ones = 0x0101010101010101ull;
@@ -607,7 +607,7 @@ static inline int
 dint_copy_line_mmx2(unsigned char *dst, unsigned char *a, long bos,
                     long cos, int ds, int ss, int w, int t)
 {
-#if !HAVE_MMX
+#if !HAVE_MMX_INLINE
     mp_msg(MSGT_VFILTER, MSGL_FATAL, "dint_copy_line_mmx2: internal error\n");
     return 0;
 #else
@@ -1438,10 +1438,10 @@ static int vf_open(vf_instance_t *vf, char *args)
     }
     if (p->mmx2 > 2)
         p->mmx2 = 0;
-#if !HAVE_MMX
+#if !HAVE_MMX_INLINE
     p->mmx2 = 0;
 #endif
-#if !HAVE_AMD3DNOW
+#if !HAVE_AMD3DNOW_INLINE
     p->mmx2 &= 1;
 #endif
     p->thres.odd  = p->thres.even;

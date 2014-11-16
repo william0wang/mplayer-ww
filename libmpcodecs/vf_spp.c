@@ -153,7 +153,7 @@ static void softthresh_c(int16_t dst[64], int16_t src[64], int qp, uint8_t *perm
         }
 }
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
 static void hardthresh_mmx(int16_t dst[64], int16_t src[64], int qp, uint8_t *permutation){
         int bias= 0; //FIXME
         unsigned int threshold1;
@@ -334,7 +334,7 @@ static void store_slice_c(uint8_t *dst, int16_t *src, int dst_stride, int src_st
         }
 }
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
 static void store_slice_mmx(uint8_t *dst, int16_t *src, int dst_stride, int src_stride, int width, int height, int log2_scale){
         int y;
 
@@ -512,10 +512,10 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
             }
         }
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
         if(gCpuCaps.hasMMX) __asm__ volatile ("emms\n\t");
 #endif
-#if HAVE_MMX2
+#if HAVE_MMXEXT_INLINE
         if(gCpuCaps.hasMMX2) __asm__ volatile ("sfence\n\t");
 #endif
 
@@ -604,7 +604,7 @@ static int vf_open(vf_instance_t *vf, char *args){
         case 1: requantize= softthresh_c; break;
     }
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
     if(gCpuCaps.hasMMX){
         store_slice= store_slice_mmx;
         switch(vf->priv->mode&3){

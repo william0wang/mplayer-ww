@@ -44,7 +44,7 @@ static struct vf_priv_s {
   0
 };
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
 static void process_MMX(unsigned char *dest, int dstride, unsigned char *src, int sstride,
                     int w, int h, int brightness, int contrast)
 {
@@ -227,7 +227,7 @@ static int vf_open(vf_instance_t *vf, char *args)
         vf->uninit=uninit;
 
         process = process_C;
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
         if(gCpuCaps.hasMMX) process = process_MMX;
 #endif
 

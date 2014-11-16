@@ -225,7 +225,7 @@ static av_always_inline void copy_samples_planar(size_t bps,
 {
     size_t s, c, o = 0;
 
-#if HAVE_NEON
+#if HAVE_NEON_INLINE
     if (nb_channels == 2 && bps == 4) {
         const unsigned char *src0 = src[0];
         const unsigned char *src1 = src[1];
