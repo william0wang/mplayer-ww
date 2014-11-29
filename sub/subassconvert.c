@@ -340,10 +340,12 @@ static char *microdvd_load_tags(struct microdvd_tag *tags, char *s)
             tag.key = tag_char;
             break;
 
-        /* Color */
+        /* Color: {c:$bbggrr} and {c:$#bbggrr}*/
         case 'C':
             tag.persistent = MICRODVD_PERSISTENT_ON;
         case 'c':
+            while(*s == '$' || *s == '#')
+                ++s;
             tag.data1 = strtol(s, &s, 16) & 0x00ffffff;
             if (*s != '}')
                 break;
@@ -470,7 +472,7 @@ static void microdvd_close_no_persistent_tags(struct line *new_line,
 {
     int i, sidx;
 
-    for (i = sizeof(MICRODVD_TAGS) - 2; i; i--) {
+    for (i = sizeof(MICRODVD_TAGS) - 2; i>=0; i--) {
         if (tags[i].persistent != MICRODVD_PERSISTENT_OFF)
             continue;
         switch (tags[i].key) {
@@ -514,6 +516,15 @@ void subassconvert_microdvd(const char *orig, char *dest, size_t dest_buffer_siz
     };
     struct microdvd_tag tags[sizeof(MICRODVD_TAGS) - 1] = {{0}};
 
+    /* '/' at beginning of line is often used to indicate italic text */
+    if(*line == '/') {
+        struct microdvd_tag tag = {0};
+        tag.key = 'y';
+        tag.data1 = 1;
+        microdvd_set_tag(tags, tag);
+        ++line;
+    }
+
     while (*line) {
         line = microdvd_load_tags(tags, line);
         microdvd_open_tags(&new_line, tags);
@@ -525,6 +536,14 @@ void subassconvert_microdvd(const char *orig, char *dest, size_t dest_buffer_siz
             microdvd_close_no_persistent_tags(&new_line, tags);
             append_text(&new_line, "\\N");
             line++;
+
+            if(*line == '/') {
+                struct microdvd_tag tag = {0};
+                tag.key = 'y';
+                tag.data1 = 1;
+                microdvd_set_tag(tags, tag);
+                ++line;
+            }
         }
     }
     new_line.buf[new_line.len] = 0;
