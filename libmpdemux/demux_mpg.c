@@ -1128,6 +1128,7 @@ static demuxer_t* demux_mpg_ps_open(demuxer_t* demuxer)
 
         reset_eof(demuxer);
         stream_seek(demuxer->stream, pos);
+        demuxer->synced = 1;
         mp_msg(MSGT_DEMUX,MSGL_INFO,"MPEG packet stats: p100: %d  p101: %d p1B6: %d p12x: %d sli: %d a: %d b: %d c: %d idr: %d sps: %d pps: %d\n",
             num_elementary_packets100, num_elementary_packets101,
             num_elementary_packets1B6, num_elementary_packets12x,
