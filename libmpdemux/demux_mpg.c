@@ -186,6 +186,14 @@ static float read_first_mpeg_pts_at_position(demuxer_t* demuxer, off_t stream_po
   return pts;
 }
 
+static void reset_eof(demuxer_t *demuxer) {
+  stream_reset(demuxer->stream);
+  demux_flush(demuxer);
+  demuxer->video->eof=0;
+  demuxer->audio->eof=0;
+  demuxer->sub->eof=0;
+}
+
 /// Open an mpg physical stream
 static demuxer_t* demux_mpg_open(demuxer_t* demuxer) {
   stream_t *s = demuxer->stream;
@@ -237,9 +245,7 @@ static demuxer_t* demux_mpg_open(demuxer_t* demuxer) {
       }
 
       //Cleaning up from seeking in stream
-      demuxer->stream->eof=0;
-      demuxer->video->eof=0;
-      demuxer->audio->eof=0;
+      reset_eof(demuxer);
 
       stream_seek(s,pos);
       ds_fill_buffer(demuxer->video);
@@ -1009,10 +1015,7 @@ static void demux_seek_mpg(demuxer_t *demuxer, float rel_seek_secs,
         //prepare another seek because we are off by more than 0.5s
 	if(mpg_d) {
         newpos += (newpts - mpg_d->last_pts) * (newpos - oldpos) / (mpg_d->last_pts - oldpts);
-        demux_flush(demuxer);
-        demuxer->stream->eof=0; // clear eof flag
-        d_video->eof=0;
-        d_audio->eof=0;
+        reset_eof(demuxer);
 	}
     }
 }
@@ -1123,8 +1126,7 @@ static demuxer_t* demux_mpg_ps_open(demuxer_t* demuxer)
             skip_video_packet(demuxer->video);
         } while(stream_tell(demuxer->stream) < pos + ps_probe && !demuxer->stream->eof);
 
-        ds_free_packs(demuxer->video);
-        demuxer->stream->eof=0;
+        reset_eof(demuxer);
         stream_seek(demuxer->stream, pos);
         mp_msg(MSGT_DEMUX,MSGL_INFO,"MPEG packet stats: p100: %d  p101: %d p1B6: %d p12x: %d sli: %d a: %d b: %d c: %d idr: %d sps: %d pps: %d\n",
             num_elementary_packets100, num_elementary_packets101,
