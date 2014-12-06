@@ -630,6 +630,7 @@ static int num_h264_dpc=0; //DPC Slice
 static int num_h264_idr=0; //IDR Slice
 static int num_h264_sps=0;
 static int num_h264_pps=0;
+static int num_h264_end=0;
 
 static int num_mp3audio_packets=0;
 
@@ -648,6 +649,7 @@ static void clear_stats(void)
   num_h264_idr=0; //IDR Slice
   num_h264_sps=0;
   num_h264_pps=0;
+  num_h264_end=0;
   num_mp3audio_packets=0;
 }
 
@@ -670,6 +672,7 @@ static inline void update_stats(int head)
     else if((head&~0x60) == 0x105 && head != 0x105) ++num_h264_idr;
     else if((head&~0x60) == 0x107 && head != 0x107) ++num_h264_sps;
     else if((head&~0x60) == 0x108 && head != 0x108) ++num_h264_pps;
+    else if((head&~0x60) == 0x10b) ++num_h264_end;
   }
 }
 
@@ -1134,6 +1137,7 @@ static demuxer_t* demux_mpg_ps_open(demuxer_t* demuxer)
             sh_video->format = 0x10000004;
         else if((num_h264_slice>3 || (num_h264_dpa>3 && num_h264_dpb>3 && num_h264_dpc>3)) &&
             num_h264_sps>=1 && num_h264_pps>=1 && num_h264_idr>=1 &&
+            2*num_h264_end < num_h264_slice &&
             num_elementary_packets1B6==0)
                 sh_video->format = 0x10000005;
         else sh_video->format = 0x10000002;
