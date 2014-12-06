@@ -1107,13 +1107,6 @@ static demuxer_t* demux_mpg_ps_open(demuxer_t* demuxer)
 {
     sh_video_t *sh_video = demuxer->video->sh;
 
-    if(demuxer->audio->id!=-2) {
-        if(!ds_fill_buffer(demuxer->audio)){
-            mp_msg(MSGT_DEMUXER,MSGL_INFO,"MPEG: " MSGTR_MissingAudioStream);
-            demuxer->audio->sh=NULL;
-        }
-    }
-
     if(sh_video && !sh_video->format && ps_probe > 0) {
         int head;
         off_t pos = stream_tell(demuxer->stream);
