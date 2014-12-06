@@ -121,6 +121,7 @@ static void write_png(struct vf_priv_s *priv)
         fwrite(priv->outbuffer, pkt.size, 1, fp);
 
     fclose (fp);
+    mp_msg(MSGT_VFILTER,MSGL_INFO,"*** screenshot '%s' ***\n",priv->fname);
 }
 
 static int fexists(char *fname)
@@ -138,9 +139,6 @@ static void gen_fname(struct vf_priv_s* priv)
         priv->fname[0] = '\0';
         return;
     }
-
-    mp_msg(MSGT_VFILTER,MSGL_INFO,"*** screenshot '%s' ***\n",priv->fname);
-
 }
 
 static void scale_image(struct vf_priv_s* priv, mp_image_t *mpi)
