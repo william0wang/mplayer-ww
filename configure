@@ -1812,6 +1812,12 @@ if os2 ; then
   def_dos_paths="#define HAVE_DOS_PATHS 1"
   def_priority="#define CONFIG_PRIORITY 1"
   def_path_max_check="#define CONFIG_PATH_MAX_CHECK 1"
+  # On OS/2, passing -static to gcc fails at linking time because linking
+  # statically against libc runtime is prevented on purpose. To avoid this,
+  # pass -static to a linker directly.
+  # And ensure that $ld_static should be at first in a library list because it
+  # has effects only libraries after it.
+  test -n "$ld_static" && ld_static='-Wl,-static'
 fi
 
 if wine ; then
@@ -8310,7 +8316,7 @@ CFLAGS_NO_OMIT_LEAF_FRAME_POINTER = $cflags_no_omit_leaf_frame_pointer
 CFLAGS_STACKREALIGN      = $cflags_stackrealign
 CFLAGS_SVGALIB_HELPER    = $cflags_svgalib_helper
 
-EXTRALIBS          = $extra_ldflags $ld_static $timer_libs $extra_libs
+EXTRALIBS          = $ld_static $extra_ldflags $timer_libs $extra_libs
 EXTRALIBS_MPLAYER  = $libs_mplayer
 EXTRALIBS_MENCODER = $libs_mencoder
 
