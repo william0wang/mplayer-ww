@@ -57,7 +57,7 @@ void vstream_error(const char *format, ...) {
     va_start(va, format);
     vsnprintf(buf, 1024, format, va);
     va_end(va);
-    mp_msg(MSGT_STREAM, MSGL_ERR, buf);
+    mp_msg(MSGT_STREAM, MSGL_ERR, "%s", buf);
 }
 
 static struct stream_priv_s {
