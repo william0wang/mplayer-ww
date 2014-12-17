@@ -2786,7 +2786,7 @@ if test -z "$CFLAGS" || test "$_profile" != "" || test "$_debug" != ""; then
     CFLAGS="-O2 $_march $_mcpu $_pipe"
   else
     CFLAGS="-O4 $_march $_mcpu $_pipe -ffast-math -fomit-frame-pointer"
-    WARNFLAGS="-Wall -Wno-switch -Wno-parentheses -Wpointer-arith -Wredundant-decls"
+    WARNFLAGS="-Wall -Wno-switch -Wno-parentheses -Wpointer-arith -Wredundant-decls -Werror=format-security"
     WARN_CFLAGS="-Werror-implicit-function-declaration"
     extra_ldflags="$extra_ldflags -ffast-math"
   fi
