@@ -1983,22 +1983,22 @@ EOF
     return 0
   }
 
-  extcheck $_mmx      "mmx"      "emms"
-  extcheck $_mmxext   "mmxext"   "sfence"
-  extcheck $_3dnow    "3dnow"    "femms"
-  extcheck $_3dnowext "3dnowext" "pswapd %%mm0, %%mm0"
-  extcheck $_sse      "sse"      "xorps %%xmm0, %%xmm0" || _gcc3_ext="$_gcc3_ext -mno-sse"
-  extcheck $_sse2     "sse2"     "xorpd %%xmm0, %%xmm0" || _gcc3_ext="$_gcc3_ext -mno-sse2"
-  extcheck $_sse3     "sse3"     "addsubps %%xmm0, %%xmm0"
-  extcheck $_ssse3    "ssse3"    "pabsd %%xmm0, %%xmm0"
-  extcheck $_sse4_1   "sse4_1"   "pmaxsb %%xmm0, %%xmm0"
-  extcheck $_sse4_2   "sse4_2"   "pcmpgtq %%xmm0, %%xmm0"
-  extcheck $_avx      "avx"      "vpabsw %%xmm0, %%xmm0"
-  extcheck $_avx2     "avx2"     "vextracti128 $0, %%ymm0, %%xmm0"
-  extcheck $_xop      "xop"      "vpmacsdd %%xmm0, %%xmm1, %%xmm2, %%xmm3"
-  extcheck $_fma3     "fma3"     "vfmadd132ps %%ymm0, %%ymm1, %%ymm2"
-  extcheck $_fma4     "fma4"     "vfmaddps %%ymm0, %%ymm1, %%ymm2, %%ymm3"
-  extcheck $_cmov     "cmov"     "cmovb %%eax,  %%ebx"
+  extcheck $_mmx      'mmx'      'emms'
+  extcheck $_mmxext   'mmxext'   'sfence'
+  extcheck $_3dnow    '3dnow'    'femms'
+  extcheck $_3dnowext '3dnowext' 'pswapd %%mm0, %%mm0'
+  extcheck $_sse      'sse'      'xorps %%xmm0, %%xmm0' || _gcc3_ext="$_gcc3_ext -mno-sse"
+  extcheck $_sse2     'sse2'     'xorpd %%xmm0, %%xmm0' || _gcc3_ext="$_gcc3_ext -mno-sse2"
+  extcheck $_sse3     'sse3'     'addsubps %%xmm0, %%xmm0'
+  extcheck $_ssse3    'ssse3'    'pabsd %%xmm0, %%xmm0'
+  extcheck $_sse4_1   'sse4_1'   'pmaxsb %%xmm0, %%xmm0'
+  extcheck $_sse4_2   'sse4_2'   'pcmpgtq %%xmm0, %%xmm0'
+  extcheck $_avx      'avx'      'vpabsw %%xmm0, %%xmm0'
+  extcheck $_avx2     'avx2'     'vextracti128 $0, %%ymm0, %%xmm0'
+  extcheck $_xop      'xop'      'vpmacsdd %%xmm0, %%xmm1, %%xmm2, %%xmm3'
+  extcheck $_fma3     'fma3'     'vfmadd132ps %%ymm0, %%ymm1, %%ymm2'
+  extcheck $_fma4     'fma4'     'vfmaddps %%ymm0, %%ymm1, %%ymm2, %%ymm3'
+  extcheck $_cmov     'cmov'     'cmovb %%eax,  %%ebx'
 
   echocheck "mtrr support"
   if test "$_mtrr" = kernel_check ; then
