@@ -30,6 +30,8 @@ static const struct {
 } conversion_map[] = {
     { IMGFMT_ARGB,       AV_PIX_FMT_ARGB },
     { IMGFMT_BGRA,       AV_PIX_FMT_BGRA },
+    { IMGFMT_BGR48LE,    AV_PIX_FMT_BGR48LE },
+    { IMGFMT_BGR48BE,    AV_PIX_FMT_BGR48BE },
     { IMGFMT_BGR24,      AV_PIX_FMT_BGR24 },
     { IMGFMT_BGR16BE,    AV_PIX_FMT_RGB565BE },
     { IMGFMT_BGR16LE,    AV_PIX_FMT_RGB565LE },
