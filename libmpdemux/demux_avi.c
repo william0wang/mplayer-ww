@@ -464,13 +464,13 @@ static demuxer_t* demux_open_avi(demuxer_t* demuxer){
   read_avi_header(demuxer,(demuxer->stream->flags & MP_STREAM_SEEK_BW)?index_mode:-2);
   update_audio_block_size(demuxer);
 
-  if(demuxer->audio->id>=0 && !demuxer->a_streams[demuxer->audio->id]){
-      mp_msg(MSGT_DEMUX,MSGL_WARN,MSGTR_InvalidAudioStreamNosound,demuxer->audio->id);
-      demuxer->audio->id=-2; // disabled
+  if(d_audio->id>=0 && !demuxer->a_streams[d_audio->id]){
+      mp_msg(MSGT_DEMUX,MSGL_WARN,MSGTR_InvalidAudioStreamNosound,d_audio->id);
+      d_audio->id=-2; // disabled
   }
-  if(demuxer->video->id>=0 && !demuxer->v_streams[demuxer->video->id]){
-      mp_msg(MSGT_DEMUX,MSGL_WARN,MSGTR_InvalidAudioStreamUsingDefault,demuxer->video->id);
-      demuxer->video->id=-1; // autodetect
+  if(d_video->id>=0 && !demuxer->v_streams[d_video->id]){
+      mp_msg(MSGT_DEMUX,MSGL_WARN,MSGTR_InvalidAudioStreamUsingDefault,d_video->id);
+      d_video->id=-1; // autodetect
   }
 
   stream_reset(demuxer->stream);
@@ -500,11 +500,11 @@ static demuxer_t* demux_open_avi(demuxer_t* demuxer){
         AVIINDEXENTRY *idx = priv->idx + i;
         demux_stream_t* ds=demux_avi_select_stream(demuxer,idx->ckid);
         off_t pos = priv->idx_offset + AVI_IDX_OFFSET(idx);
-        if(a_pos==-1 && ds==demuxer->audio){
+        if(a_pos==-1 && ds==d_audio){
           a_pos=pos;
           if(v_pos!=-1) break;
         }
-        if(v_pos==-1 && ds==demuxer->video){
+        if(v_pos==-1 && ds==d_video){
           v_pos=pos;
           if(a_pos!=-1) break;
         }
@@ -562,11 +562,11 @@ static demuxer_t* demux_open_avi(demuxer_t* demuxer){
     for(i=0;i<priv->idx_size;i++){
       int id=avi_stream_id(idx[i].ckid);
       unsigned len=idx[i].dwChunkLength;
-      if(sh_video->ds->id == id) {
+      if(d_video->id == id) {
         vsize+=len;
         ++vsamples;
       }
-      else if(sh_audio && sh_audio->ds->id == id) {
+      else if(d_audio->id == id) {
         asize+=len;
 	asamples+=(len+priv->audio_block_size-1)/priv->audio_block_size;
       }
