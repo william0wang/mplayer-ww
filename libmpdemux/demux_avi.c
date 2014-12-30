@@ -72,12 +72,10 @@ static demux_stream_t *demux_avi_select_stream(demuxer_t *demux,
   int stream_id=avi_stream_id(id);
 
 
-  if(demux->video->id==-1)
-    if(demux->v_streams[stream_id])
+  if(demux->video->id==-1 && demux->v_streams[stream_id])
         demux->video->id=stream_id;
 
-  if(demux->audio->id==-1)
-    if(demux->a_streams[stream_id])
+  if(demux->audio->id==-1 && demux->a_streams[stream_id])
         demux->audio->id=stream_id;
 
   if(stream_id==demux->audio->id){
