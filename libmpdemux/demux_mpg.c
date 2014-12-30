@@ -1139,6 +1139,15 @@ static demuxer_t* demux_mpg_ps_open(demuxer_t* demuxer)
         else sh_video->format = 0x10000002;
     }
 
+    // Try to ensure audio information is probed during open, too.
+    if (demuxer->audio->id == -1 && ps_probe > 0)
+    {
+        off_t pos = stream_tell(demuxer->stream);
+        while (stream_tell(demuxer->stream) < pos + ps_probe && !demuxer->stream->eof && !demuxer->audio->packs)
+          if (!demux_fill_buffer(demuxer, demuxer->audio))
+            break;
+    }
+
     return demuxer;
 }
 
