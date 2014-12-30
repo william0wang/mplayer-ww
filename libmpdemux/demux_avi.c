@@ -865,6 +865,11 @@ static int avi_check_file(demuxer_t *demuxer)
       /* Fallthrough */
     case formtypeAVI:
     case mmioFOURCC('A','V','I',0x19): // "Samsung Digimax i6 PMP" crap according to bug 742
+      if (demuxer->video->id == -2)
+      {
+          mp_msg(MSGT_DEMUXER, MSGL_INFO, "-novideo not supported by native AVI demuxer, selecting libavformat\n");
+          return DEMUXER_TYPE_LAVF;
+      }
       return DEMUXER_TYPE_AVI;
     }
   }
