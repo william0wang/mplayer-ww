@@ -858,13 +858,13 @@ static int avi_check_file(demuxer_t *demuxer)
   if((id==mmioFOURCC('R','I','F','F')) || (id==mmioFOURCC('O','N','2',' '))) {
     stream_read_dword_le(demuxer->stream); //filesize
     id=stream_read_dword_le(demuxer->stream); // "AVI "
-    if(id==formtypeAVI)
-      return DEMUXER_TYPE_AVI;
-    // "Samsung Digimax i6 PMP" crap according to bug 742
-    if(id==mmioFOURCC('A','V','I',0x19))
-      return DEMUXER_TYPE_AVI;
-    if(id==mmioFOURCC('O','N','2','f')){
+    switch (id)
+    {
+    case mmioFOURCC('O','N','2','f'):
       mp_msg(MSGT_DEMUXER,MSGL_INFO,MSGTR_ON2AviFormat);
+      /* Fallthrough */
+    case formtypeAVI:
+    case mmioFOURCC('A','V','I',0x19): // "Samsung Digimax i6 PMP" crap according to bug 742
       return DEMUXER_TYPE_AVI;
     }
   }
