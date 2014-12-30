@@ -115,12 +115,10 @@ static int demux_asf_read_packet(demuxer_t *demux,unsigned char *data,int len,in
 
   mp_dbg(MSGT_DEMUX,MSGL_DBG4,"demux_asf.read_packet: id=%d seq=%d len=%d\n",id,seq,len);
 
-  if(demux->video->id==-1)
-    if(demux->v_streams[id])
+  if(demux->video->id==-1 && demux->v_streams[id])
         demux->video->id=id;
 
-  if(demux->audio->id==-1)
-    if(demux->a_streams[id])
+  if(demux->audio->id==-1 && demux->a_streams[id])
         demux->audio->id=id;
 
   if(id==demux->audio->id){
