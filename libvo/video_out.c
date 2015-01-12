@@ -458,6 +458,8 @@ void calc_src_dst_rects(int src_width, int src_height, struct vo_rect *src, stru
     if (borders) {
       borders->left = apply_border_pos(vo_dwidth,  scaled_width,  vo_border_pos_x);
       borders->top  = apply_border_pos(vo_dheight, scaled_height, vo_border_pos_y);
+      borders->right  = vo_dwidth  - scaled_width  - borders->left;
+      borders->bottom = vo_dheight - scaled_height - borders->top;
     }
     src_dst_split_scaling(src_width, vo_dwidth, scaled_width, vo_border_pos_x,
                           &src->left, &src->right, &dst->left, &dst->right);
