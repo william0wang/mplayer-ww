@@ -166,7 +166,7 @@ static int texture_width;
 static int texture_height;
 static int mpi_flipped;
 static int vo_flipped;
-static int ass_border_x, ass_border_y;
+static int ass_border_l, ass_border_r, ass_border_t, ass_border_b;
 
 static unsigned int slice_height = 1;
 
@@ -214,7 +214,7 @@ static void resize(void) {
     }
   }
 
-  ass_border_x = ass_border_y = 0;
+  ass_border_l = ass_border_t = 0;
   if (aspect_scaling() && use_aspect) {
     int new_w, new_h;
     double scale_x, scale_y;
@@ -235,8 +235,10 @@ static void resize(void) {
     if (vo_rotate & 1) {
       int tmp = new_w; new_w = new_h; new_h = tmp;
     }
-    ass_border_x = apply_border_pos(draw_width, new_w, vo_border_pos_x);
-    ass_border_y = apply_border_pos(draw_height, new_h, vo_border_pos_y);
+    ass_border_l = apply_border_pos(draw_width, new_w, vo_border_pos_x);
+    ass_border_t = apply_border_pos(draw_height, new_h, vo_border_pos_y);
+    ass_border_r = draw_width  - new_w - ass_border_l;
+    ass_border_b = draw_height - new_h - ass_border_t;
   }
   mpglLoadMatrixf(video_matrix);
 
@@ -840,7 +842,7 @@ static void draw_osd(void)
     clearOSD();
     osd_w = scaled_osd ? image_width  : draw_width;
     osd_h = scaled_osd ? image_height : draw_height;
-    vo_draw_text_ext(osd_w, osd_h, ass_border_x, ass_border_y, ass_border_x, ass_border_y,
+    vo_draw_text_ext(osd_w, osd_h, ass_border_l, ass_border_t, ass_border_r, ass_border_b,
                      image_width, image_height, create_osd_texture);
   }
   if (vo_doublebuffering) do_render_osd(RENDER_OSD);
@@ -1432,8 +1434,10 @@ static int control(uint32_t request, void *data)
       r->mt = r->mb = r->ml = r->mr = 0;
       if (scaled_osd) {r->w = image_width; r->h = image_height;}
       else if (aspect_scaling()) {
-        r->ml = r->mr = ass_border_x;
-        r->mt = r->mb = ass_border_y;
+        r->ml = ass_border_l;
+        r->ml = ass_border_r;
+        r->mt = ass_border_t;
+        r->mb = ass_border_b;
       }
     }
     return VO_TRUE;
