@@ -49,7 +49,10 @@ typedef struct {
 #define DGifOpen(a, b) DGifOpen(a, b, NULL)
 #define DGifOpenFileHandle(a) DGifOpenFileHandle(a, NULL)
 #define GifError() (gif ? gif->Error : 0)
-#define GifErrorString() GifErrorString(gif->Error)
+#define GifErrorString() GifErrorString(err)
+#if defined GIFLIB_MINOR && GIFLIB_MINOR >= 1
+#define DGifCloseFile(a) DGifCloseFile(a, NULL)
+#endif
 #endif
 
 /* >= 4.2 prior GIFLIB did not have MAJOR/MINOR defines */
@@ -325,7 +328,7 @@ static void demux_close_gif(demuxer_t* demuxer)
   gif_priv_t *priv = demuxer->priv;
   if (!priv) return;
   if (priv->gif && DGifCloseFile(priv->gif) == GIF_ERROR)
-    print_gif_error(priv->gif);
+    print_gif_error(NULL);
   free(priv->refimg);
   free(priv);
 }

@@ -29,7 +29,7 @@ struct DMO_AudioDecoder
 #include <stdlib.h>
 
 #include "mp_msg.h"
-#include "libmpdemux/aviprint.h"
+//#include "libmpdemux/aviprint.h"
 
 typedef long STDCALL (*GETCLASS) (GUID*, GUID*, void**);
 
@@ -84,8 +84,8 @@ DMO_AudioDecoder * DMO_AudioDecoder_Open(char* dllname, GUID* guid, WAVEFORMATEX
     this->m_sDestType.cbFormat=18; //pWF->cbSize;
     this->m_sDestType.pbFormat=this->m_sVhdr2;
 
-print_wave_header((WAVEFORMATEX *)this->m_sVhdr,  MSGL_V);
-print_wave_header((WAVEFORMATEX *)this->m_sVhdr2, MSGL_V);
+//print_wave_header((WAVEFORMATEX *)this->m_sVhdr,  MSGL_V);
+//print_wave_header((WAVEFORMATEX *)this->m_sVhdr2, MSGL_V);
 
         this->m_pDMO_Filter = DMO_FilterCreate(dllname, guid, &this->m_sOurType, &this->m_sDestType);
 	if( !this->m_pDMO_Filter ) {

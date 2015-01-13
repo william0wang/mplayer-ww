@@ -172,7 +172,7 @@ static int                                decoder_max_refs;
 
 static VdpRect                            src_rect_vid;
 static VdpRect                            out_rect_vid;
-static int                                border_x, border_y;
+static int                                border_l, border_r, border_t, border_b;
 
 static struct vdpau_render_state          surface_render[MAX_VIDEO_SURFACES];
 static int                                surface_num;
@@ -299,8 +299,10 @@ static void resize(void)
     src_rect_vid.x1 = src_rect.right;
     src_rect_vid.y0 = flip ? src_rect.bottom : src_rect.top;
     src_rect_vid.y1 = flip ? src_rect.top    : src_rect.bottom;
-    border_x        = borders.left;
-    border_y        = borders.top;
+    border_l        = borders.left;
+    border_t        = borders.top;
+    border_r        = borders.right;
+    border_b        = borders.bottom;
 #ifdef CONFIG_FREETYPE
     // adjust font size to display size
     force_load_font = 1;
@@ -999,7 +1001,7 @@ static void draw_osd(void)
     if (handle_preemption() < 0)
         return;
 
-    vo_draw_text_ext(vo_dwidth, vo_dheight, border_x, border_y, border_x, border_y,
+    vo_draw_text_ext(vo_dwidth, vo_dheight, border_l, border_t, border_r, border_b,
                      vid_width, vid_height, draw_osd_I8A8);
 }
 
@@ -1431,8 +1433,10 @@ static int control(uint32_t request, void *data)
         if (vo_fs) {
             r->w = vo_screenwidth;
             r->h = vo_screenheight;
-            r->ml = r->mr = border_x;
-            r->mt = r->mb = border_y;
+            r->ml = border_l;
+            r->mr = border_r;
+            r->mt = border_t;
+            r->mb = border_b;
         } else {
             r->w = vo_dwidth;
             r->h = vo_dheight;

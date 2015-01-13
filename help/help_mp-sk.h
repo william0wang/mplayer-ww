@@ -698,7 +698,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_Miscellaneous "Rôzne"
 #define MSGTR_GUI_Mixer "Mixér"
 #define MSGTR_GUI_MixerChannel "Kanál mixéru"
-#define MSGTR_GUI_MSG_aRtsBroken "Novšie verze aRts sú nekompatibilné s GTK 1.x a zhavarujú GMPlayer!"
 #define MSGTR_GUI_MSG_DXR3NeedsLavc "Žiaľ, nemôžete prehrávať nie mpeg súbory s DXR3/H+ zariadením bez prekódovania.\nProsím zapnite lavc v DXR3/H+ konfig. okne."
 #define MSGTR_GUI_MSG_MemoryErrorWindow "Žiaľ, nedostatok pamäte pre buffer na kreslenie."
 #define MSGTR_GUI_MSG_NoFileLoaded "Nenahraný žiaden súbor"

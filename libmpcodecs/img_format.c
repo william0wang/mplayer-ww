@@ -48,6 +48,8 @@ const char *vo_format_name(int format)
     case IMGFMT_BGR16:   return "BGR 16-bit";
     case IMGFMT_BGR24:   return "BGR 24-bit";
 //  case IMGFMT_BGR32:   return "BGR 32-bit";
+    case IMGFMT_BGR48LE: return "BGR 48-bit LE";
+    case IMGFMT_BGR48BE: return "BGR 48-bit BE";
     case IMGFMT_ABGR:    return "ABGR";
     case IMGFMT_BGRA:    return "BGRA";
     case IMGFMT_ARGB:    return "ARGB";

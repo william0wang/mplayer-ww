@@ -753,7 +753,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_Mixer "Mixeur "
 #define MSGTR_GUI_MixerChannel "Canal de mixeur "
 #define MSGTR_GUI_MSG_AddingVideoFilter "[GUI] Ajout de filtre vidéo : %s\n"
-#define MSGTR_GUI_MSG_aRtsBroken "Versions aRts plus récentes sont incompatibles avec GTK 1.x et feront planter GMPlayer!"
 #define MSGTR_GUI_MSG_ColorDepthTooLow "Désolé, la profondeur d'échantillonnage est trop basse.\n"
 #define MSGTR_GUI_MSG_DragAndDropNothing "D&D : Rien de retourné !\n"
 #define MSGTR_GUI_MSG_DXR3NeedsLavc "Désolé, vous ne pouvez pas lire de fichiers non-MPEG avec le périphérique DXR3/H+ sans réencoder.\nActivez plutôt lavc dans la boîte de configuration DXR3/H+."

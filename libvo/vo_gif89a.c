@@ -75,6 +75,9 @@ const LIBVO_EXTERN(gif89a)
 #define MakeMapObject GifMakeMapObject
 #define FreeMapObject GifFreeMapObject
 #define QuantizeBuffer GifQuantizeBuffer
+#if defined GIFLIB_MINOR && GIFLIB_MINOR >= 1
+#define EGifCloseFile(a) EGifCloseFile(a, NULL)
+#endif
 #endif
 
 // how many frames per second we are aiming for during output.

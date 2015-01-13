@@ -392,6 +392,10 @@ int glFindFormat(uint32_t fmt, int *bpp, GLint *gl_texfmt,
       *gl_format = GL_BGRA;
       *gl_type = GL_UNSIGNED_BYTE;
       break;
+    case IMGFMT_BGR48NE:
+      *gl_format = GL_BGR;
+      *gl_type = GL_UNSIGNED_SHORT;
+      break;
     default:
       *gl_texfmt = GL_RGBA;
       *gl_format = GL_RGBA;

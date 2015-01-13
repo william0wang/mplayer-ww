@@ -57,6 +57,7 @@ typedef enum {
   VIDEO_MPEG12,
   VIDEO_MPEG4,
   VIDEO_H264,
+  VIDEO_HEVC,
   VIDEO_VC1,
   VIDEO_OTHER
 } video_codec_t;
@@ -94,6 +95,9 @@ static video_codec_t find_video_codec(sh_video_t *sh_video)
   else if((fmt == DEMUXER_TYPE_MPEG_PS ||  fmt == DEMUXER_TYPE_MPEG_TS) &&
     (sh_video->format==mmioFOURCC('W', 'V', 'C', '1')))
     return VIDEO_VC1;
+  else if((fmt == DEMUXER_TYPE_MPEG_PS ||  fmt == DEMUXER_TYPE_MPEG_TS) &&
+    (sh_video->format==mmioFOURCC('H', 'E', 'V', 'C')))
+    return VIDEO_HEVC;
   else if (fmt == DEMUXER_TYPE_ASF && sh_video->bih && sh_video->bih->biCompression == mmioFOURCC('D', 'V', 'R', ' '))
     return VIDEO_MPEG12;
   else
@@ -265,6 +269,18 @@ switch(video_codec){
      sh_video->fps=picture.fps;
      sh_video->frametime=1.0/picture.fps;
      mp_msg(MSGT_DECVIDEO,MSGL_INFO, "FPS seems to be: %f\n", picture.fps);
+   }
+   break;
+ }
+ case VIDEO_HEVC: {
+   videobuf_len=0; videobuf_code_len=0;
+   if(!videobuffer) {
+     videobuffer = memalign(8, VIDEOBUFFER_SIZE + MP_INPUT_BUFFER_PADDING_SIZE);
+     if (videobuffer) memset(videobuffer+VIDEOBUFFER_SIZE, 0, MP_INPUT_BUFFER_PADDING_SIZE);
+     else {
+       mp_msg(MSGT_DECVIDEO,MSGL_ERR,MSGTR_ShMemAllocFail);
+       return 0;
+     }
    }
    break;
  }
@@ -519,33 +535,17 @@ int video_read_frame(sh_video_t* sh_video,float* frame_time_ptr,unsigned char** 
         int in_picture = 0;
         while(videobuf_len<VIDEOBUFFER_SIZE-MAX_VIDEO_PACKET_SIZE){
           int i=sync_video_packet(d_video);
+          int mi = i & ~0x60;
           int pos = videobuf_len+4;
           if(!i) return -1;
-          if(!read_video_packet(d_video)) return -1; // EOF
-          if((i&~0x60) == 0x107 && i != 0x107) {
-            h264_parse_sps(&picture, &(videobuffer[pos]), videobuf_len - pos);
-            if(picture.fps > 0) {
-              sh_video->fps=picture.fps;
-              sh_video->frametime=1.0/picture.fps;
-            }
-            i=sync_video_packet(d_video);
-            if(!i) return -1;
-            if(!read_video_packet(d_video)) return -1; // EOF
-          }
-
+          if (in_picture) {
           // here starts the access unit end detection code
           // see the mail on MPlayer-dev-eng for details:
           // Date: Sat, 17 Sep 2005 11:24:06 +0200
           // Subject: Re: [MPlayer-dev-eng] [RFC] h264 ES parser problems
           // Message-ID: <20050917092406.GA7699@rz.uni-karlsruhe.de>
-          if((i&~0x60) == 0x101 || (i&~0x60) == 0x102 || (i&~0x60) == 0x105)
-            // found VCL NAL with slice header i.e. start of current primary coded
-            // picture, so start scanning for the end now
-            in_picture = 1;
-          if (in_picture) {
-            i = sync_video_packet(d_video) & ~0x60; // code of next packet
-            if(i == 0x106 || i == 0x109) break; // SEI or access unit delim.
-            if(i == 0x101 || i == 0x102 || i == 0x105) {
+            if (mi == 0x106 || mi == 0x107 || mi == 0x109) break; // SEI, SPS or access unit delim.
+            if (mi == 0x101 || mi == 0x102 || mi == 0x105) {
               // assuming arbitrary slice ordering is not allowed, the
               // first_mb_in_slice (golomb encoded) value should be 0 then
               // for the first VCL NAL in a picture
@@ -553,6 +553,39 @@ int video_read_frame(sh_video_t* sh_video,float* frame_time_ptr,unsigned char** 
                 break;
             }
           }
+          if(!read_video_packet(d_video)) return -1; // EOF
+          if(mi == 0x107 && i != 0x107) {
+            h264_parse_sps(&picture, &(videobuffer[pos]), videobuf_len - pos);
+            if(picture.fps > 0) {
+              sh_video->fps=picture.fps;
+              sh_video->frametime=1.0/picture.fps;
+            }
+          } else if (mi == 0x101 || mi == 0x102 || mi == 0x105) {
+            // found VCL NAL with slice header i.e. start of current primary coded
+            // picture, so start scanning for the end now
+            in_picture = 1;
+          }
+        }
+        *start=videobuffer; in_size=videobuf_len;
+        videobuf_len=0;
+  } else if(video_codec == VIDEO_HEVC){
+        int in_picture = 0;
+        while(videobuf_len<VIDEOBUFFER_SIZE-MAX_VIDEO_PACKET_SIZE){
+          int i=sync_video_packet(d_video);
+          if(!i) return -1;
+
+          i = (i >> 1) & 0x3f;
+          if (in_picture) {
+            if ((i >= 32 && i <= 35) || i == 39 || (i >= 41 && i <= 44) || (i >= 48 || i <= 55)) break;
+            if (i <= 9 || (i >= 16 && i <= 21)) {
+              // TODO: check first slice segment flag - need to peek 2 bytes ahead
+//              if (demux_peekc(d_video) & 0x80)
+                break;
+            }
+          }
+          if(!read_video_packet(d_video)) return -1; // EOF
+          if (i <= 9 || (i >= 16 && i <= 21))
+            in_picture = 1;
         }
         *start=videobuffer; in_size=videobuf_len;
         videobuf_len=0;

@@ -598,7 +598,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_Mixer "Mixér"
 #define MSGTR_GUI_MixerChannel "Kanál mixéru"
 #define MSGTR_GUI_MSG_AddingVideoFilter "[GUI] Přidávám video filtr: %s\n"
-#define MSGTR_GUI_MSG_aRtsBroken "Novější verze aRts jsou nekompatibilní s GTK 1.x a zhavarují GMPlayer!"
 #define MSGTR_GUI_MSG_ColorDepthTooLow "Promiňte, ale barevná hloubka je příliš malá.\n"
 #define MSGTR_GUI_MSG_DragAndDropNothing "D&D: Nic se nevrátilo!\n"
 #define MSGTR_GUI_MSG_DXR3NeedsLavc "Bohužel nelze přehrávat ne-MPEG s kartou DXR3/H+ bez přeenkódování.\nProsím, zapněte lavc v konfiguraci DXR3/H+."

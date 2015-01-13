@@ -58,7 +58,6 @@ Known Issues:
 #include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "libavcodec/avcodec.h"
-#include "libavcodec/dsputil.h"
 
 #undef fprintf
 #undef free

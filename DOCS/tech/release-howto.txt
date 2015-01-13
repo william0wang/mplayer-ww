@@ -44,7 +44,7 @@ sometimes links are broken. Do not forget the translations.
 
 Send the release notes as a mail to the mplayer-announce mailing list.
 
-Add the new release version to bugzilla page.
+Add the new release version and release date to Trac (Admin - Ticket System - Versions).
 
 Update release version in #mplayer and #mplayerdev topics.
 

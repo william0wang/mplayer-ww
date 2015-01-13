@@ -85,6 +85,9 @@ struct gui_t
     int playlistwindow;
     int aboutwindow;
 
+    float default_volume;
+    float default_balance;
+
     skin_t *skin;
     playlist_t *playlist;
 

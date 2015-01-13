@@ -186,6 +186,14 @@ static float read_first_mpeg_pts_at_position(demuxer_t* demuxer, off_t stream_po
   return pts;
 }
 
+static void reset_eof(demuxer_t *demuxer) {
+  stream_reset(demuxer->stream);
+  demux_flush(demuxer);
+  demuxer->video->eof=0;
+  demuxer->audio->eof=0;
+  demuxer->sub->eof=0;
+}
+
 /// Open an mpg physical stream
 static demuxer_t* demux_mpg_open(demuxer_t* demuxer) {
   stream_t *s = demuxer->stream;
@@ -237,9 +245,7 @@ static demuxer_t* demux_mpg_open(demuxer_t* demuxer) {
       }
 
       //Cleaning up from seeking in stream
-      demuxer->stream->eof=0;
-      demuxer->video->eof=0;
-      demuxer->audio->eof=0;
+      reset_eof(demuxer);
 
       stream_seek(s,pos);
       ds_fill_buffer(demuxer->video);
@@ -630,6 +636,7 @@ static int num_h264_dpc=0; //DPC Slice
 static int num_h264_idr=0; //IDR Slice
 static int num_h264_sps=0;
 static int num_h264_pps=0;
+static int num_h264_end=0;
 
 static int num_mp3audio_packets=0;
 
@@ -648,6 +655,7 @@ static void clear_stats(void)
   num_h264_idr=0; //IDR Slice
   num_h264_sps=0;
   num_h264_pps=0;
+  num_h264_end=0;
   num_mp3audio_packets=0;
 }
 
@@ -670,6 +678,7 @@ static inline void update_stats(int head)
     else if((head&~0x60) == 0x105 && head != 0x105) ++num_h264_idr;
     else if((head&~0x60) == 0x107 && head != 0x107) ++num_h264_sps;
     else if((head&~0x60) == 0x108 && head != 0x108) ++num_h264_pps;
+    else if((head&~0x60) == 0x10b) ++num_h264_end;
   }
 }
 
@@ -1006,10 +1015,7 @@ static void demux_seek_mpg(demuxer_t *demuxer, float rel_seek_secs,
         //prepare another seek because we are off by more than 0.5s
 	if(mpg_d) {
         newpos += (newpts - mpg_d->last_pts) * (newpos - oldpos) / (mpg_d->last_pts - oldpts);
-        demux_flush(demuxer);
-        demuxer->stream->eof=0; // clear eof flag
-        d_video->eof=0;
-        d_audio->eof=0;
+        reset_eof(demuxer);
 	}
     }
 }
@@ -1101,13 +1107,6 @@ static demuxer_t* demux_mpg_ps_open(demuxer_t* demuxer)
 {
     sh_video_t *sh_video = demuxer->video->sh;
 
-    if(demuxer->audio->id!=-2) {
-        if(!ds_fill_buffer(demuxer->audio)){
-            mp_msg(MSGT_DEMUXER,MSGL_INFO,"MPEG: " MSGTR_MissingAudioStream);
-            demuxer->audio->sh=NULL;
-        }
-    }
-
     if(sh_video && !sh_video->format && ps_probe > 0) {
         int head;
         off_t pos = stream_tell(demuxer->stream);
@@ -1120,9 +1119,9 @@ static demuxer_t* demux_mpg_ps_open(demuxer_t* demuxer)
             skip_video_packet(demuxer->video);
         } while(stream_tell(demuxer->stream) < pos + ps_probe && !demuxer->stream->eof);
 
-        ds_free_packs(demuxer->video);
-        demuxer->stream->eof=0;
+        reset_eof(demuxer);
         stream_seek(demuxer->stream, pos);
+        demuxer->synced = 1;
         mp_msg(MSGT_DEMUX,MSGL_INFO,"MPEG packet stats: p100: %d  p101: %d p1B6: %d p12x: %d sli: %d a: %d b: %d c: %d idr: %d sps: %d pps: %d\n",
             num_elementary_packets100, num_elementary_packets101,
             num_elementary_packets1B6, num_elementary_packets12x,
@@ -1134,9 +1133,19 @@ static demuxer_t* demux_mpg_ps_open(demuxer_t* demuxer)
             sh_video->format = 0x10000004;
         else if((num_h264_slice>3 || (num_h264_dpa>3 && num_h264_dpb>3 && num_h264_dpc>3)) &&
             num_h264_sps>=1 && num_h264_pps>=1 && num_h264_idr>=1 &&
+            2*num_h264_end < num_h264_slice &&
             num_elementary_packets1B6==0)
                 sh_video->format = 0x10000005;
         else sh_video->format = 0x10000002;
+    }
+
+    // Try to ensure audio information is probed during open, too.
+    if (demuxer->audio->id == -1 && ps_probe > 0)
+    {
+        off_t pos = stream_tell(demuxer->stream);
+        while (stream_tell(demuxer->stream) < pos + ps_probe && !demuxer->stream->eof && !demuxer->audio->packs)
+          if (!demux_fill_buffer(demuxer, demuxer->audio))
+            break;
     }
 
     return demuxer;

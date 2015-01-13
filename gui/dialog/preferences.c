@@ -551,10 +551,6 @@ static void prCListRow( GtkCList * clist,gint row,gint column,GdkEvent * event,g
              !strncmp( ao_driver[0],"esd",3 ) ||
              !strncmp( ao_driver[0],"sdl",3 ) )
           gtk_widget_set_sensitive( AConfig,TRUE );
-#ifndef CONFIG_GTK2
-        if ( !strncmp( ao_driver[0],"arts",4 ) )
-          gtkMessageBox(MSGBOX_WARNING, MSGTR_GUI_MSG_aRtsBroken);
-#endif
         break;
    case 1: // video driver
         gtk_clist_get_text( GTK_CLIST( CLVDrivers ),row,0,(char **)&vo_driver );
