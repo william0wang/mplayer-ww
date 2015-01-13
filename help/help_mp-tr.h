@@ -761,7 +761,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_Mixer "Karıştırıcı"
 #define MSGTR_GUI_MixerChannel "Karıştırıcı kanalı"
 #define MSGTR_GUI_MSG_AddingVideoFilter "[GUI] Video filtresi ekleniyor: %s\n"
-#define MSGTR_GUI_MSG_aRtsBroken "Daha yeni aRts sürümleri GTK 1.x ile bağdaşmıyor. Gmplayer bu durumda çalışmaz!!"
 #define MSGTR_GUI_MSG_ColorDepthTooLow "Üzgünüm, renk derinliği çok düşük.\n"
 #define MSGTR_GUI_MSG_DragAndDropNothing "D&D: Hiçbirşey geri dönmedi!\n"
 #define MSGTR_GUI_MSG_DXR3NeedsLavc "Üzgünüm, MPEG olmayan dosyaları DXR3/H+ aygıtınızla oynatamazsınız. \nLütfen DXR3/H+ ayarlarından lavc seçeneğini etkinleştirin."

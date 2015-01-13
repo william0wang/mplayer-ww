@@ -50,7 +50,7 @@ extern char *codecs_file;
 #define GUID_TYPE    1
 #define GUID_DEFINED 1
 typedef struct {
-    unsigned long  f1;
+    unsigned int   f1;
     unsigned short f2;
     unsigned short f3;
     unsigned char  f4[8];

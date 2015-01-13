@@ -91,8 +91,14 @@ static int bluray_stream_seek(stream_t *s, int64_t pos)
     int64_t p;
 
     p = bd_seek(b->bd, pos);
-    if (p == -1)
+    // bd_seek does not say what happens on errors,
+    // so be extra paranoid.
+    // bd_seek also does not seek exactly to the requested
+    // position, so allow for some fuzz.
+    if (p < 0 || p > pos || p + 20*1024*1024 < pos) {
+        s->pos = bd_tell(b->bd);
         return 0;
+    }
 
     s->pos = p;
     return 1;
@@ -205,12 +211,22 @@ static int bluray_stream_control(stream_t *s, int cmd, void *arg)
         *(double *)arg = ti->duration / 90000.0;
         return STREAM_OK;
     }
+    case STREAM_CTRL_GET_SIZE:
+        *(uint64_t*)arg = bd_get_title_size(b->bd);
+        return STREAM_OK;
 
     case STREAM_CTRL_GET_CURRENT_TIME:
         *(double *)arg = bd_tell_time(b->bd) / 90000.0;
         return STREAM_OK;
     case STREAM_CTRL_SEEK_TO_TIME: {
-        int64_t res = bd_seek_time(b->bd, *(double*)arg * 90000.0);
+        int64_t res;
+        double target = *(double*)arg * 90000.0;
+        BLURAY_TITLE_INFO *ti = bd_get_title_info(b->bd, b->current_title, b->current_angle);
+        // clamp to ensure that out-of-bounds seeks do not simply do nothing.
+        target = FFMAX(target, 0);
+        if (ti && ti->duration > 1)
+            target = FFMIN(target, ti->duration - 1);
+        res = bd_seek_time(b->bd, target);
         if (res < 0)
             return STREAM_ERROR;
         s->pos = res;

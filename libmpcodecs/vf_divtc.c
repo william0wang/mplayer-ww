@@ -52,7 +52,7 @@ struct vf_priv_s
  * diff_MMX and diff_C stolen from vf_decimate.c
  */
 
-#if HAVE_MMX && HAVE_EBX_AVAILABLE
+#if HAVE_MMX_INLINE && HAVE_EBX_AVAILABLE
 static int diff_MMX(unsigned char *old, unsigned char *new, int os, int ns)
    {
    volatile short out[4];
@@ -703,7 +703,7 @@ static int vf_open(vf_instance_t *vf, char *args)
       goto nomem;
 
    diff = diff_C;
-#if HAVE_MMX && HAVE_EBX_AVAILABLE
+#if HAVE_MMX_INLINE && HAVE_EBX_AVAILABLE
    if(gCpuCaps.hasMMX) diff = diff_MMX;
 #endif
 

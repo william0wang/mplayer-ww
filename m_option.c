@@ -1127,6 +1127,8 @@ static struct {
   {"y16le", IMGFMT_Y16_LE},
   {"nv12", IMGFMT_NV12},
   {"nv21", IMGFMT_NV21},
+  {"bgr48le", IMGFMT_BGR48LE},
+  {"bgr48be", IMGFMT_BGR48BE},
   {"bgr24", IMGFMT_BGR24},
   {"bgr32", IMGFMT_BGR32},
   {"bgr16", IMGFMT_BGR16},

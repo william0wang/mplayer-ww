@@ -321,9 +321,6 @@ static void guiSetEvent(int event)
             if (guiInfo.Playing == GUI_STOP)
                 break;
 
-            if (guiInfo.Balance == 50.0f)
-                mixer_setvolume(mixer, guiInfo.Volume, guiInfo.Volume);
-
             l = guiInfo.Volume * (100.0 - guiInfo.Balance) / 50.0;
             r = guiInfo.Volume * guiInfo.Balance / 50.0;
 
@@ -336,7 +333,7 @@ static void guiSetEvent(int event)
                 mixer_getvolume(mixer, &l, &r);
                 if (r == l)
                 {
-                    mp_msg(MSGT_GPLAYER, MSGL_V, "[GUI] Mixer doesn't support balanced audio\n");
+                    mp_msg(MSGT_GPLAYER, MSGL_V, "[GUI] Mixer doesn't support unbalanced audio\n");
                     mixer_setvolume(mixer, guiInfo.Volume, guiInfo.Volume);
                     guiInfo.Balance = 50.0f;
                 }
@@ -537,6 +534,9 @@ void guiInit(void)
     /* Wait until the gui is created */
     while(!mygui) Sleep(100);
     mp_msg(MSGT_GPLAYER, MSGL_V, "[GUI] GUI thread started.\n");
+
+    guiInfo.Volume = mygui->default_volume;
+    guiInfo.Balance = mygui->default_balance;
 }
 
 void guiDone(void)
@@ -636,6 +636,8 @@ int gui(int what, void *data)
                 guiInfo.AudioChannels = 0;
                 guiInfo.AudioPassthrough = FALSE;
             }
+            guiSetEvent(evSetVolume);
+            guiSetEvent(evSetBalance);
             if(IsWindowVisible(mygui->videowindow) && !guiInfo.VideoWindow)
                 ShowWindow(mygui->videowindow, SW_HIDE);
             break;

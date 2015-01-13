@@ -61,14 +61,14 @@
 /* map 0 - 0xFF -> 0 - 0x10101 */
 #define MAP_24BIT(v) RSHIFT(0x10203 * (v), 8)
 
-#if HAVE_SSE4
+#if HAVE_SSE4_INLINE
 
 DECLARE_ASM_CONST(16, uint32_t, sse_int32_80h[4])
     = { 0x80, 0x80, 0x80, 0x80 };
 DECLARE_ASM_CONST(16, uint32_t, sse_int32_map_factor[4])
     = { 0x102, 0x102, 0x102, 0x102 };
 
-#endif // HAVE_SSE4
+#endif // HAVE_SSE4_INLINE
 
 static double ass_last_pts = -303;
 
@@ -207,7 +207,7 @@ static void render_frame_yuv422(vf_instance_t *vf)
     }
 }
 
-#if HAVE_SSE4
+#if HAVE_SSE4_INLINE
 
 static void render_frame_yuv422_sse4(vf_instance_t *vf)
 {
@@ -318,7 +318,7 @@ static void render_frame_yuv422_sse4(vf_instance_t *vf)
     }
 }
 
-#endif // HAVE_SSE4
+#endif // HAVE_SSE4_INLINE
 
 static void prepare_buffer_420p(vf_instance_t *vf)
 {
@@ -347,7 +347,7 @@ static void prepare_buffer_420p(vf_instance_t *vf)
         }
     }
 
-#if HAVE_SSE4
+#if HAVE_SSE4_INLINE
     // for render_frame_yuv420p_sse4
     if (gCpuCaps.hasSSE4 && outw % 32 == 0) {
         for (i = 0; i < outh; i += 2) {
@@ -367,7 +367,7 @@ static void prepare_buffer_420p(vf_instance_t *vf)
             }
         }
     }
-#endif // HAVE_SSE4
+#endif // HAVE_SSE4_INLINE
 }
 
 static void render_frame_yuv420p(vf_instance_t *vf)
@@ -419,7 +419,7 @@ static void render_frame_yuv420p(vf_instance_t *vf)
     }
 }
 
-#if HAVE_SSE4
+#if HAVE_SSE4_INLINE
 
 #define CHECK_16_ALPHA \
     "cmpl   $-1,     0(%[alpha], %[j], 1) \n\t" \
@@ -562,7 +562,7 @@ static void render_frame_yuv420p_sse4(vf_instance_t *vf)
 #undef MAP_16_ALPHA
 #undef MUL_ALPHA
 
-#endif // HAVE_SSE4
+#endif // HAVE_SSE4_INLINE
 
 static void clean_buffer(vf_instance_t *vf)
 {
@@ -632,7 +632,7 @@ static int config(struct vf_instance *vf,
         vf->priv->draw_image = draw_image_yuv;
         vf->priv->render_frame = render_frame_yuv420p;
         vf->priv->prepare_buffer = prepare_buffer_420p;
-#if HAVE_SSE4
+#if HAVE_SSE4_INLINE
         if (gCpuCaps.hasSSE4 && outw % 32 == 0)
             vf->priv->render_frame = render_frame_yuv420p_sse4;
 #endif
@@ -645,7 +645,7 @@ static int config(struct vf_instance *vf,
         vf->priv->draw_image = draw_image_yuv;
         vf->priv->render_frame = render_frame_yuv422;
         vf->priv->prepare_buffer = prepare_buffer_422;
-#if HAVE_SSE4
+#if HAVE_SSE4_INLINE
         if (gCpuCaps.hasSSE4 && outw % 8 == 0)
             vf->priv->render_frame = render_frame_yuv422_sse4;
 #endif

@@ -378,14 +378,11 @@ void *mpctx_get_mixer(MPContext *mpctx)
     return &mpctx->mixer;
 }
 
-int mpctx_get_global_sub_size(MPContext *mpctx)
+void mpctx_get_global_sub_info(MPContext *mpctx, int *size, int *pos)
 {
-    return mpctx->global_sub_size;
-}
+    mp_property_do("sub", M_PROPERTY_GET, pos, mpctx);
 
-int mpctx_get_global_sub_pos(MPContext *mpctx)
-{
-    return mpctx->global_sub_pos;
+    if (size) *size = mpctx->global_sub_size;
 }
 
 int mpctx_get_osd_function(MPContext *mpctx)
@@ -3643,6 +3640,7 @@ goto_enable_cache:
             if (extract_embedded_fonts &&
                 att->name && att->type && att->data && att->data_size &&
                 (strcmp(att->type, "application/x-truetype-font") == 0 ||
+                 strcmp(att->type, "application/vnd.ms-opentype") == 0 ||
                  strcmp(att->type, "application/x-font") == 0))
                 ass_add_font(ass_library, att->name, att->data, att->data_size);
         }
@@ -4043,7 +4041,7 @@ goto_enable_cache:
                         // Ensure vo_pts is updated so that ao_pcm will not hang.
                         advance_timer(frame_time);
                         // only stop playing when audio is at end as well
-                        if (!mpctx->sh_audio || mpctx->d_audio->eof)
+                        if (!mpctx->sh_audio || (mpctx->d_audio->eof && !ds_fill_buffer(mpctx->d_audio)))
                             mpctx->eof = 1;
                     } else {
                         // might return with !eof && !blit_frame if !correct_pts

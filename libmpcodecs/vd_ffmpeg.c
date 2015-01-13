@@ -274,7 +274,7 @@ static void set_dr_slice_settings(struct AVCodecContext *avctx, const AVCodec *l
     ctx->nonref_dr = 0;
     // TODO: fix and enable again. This currently causes issues when using filters
     // and seeking, usually failing with the "Ran out of numbered images" message,
-    // but bugzilla #2118 might be related as well.
+    // but ticket #2118 might be related as well.
     if (0 && lavc_codec->id == AV_CODEC_ID_H264) {
         ctx->do_dr1 = 1;
         ctx->nonref_dr = 1;
@@ -306,6 +306,16 @@ static void set_format_params(struct AVCodecContext *avctx,
         return;
     ctx->use_hwaccel = fmt == AV_PIX_FMT_VDPAU;
     imgfmt = pixfmt2imgfmt2(fmt, avctx->codec_id);
+#if CONFIG_VDPAU
+    if (!ctx->use_hwaccel) {
+        av_freep(&avctx->hwaccel_context);
+    } else {
+        AVVDPAUContext *vdpc = avctx->hwaccel_context;
+        if (!vdpc)
+            avctx->hwaccel_context = vdpc = av_alloc_vdpaucontext();
+        vdpc->render2 = vdpau_render_wrapper;
+    }
+#endif
     if (IMGFMT_IS_HWACCEL(imgfmt)) {
         ctx->do_dr1    = 1;
         ctx->nonref_dr = 0;
@@ -658,20 +668,30 @@ static void update_configuration(sh_video_t *sh, enum AVPixelFormat pix_fmt) {
     }
 }
 
+static int is_in_format_list(sh_video_t *sh, int imgfmt)
+{
+    int i;
+    for (i = 0; i < CODECS_MAX_OUTFMT; i++)
+        if (sh->codec->outfmt[i] == imgfmt)
+            return 1;
+    return 0;
+}
+
 static int init_vo(sh_video_t *sh, enum AVPixelFormat pix_fmt)
 {
     vd_ffmpeg_ctx *ctx = sh->context;
     const AVCodecContext *avctx = ctx->avctx;
     int width, height;
-    int i;
+    int imgfmt = pixfmt2imgfmt2(pix_fmt, avctx->codec_id);
 
     // avoid initialization for formats not on the supported
     // list in the codecs.conf entry.
-    for (i = 0; i < CODECS_MAX_OUTFMT; i++)
-        if (sh->codec->outfmt[i] == pixfmt2imgfmt2(pix_fmt, avctx->codec_id))
-            break;
-    if (i == CODECS_MAX_OUTFMT)
+    if (!is_in_format_list(sh, imgfmt)) {
+        if (imgfmt)
+            mp_msg(MSGT_DECVIDEO, MSGL_WARN, "Unexpected decoder output format %s\n",
+                   vo_format_name(imgfmt));
         return -1;
+    }
 
     width = avctx->width;
     height = avctx->height;
@@ -791,12 +811,7 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
 #if CONFIG_VDPAU
     if (ctx->use_hwaccel) {
         struct vdpau_render_state *render = mpi->priv;
-        AVVDPAUContext *vdpc;
         avctx->draw_horiz_band= NULL;
-        if (!avctx->hwaccel_context)
-            avctx->hwaccel_context = av_alloc_vdpaucontext();
-        vdpc = avctx->hwaccel_context;
-        vdpc->render2 = vdpau_render_wrapper;
         mpi->planes[3] = render->surface;
     }
 #endif
@@ -1164,7 +1179,7 @@ static enum AVPixelFormat get_format(struct AVCodecContext *avctx,
            (fmt[i] == AV_PIX_FMT_VDPAU_MPEG1 || fmt[i] == AV_PIX_FMT_VDPAU_MPEG2))
             continue;
         imgfmt = pixfmt2imgfmt2(fmt[i], avctx->codec_id);
-        if(!IMGFMT_IS_HWACCEL(imgfmt)) continue;
+        if(!IMGFMT_IS_HWACCEL(imgfmt) || !is_in_format_list(sh, imgfmt)) continue;
         mp_msg(MSGT_DECVIDEO, MSGL_V, MSGTR_MPCODECS_TryingPixfmt, i);
         if(init_vo(sh, fmt[i]) >= 0) {
             break;

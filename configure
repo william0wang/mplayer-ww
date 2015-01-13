@@ -328,7 +328,6 @@ Optional features:
   --disable-mencoder     disable MEncoder (A/V encoder) compilation [enable]
   --disable-mplayer      disable MPlayer compilation [enable]
   --enable-gui           enable GMPlayer compilation (GTK+ GUI) [disable]
-  --enable-gtk1          force using GTK+ 1.2 for the GUI [disable]
   --enable-termcap       use termcap database for key codes [autodetect]
   --enable-termios       use termios database for key codes [autodetect]
   --disable-iconv        disable iconv for encoding conversion [autodetect]
@@ -360,8 +359,6 @@ Optional features:
   --disable-bluray       disable Blu-ray support [autodetect]
   --disable-dvdnav       disable libdvdnav [autodetect]
   --disable-dvdread      disable libdvdread [autodetect]
-  --disable-dvdread-internal  disable internal libdvdread and libdvdnav [autodetect]
-  --disable-libdvdcss-internal  disable internal libdvdcss [autodetect]
   --disable-cdparanoia   disable cdparanoia [autodetect]
   --disable-cddb         disable cddb [autodetect]
   --disable-bitmap-font  disable bitmap font support [enable]
@@ -389,6 +386,7 @@ Optional features:
   --enable-ass-internal  enable internal SSA/ASS subtitle support [autodetect]
   --disable-ass          disable SSA/ASS subtitle support [autodetect]
   --enable-rpath         enable runtime linker path for extra libs [disabled]
+  --disable-gnutls       disable GnuTLS [autodetect]
 
 Codecs:
   --enable-gif              enable GIF support [autodetect]
@@ -607,8 +605,6 @@ Use these options if autodetection fails:
   --with-xvmclib=NAME         adapter-specific library name (e.g. XvMCNVIDIA)
 
   --with-freetype-config=PATH path to freetype-config
-  --with-glib-config=PATH     path to glib*-config
-  --with-gtk-config=PATH      path to gtk*-config
   --with-sdl-config=PATH      path to sdl*-config
   --with-dvdnav-config=PATH   path to dvdnav-config, also disables internal dvdread and dvdnav
   --with-dvdread-config=PATH  path to dvdread-config, also disables internal dvdread and dvdnav
@@ -647,6 +643,7 @@ _armv6=auto
 _armv6t2=auto
 _armvfp=auto
 vfpv3=auto
+setend=auto
 neon=auto
 armthumb=auto
 _iwmmxt=auto
@@ -750,11 +747,11 @@ _xmms=no
 _vcd=auto
 _bluray=auto
 _dvdnav=auto
-_dvdnavconfig=dvdnav-config
-_dvdreadconfig=dvdread-config
+_dvdnavconfig="pkg-config dvdnav"
+type dvdnav-config >/dev/null 2>&1 && _dvdnavconfig=dvdnav-config
+_dvdreadconfig="pkg-config dvdread"
+type dvdread-config >/dev/null 2>&1 && _dvdreadconfig=dvdread-config
 _dvdread=auto
-_dvdread_internal=auto
-_libdvdcss_internal=auto
 _xanim=auto
 _real=auto
 _live=auto
@@ -812,7 +809,6 @@ _lircc=auto
 _apple_remote=auto
 _apple_ir=auto
 _gui=no
-_gtk1=no
 _termcap=auto
 _termios=auto
 _3dfx=no
@@ -855,6 +851,7 @@ _enca=auto
 _inet6=auto
 _sctp=auto
 _gethostbyname2=auto
+_gnutls=auto
 _ftp=auto
 _ftp_p2p=auto
 _vod=yes
@@ -924,19 +921,11 @@ for ac_option do
   --with-freetype-config=*)
     _freetypeconfig=$(option_value $ac_option)
     ;;
-  --with-gtk-config=*)
-    _gtkconfig=$(option_value $ac_option)
-    ;;
-  --with-glib-config=*)
-    _glibconfig=$(option_value $ac_option)
-    ;;
   --with-dvdnav-config=*)
     _dvdnavconfig=$(option_value $ac_option)
-    _dvdread_internal=no
     ;;
   --with-dvdread-config=*)
     _dvdreadconfig=$(option_value $ac_option)
-    _dvdread_internal=no
     ;;
 
   --extra-cflags=*)
@@ -1183,10 +1172,6 @@ for ac_option do
   --disable-bluray)     _bluray=no      ;;
   --enable-dvdread)     _dvdread=yes    ;;
   --disable-dvdread)    _dvdread=no     ;;
-  --enable-dvdread-internal)    _dvdread_internal=yes   ;;
-  --disable-dvdread-internal)   _dvdread_internal=no    ;;
-  --enable-libdvdcss-internal)  _libdvdcss_internal=yes ;;
-  --disable-libdvdcss-internal) _libdvdcss_internal=no  ;;
   --enable-dvdnav)      _dvdnav=yes     ;;
   --disable-dvdnav)     _dvdnav=no      ;;
   --enable-xanim)       _xanim=yes      ;;
@@ -1306,8 +1291,6 @@ for ac_option do
   --disable-apple-ir)   _apple_ir=no    ;;
   --enable-gui)         _gui=yes        ;;
   --disable-gui)        _gui=no         ;;
-  --enable-gtk1)        _gtk1=yes       ;;
-  --disable-gtk1)       _gtk1=no        ;;
   --enable-termcap)     _termcap=yes    ;;
   --disable-termcap)    _termcap=no     ;;
   --enable-termios)     _termios=yes    ;;
@@ -1372,6 +1355,8 @@ for ac_option do
   --disable-ass-internal) ass_internal=no  ;;
   --enable-rpath)       _rpath=yes      ;;
   --disable-rpath)      _rpath=no       ;;
+  --enable-gnutls)       _gnutls=yes    ;;
+  --disable-gnutls)      _gnutls=no     ;;
 
   --enable-fribidi)     _fribidi=yes    ;;
   --disable-fribidi)    _fribidi=no     ;;
@@ -1608,7 +1593,7 @@ libavprotocols=$(echo $libavprotocols_all)
 libavfilters=$(echo $libavfilters_all)
 
 libavdecoders=$(filter_out_component decoder 'LIB[A-Z0-9_]*')
-libavencoders=$(filter_out_component encoder 'LIB[A-Z0-9_]*')
+libavencoders=$(filter_out_component encoder 'LIB[A-Z0-9_]* NVENC')
 libavdemuxers=$(filter_out_component demuxer 'AVISYNTH LIB[A-Z0-9_]* REDIR')
 libavmuxers=$(filter_out_component muxer 'LIB[A-Z0-9_]* RTP RTSP SAP')
 libavprotocols=$(filter_out_component protocol 'BLURAY FFRTMPCRYPT HTTPS LIB[A-Z0-9_]* TLS')
@@ -1839,6 +1824,12 @@ if os2 ; then
   def_dos_paths="#define HAVE_DOS_PATHS 1"
   def_priority="#define CONFIG_PRIORITY 1"
   def_path_max_check="#define CONFIG_PATH_MAX_CHECK 1"
+  # On OS/2, passing -static to gcc fails at linking time because linking
+  # statically against libc runtime is prevented on purpose. To avoid this,
+  # pass -static to a linker directly.
+  # And ensure that $ld_static should be at first in a library list because it
+  # has effects only libraries after it.
+  test -n "$ld_static" && ld_static='-Wl,-static'
 fi
 
 if wine ; then
@@ -1866,6 +1857,10 @@ int main(void) {
 EOF
 if x86 ; then
   cc_check && host_arch=x86_64 || host_arch=i386
+  # Treat x32 as generic architecture without any optimizations.
+  if test "$host_arch" = 'i386' && cpp_condition_check '' 'defined(__x86_64__)'; then
+      host_arch=generic
+  fi
 fi
 if ppc ; then
   cc_check && host_arch=ppc64 || host_arch=ppc
@@ -2000,22 +1995,22 @@ EOF
     return 0
   }
 
-  extcheck $_mmx      "mmx"      "emms"
-  extcheck $_mmxext   "mmxext"   "sfence"
-  extcheck $_3dnow    "3dnow"    "femms"
-  extcheck $_3dnowext "3dnowext" "pswapd %%mm0, %%mm0"
-  extcheck $_sse      "sse"      "xorps %%xmm0, %%xmm0" || _gcc3_ext="$_gcc3_ext -mno-sse"
-  extcheck $_sse2     "sse2"     "xorpd %%xmm0, %%xmm0" || _gcc3_ext="$_gcc3_ext -mno-sse2"
-  extcheck $_sse3     "sse3"     "addsubps %%xmm0, %%xmm0"
-  extcheck $_ssse3    "ssse3"    "pabsd %%xmm0, %%xmm0"
-  extcheck $_sse4_1   "sse4_1"   "pmaxsb %%xmm0, %%xmm0"
-  extcheck $_sse4_2   "sse4_2"   "pcmpgtq %%xmm0, %%xmm0"
-  extcheck $_avx      "avx"      "vpabsw %%xmm0, %%xmm0"
-  extcheck $_avx2     "avx2"     "vextracti128 $0, %%ymm0, %%xmm0"
-  extcheck $_xop      "xop"      "vpmacsdd %%xmm0, %%xmm1, %%xmm2, %%xmm3"
-  extcheck $_fma3     "fma3"     "vfmadd132ps %%ymm0, %%ymm1, %%ymm2"
-  extcheck $_fma4     "fma4"     "vfmaddps %%ymm0, %%ymm1, %%ymm2, %%ymm3"
-  extcheck $_cmov     "cmov"     "cmovb %%eax,  %%ebx"
+  extcheck $_mmx      'mmx'      'emms'
+  extcheck $_mmxext   'mmxext'   'sfence'
+  extcheck $_3dnow    '3dnow'    'femms'
+  extcheck $_3dnowext '3dnowext' 'pswapd %%mm0, %%mm0'
+  extcheck $_sse      'sse'      'xorps %%xmm0, %%xmm0' || _gcc3_ext="$_gcc3_ext -mno-sse"
+  extcheck $_sse2     'sse2'     'xorpd %%xmm0, %%xmm0' || _gcc3_ext="$_gcc3_ext -mno-sse2"
+  extcheck $_sse3     'sse3'     'addsubps %%xmm0, %%xmm0'
+  extcheck $_ssse3    'ssse3'    'pabsd %%xmm0, %%xmm0'
+  extcheck $_sse4_1   'sse4_1'   'pmaxsb %%xmm0, %%xmm0'
+  extcheck $_sse4_2   'sse4_2'   'pcmpgtq %%xmm0, %%xmm0'
+  extcheck $_avx      'avx'      'vpabsw %%xmm0, %%xmm0'
+  extcheck $_avx2     'avx2'     'vextracti128 $0, %%ymm0, %%xmm0'
+  extcheck $_xop      'xop'      'vpmacsdd %%xmm0, %%xmm1, %%xmm2, %%xmm3'
+  extcheck $_fma3     'fma3'     'vfmadd132ps %%ymm0, %%ymm1, %%ymm2'
+  extcheck $_fma4     'fma4'     'vfmaddps %%ymm0, %%ymm1, %%ymm2, %%ymm3'
+  extcheck $_cmov     'cmov'     'cmovb %%eax,  %%ebx'
 
   echocheck "mtrr support"
   if test "$_mtrr" = kernel_check ; then
@@ -2039,6 +2034,7 @@ def_fast_unaligned='#define HAVE_FAST_UNALIGNED 0'
 def_av_fast_unaligned='#define AV_HAVE_FAST_UNALIGNED 0'
 def_local_aligned_8='#define HAVE_LOCAL_ALIGNED_8 0'
 def_local_aligned_16='#define HAVE_LOCAL_ALIGNED_16 0'
+def_local_aligned_32='#define HAVE_LOCAL_ALIGNED_32 0'
 arch_all='X86 IA64 SPARC ARM AVR32 SH4 PPC ALPHA MIPS PA_RISC S390 S390X VAX BFIN XTENSA TOMI GENERIC AARCH64'
 subarch_all='X86_32 X86_64 PPC64'
 case "$host_arch" in
@@ -2049,6 +2045,7 @@ case "$host_arch" in
   def_av_fast_unaligned='#define AV_HAVE_FAST_UNALIGNED 1'
   def_local_aligned_8='#define HAVE_LOCAL_ALIGNED_8 1'
   def_local_aligned_16='#define HAVE_LOCAL_ALIGNED_16 1'
+  def_local_aligned_32='#define HAVE_LOCAL_ALIGNED_32 1'
   iproc=486
   proc=i486
 
@@ -2303,6 +2300,7 @@ case "$host_arch" in
     def_av_fast_unaligned='#define AV_HAVE_FAST_UNALIGNED 1'
     def_local_aligned_8='#define HAVE_LOCAL_ALIGNED_8 1'
     def_local_aligned_16='#define HAVE_LOCAL_ALIGNED_16 1'
+    def_local_aligned_32='#define HAVE_LOCAL_ALIGNED_32 1'
     def_fast_64bit='#define HAVE_FAST_64BIT 1'
     iproc='x86_64'
 
@@ -2438,6 +2436,12 @@ case "$host_arch" in
   arm*)
     arch='arm'
     iproc='arm'
+    def_fast_unaligned='#define HAVE_FAST_UNALIGNED 1'
+    def_av_fast_unaligned='#define AV_HAVE_FAST_UNALIGNED 1'
+    def_local_aligned_8='#define HAVE_LOCAL_ALIGNED_8 1'
+    def_local_aligned_16='#define HAVE_LOCAL_ALIGNED_16 1'
+    def_local_aligned_32='#define HAVE_LOCAL_ALIGNED_32 1'
+    test $_fast_clz = "auto" && _fast_clz=yes
     ;;
 
   avr32)
@@ -2460,6 +2464,7 @@ case "$host_arch" in
     def_av_fast_unaligned='#define AV_HAVE_FAST_UNALIGNED 1'
     def_local_aligned_8='#define HAVE_LOCAL_ALIGNED_8 1'
     def_local_aligned_16='#define HAVE_LOCAL_ALIGNED_16 1'
+    def_local_aligned_32='#define HAVE_LOCAL_ALIGNED_32 1'
     iproc='ppc'
 
     if test "$host_arch" = "ppc64" ; then
@@ -2793,7 +2798,7 @@ if test -z "$CFLAGS" || test "$_profile" != "" || test "$_debug" != ""; then
     CFLAGS="-O2 $_march $_mcpu $_pipe"
   else
     CFLAGS="-O4 $_march $_mcpu $_pipe -ffast-math -fomit-frame-pointer"
-    WARNFLAGS="-Wall -Wno-switch -Wno-parentheses -Wpointer-arith -Wredundant-decls"
+    WARNFLAGS="-Wall -Wno-switch -Wno-parentheses -Wpointer-arith -Wredundant-decls -Werror=format-security"
     extra_ldflags="$extra_ldflags -ffast-math"
   fi
 
@@ -3025,7 +3030,7 @@ if test "$_yasm" ; then
       esac
     fi
     YASMFLAGS="-f $objformat $yasmdefines"
-    yasm_check || die "yasm not found, use --yasm='' if you really want to compile without"
+    yasm_check || ! x86 || die "yasm not found, use --yasm='' if you really want to compile without"
     echo "CPU amdnop" > $TMPS
     yasm_check && yasm_features="cpunop"
   fi
@@ -3163,6 +3168,13 @@ if arm ; then
   fi
   echores "$vfpv3"
 
+  echocheck "ARM setend"
+  if test $setend = "auto" ; then
+    setend=no
+    inline_asm_check '"setend be"' && setend=yes
+  fi
+  echores "$setend"
+
   echocheck "softfloat ABI"
   softfloat=yes
   cpp_condition_check '' 'defined(__ARM_PCS_VFP) || (!defined(__ARM_PCS) && !defined(__SOFTFP__))' && softfloat=no
@@ -3201,7 +3213,7 @@ if arm ; then
   echores "$_iwmmxt"
 fi
 
-cpuexts_all='ALTIVEC XOP AVX AVX2 FMA3 FMA4 MMX MMX2 MMXEXT AMD3DNOW AMD3DNOWEXT SSE SSE2 SSE3 SSSE3 SSE4 SSE42 FAST_CMOV I686 FAST_CLZ ARMV5TE ARMV6 ARMV6T2 VFP VFPV3 NEON IWMMXT MMI VIS MVI'
+cpuexts_all='ALTIVEC XOP AVX AVX2 FMA3 FMA4 MMX MMX2 MMXEXT AMD3DNOW AMD3DNOWEXT SSE SSE2 SSE3 SSSE3 SSE4 SSE42 FAST_CMOV I686 FAST_CLZ ARMV5TE ARMV6 ARMV6T2 VFP VFPV3 SETEND NEON IWMMXT MMI VIS MVI'
 test "$_altivec"   = yes && cpuexts="ALTIVEC $cpuexts"
 test "$_mmx"       = yes && cpuexts="MMX $cpuexts"
 test "$_mmxext"    = yes && cpuexts="MMX2 $cpuexts"
@@ -3227,6 +3239,7 @@ test "$_armv6"     = yes && cpuexts="ARMV6 $cpuexts"
 test "$_armv6t2"   = yes && cpuexts="ARMV6T2 $cpuexts"
 test "$_armvfp"    = yes && cpuexts="VFP $cpuexts"
 test "$vfpv3"      = yes && cpuexts="VFPV3 $cpuexts"
+test "$setend"     = yes && cpuexts="SETEND $cpuexts"
 test "$neon"       = yes && cpuexts="NEON $cpuexts"
 test "$_iwmmxt"    = yes && cpuexts="IWMMXT $cpuexts"
 test "$_vis"       = yes && cpuexts="VIS $cpuexts"
@@ -3422,6 +3435,25 @@ else
 fi
 echores "$_mkstemp"
 
+echocheck "gmtime_r"
+_gmtime_r=no
+statement_check time.h 'gmtime_r(0, 0)' && _gmtime_r=yes
+if test "$_gmtime_r" = yes ; then
+  def_gmtime_r='#define HAVE_GMTIME_R 1'
+else
+  def_gmtime_r='#undef HAVE_GMTIME_R'
+fi
+echores "$_gmtime_r"
+
+echocheck "localtime_r"
+_localtime_r=no
+statement_check time.h 'localtime_r(0, 0)' && _localtime_r=yes
+if test "$_localtime_r" = yes ; then
+  def_localtime_r='#define HAVE_LOCALTIME_R 1'
+else
+  def_localtime_r='#undef HAVE_LOCALTIME_R'
+fi
+echores "$_localtime_r"
 
 echocheck "nanosleep"
 _nanosleep=no
@@ -4333,6 +4365,24 @@ else
 fi
 
 
+echocheck "GnuTLS"
+if test "$_gnutls" = auto ; then
+  _gnutls=no
+  if $_pkg_config --exists gnutls ; then
+	  statement_check gnutls/gnutls.h 'gnutls_global_init()' $($_pkg_config --libs --cflags gnutls) &&
+      _gnutls=yes
+  fi
+fi
+if test "$_gnutls" = yes ; then
+  def_gnutls='#define CONFIG_GNUTLS 1'
+  libavprotocols="$libavprotocols HTTPS_PROTOCOL TLS_PROTOCOL"
+  extra_cflags="$extra_cflags $($_pkg_config --cflags gnutls)"
+  extra_ldflags="$extra_ldflags $($_pkg_config --libs gnutls)"
+else
+  def_gnutls='#define CONFIG_GNUTLS 0'
+fi
+echores "$_gnutls"
+
 echocheck "Samba support (libsmbclient)"
 if test "$_smb" = yes; then
   extra_ldflags="$extra_ldflags -lsmbclient"
@@ -4663,7 +4713,7 @@ fi
 if test "$_vda" = yes ; then
   def_vda='#define CONFIG_VDA 1'
   extra_ldflags="$extra_ldflags -framework CoreFoundation -framework VideoDecodeAcceleration -framework QuartzCore"
-  libavhwaccels="$libavhwaccels H264_VDA_HWACCEL"
+  libavhwaccels="$libavhwaccels H264_VDA_HWACCEL H264_VDA_OLD_HWACCEL"
 else
   def_vda='#define CONFIG_VDA 0'
   libavdecoders=$(filter_out_component decoder '[A-Z0-9]*_VDA')
@@ -6066,120 +6116,27 @@ fi
 echores "$_bluray"
 
 echocheck "dvdread"
-if test "$_dvdread_internal" = auto ; then
-  _dvdread_internal=no
-  if linux || freebsd || netbsd || openbsd || dragonfly || sunos || hpux ||
-     darwin || win32 || os2; then
-    _dvdread_internal=yes
-    _dvdread=yes
-    extra_cflags="-Ilibdvdread4 $extra_cflags"
-  fi
-fi
 if test "$_dvdread" = auto ; then
   _dvdread=no
-  if test "$_dl" = yes; then
     _dvdreadcflags=$($_dvdreadconfig --cflags 2> /dev/null)
     _dvdreadlibs=$($_dvdreadconfig --libs 2> /dev/null)
-    if header_check dvdread/dvd_reader.h $_dvdreadcflags $_dvdreadlibs $ld_dl ; then
+    if header_check dvdread/dvd_reader.h $_dvdreadcflags $_dvdreadlibs ; then
       _dvdread=yes
       extra_cflags="$extra_cflags $_dvdreadcflags"
       extra_ldflags="$extra_ldflags $_dvdreadlibs"
-      res_comment="external"
     fi
-  fi
 fi
 
-if test "$_dvdread_internal" = yes; then
+if test "$_dvdread" = yes; then
   def_dvdread='#define CONFIG_DVDREAD 1'
-  inputmodules="dvdread(internal) $inputmodules"
-  res_comment="internal"
-elif test "$_dvdread" = yes; then
-  def_dvdread='#define CONFIG_DVDREAD 1'
-  extra_ldflags="$extra_ldflags -ldvdread"
-  inputmodules="dvdread(external) $inputmodules"
-  res_comment="external"
+  extra_ldflags="$extra_ldflags"
+  inputmodules="dvdread $inputmodules"
 else
+  _dvdnav=no
   def_dvdread='#undef CONFIG_DVDREAD'
   noinputmodules="dvdread $noinputmodules"
 fi
 echores "$_dvdread"
-
-
-echocheck "internal libdvdcss"
-def_broken_mkdir='#undef HAVE_BROKEN_MKDIR'
-def_dvdio='#undef DVD_STRUCT_IN_SYS_DVDIO_H'
-def_dvd='#undef DVD_STRUCT_IN_DVD_H'
-def_cdio='#undef DVD_STRUCT_IN_SYS_CDIO_H'
-def_cdrom='#undef DVD_STRUCT_IN_LINUX_CDROM_H'
-def_hpux_scsi_h='#undef HPUX_SCTL_IO'
-def_sol_scsi_h='#undef SOLARIS_USCSI'
-def_sys_uio_h='#undef HAVE_SYS_UIO_H'
-_dvdio=no
-_dvd=no
-_cdio=no
-_cdrom=no
-_sol_scsi_h=no
-_hpux_scsi_h=no
-if test "$_libdvdcss_internal" = auto && test "$_dvdread_internal" = yes ; then
-  _libdvdcss_internal=no
-  test -d libdvdcss && _libdvdcss_internal=yes
-
-  if header_check linux/cdrom.h ; then
-     _cdrom=yes
-     def_cdrom='#define DVD_STRUCT_IN_LINUX_CDROM_H 1'
-  # FreeBSD 8.1 has broken dvdio.h
-  elif header_check_broken sys/types.h sys/dvdio.h ; then
-    _dvdio=yes
-    def_dvdio='#define DVD_STRUCT_IN_SYS_DVDIO_H 1'
-  elif header_check dvd.h ; then
-    _dvd=yes
-    def_dvd='#define DVD_STRUCT_IN_DVD_H 1'
-  # at least OpenSolaris has a broken cdio.h
-  elif header_check_broken sys/types.h sys/cdio.h ; then
-    _cdio=yes
-    def_cdio='#define DVD_STRUCT_IN_SYS_CDIO_H 1'
-  fi
-
-  if sunos; then
-    header_check sys/scsi/scsi_types.h &&
-      header_check_broken sys/types.h sys/scsi/impl/uscsi.h &&
-        _sol_scsi_h=yes && def_sol_scsi_h='#define SOLARIS_USCSI 1'
-  elif hpux; then
-    # also used by AIX, but AIX does not support VCD and/or libdvdread
-    header_check sys/scsi.h && _hpux_scsi_h=yes &&
-      def_hpux_scsi_h='#define HPUX_SCTL_IO 1' ||
-      _libdvdcss_internal=no
-  fi
-
-  statement_check_broken stddef.h sys/stat.h 'mkdir(NULL, 0)' ||
-    def_broken_mkdir='#define HAVE_BROKEN_MKDIR 1'
-
-  header_check "sys/uio.h" &&
-    def_sys_uio_h='#define HAVE_SYS_UIO_H 1'
-
-fi
-if test "$_libdvdcss_internal" = yes ; then
-  if linux || netbsd || openbsd || wine ; then
-    def_dvd_linux='#define HAVE_LINUX_DVD_STRUCT 1'
-    openbsd && def_dvd_openbsd='#define HAVE_OPENBSD_DVD_STRUCT 1'
-  elif freebsd || dragonfly ; then
-    def_dvd_bsd='#define HAVE_BSD_DVD_STRUCT 1'
-  elif darwin ; then
-    def_dvd_darwin='#define DARWIN_DVD_IOCTL'
-    extra_ldflags="$extra_ldflags -framework IOKit -framework Carbon"
-  elif cygwin ; then
-    cflags_libdvdcss="-D_WIN32_IE=0x0500 -mwin32"
-  elif mingw32 ; then
-    cflags_libdvdcss="-D_WIN32_IE=0x0500"
-    libs_mplayer="$libs_mplayer -lshfolder"
-  fi
-  cflags_libdvdcss_dvdread="-Ilibdvdcss"
-  def_dvdcss="#define HAVE_DVDCSS_DVDCSS_H 1"
-  inputmodules="libdvdcss(internal) $inputmodules"
-else
-  noinputmodules="libdvdcss(internal) $noinputmodules"
-fi
-echores "$_libdvdcss_internal"
 
 
 echocheck "libcdio"
@@ -6452,6 +6409,7 @@ statement_check zlib.h 'inflate(0, Z_NO_FLUSH)' -lz && _zlib=yes
 if test "$_zlib" = yes ; then
   def_zlib='#define CONFIG_ZLIB 1'
   extra_ldflags="$extra_ldflags -lz"
+  extra_cflags="$extra_cflags -DZLIB_CONST"
   # necessary for vf_screenshot
   mplayer_encoders="$mplayer_encoders PNG_ENCODER"
 else
@@ -7436,7 +7394,7 @@ struct vpx_codec_ctx decoder;
 int main(void) {
   vpx_codec_dec_init(NULL, &vpx_codec_vp8_dx_algo, NULL, 0);
   vpx_codec_enc_init(NULL, &vpx_codec_vp8_dx_algo, NULL, 0);
-  return VPX_CQ;
+  return VPX_CQ + VP8E_SET_MAX_INTRA_BITRATE_PCT;
 }
 EOF
     cc_check -lvpx && _libvpx_lavc=yes && extra_ldflags="$extra_ldflags -lvpx"
@@ -7890,7 +7848,7 @@ if test "$_gui" = yes ; then
 
   if ! win32 ; then
     _gui_gtk=yes
-    test "$_x11" != yes && die "X11 support required for GUI compilation."
+    test "$_x11" != yes && die "The GUI requires X11."
 
     echocheck "XShape extension"
     if test "$_xshape" = auto ; then
@@ -7924,81 +7882,51 @@ EOF
     echores "$_xshape"
 
     # Check for GTK2
-    if test "$_gtk1" = no ; then
-      echocheck "GTK+ version"
+    echocheck "GTK+ version"
 
-      if $_pkg_config gtk+-2.0 --exists ; then
-        _gtk=$($_pkg_config gtk+-2.0 --modversion 2>/dev/null)
-        extra_cflags="$extra_cflags $($_pkg_config gtk+-2.0 --cflags 2>/dev/null)"
-        libs_mplayer="$libs_mplayer $($_pkg_config gtk+-2.0 --libs 2>/dev/null)"
+    if $_pkg_config --exists gtk+-2.0 ; then
+      _gtk=$($_pkg_config --modversion "gtk+-2.0 >= 2.4.0" 2>&1)
+      if [ $? -eq 0 ]; then
+        extra_cflags="$extra_cflags $($_pkg_config --cflags gtk+-2.0 2>/dev/null)"
+        libs_mplayer="$libs_mplayer $($_pkg_config --libs gtk+-2.0 2>/dev/null)"
         echores "$_gtk"
-
-        # Check for GLIB2
-        echocheck "GLib version"
-        if $_pkg_config glib-2.0 --exists ; then
-          _glib=$($_pkg_config glib-2.0 --modversion 2>/dev/null)
-          libs_mplayer="$libs_mplayer $($_pkg_config glib-2.0 --libs 2>/dev/null)"
-          echores "$_glib"
-
-          def_gui='#define CONFIG_GUI 1'
-          def_gtk2='#define CONFIG_GTK2 1'
-        else
-          _gtk1=yes
-          echores "GLib 2 devel packages were not found, trying GTK+ 1.2"
-        fi
       else
-        _gtk1=yes
-        echores "GTK+ 2 devel packages were not found, trying GTK+ 1.2"
+        res_comment="too old"
+        echores "$($_pkg_config --modversion gtk+-2.0 2>/dev/null)"
+        die "$_gtk"
       fi
-    fi
 
-    # Check for (old) GTK1
-    if test "$_gtk1" = yes ; then
-      echocheck "GTK+ version"
-
-      if test -z "$_gtkconfig" ; then
-        if ( gtk-config --version ) >/dev/null 2>&1 ; then
-          _gtkconfig="gtk-config"
-        elif ( gtk12-config --version ) >/dev/null 2>&1 ; then
-          _gtkconfig="gtk12-config"
-        else
-          die "The GUI requires GTK+ devel packages (which were not found)."
-        fi
-      fi
-      _gtk=$($_gtkconfig --version 2>&1)
-      extra_cflags="$extra_cflags $($_gtkconfig --cflags 2>&1)"
-      libs_mplayer="$libs_mplayer $($_gtkconfig --libs 2>&1)"
-      echores "$_gtk (using $_gtkconfig)"
-
-      # Check for (old) GLIB1
+      # Check for GLIB2
       echocheck "GLib version"
-      if test -z "$_glibconfig" ; then
-        if ( glib-config --version ) >/dev/null 2>&1 ; then
-          _glibconfig="glib-config"
-        elif ( glib12-config --version ) >/dev/null 2>&1 ; then
-          _glibconfig="glib12-config"
+      if $_pkg_config --exists glib-2.0 ; then
+        _glib=$($_pkg_config --modversion "glib-2.0 >= 2.6.0" 2>&1)
+        if [ $? -eq 0 ]; then
+          libs_mplayer="$libs_mplayer $($_pkg_config --libs glib-2.0 2>/dev/null)"
+          echores "$_glib"
         else
-          die "The GUI requires GLib devel packages (which were not found)"
+          res_comment="too old"
+          echores "$($_pkg_config --modversion glib-2.0 2>/dev/null)"
+          die "$_glib"
         fi
-      fi
-      _glib=$($_glibconfig --version 2>&1)
-      libs_mplayer="$libs_mplayer $($_glibconfig --libs 2>&1)"
-      echores "$_glib (using $_glibconfig)"
 
-      def_gui='#define CONFIG_GUI 1'
-      def_gtk2='#undef CONFIG_GTK2'
+        def_gui='#define CONFIG_GUI 1'
+      else
+        echores "no"
+        die "GLib version 2 devel packages were not found (required for GUI)."
+      fi
+    else
+      echores "no"
+      die "GTK+ version 2 devel packages were not found (required for GUI)."
     fi
 
   else #if ! win32
     _gui_win32=yes
     libs_mplayer="$libs_mplayer -lcomdlg32 -lcomctl32 -lshell32 -lkernel32"
     def_gui='#define CONFIG_GUI 1'
-    def_gtk2='#undef CONFIG_GTK2'
   fi #if ! win32
 
 else #if test "$_gui"
   def_gui='#undef CONFIG_GUI'
-  def_gtk2='#undef CONFIG_GTK2'
 fi #if test "$_gui"
 # --------------- GUI specific tests end -------------------
 
@@ -8170,22 +8098,7 @@ CFLAGS="$CFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE
 
 CXXFLAGS=" $CFLAGS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS"
 
-# This must be the last test to be performed. Any other tests following it
-# could fail due to linker errors. libdvdnavmini is intentionally not linked
-# against libdvdread (to permit MPlayer to use its own copy of the library).
-# So any compilation using the flags added here but not linking against
-# libdvdread can fail.
 echocheck "DVD support (libdvdnav)"
-dvdnav_internal=no
-if test "$_dvdnav" = auto ; then
-  if test "$_dvdread_internal" = yes ; then
-    _dvdnav=yes
-    dvdnav_internal=yes
-    res_comment="internal"
-  else
-    $_dvdnavconfig --version --minilibs >> $TMPLOG 2>&1 || _dvdnav=no
-  fi
-fi
 if test "$_dvdnav" = auto ; then
   _dvdnav=no
   _dvdnavdir=$($_dvdnavconfig --cflags)
@@ -8194,14 +8107,9 @@ if test "$_dvdnav" = auto ; then
 fi
 if test "$_dvdnav" = yes ; then
   def_dvdnav='#define CONFIG_DVDNAV 1'
-  if test "$dvdnav_internal" = yes ; then
-    cflags_libdvdnav="-Ilibdvdnav"
-    inputmodules="dvdnav(internal) $inputmodules"
-  else
-    extra_cflags="$extra_cflags $($_dvdnavconfig --cflags)"
-    extra_ldflags="$extra_ldflags $($_dvdnavconfig --minilibs)"
-    inputmodules="dvdnav $inputmodules"
-  fi
+  extra_cflags="$extra_cflags $($_dvdnavconfig --cflags)"
+  extra_ldflags="$extra_ldflags $($_dvdnavconfig --libs)"
+  inputmodules="dvdnav $inputmodules"
 else
   def_dvdnav='#undef CONFIG_DVDNAV'
   noinputmodules="dvdnav $noinputmodules"
@@ -8457,7 +8365,7 @@ CFLAGS_NO_OMIT_LEAF_FRAME_POINTER = $cflags_no_omit_leaf_frame_pointer
 CFLAGS_STACKREALIGN      = $cflags_stackrealign
 CFLAGS_SVGALIB_HELPER    = $cflags_svgalib_helper
 
-EXTRALIBS          = $extra_ldflags $ld_static $timer_libs $extra_libs
+EXTRALIBS          = $ld_static $extra_ldflags $timer_libs $extra_libs
 EXTRALIBS_MPLAYER  = $libs_mplayer
 EXTRALIBS_MENCODER = $libs_mencoder
 
@@ -8712,10 +8620,11 @@ CONFIG_BLOCKDSP= yes
 CONFIG_BSWAPDSP= yes
 CONFIG_CABAC   = yes
 CONFIG_DCT     = yes
-CONFIG_DSPUTIL = yes
 CONFIG_DWT     = yes
 CONFIG_ERROR_RESILIENCE = yes
 CONFIG_EXIF    = yes
+CONFIG_FAANDCT = yes
+CONFIG_FAANIDCT= yes
 CONFIG_FDCTDSP = yes
 CONFIG_FRAME_THREAD_ENCODER = yes
 CONFIG_FFT     = yes
@@ -8726,6 +8635,7 @@ CONFIG_H264DSP = yes
 CONFIG_H264PRED= yes
 CONFIG_H264QPEL= yes
 CONFIG_HPELDSP = yes
+CONFIG_IIRFILTER = yes
 CONFIG_QPELDSP = yes
 CONFIG_HUFFYUVDSP = yes
 CONFIG_HUFFYUVENCDSP = yes
@@ -8739,18 +8649,22 @@ CONFIG_LPC     = yes
 CONFIG_LSP     = yes
 CONFIG_LZO     = yes
 CONFIG_MDCT    = yes
+CONFIG_ME_CMP  = yes
 CONFIG_MPEG_ER = yes
 CONFIG_MPEGAUDIODSP = yes
 CONFIG_MPEGVIDEO    = yes
 CONFIG_MPEGVIDEOENC = yes
+CONFIG_PIXBLOCKDSP  = yes
 CONFIG_RANGECODER   = yes
 CONFIG_RDFT    = yes
 CONFIG_RIFFDEC = yes
 CONFIG_RIFFENC = yes
 CONFIG_RTPENC_CHAIN = yes
 CONFIG_SINEWIN = yes
+CONFIG_STARTCODE = yes
 CONFIG_VIDEODSP = yes
 CONFIG_VP3DSP  = yes
+CONFIG_WMA_FREQS = yes
 
 $mak_hardcoded_tables
 $mak_libavcodec_mpegaudio_hp
@@ -8761,6 +8675,7 @@ CONFIG_AC3DSP   = yes
 CONFIG_BZLIB    = $bzlib
 CONFIG_CRYSTALHD= $crystalhd
 CONFIG_ENCODERS = yes
+CONFIG_GNUTLS   = $_gnutls
 CONFIG_GPL      = yes
 CONFIG_ICONV    = $_iconv
 CONFIG_MLIB     = $_mlib
@@ -8781,6 +8696,7 @@ HAVE_SHM        = $_shm
 HAVE_W32THREADS = $_w32threads
 HAVE_THREADS    = $_threads
 HAVE_YASM       = $have_yasm
+INTRINSICS      = none
 
 CONFIG_LIBXVID = $_xvid_lavc
 $(mak_enable "$libavdecoders_all"  "$libavdecoders"  CONFIG)
@@ -8909,7 +8825,9 @@ $def_gethostbyname2
 $def_gettimeofday
 $def_clock_gettime
 $def_glob
+$def_gmtime_r
 $def_langinfo
+$def_localtime_r
 $def_map_memalign
 $def_memalign
 $def_nanosleep
@@ -9030,7 +8948,6 @@ $def_xmms
 
 /* GUI */
 $def_gui
-$def_gtk2
 $def_xshape
 
 
@@ -9236,6 +9153,7 @@ $def_gnu_as
 $def_ibm_asm
 $def_local_aligned_8
 $def_local_aligned_16
+$def_local_aligned_32
 $def_os2threads
 $def_pic
 $def_pthreads
@@ -9298,7 +9216,7 @@ $def_truncf
 #define CONFIG_FASTDIV 0
 #define CONFIG_FFSERVER 0
 #define CONFIG_FTRAPV 0
-#define CONFIG_GNUTLS 0
+$def_gnutls
 #define CONFIG_GPL 1
 #define CONFIG_GRAY 0
 #define CONFIG_LIBMODPLUG 0
@@ -9315,24 +9233,28 @@ $def_truncf
 #define CONFIG_VAAPI 0
 
 #define HAVE_ALIGNED_STACK 1
+#define HAVE_AS_DN_DIRECTIVE 1
 #define HAVE_ASM_MOD_Q 1
 #define HAVE_ATOMICS_GCC 1
+#define HAVE_SYNC_VAL_COMPARE_AND_SWAP 1
 #define HAVE_ATOMICS_NATIVE 1
 #define HAVE_ATTRIBUTE_PACKED 1
 #define HAVE_GETHRTIME 0
 #define HAVE_INLINE_ASM 1
 #define HAVE_INLINE_ASM_NONLOCAL_LABELS 1
 #define HAVE_INLINE_ASM_DIRECT_SYMBOL_REFS 1
+#define HAVE_INTRINSICS_NEON 0
 #define HAVE_ISATTY 0
 #define HAVE_LDBRX 0
 #define HAVE_LIBC_MSVCRT 0
-#define HAVE_LOCALTIME_R 0
+#define HAVE_MACH_MACH_TIME_H 0
 #define HAVE_MAPVIEWOFFILE 0
 #define HAVE_MIPSDSPR1 0
 #define HAVE_MIPSFPU 0
 #define HAVE_MM_EMPTY 0
 #define HAVE_PPC4XX 0
 #define HAVE_RDTSC 0
+#define HAVE_SIMD_ALIGN_16 1
 #define HAVE_STRERROR_R 0
 #define HAVE_STRPTIME 0
 #define HAVE_STRUCT_POLLFD 0
@@ -9349,10 +9271,12 @@ $def_truncf
 #define CONFIG_BLOCKDSP 1
 #define CONFIG_BSWAPDSP 1
 #define CONFIG_DCT 1
-#define CONFIG_DSPUTIL 1
+#define CONFIG_DVPROFILE 1
 #define CONFIG_DWT 1
 #define CONFIG_ERROR_RESILIENCE 1
 #define CONFIG_EXIF 1
+#define CONFIG_FAANDCT 1
+#define CONFIG_FAANIDCT 1
 #define CONFIG_FDCTDSP 1
 #define CONFIG_FRAME_THREAD_ENCODER 1
 #define CONFIG_FFT 1
@@ -9367,12 +9291,16 @@ $def_truncf
 #define CONFIG_LPC 1
 #define CONFIG_LZO 1
 #define CONFIG_MDCT 1
+#define CONFIG_ME_CMP 1
 #define CONFIG_MPEG_ER 1
 #define CONFIG_MPEGVIDEO 1
+#define CONFIG_PIXBLOCKDSP 1
 #define CONFIG_RDFT 1
 #define CONFIG_RIFFDEC 1
 #define CONFIG_RIFFENC 1
+#define CONFIG_STARTCODE 1
 #define CONFIG_VIDEODSP 1
+#define CONFIG_WMA_FREQS 1
 
 /* Use these registers in FFmpeg x86 inline asm. No proper detection yet. */
 #ifndef MP_DEBUG

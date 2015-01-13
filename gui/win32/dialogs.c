@@ -329,7 +329,7 @@ static LRESULT CALLBACK OpenUrlWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPAR
                     uiSetFile(NULL, file, STREAMTYPE_STREAM);
                     if((f = fopen(history, "wt+")))
                     {
-                        fprintf(f, file);
+                        fprintf(f, "%s", file);
                         fclose(f);
                     }
                     if(!parse_filename(file, playtree, mconfig, addurl? FALSE : TRUE))

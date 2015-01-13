@@ -24,6 +24,8 @@ MPlayer
     * Danish messages header file renamed from help_mp-dk.h to help_mp-da.h
       in order to comply with ISO 639 language code (configure language
       options will now require da instead of dk)
+    * configure: options --enable-gtk1, --with-glib-config= and
+      --with-gtk-config= removed
 
     Ports:
     * Windows: support file names as UTF-8 in slave mode and passing
@@ -48,6 +50,8 @@ MPlayer
       slim, softgrip, standard, trium, tvisor, xanim)
     * Video can be rotated
     * New GUI message: evSetRotation
+    * GUI now officially needs GTK+ and GLib versions 2 (it hadn't compiled
+      with versions 1 for quite some time)
 
   1.1: "We gave up on 1.0"
 

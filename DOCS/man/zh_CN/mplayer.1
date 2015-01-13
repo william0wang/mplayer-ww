@@ -1,5 +1,5 @@
-.\" sync with en/mplayer.1 rev. 37194
-.\" MPlayer (C) 2000-2014 MPlayer Team
+.\" sync with en/mplayer.1 rev. 37262
+.\" MPlayer (C) 2000-2015 MPlayer Team
 .\" This man page was/is translated by JRaSH<jrash06 at gmail.com>
 .
 .\" --------------------------------------------------------------------------
@@ -31,7 +31,7 @@
 .\" 标题
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "2014-02-13" "MPlayer 项目" "影视播放器"
+.TH MPlayer 1 "2015-02-13" "MPlayer 项目" "影视播放器"
 .
 .SH 名称
 mplayer  \- 影视播放器
@@ -1843,9 +1843,12 @@ MPlayer 并不防止加载产生自不同 AVI 文件的索引，\
 .PD 1
 .
 .TP
-.B \-ni（仅用于 AVI）
-强制使用非交错 AVI 解析器（修复某些异常 AVI 文件\
-的播放错误）。
+.B \-ni
+强制将文件作为非交错格式处理。\
+特别是强制使用非交错格式的 AVI 解析器（可使某些损坏的 AVI 文件\
+重新可以播放）。\
+也可能有助于播放一些默认方式下交替而非同时播放音频和\
+视频的文件。
 .
 .TP
 .B \-nobps（仅用于 AVI）
@@ -12410,7 +12413,7 @@ rar p test-SVCD.rar | mencoder \-ovc lavc \-lavcopts vcodec=mpeg4:vbitrate=800 \
 MPlayer 最初由 Arpad Gereoffy 制作。\
 参见 AUTHORS 文件以查看其它众多贡献者的部分列表。
 .PP
-MPlayer 为 (C) 2000\-2014 MPlayer 团队所有
+MPlayer 为 (C) 2000\-2015 MPlayer 团队所有
 .PP
 本（英文）手册主要由 Gabucino、Jonas Jermann 和 Diego Biurrun 编写，\
 由 Diego Biurrun 维护。中文版由 JRaSH <jrash06 AT 163.com> 翻译。\

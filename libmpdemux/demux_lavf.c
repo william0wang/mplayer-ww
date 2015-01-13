@@ -45,7 +45,7 @@
 
 #include "mp_taglists.h"
 
-#define INITIAL_PROBE_SIZE STREAM_BUFFER_SIZE
+#define INITIAL_PROBE_SIZE STREAM_BUFFER_MIN
 #define SMALL_MAX_PROBE_SIZE (32 * 1024)
 #define PROBE_BUF_SIZE (2*1024*1024)
 
@@ -110,7 +110,7 @@ static int64_t mp_seek(void *opaque, int64_t pos, int whence) {
     else if(whence == SEEK_SET)
         pos += stream->start_pos;
     else if(whence == AVSEEK_SIZE && stream->end_pos > 0) {
-        uint64_t size;
+        uint64_t size = 0;
         stream_control(stream, STREAM_CTRL_GET_SIZE, &size);
         if (size > stream->end_pos)
             stream->end_pos = size;
@@ -153,7 +153,7 @@ static void list_formats(void) {
 }
 
 static int lavf_check_file(demuxer_t *demuxer){
-    AVProbeData avpd;
+    AVProbeData avpd = { 0 };
     lavf_priv_t *priv;
     int probe_data_size = 0;
     int read_size = is_rar_stream?2048:INITIAL_PROBE_SIZE;
@@ -493,10 +493,11 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
             break;
         }
         case AVMEDIA_TYPE_ATTACHMENT:{
-            if (st->codec->codec_id == AV_CODEC_ID_TTF) {
+            if (st->codec->codec_id == AV_CODEC_ID_TTF || st->codec->codec_id == AV_CODEC_ID_OTF) {
                 AVDictionaryEntry *fnametag = av_dict_get(st->metadata, "filename", NULL, 0);
+                AVDictionaryEntry *mimetype = av_dict_get(st->metadata, "mimetype", NULL, 0);
                 demuxer_add_attachment(demuxer, fnametag ? fnametag->value : NULL,
-                                       "application/x-truetype-font",
+                                       mimetype ? mimetype->value : "application/x-font",
                                        codec->extradata, codec->extradata_size);
             }
             break;
@@ -664,6 +665,7 @@ static int demux_lavf_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
     demux_packet_t *dp;
     demux_stream_t *ds;
     int id;
+    double stream_pts = MP_NOPTS_VALUE;
     mp_msg(MSGT_DEMUX,MSGL_DBG2,"demux_lavf_fill_buffer()\n");
 
     demux->filepos=stream_tell(demux->stream);
@@ -723,6 +725,9 @@ static int demux_lavf_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
     }
     dp->pos=demux->filepos;
     dp->flags= !!(pkt.flags&AV_PKT_FLAG_KEY);
+    if (ds == demux->video &&
+        stream_control(demux->stream, STREAM_CTRL_GET_CURRENT_TIME, (void *)&stream_pts) != STREAM_UNSUPPORTED)
+        dp->stream_pts = stream_pts;
     // append packet to DS stream:
     ds_add_packet(ds,dp);
     return 1;

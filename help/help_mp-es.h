@@ -630,7 +630,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_Mixer "Mezclador"
 #define MSGTR_GUI_MixerChannel "Canal del Mezclador"
 #define MSGTR_GUI_MSG_AddingVideoFilter "[GUI] Agregando filtro de video: %s\n"
-#define MSGTR_GUI_MSG_aRtsBroken "Las versiones nuevas de aRts no son compatibles con GTK 1.x y botan GMPlayer!"
 #define MSGTR_GUI_MSG_ColorDepthTooLow "Lo lamento, la profundidad de color es demasiado baja.\n"
 #define MSGTR_GUI_MSG_DragAndDropNothing "D&D: ¡No retorno nada!\n"
 #define MSGTR_GUI_MSG_DXR3NeedsLavc "No puede reproducir archivos no MPEG con su DXR3/H+ sin recodificación. Activa lavc en la configuración del DXR3/H+."

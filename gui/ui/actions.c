@@ -22,6 +22,7 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -135,7 +136,6 @@ void uiEvent(int ev, float param)
     case evPlayCD:
         guiInfo.StreamType = STREAMTYPE_CDDA;
         goto play;
-
 #endif
 #ifdef CONFIG_VCD
     case ivSetVCDTrack:
@@ -144,7 +144,6 @@ void uiEvent(int ev, float param)
     case evPlayVCD:
         guiInfo.StreamType = STREAMTYPE_VCD;
         goto play;
-
 #endif
 #ifdef CONFIG_DVDREAD
     case ivSetDVDSubtitle:
@@ -176,13 +175,11 @@ void uiEvent(int ev, float param)
     case ivPlayDVD:
         guiInfo.StreamType = STREAMTYPE_DVD;
         goto play;
-
 #endif
 #ifdef CONFIG_TV
     case evPlayTV:
         guiInfo.StreamType = guiTV[gui_tv_digital].StreamType;
         goto play;
-
 #endif
     case evPlay:
     case evPlaySwitchToPause:
