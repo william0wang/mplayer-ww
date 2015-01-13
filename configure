@@ -752,6 +752,9 @@ type dvdnav-config >/dev/null 2>&1 && _dvdnavconfig=dvdnav-config
 _dvdreadconfig="pkg-config dvdread"
 type dvdread-config >/dev/null 2>&1 && _dvdreadconfig=dvdread-config
 _dvdread=auto
+_dvdcssconfig="pkg-config dvdcss"
+type dvdcss-config >/dev/null 2>&1 && _dvdcssconfig=dvdcss-config
+_dvdcss=auto
 _xanim=auto
 _real=auto
 _live=auto
@@ -6125,6 +6128,18 @@ if test "$_dvdread" = auto ; then
       _dvdread=yes
       extra_cflags="$extra_cflags $_dvdreadcflags"
       extra_ldflags="$extra_ldflags $_dvdreadlibs"
+    fi
+fi
+
+echocheck "dvdcss"
+if test "$_dvdcss" = auto ; then
+  _dvdcss=no
+    _dvdcsscflags=$($_dvdcssconfig --cflags 2> /dev/null)
+    _dvdcsslibs=$($_dvdcssconfig --libs 2> /dev/null)
+    if header_check dvdcss/dvdcss.h $_dvdcsscflags $_dvdcsslibs ; then
+      _dvdcss=yes
+      extra_cflags="$extra_cflags $_dvdcsscflags"
+      extra_ldflags="$extra_ldflags $_dvdcsslibs"
     fi
 fi
 
