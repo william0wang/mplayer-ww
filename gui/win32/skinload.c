@@ -39,6 +39,12 @@
 #include "gui/util/mem.h"
 #include "gui/util/bitmap.h"
 
+#ifndef stricmp
+#ifdef __CYGWIN__
+#define stricmp strcasecmp
+#endif
+#endif
+
 #define MAX_LINESIZE 256
 
 typedef struct
