@@ -43,6 +43,9 @@
 #ifdef __CYGWIN__
 #define stricmp strcasecmp
 #endif
+#ifdef __WINE__
+#define stricmp lstrcmpiA
+#endif
 #endif
 
 #define MAX_LINESIZE 256
