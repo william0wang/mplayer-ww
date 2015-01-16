@@ -39,12 +39,6 @@
 #include "gui/util/mem.h"
 #include "gui/util/bitmap.h"
 
-#ifndef stricmp
-#ifdef __CYGWIN__
-#define stricmp strcasecmp
-#endif
-#endif
-
 #define MAX_LINESIZE 256
 
 typedef struct
@@ -152,7 +146,7 @@ static image *pngRead(skin_t *skin, const char *fname)
     char *filename = NULL;
     FILE *fp;
 
-    if(!stricmp(fname, "NULL")) return 0;
+    if(!strcasecmp(fname, "NULL")) return 0;
 
     /* find filename in order file file.png */
     if(!(fp = fopen(fname, "rb")))
