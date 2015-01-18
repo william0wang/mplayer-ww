@@ -1821,7 +1821,7 @@ if os2 ; then
 fi
 
 if wine ; then
-  extra_cflags="-fno-pic -UWIN32 -U_WIN32 -U__WIN32 -U__WIN32__ -DWINE_NOWINSOCK -Dstrcasecmp=lstrcmpiA $extra_cflags"
+  extra_cflags="-fno-pic -UWIN32 -U_WIN32 -U__WIN32 -U__WIN32__ -DWINE_NOWINSOCK $extra_cflags"
 fi
 
 if darwin && test "$cc_vendor" != "clang" ; then
