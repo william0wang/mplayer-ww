@@ -579,7 +579,12 @@ static void draw_slice(struct AVCodecContext *s,
     }
 }
 
-static void update_configuration(sh_video_t *sh, enum AVPixelFormat pix_fmt) {
+// ignore_aspect is used to not bother with aspect changes during get_buffer.
+// The aspect can be wrong when get_buffer is called before decoding and it
+// should simply not be necessary.
+// In particular this stops spurious get_buffer aspect values from causing
+// a container value to be overwritten.
+static void update_configuration(sh_video_t *sh, enum AVPixelFormat pix_fmt, int ignore_aspect) {
     vd_ffmpeg_ctx *ctx = sh->context;
     AVCodecContext *avctx = ctx->avctx;
     int aspect_change = av_cmp_q(avctx->sample_aspect_ratio, ctx->last_sample_aspect_ratio);
@@ -589,7 +594,7 @@ static void update_configuration(sh_video_t *sh, enum AVPixelFormat pix_fmt) {
     }
      // it is possible another vo buffers to be used after vo config()
      // lavc reset its buffers on width/heigh change but not on aspect change!!!
-    if (aspect_change ||
+    if ((!ignore_aspect && aspect_change) ||
         pix_fmt != ctx->pix_fmt ||
         !ctx->vo_initialized)
     {
@@ -598,6 +603,8 @@ static void update_configuration(sh_video_t *sh, enum AVPixelFormat pix_fmt) {
         // this is a special-case HACK for MPEG-1/2 VDPAU that uses neither get_format nor
         // sets the value correctly in avcodec_open.
         set_format_params(avctx, pix_fmt);
+
+        if (!ignore_aspect) {
         mp_msg(MSGT_DECVIDEO, MSGL_V, "[ffmpeg] aspect_ratio: %f\n", aspect);
 
         // Do not overwrite sh->original_aspect on the first call,
@@ -608,6 +615,7 @@ static void update_configuration(sh_video_t *sh, enum AVPixelFormat pix_fmt) {
         if (sh->original_aspect == 0 || (aspect_change && ctx->last_sample_aspect_ratio.den))
             sh->original_aspect = aspect;
         ctx->last_sample_aspect_ratio = avctx->sample_aspect_ratio;
+        }
         ctx->pix_fmt = pix_fmt;
         ctx->best_csp = pixfmt2imgfmt2(pix_fmt, avctx->codec_id);
     }
@@ -622,7 +630,7 @@ static int is_in_format_list(sh_video_t *sh, int imgfmt)
     return 0;
 }
 
-static int init_vo(sh_video_t *sh, enum AVPixelFormat pix_fmt)
+static int init_vo(sh_video_t *sh, enum AVPixelFormat pix_fmt, int ignore_aspect)
 {
     vd_ffmpeg_ctx *ctx = sh->context;
     const AVCodecContext *avctx = ctx->avctx;
@@ -651,7 +659,7 @@ static int init_vo(sh_video_t *sh, enum AVPixelFormat pix_fmt)
     if (width != sh->disp_w  || height != sh->disp_h)
         ctx->vo_initialized = 0;
 
-    update_configuration(sh, pix_fmt);
+    update_configuration(sh, pix_fmt, ignore_aspect);
     if (!ctx->vo_initialized)
     {
         sh->disp_w = width;
@@ -716,7 +724,7 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
         type = MP_IMGTYPE_NUMBERED;
     }
 
-    if(init_vo(sh, avctx->pix_fmt) < 0){
+    if(init_vo(sh, avctx->pix_fmt, 1) < 0){
         avctx->release_buffer= avcodec_default_release_buffer;
         goto disable_dr1;
     }
@@ -1047,7 +1055,7 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
 	    return NULL;    // skipped image
     }
 
-    if(init_vo(sh, avctx->pix_fmt) < 0) return NULL;
+    if(init_vo(sh, avctx->pix_fmt, 0) < 0) return NULL;
 
     if(dr1 && pic->opaque){
         mpi=pic->opaque;
@@ -1126,14 +1134,14 @@ static enum AVPixelFormat get_format(struct AVCodecContext *avctx,
         imgfmt = pixfmt2imgfmt2(fmt[i], avctx->codec_id);
         if(!IMGFMT_IS_HWACCEL(imgfmt) || !is_in_format_list(sh, imgfmt)) continue;
         mp_msg(MSGT_DECVIDEO, MSGL_V, MSGTR_MPCODECS_TryingPixfmt, i);
-        if(init_vo(sh, fmt[i]) >= 0) {
+        if(init_vo(sh, fmt[i], 1) >= 0) {
             break;
         }
     }
     selected_format = fmt[i];
     if (selected_format == PIX_FMT_NONE) {
         selected_format = avcodec_default_get_format(avctx, fmt);
-        update_configuration(sh, selected_format);
+        update_configuration(sh, selected_format, 1);
     }
     set_format_params(avctx, selected_format);
     return selected_format;
