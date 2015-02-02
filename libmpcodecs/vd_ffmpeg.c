@@ -605,16 +605,16 @@ static void update_configuration(sh_video_t *sh, enum AVPixelFormat pix_fmt, int
         set_format_params(avctx, pix_fmt);
 
         if (!ignore_aspect) {
-        mp_msg(MSGT_DECVIDEO, MSGL_V, "[ffmpeg] aspect_ratio: %f\n", aspect);
+            mp_msg(MSGT_DECVIDEO, MSGL_V, "[ffmpeg] aspect_ratio: %f\n", aspect);
 
-        // Do not overwrite sh->original_aspect on the first call,
-        // if a container aspect is available (which is preferred then).
-        // But set it even if the sample aspect did not change, since a
-        // resolution change can cause an aspect change even if the
-        // _sample_ aspect is unchanged.
-        if (sh->original_aspect == 0 || (aspect_change && ctx->last_sample_aspect_ratio.den))
-            sh->original_aspect = aspect;
-        ctx->last_sample_aspect_ratio = avctx->sample_aspect_ratio;
+            // Do not overwrite sh->original_aspect on the first call,
+            // if a container aspect is available (which is preferred then).
+            // But set it even if the sample aspect did not change, since a
+            // resolution change can cause an aspect change even if the
+            // _sample_ aspect is unchanged.
+            if (sh->original_aspect == 0 || (aspect_change && ctx->last_sample_aspect_ratio.den))
+                sh->original_aspect = aspect;
+            ctx->last_sample_aspect_ratio = avctx->sample_aspect_ratio;
         }
         ctx->pix_fmt = pix_fmt;
         ctx->best_csp = pixfmt2imgfmt2(pix_fmt, avctx->codec_id);
