@@ -1716,6 +1716,7 @@ if test -z "$_target" ; then
       alpha) host_arch=alpha ;;
       sun4*|sparc*) host_arch=sparc ;;
       parisc*|hppa*|9000*) host_arch=hppa ;;
+      aarch64*) host_arch=aarch64 ;;
       arm*|zaurus|cats) host_arch=arm ;;
       sh3|sh4|sh4a) host_arch=sh ;;
       s390) host_arch=s390 ;;
@@ -2419,6 +2420,11 @@ case "$host_arch" in
     fi
     _mcpu="-mcpu=$proc"
     _optimizing="$proc"
+    ;;
+
+  aarch64)
+    arch='aarch64'
+    iproc='aarch64'
     ;;
 
   arm*)
