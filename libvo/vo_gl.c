@@ -1435,7 +1435,7 @@ static int control(uint32_t request, void *data)
       if (scaled_osd) {r->w = image_width; r->h = image_height;}
       else if (aspect_scaling()) {
         r->ml = ass_border_l;
-        r->ml = ass_border_r;
+        r->mr = ass_border_r;
         r->mt = ass_border_t;
         r->mb = ass_border_b;
       }
