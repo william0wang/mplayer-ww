@@ -1580,7 +1580,7 @@ libavmuxers=$(echo $libavmuxers_all)
 libavprotocols=$(echo $libavprotocols_all)
 libavfilters=$(echo $libavfilters_all)
 
-libavdecoders=$(filter_out_component decoder 'LIB[A-Z0-9_]*')
+libavdecoders=$(filter_out_component decoder 'LIB[A-Z0-9_]* H264_QSV')
 libavencoders=$(filter_out_component encoder 'LIB[A-Z0-9_]* NVENC')
 libavdemuxers=$(filter_out_component demuxer 'AVISYNTH LIB[A-Z0-9_]* REDIR')
 libavmuxers=$(filter_out_component muxer 'LIB[A-Z0-9_]* RTP RTSP SAP')
@@ -8592,6 +8592,7 @@ CONFIG_H264QPEL= yes
 CONFIG_HPELDSP = yes
 CONFIG_IIRFILTER = yes
 CONFIG_QPELDSP = yes
+CONFIG_QSV     = no
 CONFIG_HUFFYUVDSP = yes
 CONFIG_HUFFYUVENCDSP = yes
 CONFIG_IDCTDSP = yes
@@ -9183,6 +9184,7 @@ $def_gnutls
 #define CONFIG_SMALL 0
 #define CONFIG_SWSCALE_ALPHA 1
 #define SWS_MAX_FILTER_SIZE 256
+#define CONFIG_QSV 0
 #define CONFIG_VAAPI 0
 
 #define HAVE_ALIGNED_STACK 1
