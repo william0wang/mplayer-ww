@@ -3511,6 +3511,18 @@ Fixes fullscreen switching on OpenBox 1.x.
 .PD 1
 .
 .TP
+.B \-fs-border-left   <pixels>
+.TP
+.B \-fs-border-right  <pixels>
+.TP
+.B \-fs-border-top    <pixels>
+.TP
+.B \-fs-border-bottom <pixels>
+Specify extra borders in full screen mode.
+The borders apply to all displayed elements: video, OSD and EOSD.
+The number of pixels is specified in terms of screen resolution.
+Currently only supported with by the gl video output driver.
+.TP
 .B \-gamma <\-100\-100>
 Adjust the gamma of the video signal (default: 0).
 Not supported by all video output drivers.

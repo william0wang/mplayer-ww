@@ -963,6 +963,19 @@ int vo_x11_check_events(Display * mydisplay)
     return ret;
 }
 
+static void vo_x11_update_fs_borders(void)
+{
+    if (!vo_fs)
+        return;
+    if (vo_dwidth  <= vo_fs_border_l + vo_fs_border_r ||
+        vo_dheight <= vo_fs_border_t + vo_fs_border_b) {
+        mp_msg(MSGT_VO, MSGL_ERR, "[x11] borders too wide, ignored.\n");
+        return;
+    }
+    vo_dwidth  -= vo_fs_border_l + vo_fs_border_r;
+    vo_dheight -= vo_fs_border_t + vo_fs_border_b;
+}
+
 /**
  * \brief sets the size and position of the non-fullscreen window.
  */
@@ -1145,6 +1158,7 @@ void vo_x11_create_vo_window(XVisualInfo *vis, int x, int y,
     vo_fs = 0;
     vo_dwidth = width;
     vo_dheight = height;
+    vo_x11_update_fs_borders();
     vo_window = vo_x11_create_smooth_window(mDisplay, mRootWin, vis->visual,
                       x, y, width, height, vis->depth, col_map);
     window_state = VOFLAG_HIDDEN;
@@ -1189,6 +1203,7 @@ void vo_x11_create_vo_window(XVisualInfo *vis, int x, int y,
     // set the size values right.
     vo_dwidth  = vo_screenwidth;
     vo_dheight = vo_screenheight;
+    vo_x11_update_fs_borders();
   }
 final:
   if (vo_gc != None)
@@ -1381,7 +1396,11 @@ int vo_x11_update_geometry(void) {
     Window dummy_win;
     XGetGeometry(mDisplay, vo_window, &dummy_win, &dummy_int, &dummy_int,
                  &w, &h, &dummy_int, &depth);
-    if (w <= INT_MAX && h <= INT_MAX) { vo_dwidth = w; vo_dheight = h; }
+    if (w <= INT_MAX && h <= INT_MAX) {
+        vo_dwidth = w;
+        vo_dheight = h;
+        vo_x11_update_fs_borders();
+    }
     XTranslateCoordinates(mDisplay, vo_window, mRootWin, 0, 0, &vo_dx, &vo_dy,
                           &dummy_win);
 

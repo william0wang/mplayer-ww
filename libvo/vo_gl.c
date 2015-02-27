@@ -203,6 +203,8 @@ static void resize(void) {
     geometry(&left, &top, &w, &h, vo_dwidth, vo_dheight);
     top = vo_dheight - h - top;
     mpglViewport(left, top, w, h);
+  } else if (vo_fs) {
+    mpglViewport(vo_fs_border_l, vo_fs_border_b, vo_dwidth, vo_dheight);
   } else
     mpglViewport(0, 0, vo_dwidth, vo_dheight);
 
