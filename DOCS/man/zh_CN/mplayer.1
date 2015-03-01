@@ -1,4 +1,4 @@
-.\" sync with en/mplayer.1 rev. 37262
+.\" sync with en/mplayer.1 rev. 37376
 .\" MPlayer (C) 2000-2015 MPlayer Team
 .\" This man page was/is translated by JRaSH<jrash06 at gmail.com>
 .
@@ -3510,6 +3510,18 @@ VESA 帧缓冲不支持改变模式。
 .RE
 .PD 1
 .
+.TP
+.B \-fs-border-left   <像素数>
+.TP
+.B \-fs-border-right  <像素数>
+.TP
+.B \-fs-border-top    <像素数>
+.TP
+.B \-fs-border-bottom <像素数>
+指定全屏模式下额外边框的宽度。\
+该边框用于所有显示的元素：视频、OSD 和 EOSD。\
+像素数是相对于屏幕分辨率的像素量而指定的。\
+目前仅 gl 视频输出驱动支持。
 .TP
 .B \-gamma <\-100\-100>
 调整视频信号的伽玛校正值（默认值：0）。\
