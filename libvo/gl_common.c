@@ -493,7 +493,7 @@ static const extfunc_desc_t extfuncs[] = {
   {&mpglDeleteBuffers, NULL, {"glDeleteBuffers", "glDeleteBuffersARB", NULL}},
   {&mpglBindBuffer, NULL, {"glBindBuffer", "glBindBufferARB", NULL}},
   {&mpglMapBuffer, NULL, {"glMapBuffer", "glMapBufferARB", NULL}},
-  {&mpglMapBufferRange, NULL, {"glMapBufferRange", "glMapBufferRangeARB", NULL}},
+  {&mpglMapBufferRange, "ARB_map_buffer_range", {"glMapBufferRange", "glMapBufferRangeARB", NULL}},
   {&mpglUnmapBuffer, NULL, {"glUnmapBuffer", "glUnmapBufferARB", NULL}},
   {&mpglBufferData, NULL, {"glBufferData", "glBufferDataARB", NULL}},
   {&mpglCombinerParameterfv, "NV_register_combiners", {"glCombinerParameterfv", "glCombinerParameterfvNV", NULL}},
