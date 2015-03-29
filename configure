@@ -1580,7 +1580,7 @@ libavmuxers=$(echo $libavmuxers_all)
 libavprotocols=$(echo $libavprotocols_all)
 libavfilters=$(echo $libavfilters_all)
 
-libavdecoders=$(filter_out_component decoder 'LIB[A-Z0-9_]* H264_QSV')
+libavdecoders=$(filter_out_component decoder 'LIB[A-Z0-9_]* H264_QSV H264_MMAL')
 libavencoders=$(filter_out_component encoder 'LIB[A-Z0-9_]* H264_QSV NVENC[A-Z0-9_]*')
 libavdemuxers=$(filter_out_component demuxer 'AVISYNTH LIB[A-Z0-9_]* REDIR')
 libavmuxers=$(filter_out_component muxer 'LIB[A-Z0-9_]* RTP RTSP SAP')
