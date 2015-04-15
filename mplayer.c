@@ -785,6 +785,9 @@ static void child_sighandler(int x)
     do {
         pid = waitpid(-1, NULL, WNOHANG);
     } while (pid > 0);
+    // Without this, we will be called only once at
+    // least on Linux 3.16.
+    signal(SIGCHLD, child_sighandler);
 }
 
 #endif
@@ -3024,6 +3027,8 @@ int main(int argc, char *argv[])
 
     // Catch signals
 #ifndef __MINGW32__
+    // TODO: use newer POSIX SIG_IGN behaviour instead to
+    // automatically handle children?
     signal(SIGCHLD, child_sighandler);
 #endif
 
