@@ -23,6 +23,7 @@ Comment[fr]=Lit les films et musiques
 Comment[it]=Riproduce filmati e musica
 Comment[ja]=動画や音声のファイルを再生します
 Keywords=Player;Capture;Audio;Music;Song;Video;Movie;Film;Clip;DVD;VCD;CD;Disc;DVB;TV;
+Keywords[de]=Player;Wiedergabe;Capture;Mitschnitt;Audio;Musik;Lied;Video;Film;Clip;DVD;VCD;CD;Disc;Disk;DVB;TV;
 Icon=mplayer
 TryExec=gmplayer
 Exec=gmplayer %F
