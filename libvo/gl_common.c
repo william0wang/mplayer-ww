@@ -2444,6 +2444,7 @@ static void *eglgpa(const GLubyte *name) {
       "/usr/lib/libGLESv2.so",
       "/usr/lib/x86_64-linux-gnu/libGLESv2.so",
       "/usr/lib/i386-linux-gnu/libGLESv2.so",
+      "/usr/lib/arm-linux-gnueabihf/libGLESv2.so",
       NULL};
     int i;
     void *h = NULL;
