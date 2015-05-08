@@ -181,7 +181,7 @@ int parse_filename(char *file, play_tree_t *playtree, m_config_t *mconfig, int c
     if(clear)
         mygui->playlist->clear_playlist(mygui->playlist);
 
-    if(strstr(file, ".m3u") || strstr(file, ".pls"))
+    if(strstr(file, ".m3u") || strstr(file, ".m4u") || strstr(file, ".mxu") || strstr(file, ".pls"))
     {
         playtree = parse_playlist_file(file);
         guiPlaylist(GUI_PLAYLIST_ADD, playtree, mconfig, 0);

@@ -193,7 +193,7 @@ static void display_loadplaylistwindow(gui_t *gui)
     playlistopen.hwndOwner = gui->mainwindow;
     playlistopen.hInstance = GetModuleHandle(NULL);
     playlistopen.lpstrFilter = "All Files (*.*)\0*.*\0"
-                               "Playlist Files (*.m3u;*.pls;*.txt)\0*.m3u;*.pls;*.txt\0";
+                               "Playlist Files (*.m3u;*.m4u;*.mxu;*.pls;*.txt)\0*.m3u;*.m4u;*.mxu;*.pls;*.txt\0";
     playlistopen.nFilterIndex = 0;
     playlistopen.lpstrTitle = acp(MSGTR_GUI_WIN32_SelectPlaylist);
     playlistopen.Flags = OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_EXPLORER | OFN_READONLY | OFN_HIDEREADONLY;
