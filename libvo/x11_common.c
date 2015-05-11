@@ -826,6 +826,19 @@ err:
     return 0;
 }
 
+static void fixup_ctrl_state(int *ctrl_state, int state)
+{
+    // Attempt to fix if somehow our state got out of
+    // sync with reality.
+    // This usually happens when a shortcut involving CTRL
+    // was used to switch to a different window/workspace.
+    if (*ctrl_state != !!(state & 4)) {
+        *ctrl_state = !!(state & 4);
+        mplayer_put_key(KEY_CTRL |
+            (*ctrl_state ? MP_KEY_DOWN : 0));
+    }
+}
+
 static int handle_x11_event(Display *mydisplay, XEvent *event)
 {
     int key = 0;
@@ -872,15 +885,7 @@ static int handle_x11_event(Display *mydisplay, XEvent *event)
                     } else if (event->type == KeyRelease) {
                         break;
                     }
-                    // Attempt to fix if somehow our state got out of
-                    // sync with reality.
-                    // This usually happens when a shortcut involving CTRL
-                    // was used to switch to a different window/workspace.
-                    if (ctrl_state != !!(event->xkey.state & 4)) {
-                        ctrl_state = !!(event->xkey.state & 4);
-                        mplayer_put_key(KEY_CTRL |
-                            (ctrl_state ? MP_KEY_DOWN : 0));
-                    }
+                    fixup_ctrl_state(&ctrl_state, event->xkey.state);
                     if (!vo_x11_putkey_ext(keySym)) {
                         if (utf8) mplayer_put_key(utf8);
                         else vo_x11_putkey(key);
@@ -896,6 +901,7 @@ static int handle_x11_event(Display *mydisplay, XEvent *event)
                 key = MP_KEY_DOWN;
                 /* Fallthrough, treat like release otherwise */
             case ButtonRelease:
+                fixup_ctrl_state(&ctrl_state, event->xbutton.state);
 #ifdef CONFIG_GUI
                 // Ignore mouse button 1-3 under GUI.
                 if (use_gui && (event->xbutton.button >= 1)
