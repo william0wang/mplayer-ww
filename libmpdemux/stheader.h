@@ -68,6 +68,9 @@ typedef struct sh_audio {
   char* a_buffer;
   int a_buffer_len;
   int a_buffer_size;
+  int a_buffer_format_change; // audio data in the input buffer is subject
+                              // to a format change but data in the old
+                              // format is still present in the out buffer
   // output buffers:
   char* a_out_buffer;
   int a_out_buffer_len;
