@@ -1584,7 +1584,7 @@ libavdecoders=$(filter_out_component decoder 'LIB[A-Z0-9_]* H264_QSV H264_MMAL')
 libavencoders=$(filter_out_component encoder 'LIB[A-Z0-9_]* H264_QSV NVENC[A-Z0-9_]*')
 libavdemuxers=$(filter_out_component demuxer 'AVISYNTH LIB[A-Z0-9_]* REDIR')
 libavmuxers=$(filter_out_component muxer 'LIB[A-Z0-9_]* RTP RTSP SAP')
-libavprotocols=$(filter_out_component protocol 'BLURAY FFRTMPCRYPT HTTPS LIB[A-Z0-9_]* TLS')
+libavprotocols=$(filter_out_component protocol 'BLURAY FFRTMPCRYPT HTTPS LIB[A-Z0-9_]* TLS TLS_GNUTLS TLS_OPENSSL')
 libavfilters=$(filter_out_component filter 'FREI0R[A-Z0-9_]* LIB[A-Z0-9_]* MP OCV')
 
 # second pass command line parsing for options needing local FFmpeg checkout
@@ -4370,7 +4370,7 @@ if test "$_gnutls" = auto ; then
 fi
 if test "$_gnutls" = yes ; then
   def_gnutls='#define CONFIG_GNUTLS 1'
-  libavprotocols="$libavprotocols HTTPS_PROTOCOL TLS_PROTOCOL"
+  libavprotocols="$libavprotocols HTTPS_PROTOCOL TLS_PROTOCOL TLS_GNUTLS_PROTOCOL"
   extra_cflags="$extra_cflags $($_pkg_config --cflags gnutls)"
   extra_ldflags="$extra_ldflags $($_pkg_config --libs gnutls)"
 else
