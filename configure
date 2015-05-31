@@ -6135,12 +6135,13 @@ echores "$_dvdread"
 
 
 echocheck "libcdio"
+header_check cdio/cdda.h && _inc_paranoia=cdio || _inc_paranoia=cdio/paranoia
 if test "$_libcdio" = auto ; then
         cat > $TMPC << EOF
 #include <stdio.h>
 #include <cdio/version.h>
-#include <cdio/cdda.h>
-#include <cdio/paranoia.h>
+#include <$_inc_paranoia/cdda.h>
+#include <$_inc_paranoia/paranoia.h>
 int main(void) {
     void *test = cdda_verbose_set;
     printf("%s\n", CDIO_VERSION);
@@ -6164,10 +6165,19 @@ if test "$_libcdio" = yes ; then
     _cdda='yes'
     _cdparanoia=no
     def_libcdio='#define CONFIG_LIBCDIO 1'
+    if test "$_inc_paranoia" = cdio ; then
+      def_cdio_paranoia_h='#define HAVE_CDIO_PARANOIA_H 1'
+      def_cdio_paranoia_paranoia_h='#define HAVE_CDIO_PARANOIA_PARANOIA_H 0'
+    else
+      def_cdio_paranoia_h='#define HAVE_CDIO_PARANOIA_H 0'
+      def_cdio_paranoia_paranoia_h='#define HAVE_CDIO_PARANOIA_PARANOIA_H 1'
+    fi
     def_havelibcdio='yes'
 else
     _libcdio=no
     def_libcdio='#undef CONFIG_LIBCDIO'
+    def_cdio_paranoia_h='#define HAVE_CDIO_PARANOIA_H 0'
+    def_cdio_paranoia_paranoia_h='#define HAVE_CDIO_PARANOIA_PARANOIA_H 0'
     def_havelibcdio='no'
 fi
 echores "$_libcdio"
@@ -8777,6 +8787,8 @@ $def_sys_videoio_h
 $def_termios_h
 $def_termios_sys_h
 $def_winsock2_h
+$def_cdio_paranoia_h
+$def_cdio_paranoia_paranoia_h
 
 
 /* system functions */

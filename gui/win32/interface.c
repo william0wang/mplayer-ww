@@ -24,7 +24,11 @@
 #include "config.h"
 
 #if defined(CONFIG_LIBCDIO)
+#if HAVE_CDIO_PARANOIA_H
 #include <cdio/cdda.h>
+#elif HAVE_CDIO_PARANOIA_PARANOIA_H
+#include <cdio/paranoia/cdda.h>
+#endif
 #elif defined(CONFIG_CDDA)
 #include <cdda_interface.h>
 #endif
