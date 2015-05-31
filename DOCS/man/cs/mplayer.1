@@ -1636,9 +1636,9 @@ velikost snímku v bajtech
 .RE
 .PD 0
 .RSs
-.IPs "mplayer foreman.qcif -demuxer rawvideo -rawvideo qcif"
+.IPs "mplayer foreman.qcif \-demuxer rawvideo \-rawvideo qcif"
 Přehraje věhlasné "foreman" vzorkové video.
-.IPs "mplayer sample-720x576.yuv -demuxer rawvideo -rawvideo w=720:h=576"
+.IPs "mplayer sample-720x576.yuv \-demuxer rawvideo \-rawvideo w=720:h=576"
 Přehraje surový YUV sampl.
 .RE
 .PD 1
@@ -1750,7 +1750,7 @@ Nastaví TV zařízení (výchozí: /dev/\:video0).
 .I POZNÁMKA:
 Při použití ovladače bsdbt848 můžete zadat jméno zařízení bktr i tuner.
 Oddělte je čárkou, tuner až po bktr
-(čili -tv device=/dev/bktr1,/dev/tuner1).
+(čili \-tv device=/dev/bktr1,/dev/tuner1).
 .IPs input=<hodnota>
 Nastaví vstup (výchozí: 0 (TV), viz seznam vypsaný na konzoli).
 .IPs freq=<hodnota>
@@ -1898,7 +1898,7 @@ Seznam podporovaných kódů jazyků dostanete nastavením této volby na \-1.
 .TP
 .B \-tvscan <parametr1:parametr2:...> (pouze TV a MPlayer)
 Doladí scanner TV kanálu.
-MPlayer rovněž vypíše hodnotu pro volbu "-tv channels="
+MPlayer rovněž vypíše hodnotu pro volbu "\-tv channels="
 a to pro existující i právě nalezené kanály.
 .sp 1
 Dostupné parametry jsou:
@@ -4959,7 +4959,7 @@ dostanete vzdálenosti s1 až s5 (pro systém 5.1).
 Není důvod kompenzovat subwoofer (rozdíl byste stejně neslyšeli).
 .IP 2. 3
 Přiřaďte vzdálenosti s1 až s5 od nejdelší, čili
-s[i] = max(s) - s[i]; i = 1...5.
+s[i] = max(s) \- s[i]; i = 1...5.
 .IP 3.
 Vypočtěte nutná zpoždění v ms jako d[i] = 1000*s[i]/342; i = 1...5.
 .RE
@@ -5266,7 +5266,7 @@ Použijete-li \-zoom, a podkladové filtry (včetně libvo) nejsou schopny
 .br
 \-3:   Vypočítá š/v pomocí druhého rozměru a původního poměru stran.
 .br
--(n+8): Jako výše uvedené -n, ale zaokrouhlí rozměr na nejbližší násobek 16.
+\-(n+8): Jako výše uvedené \-n, ale zaokrouhlí rozměr na nejbližší násobek 16.
 .REss
 .IPs <proklad>
 Přepíná prokládané škálování.
@@ -7775,7 +7775,7 @@ I/B-snímkový kvantizer = P-snímkový kvantizer * v{b|i}_qfactor + v{b|i}_qoff
 else
 .br
 provádět normální řízení toku (nefixovat se na kvantizer následujícího P-snímku) a
-nastavit q= -q * v{b|i}_qfactor + v{b|i}_qoffset
+nastavit q= \-q * v{b|i}_qfactor + v{b|i}_qoffset
 .br
 .I TIP:
 Chcete-li enkódovat s konstantním kvantizerem a odlišnými kvantizery pro

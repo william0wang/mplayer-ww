@@ -2393,7 +2393,7 @@ disturbato usando immediatemode=0.
 .TP
 .B \-tvscan <opzione1:opzione2:...> (solo TV e MPlayer)
 Imposta lo scanner dei canali TV.
-MPlayer emetterà anche dei valori per l'opzione "-tv channels=", includendo
+MPlayer emetterà anche dei valori per l'opzione "\-tv channels=", includendo
 canali esistenti e appena trovati.
 .sp 1
 Le sotto opzioni disponibili sono:
@@ -3092,7 +3092,7 @@ in percentuale sulla gamma totale (default: 3).
 .B \-volume <-1\-100> (vedi anche \-af volume)
 Imposta sul mixer il volume in apertura, sia hardware o software (se usato con
 \-softvol).
-Un valore di -1 (default) non modifica il volume.
+Un valore di \-1 (default) non modifica il volume.
 .
 .
 .
@@ -3563,7 +3563,7 @@ Regola la gamma del segnale video (default: 0).
 Non è supportato da tutti i driver di uscita video.
 .
 .TP
-.B \-geometry x[%][:y[%]] o [WxH][+x+y]
+.B \-geometry x[%][:y[%]] o [WxH][+\-x+\-y]
 Regola dove viene visualizzata l'uscita sullo schermo inizialmente.
 I valori di x ed y sono in pixel misurati dall'angolo alto a sinistra
 dello schermo all'angolo alto a sinistra dell'immagine visualizzata,
@@ -3571,8 +3571,8 @@ comunque se viene aggiunto il segno di percentuale ad un argomento,
 il valore viene convertito in una percentuale della dimensione
 dello schermo in quella direzione.
 Supporta anche il formato dell'opzione standard di X \-geometry, nel quale
-+10-50 significa "posiziona 10 pixel dal bordo sinistro e 50 pixel dal bordo in
-basso", mentre "--20+-10" significa "posiziona 20 pixel oltre la destra e 10
++10\-50 significa "posiziona 10 pixel dal bordo sinistro e 50 pixel dal bordo in
+basso", mentre "\-\-20+\-10" significa "posiziona 20 pixel oltre la destra e 10
 pixel oltre il bordo in alto".
 Se viene specificata una finestra esterna utilizzando l'opzione \-wid
 allora le coordinate x ed y sono relative all'angolo in alto a sinistra
@@ -4901,7 +4901,7 @@ Il formato è lo stesso utilizzato da mjpegtools, perciò questo è utile
 se vuoi elaborare il video con la suite mjpegtools.
 Supporta il formato YV12.
 Se il tuo file ha un formato differente ed è interlacciato, assicurati di usare
--vf scale=::1 affinché la conversione utilizzi la modalità interlacciata.
+\-vf scale=::1 affinché la conversione utilizzi la modalità interlacciata.
 Può combinarlo con l'opzione \-fixed\-vo per concatenare file con le stesse
 dimensioni e la stessa frequenza (fps).
 .PD 0
@@ -8257,7 +8257,7 @@ Il rilascio può essere necessario per evitare di confondere i codificatori.
 .RS
 .I NOTA:
 Utilizzare questo filtro con qualsiasi tipo di posizionamento (seek) (inclusi
--ss e EDL), può causare comportamenti inattesi e bizzarri.
+\-ss e EDL), può causare comportamenti inattesi e bizzarri.
 .RE
 .
 .

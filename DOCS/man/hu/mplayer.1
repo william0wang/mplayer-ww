@@ -2131,7 +2131,7 @@ eredményezve, ha immediatemode=0-t használsz.
 .TP
 .B \-tvscan <opció1:opció2:...> (csak TV és MPlayer)
 A TV csatorna kereső finomhangolására használható opció.
-Az MPlayer kiírja az értékeket a "-tv channels=" opcióhoz,
+Az MPlayer kiírja az értékeket a "\-tv channels=" opcióhoz,
 beleértve a már meglévő és az épp megtalált csatornákat.
 .sp 1
 Az elérhető alopciók:
@@ -2308,7 +2308,7 @@ Lásd még a \-dump*sub és \-vobsubout* opciókat is.
 .B \-embeddedfonts (csak FreeType)
 Engedélyezi a matroska beágyazott betűinek kicsomagolását (alapértelmezett: kikapcsolva).
 Ezek a betűtípusok használhatóak az SSA/ASS feliratok
-rendereléséhez (-ass kapcsoló).
+rendereléséhez (\-ass kapcsoló).
 A betűtípus fájlok a ~/.mplayer/fonts könyvtárban lesznek létrehozva.
 .br
 .I MEGJEGYZÉS:
@@ -2772,7 +2772,7 @@ százalékában (alapértelmezett: 3).
 .B \-volume <-1\-100> (lásd még \-af volume)
 Beállítja a kezdő hangerőt a keverőben, akár hardveres, akár szoftveres (ha a
 \-softvol-lal együtt használod).
-A -1-es érték (alapértelmezett) nem változtat a hangerőn.
+A \-1-es érték (alapértelmezett) nem változtat a hangerőn.
 .
 .
 .
@@ -3230,14 +3230,14 @@ A teljes képernyős váltás javítása OpenBox 1.x-en.
 .PD 1
 .
 .TP
-.B \-geometry x[%][:y[%]] vagy [WxH][+-x+-y]
+.B \-geometry x[%][:y[%]] vagy [WxH][+\-x+\-y]
 Annak beállítása hogy kezdéskor hova lesz kirakva a video.
 Az x és y érték a képernyő bal felső sarkától a megjelenítendő ablak
 bal felső sarkáig mért távolság pixelben, vagy ha egy százalék jelet
 írsz az érték mögé, akkor a képernyő adott irányú méretének százalék
 érték lesz. Támogatja továbbá a szabványos X11 \-geometry opció formátumot
-is, melyben pl. a +10-50 azt jelenti, hogy "tedd 10 pixellel a bal szegély
-mellé és 50 pixellel az alsó szegély fölé", a "--20+-10" pedig azt, hogy
+is, melyben pl. a +10\-50 azt jelenti, hogy "tedd 10 pixellel a bal szegély
+mellé és 50 pixellel az alsó szegély fölé", a "\-\-20+\-10" pedig azt, hogy
 "tedd 20 pixellel a jobb szegélyen túl és 10 pixellel a felső szegély fölé".
 Ha egy külső ablak is meg van adva a \-wid opcióval, akkor az x és y
 koordináták az ablak bal felső sarkához viszonyulnak a képernyő helyett.
@@ -3814,7 +3814,7 @@ Mac OS X CoreVideo kimeneti videó vezérlő
 .PD 0
 .RSs
 .IPs device_id=<szám>
-Teljes képernyős lejátszásnál a használni kívánt képernyő eszköz, vagy -1-re állítva
+Teljes képernyős lejátszásnál a használni kívánt képernyő eszköz, vagy \-1-re állítva
 mindig ugyan azt a képernyőt használja, amelyiken a videó ablak van (alapértelmezett: \-1 \- auto).
 .
 .IPs shared_buffer
@@ -4057,7 +4057,7 @@ A részletekért lásd a lscale-t.
 Beállítja a lscale/cscale szűrők erősségét, ahol ez támogatott.
 .IPs stereo=<érték>
 Kiválaszt egy módszert a sztereó képernyőkhöz.
-Valószínűleg használnod kell a -aspect kapcsolót a képarány javításához.
+Valószínűleg használnod kell a \-aspect kapcsolót a képarány javításához.
 Kísérleti dolog, ne várj tőle túl sokat.
 .RSss
 0: Normális 2D képernyő
@@ -4469,7 +4469,7 @@ A formátum ugyan az, mint amit az mjpegtools alkalmaz, így ez akkor
 hasznos, ha a videót az mjpegtools-szal akarod feldolgozni.
 Az YV12 formátumot támogatja.
 Ha a forrás fájlodnak eltérő formátuma van és átlapolt, akkor használd
-a -vf scale=::1 opciót, hogy kényszerítsd az átlapolt módú konvertálást.
+a \-vf scale=::1 opciót, hogy kényszerítsd az átlapolt módú konvertálást.
 Kombinálhatod a \-fixed\-vo opcióval ugyanolyan képméretű és fps
 értékű fájlok összefűzéséhez.
 .PD 0
@@ -7660,7 +7660,7 @@ Az eldobásuk szükséges lehet, hogy a kódolók ne zavarodjanak össze.
 .sp 1
 .RS
 .I MEGJEGYZÉS:
-Ezen szűrő és bármelyik keresési forma (beleértve a -ss -t és az EDL-eket)
+Ezen szűrő és bármelyik keresési forma (beleértve a \-ss -t és az EDL-eket)
 együttes használata kiszabadíthatja a szellemet a palackból.
 .RE
 .

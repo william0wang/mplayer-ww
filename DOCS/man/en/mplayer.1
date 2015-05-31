@@ -1294,8 +1294,8 @@ maliciously constructed files.
 Such files may trigger harmful actions.
 This has been the case for all MPlayer versions, but unfortunately this
 fact was not well documented earlier, and some people have even misguidedly
-recommended use of -playlist with untrusted sources.
-Do NOT use -playlist with random internet sources or files you don't trust!
+recommended use of \-playlist with untrusted sources.
+Do NOT use \-playlist with random internet sources or files you don't trust!
 .br
 .I NOTE:
 This option is considered an entry so options found after it will apply
@@ -2060,9 +2060,9 @@ frame size in Bytes
 .RE
 .PD 0
 .RSs
-.IPs "mplayer foreman.qcif -demuxer rawvideo -rawvideo qcif"
+.IPs "mplayer foreman.qcif \-demuxer rawvideo \-rawvideo qcif"
 Play the famous "foreman" sample video.
-.IPs "mplayer sample-720x576.yuv -demuxer rawvideo -rawvideo w=720:h=576"
+.IPs "mplayer sample-720x576.yuv \-demuxer rawvideo \-rawvideo w=720:h=576"
 Play a raw YUV sample.
 .RE
 .PD 1
@@ -2185,7 +2185,7 @@ Specify TV device (default: /dev/\:video0).
 .I NOTE:
 For the bsdbt848 driver you can provide both bktr and tuner device
 names separating them with a comma, tuner after
-bktr (e.g.\& -tv device=/dev/bktr1,/dev/tuner1).
+bktr (e.g.\& \-tv device=/dev/bktr1,/dev/tuner1).
 .IPs input=<value>
 Specify input (default: 0 (TV), see console output for available inputs).
 .IPs freq=<value>
@@ -2353,7 +2353,7 @@ choppy video when using immediatemode=0.
 .TP
 .B \-tvscan <option1:option2:...> (TV and MPlayer only)
 Tune the TV channel scanner.
-MPlayer will also print value for "-tv channels=" option,
+MPlayer will also print value for "\-tv channels=" option,
 including existing and just found channels.
 .sp 1
 Available suboptions are:
@@ -2811,8 +2811,8 @@ CC subtitles have not been spotted on DVDs from other regions so far.
 .TP
 .B \-subcp <codepage> (iconv only)
 If your system supports iconv(3), you can use this option to
-specify the subtitle codepage. It takes priority over both -utf8 and
--unicode.
+specify the subtitle codepage. It takes priority over both \-utf8 and
+\-unicode.
 .sp 1
 .I EXAMPLE:
 .PD 0
@@ -2961,7 +2961,7 @@ used for the OSD and clear it (default: ^[[A\\r^[[K).
 .TP
 .B \-unicode
 Tells MPlayer to handle the subtitle file as unicode. (It will only take
-effect if neither -subcp nor -utf8 is given.)
+effect if neither \-subcp nor \-utf8 is given.)
 .
 .TP
 .B \-unrarexec <path to unrar executable> (not supported on MingW)
@@ -2972,7 +2972,7 @@ The path must include the executable's filename, i.e.\& /usr/local/bin/unrar.
 .TP
 .B "\-utf8 \ \ "
 Tells MPlayer to handle the subtitle file as UTF-8. (It will only take effect
-if -subcp isn't given, and it takes priority over -unicode.)
+if \-subcp isn't given, and it takes priority over \-unicode.)
 .
 .TP
 .B \-vobsub <VOBsub file without extension>
@@ -3043,7 +3043,7 @@ Set the step size of mixer volume changes in percent of the whole range
 .B \-volume <-1\-100> (also see \-af volume)
 Set the startup volume in the mixer, either hardware or software (if
 used with \-softvol).
-A value of -1 (the default) will not change the volume.
+A value of \-1 (the default) will not change the volume.
 .
 .
 .
@@ -3528,15 +3528,15 @@ Adjust the gamma of the video signal (default: 0).
 Not supported by all video output drivers.
 .
 .TP
-.B \-geometry x[%][:y[%]] or [WxH][+-x+-y]
+.B \-geometry x[%][:y[%]] or [WxH][+\-x+\-y]
 Adjust where the output is on the screen initially.
 The x and y specifications are in pixels measured from the top-left of the
 screen to the top-left of the image being displayed, however if a percentage
 sign is given after the argument it turns the value into a percentage of the
 screen size in that direction.
 It also supports the standard X11 \-geometry option format, in which e.g.
-+10-50 means "place 10 pixels from the left border and 50 pixels from the lower
-border" and "--20+-10" means "place 20 pixels beyond the right and 10 pixels
++10\-50 means "place 10 pixels from the left border and 50 pixels from the lower
+border" and "\-\-20+\-10" means "place 20 pixels beyond the right and 10 pixels
 beyond the top border".
 If an external window is specified using the \-wid option, then the x and
 y coordinates are relative to the top-left corner of the window rather
@@ -3675,7 +3675,7 @@ As \-border\-pos\-x but for top/bottom borders.
 Rotate display by 90, 180 or 270 degrees.
 Rotates also the OSD, not just the video image itself.
 Currently only supported by the gl video output driver.
-For all other video outputs -vf ass,expand=osd=1,rotate=n can be used, in the future this might even happen automatically.
+For all other video outputs \-vf ass,expand=osd=1,rotate=n can be used, in the future this might even happen automatically.
 .
 .TP
 .B \-refreshrate <Hz>
@@ -4228,9 +4228,9 @@ Use glxinfo or a similar tool to display the supported OpenGL extensions.
 .PD 0
 .RSs
 .IPs backend=<n>
-Select the backend/OpenGL implementation to use (default: -1).
+Select the backend/OpenGL implementation to use (default: \-1).
 .RSss
--1: Autoselect
+\-1: Autoselect
 .br
 0: Win32/WGL
 .br
@@ -4800,7 +4800,7 @@ The format is the same as the one employed by mjpegtools, so this is
 useful if you want to process the video with the mjpegtools suite.
 It supports the YV12 format.
 If your source file has a different format and is interlaced, make sure
-to use -vf scale=::1 to ensure the conversion uses interlaced mode.
+to use \-vf scale=::1 to ensure the conversion uses interlaced mode.
 You can combine it with the \-fixed\-vo option to concatenate files
 with the same dimensions and fps value.
 .PD 0
@@ -6218,15 +6218,15 @@ Collects and prints statistics about the audio stream, especially the volume.
 These statistics are especially intended to help adjusting the volume while
 avoiding clipping.
 The volumes are printed in dB and compatible with the volume audio filter,
-they are always rounded towards -0dB.
+they are always rounded towards \-0dB.
 .sp 1
 The 'n_samples' field is the total number of samples seen by the filter.
 The 'mean_volume' field is the root mean square.
 The 'max_volume' field is exactly what it says.
-The 'histogram_Xdb' fields count how many samples were at -XdB, for X just
+The 'histogram_Xdb' fields count how many samples were at \-XdB, for X just
 below max_volume.
 .sp 1
-For example, if max_volume is -7dB and histogram_7dB is 19, 'volume=7' will
+For example, if max_volume is \-7dB and histogram_7dB is 19, 'volume=7' will
 not cause clipping and 'volume=8' will cause clipping on exactly 19 samples.
 .
 .
@@ -7155,7 +7155,7 @@ filters.
 .I EXAMPLE:
 .br
 overlay="movie=$small_video, scale=160:120 [ca]; [in] [ca] overlay=16:8"
-mplayer -vf lavfi='$overlay' $big_video
+mplayer \-vf lavfi='$overlay' $big_video
 .
 .TP
 .B kerndeint[=thresh[:map[:order[:sharp[:twoway]]]]]
@@ -8115,7 +8115,7 @@ To use either of the interleaved-rows output formats to display
 full-screen on a row-interleaved 3D display, you will need to scale the
 video to the correct height first using the "scale" filter, if it is not
 already the right height.  Typically, that is 1080 rows (so use e.g.
-"-vf scale=1440:1080,stereo3d=sbsl:irl" for a 720p side-by-side encoded
+"\-vf scale=1440:1080,stereo3d=sbsl:irl" for a 720p side-by-side encoded
 movie).
 .RE
 .PD 1
@@ -8179,7 +8179,7 @@ Dropping it may be necessary to avoid confusing encoders.
 .sp 1
 .RS
 .I NOTE:
-Using this filter together with any sort of seeking (including -ss and EDLs)
+Using this filter together with any sort of seeking (including \-ss and EDLs)
 may make demons fly out of your nose.
 .RE
 .

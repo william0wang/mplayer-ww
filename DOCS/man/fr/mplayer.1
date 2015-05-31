@@ -1216,7 +1216,7 @@ d'information de contrôle.
 Sélectionne le canal audio (MPEG: 0\-31 AVI/\:OGM: 1\-99 ASF/\:RM: 0\-127
 VOB(AC-3): 128\-159 VOB(LPCM): 160\-191 MPEG-TS 17\-8190).
 MPlayer affiche les IDs audios disponibles quand il est lancé en mode
-bavard (-v).
+bavard (\-v).
 Pour jouer des flux MPEG-TS, MPlayer/\:MEncoder utilisera le premier programme
 (si présent) avec le flux audio choisi.
 .
@@ -1830,9 +1830,9 @@ taille de trame en octets
 .RE
 .PD 0
 .RSs
-.IPs "mplayer foreman.qcif -demuxer rawvideo -rawvideo qcif"
+.IPs "mplayer foreman.qcif \-demuxer rawvideo \-rawvideo qcif"
 Joue le fameux morceau de vidéo "foreman".
-.IPs "mplayer sample-720x576.yuv -demuxer rawvideo -rawvideo w=720:h=576"
+.IPs "mplayer sample-720x576.yuv \-demuxer rawvideo \-rawvideo w=720:h=576"
 Joue un morceau de vidéo YUV.
 .RE
 .PD 1
@@ -1961,7 +1961,7 @@ Défini un périphérique TV (par défaut /dev/\:video0).
 .I NOTE\ :
 Pour le pilote bsdbt848 vous pouvez donner autant bktr que tuner en tant que nom
 de périphérique, séparé par une virgule, en plaçant tuner après bktr
-(ex\ : -tv device=/dev/bktr1,/dev/tuner1).
+(ex\ : \-tv device=/dev/bktr1,/dev/tuner1).
 .IPs input=<valeur>
 Défini une autre entrée que celle par défaut 0 (Télévision) (voir
 la sortie console pour en obtenir la liste)
@@ -2135,7 +2135,7 @@ débouchant à une vidéo haché avec l'option immediatemode=0.
 .TP
 .B \-tvscan <option1:option2:...> (TV et MPlayer uniquement)
 Ajuste le scanner de chaînes TV.
-MPlayer affichera aussi des informations avec l'option "-tv channels=",
+MPlayer affichera aussi des informations avec l'option "\-tv channels=",
 comprenant les chaînes existantes et celles nouvellement trouvées.
 .sp 1
 Les sous-options disponibles sont:
@@ -2729,7 +2729,7 @@ Définit le numéro de sous-titre du fichier VOBsub.
 .B \-volume <-1\-100> (voir aussi \-af volume)
 Défini le niveau de démarrage du volume mixeur, soit matériel ou matériel
 (si l'option \-softvol est aussi activée).
-La valeur -1 (par défaut) ne change pas le volume.
+La valeur \-1 (par défaut) ne change pas le volume.
 .
 .
 .SH "OPTIONS DE SORTIE AUDIO (MPLAYER UNIQUEMENT)"
@@ -3869,8 +3869,8 @@ pilote de sortie vidéo CoreVideo pour Mac OS X
 .PD 0
 .RSs
 .IPs device_id=<numéro>
-Choisir le moniteur à utiliser en plein-écran (par défaut\ : -1).
-La valeur -1 laisse la vidéo sur le même écran.
+Choisir le moniteur à utiliser en plein-écran (par défaut\ : \-1).
+La valeur \-1 laisse la vidéo sur le même écran.
 .IPs shared_buffer
 Écrit la sortie dans un tampon partagé au lieu de l'afficher, et essaye
 d'établir une NSConnection avec une IHM existante.
@@ -4836,7 +4836,7 @@ Affiche des informations de débogage.
 .br
 32: vecteur de mouvement (MV)
 .br
-0x0040: visualisation du vecteur de mouvement (utilisez -noslices)
+0x0040: visualisation du vecteur de mouvement (utilisez \-noslices)
 .br
 0x0080: saut macro-bloc (MB)
 .br
@@ -5589,7 +5589,7 @@ Cette fonctionnalité peut créer des distortions, et ne devrait
 .I EXEMPLE\ :
 .RE
 .RSs
-.IPs "mplayer -af volume=10.1:0 media.avi"
+.IPs "mplayer \-af volume=10.1:0 media.avi"
 amplifierait le son de 10.1dB et bloque le volume s'il est
 trop haut.
 .RE
@@ -5665,7 +5665,7 @@ si nécessaire.
 .I EXEMPLE\ :
 .RE
 .RSs
-.IPs "mplayer \-af sub=100:4 -channels 5 media.avi"
+.IPs "mplayer \-af sub=100:4 \-channels 5 media.avi"
 Ajoutera un canal pour caisson de basse dont la fréquence de
 coupure sera de 100Hz, et sera envoyé vers le canal 4.
 .RE
@@ -5739,7 +5739,7 @@ Ce n'est pas la peine de le faire pour le caisson de basses (vous
 n'entendrez pas la différence de toute façon).
 .IP 2. 3
 Soustrayez les distances s1 à s5 à la distance maximum c-à-d.\&
-s[i] = max(s) - s[i]; i = 1...5.
+s[i] = max(s) \- s[i]; i = 1...5.
 .IP 3.
 Calculez les décalages requis (en ms) ainsi\ :
 d[i] = 1000*s[i]/342; i = 1...5
