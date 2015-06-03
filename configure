@@ -604,8 +604,8 @@ Use these options if autodetection fails:
 
   --with-freetype-config=PATH path to freetype-config
   --with-sdl-config=PATH      path to sdl*-config
-  --with-dvdnav-config=PATH   path to dvdnav-config, also disables internal dvdread and dvdnav
-  --with-dvdread-config=PATH  path to dvdread-config, also disables internal dvdread and dvdnav
+  --with-dvdnav-config=PATH   path to dvdnav-config
+  --with-dvdread-config=PATH  path to dvdread-config
 
 This configure script is NOT autoconf-based, even though its output is similar.
 It will try to autodetect all configuration options. If you --enable an option
@@ -8337,9 +8337,6 @@ CXXFLAGS = $WARNFLAGS $CXXFLAGS $extra_cflags $extra_cxxflags
 CC_DEPFLAGS = $DEPFLAGS
 
 CFLAGS_DHAHELPER         = $cflags_dhahelper
-CFLAGS_LIBDVDCSS         = $cflags_libdvdcss
-CFLAGS_LIBDVDCSS_DVDREAD = $cflags_libdvdcss_dvdread
-CFLAGS_LIBDVDNAV         = $cflags_libdvdnav
 CFLAGS_NO_OMIT_LEAF_FRAME_POINTER = $cflags_no_omit_leaf_frame_pointer
 CFLAGS_STACKREALIGN      = $cflags_stackrealign
 CFLAGS_SVGALIB_HELPER    = $cflags_svgalib_helper
@@ -8397,9 +8394,7 @@ DIRECTFB = $_directfb
 DIRECTX = $_directx
 DVBIN = $_dvbin
 DVDNAV = $_dvdnav
-DVDNAV_INTERNAL = $dvdnav_internal
 DVDREAD = $_dvdread
-DVDREAD_INTERNAL = $_dvdread_internal
 DXR2 = $_dxr2
 DXR3 = $_dxr3
 ESD = $_esd
@@ -8438,7 +8433,6 @@ LIBBLURAY = $_bluray
 LIBBS2B = $_libbs2b
 LIBDCA = $_libdca
 LIBDV = $_libdv
-LIBDVDCSS_INTERNAL = $_libdvdcss_internal
 LIBLZO = $_liblzo
 LIBMAD = $_mad
 LIBMENU = $_menu

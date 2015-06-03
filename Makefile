@@ -840,8 +840,6 @@ loader/win32%: CFLAGS += $(CFLAGS_STACKREALIGN)
 
 mp3lib/decode_i586%: CFLAGS += -fomit-frame-pointer
 
-stream/stream_dvdnav%: CFLAGS := $(CFLAGS_LIBDVDNAV) $(CFLAGS)
-
 tremor/%: CFLAGS += $(CFLAGS_TREMOR_LOW)
 
 vidix/%: CFLAGS += $(CFLAGS_DHAHELPER) $(CFLAGS_SVGALIB_HELPER)
