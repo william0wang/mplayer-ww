@@ -695,7 +695,6 @@ DIRS =  .                       \
         loader/dmo              \
         loader/dshow            \
         loader/wine             \
-        mp3lib                  \
         osdep                   \
         stream                  \
         stream/freesdp          \
@@ -708,7 +707,6 @@ DIRS =  .                       \
 ALL_DIRS = $(DIRS)              \
            libass               \
            libmpeg2             \
-           tremor               \
 
 ALLHEADERS = $(foreach dir,$(DIRS),$(wildcard $(dir)/*.h))
 
@@ -837,10 +835,6 @@ gui/%: CFLAGS += -Wno-strict-prototypes
 loader/%: CFLAGS += -fno-omit-frame-pointer $(CFLAGS_NO_OMIT_LEAF_FRAME_POINTER)
 #loader/%: CFLAGS += -Ddbg_printf=__vprintf -DTRACE=__vprintf -DDETAILED_OUT
 loader/win32%: CFLAGS += $(CFLAGS_STACKREALIGN)
-
-mp3lib/decode_i586%: CFLAGS += -fomit-frame-pointer
-
-tremor/%: CFLAGS += $(CFLAGS_TREMOR_LOW)
 
 vidix/%: CFLAGS += $(CFLAGS_DHAHELPER) $(CFLAGS_SVGALIB_HELPER)
 

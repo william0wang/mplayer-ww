@@ -34,7 +34,6 @@ float drc_level = 1.0;
 /* Missed vorbis, mad, dshow */
 
 extern const ad_functions_t mpcodecs_ad_mpg123;
-extern const ad_functions_t mpcodecs_ad_mp3lib;
 extern const ad_functions_t mpcodecs_ad_ffmpeg;
 extern const ad_functions_t mpcodecs_ad_liba52;
 extern const ad_functions_t mpcodecs_ad_hwac3;
