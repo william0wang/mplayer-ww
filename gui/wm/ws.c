@@ -1210,7 +1210,7 @@ void wsWindowFullscreen(wsWindow *win)
     }
 
     /* some window managers lose ontop after fullscreen */
-    if (!win->isFullScreen & vo_ontop)
+    if (!win->isFullScreen && vo_ontop)
         wsWindowLayer(wsDisplay, win->WindowID, vo_ontop);
 
     wsWindowRaiseTop(wsDisplay, win->WindowID);
