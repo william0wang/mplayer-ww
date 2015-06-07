@@ -828,6 +828,13 @@ int gui(int what, void *data)
           gui(GUI_SET_STATE, (void *) GUI_STOP);
           break;
         }
+#ifdef __WINE__
+        // it's possible to have an X11 video output driver (sending events)
+        case GUI_HANDLE_X_EVENT:
+        {
+          break;
+        }
+#endif
         default:
             mp_msg(MSGT_GPLAYER, MSGL_ERR, "[GUI] GOT UNHANDLED EVENT %i\n", what);
     }
