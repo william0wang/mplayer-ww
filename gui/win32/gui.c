@@ -864,7 +864,7 @@ static LRESULT CALLBACK EventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
                 RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
                 handlemsg(hWnd, gui->activewidget->msg);
 
-                if(gui->activewidget->type == tyRpotmeter)
+                if(gui->activewidget && gui->activewidget->type == tyRpotmeter)
                 {
                     prev_point = appRadian(gui->activewidget, gui->mousewx, gui->mousewy) - gui->activewidget->zeropoint;
                     if(prev_point < 0.0) prev_point += 2 * M_PI;
