@@ -6115,7 +6115,7 @@ if test "$_dvdread" = auto ; then
   _dvdread=no
     _dvdreadcflags=$($_dvdreadconfig --cflags 2> /dev/null)
     _dvdreadlibs=$($_dvdreadconfig --libs 2> /dev/null)
-    if header_check dvdread/dvd_reader.h $_dvdreadcflags $_dvdreadlibs ; then
+    if statement_check dvdread/dvd_reader.h 'DVDOpen("test")' $_dvdreadcflags $_dvdreadlibs ; then
       _dvdread=yes
       extra_cflags="$extra_cflags $_dvdreadcflags"
       extra_ldflags="$extra_ldflags $_dvdreadlibs"
@@ -8070,7 +8070,7 @@ if test "$_dvdnav" = auto ; then
   _dvdnav=no
   _dvdnavdir=$($_dvdnavconfig --cflags)
   _dvdnavlibs=$($_dvdnavconfig --libs)
-  statement_check_broken stdint.h dvdnav/dvdnav.h 'dvdnav_t *dvd = 0' $_dvdnavdir $_dvdnavlibs $ld_dl $ld_pthread && _dvdnav=yes
+  statement_check_broken stdint.h dvdnav/dvdnav.h 'dvdnav_t *dvd = 0; dvdnav_open(&dvd, 0)' $_dvdnavdir $_dvdnavlibs $ld_dl $ld_pthread && _dvdnav=yes
 fi
 if test "$_dvdnav" = yes ; then
   def_dvdnav='#define CONFIG_DVDNAV 1'
