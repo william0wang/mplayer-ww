@@ -5177,6 +5177,9 @@ struct libs
 #define UNDEFF(X, Y) \
     {#X, Y, (void*)-1},
 
+#define UNDEFORD(Y) \
+    {NULL, Y, (void*)-1},
+
 static const struct exports exp_kernel32[]=
 {
     FF(GetVolumeInformationA,-1)
@@ -5751,6 +5754,8 @@ void* LookupExternal(const char* library, int ordinal)
 	    if(ordinal!=libraries[i].exps[j].id)
 		continue;
 	    //printf("Hit: 0x%p\n", libraries[i].exps[j].func);
+	    if((unsigned int)(libraries[i].exps[j].func) == -1)
+		return NULL; //undefined func
 	    return libraries[i].exps[j].func;
 	}
     }
@@ -5813,7 +5818,7 @@ void* LookupExternalByName(const char* library, const char* name)
 	    continue;
 	for(j=0; j<libraries[i].length; j++)
 	{
-	    if(strcmp(name, libraries[i].exps[j].name))
+	    if(libraries[i].exps[j].name && strcmp(name, libraries[i].exps[j].name))
 		continue;
  	    if((unsigned int)(libraries[i].exps[j].func) == -1)
 		return NULL; //undefined func
