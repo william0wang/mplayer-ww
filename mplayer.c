@@ -1521,7 +1521,7 @@ void set_osd_bar(int type, const char *name, double min, double max, double val)
         return;
 
     if (mpctx->sh_video) {
-        osd_visible = (GetTimerMS() + 1000) | 1;
+        osd_visible = (GetTimerMS() + osd_duration) | 1;
         vo_osd_progbar_type  = type;
         vo_osd_progbar_value = 256 * (val - min) / (max - min);
         vo_osd_changed(OSDTYPE_PROGBAR);
