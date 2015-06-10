@@ -23,7 +23,6 @@
 #include "ad_internal.h"
 #include "av_helpers.h"
 #include "libavformat/avformat.h"
-#include "libavformat/internal.h"
 #include "libavcodec/avcodec.h"
 #include "libavutil/opt.h"
 
@@ -130,7 +129,6 @@ static int init(sh_audio_t *sh)
             break;
         }
     }
-    lavf_ctx->internal->raw_packet_buffer_remaining_size = RAW_PACKET_BUFFER_SIZE;
     if (AVERROR_PATCHWELCOME == lavf_ctx->oformat->write_header(lavf_ctx)) {
         mp_msg(MSGT_DECAUDIO,MSGL_INFO,
                "This codec is not supported by spdifenc.\n");
