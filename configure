@@ -1581,7 +1581,7 @@ libavprotocols=$(echo $libavprotocols_all)
 libavfilters=$(echo $libavfilters_all)
 
 libavdecoders=$(filter_out_component decoder 'LIB[A-Z0-9_]* H264_QSV H264_MMAL')
-libavencoders=$(filter_out_component encoder 'LIB[A-Z0-9_]* H264_QSV NVENC[A-Z0-9_]* H264_NVENC[A-Z0-9_]* HEVC_NVENC[A-Z0-9_]*')
+libavencoders=$(filter_out_component encoder 'LIB[A-Z0-9_]* H264_QSV NVENC[A-Z0-9_]* H264_NVENC[A-Z0-9_]* HEVC_NVENC[A-Z0-9_]* HAP')
 libavdemuxers=$(filter_out_component demuxer 'AVISYNTH LIB[A-Z0-9_]* REDIR')
 libavmuxers=$(filter_out_component muxer 'LIB[A-Z0-9_]* RTP RTSP SAP')
 libavprotocols=$(filter_out_component protocol 'BLURAY FFRTMPCRYPT HTTPS LIB[A-Z0-9_]* TLS TLS_GNUTLS TLS_OPENSSL TLS_SECURETRANSPORT')
@@ -8624,6 +8624,7 @@ CONFIG_RIFFDEC = yes
 CONFIG_RIFFENC = yes
 CONFIG_RTPENC_CHAIN = yes
 CONFIG_SINEWIN = yes
+CONFIG_SNAPPY = yes
 CONFIG_STARTCODE = yes
 CONFIG_TEXTUREDSP = yes
 CONFIG_VIDEODSP = yes
@@ -9265,6 +9266,7 @@ $def_gnutls
 #define CONFIG_RDFT 1
 #define CONFIG_RIFFDEC 1
 #define CONFIG_RIFFENC 1
+#define CONFIG_SNAPPY 1
 #define CONFIG_STARTCODE 1
 #define CONFIG_TEXTUREDSP 1
 #define CONFIG_VIDEODSP 1
