@@ -235,6 +235,7 @@ static int pixfmt2imgfmt2(enum AVPixelFormat fmt, enum AVCodecID cid)
         case AV_CODEC_ID_MPEG4:      return IMGFMT_VDPAU_MPEG4;
         case AV_CODEC_ID_WMV3:       return IMGFMT_VDPAU_WMV3;
         case AV_CODEC_ID_VC1:        return IMGFMT_VDPAU_VC1;
+        case AV_CODEC_ID_HEVC:       return IMGFMT_VDPAU_HEVC;
         }
     return pixfmt2imgfmt(fmt);
 }

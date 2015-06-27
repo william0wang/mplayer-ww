@@ -620,6 +620,12 @@ static int create_vdp_decoder(uint32_t format, uint32_t width, uint32_t height,
     case IMGFMT_VDPAU_MPEG4:
         vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG4_PART2_ASP;
         break;
+#ifdef VDP_DECODER_PROFILE_HEVC_MAIN;
+    case IMGFMT_VDPAU_HEVC:
+        vdp_decoder_profile = VDP_DECODER_PROFILE_HEVC_MAIN;
+        mp_msg(MSGT_VO, MSGL_V, "[vdpau] Creating HEVC hardware decoder for %d reference frames.\n", max_refs);
+        break;
+#endif
     default:
         goto err_out;
     }
@@ -1028,7 +1034,17 @@ static int draw_slice(uint8_t *image[], int stride[], int w, int h,
 {
     VdpStatus vdp_st;
     struct vdpau_frame_data *rndr = (struct vdpau_frame_data *)image[0];
-    int max_refs = image_format == IMGFMT_VDPAU_H264 ? ((VdpPictureInfoH264 *)rndr->info)->num_ref_frames : 2;
+    int max_refs;
+    switch (image_format) {
+    case IMGFMT_VDPAU_H264:
+        max_refs = ((VdpPictureInfoH264 *)rndr->info)->num_ref_frames;
+        break;
+    case IMGFMT_VDPAU_HEVC:
+        max_refs = 16;
+        break;
+    default:
+        max_refs = 2;
+    }
 
     if (handle_preemption() < 0)
         return VO_TRUE;
@@ -1151,6 +1167,7 @@ static int query_format(uint32_t format)
     case IMGFMT_VDPAU_WMV3:
     case IMGFMT_VDPAU_VC1:
     case IMGFMT_VDPAU_MPEG4:
+    case IMGFMT_VDPAU_HEVC:
         // Note: this will break the current decoder
         // Not all implementations support safely instantiating
         // a second decoder, so this is the "lesser evil"

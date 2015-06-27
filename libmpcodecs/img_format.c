@@ -142,6 +142,7 @@ const char *vo_format_name(int format)
     case IMGFMT_VDPAU_MPEG4:     return "MPEG-4 Part 2 VDPAU acceleration";
     case IMGFMT_VDPAU_WMV3:      return "WMV3 VDPAU acceleration";
     case IMGFMT_VDPAU_VC1:       return "VC1 VDPAU acceleration";
+    case IMGFMT_VDPAU_HEVC:      return "HEVC VDPAU acceleration";
     }
     snprintf(unknown_format,20,"Unknown 0x%04x",format);
     return unknown_format;

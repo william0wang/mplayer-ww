@@ -290,6 +290,7 @@ static inline int normalize_yuvp16(int fmt) {
 #define IMGFMT_VDPAU_WMV3          (IMGFMT_VDPAU|0x04)
 #define IMGFMT_VDPAU_VC1           (IMGFMT_VDPAU|0x05)
 #define IMGFMT_VDPAU_MPEG4         (IMGFMT_VDPAU|0x06)
+#define IMGFMT_VDPAU_HEVC          (IMGFMT_VDPAU|0x07)
 
 #define IMGFMT_IS_HWACCEL(fmt) (IMGFMT_IS_VDPAU(fmt) || IMGFMT_IS_XVMC(fmt))
 

@@ -4721,6 +4721,7 @@ if test "$_vdpau" = auto && test "$_x11" = yes ; then
   _vdpau=no
   if test "$_dl" = yes ; then
     return_statement_check vdpau/vdpau_x11.h 'vdp_device_create_x11(0, 0, 0, 0)' VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 -lvdpau && _vdpau=yes
+    return_statement_check vdpau/vdpau_x11.h 'vdp_device_create_x11(0, 0, 0, 0)' VDP_DECODER_PROFILE_HEVC_MAIN -lvdpau && _vdpau_hevc=yes
   fi
 fi
 if test "$_vdpau" = yes ; then
@@ -4728,6 +4729,9 @@ if test "$_vdpau" = yes ; then
   libs_mplayer="$libs_mplayer -lvdpau"
   vomodules="vdpau $vomodules"
   libavhwaccels="$libavhwaccels H263_VDPAU_HWACCEL H264_VDPAU_HWACCEL MPEG1_VDPAU_HWACCEL MPEG2_VDPAU_HWACCEL MPEG4_VDPAU_HWACCEL VC1_VDPAU_HWACCEL WMV3_VDPAU_HWACCEL"
+  if test "$_vdpau_hevc" = yes ; then
+    libavhwaccels="$libavhwaccels HEVC_VDPAU_HWACCEL"
+  fi
 else
   def_vdpau='#define CONFIG_VDPAU 0'
   novomodules="vdpau $novomodules"
