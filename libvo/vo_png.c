@@ -167,6 +167,9 @@ static uint32_t draw_image(mp_image_t* mpi){
     pic = av_frame_alloc();
     avctx->width = mpi->w;
     avctx->height = mpi->h;
+    pic->width  = mpi->w;
+    pic->height = mpi->h;
+    pic->format = imgfmt2pixfmt(png_format);
     pic->data[0] = mpi->planes[0];
     pic->linesize[0] = mpi->stride[0];
     buffersize = mpi->w * mpi->h * 8;
