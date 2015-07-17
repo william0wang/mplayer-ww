@@ -9257,9 +9257,11 @@ $def_gnutls
 #define CONFIG_FAANDCT 1
 #define CONFIG_FAANIDCT 1
 #define CONFIG_FDCTDSP 1
+#define CONFIG_FLACDSP 1
 #define CONFIG_FMTCONVERT 1
 #define CONFIG_FRAME_THREAD_ENCODER 1
 #define CONFIG_FFT 1
+#define CONFIG_G722DSP 1
 #define CONFIG_GOLOMB 1
 #define CONFIG_H263DSP 1
 #define CONFIG_H264CHROMA 1
@@ -9268,21 +9270,27 @@ $def_gnutls
 #define CONFIG_H264QPEL 1
 #define CONFIG_HUFFMAN 1
 #define CONFIG_IDCTDSP 1
+#define CONFIG_IVIDSP 1
 #define CONFIG_LPC 1
 #define CONFIG_LZO 1
 #define CONFIG_MDCT 1
 #define CONFIG_ME_CMP 1
 #define CONFIG_MPEG_ER 1
 #define CONFIG_MPEGVIDEO 1
+#define CONFIG_MSS34DSP 1
 #define CONFIG_PIXBLOCKDSP 1
 #define CONFIG_RDFT 1
 #define CONFIG_RIFFDEC 1
 #define CONFIG_RIFFENC 1
+#define CONFIG_RV34DSP 1
 #define CONFIG_SNAPPY 1
 #define CONFIG_STARTCODE 1
 #define CONFIG_TEXTUREDSP 1
 #define CONFIG_VIDEODSP 1
+#define CONFIG_VP56DSP 1
+#define CONFIG_VP8DSP 1
 #define CONFIG_WMA_FREQS 1
+#define CONFIG_WMV2DSP 1
 
 /* Use these registers in FFmpeg x86 inline asm. No proper detection yet. */
 #ifndef MP_DEBUG
