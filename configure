@@ -8637,7 +8637,10 @@ CONFIG_STARTCODE = yes
 CONFIG_TEXTUREDSP = yes
 CONFIG_VIDEODSP = yes
 CONFIG_VP3DSP  = yes
+CONFIG_VP56DSP = yes
+CONFIG_VP8DSP = yes
 CONFIG_WMA_FREQS = yes
+CONFIG_WMV2DSP = yes
 
 $mak_hardcoded_tables
 $mak_libavcodec_mpegaudio_hp
