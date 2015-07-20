@@ -41,7 +41,7 @@ const char *fsdp_error_t_s[] = {
   "Syntax error in connection item", /** FSDPE_INVALID_CONNECTION **/
   "Unrecognized address type in connection item", /** FSDPE_INVALID_CONNECTION_ADDRTYPE **/
   "Unrecognized network type in connection item", /** FSDPE_INVALID_CONNECTION_NETTYPE **/
-  "Parse error in bandwith item", /** FSDPE_INVALID_BANDWIDTH **/
+  "Parse error in bandwidth item", /** FSDPE_INVALID_BANDWIDTH **/
   "No time period for the session", /** FSDPE_MISSING_TIME **/
   "Parse error in time item", /** FSDPE_INVALID_TIME **/
   "Parse error in repeat time item", /** FSDPE_INVALID_REPEAT **/
