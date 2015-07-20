@@ -26,6 +26,8 @@ MPlayer
       options will now require da instead of dk)
     * configure: options --enable-gtk1, --with-glib-config= and
       --with-gtk-config= removed
+    * Change ID3 genre name for genre ID 67 from "Psychadelic"
+      to "Psychedelic"
 
     Ports:
     * Windows: support file names as UTF-8 in slave mode and passing
