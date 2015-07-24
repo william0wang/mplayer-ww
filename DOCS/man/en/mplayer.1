@@ -3541,8 +3541,8 @@ beyond the top border".
 If an external window is specified using the \-wid option, then the x and
 y coordinates are relative to the top-left corner of the window rather
 than the screen.
-The coordinates are relative to the screen given with \-xineramascreen for
-the video output drivers that fully support \-xineramascreen (direct3d, gl, gl_tiled,
+The coordinates are relative to the screen given with \-screen for
+the video output drivers that fully support \-screen (direct3d, gl, gl_tiled,
 vdpau, x11, xv, xvmc, corevideo).
 .br
 .I NOTE:
@@ -3742,7 +3742,7 @@ panscan, etc are no longer handled by MPlayer but must be managed by the
 application that created the window.
 .
 .TP
-.B \-xineramascreen <\-2\-...>
+.B \-screen <\-2\-...> (alias for \-xineramascreen)
 In Xinerama configurations (i.e.\& a single desktop that spans across multiple
 displays) this option tells MPlayer which screen to display the movie on.
 A value of \-2 means fullscreen across the whole virtual display (in this case
@@ -4129,7 +4129,7 @@ Mac OS X CoreVideo video output driver
 .PD 0
 .RSs
 .IPs device_id=<number>
-DEPRECATED, use \-xineramascreen instead.
+DEPRECATED, use \-screen instead.
 Choose the display device to use for fullscreen or set it to \-1 to
 always use the same screen the video window is on (default: \-1 \- auto).
 .IPs shared_buffer

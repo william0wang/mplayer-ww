@@ -201,6 +201,7 @@ const m_option_t mplayer_opts[]={
     {"nomouseinput", &vo_nomouse_input, CONF_TYPE_FLAG,0, 0, 1, NULL},
 
     {"xineramascreen", &xinerama_screen, CONF_TYPE_INT, CONF_RANGE, -2, 32, NULL},
+    {"screen",         &xinerama_screen, CONF_TYPE_INT, CONF_RANGE, -2, 32, NULL},
 
     {"brightness",&vo_gamma_brightness, CONF_TYPE_INT, CONF_RANGE, -100, 100, NULL},
     {"saturation",&vo_gamma_saturation, CONF_TYPE_INT, CONF_RANGE, -100, 100, NULL},
