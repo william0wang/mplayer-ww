@@ -7433,6 +7433,7 @@ if test "$_zr" = yes ; then
     vomodules="zr zr2 $vomodules"
     mplayer_encoders="$mplayer_encoders MJPEG_ENCODER"
 else
+    _zr=no
     def_zr='#undef CONFIG_ZR'
     novomodules="zr zr2 $novomodules"
 fi
@@ -7583,6 +7584,7 @@ if test "$_tv_dshow" = yes ; then
   def_tv_dshow='#define CONFIG_TV_DSHOW 1'
   extra_ldflags="$extra_ldflags -lole32 -luuid"
 else
+  _tv_dshow=no
   noinputmodules="tv-dshow $noinputmodules"
   def_tv_dshow='#undef CONFIG_TV_DSHOW'
 fi
@@ -7601,6 +7603,7 @@ if test "$_tv_v4l1" = yes ; then
   def_tv_v4l1='#define CONFIG_TV_V4L1 1'
   inputmodules="tv-v4l $inputmodules"
 else
+  _tv_v4l1=no
   noinputmodules="tv-v4l1 $noinputmodules"
   def_tv_v4l='#undef CONFIG_TV_V4L'
 fi
@@ -7662,6 +7665,7 @@ fi
 if test "$_radio_v4l2" = yes ; then
   def_radio_v4l2='#define CONFIG_RADIO_V4L2 1'
 else
+  _radio_v4l2=no
   def_radio_v4l2='#undef CONFIG_RADIO_V4L2'
 fi
 echores "$_radio_v4l2"
@@ -7675,6 +7679,7 @@ fi
 if test "$_radio_v4l" = yes ; then
   def_radio_v4l='#define CONFIG_RADIO_V4L 1'
 else
+  _radio_v4l=no
   def_radio_v4l='#undef CONFIG_RADIO_V4L'
 fi
 echores "$_radio_v4l"
@@ -7698,6 +7703,7 @@ fi #if freebsd || netbsd || openbsd || dragonfly || bsdos && _radio && _radio_bs
 if test "$_radio_bsdbt848" = yes ; then
   def_radio_bsdbt848='#define CONFIG_RADIO_BSDBT848 1'
 else
+  _radio_bsdbt848=no
   def_radio_bsdbt848='#undef CONFIG_RADIO_BSDBT848'
 fi
 
@@ -7720,6 +7726,7 @@ if test "$_pvr" = yes ; then
   def_pvr='#define CONFIG_PVR 1'
   inputmodules="pvr $inputmodules"
 else
+  _pvr=no
   noinputmodules="pvr $noinputmodules"
   def_pvr='#undef CONFIG_PVR'
 fi
