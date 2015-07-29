@@ -1,4 +1,4 @@
-.\" sync with en/mplayer.1 rev. 37406
+.\" sync with en/mplayer.1 rev. 37436
 .\" MPlayer (C) 2000-2015 MPlayer Team
 .\" This man page was/is translated by JRaSH<jrash06 at gmail.com>
 .
@@ -3541,8 +3541,8 @@ x 和 y 指定的是从屏幕左上角到所显示图像的左上角\
 如果使用 \-wid 选项指定了外部窗口，\
 那么 x 和 y 坐标是相对于窗口而非\
 屏幕的左上角。\
-使用完全支持 \-xineramascreen 的视频输出的驱动（direct3d、gl、gl_tiled、\
-vdpau、x11、xv、xvmc、corevideo）时，坐标是相对于 \-xineramascreen 选项\
+使用完全支持 \-screen 的视频输出的驱动（direct3d、gl、gl_tiled、\
+vdpau、x11、xv、xvmc、corevideo）时，坐标是相对于 \-screen 选项\
 所给屏幕的值。
 .br
 .I 注意：
@@ -3742,7 +3742,7 @@ dga、x11、xv、sdl 和 directx 视频输出驱动支持该选项。\
 程序管理。
 .
 .TP
-.B \-xineramascreen <\-2\-...>
+.B \-screen <\-2\-...>（\-xineramascreen 的别名）
 在 Xinerama 配置过程中（即单个桌面跨越多个显示终端显示），\
 该选项告诉 MPlayer 将影片显示在哪个屏幕上。\
 值为 \-2 表示跨越整个虚拟显示终端全屏幕显示（在这种\
@@ -4129,7 +4129,7 @@ Mac OS X CoreVideo 视频输出驱动
 .PD 0
 .RSs
 .IPs device_id=<数值>
-过时选项，可使用 \-xineramascreen 代替。
+过时选项，可使用 \-screen 代替。
 选择用于全屏模式的显示设备，或将其设为 \-1 以总是使用视频窗口所在的屏幕\
 （默认值：\-1 \- 自动选择）。
 .IPs shared_buffer
