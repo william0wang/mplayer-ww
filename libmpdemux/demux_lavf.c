@@ -406,7 +406,10 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
                 sh_video->default_track = 1;
             if (rot && rot->value)
                 mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VID_%d_ROTATE=%s\n", priv->video_streams, rot->value);
-            mp_msg(MSGT_DEMUX,MSGL_DBG2,"aspect= %d*%d/(%d*%d)\n",
+            mp_msg(MSGT_DEMUX,MSGL_DBG2,"stream aspect= %d*%d/(%d*%d)\n",
+                codec->width, st->sample_aspect_ratio.num,
+                codec->height, st->sample_aspect_ratio.den);
+            mp_msg(MSGT_DEMUX,MSGL_DBG2,"codec aspect= %d*%d/(%d*%d)\n",
                 codec->width, codec->sample_aspect_ratio.num,
                 codec->height, codec->sample_aspect_ratio.den);
 
