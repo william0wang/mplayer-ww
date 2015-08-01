@@ -134,19 +134,19 @@ static int pngRead(const char *fname, guiImage *img)
     memset(img, 0, sizeof(*img));
 
     switch (avctx->pix_fmt) {
-    case PIX_FMT_GRAY8:
+    case AV_PIX_FMT_GRAY8:
         img->Bpp = 8;
         break;
 
-    case PIX_FMT_GRAY16BE:
+    case AV_PIX_FMT_GRAY16BE:
         img->Bpp = 16;
         break;
 
-    case PIX_FMT_RGB24:
+    case AV_PIX_FMT_RGB24:
         img->Bpp = 24;
         break;
 
-    case PIX_FMT_RGBA:
+    case AV_PIX_FMT_RGBA:
         img->Bpp = 32;
         break;
 

@@ -364,10 +364,10 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
 
             if (codec->codec_id == AV_CODEC_ID_RAWVIDEO) {
                 switch (codec->pix_fmt) {
-                    case PIX_FMT_RGB24:
+                    case AV_PIX_FMT_RGB24:
                         codec->codec_tag= MKTAG(24, 'B', 'G', 'R');
                         break;
-                    case PIX_FMT_BGR24:
+                    case AV_PIX_FMT_BGR24:
                         codec->codec_tag= MKTAG(24, 'R', 'G', 'B');
                         break;
                 }

@@ -74,7 +74,7 @@ draw_slice_g200(uint8_t *image[], int stride[], int width,int height,int x,int y
 	int dst_stride[4] = { bespitch, bespitch };
 	uint8_t *dst[4];
 
-	av_image_fill_pointers(dst, PIX_FMT_NV12, mga_vid_config.src_height,
+	av_image_fill_pointers(dst, AV_PIX_FMT_NV12, mga_vid_config.src_height,
 	                       vid_data, dst_stride);
 
 	sws_scale(sws_ctx, image, stride, y, height, dst, dst_stride);
@@ -419,8 +419,8 @@ static int mga_init(int width,int height,unsigned int format){
 		}
 	}
 	if (mga_vid_config.card_type == MGA_G200) {
-		sws_ctx = sws_getContext(width, height, PIX_FMT_YUV420P,
-		                         width, height, PIX_FMT_NV12,
+		sws_ctx = sws_getContext(width, height, AV_PIX_FMT_YUV420P,
+		                         width, height, AV_PIX_FMT_NV12,
 		                         SWS_BILINEAR, NULL, NULL, NULL);
 		if (!sws_ctx) {
 			mp_msg(MSGT_VO, MSGL_FATAL,

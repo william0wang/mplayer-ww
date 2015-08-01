@@ -587,7 +587,7 @@ static int config(struct vf_instance *vf,
 
     mux_v->imgfmt = lavc_param_format;
     lavc_venc_context->pix_fmt = imgfmt2pixfmt(lavc_param_format);
-    if (lavc_venc_context->pix_fmt == PIX_FMT_NONE)
+    if (lavc_venc_context->pix_fmt == AV_PIX_FMT_NONE)
         return 0;
 
     if(!stats_file) {

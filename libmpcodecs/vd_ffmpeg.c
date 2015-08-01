@@ -191,7 +191,7 @@ static int control(sh_video_t *sh, int cmd, void *arg, ...){
 #if CONFIG_XVMC
         case IMGFMT_XVMC_IDCT_MPEG2:
         case IMGFMT_XVMC_MOCO_MPEG2:
-            if(avctx->pix_fmt==PIX_FMT_XVMC_MPEG2_IDCT) return CONTROL_TRUE;
+            if(avctx->pix_fmt == AV_PIX_FMT_XVMC_MPEG2_IDCT) return CONTROL_TRUE;
 #endif
         }
         return CONTROL_FALSE;
@@ -289,7 +289,7 @@ static void set_format_params(struct AVCodecContext *avctx,
     sh_video_t *sh     = avctx->opaque;
     vd_ffmpeg_ctx *ctx = sh->context;
     int imgfmt;
-    if (fmt == PIX_FMT_NONE)
+    if (fmt == AV_PIX_FMT_NONE)
         return;
     ctx->use_hwaccel = fmt == AV_PIX_FMT_VDPAU;
     imgfmt = pixfmt2imgfmt2(fmt, avctx->codec_id);
@@ -1127,7 +1127,7 @@ static enum AVPixelFormat get_format(struct AVCodecContext *avctx,
         for (i = 0; fmt[i] != AV_PIX_FMT_NONE; i++)
             if (fmt[i] == ctx->pix_fmt) return ctx->pix_fmt;
 
-    for(i=0;fmt[i]!=PIX_FMT_NONE;i++){
+    for(i=0;fmt[i]!=AV_PIX_FMT_NONE;i++){
         // it is incorrect of FFmpeg to even offer these, filter them out
         if(!(avctx->codec->capabilities & CODEC_CAP_HWACCEL_VDPAU) &&
            (fmt[i] == AV_PIX_FMT_VDPAU_MPEG1 || fmt[i] == AV_PIX_FMT_VDPAU_MPEG2))
@@ -1140,7 +1140,7 @@ static enum AVPixelFormat get_format(struct AVCodecContext *avctx,
         }
     }
     selected_format = fmt[i];
-    if (selected_format == PIX_FMT_NONE) {
+    if (selected_format == AV_PIX_FMT_NONE) {
         selected_format = avcodec_default_get_format(avctx, fmt);
         update_configuration(sh, selected_format, 1);
     }

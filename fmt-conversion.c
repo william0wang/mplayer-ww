@@ -155,7 +155,7 @@ enum AVPixelFormat imgfmt2pixfmt(int fmt)
         if (conversion_map[i].fmt == fmt)
             break;
     pix_fmt = conversion_map[i].pix_fmt;
-    if (pix_fmt == PIX_FMT_NONE)
+    if (pix_fmt == AV_PIX_FMT_NONE)
         mp_msg(MSGT_GLOBAL, MSGL_ERR, "Unsupported format %s\n", vo_format_name(fmt));
     return pix_fmt;
 }
@@ -164,7 +164,7 @@ int pixfmt2imgfmt(enum AVPixelFormat pix_fmt)
 {
     int i;
     int fmt;
-    for (i = 0; conversion_map[i].pix_fmt != PIX_FMT_NONE; i++)
+    for (i = 0; conversion_map[i].pix_fmt != AV_PIX_FMT_NONE; i++)
         if (conversion_map[i].pix_fmt == pix_fmt)
             break;
     fmt = conversion_map[i].fmt;

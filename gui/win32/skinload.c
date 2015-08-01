@@ -185,12 +185,12 @@ static image *pngRead(skin_t *skin, const char *fname)
       int src_stride[4] = { 4 * bmp.Width, 0, 0, 0 };
       uint8_t *dst[4] = { NULL, NULL, NULL, NULL };
       int dst_stride[4];
-      enum AVPixelFormat out_pix_fmt = PIX_FMT_NONE;
+      enum AVPixelFormat out_pix_fmt = AV_PIX_FMT_NONE;
       struct SwsContext *sws;
-      if      (skin->desktopbpp == 16) out_pix_fmt = PIX_FMT_RGB555;
-      else if (skin->desktopbpp == 24) out_pix_fmt = PIX_FMT_RGB24;
+      if      (skin->desktopbpp == 16) out_pix_fmt = AV_PIX_FMT_RGB555;
+      else if (skin->desktopbpp == 24) out_pix_fmt = AV_PIX_FMT_RGB24;
       av_image_fill_linesizes(dst_stride, out_pix_fmt, bmp.Width);
-      sws = sws_getContext(bmp.Width, bmp.Height, PIX_FMT_RGB32,
+      sws = sws_getContext(bmp.Width, bmp.Height, AV_PIX_FMT_RGB32,
                            bmp.Width, bmp.Height, out_pix_fmt,
                            SWS_POINT, NULL, NULL, NULL);
       bf->data = malloc(bf->size);

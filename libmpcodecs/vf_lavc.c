@@ -161,7 +161,7 @@ static int vf_open(vf_instance_t *vf, char *args){
     lavc_venc_context.time_base.num = 1000*1001;
     lavc_venc_context.time_base.den = (p_fps<1.0) ? 1000*1001*25 : (p_fps * lavc_venc_context.time_base.num);
     lavc_venc_context.gop_size = 0; // I-only
-    lavc_venc_context.pix_fmt= PIX_FMT_YUV420P;
+    lavc_venc_context.pix_fmt= AV_PIX_FMT_YUV420P;
 
     return 1;
 }

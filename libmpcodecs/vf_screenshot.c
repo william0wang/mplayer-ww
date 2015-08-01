@@ -78,7 +78,7 @@ static int config(struct vf_instance *vf,
     av_fast_malloc(&vf->priv->outbuffer, &vf->priv->outbuffer_size, d_width * d_height * 3 * 2);
     if (!vf->priv->avctx) {
         vf->priv->avctx = avcodec_alloc_context3(NULL);
-        vf->priv->avctx->pix_fmt = PIX_FMT_RGB24;
+        vf->priv->avctx->pix_fmt = AV_PIX_FMT_RGB24;
         vf->priv->avctx->width = d_width;
         vf->priv->avctx->height = d_height;
         vf->priv->avctx->compression_level = 0;
