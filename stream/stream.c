@@ -366,6 +366,9 @@ int stream_fill_buffer(stream_t *s){
       break;
     s->buf_len += len;
   }
+  // since the first read succeeded we are
+  // definitely not at EOF yet
+  s->eof = 0;
 //  printf("[%d]",len);fflush(stdout);
   if (s->capture_file)
     stream_capture_do(s);
