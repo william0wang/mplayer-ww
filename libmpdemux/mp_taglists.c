@@ -84,7 +84,7 @@ static const struct AVCodecTag mp_wav_tags[] = {
     { AV_CODEC_ID_TTA,               MKTAG('T', 'T', 'A', '1') },
     { AV_CODEC_ID_TWINVQ,            MKTAG('T', 'W', 'I', '2') },
 #if LIBAVUTIL_VERSION_MICRO >= 100
-    { AV_CODEC_ID_VIMA,              MKTAG('V', 'I', 'M', 'A') },
+    { AV_CODEC_ID_ADPCM_VIMA,        MKTAG('V', 'I', 'M', 'A') },
 #endif
     { AV_CODEC_ID_VMDAUDIO,          MKTAG('V', 'M', 'D', 'A') },
     { AV_CODEC_ID_WAVPACK,           MKTAG('W', 'V', 'P', 'K') },
