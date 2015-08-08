@@ -144,7 +144,7 @@ static int vf_open(vf_instance_t *vf, char *args){
     }
 
     vf->priv->context=avcodec_alloc_context3(vf->priv->codec);
-    vf->priv->pic = avcodec_alloc_frame();
+    vf->priv->pic = av_frame_alloc();
 
     // TODO: parse args ->
     if(args) sscanf(args, "%d:%f", &p_quality, &p_fps);

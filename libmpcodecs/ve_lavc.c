@@ -987,7 +987,7 @@ static int vf_open(vf_instance_t *vf, char* args){
 	return 0;
     }
 
-    vf->priv->pic = avcodec_alloc_frame();
+    vf->priv->pic = av_frame_alloc();
     vf->priv->context = avcodec_alloc_context3(vf->priv->codec);
     vf->priv->context->codec_id = vf->priv->codec->id;
 

@@ -251,7 +251,7 @@ static int config(struct vf_instance *vf,
             av_dict_free(&opts);
 
         }
-        vf->priv->frame= avcodec_alloc_frame();
+        vf->priv->frame= av_frame_alloc();
 
         vf->priv->outbuf_size= width*height*10;
         vf->priv->outbuf= malloc(vf->priv->outbuf_size);
