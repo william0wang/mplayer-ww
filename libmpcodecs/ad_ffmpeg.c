@@ -46,6 +46,7 @@ LIBAD_EXTERN(ffmpeg)
 
 #include "libavcodec/avcodec.h"
 #include "libavutil/dict.h"
+#include "libavutil/channel_layout.h"
 
 struct adctx {
     int last_samplerate;
@@ -127,7 +128,7 @@ static int init(sh_audio_t *sh_audio)
 	lavc_context->bits_per_coded_sample = sh_audio->wf->wBitsPerSample;
     }
     lavc_context->channel_layout = sh_audio->channel_layout;
-    lavc_context->request_channels = audio_output_channels;
+    lavc_context->request_channel_layout = av_get_default_channel_layout(audio_output_channels);
     lavc_context->codec_tag = sh_audio->format; //FOURCC
     lavc_context->codec_id = lavc_codec->id; // not sure if required, imho not --A'rpi
 
