@@ -682,16 +682,9 @@ static int demux_lavf_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
         return 1;
     }
 
-    if(pkt.destruct == av_destruct_packet && !CONFIG_MEMALIGN_HACK){
-        dp=new_demux_packet(0);
-        dp->len=pkt.size;
-        dp->buffer=pkt.data;
-        pkt.destruct= NULL;
-    }else{
         dp=new_demux_packet(pkt.size);
         memcpy(dp->buffer, pkt.data, pkt.size);
         av_free_packet(&pkt);
-    }
 
     if(pkt.pts != AV_NOPTS_VALUE){
         dp->pts=pkt.pts * av_q2d(priv->avfc->streams[id]->time_base);
