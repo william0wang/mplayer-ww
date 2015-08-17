@@ -269,6 +269,9 @@ static void set_dr_slice_settings(struct AVCodecContext *avctx, const AVCodec *l
     if (lavc_param_vismv || (lavc_param_debug & (FF_DEBUG_VIS_MB_TYPE|FF_DEBUG_VIS_QP))) {
         ctx->do_slices = ctx->do_dr1 = 0;
     }
+#ifndef CODEC_FLAG_EMU_EDGE
+#define CODEC_FLAG_EMU_EDGE 0
+#endif
     if(ctx->do_dr1){
         avctx->flags |= CODEC_FLAG_EMU_EDGE;
         avctx->  reget_buffer =
