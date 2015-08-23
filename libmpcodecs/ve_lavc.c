@@ -273,7 +273,7 @@ const m_option_t lavcopts_conf[]={
 	{"intra_matrix", &lavc_param_intra_matrix, CONF_TYPE_STRING, 0, 0, 0, NULL},
 	{"inter_matrix", &lavc_param_inter_matrix, CONF_TYPE_STRING, 0, 0, 0, NULL},
 	{"cbp", "Please use o=mpv_flags=+cbp_rd instead of cbp.\n", CONF_TYPE_PRINT, 0, 0, 0, NULL},
-	{"mv0", &lavc_param_mv0, CONF_TYPE_FLAG, 0, 0, CODEC_FLAG_MV0, NULL},
+	{"mv0", "Please use o=mpv_flags=+mv0 instead of mv0.\n", CONF_TYPE_PRINT, 0, 0, 0, NULL},
 	{"nr", &lavc_param_noise_reduction, CONF_TYPE_INT, CONF_RANGE, 0, 1000000, NULL},
 	{"qprd", "Please use o=mpv_flags=+qp_rd instead of qprd.\n", CONF_TYPE_PRINT, 0, 0, 0, NULL},
 	{"ss", &lavc_param_ss, CONF_TYPE_FLAG, 0, 0, 1, NULL},
@@ -641,7 +641,7 @@ static int config(struct vf_instance *vf,
 	  lavc_venc_context->flags &= ~CODEC_FLAG_QPEL;
 	  lavc_venc_context->flags &= ~CODEC_FLAG_4MV;
 	  lavc_venc_context->trellis = 0;
-	  lavc_venc_context->flags &= ~CODEC_FLAG_MV0;
+	  av_dict_set(&opts, "mpv_flags", "-mv0", 0);
 	  av_dict_set(&opts, "mpv_flags", "-qp_rd-cbp_rd", 0);
 	}
 	break;
