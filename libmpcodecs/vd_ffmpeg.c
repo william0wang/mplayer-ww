@@ -870,15 +870,6 @@ static void release_buffer(struct AVCodecContext *avctx, AVFrame *pic){
 //printf("R%X %X\n", pic->linesize[0], pic->data[0]);
 }
 
-// copypaste from demux_real.c - it should match to get it working!
-//FIXME put into some header
-typedef struct dp_hdr_s {
-    uint32_t chunks;        // number of chunks
-    uint32_t timestamp; // timestamp from packet header
-    uint32_t len;        // length of actual data
-    uint32_t chunktab;        // offset to chunk offset array
-} dp_hdr_t;
-
 static av_unused void swap_palette(void *pal)
 {
     int i;
