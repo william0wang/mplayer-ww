@@ -90,7 +90,7 @@ typedef struct {
     int b_count;
     AVRational last_sample_aspect_ratio;
     int palette_sent;
-    int use_hwaccel;
+    int use_vdpau;
 } vd_ffmpeg_ctx;
 
 #include "m_option.h"
@@ -216,7 +216,7 @@ static int vdpau_render_wrapper(AVCodecContext *s, AVFrame *f,
     sh_video_t *sh = s->opaque;
     struct vdpau_frame_data data;
     uint8_t *planes[4] = {(void *)&data};
-    data.render_state = mpi->priv;
+    data.surface = (VdpVideoSurface)mpi->priv;
     data.info = info;
     data.bitstream_buffers_used = count;
     data.bitstream_buffers = buffers;
@@ -294,10 +294,10 @@ static void set_format_params(struct AVCodecContext *avctx,
     int imgfmt;
     if (fmt == AV_PIX_FMT_NONE)
         return;
-    ctx->use_hwaccel = fmt == AV_PIX_FMT_VDPAU;
+    ctx->use_vdpau = fmt == AV_PIX_FMT_VDPAU;
     imgfmt = pixfmt2imgfmt2(fmt, avctx->codec_id);
 #if CONFIG_VDPAU
-    if (!ctx->use_hwaccel) {
+    if (!ctx->use_vdpau) {
         av_freep(&avctx->hwaccel_context);
     } else {
         AVVDPAUContext *vdpc = avctx->hwaccel_context;
@@ -315,7 +315,7 @@ static void set_format_params(struct AVCodecContext *avctx,
         mp_msg(MSGT_DECVIDEO, MSGL_V, IMGFMT_IS_XVMC(imgfmt) ?
                MSGTR_MPCODECS_XVMCAcceleratedMPEG2 :
                "[VD_FFMPEG] VDPAU accelerated decoding\n");
-        if (ctx->use_hwaccel) {
+        if (ctx->use_vdpau) {
             avctx->draw_horiz_band = NULL;
             avctx->slice_flags = 0;
             ctx->do_slices = 0;
@@ -555,17 +555,10 @@ static void draw_slice(struct AVCodecContext *s,
         mp_msg(MSGT_DECVIDEO, MSGL_FATAL, "BUG in FFmpeg, draw_slice called with NULL pointer!\n");
         return;
     }
-    if (mpi && ctx->use_hwaccel) {
+    if (mpi && ctx->use_vdpau) {
         mp_msg(MSGT_DECVIDEO, MSGL_FATAL, "BUG in FFmpeg, draw_slice called for VDPAU!\n");
         return;
     }
-#if CONFIG_VDPAU
-    if (mpi && IMGFMT_IS_VDPAU(mpi->imgfmt)) {
-        struct vdpau_render_state *render = mpi->priv;
-        vdpau_render_wrapper(s, src, &render->info, render->bitstream_buffers_used, render->bitstream_buffers);
-        return;
-    }
-#endif
     if (height < 0)
     {
         int i;
@@ -762,14 +755,11 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
         avctx->draw_horiz_band= draw_slice;
     } else
         avctx->draw_horiz_band= NULL;
-    if(IMGFMT_IS_HWACCEL(mpi->imgfmt)) {
-        avctx->draw_horiz_band= draw_slice;
-    }
 #if CONFIG_VDPAU
-    if (ctx->use_hwaccel) {
-        struct vdpau_render_state *render = mpi->priv;
+    if (ctx->use_vdpau) {
+        VdpVideoSurface surface = (VdpVideoSurface)mpi->priv;
         avctx->draw_horiz_band= NULL;
-        mpi->planes[3] = render->surface;
+        mpi->planes[3] = surface;
     }
 #endif
 #if CONFIG_XVMC
@@ -784,6 +774,7 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
             mp_msg(MSGT_DECVIDEO, MSGL_DBG5, "vd_ffmpeg::get_buffer (xvmc render=%p)\n", render);
         assert(render != 0);
         assert(render->xvmc_id == AV_XVMC_ID);
+        avctx->draw_horiz_band= draw_slice;
     }
 #endif
 
@@ -1131,10 +1122,6 @@ static enum AVPixelFormat get_format(struct AVCodecContext *avctx,
             if (fmt[i] == ctx->pix_fmt) return ctx->pix_fmt;
 
     for(i=0;fmt[i]!=AV_PIX_FMT_NONE;i++){
-        // it is incorrect of FFmpeg to even offer these, filter them out
-        if(!(avctx->codec->capabilities & CODEC_CAP_HWACCEL_VDPAU) &&
-           (fmt[i] == AV_PIX_FMT_VDPAU_MPEG1 || fmt[i] == AV_PIX_FMT_VDPAU_MPEG2))
-            continue;
         imgfmt = pixfmt2imgfmt2(fmt[i], avctx->codec_id);
         if(!IMGFMT_IS_HWACCEL(imgfmt) || !is_in_format_list(sh, imgfmt)) continue;
         mp_msg(MSGT_DECVIDEO, MSGL_V, MSGTR_MPCODECS_TryingPixfmt, i);

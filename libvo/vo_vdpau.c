@@ -174,7 +174,7 @@ static VdpRect                            src_rect_vid;
 static VdpRect                            out_rect_vid;
 static int                                border_l, border_r, border_t, border_b;
 
-static struct vdpau_render_state          surface_render[MAX_VIDEO_SURFACES];
+static VdpVideoSurface                    surface_render[MAX_VIDEO_SURFACES];
 static int                                surface_num;
 static int                                vid_surface_num;
 static uint32_t                           vid_width, vid_height;
@@ -251,7 +251,7 @@ static void video_to_output_surface(void)
         return;
 
     if (deint < 2 || deint_surfaces[0] == VDP_INVALID_HANDLE)
-        push_deint_surface(surface_render[vid_surface_num].surface);
+        push_deint_surface(surface_render[vid_surface_num]);
 
     for (i = 0; i <= !!(deint > 1); i++) {
         int field = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;
@@ -274,12 +274,12 @@ static void video_to_output_surface(void)
         vdp_st = vdp_video_mixer_render(video_mixer, VDP_INVALID_HANDLE, 0,
                                         field, 2, deint_surfaces + 1,
                                         deint_surfaces[0],
-                                        1, &surface_render[vid_surface_num].surface,
+                                        1, &surface_render[vid_surface_num],
                                         &src_rect_vid,
                                         output_surface,
                                         NULL, &out_rect_vid, 0, NULL);
         CHECK_ST_WARNING("Error when calling vdp_video_mixer_render")
-        push_deint_surface(surface_render[vid_surface_num].surface);
+        push_deint_surface(surface_render[vid_surface_num]);
     }
 }
 
@@ -579,11 +579,11 @@ static void free_video_specific(void)
     }
 
     for (i = 0; i < MAX_VIDEO_SURFACES; i++) {
-        if (surface_render[i].surface != VDP_INVALID_HANDLE) {
-          vdp_st = vdp_video_surface_destroy(surface_render[i].surface);
+        if (surface_render[i] != VDP_INVALID_HANDLE) {
+          vdp_st = vdp_video_surface_destroy(surface_render[i]);
           CHECK_ST_WARNING("Error when calling vdp_video_surface_destroy")
         }
-        surface_render[i].surface = VDP_INVALID_HANDLE;
+        surface_render[i] = VDP_INVALID_HANDLE;
     }
 
     if (video_mixer != VDP_INVALID_HANDLE) {
@@ -620,7 +620,7 @@ static int create_vdp_decoder(uint32_t format, uint32_t width, uint32_t height,
     case IMGFMT_VDPAU_MPEG4:
         vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG4_PART2_ASP;
         break;
-#ifdef VDP_DECODER_PROFILE_HEVC_MAIN;
+#ifdef VDP_DECODER_PROFILE_HEVC_MAIN
     case IMGFMT_VDPAU_HEVC:
         vdp_decoder_profile = VDP_DECODER_PROFILE_HEVC_MAIN;
         mp_msg(MSGT_VO, MSGL_V, "[vdpau] Creating HEVC hardware decoder for %d reference frames.\n", max_refs);
@@ -647,7 +647,7 @@ static void mark_vdpau_objects_uninitialized(void)
     int i;
 
     for (i = 0; i < MAX_VIDEO_SURFACES; i++)
-        surface_render[i].surface = VDP_INVALID_HANDLE;
+        surface_render[i] = VDP_INVALID_HANDLE;
     vdp_flip_queue  = VDP_INVALID_HANDLE;
     vdp_flip_target = VDP_INVALID_HANDLE;
     for (i = 0; i <= NUM_OUTPUT_SURFACES; i++)
@@ -1015,7 +1015,7 @@ static void flip_page(void)
 {
     VdpStatus vdp_st;
     mp_msg(MSGT_VO, MSGL_DBG2, "\nFLIP_PAGE VID:%u -> OUT:%u\n",
-           surface_render[vid_surface_num].surface, output_surfaces[surface_num]);
+           surface_render[vid_surface_num], output_surfaces[surface_num]);
 
     if (handle_preemption() < 0)
         return;
@@ -1055,34 +1055,45 @@ static int draw_slice(uint8_t *image[], int stride[], int w, int h,
         && !create_vdp_decoder(image_format, vid_width, vid_height, max_refs))
         return VO_FALSE;
 
-    vdp_st = vdp_decoder_render(decoder, rndr->render_state->surface, rndr->info, rndr->bitstream_buffers_used, rndr->bitstream_buffers);
+    vdp_st = vdp_decoder_render(decoder, rndr->surface, rndr->info, rndr->bitstream_buffers_used, rndr->bitstream_buffers);
     CHECK_ST_WARNING("Failed VDPAU decoder rendering");
     return VO_TRUE;
 }
 
+static int get_surface_idx(VdpVideoSurface surface)
+{
+    int i;
+    for (i = 0; i < MAX_VIDEO_SURFACES; i++) {
+      if (surface == surface_render[i]) {
+          return i;
+      }
+    }
+    mp_msg(MSGT_VO, MSGL_FATAL, "Unknown VdpVideoSurface %u!\n", surface);
+    return -1;
+}
 
-static struct vdpau_render_state *get_surface(int number)
+static VdpVideoSurface get_surface(int number)
 {
     if (number >= MAX_VIDEO_SURFACES)
-        return NULL;
-    if (surface_render[number].surface == VDP_INVALID_HANDLE) {
+        return VDP_INVALID_HANDLE;
+    if (surface_render[number] == VDP_INVALID_HANDLE) {
         VdpStatus vdp_st;
         vdp_st = vdp_video_surface_create(vdp_device, vdp_chroma_type,
                                           vid_width, vid_height,
-                                          &surface_render[number].surface);
+                                          &surface_render[number]);
         CHECK_ST_WARNING("Error when calling vdp_video_surface_create")
         if (vdp_st != VDP_STATUS_OK)
-            return NULL;
+            return VDP_INVALID_HANDLE;
     }
-    mp_msg(MSGT_VO, MSGL_DBG2, "VID CREATE: %u\n", surface_render[number].surface);
-    return &surface_render[number];
+    mp_msg(MSGT_VO, MSGL_DBG2, "VID CREATE: %u\n", surface_render[number]);
+    return surface_render[number];
 }
 
 static uint32_t draw_image(mp_image_t *mpi)
 {
     if (IMGFMT_IS_VDPAU(image_format)) {
-        struct vdpau_render_state *rndr = mpi->priv;
-        vid_surface_num = rndr - surface_render;
+        VdpVideoSurface surface = (VdpVideoSurface)mpi->priv;
+        vid_surface_num = get_surface_idx(surface);
         mpi->usage_count++;
         if (deint_mpi[1])
             deint_mpi[1]->usage_count--;
@@ -1098,12 +1109,12 @@ static uint32_t draw_image(mp_image_t *mpi)
     } else if (!(mpi->flags & MP_IMGFLAG_DRAW_CALLBACK)) {
         VdpStatus vdp_st;
         void *destdata[3] = {mpi->planes[0], mpi->planes[2], mpi->planes[1]};
-        struct vdpau_render_state *rndr = get_surface(deint_counter);
+        VdpVideoSurface surface = get_surface(deint_counter);
         deint_counter = (deint_counter + 1) % 3;
-        vid_surface_num = rndr - surface_render;
+        vid_surface_num = get_surface_idx(surface);
         if (image_format == IMGFMT_NV12)
             destdata[1] = destdata[2];
-        vdp_st = vdp_video_surface_put_bits_y_cb_cr(rndr->surface,
+        vdp_st = vdp_video_surface_put_bits_y_cb_cr(surface,
                                                     vdp_pixel_format,
                                                     (const void *const*)destdata,
                                                     mpi->stride); // pitch
@@ -1120,7 +1131,7 @@ static uint32_t draw_image(mp_image_t *mpi)
 
 static uint32_t get_image(mp_image_t *mpi)
 {
-    struct vdpau_render_state *rndr;
+    VdpVideoSurface surface;
 
     // no dr for non-decoding for now
     if (!IMGFMT_IS_VDPAU(image_format))
@@ -1128,8 +1139,8 @@ static uint32_t get_image(mp_image_t *mpi)
     if (mpi->type != MP_IMGTYPE_NUMBERED)
         return VO_FALSE;
 
-    rndr = get_surface(mpi->number);
-    if (!rndr) {
+    surface = get_surface(mpi->number);
+    if (surface == VDP_INVALID_HANDLE) {
         mp_msg(MSGT_VO, MSGL_ERR, "[vdpau] no surfaces available in get_image\n");
         // TODO: this probably breaks things forever, provide a dummy buffer?
         return VO_FALSE;
@@ -1138,9 +1149,9 @@ static uint32_t get_image(mp_image_t *mpi)
     mpi->stride[0] = mpi->stride[1] = mpi->stride[2] = 0;
     mpi->planes[0] = mpi->planes[1] = mpi->planes[2] = NULL;
     // hack to get around a check and to avoid a special-case in vd_ffmpeg.c
-    mpi->planes[0] = (void *)rndr;
+    mpi->planes[0] = (void *)(uintptr_t)surface;
     mpi->num_planes = 1;
-    mpi->priv = rndr;
+    mpi->priv = (void *)(uintptr_t)surface;
     return VO_TRUE;
 }
 
@@ -1214,17 +1225,9 @@ static void DestroyVdpauObjects(void)
 
 static void uninit(void)
 {
-    int i;
-
     if (!vo_config_count)
         return;
     visible_buf = 0;
-
-    for (i = 0; i < MAX_VIDEO_SURFACES; i++) {
-        // Allocated in ff_vdpau_add_data_chunk()
-        av_freep(&surface_render[i].bitstream_buffers);
-        surface_render[i].bitstream_buffers_allocated = 0;
-    }
 
     /* Destroy all vdpau objects */
     DestroyVdpauObjects();

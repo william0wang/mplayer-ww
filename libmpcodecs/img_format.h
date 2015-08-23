@@ -20,6 +20,9 @@
 #define MPLAYER_IMG_FORMAT_H
 
 #include "config.h"
+#ifdef CONFIG_VDPAU
+#include <vdpau/vdpau.h>
+#endif
 
 /* RGB/BGR Formats */
 
@@ -302,7 +305,7 @@ typedef struct {
 } vo_mpegpes_t;
 
 struct vdpau_frame_data {
-    struct vdpau_render_state *render_state;
+    VdpVideoSurface surface;
     const void *info;
     unsigned bitstream_buffers_used;
     const void *bitstream_buffers;
