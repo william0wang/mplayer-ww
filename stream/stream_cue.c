@@ -580,6 +580,11 @@ static int control(stream_t *stream, int cmd, void *arg) {
       *(unsigned int *)arg = cue_current_pos.track - 1;
       return STREAM_OK;
     }
+    case STREAM_CTRL_GET_NUM_ANGLES:
+    {
+      *(unsigned int *)arg = tracks[cue_current_pos.track - 1].mode != AUDIO;
+      return STREAM_OK;
+    }
   }
   return STREAM_UNSUPPORTED;
 }
