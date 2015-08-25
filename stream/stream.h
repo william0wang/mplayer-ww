@@ -40,7 +40,7 @@
 #define STREAMTYPE_DVDNAV 9    // we cannot safely "seek" in this...
 #define STREAMTYPE_CDDA 10     // raw audio CD reader
 #define STREAMTYPE_SMB 11      // smb:// url, using libsmbclient (samba)
-#define STREAMTYPE_VCDBINCUE 12      // vcd directly from bin/cue files
+#define STREAMTYPE_BINCUE 12   // cd/vcd directly from bin/cue files
 #define STREAMTYPE_DVB 13
 #define STREAMTYPE_VSTREAM 14
 #define STREAMTYPE_SDP 15

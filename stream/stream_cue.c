@@ -1,5 +1,5 @@
 /*
- * VideoCD BinCue
+ * AudioCD/VideoCD BinCue
  *
  * This file is part of MPlayer.
  *
@@ -475,7 +475,7 @@ static int cue_read_toc_entry(int track) {
   return 0;
 }
 
-static int cue_vcd_get_track_end (int track){
+static int cue_get_track_end (int track){
   int sector = cue_msf_2_sector(tracks[track].minute, tracks[track].second,
                                 tracks[track].frame);
 
@@ -488,19 +488,19 @@ static int seek(stream_t *s, int64_t newpos) {
   return 1;
 }
 
-static int cue_vcd_seek_to_track (stream_t *stream, int track){
+static int cue_seek_to_track (stream_t *stream, int track){
   int pos;
   if (cue_read_toc_entry (track))
     return -1;
 
   pos = tracks[track-1].sector_data_length * cue_get_msf();
   stream->start_pos = pos;
-  stream->end_pos = cue_vcd_get_track_end(track);
+  stream->end_pos = cue_get_track_end(track);
   seek(stream, pos);
   return pos;
 }
 
-static void cue_vcd_read_toc(void){
+static void cue_read_toc(void){
   int i;
   for (i = 0; i < nTracks; ++i) {
 
@@ -515,7 +515,7 @@ static void cue_vcd_read_toc(void){
   }
 }
 
-static int cue_vcd_read(stream_t *stream, char *mem, int size) {
+static int cue_read(stream_t *stream, char *mem, int size) {
   unsigned long position, offset;
   int fd_bin = stream->fd;
   int track = cue_current_pos.track - 1;
@@ -567,7 +567,7 @@ static int control(stream_t *stream, int cmd, void *arg) {
     {
       int r;
       unsigned int track = *(unsigned int *)arg + 1;
-      r = cue_vcd_seek_to_track(stream, track);
+      r = cue_seek_to_track(stream, track);
       if (r >= 0) {
         return STREAM_OK;
       }
@@ -604,8 +604,8 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
   f = cue_read_cue(filename);
   if(f < 0)
     goto err_out;
-  cue_vcd_read_toc();
-  ret=cue_vcd_seek_to_track(stream, track);
+  cue_read_toc();
+  ret=cue_seek_to_track(stream, track);
   if(ret<0){
     mp_msg(MSGT_OPEN,MSGL_ERR,MSGTR_ErrTrackSelect " (seek)\n");
     goto err_out;
@@ -614,10 +614,10 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
          filename, track, ret, (int)stream->end_pos);
 
   stream->fd = f;
-  stream->type = STREAMTYPE_VCDBINCUE;
+  stream->type = STREAMTYPE_BINCUE;
   stream->sector_size = tracks[track-1].sector_data_length;
   stream->flags = STREAM_READ | MP_STREAM_SEEK_FW;
-  stream->fill_buffer = cue_vcd_read;
+  stream->fill_buffer = cue_read;
   stream->seek = seek;
   stream->control = control;
 
