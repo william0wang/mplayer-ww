@@ -558,6 +558,7 @@ static int cue_read(stream_t *stream, char *mem, int size) {
 
 static int control(stream_t *stream, int cmd, void *arg) {
   switch(cmd) {
+    case STREAM_CTRL_GET_NUM_TITLES:
     case STREAM_CTRL_GET_NUM_CHAPTERS:
     {
       *(unsigned int *)arg = nTracks;
@@ -573,6 +574,7 @@ static int control(stream_t *stream, int cmd, void *arg) {
       }
       break;
     }
+    case STREAM_CTRL_GET_CURRENT_TITLE:
     case STREAM_CTRL_GET_CURRENT_CHAPTER:
     {
       *(unsigned int *)arg = cue_current_pos.track - 1;
