@@ -90,6 +90,7 @@ typedef struct track
    /* its needed if there are mode1 tracks befor the mpeg tracks */
    unsigned long start_offset;
 
+   unsigned int sector_data_length;
    /*   unsigned char num[3]; */
 } tTrack;
 
@@ -131,6 +132,7 @@ static int cue_getTrackinfo(FILE *fd_cue, char *Line, tTrack *track)
     if(strncmp(&Line[11], "MODE1/2048", 10)==0) track->mode = MODE1_2048;
     if(strncmp(&Line[11], "MODE2/2352", 10)==0) track->mode = MODE2_2352;
     if(strncmp(&Line[11], "MODE2/2336", 10)==0) track->mode = MODE2_2336;
+    track->sector_data_length = track->mode == AUDIO ? SIZERAW : VCD_SECTOR_DATA;
   }
   else return 1;
 
@@ -294,7 +296,7 @@ static inline int cue_mode_2_sector_size(int mode)
 {
   switch (mode)
   {
-    case AUDIO:      return AUDIO;
+    case AUDIO:      return SIZERAW;
     case MODE1_2352: return SIZERAW;
     case MODE1_2048: return SIZEISO_MODE1;
     case MODE2_2352: return SIZEISO_MODE2_RAW;
@@ -477,12 +479,12 @@ static int cue_vcd_get_track_end (int track){
   int sector = cue_msf_2_sector(tracks[track].minute, tracks[track].second,
                                 tracks[track].frame);
 
-  return VCD_SECTOR_DATA * sector;
+  return tracks[track-1].sector_data_length * sector;
 }
 
 static int seek(stream_t *s, int64_t newpos) {
   s->pos=newpos;
-  cue_set_msf(s->pos/VCD_SECTOR_DATA);
+  cue_set_msf(s->pos/tracks[cue_current_pos.track-1].sector_data_length);
   return 1;
 }
 
@@ -491,7 +493,7 @@ static int cue_vcd_seek_to_track (stream_t *stream, int track){
   if (cue_read_toc_entry (track))
     return -1;
 
-  pos = VCD_SECTOR_DATA * cue_get_msf();
+  pos = tracks[track-1].sector_data_length * cue_get_msf();
   stream->start_pos = pos;
   stream->end_pos = cue_vcd_get_track_end(track);
   seek(stream, pos);
@@ -514,7 +516,7 @@ static void cue_vcd_read_toc(void){
 }
 
 static int cue_vcd_read(stream_t *stream, char *mem, int size) {
-  unsigned long position;
+  unsigned long position, offset;
   int fd_bin = stream->fd;
   int track = cue_current_pos.track - 1;
 
@@ -529,13 +531,15 @@ static int cue_vcd_read(stream_t *stream, char *mem, int size) {
   if(position >= tracks[track+1].start_offset)
     return 0;
 
-  if(lseek(fd_bin, position+VCD_SECTOR_OFFS, SEEK_SET) == -1) {
+  offset = tracks[track].mode == AUDIO ? 0 : VCD_SECTOR_OFFS;
+
+  if(lseek(fd_bin, position+offset, SEEK_SET) == -1) {
     mp_msg(MSGT_OPEN,MSGL_ERR, MSGTR_MPDEMUX_CUEREAD_UnexpectedBinFileEOF);
     return 0;
   }
 
-  if(read(fd_bin, mem, VCD_SECTOR_DATA) != VCD_SECTOR_DATA) {
-    mp_msg(MSGT_OPEN,MSGL_ERR, MSGTR_MPDEMUX_CUEREAD_CannotReadNBytesOfPayload, VCD_SECTOR_DATA);
+  if(read(fd_bin, mem, tracks[track].sector_data_length) != tracks[track].sector_data_length) {
+    mp_msg(MSGT_OPEN,MSGL_ERR, MSGTR_MPDEMUX_CUEREAD_CannotReadNBytesOfPayload, tracks[track].sector_data_length);
     return 0;
   }
 
@@ -549,7 +553,7 @@ static int cue_vcd_read(stream_t *stream, char *mem, int size) {
     }
   }
 
-  return VCD_SECTOR_DATA;
+  return tracks[track].sector_data_length;
 }
 
 static int control(stream_t *stream, int cmd, void *arg) {
@@ -611,7 +615,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
 
   stream->fd = f;
   stream->type = STREAMTYPE_VCDBINCUE;
-  stream->sector_size = VCD_SECTOR_DATA;
+  stream->sector_size = tracks[track-1].sector_data_length;
   stream->flags = STREAM_READ | MP_STREAM_SEEK_FW;
   stream->fill_buffer = cue_vcd_read;
   stream->seek = seek;
