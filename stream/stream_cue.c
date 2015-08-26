@@ -421,8 +421,8 @@ static int cue_read_cue (const char *in_cue_filename)
   for(i = 0; i <= nTracks; i++)
   {
     tracks[i].start_sector = cue_msf_2_sector(tracks[i].minute,
-                                              tracks[nTracks].second,
-                                              tracks[nTracks].frame);
+                                              tracks[i].second,
+                                              tracks[i].frame);
 
     /* if we're the first track we don't need to offset of the one befor */
     if (i == 0)
