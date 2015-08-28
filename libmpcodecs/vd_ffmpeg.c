@@ -539,7 +539,7 @@ static void uninit(sh_video_t *sh){
     }
 
     av_freep(&avctx);
-    av_freep(&ctx->pic);
+    av_frame_free(&ctx->pic);
     free(ctx);
 }
 
