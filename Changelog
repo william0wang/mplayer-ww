@@ -28,6 +28,7 @@ MPlayer
       --with-gtk-config= removed
     * Change ID3 genre name for genre ID 67 from "Psychadelic"
       to "Psychedelic"
+    * support for audio bin/cue images
 
     Ports:
     * Windows: support file names as UTF-8 in slave mode and passing
