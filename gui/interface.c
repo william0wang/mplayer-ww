@@ -543,6 +543,7 @@ int gui(int what, void *data)
             sprintf(tmp, "%s://", guiTV[gui_tv_digital].SchemeName);
             uiSetFile(NULL, tmp, SAME_STREAMTYPE);
         }
+        break;
         }
 
         /* video opts */
