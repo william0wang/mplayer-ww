@@ -1832,19 +1832,19 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPDEMUX_CDDB_NoCDInDrive "No CD in the drive.\n"
 
 // stream_cue.c
-#define MSGTR_MPDEMUX_CUEREAD_UnexpectedCuefileLine "[bincue] Unexpected cuefile line: %s\n"
+#define MSGTR_MPDEMUX_CUEREAD_UnexpectedCuefileLine "[bincue] Unexpected cuefile line: %s"
 #define MSGTR_MPDEMUX_CUEREAD_BinFilenameFound "[bincue] File specification found: %s"
 #define MSGTR_MPDEMUX_CUEREAD_BinFilenameTested "[bincue] bin filename tested: %s\n"
 #define MSGTR_MPDEMUX_CUEREAD_CannotFindBinFile "[bincue] Couldn't find the bin file - giving up.\n"
 #define MSGTR_MPDEMUX_CUEREAD_UsingBinFile "[bincue] Using bin file %s.\n"
-#define MSGTR_MPDEMUX_CUEREAD_UnknownModeForBinfile "[bincue] unknown mode for binfile. Should not happen. Aborting.\n"
+#define MSGTR_MPDEMUX_CUEREAD_UnknownModeForBinfile "[bincue] Unknown mode for binfile. Should not happen. Aborting.\n"
 #define MSGTR_MPDEMUX_CUEREAD_CannotOpenCueFile "[bincue] Cannot open %s.\n"
-#define MSGTR_MPDEMUX_CUEREAD_ErrReadingFromCueFile "[bincue] Error reading from  %s\n"
-#define MSGTR_MPDEMUX_CUEREAD_ErrGettingBinFileSize "[bincue] Error getting size of bin file.\n"
+#define MSGTR_MPDEMUX_CUEREAD_ErrReadingFromCueFile "[bincue] Error reading from %s\n"
+#define MSGTR_MPDEMUX_CUEREAD_ErrGettingBinFileSize "[bincue] Error getting size of bin file\n"
 #define MSGTR_MPDEMUX_CUEREAD_InfoTrackFormat "track %02d:  format=%d  %02d:%02d:%02d\n"
-#define MSGTR_MPDEMUX_CUEREAD_UnexpectedBinFileEOF "[bincue] unexpected end of bin file\n"
+#define MSGTR_MPDEMUX_CUEREAD_UnexpectedBinFileEOF "[bincue] Unexpected end of bin file\n"
 #define MSGTR_MPDEMUX_CUEREAD_CannotReadNBytesOfPayload "[bincue] Couldn't read %d bytes of payload.\n"
-#define MSGTR_MPDEMUX_CUEREAD_CueStreamInfo_FilenameTrackTracksavail "CUE stream_open, filename=%s, track=%d, available tracks: %d -> %d\n"
+#define MSGTR_MPDEMUX_CUEREAD_CueStreamInfo_FilenameTrackTracksavail "[bincue] stream open: filename=%s, track=%d (sectors: %d -> %d)\n"
 
 // stream_dvd.c
 #define MSGTR_DVDspeedCantOpen "Couldn't open DVD device for writing, changing DVD speed needs write access.\n"
