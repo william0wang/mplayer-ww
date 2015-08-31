@@ -184,7 +184,7 @@ static int cue_find_bin (const char *firstline) {
 
   /* get the filename out of that */
   /*                      12345 6  */
-  mp_msg (MSGT_OPEN,MSGL_INFO, "[bincue] cue_find_bin(%s)\n", firstline);
+  mp_msg (MSGT_OPEN,MSGL_INFO, MSGTR_MPDEMUX_CUEREAD_BinFilenameFound, firstline);
   if (strncmp(firstline, "FILE \"",6)==0)
   {
     firstline += 6;

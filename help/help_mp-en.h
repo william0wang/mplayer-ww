@@ -1833,6 +1833,7 @@ static const char help_text[] = MSGTR_Help;
 
 // stream_cue.c
 #define MSGTR_MPDEMUX_CUEREAD_UnexpectedCuefileLine "[bincue] Unexpected cuefile line: %s\n"
+#define MSGTR_MPDEMUX_CUEREAD_BinFilenameFound "[bincue] File specification found: %s"
 #define MSGTR_MPDEMUX_CUEREAD_BinFilenameTested "[bincue] bin filename tested: %s\n"
 #define MSGTR_MPDEMUX_CUEREAD_CannotFindBinFile "[bincue] Couldn't find the bin file - giving up.\n"
 #define MSGTR_MPDEMUX_CUEREAD_UsingBinFile "[bincue] Using bin file %s.\n"

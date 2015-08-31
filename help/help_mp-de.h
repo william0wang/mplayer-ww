@@ -1482,6 +1482,7 @@ static const char help_text[] = MSGTR_Help;
 
 // cue_read.c
 #define MSGTR_MPDEMUX_CUEREAD_UnexpectedCuefileLine "[bincue] Unerwartete Zeile in der Cue-Datei: %s\n"
+#define MSGTR_MPDEMUX_CUEREAD_BinFilenameFound "[bincue] Gefundene Datei-Angabe: %s"
 #define MSGTR_MPDEMUX_CUEREAD_BinFilenameTested "[bincue] Zugehörige Bin-Datei unter dem Namen '%s' nicht gefunden.\n"
 #define MSGTR_MPDEMUX_CUEREAD_CannotFindBinFile "[bincue] Konnte Bin-Datei nicht finden. Gebe auf.\n"
 #define MSGTR_MPDEMUX_CUEREAD_UsingBinFile "[bincue] Benutze Bin-Datei %s.\n"
