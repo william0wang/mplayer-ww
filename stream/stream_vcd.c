@@ -38,7 +38,9 @@
 #endif
 #include <errno.h>
 
-#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__DragonFly__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#if CONFIG_LIBCDIO
+#include "vcd_read_libcdio.h"
+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__DragonFly__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include "vcd_read_fbsd.h"
 #elif defined(__APPLE__)
 #include "vcd_read_darwin.h"
@@ -46,8 +48,6 @@
 #include "vcd_read_win32.h"
 #elif defined(__OS2__)
 #include "vcd_read_os2.h"
-#elif CONFIG_LIBCDIO
-#include "vcd_read_libcdio.h"
 #else
 #include "vcd_read.h"
 #endif
