@@ -274,6 +274,19 @@ static int cue_find_bin (const char *firstline) {
   return fd_bin;
 }
 
+static int cue_get_first_track(int fd_bin) {
+  char vol_descriptor[5];
+
+  if (lseek(fd_bin, 16 * VCD_SECTOR_SIZE + VCD_SECTOR_OFFS + 1, SEEK_SET) != -1)
+    if (read(fd_bin, vol_descriptor, 5) == 5)
+      if (strncmp(vol_descriptor, "CD001", 5) == 0)
+        /* ISO 9660 filesystem, so data starting in track 2 */
+        return 2;
+
+  /* data starting in track 1 */
+  return 1;
+}
+
 static inline int cue_msf_2_sector(int minute, int second, int frame) {
  return frame + (second + minute * 60 ) * 75;
 }
@@ -605,12 +618,12 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
       track = atoi(colon+1);
     *colon = 0;
   }
-  if(!track)
-    track = 1;
-
   f = cue_read_cue(filename);
   if(f < 0)
     goto err_out;
+  if(!track)
+    track = cue_get_first_track(f);
+
   cue_read_toc();
   ret=cue_seek_to_track(stream, track);
   if(ret<0){
