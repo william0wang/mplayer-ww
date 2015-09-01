@@ -1058,8 +1058,8 @@ image = font.png
         <term><emphasis role="bold">evLoad</emphasis></term>
         <listitem>
           <para>
-            Lade eine Datei (durch Öffnen des Datei-Browser-Fensters,
-            in dem du die Datei wählen kannst).
+            Lade eine Datei (durch Öffnen einer Dateiauswahl-Dialogbox,
+            in der die Datei ausgesucht werden kann).
           </para>
         </listitem>
       </varlistentry>
@@ -1078,7 +1078,7 @@ image = font.png
         <term><emphasis role="bold">evLoadAudioFile</emphasis></term>
         <listitem>
           <para>
-            Lädt eine Audio-Datei (mit dem Dateiwähler)
+            Lädt eine Audio-Datei (mit dem Dateiauswahl-Dialog).
           </para>
         </listitem>
       </varlistentry>
@@ -1087,7 +1087,7 @@ image = font.png
         <term><emphasis role="bold">evLoadSubtitle</emphasis></term>
         <listitem>
           <para>
-            Lädt eine Untertiteldatei (mit dem Dateiwähler)
+            Lädt eine Untertiteldatei (mit dem Dateiauswahl-Dialog).
           </para>
         </listitem>
       </varlistentry>

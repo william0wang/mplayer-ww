@@ -905,7 +905,7 @@ menu entries.
 <varlistentry>
   <term><emphasis role="bold">evLoad</emphasis></term>
   <listitem><para>
-  Load a file (by opening a file browser window, where you can choose a file).
+  Load a file (by opening a file selector dialog box, where you can choose a file).
   </para></listitem>
 </varlistentry>
 
