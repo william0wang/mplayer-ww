@@ -84,10 +84,11 @@ static void MediumPrepare(int type)
     case STREAMTYPE_FILE:
     case STREAMTYPE_STREAM:
     case STREAMTYPE_PLAYLIST:
+        guiInfo.Angles = 0;
+    case STREAMTYPE_BINCUE:
         guiInfo.AudioStreams = 0;
         guiInfo.Subtitles    = 0;
         guiInfo.Chapters     = 0;
-        guiInfo.Angles       = 0;
         break;
     }
 }
@@ -210,6 +211,7 @@ play:
                 if (!guiInfo.Track)
                     guiInfo.Track = (guiInfo.StreamType == STREAMTYPE_VCD ? 2 : 1);
 
+            case STREAMTYPE_BINCUE:   // track 0 is OK and will auto-select first media data track
                 guiInfo.MediumChanged = GUI_MEDIUM_SAME;
 
                 break;
@@ -740,7 +742,9 @@ void uiUnsetMedia(int totals)
 
     if (totals) {
         guiInfo.Chapters = 0;
-        guiInfo.Angles   = 0;
+
+        if (guiInfo.StreamType != STREAMTYPE_BINCUE)
+            guiInfo.Angles = 0;
     } else {
         guiInfo.Track   = 0;
         guiInfo.Chapter = 0;
@@ -841,6 +845,15 @@ void uiPrev(void)
 
         return;
 
+    case STREAMTYPE_BINCUE:
+
+        if (--guiInfo.Track == 0) {
+            guiInfo.Track = 1 + guiInfo.Angles;
+            stop = True;
+        }
+
+        break;
+
     default:
 
         prev = listMgr(PLAYLIST_ITEM_GET_PREV, 0);
@@ -878,6 +891,7 @@ void uiNext(void)
     switch (guiInfo.StreamType) {
     case STREAMTYPE_CDDA:
     case STREAMTYPE_VCD:
+    case STREAMTYPE_BINCUE:
 
         if (++guiInfo.Track > guiInfo.Tracks) {
             guiInfo.Track = guiInfo.Tracks;

@@ -618,7 +618,7 @@ blocks.
     <entry>
     a character according to the stream type (file: <keycap>f</keycap>,
     CD: <keycap>a</keycap>, Video CD: <keycap>v</keycap>, DVD: <keycap>d</keycap>,
-    URL: <keycap>u</keycap>, TV/DVB: <keycap>b</keycap>)
+    URL: <keycap>u</keycap>, TV/DVB: <keycap>b</keycap>, CUE: <keycap>c</keycap>)
     </entry>
   </row>
   <row>
@@ -838,6 +838,7 @@ symbols (and thus require a different font).
   <row><entry><keycap>d</keycap></entry><entry>stream is a DVD</entry></row>
   <row><entry><keycap>u</keycap></entry><entry>stream is a URL</entry></row>
   <row><entry><keycap>b</keycap></entry><entry>stream is a TV/DVB broadcast</entry></row>
+  <row><entry><keycap>c</keycap></entry><entry>stream is a cue sheet</entry></row>
 </tbody>
 </tgroup>
 </informaltable>

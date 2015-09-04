@@ -651,7 +651,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_FilterFontBitmap "Bitmap fonts (*.desc)"
 #define MSGTR_GUI_FilterFontTTF "TrueType fonts (*.ttf)"
 #define MSGTR_GUI_FilterFontType1 "Type1 fonts (*.pfb)"
-#define MSGTR_GUI_FilterImageVCD "VCD/SVCD images"
+#define MSGTR_GUI_FilterImageCue "CD/VCD/SVCD image cue sheet"
 #define MSGTR_GUI_FilterMediumMatroska "Matroska media"
 #define MSGTR_GUI_FilterMediumOgg "Ogg media"
 #define MSGTR_GUI_FilterMediumQuickTime "QuickTime media"

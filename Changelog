@@ -55,6 +55,7 @@ MPlayer
     * New GUI message: evSetRotation
     * GUI now officially needs GTK+ and GLib versions 2 (it hadn't compiled
       with versions 1 for quite some time)
+    * Support for audio and video bin/cue image playback
 
   1.1: "We gave up on 1.0"
 

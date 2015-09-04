@@ -748,7 +748,8 @@ end
                     <entry>
                       Buchstabe entsprechend dem Streamtyp (Datei: <keycap>f</keycap>,
                       CD: <keycap>a</keycap>, Video-CD: <keycap>v</keycap>, DVD: <keycap>d</keycap>,
-                      URL: <keycap>u</keycap>, TV/DVB: <keycap>b</keycap>)
+                      URL: <keycap>u</keycap>, TV/DVB: <keycap>b</keycap>,
+                      CUE: <keycap>c</keycap>)
                     </entry>
                   </row>
                   <row>
@@ -987,6 +988,7 @@ image = font.png
             <row><entry><keycap>d</keycap></entry><entry>Stream ist eine DVD</entry></row>
             <row><entry><keycap>u</keycap></entry><entry>Stream ist eine URL</entry></row>
             <row><entry><keycap>b</keycap></entry><entry>Stream ist eine TV/DVB-Übertragung</entry></row>
+            <row><entry><keycap>c</keycap></entry><entry>Stream ist ein Cuesheet</entry></row>
           </tbody>
         </tgroup>
       </informaltable>

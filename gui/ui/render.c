@@ -123,6 +123,15 @@ static char *TranslateFilename(int how, char *fname, size_t maxlen)
         av_strlcpy(fname, p, maxlen);
         break;
 
+    case STREAMTYPE_BINCUE:
+
+        if (guiInfo.Track)
+            snprintf(fname, maxlen, MSGTR_GUI_TitleN, guiInfo.Track - guiInfo.Angles);
+        else
+            *fname = 0;
+
+        break;
+
     default:
 
         av_strlcpy(fname, MSGTR_GUI_MSG_NoMediaOpened, maxlen);
@@ -318,6 +327,10 @@ MMMM_SS:        snprintf(trans, sizeof(trans), "%04d:%02d", t / 60, t % 60);
                 case STREAMTYPE_TV:
                 case STREAMTYPE_DVB:
                     av_strlcat(translation, "b", sizeof(translation));
+                    break;
+
+                case STREAMTYPE_BINCUE:
+                    av_strlcat(translation, "c", sizeof(translation));
                     break;
 
                 default:

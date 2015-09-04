@@ -651,7 +651,6 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_FilterFontBitmap "位图字体文件（*.desc）"
 #define MSGTR_GUI_FilterFontTTF "TrueType 字体文件（*.ttf）"
 #define MSGTR_GUI_FilterFontType1 "Type1 字体文件（*.pfb）"
-#define MSGTR_GUI_FilterImageVCD "VCD/SVCD 镜像文件"
 #define MSGTR_GUI_FilterMediumMatroska "Matroska 媒体文件"
 #define MSGTR_GUI_FilterMediumOgg "Ogg 媒体文件"
 #define MSGTR_GUI_FilterMediumQuickTime "QuickTime 媒体文件"

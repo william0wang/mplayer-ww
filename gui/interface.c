@@ -53,6 +53,7 @@
 #include "libmpcodecs/dec_video.h"
 #include "libmpcodecs/vd.h"
 #include "libmpcodecs/vf.h"
+#include "libmpdemux/demuxer.h"
 #include "libvo/video_out.h"
 #include "libvo/x11_common.h"
 #include "osdep/timer.h"
@@ -76,6 +77,10 @@ guiInterface_t guiInfo = {
 
 static int guiInitialized;
 static int orig_fontconfig;
+static struct {
+    int changed;
+    char *name;
+} orig_demuxer;
 
 /**
  * @brief Set option 'fontconfig' depending on #font_name.
@@ -544,6 +549,25 @@ int gui(int what, void *data)
             uiSetFile(NULL, tmp, SAME_STREAMTYPE);
         }
         break;
+
+        case STREAMTYPE_BINCUE:
+        {
+            char tmp[512], *fname, *colon;
+
+            fname = guiInfo.Filename;
+
+            if (strncmp(guiInfo.Filename, "cue://", 6) == 0)
+                fname += 6;
+
+            colon = strrchr(fname, ':');
+
+            if (colon)
+                *colon = 0;
+
+            snprintf(tmp, sizeof(tmp), "cue://%s:%d", fname, guiInfo.Track);
+            uiSetFile(NULL, tmp, SAME_STREAMTYPE);
+        }
+        break;
         }
 
         /* video opts */
@@ -730,6 +754,12 @@ int gui(int what, void *data)
             guiInfo.StreamType = stream->type;
         }
 
+        if (orig_demuxer.changed) {
+            free(demuxer_name);
+            demuxer_name = orig_demuxer.name;
+            orig_demuxer.changed = False;
+        }
+
         switch (guiInfo.StreamType) {
         case STREAMTYPE_FILE:
         case STREAMTYPE_STREAM:
@@ -774,6 +804,22 @@ int gui(int what, void *data)
         case STREAMTYPE_TV:
         case STREAMTYPE_DVB:
             guiInfo.Tracks = guiInfo.Track = 1;
+            break;
+
+        case STREAMTYPE_BINCUE:
+
+            guiInfo.Tracks = 0;
+            stream_control(stream, STREAM_CTRL_GET_NUM_TITLES, &guiInfo.Tracks);
+            if (stream_control(stream, STREAM_CTRL_GET_CURRENT_TITLE, &guiInfo.Track) == STREAM_OK)
+                guiInfo.Track++;
+            stream_control(stream, STREAM_CTRL_GET_NUM_ANGLES, &guiInfo.Angles);
+
+            if (guiInfo.Angles == 0) {
+                orig_demuxer.name    = demuxer_name;
+                demuxer_name         = strdup("rawaudio");
+                orig_demuxer.changed = True;
+            }
+
             break;
         }
 
@@ -927,7 +973,7 @@ int gui(int what, void *data)
                 break;
             }
 
-            if (guiInfo.StreamType == STREAMTYPE_CDDA && guiInfo.Track < guiInfo.Tracks) {
+            if ((guiInfo.StreamType == STREAMTYPE_CDDA || guiInfo.StreamType == STREAMTYPE_BINCUE) && guiInfo.Track < guiInfo.Tracks) {
                 uiNext();
                 break;
             }
@@ -956,7 +1002,21 @@ int gui(int what, void *data)
                     guiInfo.Track = 1;
                 }
             } else if (guiInfo.Playing) {
-                int first = (guiInfo.StreamType == STREAMTYPE_VCD ? 2 : 1);
+                int first;
+
+                switch (guiInfo.StreamType) {
+                case STREAMTYPE_VCD:
+                    first = 2;
+                    break;
+
+                case STREAMTYPE_BINCUE:
+                    first = 1 + guiInfo.Angles;
+                    break;
+
+                default:
+                    first = 1;
+                    break;
+                }
 
                 if (guiInfo.Track != first) {
                     uiUnsetMedia(True);

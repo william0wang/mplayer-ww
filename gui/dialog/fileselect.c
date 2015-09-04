@@ -75,12 +75,12 @@ char *fsVideoAudioFilterNames[][2] = {
     { MSGTR_GUI_FilterMediumOgg,          "*.oga,*.ogg,*.ogm,*.ogv,*.ogx,*.spx"                                                                                                                                                                                                                                                                                                                                                                                   },
     { MSGTR_GUI_FilterMediumQuickTime,    "*.moov,*.mov,*.qt,*.qtvr"                                                                                                                                                                                                                                                                                                                                                                                              },
     { MSGTR_GUI_FilterMediumRealNetworks, "*.ra,*.rm,*.rmvb,*.rv"                                                                                                                                                                                                                                                                                                                                                                                                 },
-    { MSGTR_GUI_FilterImageVCD,           "*.bin"                                                                                                                                                                                                                                                                                                                                                                                                                 },
+    { MSGTR_GUI_FilterImageCue,           "*.cue"                                                                                                                                                                                                                                                                                                                                                                                                                 },
     { MSGTR_GUI_FilterFileWav,            "*.wav"                                                                                                                                                                                                                                                                                                                                                                                                                 },
     { MSGTR_GUI_FilterMediumWindows,      "*.asf,*.wma,*.wmv"                                                                                                                                                                                                                                                                                                                                                                                                     },
     { MSGTR_GUI_FilterFilePlaylist,       "*.asx,*.m3u,*.m3u8,*.m4u,*.mxu,*.nsc,*.pls,*.ram,*.smi,*.smil,*.sml,*.vlc,*.wax,*.wmx,*.wvx"                                                                                                                                                                                                                                                                                                                           },
     { MSGTR_GUI_FilterAudioAll,           "*.aac,*.ac3,*.aif,*.aifc,*.aiff,*.amr,*.ape,*.au,*.awb,*.cdg,*.f4a,*.f4b,*.flac,*.m4a,*.m4b,*.mka,*.mp+,*.mp2,*.mp3,*.mpc,*.mpga,*.mpp,*.nsa,*.oga,*.ogg,*.pcm,*.qcp,*.ra,*.snd,*.spx,*.tak,*.voc,*.vqf,*.w64,*.wav,*.wma,*.wv,*.wvp"                                                                                                                                                                                  },
-    { MSGTR_GUI_FilterVideoAll,           "*.264,*.3g2,*.3ga,*.3gp,*.3gp2,*.3gpp,*.3gpp2,*.asf,*.avi,*.bdm,*.bdmv,*.bin,*.clpi,*.cpi,*.cpk,*.divx,*.dv,*.f4v,*.flc,*.fli,*.flv,*.m1v,*.m2t,*.m2ts,*.m2v,*.m4v,*.mjpg,*.mkv,*.moov,*.mov,*.mp2,*.mp4,*.mpe,*.mpeg,*.mpg,*.mpl,*.mpls,*.mts,*.mxf,*.nsv,*.nuv,*.ogg,*.ogm,*.ogv,*.ogx,*.pva,*.qt,*.qtvr,*.rec,*.rm,*.rmvb,*.roq,*.rv,*.spl,*.str,*.swf,*.trp,*.ts,*.ty,*.vdr,*.viv,*.vivo,*.vob,*.webm,*.wmv,*.y4m" },
+    { MSGTR_GUI_FilterVideoAll,           "*.264,*.3g2,*.3ga,*.3gp,*.3gp2,*.3gpp,*.3gpp2,*.asf,*.avi,*.bdm,*.bdmv,*.clpi,*.cpi,*.cpk,*.divx,*.dv,*.f4v,*.flc,*.fli,*.flv,*.m1v,*.m2t,*.m2ts,*.m2v,*.m4v,*.mjpg,*.mkv,*.moov,*.mov,*.mp2,*.mp4,*.mpe,*.mpeg,*.mpg,*.mpl,*.mpls,*.mts,*.mxf,*.nsv,*.nuv,*.ogg,*.ogm,*.ogv,*.ogx,*.pva,*.qt,*.qtvr,*.rec,*.rm,*.rmvb,*.roq,*.rv,*.spl,*.str,*.swf,*.trp,*.ts,*.ty,*.vdr,*.viv,*.vivo,*.vob,*.webm,*.wmv,*.y4m"       },
     { MSGTR_GUI_FilterFileAll,            "*"                                                                                                                                                                                                                                                                                                                                                                                                                     },
     { NULL,                               NULL                                                                                                                                                                                                                                                                                                                                                                                                                    }
 };
@@ -437,7 +437,7 @@ static void fs_Cancel_released(GtkButton *button, gpointer user_data)
 static void fs_Ok_released(GtkButton *button, gpointer user_data)
 {
     char *fsSelectedDirectory;
-    int l;
+    int type = STREAMTYPE_FILE;
     struct stat fs;
     gchar *selected;
 
@@ -465,11 +465,12 @@ static void fs_Ok_released(GtkButton *button, gpointer user_data)
     switch (fsType) {
     case FILESELECT_VIDEO_AUDIO:
 
-        for (l = 0; fsVideoAudioFilterNames[l][0]; l++)
-            if (strcmp(fsVideoAudioFilterNames[l][0], MSGTR_GUI_FilterFilePlaylist) == 0)
-                break;
+        if (strcmp(fsVideoAudioFilterNames[fsLastVideoAudioFilterSelected][0], MSGTR_GUI_FilterImageCue) == 0)
+            type = STREAMTYPE_BINCUE;
+        else if (strcmp(fsVideoAudioFilterNames[fsLastVideoAudioFilterSelected][0], MSGTR_GUI_FilterFilePlaylist) == 0)
+            type = STREAMTYPE_PLAYLIST;
 
-        uiSetFile(fsSelectedDirectory, fsSelectedFile, fsLastVideoAudioFilterSelected == l ? STREAMTYPE_PLAYLIST : STREAMTYPE_FILE);
+        uiSetFile(fsSelectedDirectory, fsSelectedFile, type);
         selected = g_strconcat(fsSelectedDirectory, "/", fsSelectedFile, NULL);
 
         if (selected) {
