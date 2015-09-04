@@ -129,6 +129,18 @@ char *fsFontFileNames[][2] = {
 };
 int fsLastFontFilterSelected = -1;
 
+char *fsImageFilterNames[][2] = {
+#ifdef CONFIG_LIBCDIO
+    { MSGTR_GUI_FilterImageCD,  "*.cue"       },
+    { MSGTR_GUI_FilterImageVCD, "*.cue"       },
+#endif
+#ifdef CONFIG_DVDREAD
+    { MSGTR_GUI_FilterImageDVD, "*.ifo,*.iso" },
+#endif
+    { NULL,                     NULL          }
+};
+int fsLastImageFilterSelected = -1;
+
 GtkWidget *fsFileNamesList;
 GtkWidget *fsFNameList;
 GtkWidget *FileSelector;
@@ -349,6 +361,17 @@ static void fs_fsFilterCombo_changed(GtkEditable *editable,
 
         break;
 
+    case FILESELECT_IMAGE:
+
+        for (i = 0; fsImageFilterNames[i][0]; i++)
+            if (!strcmp(str, fsImageFilterNames[i][0])) {
+                fsFilter = fsImageFilterNames[i][1];
+                fsLastImageFilterSelected = i;
+                break;
+            }
+
+        break;
+
     default:
 
         return;
@@ -437,7 +460,7 @@ static void fs_Cancel_released(GtkButton *button, gpointer user_data)
 static void fs_Ok_released(GtkButton *button, gpointer user_data)
 {
     char *fsSelectedDirectory;
-    int type = STREAMTYPE_FILE;
+    int type = STREAMTYPE_FILE, ev = evPlay;
     struct stat fs;
     gchar *selected;
 
@@ -501,6 +524,28 @@ static void fs_Ok_released(GtkButton *button, gpointer user_data)
             gtk_entry_set_text(GTK_ENTRY(prEFontName), font_name);
 
         break;
+
+    case FILESELECT_IMAGE:
+
+        if (strcmp(fsImageFilterNames[fsLastImageFilterSelected][0], MSGTR_GUI_FilterImageCD) == 0)
+            ev = evPlayCD;
+        else if (strcmp(fsImageFilterNames[fsLastImageFilterSelected][0], MSGTR_GUI_FilterImageVCD) == 0)
+            ev = evPlayVCD;
+        else if (strcmp(fsImageFilterNames[fsLastImageFilterSelected][0], MSGTR_GUI_FilterImageDVD) == 0)
+            ev = evPlayDVD;
+
+        if (ev == evPlayDVD) {
+            char *ext = strrchr(fsSelectedFile, '.');
+
+            if (ext && (strcmp(ext, ".ifo") == 0))
+                fsSelectedFile = "";
+        }
+
+        uiUnsetFile();
+        setddup(&guiInfo.ImageFilename, fsSelectedDirectory, fsSelectedFile);
+        fs_PersistantHistory(fsSelectedDirectory);
+        uiLoadPlay = True;
+        break;
     }
 
     free(fsSelectedDirectory);
@@ -512,7 +557,7 @@ static void fs_Ok_released(GtkButton *button, gpointer user_data)
 
     if (uiLoadPlay) {
         uiLoadPlay = False;
-        uiEvent(evPlay, 0);
+        uiEvent(ev, 0);
     } else
         gui(GUI_SET_STATE, (void *)GUI_STOP);
 }
@@ -762,9 +807,23 @@ void ShowFileSelector(int type)
         gtk_entry_set_text(GTK_ENTRY(fsFilterCombo), fsFontFileNames[k >= 0 ? k : i - 2][0]);
         tmp = font_name;
         break;
+
+    case FILESELECT_IMAGE:
+        gtk_window_set_title(GTK_WINDOW(FileSelector), MSGTR_GUI_SelectImage);
+        fsList_items = NULL;
+
+        for (i = 0; fsImageFilterNames[i][0]; i++)
+            fsList_items = g_list_append(fsList_items, fsImageFilterNames[i][0]);
+
+        k = fsLastImageFilterSelected;
+        gtk_combo_set_popdown_strings(GTK_COMBO(List), fsList_items);
+        g_list_free(fsList_items);
+        gtk_entry_set_text(GTK_ENTRY(fsFilterCombo), fsImageFilterNames[k >= 0 ? k : 0][0]);
+        tmp = guiInfo.ImageFilename;
+        break;
     }
 
-    fsMedium = (fsType == FILESELECT_VIDEO_AUDIO || fsType == FILESELECT_SUBTITLE || fsType == FILESELECT_AUDIO);
+    fsMedium = (fsType == FILESELECT_VIDEO_AUDIO || fsType == FILESELECT_SUBTITLE || fsType == FILESELECT_AUDIO || fsType == FILESELECT_IMAGE);
 
     if (tmp && tmp[0] && !strstr(tmp, "://")) {
         dir = strdup(tmp);

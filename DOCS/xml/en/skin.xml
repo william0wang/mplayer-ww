@@ -968,6 +968,14 @@ menu entries.
 </varlistentry>
 
 <varlistentry>
+  <term><emphasis role="bold">evPlayImage</emphasis></term>
+  <listitem><para>
+  Loads an CD/(S)VCD/DVD image or DVD copy (with the file selector) and plays it
+  as if it were a real disc.
+  </para></listitem>
+</varlistentry>
+
+<varlistentry>
   <term><emphasis role="bold">evLoadURL</emphasis></term>
   <listitem><para>
   Displays the URL dialog window.

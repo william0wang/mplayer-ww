@@ -97,6 +97,9 @@
 #ifdef CONFIG_TV
 #include "pixmaps/tv.xpm"
 #endif
+#if defined(CONFIG_LIBCDIO) || defined(CONFIG_DVDREAD)
+#include "pixmaps/playimage.xpm"
+#endif
 #include "pixmaps/empty1px.xpm"
 #include "pixmaps/rotate.xpm"
 #include "pixmaps/rotate0.xpm"
@@ -595,6 +598,9 @@ GtkWidget * CreatePopUpMenu( void )
         MenuItem=AddMenuItem( window1, (const char*)empty1px_xpm, DVDSubtitleLanguageMenu,MSGTR_GUI__none_,evNone );
         gtk_widget_set_sensitive( MenuItem,FALSE );
        }
+#endif
+#if defined(CONFIG_LIBCDIO) || defined(CONFIG_DVDREAD)
+    AddMenuItem( window1, (const char*)playimage_xpm, SubMenu,MSGTR_GUI_Image"...    ", evPlayImage );
 #endif
     AddMenuItem( window1, (const char*)url_xpm, SubMenu,MSGTR_GUI_URL"...", evLoadURL );
 #ifdef CONFIG_TV

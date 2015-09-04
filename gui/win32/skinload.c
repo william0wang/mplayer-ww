@@ -64,6 +64,7 @@ static const evName evNames[] =
     {   evPlayCD,               "evPlayCD"              },
     {   evPlayVCD,              "evPlayVCD"             },
     {   evPlayDVD,              "evPlayDVD"             },
+    {   evPlayImage,            "evPlayImage"           },
     {   evLoadURL,              "evSetURL"              }, // legacy
     {   evLoadURL,              "evLoadURL"             },
     {   evPlayTV,               "evPlayTV"              },

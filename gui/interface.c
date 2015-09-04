@@ -513,7 +513,7 @@ int gui(int what, void *data)
         {
             char tmp[512];
 
-            sprintf(tmp, "cdda://%d", guiInfo.Track);
+            snprintf(tmp, sizeof(tmp), "cdda://%d%s%s", guiInfo.Track, guiInfo.ImageFilename ? "/" : "", guiInfo.ImageFilename ? guiInfo.ImageFilename : "");
             uiSetFile(NULL, tmp, SAME_STREAMTYPE);
         }
         break;
@@ -522,7 +522,7 @@ int gui(int what, void *data)
         {
             char tmp[512];
 
-            sprintf(tmp, "vcd://%d", guiInfo.Track);
+            snprintf(tmp, sizeof(tmp), "vcd://%d%s%s", guiInfo.Track, guiInfo.ImageFilename ? "/" : "", guiInfo.ImageFilename ? guiInfo.ImageFilename : "");
             uiSetFile(NULL, tmp, SAME_STREAMTYPE);
         }
         break;
@@ -531,7 +531,7 @@ int gui(int what, void *data)
         {
             char tmp[512];
 
-            sprintf(tmp, "dvd://%d", guiInfo.Track);
+            snprintf(tmp, sizeof(tmp), "dvd://%d%s%s", guiInfo.Track, guiInfo.ImageFilename ? "/" : "", guiInfo.ImageFilename ? guiInfo.ImageFilename : "");
             uiSetFile(NULL, tmp, SAME_STREAMTYPE);
         }
 #ifdef CONFIG_DVDREAD

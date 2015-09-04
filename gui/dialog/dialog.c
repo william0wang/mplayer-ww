@@ -306,6 +306,11 @@ void gtkShow(int type, char *param)
         gtkSetLayer(FileSelector);
         break;
 
+    case evPlayImage:
+        ShowFileSelector(FILESELECT_IMAGE);
+        gtkSetLayer(FileSelector);
+        break;
+
     case evAbout:
         ShowAbout();
         gtkSetLayer(About);

@@ -252,6 +252,10 @@ play:
         gtkShow(evLoadAudioFile, NULL);
         break;
 
+    case evPlayImage:
+        gtkShow(evPlayImage, NULL);
+        break;
+
     case evPrev:
         uiPrev();
         break;
@@ -754,6 +758,7 @@ void uiUnsetMedia(int totals)
     nfree(guiInfo.CodecName);
     nfree(guiInfo.AudioFilename);
     nfree(guiInfo.SubtitleFilename);
+    nfree(guiInfo.ImageFilename);
 }
 
 /**

@@ -121,6 +121,7 @@ typedef struct {
     char *Filename;           // public, read access by MPlayer
     char *AudioFilename;
     char *SubtitleFilename;
+    char *ImageFilename;
 
     int Tracks;
     int Track;                // public, read access by MPlayer
