@@ -534,12 +534,8 @@ static void fs_Ok_released(GtkButton *button, gpointer user_data)
         else if (strcmp(fsImageFilterNames[fsLastImageFilterSelected][0], MSGTR_GUI_FilterImageDVD) == 0)
             ev = evPlayDVD;
 
-        if (ev == evPlayDVD) {
-            char *ext = strrchr(fsSelectedFile, '.');
-
-            if (ext && (strcmp(ext, ".ifo") == 0))
-                fsSelectedFile = "";
-        }
+        if (ev == evPlayDVD && gstrcmp(strrchr(fsSelectedFile, '.'), ".ifo") == 0)
+            fsSelectedFile = "";
 
         uiUnsetFile();
         setddup(&guiInfo.ImageFilename, fsSelectedDirectory, fsSelectedFile);
