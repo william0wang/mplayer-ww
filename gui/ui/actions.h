@@ -21,13 +21,13 @@
 
 extern int uiLoadPlay;
 
-void uiAbsSeek(float sec);
 void uiChangeSkin(char *name);
 void uiCurr(void);
 void uiEvent(int ev, float param);
 void uiFullScreen(void);
 void uiNext(void);
 void uiPause(void);
+void uiPctSeek(float sec);
 void uiPlay(void);
 void uiPrev(void);
 void uiRelSeek(float percent);

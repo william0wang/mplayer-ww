@@ -310,7 +310,7 @@ play:
 
     case evSetMoviePosition:
         guiInfo.Position = param;
-        uiAbsSeek(guiInfo.Position);
+        uiPctSeek(guiInfo.Position);
         break;
 
     case evIncVolume:
@@ -620,7 +620,7 @@ void uiRelSeek(float sec)
  *
  * @param percent percentage of playback time to position to
  */
-void uiAbsSeek(float percent)
+void uiPctSeek(float percent)
 {
     rel_seek_secs = percent / 100.0;
     abs_seek_pos  = SEEK_ABSOLUTE | SEEK_FACTOR;
