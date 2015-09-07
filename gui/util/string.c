@@ -100,6 +100,25 @@ char *strswap(char *in, char from, char to)
 }
 
 /**
+ * @brief Skip all leading space characters in a string.
+ *
+ * @param in string to be processed
+ *
+ * @return trailing part of @a in starting with the first non-space character
+ */
+const char *ltrim(const char *in)
+{
+    while (*in) {
+        if (*in == ' ')
+            in++;
+        else
+            break;
+    }
+
+    return in;
+}
+
+/**
  * @brief Remove all space characters from a string,
  *        but leave text enclosed in quotation marks untouched.
  *

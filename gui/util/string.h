@@ -36,6 +36,7 @@ char *gstrchr(const char *str, int c);
 int gstrcmp(const char *a, const char *b);
 char *gstrdup(const char *str);
 int gstrncmp(const char *a, const char *b, size_t n);
+const char *ltrim(const char *in);
 void setddup(char **old, const char *dir, const char *name);
 void setdup(char **old, const char *str);
 char *strlower(char *in);
