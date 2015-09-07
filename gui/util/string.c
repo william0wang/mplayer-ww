@@ -109,7 +109,7 @@ char *strswap(char *in, char from, char to)
  *
  * @note This is an in-place processing.
  */
-char *trim(char *in)
+char *despace(char *in)
 {
     char *src, *dest;
     int freeze = False;

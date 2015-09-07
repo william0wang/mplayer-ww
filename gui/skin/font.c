@@ -127,7 +127,7 @@ int fntRead(char *path, char *fname)
 
     while (fgetstr(buf, sizeof(buf), file)) {
         strswap(buf, '\t', ' ');
-        trim(buf);
+        despace(buf);
         decomment(buf);
 
         if (!*buf)

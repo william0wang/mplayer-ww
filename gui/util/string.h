@@ -31,6 +31,7 @@
 int cutInt(char *in, char sep, int num);
 void cutString(char *in, char *out, char sep, int num, size_t maxout);
 char *decomment(char *in);
+char *despace(char *in);
 char *gstrchr(const char *str, int c);
 int gstrcmp(const char *a, const char *b);
 char *gstrdup(const char *str);
@@ -40,6 +41,5 @@ void setdup(char **old, const char *str);
 char *strlower(char *in);
 char *strswap(char *in, char from, char to);
 char *strupper(char *in);
-char *trim(char *in);
 
 #endif /* MPLAYER_GUI_STRING_H */
