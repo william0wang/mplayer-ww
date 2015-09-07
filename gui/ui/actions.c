@@ -603,6 +603,19 @@ void uiState(void)
 /**
  * @brief Seek new playback position.
  *
+ *        The new position is an absolute one.
+ *
+ * @param sec playback time in seconds to position to
+ */
+void uiAbsSeek(float sec)
+{
+    rel_seek_secs = sec;
+    abs_seek_pos  = SEEK_ABSOLUTE;
+}
+
+/**
+ * @brief Seek new playback position.
+ *
  *        The new position is a relative one.
  *
  * @param sec seconds to seek (either forward (> 0) or backward (< 0))

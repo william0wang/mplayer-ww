@@ -21,6 +21,7 @@
 
 extern int uiLoadPlay;
 
+void uiAbsSeek(float sec);
 void uiChangeSkin(char *name);
 void uiCurr(void);
 void uiEvent(int ev, float param);
