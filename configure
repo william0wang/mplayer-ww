@@ -8624,6 +8624,7 @@ CONFIG_LLAUDDSP= yes
 CONFIG_LLVIDDSP= yes
 CONFIG_LPC     = yes
 CONFIG_LSP     = yes
+CONFIG_LZF = yes
 CONFIG_LZO     = yes
 CONFIG_MDCT    = yes
 CONFIG_ME_CMP  = yes
@@ -9279,6 +9280,7 @@ $def_gnutls
 #define CONFIG_IDCTDSP 1
 #define CONFIG_IVIDSP 1
 #define CONFIG_LPC 1
+#define CONFIG_LZF 1
 #define CONFIG_LZO 1
 #define CONFIG_MDCT 1
 #define CONFIG_ME_CMP 1
