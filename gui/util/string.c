@@ -189,6 +189,29 @@ char *decomment(char *in)
 }
 
 /**
+ * @brief Remove enclosed quotation marks from a string.
+ *
+ * @param in string to be processed
+ *
+ * @return processed string
+ *
+ * @note This is an in-place processing.
+ */
+char *dequote(char *in)
+{
+    if (*in == '"') {
+        size_t end = strlen(in) - 1;
+
+        if (in[end] == '"') {
+            in[end] = 0;
+            in++;
+        }
+    }
+
+    return in;
+}
+
+/**
  * @brief Extract a part of a string delimited by a separator character.
  *
  * @param in string to be analyzed

@@ -31,6 +31,7 @@
 int cutInt(char *in, char sep, int num);
 void cutString(char *in, char *out, char sep, int num, size_t maxout);
 char *decomment(char *in);
+char *dequote(char *in);
 char *despace(char *in);
 char *gstrchr(const char *str, int c);
 int gstrcmp(const char *a, const char *b);
