@@ -22,9 +22,15 @@
  */
 
 #include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "misc.h"
+#include "string.h"
+#include "gui/app/gui.h"
+
+#include "mp_msg.h"
 
 /**
  * @brief Read characters from @a file.
@@ -99,4 +105,99 @@ float msf2sec(const char *msf)
     return (msf[0] - '0') * 600 + (msf[1] - '0') * 60 +
            (msf[3] - '0') * 10 + (msf[4] - '0') +
            ((msf[6] - '0') * 10 + (msf[7] - '0')) / 75.0f;
+}
+
+/**
+ * @brief Analyze a cue file whether it describes a disc image (binary data)
+ *        or a playlist for data files containing multiple titles.
+ *
+ * @param fname cue file to be analyzed
+ *
+ * @return pointer to an array of playlist items or NULL (binary data or error)
+ */
+plItem **cue_playlist(const char *fname)
+{
+    static plItem *item[100];
+    FILE *file;
+    char line[256], *l, *fmt, *path = NULL, *data = NULL;
+    int i = -1, isFILE = False, isTRACK = False;
+
+    file = fopen(fname, "rt");
+
+    if (file)
+        mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[misc] cue file: %s\n", fname);
+    else
+        return NULL;
+
+    while (fgetstr(line, sizeof(line), file) && (i < 99)) {
+        l = (char *)ltrim(line);
+
+        if (strncmp(l, "FILE ", 5) == 0) {
+            fmt = strrchr(l, ' ');
+
+            if (strcmp(fmt + 1, "BINARY") == 0) {
+                mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[misc] cue file describes BINARY (bin/cue)\n");
+                break;
+            }
+
+            *fmt = 0;
+
+            setdup(&data, dequote(l + 5));
+            mp_msg(MSGT_GPLAYER, MSGL_DBG2, "[misc] cue file data: %s (%s)\n", data, fmt + 1);
+
+            if (strrchr(data, '/')) {
+                setdup(&path, data);
+                l  = strrchr(path, '/');
+                *l = 0;
+                setdup(&data, l + 1);
+            } else {
+                setdup(&path, fname);
+                l = strrchr(path, '/');
+
+                if (l)
+                    *l = 0;
+                else
+                    setdup(&path, ".");
+            }
+
+            isFILE = True;
+        }
+
+        if (strncmp(l, "TRACK ", 6) == 0) {
+            if (!isFILE)
+                continue;
+
+            item[++i] = calloc(1, sizeof(**item));
+
+            if (!item[i])
+                break;
+
+            item[i]->path = strdup(path);
+            item[i]->name = strdup(data);
+
+            isTRACK = True;
+        }
+
+        if (strncmp(l, "TITLE ", 6) == 0) {
+            if (!isTRACK)
+                continue;
+
+            item[i]->title = strdup(dequote(l + 6));
+        }
+
+        if (strncmp(l, "INDEX 01 ", 9) == 0) {
+            if (!isTRACK)
+                continue;
+
+            item[i]->start = msf2sec(l + 9);
+
+            mp_msg(MSGT_GPLAYER, MSGL_V, "[misc] cue file data track %02d starts at %s\n", i + 1, l + 9);
+        }
+    }
+
+    free(path);
+    free(data);
+    fclose(file);
+
+    return (i == -1 ? NULL : item);
 }
