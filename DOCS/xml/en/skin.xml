@@ -606,6 +606,10 @@ blocks.
     <entry>filename</entry>
   </row>
   <row>
+    <entry>$O</entry>
+    <entry>filename (if no title name available) otherwise title</entry>
+  </row>
+  <row>
     <entry>$f</entry>
     <entry>filename in lower case</entry>
   </row>

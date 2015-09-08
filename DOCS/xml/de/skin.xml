@@ -736,6 +736,13 @@ end
                     <entry>Dateiname</entry>
                   </row>
                   <row>
+                    <entry>$O</entry>
+                    <entry>
+                      Dateiname (falls kein Titelname verfügbar), ansonsten
+                      der Titel
+                    </entry>
+                  </row>
+                  <row>
                     <entry>$f</entry>
                     <entry>Dateiname in Kleinbuchstaben</entry>
                   </row>
