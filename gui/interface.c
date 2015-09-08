@@ -590,13 +590,13 @@ int gui(int what, void *data)
             }
 
             if (guiInfo.StreamType == STREAMTYPE_BINCUE) {
-            colon = strrchr(fname, ':');
+                colon = strrchr(fname, ':');
 
-            if (colon)
-                *colon = 0;
+                if (colon)
+                    *colon = 0;
 
-            snprintf(tmp, sizeof(tmp), "cue://%s:%d", fname, guiInfo.Track);
-            uiSetFile(NULL, tmp, SAME_STREAMTYPE);
+                snprintf(tmp, sizeof(tmp), "cue://%s:%d", fname, guiInfo.Track);
+                uiSetFile(NULL, tmp, SAME_STREAMTYPE);
             } else {
                 next = listMgr(PLAYLIST_ITEM_GET_CURR, 0);
                 uiSetFileFromPlaylist(next);
