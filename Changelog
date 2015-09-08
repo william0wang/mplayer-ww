@@ -58,6 +58,8 @@ MPlayer
     * Support for audio and video bin/cue image playback
     * Support for Audio CD / (Super) Video CD / DVD image and DVD copy playback
       through the respective scheme (cd://, vcd://, dvd://)
+    * Support for arbitrary non-binary data file cue sheets (i.e. cue sheets
+      describing playlists for data files containing multiple titles)
 
 
   1.1.1: May 5, 2013

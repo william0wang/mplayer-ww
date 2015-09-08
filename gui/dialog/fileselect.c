@@ -488,9 +488,7 @@ static void fs_Ok_released(GtkButton *button, gpointer user_data)
     switch (fsType) {
     case FILESELECT_VIDEO_AUDIO:
 
-        if (strcmp(fsVideoAudioFilterNames[fsLastVideoAudioFilterSelected][0], MSGTR_GUI_FilterImageCue) == 0)
-            type = STREAMTYPE_BINCUE;
-        else if (strcmp(fsVideoAudioFilterNames[fsLastVideoAudioFilterSelected][0], MSGTR_GUI_FilterFilePlaylist) == 0)
+        if (strcmp(fsVideoAudioFilterNames[fsLastVideoAudioFilterSelected][0], MSGTR_GUI_FilterFilePlaylist) == 0)
             type = STREAMTYPE_PLAYLIST;
 
         uiSetFile(fsSelectedDirectory, fsSelectedFile, type);

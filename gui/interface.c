@@ -32,6 +32,7 @@
 #include "ui/ui.h"
 #include "util/list.h"
 #include "util/mem.h"
+#include "util/misc.h"
 #include "util/string.h"
 #include "wm/ws.h"
 #include "wm/wsxdnd.h"
@@ -445,6 +446,9 @@ int gui(int what, void *data)
         wsMouseAutohide();
         gtkEvents();
 
+        if (guiInfo.Stop && (guiInfo.ElapsedTime >= guiInfo.Stop))
+            guiInfo.MediumChanged = GUI_MEDIUM_NEW;
+
         break;
 
     case GUI_RUN_COMMAND:
@@ -503,6 +507,9 @@ int gui(int what, void *data)
             force_fps = 0;
         }
 
+        if (gstrcmp(strrchr(guiInfo.Filename, '.'), ".cue") == 0)
+            guiInfo.StreamType = STREAMTYPE_BINCUE;
+
         switch (guiInfo.StreamType) {
         case STREAMTYPE_FILE:
         case STREAMTYPE_STREAM:
@@ -559,6 +566,30 @@ int gui(int what, void *data)
             if (strncmp(guiInfo.Filename, "cue://", 6) == 0)
                 fname += 6;
 
+            if (fname == guiInfo.Filename) {   // no scheme, so check for playlist
+                plItem **playlist = cue_playlist(guiInfo.Filename);
+
+                if (playlist) {
+                    plItem *curr = listMgr(PLAYLIST_ITEM_GET_CURR, 0);
+
+                    while (*playlist) {
+                        if (*(playlist + 1))
+                            (*playlist)->stop = (*(playlist + 1))->start;
+                        else
+                            (*playlist)->stop = 0;
+
+                        listMgr(PLAYLIST_ITEM_INSERT, *playlist);
+                        playlist++;
+                    }
+
+                    listMgr(PLAYLIST_ITEM_SET_CURR, curr);
+                    listMgr(PLAYLIST_ITEM_DEL_CURR, 0);
+
+                    guiInfo.StreamType = STREAMTYPE_FILE;
+                }
+            }
+
+            if (guiInfo.StreamType == STREAMTYPE_BINCUE) {
             colon = strrchr(fname, ':');
 
             if (colon)
@@ -566,6 +597,11 @@ int gui(int what, void *data)
 
             snprintf(tmp, sizeof(tmp), "cue://%s:%d", fname, guiInfo.Track);
             uiSetFile(NULL, tmp, SAME_STREAMTYPE);
+            } else {
+                next = listMgr(PLAYLIST_ITEM_GET_CURR, 0);
+                uiSetFileFromPlaylist(next);
+                guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
+            }
         }
         break;
         }
@@ -897,6 +933,9 @@ int gui(int what, void *data)
                 }
             }
         }
+
+        if (guiInfo.Start)
+            uiAbsSeek(guiInfo.Start);
 
         // These must be done here (in the last call from MPlayer before
         // playback starts) and not in GUI_SETUP_VIDEO_WINDOW, because...
