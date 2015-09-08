@@ -600,7 +600,6 @@ int gui(int what, void *data)
             } else {
                 next = listMgr(PLAYLIST_ITEM_GET_CURR, 0);
                 uiSetFileFromPlaylist(next);
-                guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
             }
         }
         break;
@@ -1023,7 +1022,6 @@ int gui(int what, void *data)
         if (next) {
             uiSetFileFromPlaylist(next);
             guiInfo.MediumChanged = GUI_MEDIUM_NEW;
-            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
         } else {
             if (guiInfo.MediumChanged == GUI_MEDIUM_NEW)
                 break;

@@ -726,6 +726,7 @@ void uiSetFileFromPlaylist(plItem *item)
     guiInfo.Start = item->start;
     guiInfo.Stop  = item->stop;
     guiInfo.Title = gstrdup(item->title);
+    guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, item);
 }
 
 /**
@@ -820,7 +821,6 @@ void uiCurr(void)
         if (curr) {
             uiSetFileFromPlaylist(curr);
             guiInfo.PlaylistNext = False;
-            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, curr);
             break;
         }
 
@@ -899,7 +899,6 @@ void uiPrev(void)
         if (prev) {
             uiSetFileFromPlaylist(prev);
             guiInfo.PlaylistNext = !guiInfo.Playing;
-            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, prev);
             break;
         }
 
@@ -968,7 +967,6 @@ void uiNext(void)
         if (next) {
             uiSetFileFromPlaylist(next);
             guiInfo.PlaylistNext = !guiInfo.Playing;
-            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
             break;
         }
 
