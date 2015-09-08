@@ -34,7 +34,6 @@
 #include "gui/app/gui.h"
 #include "gui/dialog/dialog.h"
 #include "gui/skin/skin.h"
-#include "gui/util/list.h"
 #include "gui/util/mem.h"
 #include "gui/util/string.h"
 #include "gui/wm/ws.h"
@@ -709,6 +708,24 @@ void uiChangeSkin(char *name)
 
     wsWindowLayer(wsDisplay, guiApp.mainWindow.WindowID, guiApp.videoWindow.isFullScreen);
     wsWindowLayer(wsDisplay, guiApp.menuWindow.WindowID, guiApp.videoWindow.isFullScreen);
+}
+
+/**
+ * @brief Set the file to be played from a playlist item.
+ *
+ * @note This allows a file to be played partially (seeking before playback
+ *       and stopping before its end).
+ *
+ * @param item pointer to the playlist item
+ *
+ * @note All #guiInfo members associated with the file will be cleared.
+ */
+void uiSetFileFromPlaylist(plItem *item)
+{
+    uiSetFile(item->path, item->name, STREAMTYPE_FILE);
+    guiInfo.Start = item->start;
+    guiInfo.Stop  = item->stop;
+    guiInfo.Title = gstrdup(item->title);
 }
 
 /**

@@ -19,6 +19,8 @@
 #ifndef MPLAYER_GUI_ACTIONS_H
 #define MPLAYER_GUI_ACTIONS_H
 
+#include "gui/util/list.h"
+
 extern int uiLoadPlay;
 
 void uiAbsSeek(float sec);
@@ -33,6 +35,7 @@ void uiPlay(void);
 void uiPrev(void);
 void uiRelSeek(float sec);
 void uiSetFile(const char *dir, const char *name, int type);
+void uiSetFileFromPlaylist(plItem *item);
 void uiState(void);
 void uiUnsetFile(void);
 void uiUnsetMedia(int totals);
