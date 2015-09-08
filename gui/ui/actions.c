@@ -756,6 +756,8 @@ void uiUnsetMedia(int totals)
     guiInfo.AudioChannels    = 0;
     guiInfo.AudioPassthrough = False;
     guiInfo.RunningTime      = 0;
+    guiInfo.Start = 0;
+    guiInfo.Stop  = 0;
 
     if (totals) {
         guiInfo.Chapters = 0;
@@ -769,6 +771,7 @@ void uiUnsetMedia(int totals)
     }
 
     nfree(guiInfo.CodecName);
+    nfree(guiInfo.Title);
     nfree(guiInfo.AudioFilename);
     nfree(guiInfo.SubtitleFilename);
     nfree(guiInfo.ImageFilename);
