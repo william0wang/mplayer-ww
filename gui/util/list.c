@@ -197,6 +197,7 @@ void *listMgr(int cmd, void *data)
 
             free(curr->path);
             free(curr->name);
+            free(curr->title);
             free(curr);
         }
 
@@ -209,6 +210,7 @@ void *listMgr(int cmd, void *data)
 
             free(plList->path);
             free(plList->name);
+            free(plList->title);
             free(plList);
 
             plList = item;

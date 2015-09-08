@@ -41,6 +41,9 @@ enum {
 typedef struct plItem {
     char *path;
     char *name;
+    char *title;
+    int start;
+    int stop;
     struct plItem *prev, *next;
 } plItem;
 
