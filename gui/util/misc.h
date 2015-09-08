@@ -23,5 +23,6 @@
 
 float constrain(float value);
 char *fgetstr(char *str, int size, FILE *file);
+float msf2sec(const char *msf);
 
 #endif /* MPLAYER_GUI_MISC_H */

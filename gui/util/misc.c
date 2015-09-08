@@ -21,6 +21,7 @@
  * @brief Miscellaneous utilities
  */
 
+#include <ctype.h>
 #include <string.h>
 
 #include "misc.h"
@@ -63,4 +64,39 @@ float constrain(float value)
         return 100.0f;
 
     return value;
+}
+
+/**
+ * @brief Convert MM:SS:FF (minute/second/frame) to seconds.
+ *
+ * @param msf string in MM:SS:FF format
+ *
+ * @return seconds equivalent to @a msf (0 in case of error)
+ */
+float msf2sec(const char *msf)
+{
+    int i;
+
+    for (i = 0; i < 8; i++)
+        switch (i) {
+        case 0:
+        case 1:
+        case 3:
+        case 4:
+        case 6:
+        case 7:
+            if (!isdigit(msf[i]))
+                return 0.0f;
+            break;
+
+        case 2:
+        case 5:
+            if (msf[i] != ':')
+                return 0.0f;
+            break;
+        }
+
+    return (msf[0] - '0') * 600 + (msf[1] - '0') * 60 +
+           (msf[3] - '0') * 10 + (msf[4] - '0') +
+           ((msf[6] - '0') * 10 + (msf[7] - '0')) / 75.0f;
 }
