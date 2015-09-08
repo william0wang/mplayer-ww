@@ -982,7 +982,7 @@ int gui(int what, void *data)
         }
 
         if (next) {
-            uiSetFile(next->path, next->name, STREAMTYPE_FILE);
+            uiSetFileFromPlaylist(next);
             guiInfo.MediumChanged = GUI_MEDIUM_NEW;
             guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
         } else {
@@ -998,7 +998,7 @@ int gui(int what, void *data)
                     uiUnsetFile();
                 else if ((curr != listMgr(PLAYLIST_GET, 0)) && guiInfo.Playing) {
                     curr = listMgr(PLAYLIST_ITEM_SET_CURR, listMgr(PLAYLIST_GET, 0));
-                    uiSetFile(curr->path, curr->name, STREAMTYPE_FILE);
+                    uiSetFileFromPlaylist(curr);
                     guiInfo.Track = 1;
                 }
             } else if (guiInfo.Playing) {

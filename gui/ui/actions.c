@@ -818,7 +818,7 @@ void uiCurr(void)
         curr = listMgr(PLAYLIST_ITEM_GET_CURR, 0);
 
         if (curr) {
-            uiSetFile(curr->path, curr->name, STREAMTYPE_FILE);
+            uiSetFileFromPlaylist(curr);
             guiInfo.PlaylistNext = False;
             guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, curr);
             break;
@@ -897,7 +897,7 @@ void uiPrev(void)
         prev = listMgr(PLAYLIST_ITEM_GET_PREV, 0);
 
         if (prev) {
-            uiSetFile(prev->path, prev->name, STREAMTYPE_FILE);
+            uiSetFileFromPlaylist(prev);
             guiInfo.PlaylistNext = !guiInfo.Playing;
             guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, prev);
             break;
@@ -966,7 +966,7 @@ void uiNext(void)
         next = listMgr(PLAYLIST_ITEM_GET_NEXT, 0);
 
         if (next) {
-            uiSetFile(next->path, next->name, STREAMTYPE_FILE);
+            uiSetFileFromPlaylist(next);
             guiInfo.PlaylistNext = !guiInfo.Playing;
             guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
             break;
