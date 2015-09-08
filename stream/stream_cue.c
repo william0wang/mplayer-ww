@@ -256,7 +256,7 @@ static int cue_find_bin (const char *firstline) {
         fd_bin = -1;
     }
     if (fd_bin == -1) {
-      mp_msg(MSGT_OPEN,MSGL_STATUS, MSGTR_MPDEMUX_CUEREAD_BinFilenameTested,
+      mp_msg(MSGT_OPEN,MSGL_INFO, MSGTR_MPDEMUX_CUEREAD_BinFilenameTested,
             cur_name);
     }
   }
