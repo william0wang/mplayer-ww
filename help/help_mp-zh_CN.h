@@ -1,4 +1,4 @@
-// Synced with help_mp-en.h rev. 37272
+// Synced with help_mp-en.h rev. 37475
 //
 // Translated by JRaSH <jrash06@gmail.com>
 
@@ -651,6 +651,10 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_FilterFontBitmap "位图字体文件（*.desc）"
 #define MSGTR_GUI_FilterFontTTF "TrueType 字体文件（*.ttf）"
 #define MSGTR_GUI_FilterFontType1 "Type1 字体文件（*.pfb）"
+#define MSGTR_GUI_FilterImageCD "CD 镜像索引表"
+#define MSGTR_GUI_FilterImageCue "CD/VCD/SVCD 镜像索引表"
+#define MSGTR_GUI_FilterImageDVD "DVD 镜像/拷贝"
+#define MSGTR_GUI_FilterImageVCD "VCD/SVCD 镜像索引表"
 #define MSGTR_GUI_FilterMediumMatroska "Matroska 媒体文件"
 #define MSGTR_GUI_FilterMediumOgg "Ogg 媒体文件"
 #define MSGTR_GUI_FilterMediumQuickTime "QuickTime 媒体文件"
@@ -679,6 +683,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_FrontRight "前右"
 #define MSGTR_GUI_HideVideoWindow "播放后隐藏视频窗口"
 #define MSGTR_GUI_Hue "色调"
+#define MSGTR_GUI_Image "镜像"
 #define MSGTR_GUI_Information "信息"
 #define MSGTR_GUI_Lavc "lavc（实时 mpeg1 编码）"
 #define MSGTR_GUI_MaximumUsageSpareCPU "空闲 CPU 时间的最大使用量"
@@ -784,6 +789,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_SelectedFiles "所选文件"
 #define MSGTR_GUI_SelectFile "选择文件"
 #define MSGTR_GUI_SelectFont "选择字体"
+#define MSGTR_GUI_SelectImage "选择镜像"
 #define MSGTR_GUI_SelectSubtitle "选择字幕"
 #define MSGTR_GUI_SizeDouble "双倍尺寸"
 #define MSGTR_GUI_SizeFullscreen "全屏"
@@ -1831,7 +1837,8 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPDEMUX_CDDB_NoCDInDrive "驱动器里没有 CD。\n"
 
 // stream_cue.c
-#define MSGTR_MPDEMUX_CUEREAD_UnexpectedCuefileLine "[bincue] cue 文件中不应出现的一行内容：%s\n"
+#define MSGTR_MPDEMUX_CUEREAD_UnexpectedCuefileLine "[bincue] cue 文件中有内容异常的一行：%s"
+#define MSGTR_MPDEMUX_CUEREAD_BinFilenameFound "[bincue] 未找到文件描述内容：%s"
 #define MSGTR_MPDEMUX_CUEREAD_BinFilenameTested "[bincue] 已测试 bin 文件名：%s\n"
 #define MSGTR_MPDEMUX_CUEREAD_CannotFindBinFile "[bincue] 无法找到 bin 文件 - 正在放弃尝试。\n"
 #define MSGTR_MPDEMUX_CUEREAD_UsingBinFile "[bincue] 正在使用 bin 文件 %s。\n"
