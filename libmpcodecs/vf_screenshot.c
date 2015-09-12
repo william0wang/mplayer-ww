@@ -110,6 +110,9 @@ static void write_png(struct vf_priv_s *priv)
     av_init_packet(&pkt);
     pkt.data = priv->outbuffer;
     pkt.size = priv->outbuffer_size;
+    priv->pic->width = priv->avctx->width;
+    priv->pic->height = priv->avctx->height;
+    priv->pic->format = priv->avctx->pix_fmt;
     res = avcodec_encode_video2(priv->avctx, &pkt, priv->pic, &got_pkt);
     if (res < 0 || !got_pkt || pkt.size <= 0) {
         mp_msg(MSGT_VFILTER,MSGL_ERR,"\nFailed to encode screenshot %s!\n", fname);
