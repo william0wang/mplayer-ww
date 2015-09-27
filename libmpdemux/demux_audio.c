@@ -261,6 +261,21 @@ get_flac_metadata (demuxer_t* demuxer)
 }
 #endif
 
+static void skip_flac_metadata(demuxer_t *demuxer)
+{
+  stream_t *s = demuxer->stream;
+  unsigned char blk_type;
+
+  mp_msg(MSGT_DEMUX,MSGL_V,"demux_audio: skipping flac metadata\n");
+  do {
+    int blk_len;
+    blk_type = stream_read_char (s);
+    blk_len = stream_read_int24(s);
+    mp_msg(MSGT_DEMUX,MSGL_DBG2,"Blk type %2x, size = %6x\n",blk_type, blk_len);
+    stream_skip (s, blk_len);
+  } while (!(blk_type & 0x80));
+}
+
 /**
  * @brief Determine the number of frames of a file encoded with
  *        variable bitrate mode (VBR).
@@ -595,7 +610,8 @@ static int demux_audio_open(demuxer_t* demuxer) {
     sh_audio->needs_parsing = 1;
     stream_seek(s,demuxer->movi_start);
   } break;
-  case fLaC:
+  case fLaC: {
+	    int have_metadata = 0;
 	    sh_audio->format = mmioFOURCC('f', 'L', 'a', 'C');
 	    demuxer->movi_start = stream_tell(s) - 4;
 	    demuxer->movi_end = s->end_pos;
@@ -604,19 +620,29 @@ static int demux_audio_open(demuxer_t* demuxer) {
 	      int64_t size = demuxer->movi_end - demuxer->movi_start;
 	      int64_t num_samples;
 	      int32_t srate;
-	      stream_skip(s, 14);
+	      int header_size;
+	      have_metadata = !(stream_read_char(s) & 0x80);
+	      header_size = stream_read_int24(s);
+	      if (header_size != 0x22)
+	        mp_msg(MSGT_DEMUX,MSGL_WARN,"demux_audio: unexpected flac header size: 0x%x\n", header_size);
+	      stream_skip(s, 10);
 	      srate = stream_read_int24(s) >> 4;
 	      num_samples  = stream_read_char(s) & 0xf;
 	      num_samples <<= 32;
 	      num_samples |= stream_read_dword(s);
 	      if (num_samples && srate)
 	        sh_audio->i_bps = size * srate / num_samples;
+	      stream_skip(s, 16);
 	    }
 	    if (sh_audio->i_bps < 1) // guess value to prevent crash
 	      sh_audio->i_bps = 64 * 1024;
 	    sh_audio->needs_parsing = 1;
+	    if (have_metadata) { // Remove this block if reenabling get_metadata
+	      skip_flac_metadata(demuxer);
+	      demuxer->movi_start = stream_tell(s);
+	    }
 //	    get_flac_metadata (demuxer);
-	    break;
+	    } break;
   }
 
   priv = malloc(sizeof(da_priv_t));
