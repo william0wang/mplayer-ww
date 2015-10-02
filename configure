@@ -2454,6 +2454,7 @@ case "$host_arch" in
   ppc*|powerpc*)
     arch='ppc'
     def_dcbzl='#define HAVE_DCBZL 0'
+    def_vsx='#define HAVE_VSX 0'
     def_fast_unaligned='#define HAVE_FAST_UNALIGNED 1'
     def_av_fast_unaligned='#define AV_HAVE_FAST_UNALIGNED 1'
     def_local_aligned_8='#define HAVE_LOCAL_ALIGNED_8 1'
@@ -9158,6 +9159,7 @@ $def_yasm
 $def_aligned_malloc
 $def_bswap
 $def_dcbzl
+$def_vsx
 $def_atanf
 $def_atan2f
 $def_cbrt
