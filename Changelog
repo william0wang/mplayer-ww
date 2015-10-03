@@ -1,5 +1,7 @@
 MPlayer
 
+  1.2: "FrameCounter" October 3, 2015
+
     Decoders:
     * Hardware accelerated decoding on OS X via VDA.
     * Internal libmpeg2 disabled by default, on the assumption
@@ -61,6 +63,8 @@ MPlayer
     * Support for arbitrary non-binary data file cue sheets (i.e. cue sheets
       describing playlists for data files containing multiple titles)
 
+    FFmpeg:
+    * Version 2.8 with local patches
 
   1.1.1: May 5, 2013
 
