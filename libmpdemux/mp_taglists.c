@@ -48,6 +48,9 @@ static const struct AVCodecTag mp_wav_tags[] = {
     { AV_CODEC_ID_ADPCM_IMA_ISS,     MKTAG('A', 'I', 'S', 'S') },
     { AV_CODEC_ID_ADPCM_IMA_WS,      MKTAG('A', 'I', 'W', 'S') },
     { AV_CODEC_ID_ADPCM_THP,         MKTAG('T', 'H', 'P', 'A') },
+#if LIBAVUTIL_VERSION_MICRO >= 100
+    { AV_CODEC_ID_ADPCM_THP_LE,      MKTAG('T', 'H', 'P', 'L') },
+#endif
     { AV_CODEC_ID_ADPCM_XA,          MKTAG('P', 'S', 'X', 'A') },
     { AV_CODEC_ID_AMR_NB,            MKTAG('n', 'b',   0,   0) },
     { AV_CODEC_ID_ATRAC1,            MKTAG('A', 'T', 'R', '1') },
