@@ -507,7 +507,7 @@ int gui(int what, void *data)
             force_fps = 0;
         }
 
-        if (gstrcmp(strrchr(guiInfo.Filename, '.'), ".cue") == 0)
+        if (guiInfo.Filename && (gstrcmp(strrchr(guiInfo.Filename, '.'), ".cue") == 0))
             guiInfo.StreamType = STREAMTYPE_BINCUE;
 
         switch (guiInfo.StreamType) {
