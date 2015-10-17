@@ -79,6 +79,7 @@ typedef struct lavf_priv {
     int sstreams[MAX_S_STREAMS];
     int cur_program;
     int nb_streams_last;
+    int use_lavf_netstream;
 }lavf_priv_t;
 
 static int mp_read(void *opaque, uint8_t *buf, int size) {
@@ -204,8 +205,14 @@ static int lavf_check_file(demuxer_t *demuxer){
     if(!priv->avif){
         mp_msg(MSGT_HEADER,MSGL_V,"LAVF_check: no clue about this gibberish!\n");
         return 0;
-    }else
+    }else{
         mp_msg(MSGT_HEADER,MSGL_V,"LAVF_check: %s\n", priv->avif->long_name);
+        if (!strcmp(priv->avif->name, "hls,applehttp")) {
+            mp_msg(MSGT_HEADER,MSGL_V,"LAVF: network streaming with lavf\n");
+            avformat_network_init();
+            priv->use_lavf_netstream  = 1;
+        }
+    }
 
     return DEMUXER_TYPE_LAVF;
 }
@@ -556,6 +563,8 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
         else if (!strncmp(demuxer->stream->url, "ffmpeg://", 9))
             av_strlcpy(mp_filename, demuxer->stream->url + 9, sizeof(mp_filename));
         else if (!strncmp(demuxer->stream->url, "rtsp://", 7))
+            av_strlcpy(mp_filename, demuxer->stream->url, sizeof(mp_filename));
+        else if (priv->use_lavf_netstream)
             av_strlcpy(mp_filename, demuxer->stream->url, sizeof(mp_filename));
         else
             av_strlcat(mp_filename, demuxer->stream->url, sizeof(mp_filename));
