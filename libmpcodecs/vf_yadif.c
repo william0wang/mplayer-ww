@@ -34,7 +34,7 @@
 #include "libmpdemux/demuxer.h"
 #include "libvo/fastmemcpy.h"
 #include "libavutil/common.h"
-#include "libavutil/x86/asm.h"
+#include "mpx86asm.h"
 
 //===========================================================================//
 

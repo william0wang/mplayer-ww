@@ -51,7 +51,7 @@
 #include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mem.h"
-#include "libavutil/x86/asm.h"
+#include "mpx86asm.h"
 #include "libavcodec/avcodec.h"
 
 #undef free
