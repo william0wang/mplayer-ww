@@ -9263,6 +9263,7 @@ $def_gnutls
 #define HAVE_LIBC_MSVCRT 0
 #define HAVE_MACH_MACH_TIME_H 0
 #define HAVE_MAPVIEWOFFILE 0
+#define HAVE_MIPSDSP 0
 #define HAVE_MIPSDSPR1 0
 #define HAVE_MIPSFPU 0
 #define HAVE_MM_EMPTY 0
