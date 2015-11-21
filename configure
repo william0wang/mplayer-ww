@@ -3430,7 +3430,7 @@ fi
 done
 
 
-for func in atan2f fminf ldexpf powf; do
+for func in atan2f fminf ldexpf powf hypot; do
 echocheck $func
 eval _$func=no
 statement_check math.h "${func}(1.0,1.0)" && eval _$func=yes
@@ -9195,6 +9195,7 @@ $def_exp2
 $def_exp2f
 $def_fminf
 $def_getaddrinfo
+$def_hypot
 $def_isinf
 $def_isnan
 $def_ldexpf
