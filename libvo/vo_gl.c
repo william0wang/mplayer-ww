@@ -1334,7 +1334,8 @@ static int preinit_internal(const char *arg, int allow_sw)
               "  customtrect\n"
               "    use texture_rectangle for customtex texture\n"
               "  mipmapgen\n"
-              "    generate mipmaps for the video image (use with TXB in customprog)\n"
+              "    generate mipmaps for the video image (use with TXB in customprog)\n" );
+      mp_msg(MSGT_VO, MSGL_FATAL,
               "  osdcolor=<0xAARRGGBB>\n"
               "    use the given color for the OSD\n"
               "  stereo=<n> (add 32 to swap left and right)\n"
