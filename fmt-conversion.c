@@ -42,7 +42,7 @@ static const struct {
     { IMGFMT_BGR8,       AV_PIX_FMT_RGB8 },
     { IMGFMT_BGR4,       AV_PIX_FMT_RGB4 },
     { IMGFMT_BGR1,       AV_PIX_FMT_MONOBLACK },
-    { IMGFMT_RGB1,       AV_PIX_FMT_MONOBLACK },
+    { IMGFMT_RGB1,       AV_PIX_FMT_MONOWHITE },
     { IMGFMT_RG4B,       AV_PIX_FMT_BGR4_BYTE },
     { IMGFMT_BG4B,       AV_PIX_FMT_RGB4_BYTE },
     { IMGFMT_RGB48LE,    AV_PIX_FMT_RGB48LE },
