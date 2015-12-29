@@ -92,6 +92,8 @@ static int preinit(sh_audio_t *sh_audio)
     return 0;
   sh_audio->audio_in_minsize=
   sh_audio->ds->ss_mul = sh_audio->wf->nBlockAlign;
+  if (!sh_audio->audio_in_minsize)
+    return 0;
   return 1;
 }
 
