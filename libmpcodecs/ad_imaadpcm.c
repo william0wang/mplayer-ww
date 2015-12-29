@@ -100,6 +100,8 @@ static int preinit(sh_audio_t *sh_audio)
   {
     sh_audio->ds->ss_div = (sh_audio->wf->nBlockAlign -
       (MS_IMA_ADPCM_PREAMBLE_SIZE * sh_audio->wf->nChannels)) * 2;
+    if (!sh_audio->ds->ss_div)
+      return 0;
     sh_audio->ds->ss_mul = sh_audio->wf->nBlockAlign;
   }
   else
