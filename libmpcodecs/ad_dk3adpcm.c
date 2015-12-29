@@ -88,6 +88,8 @@ static int preinit(sh_audio_t *sh_audio)
   sh_audio->audio_out_minsize = sh_audio->wf->nBlockAlign * 6;
   sh_audio->ds->ss_div =
     (sh_audio->wf->nBlockAlign - DK3_ADPCM_PREAMBLE_SIZE) * 8 / 3;
+  if (!sh_audio->ds->ss_div)
+    return 0;
   sh_audio->audio_in_minsize=
   sh_audio->ds->ss_mul = sh_audio->wf->nBlockAlign;
   return 1;
