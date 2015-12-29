@@ -137,7 +137,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
   struct stream_priv_s* p = opts;
   int ret,ret2,f,sect,tmp;
   mp_vcd_priv_t* vcd;
-#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+#if (defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && !defined(CONFIG_LIBCDIO)
   int bsize = VCD_SECTOR_SIZE;
 #endif
 #if defined(__MINGW32__) || defined(__CYGWIN__)
@@ -248,7 +248,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
 
   mp_msg(MSGT_OPEN,MSGL_V,"VCD start byte position: 0x%X  end: 0x%X\n",ret,ret2);
 
-#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+#if (defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && !defined(CONFIG_LIBCDIO)
   if (ioctl (f, CDRIOCSETBLOCKSIZE, &bsize) == -1) {
     mp_msg(MSGT_OPEN,MSGL_WARN,"Error in CDRIOCSETBLOCKSIZE");
   }
