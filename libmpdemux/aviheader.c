@@ -341,6 +341,8 @@ while(1){
 	if (sh_audio->format == 1 &&
 	    last_fccHandler == mmioFOURCC('A', 'x', 'a', 'n'))
 	    sh_audio->format = last_fccHandler;
+	if (sh_audio->format == 0x11 && sh_audio->wf->wBitsPerSample == 8)
+	    sh_audio->format = 0x116b727a; // Zork PCM, format conflicts with IMA ADPCM
 	sh_audio->i_bps=sh_audio->wf->nAvgBytesPerSec;
         chunksize=0;
         if( mp_msg_test(MSGT_HEADER,MSGL_V) ) print_wave_header(sh_audio->wf,MSGL_V);
