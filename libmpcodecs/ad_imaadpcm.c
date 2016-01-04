@@ -92,6 +92,10 @@ static int preinit(sh_audio_t *sh_audio)
   // not exactly sure what this field is for
   sh_audio->audio_out_minsize = 8192;
 
+  // These formats can have only 1 or 2 channels
+  if (sh_audio->wf->nChannels != 1 && sh_audio->wf->nChannels != 2)
+    return 0;
+
   // if format is "ima4", assume the audio is coming from a QT file which
   // indicates constant block size, whereas an AVI/ASF/WAV file will fill
   // in this field with 0x11
