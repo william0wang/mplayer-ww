@@ -204,6 +204,11 @@ static int demux_gif_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
 
   effective_map = gif->Image.ColorMap;
   if (effective_map == NULL) effective_map = gif->SColorMap;
+  if (effective_map == NULL) {
+    mp_msg(MSGT_DEMUX, MSGL_ERR, "[demux_gif] No local nor global colormap.\n");
+    free(buf);
+    return 0;
+  }
 
   {
     int y;
