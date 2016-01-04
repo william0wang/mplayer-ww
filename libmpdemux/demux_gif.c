@@ -146,7 +146,7 @@ static int demux_gif_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
       }
       if (code == 0xF9) {
         int frametime = 0;
-        if (p[0] == 4) // is the length correct?
+        if (p && p[0] == 4) // is the length correct?
         {
           transparency = p[1] & 1;
           refmode = (p[1] >> 2) & 3;
