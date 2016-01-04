@@ -168,6 +168,11 @@ static int preinit(sh_audio_t *sh)
 
 static int init(sh_audio_t *sh_audio)
 {
+  demux_stream_t *ds = sh_audio->ds;
+
+  /* Ensure that the demuxer buffer is not empty */
+  if(ds->buffer_pos >= ds->buffer_size && !ds_fill_buffer(ds))
+    return 0;
   /* Dolby AC3 passthrough:*/
   if(ac3dts_fillbuff(sh_audio) < 0)
   {
