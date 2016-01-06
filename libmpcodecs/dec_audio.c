@@ -118,6 +118,14 @@ static int init_audio_codec(sh_audio_t *sh_audio)
 	return 0;
     }
 
+    if (sh_audio->channels < 0 || sh_audio->samplerate < 0 || sh_audio->samplesize < 0 ||
+	(int64_t)sh_audio->channels * sh_audio->samplerate > INT_MAX ||
+	(int64_t)sh_audio->channels * sh_audio->samplerate * sh_audio->samplesize > INT_MAX) {
+	mp_msg(MSGT_DECAUDIO, MSGL_WARN, "dec_audio: Unreasonable audio codec parameters\n");
+	uninit_audio(sh_audio);	// free buffers
+	return 0;
+    }
+
     if (!sh_audio->o_bps)
 	sh_audio->o_bps = sh_audio->channels * sh_audio->samplerate
 	                  * sh_audio->samplesize;
