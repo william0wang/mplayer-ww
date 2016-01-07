@@ -44,6 +44,11 @@ void mp_image_alloc_planes(mp_image_t *mpi) {
   }
   // IF09 - allocate space for 4. plane delta info - unused
   if (mpi->imgfmt == IMGFMT_IF09) {
+    if ((int64_t)mpi->chroma_width*mpi->chroma_height > INT_MAX ||
+        mpi->bpp*mpi->width*(mpi->height+2)/8 > INT_MAX - mpi->chroma_width*mpi->chroma_height) {
+        mp_msg(MSGT_DECVIDEO,MSGL_WARN,"mp_image: Unreasonable image parameters\n");
+        return;
+  }
     mpi->planes[0]=av_malloc(mpi->bpp*mpi->width*(mpi->height+2)/8+
                             mpi->chroma_width*mpi->chroma_height);
   } else
