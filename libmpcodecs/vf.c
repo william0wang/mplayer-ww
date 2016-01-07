@@ -294,6 +294,11 @@ mp_image_t* vf_get_image(vf_instance_t* vf, unsigned int outfmt, int mp_imgtype,
   if (w == -1) w = vf->w;
   if (h == -1) h = vf->h;
 
+  if (w < 0 || h < 0 || w > INT_MAX - 32) {
+      mp_msg(MSGT_DECVIDEO, MSGL_ERR, "vf_get_image: unreasonable picture size\n");
+      return NULL;
+  }
+
   w2=(mp_imgflag&MP_IMGFLAG_ACCEPT_ALIGNED_STRIDE)?FFALIGN(w, 32):w;
 
   if(vf->put_image==vf_next_put_image){
@@ -411,6 +416,11 @@ mp_image_t* vf_get_image(vf_instance_t* vf, unsigned int outfmt, int mp_imgtype,
           }
 
           mp_image_alloc_planes(mpi);
+          if (!(mpi->flags & MP_IMGFLAG_ALLOCATED)) { // allocation failed
+              mp_msg(MSGT_DECVIDEO, MSGL_FATAL, "vf_get_image: allocation of image planes failed!\n");
+              return NULL;
+          }
+
 //        printf("clearing img!\n");
           vf_mpi_clear(mpi,0,0,mpi->width,mpi->height);
         }

@@ -33,6 +33,15 @@
 #include "mp_msg.h"
 
 void mp_image_alloc_planes(mp_image_t *mpi) {
+  /* This condition is stricter than needed, but I want to be sure that every
+   * calculation step can fit in int32_t. This assumption is true over most of
+   * the code, so this acts as a safeguard for other image size calulations. */
+  if ((unsigned int)mpi->height + 2 > INT_MAX ||
+      (int64_t)mpi->width*(mpi->height+2) > INT_MAX ||
+      (int64_t)mpi->bpp*mpi->width*(mpi->height+2) > INT_MAX) {
+      mp_msg(MSGT_DECVIDEO,MSGL_WARN,"mp_image: Unreasonable image parameters\n");
+      return;
+  }
   // IF09 - allocate space for 4. plane delta info - unused
   if (mpi->imgfmt == IMGFMT_IF09) {
     mpi->planes[0]=av_malloc(mpi->bpp*mpi->width*(mpi->height+2)/8+
