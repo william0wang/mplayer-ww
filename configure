@@ -8594,6 +8594,7 @@ CONFIG_SELECT_FILTER = no
 
 CONFIG_STATIC = yes
 SRC_PATH      = .
+DST_PATH      = $(pwd)/ffmpeg
 LIBPREF       = lib
 LIBSUF        = .a
 FULLNAME      = \$(NAME)\$(BUILDSUF)
