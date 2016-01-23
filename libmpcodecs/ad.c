@@ -41,7 +41,6 @@ extern const ad_functions_t mpcodecs_ad_hwmpa;
 extern const ad_functions_t mpcodecs_ad_pcm;
 extern const ad_functions_t mpcodecs_ad_dvdpcm;
 extern const ad_functions_t mpcodecs_ad_alaw;
-extern const ad_functions_t mpcodecs_ad_dk4adpcm;
 extern const ad_functions_t mpcodecs_ad_dshow;
 extern const ad_functions_t mpcodecs_ad_dmo;
 extern const ad_functions_t mpcodecs_ad_acm;
