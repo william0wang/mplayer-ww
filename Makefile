@@ -293,12 +293,9 @@ SRCS_COMMON = asxparser.c                       \
               libaf/window.c                    \
               libmpcodecs/ad.c                  \
               libmpcodecs/ad_alaw.c             \
-              libmpcodecs/ad_dk3adpcm.c         \
               libmpcodecs/ad_dvdpcm.c           \
               libmpcodecs/ad_hwac3.c            \
               libmpcodecs/ad_hwmpa.c            \
-              libmpcodecs/ad_imaadpcm.c         \
-              libmpcodecs/ad_msadpcm.c          \
               libmpcodecs/ad_pcm.c              \
               libmpcodecs/dec_audio.c           \
               libmpcodecs/dec_teletext.c        \
