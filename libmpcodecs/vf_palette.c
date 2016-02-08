@@ -36,7 +36,7 @@
 //===========================================================================//
 
 // commented out 16 and 15 bit output support, because the conversion
-// routines are incorrrect.  they assume the palette to be of the same
+// routines are incorrect.  They assume the palette to be of the same
 // depth as the output, which is incorrect. --Joey
 
 static const unsigned int bgr_list[]={
