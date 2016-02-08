@@ -455,7 +455,6 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
   }
   case AF_CONTROL_SCALETEMPO_AMOUNT | AF_CONTROL_SET:{
     s->scale = *(float*)arg;
-    s->scale = s->speed * s->scale_nominal;
     return AF_OK;
   }
   case AF_CONTROL_SCALETEMPO_AMOUNT | AF_CONTROL_GET:
