@@ -505,6 +505,8 @@ static int config(uint32_t s_width, uint32_t s_height, uint32_t d_width,
 // vm things
 
 	if (vm) {
+	    int i;
+	    static const uint8_t fallback_bpps[] = {24, 32, 16, 8, 0};
 	    videomode_t params;
 	    params.out_width=d_width;
 	    params.out_height=d_height;
@@ -533,17 +535,8 @@ static int config(uint32_t s_width, uint32_t s_height, uint32_t d_width,
 	    mp_msg(MSGT_VO, MSGL_DBG2,"DirectFB: Config - trying to change videomode\n");
             DFBCHECK (dfb->EnumVideoModes(dfb,video_modes_callback,&params));
 	    ret=dfb->SetVideoMode(dfb,params.width,params.height,params.bpp);
-	    if (ret) {
-		ret=dfb->SetVideoMode(dfb,params.width,params.height,24);
-		    if (ret) {
-			ret=dfb->SetVideoMode(dfb,params.width,params.height,32);
-			    if (ret) {
-				ret=dfb->SetVideoMode(dfb,params.width,params.height,16);
-				    if (ret) {
-					ret=dfb->SetVideoMode(dfb,params.width,params.height,8);
-				    }
-			    }
-		    }
+	    for (i = 0; ret && fallback_bpps[i]; i++) {
+		ret=dfb->SetVideoMode(dfb,params.width,params.height,fallback_bpps[i]);
 	    }
 	} // vm end
 
