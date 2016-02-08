@@ -1,5 +1,20 @@
 MPlayer
 
+
+  1.2.1:January 24, 2016
+
+    Fixes:
+    * misc GUI fixes
+    * fix build regression in FreeBSD
+    * fix many crashes with fuzzed files
+    * fix errors for multichannels files and pulseaudio >= 6
+    Other:
+    * building with system FFmpeg libs is possible without a local copy of
+      of private FFmpeg headers
+    * docs building does not require FFmpeg anymore
+    * FFmpeg updated to 2.8.5
+
+
   1.2: "FrameCounter" October 3, 2015
 
     Decoders:
