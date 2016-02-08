@@ -344,8 +344,6 @@ static int demux_ty_fill_buffer( demuxer_t *demux, demux_stream_t *dsds )
 
    int              counter;
 
-   int              aid;
-
    TiVoInfo         *tivo = demux->priv;
    unsigned char    *chunk = tivo->chunk;
 
@@ -496,13 +494,12 @@ static int demux_ty_fill_buffer( demuxer_t *demux, demux_stream_t *dsds )
 
 
    // Let's make a Video Demux Stream for MPlayer
-   aid = 0x0;
-   if( !demux->v_streams[ aid ] ) new_sh_video( demux, aid );
-   if( demux->video->id == -1 ) demux->video->id = aid;
-   if( demux->video->id == aid )
+   if( !demux->v_streams[ 0 ] ) new_sh_video( demux, 0 );
+   if( demux->video->id == -1 ) demux->video->id = 0;
+   if( demux->video->id == 0 )
    {
       demux_stream_t *ds = demux->video;
-      if( !ds->sh ) ds->sh = demux->v_streams[ aid ];
+      if( !ds->sh ) ds->sh = demux->v_streams[ 0 ];
    }
 
    // ======================================================================
@@ -554,6 +551,7 @@ static int demux_ty_fill_buffer( demuxer_t *demux, demux_stream_t *dsds )
          {
             if( demux->audio->id == -1 )
             {
+               int aid = 0;
                if ( nybbleType == 0x02 )
                   continue;    // DTiVo inconclusive, wait for more
                else if ( nybbleType == 0x09 )
@@ -585,8 +583,6 @@ static int demux_ty_fill_buffer( demuxer_t *demux, demux_stream_t *dsds )
                  }
                }
             }
-
-            aid = demux->audio->id;
 
 
             // SA DTiVo Audio Data, no PES
