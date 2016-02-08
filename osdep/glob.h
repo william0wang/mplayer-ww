@@ -19,8 +19,13 @@
 #ifndef MPLAYER_GLOB_H
 #define MPLAYER_GLOB_H
 
-#include <sys/types.h>
 #include "config.h"
+
+#ifdef HAVE_GLOB
+#include <glob.h>
+#else
+
+#include <sys/types.h>
 
 typedef struct {
   size_t gl_pathc;
@@ -31,5 +36,7 @@ typedef struct {
 void globfree(glob_t *pglob);
 
 int  glob(const char *pattern, int flags, int (*errfunc)(const char *epath, int eerrno), glob_t *pglob);
+
+#endif
 
 #endif /* MPLAYER_GLOB_H */

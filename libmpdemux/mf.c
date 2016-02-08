@@ -31,11 +31,7 @@
 
 #include "config.h"
 
-#ifdef HAVE_GLOB
-#include <glob.h>
-#else
 #include "osdep/glob.h"
-#endif
 #include "osdep/strsep.h"
 
 #include "mp_msg.h"
