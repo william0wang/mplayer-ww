@@ -337,16 +337,13 @@ static int asf_streaming_parse_header(int fd, streaming_ctrl_t* streaming_ctrl) 
   if (asf_ctrl->n_audio) {
     // find lowest-bitrate audio stream
     a_rate = a_rates[0];
-    a_idx = 0;
     for (i = 0; i < asf_ctrl->n_audio; i++) {
       if (a_rates[i] < a_rate) {
         a_rate = a_rates[i];
-        a_idx = i;
       }
     }
     if (max_idx(asf_ctrl->n_video, v_rates, bw - a_rate) < 0) {
       // both audio and video are not possible, try video only next
-      a_idx = -1;
       a_rate = 0;
     }
   }
