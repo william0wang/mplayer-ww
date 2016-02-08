@@ -138,7 +138,7 @@ static int ac3dts_fillbuff(sh_audio_t *sh_audio)
       }
     }
     /* bad file => resync*/
-    memcpy(sh_audio->a_in_buffer, sh_audio->a_in_buffer + 1, 11);
+    memmove(sh_audio->a_in_buffer, sh_audio->a_in_buffer + 1, 11);
     --sh_audio->a_in_buffer_len;
   }
   mp_msg(MSGT_DECAUDIO, MSGL_DBG2, "ac3dts: %s len=%d  flags=0x%X  %d Hz %d bit/s\n", isdts == 1 ? "DTS" : isdts == 0 ? "AC3" : "unknown", length, flags, sample_rate, bit_rate);
