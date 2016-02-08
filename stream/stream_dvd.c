@@ -885,7 +885,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
 
     mp_msg(MSGT_OPEN,MSGL_V, "DVD successfully opened.\n");
     // store data
-    d=malloc(sizeof(dvd_priv_t)); memset(d,0,sizeof(dvd_priv_t));
+    d=calloc(1, sizeof(*d));
     d->dvd=dvd;
     d->title=title;
     d->vmg_file=vmg_file;
@@ -1013,7 +1013,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
     mp_msg(MSGT_DVD,MSGL_V, "DVD start cell: %d  pack: 0x%X-0x%X  \n",d->cur_cell,d->cur_pack,d->cell_last_pack);
 
     //assign cell_times_table
-    d->cell_times_table = malloc(sizeof(unsigned int) * d->cur_pgc->nr_of_cells);
+    d->cell_times_table = calloc(d->cur_pgc->nr_of_cells, sizeof(*d->cell_times_table));
     if(d->cell_times_table == NULL)
       return STREAM_UNSUPPORTED;
     for(k=0; k<d->cur_pgc->nr_of_cells; k++)
