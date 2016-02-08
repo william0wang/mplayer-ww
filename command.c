@@ -2549,6 +2549,7 @@ static void overlay_add(char *file, int id, int x, int y, unsigned col)
     if (bpp != 1 || maxval != 255) {
         mp_msg(MSGT_CPLAYER, MSGL_ERR,
                "overlay_add: file format not supported.\n");
+        free(data);
         return;
     }
     if (!overlay_source_registered) {
