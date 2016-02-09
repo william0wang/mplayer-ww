@@ -745,13 +745,14 @@ static int gen_sh_audio(sh_audio_t* sh, mov_track_t* trak, int timescale) {
 		    if((len >= 4) &&
 		       (char2int(trak->stdata,52) >= 12) &&
 		       (char2int(trak->stdata,52+4) == MOV_FOURCC('f','r','m','a'))) {
+			int frma_len = char2int(trak->stdata,52);
 			switch(char2int(trak->stdata,52+8)) {
 			 case MOV_FOURCC('a','l','a','c'):
-			  if (len >= 36 + char2int(trak->stdata,52)) {
-			    sh->codecdata_len = char2int(trak->stdata,52+char2int(trak->stdata,52));
+			  if (len >= 36 + frma_len) {
+			    sh->codecdata_len = char2int(trak->stdata,52+frma_len);
 			    mp_msg(MSGT_DEMUX, MSGL_V, "MOV: Found alac atom (%d)!\n", sh->codecdata_len);
 			    sh->codecdata = malloc(sh->codecdata_len);
-			    memcpy(sh->codecdata, &trak->stdata[52+char2int(trak->stdata,52)], sh->codecdata_len);
+			    memcpy(sh->codecdata, &trak->stdata[52+frma_len], sh->codecdata_len);
 			  }
 			  break;
 			 case MOV_FOURCC('i','n','2','4'):
