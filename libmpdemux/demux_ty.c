@@ -524,7 +524,7 @@ static int demux_ty_fill_buffer( demuxer_t *demux, demux_stream_t *dsds )
       // ================================================================
       if ( type == 0xe0 )
       {
-         if ( size > 0 && size + offset <= CHUNKSIZE )
+         if ( size > 0 && size <= CHUNKSIZE - offset )
          {
             int esOffset1 = demux_ty_FindESHeader( VIDEO_NAL, &chunk[ offset ],
                size);
@@ -547,7 +547,7 @@ static int demux_ty_fill_buffer( demuxer_t *demux, demux_stream_t *dsds )
       // ================================================================
       else if ( type == 0xc0 )
       {
-         if ( size > 0 && size + offset <= CHUNKSIZE )
+         if ( size > 0 && size <= CHUNKSIZE - offset )
          {
             if( demux->audio->id == -1 )
             {
@@ -703,7 +703,7 @@ static int demux_ty_fill_buffer( demuxer_t *demux, demux_stream_t *dsds )
       // ================================================================
       else
       {
-         if ( size > 0 && size + offset <= CHUNKSIZE )
+         if ( size > 0 && size <= CHUNKSIZE - offset )
             offset += size;
          if (type != 3 && type != 5 && (type != 0 || size > 0)) {
          mp_msg( MSGT_DEMUX, MSGL_DBG3, "ty:Invalid Type %x\n", type );
