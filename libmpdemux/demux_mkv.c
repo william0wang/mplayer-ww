@@ -1858,7 +1858,8 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
                && !strncmp(track->codec_id, MKV_A_REALATRC, 7)) {
         /* Common initialization for all RealAudio codecs */
         unsigned char *src = track->private_data;
-        int codecdata_length, version;
+        unsigned char *src_end = src + track->private_size;
+        unsigned codecdata_length, version;
         int flavor;
 
         sh_a->wf->nAvgBytesPerSec = 0;  /* FIXME !? */
@@ -1871,16 +1872,23 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
         track->sub_packet_size = AV_RB16(src + 44);
         if (version == 4) {
             src += RAPROPERTIES4_SIZE;
+            if (src[0] + 1 > src_end - src) goto err_out;
             src += src[0] + 1;
+            if (src[0] + 1 > src_end - src) goto err_out;
             src += src[0] + 1;
-        } else
+        } else {
+            if (RAPROPERTIES5_SIZE > src_end - src) goto err_out;
             src += RAPROPERTIES5_SIZE;
+        }
 
+        if (4 > src_end - src) goto err_out;
         src += 3;
         if (version == 5)
             src++;
+        if (4 > src_end - src) goto err_out;
         codecdata_length = AV_RB32(src);
         src += 4;
+        codecdata_length = FFMIN(codecdata_length, src_end - src);
         sh_a->wf->cbSize = codecdata_length;
         sh_a->wf = realloc(sh_a->wf, sizeof(*sh_a->wf) + sh_a->wf->cbSize);
         memcpy(((char *) (sh_a->wf + 1)), src, codecdata_length);
