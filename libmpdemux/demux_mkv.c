@@ -1674,8 +1674,7 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
         WAVEFORMATEX *wf = (WAVEFORMATEX *) track->private_data;
         if (track->private_size > USHRT_MAX + sizeof(WAVEFORMATEX)) {
             mp_msg(MSGT_DEMUX, MSGL_ERR, "[mkv] Integer overflow!\n");
-            free_sh_audio(demuxer, track->tnum);
-            return 1;
+            goto err_out;
         }
         sh_a->wf = realloc(sh_a->wf, track->private_size);
         sh_a->wf->wFormatTag = le2me_16(wf->wFormatTag);
@@ -1721,7 +1720,7 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
             track->a_formattag = mmioFOURCC('M', 'P', '4', 'A');
         else if (!strcmp(track->codec_id, MKV_A_VORBIS)) {
             if (track->private_data == NULL)
-                return 1;
+                goto err_out;
             track->a_formattag = mmioFOURCC('v', 'r', 'b', 's');
         } else if (!strcmp(track->codec_id, MKV_A_QDMC))
             track->a_formattag = mmioFOURCC('Q', 'D', 'M', 'C');
@@ -1735,7 +1734,7 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
             if (track->private_data == NULL || track->private_size == 0) {
                 mp_msg(MSGT_DEMUX, MSGL_WARN,
                        MSGTR_MPDEMUX_MKV_FlacTrackDoesNotContainValidHeaders);
-                return 1;
+                goto err_out;
             }
             track->a_formattag = mmioFOURCC('f', 'L', 'a', 'C');
         } else if (track->private_size >= RAPROPERTIES4_SIZE) {
@@ -1752,8 +1751,7 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
         } else {
             mp_msg(MSGT_DEMUX, MSGL_WARN, MSGTR_MPDEMUX_MKV_UnknownAudioCodec,
                    track->codec_id, track->tnum);
-            free_sh_audio(demuxer, track->tnum);
-            return 1;
+            goto err_out;
         }
     }
 
@@ -1792,8 +1790,7 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
         if (track->private_data != NULL) {
             if (track->private_size > INT_MAX) {
                 mp_msg(MSGT_DEMUX, MSGL_ERR, "[mkv] Integer overflow!\n");
-                free_sh_audio(demuxer, track->tnum);
-                return 1;
+                goto err_out;
             }
             sh_a->codecdata = malloc(track->private_size);
             memcpy(sh_a->codecdata, track->private_data, track->private_size);
@@ -1809,8 +1806,7 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
             && (NULL != track->private_data)) {
             if (track->private_size > INT_MAX) {
                 mp_msg(MSGT_DEMUX, MSGL_ERR, "[mkv] Integer overflow!\n");
-                free_sh_audio(demuxer, track->tnum);
-                return 1;
+                goto err_out;
             }
             sh_a->codecdata = malloc(track->private_size);
             memcpy(sh_a->codecdata, track->private_data, track->private_size);
@@ -1852,8 +1848,7 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
     } else if (track->a_formattag == mmioFOURCC('v', 'r', 'b', 's')) {  /* VORBIS */
         if (track->private_size > USHRT_MAX) {
             mp_msg(MSGT_DEMUX, MSGL_ERR, "[mkv] Integer overflow!\n");
-            free_sh_audio(demuxer, track->tnum);
-            return 1;
+            goto err_out;
         }
         sh_a->wf->cbSize = track->private_size;
         sh_a->wf = realloc(sh_a->wf, sizeof(*sh_a->wf) + sh_a->wf->cbSize);
@@ -1957,11 +1952,14 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
         /* do nothing, still works */
     } else if (!track->ms_compat
                || (track->private_size < sizeof(*sh_a->wf))) {
-        free_sh_audio(demuxer, track->tnum);
-        return 1;
+        goto err_out;
     }
 
     return 0;
+
+err_out:
+    free_sh_audio(demuxer, track->tnum);
+    return 1;
 }
 
 static int demux_mkv_open_sub(demuxer_t *demuxer, mkv_track_t *track,
