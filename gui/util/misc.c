@@ -161,9 +161,7 @@ plItem **cue_playlist(const char *fname)
             }
 
             isFILE = True;
-        }
-
-        if (strncmp(l, "TRACK ", 6) == 0) {
+        } else if (strncmp(l, "TRACK ", 6) == 0) {
             if (!isFILE)
                 continue;
 
@@ -176,16 +174,12 @@ plItem **cue_playlist(const char *fname)
             item[i]->name = strdup(data);
 
             isTRACK = True;
-        }
-
-        if (strncmp(l, "TITLE ", 6) == 0) {
+        } else if (strncmp(l, "TITLE ", 6) == 0) {
             if (!isTRACK)
                 continue;
 
             item[i]->title = strdup(dequote(l + 6));
-        }
-
-        if (strncmp(l, "INDEX 01 ", 9) == 0) {
+        } else if (strncmp(l, "INDEX 01 ", 9) == 0) {
             if (!isTRACK)
                 continue;
 
