@@ -1,5 +1,28 @@
 MPlayer
 
+    Decoders, demuxers, streams:
+    * HLS streams can be played without ffmpeg:// prefix
+    * Removed internal ADPCM decoders for DK3, DK4, MS, MS ima, QT ima
+    * FFmpeg ADPCM audio decoders: THP, AICA, EA XAS, PSX, SbPro
+    * FFmpeg audio decoders: DSD, DSS sp, Interplay ACM, Zork PCM,
+      Xbox media 1 and 2, Ulead DV
+    * FFmpeg video decoders: Screenpresso, Hap, more Go2Meeting formats,
+      DXV, apng, AVS, CPiA, EA TGQ, EA TQI, Cryo HMN4, Canopus HQ, RSCC/ISCC,
+      QTrle monochrome, Canopus C210, Drastic YUYV
+
+    Fixes:
+    * fix many crashes with fuzzed files
+    * fix errors for multichannels files and pulseaudio >= 6
+
+    Other:
+    * MPlayer now depends also on libswresample
+    * building with system FFmpeg libs is possible without a local copy of
+      of private FFmpeg headers
+    * docs building does not require FFmpeg anymore
+
+    FFmpeg:
+    * Fix compatibility with post 2.8 changes
+
 
   1.2.1:January 24, 2016
 
