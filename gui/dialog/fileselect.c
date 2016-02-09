@@ -461,17 +461,13 @@ static void fs_Ok_released(GtkButton *button, gpointer user_data)
 {
     char *fsSelectedDirectory;
     int type = STREAMTYPE_FILE, ev = evPlay;
-    struct stat fs;
     gchar *selected;
 
     (void)button;
     (void)user_data;
 
-    if ((stat(fsSelectedFile, &fs) == 0) && S_ISDIR(fs.st_mode)) {
+    if (chdir(fsSelectedFile) == 0) {
         gchar *utf8dir;
-
-        if (chdir(fsSelectedFile) != 0)
-            return;
 
         CheckDir(fsFNameList);
         utf8dir = get_current_dir_name_utf8();
