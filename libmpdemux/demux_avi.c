@@ -410,13 +410,13 @@ do{
   if(stream_eof(demux->stream)) return 0;
 
   if(id==mmioFOURCC('L','I','S','T')){
-      id=stream_read_dword_le(demux->stream);      // list type
+      stream_read_dword_le(demux->stream);      // list type
       continue;
   }
 
   if(id==mmioFOURCC('R','I','F','F')){
       mp_msg(MSGT_DEMUX,MSGL_V,"additional RIFF header...\n");
-      id=stream_read_dword_le(demux->stream);      // "AVIX"
+      stream_read_dword_le(demux->stream);      // "AVIX"
       continue;
   }
 
