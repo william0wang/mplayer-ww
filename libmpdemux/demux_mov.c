@@ -748,7 +748,7 @@ static int gen_sh_audio(sh_audio_t* sh, mov_track_t* trak, int timescale) {
 			int frma_len = char2int(trak->stdata,52);
 			switch(char2int(trak->stdata,52+8)) {
 			 case MOV_FOURCC('a','l','a','c'):
-			  if (len >= 36 + frma_len) {
+			  if (len >= 36 && frma_len <= len - 36) {
 			    sh->codecdata_len = char2int(trak->stdata,52+frma_len);
 			    mp_msg(MSGT_DEMUX, MSGL_V, "MOV: Found alac atom (%d)!\n", sh->codecdata_len);
 			    sh->codecdata = malloc(sh->codecdata_len);
