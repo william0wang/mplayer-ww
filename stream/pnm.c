@@ -662,7 +662,10 @@ static int pnm_get_stream_chunk(pnm_t *p) {
   {
     int size=AV_RB16(&p->buffer[1]);
 
-    rm_read (p->s, &p->buffer[8], size-5);
+    if (size > sizeof(p->buffer) - 4) size = sizeof(p->buffer) - 4;
+    if (size > 5)
+      rm_read (p->s, &p->buffer[8], size-5);
+
     p->buffer[size+3]=0;
     mp_msg(MSGT_OPEN, MSGL_WARN, "input_pnm: got message from server while reading stream:\n%s\n", &p->buffer[3]);
     return -1;
