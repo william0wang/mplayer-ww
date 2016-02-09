@@ -807,6 +807,9 @@ unichrome_config_playback (vidix_playback_t * info)
       pitch = ALIGN_TO (src_w << 2, 32);
       uv_size = 0;
       break;
+
+    default: // should have been caught by is_supported_fourcc above
+      return -1;
     }
   if ((src_w > 4096) || (src_h > 4096) ||
       (src_w < 32) || (src_h < 1) || (pitch > 0x1fff))
