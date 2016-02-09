@@ -742,8 +742,8 @@ static int gen_sh_audio(sh_audio_t* sh, mov_track_t* trak, int timescale) {
 		    int fcc=char2int(trak->stdata,48);
 		    // we have extra audio headers!!!
 		    mp_msg(MSGT_DEMUX,MSGL_V,"Audio extra header: len=%d  fcc=0x%X\n",len,fcc);
-		    if((len >= 4) &&
-		       (char2int(trak->stdata,52) >= 12) &&
+		    if (len > 8 && len <= trak->stdata_len - 44) {
+		    if((char2int(trak->stdata,52) >= 12) &&
 		       (char2int(trak->stdata,52+4) == MOV_FOURCC('f','r','m','a'))) {
 			int frma_len = char2int(trak->stdata,52);
 			switch(char2int(trak->stdata,52+8)) {
@@ -767,18 +767,15 @@ static int gen_sh_audio(sh_audio_t* sh, mov_track_t* trak, int timescale) {
 			  }
 		          break;
 		         default:
-			  if (len > 8 && len <= trak->stdata_len - 44) {
 				sh->codecdata_len = len-8;
 				sh->codecdata = malloc(sh->codecdata_len);
 				memcpy(sh->codecdata, trak->stdata+44+8, sh->codecdata_len);
-			  }
 		        }
 		    } else {
-		      if (len > 8 && len <= trak->stdata_len - 44) {
 		    sh->codecdata_len = len-8;
 		    sh->codecdata = malloc(sh->codecdata_len);
 		    memcpy(sh->codecdata, trak->stdata+44+8, sh->codecdata_len);
-		      }
+		    }
 		    }
 		  }
 		}
