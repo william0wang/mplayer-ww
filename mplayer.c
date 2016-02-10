@@ -3691,7 +3691,7 @@ goto_enable_cache:
             mp_msg(MSGT_CPLAYER, MSGL_INFO, MSGTR_Video_NoVideo);
             mp_msg(MSGT_CPLAYER, MSGL_V, "Freeing %d unused video chunks.\n", mpctx->d_video->packs);
             ds_free_packs(mpctx->d_video);
-            mpctx->d_video->id = -2;
+            //mpctx->d_video->id = -2;
             //if(!fixed_vo) uninit_player(INITIALIZED_VO);
         }
 
@@ -3769,6 +3769,15 @@ goto_enable_cache:
                 mpctx->sh_audio     = mpctx->d_audio->sh;
                 mpctx->sh_audio->ds = mpctx->d_audio;
                 reinit_audio_chain();
+            }
+            // Note: the video_id != -2 is only there because
+            // some demuxers do not have support for disabling
+            // video.
+            if (video_id != -2 && mpctx->d_video->id != -2 &&
+                !mpctx->sh_video && mpctx->d_video->sh) {
+                mpctx->sh_video     = mpctx->d_video->sh;
+                mpctx->sh_video->ds = mpctx->d_video;
+                reinit_video_chain();
             }
 
 /*========================== PLAY AUDIO ============================*/
