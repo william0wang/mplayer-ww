@@ -443,7 +443,7 @@ parse_setup_stationlist (struct pvr_t *pvr)
     return -1;
   }
 
-  if (copycreate_stationlist (&(pvr->stationlist), -1) < 0)
+  if (copycreate_stationlist (&(pvr->stationlist), 0) < 0)
   {
     mp_msg (MSGT_OPEN, MSGL_FATAL,
             "%s No memory allocated for station list, giving up\n",
