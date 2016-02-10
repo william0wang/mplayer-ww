@@ -1402,6 +1402,7 @@ v4l2_list_capabilities (struct pvr_t *pvr)
 
   /* list available norms */
   vs.index = 0;
+  err = 1;
   mp_msg (MSGT_OPEN, MSGL_INFO, "%s Available norms: ", LOG_LEVEL_V4L2);
   while (ioctl (pvr->dev_fd, VIDIOC_ENUMSTD, &vs) >= 0)
   {
