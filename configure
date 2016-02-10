@@ -3416,7 +3416,7 @@ fi
 echores "$_kstat"
 
 
-for func in atanf cbrt cbrtf cosf expf exp2 exp2f isnan isinf llrint llrintf log2 log2f log10f lrint lrintf rint round roundf sinf trunc truncf erf; do
+for func in atanf cbrt cbrtf cosf expf exp2 exp2f isnan isfinite isinf llrint llrintf log2 log2f log10f lrint lrintf rint round roundf sinf trunc truncf erf; do
 echocheck $func
 eval _$func=no
 statement_check math.h "${func}(2.0)" && eval _$func=yes
@@ -9194,6 +9194,7 @@ $def_exp2f
 $def_fminf
 $def_getaddrinfo
 $def_hypot
+$def_isfinite
 $def_isinf
 $def_isnan
 $def_ldexpf
