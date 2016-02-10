@@ -2320,6 +2320,27 @@ int reinit_video_chain(void)
 {
     sh_video_t *const sh_video = mpctx->sh_video;
     double ar = -1.0;
+    if (!video_read_properties(mpctx->sh_video)) {
+        mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_CannotReadVideoProperties);
+        goto err_out;
+    } else {
+        mp_msg(MSGT_CPLAYER, MSGL_V, MSGTR_FilefmtFourccSizeFpsFtime,
+               mpctx->demuxer->file_format, mpctx->sh_video->format, mpctx->sh_video->disp_w, mpctx->sh_video->disp_h,
+               mpctx->sh_video->fps, mpctx->sh_video->frametime
+               );
+
+        /* need to set fps here for output encoders to pick it up in their init */
+        if (force_fps) {
+            mpctx->sh_video->fps       = force_fps;
+            mpctx->sh_video->frametime = 1.0f / mpctx->sh_video->fps;
+        }
+        vo_fps = mpctx->sh_video->fps;
+
+        if (!mpctx->sh_video->fps && !force_fps && !correct_pts) {
+            mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_FPSnotspecified);
+            correct_pts = 1;
+        }
+    }
     //================== Init VIDEO (codec & libvo) ==========================
     if (!fixed_vo || !(initialized_flags & INITIALIZED_VO)) {
         current_module = "preinit_libvo";
@@ -3537,27 +3558,7 @@ goto_enable_cache:
 
     if (mpctx->sh_video) {
         current_module = "video_read_properties";
-        if (!video_read_properties(mpctx->sh_video)) {
-            mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_CannotReadVideoProperties);
-            mpctx->sh_video = mpctx->d_video->sh = NULL;
-        } else {
-            mp_msg(MSGT_CPLAYER, MSGL_V, MSGTR_FilefmtFourccSizeFpsFtime,
-                   mpctx->demuxer->file_format, mpctx->sh_video->format, mpctx->sh_video->disp_w, mpctx->sh_video->disp_h,
-                   mpctx->sh_video->fps, mpctx->sh_video->frametime
-                   );
-
-            /* need to set fps here for output encoders to pick it up in their init */
-            if (force_fps) {
-                mpctx->sh_video->fps       = force_fps;
-                mpctx->sh_video->frametime = 1.0f / mpctx->sh_video->fps;
-            }
-            vo_fps = mpctx->sh_video->fps;
-
-            if (!mpctx->sh_video->fps && !force_fps && !correct_pts) {
-                mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_FPSnotspecified);
-                correct_pts = 1;
-            }
-        }
+        reinit_video_chain();
     }
 
     if (!mpctx->sh_video && !mpctx->sh_audio) {
@@ -3622,9 +3623,6 @@ goto_enable_cache:
             edl = edl->next;
         }
     }
-
-    if (mpctx->sh_video)
-        reinit_video_chain();
 
     if (mpctx->sh_video) {
         if (vo_flags & 0x08 && vo_spudec)
