@@ -399,6 +399,7 @@ static int cue_read_cue (const char *in_cue_filename)
     mp_msg(MSGT_OPEN,MSGL_ERR,
            MSGTR_MPDEMUX_CUEREAD_ErrReadingFromCueFile, in_cue_filename);
     fclose (fd_cue);
+    close (fd_bin);
     return -1;
   }
 
@@ -409,6 +410,7 @@ static int cue_read_cue (const char *in_cue_filename)
       mp_msg(MSGT_OPEN,MSGL_ERR,
              MSGTR_MPDEMUX_CUEREAD_ErrReadingFromCueFile, in_cue_filename);
       fclose (fd_cue);
+      close (fd_bin);
       return -1;
     }
   }
@@ -418,6 +420,7 @@ static int cue_read_cue (const char *in_cue_filename)
     mp_msg(MSGT_OPEN,MSGL_ERR,
            MSGTR_MPDEMUX_CUEREAD_ErrGettingBinFileSize);
     fclose (fd_cue);
+    close (fd_bin);
     return -1;
   }
 
