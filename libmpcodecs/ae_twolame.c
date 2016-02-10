@@ -163,74 +163,66 @@ int mpae_init_twolame(audio_encoder_t *encoder)
 		else
 		{
 			mp_msg(MSGT_MENCODER, MSGL_ERR, "ae_twolame, unknown mode %s, exiting\n", param_mode);
+			goto err_out;
 		}
 	}
 	else
+	{
 		mp_msg(MSGT_MENCODER, MSGL_ERR, "ae_twolame, Twolame can't encode > 2 channels, exiting\n");
+		goto err_out;
+	}
 
 	ctx = calloc(1, sizeof(*ctx));
 	if(ctx == NULL)
 	{
 		mp_msg(MSGT_MENCODER, MSGL_ERR, "ae_twolame, couldn't alloc context, exiting\n");
-		return 0;
+		goto err_out;
 	}
 
 	ctx->twolame_ctx = twolame_init();
 	if(ctx->twolame_ctx == NULL)
 	{
 		mp_msg(MSGT_MENCODER, MSGL_ERR, "ae_twolame, couldn't initial parameters from libtwolame, exiting\n");
-		free(ctx);
-		return 0;
+		goto err_out;
 	}
 	ctx->vbr = 0;
 
-	if(twolame_set_num_channels(ctx->twolame_ctx, encoder->params.channels) != 0)
-		return 0;
-	if(twolame_set_mode(ctx->twolame_ctx, mode) != 0)
-		return 0;
-
-	if(twolame_set_in_samplerate(ctx->twolame_ctx, encoder->params.sample_rate) != 0)
-		return 0;
-
-	if(twolame_set_out_samplerate(ctx->twolame_ctx, encoder->params.sample_rate) != 0)
-		return 0;
+	if(twolame_set_num_channels(ctx->twolame_ctx, encoder->params.channels) != 0 ||
+	   twolame_set_mode(ctx->twolame_ctx, mode) != 0 ||
+	   twolame_set_in_samplerate(ctx->twolame_ctx, encoder->params.sample_rate) != 0 ||
+	   twolame_set_out_samplerate(ctx->twolame_ctx, encoder->params.sample_rate) != 0)
+		goto err_out;
 
 	if(encoder->params.sample_rate < 32000)
 		twolame_set_version(ctx->twolame_ctx, TWOLAME_MPEG2);
 	else
 		twolame_set_version(ctx->twolame_ctx, TWOLAME_MPEG1);
 
-	if(twolame_set_psymodel(ctx->twolame_ctx, param_psy) != 0)
-		return 0;
-
-	if(twolame_set_bitrate(ctx->twolame_ctx, param_bitrate) != 0)
-		return 0;
+	if(twolame_set_psymodel(ctx->twolame_ctx, param_psy) != 0 ||
+	   twolame_set_bitrate(ctx->twolame_ctx, param_bitrate) != 0)
+		goto err_out;
 
 	if(param_errprot)
 		if(twolame_set_error_protection(ctx->twolame_ctx, TRUE) != 0)
-			return 0;
+			goto err_out;
 
 	if(param_vbr != 0)
 	{
-		if(twolame_set_VBR(ctx->twolame_ctx, TRUE) != 0)
-			return 0;
-		if(twolame_set_VBR_q(ctx->twolame_ctx, param_vbr) != 0)
-			return 0;
-		if(twolame_set_padding(ctx->twolame_ctx, FALSE) != 0)
-			return 0;
+		if(twolame_set_VBR(ctx->twolame_ctx, TRUE) != 0 ||
+		   twolame_set_VBR_q(ctx->twolame_ctx, param_vbr) != 0 ||
+		   twolame_set_padding(ctx->twolame_ctx, FALSE) != 0)
+			goto err_out;
 		if(param_maxvbr)
 		{
 			if(twolame_set_VBR_max_bitrate_kbps(ctx->twolame_ctx, param_maxvbr) != 0)
-				return 0;
+				goto err_out;
 		}
 		ctx->vbr = 1;
 	}
 
-	if(twolame_set_verbosity(ctx->twolame_ctx, param_debug) != 0)
-		return 0;
-
-	if(twolame_init_params(ctx->twolame_ctx) != 0)
-		return 0;
+	if(twolame_set_verbosity(ctx->twolame_ctx, param_debug) != 0 ||
+	   twolame_init_params(ctx->twolame_ctx) != 0)
+		goto err_out;
 
 	encoder->params.bitrate = param_bitrate * 1000;
 	encoder->params.samples_per_frame = 1152;
@@ -243,4 +235,8 @@ int mpae_init_twolame(audio_encoder_t *encoder)
 	encoder->close = close_twolame;
 
 	return 1;
+
+err_out:
+	free(ctx);
+	return 0;
 }
