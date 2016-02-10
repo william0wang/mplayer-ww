@@ -77,6 +77,7 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
     }
 
     mpi=mpcodecs_get_image(sh, MP_IMGTYPE_EXPORT, 0, sh->disp_w, sh->disp_h);
+    if (!mpi) return 0;
     packet.data=data;
     packet.size=len;
     packet.timestamp=sh->timer*90000.0;
