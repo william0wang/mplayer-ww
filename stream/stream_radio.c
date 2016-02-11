@@ -1113,6 +1113,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
     if (!priv)
         return STREAM_ERROR;
 
+    stream->priv=priv;
 
     priv->radio_param=opts;
 
@@ -1155,7 +1156,6 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
 
     stream->start_pos=0;
     stream->end_pos=0;
-    stream->priv=priv;
     stream->close=close_s;
     stream->fill_buffer=fill_buffer_s;
 
