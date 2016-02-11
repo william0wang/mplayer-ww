@@ -60,7 +60,7 @@ typedef struct {
 static void print_gif_error(GifFileType *gif)
 {
   int err = GifError();
-  char *err_str = GifErrorString();
+  const char *err_str = GifErrorString();
 
   if (err_str)
     mp_msg(MSGT_DEMUX, MSGL_ERR, "\n[gif] GIF-LIB error: %s.\n", err_str);
