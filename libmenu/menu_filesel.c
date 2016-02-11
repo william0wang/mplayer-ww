@@ -492,7 +492,7 @@ static int open_fs(menu_t* menu, char* av_unused args) {
 }
 
 const menu_info_t menu_info_filesel = {
-  "File seletor menu",
+  "File selector menu",
   "filesel",
   "Albeu",
   "",
