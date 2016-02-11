@@ -851,7 +851,7 @@ static int demux_mkv_read_trackentry(demuxer_t *demuxer)
             uint64_t num = ebml_read_length(s, &x);
             // audit: cheap guard against overflows later..
             if (num > SIZE_MAX - 1000)
-                return 0;
+                goto err_out;
             l = x + num;
             track->private_data = malloc(num + AV_LZO_INPUT_PADDING);
             if (stream_read(s, track->private_data, num) != (int) num)
