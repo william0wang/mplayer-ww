@@ -8,7 +8,7 @@ MPlayer
       Xbox media 1 and 2, Ulead DV
     * FFmpeg video decoders: Screenpresso, Hap, more Go2Meeting formats,
       DXV, apng, AVS, CPiA, EA TGQ, EA TQI, Cryo HMN4, Canopus HQ, RSCC/ISCC,
-      QTrle monochrome, Canopus C210, Drastic YUYV
+      QTrle monochrome, Canopus C210, Drastic YUYV, Cineform HD
 
     Fixes:
     * fix many crashes with fuzzed files
