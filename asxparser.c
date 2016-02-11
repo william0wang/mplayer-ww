@@ -314,6 +314,7 @@ asx_get_element(ASX_Parser_t* parser,char** _buffer,
         }
         if(ptr4[0] == '\n') parser->line++;
         }
+        if (ptr4)
         continue;
       }
       if(ptr4 == NULL || ptr4[1] == '\0') {
