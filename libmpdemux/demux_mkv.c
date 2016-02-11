@@ -1133,6 +1133,7 @@ static int demux_mkv_read_chapters(demuxer_t *demuxer)
 
                                 switch (ebml_read_id(s, &il)) {
                                 case MATROSKA_ID_CHAPSTRING:
+                                    free(name);
                                     name = ebml_read_utf8(s, &l);
                                     break;
                                 default:
