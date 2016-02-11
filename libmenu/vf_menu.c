@@ -109,6 +109,7 @@ static int cmd_filter(mp_cmd_t* cmd, int paused, void *p) {
     priv->current->show = new != NULL;
     if (new) {
       new->parent = priv->current;
+      new->show = 1;
       priv->current = new;
     } else {
       mp_msg(MSGT_GLOBAL,MSGL_WARN,MSGTR_LIBMENU_FailedToOpenMenu,menu);
