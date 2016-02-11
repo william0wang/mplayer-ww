@@ -767,7 +767,6 @@ dvb_config_t *dvb_get_config(void)
 {
 	int i, fd, type, size;
 	char filename[30], *conf_file, *name;
-	dvb_channels_list *list;
 	dvb_config_t *conf = NULL;
 
 
@@ -780,6 +779,7 @@ dvb_config_t *dvb_get_config(void)
 	conf->cards = NULL;
 	for(i=0; i<MAX_CARDS; i++)
 	{
+		dvb_channels_list *list;
 		dvb_card_config_t *tmp;
 		snprintf(filename, sizeof(filename), "/dev/dvb/adapter%d/frontend0", i);
 		fd = open(filename, O_RDONLY|O_NONBLOCK);
@@ -838,6 +838,8 @@ dvb_config_t *dvb_get_config(void)
 		if(tmp == NULL)
 		{
 			fprintf(stderr, "DVB_CONFIG, can't realloc %d bytes, skipping\n", size);
+			free(list->channels);
+			free(list);
 			continue;
 		}
 		conf->cards = tmp;
@@ -846,6 +848,8 @@ dvb_config_t *dvb_get_config(void)
 		if(name==NULL)
 		{
 			fprintf(stderr, "DVB_CONFIG, can't realloc 20 bytes, skipping\n");
+			free(list->channels);
+			free(list);
 			continue;
 		}
 
