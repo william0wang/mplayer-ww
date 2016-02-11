@@ -51,9 +51,7 @@ void
 play_tree_free(play_tree_t* pt, int children) {
   play_tree_t* iter;
 
-#ifdef MP_DEBUG
-  assert(pt != NULL);
-#endif
+  if (!pt) return;
 
   if(children) {
     for(iter = pt->child; iter != NULL; ) {
