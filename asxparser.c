@@ -493,6 +493,7 @@ asx_parse_entry(ASX_Parser_t* parser,char* buffer,char** _attribs) {
     int r = asx_get_element(parser,&buffer,&element,&body,&attribs);
     if(r < 0) {
       asx_warning_body_parse_error(parser,"ENTRY");
+      play_tree_free(ref,1);
       return NULL;
     } else if (r == 0) { // No more element
       break;
@@ -503,6 +504,7 @@ asx_parse_entry(ASX_Parser_t* parser,char* buffer,char** _attribs) {
       nref++;
     } else
       mp_msg(MSGT_PLAYTREE,MSGL_DBG2,"Ignoring element %s\n",element);
+    free(element);
     free(body);
     asx_free_attribs(attribs);
   }
@@ -539,6 +541,8 @@ asx_parse_repeat(ASX_Parser_t* parser,char* buffer,char** _attribs) {
     int r = asx_get_element(parser,&buffer,&element,&body,&attribs);
     if(r < 0) {
       asx_warning_body_parse_error(parser,"REPEAT");
+      play_tree_free(list,1);
+      play_tree_free(repeat,1);
       return NULL;
     } else if (r == 0) { // No more element
       break;
@@ -568,6 +572,7 @@ asx_parse_repeat(ASX_Parser_t* parser,char* buffer,char** _attribs) {
        asx_parse_param(parser,attribs,repeat);
      } else
        mp_msg(MSGT_PLAYTREE,MSGL_DBG2,"Ignoring element %s\n",element);
+     free(element);
      free(body);
      asx_free_attribs(attribs);
   }
@@ -607,13 +612,19 @@ asx_parser_build_tree(char* buffer,int deep) {
 
   if(strcasecmp(element,"ASX") != 0) {
     mp_msg(MSGT_PLAYTREE,MSGL_ERR,"first element isn't ASX, it's %s\n",element);
+    free(element);
+    free(asx_body);
     asx_free_attribs(asx_attribs);
     asx_parser_free(parser);
     return NULL;
   }
 
+  free(element);
+  element = NULL;
+
   if(!asx_body) {
     mp_msg(MSGT_PLAYTREE,MSGL_ERR,"ASX element is empty");
+    free(asx_body);
     asx_free_attribs(asx_attribs);
     asx_parser_free(parser);
     return NULL;
@@ -625,6 +636,10 @@ asx_parser_build_tree(char* buffer,int deep) {
     r = asx_get_element(parser,&buffer,&element,&body,&attribs);
      if(r < 0) {
        asx_warning_body_parse_error(parser,"ASX");
+       play_tree_free(list,1);
+       play_tree_free(asx,1);
+       free(asx_body);
+       asx_free_attribs(asx_attribs);
        asx_parser_free(parser);
        return NULL;
      } else if (r == 0) { // No more element
@@ -653,6 +668,7 @@ asx_parser_build_tree(char* buffer,int deep) {
        }
      } else
        mp_msg(MSGT_PLAYTREE,MSGL_DBG2,"Ignoring element %s\n",element);
+     free(element);
      free(body);
      asx_free_attribs(attribs);
   }
