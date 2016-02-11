@@ -256,6 +256,7 @@ static mp_image_t* decode(sh_video_t *sh, void* data, int len, int flags)
 			mpi = mpcodecs_get_image(sh, p->img_type,
 					MP_IMGFLAG_ACCEPT_STRIDE,
 					sh->disp_w, sh->disp_h);
+			if (!mpi) return NULL;
 
 			if(p->cs != XVID_CSP_INTERNAL) {
 				dec.output.plane[0] = mpi->planes[0];
