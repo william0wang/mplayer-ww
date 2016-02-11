@@ -312,7 +312,7 @@ asx_get_element(ASX_Parser_t* parser,char** _buffer,
           ptr4 = NULL;
           break;
         }
-        if(ptr1[0] == '\n') parser->line++;
+        if(ptr4[0] == '\n') parser->line++;
         }
         continue;
       }
