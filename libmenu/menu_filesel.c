@@ -30,6 +30,7 @@
 #include <limits.h>
 
 #include "libavutil/attributes.h"
+#include "libavutil/avstring.h"
 
 #include "config.h"
 #include "mp_msg.h"
@@ -434,12 +435,11 @@ static int open_fs(menu_t* menu, char* av_unused args) {
 
       path_fp = open (MENU_KEEP_PATH, O_RDONLY);
       if (path_fp >= 0) {
-        if (!fstat (path_fp, &st) && (st.st_size > 0)) {
-          path = malloc(st.st_size+1);
+        if (!fstat (path_fp, &st) && (st.st_size > 0) && (st.st_size < sizeof(b))) {
+          path = b;
           path[st.st_size] = '\0';
           if (!((read(path_fp, path, st.st_size) == st.st_size) && path[0] == '/'
               && !stat(path, &st) && S_ISDIR(st.st_mode))) {
-            free(path);
             path = NULL;
           }
         }
@@ -464,18 +464,15 @@ static int open_fs(menu_t* menu, char* av_unused args) {
       slash[1] = '\0';
     else
 #endif
-      path = wd;
   }
-  if (path[0] != '/') {
-    if(path[strlen(path)-1] != '/')
-      snprintf(b,sizeof(b),"%s/%s/",wd,path);
-    else
-      snprintf(b,sizeof(b),"%s/%s",wd,path);
-    path = b;
-  } else if (path[strlen(path)-1]!='/') {
-    sprintf(b,"%s/",path);
-    path = b;
+  else if (path[0] != '/') {
+    av_strlcat(wd, "/", sizeof(wd));
+    av_strlcat(wd, path, sizeof(wd));
   }
+  if (!wd[0] || wd[strlen(wd)-1]!='/') {
+    av_strlcat(wd, "/", sizeof(wd));
+  }
+  path = wd;
   if (menu_chroot && menu_chroot[0] == '/') {
     int l = strlen(menu_chroot);
     if (l > 0 && menu_chroot[l-1] == '/')
@@ -484,7 +481,7 @@ static int open_fs(menu_t* menu, char* av_unused args) {
       if (menu_chroot[l] == '/')
         path = menu_chroot;
       else {
-        sprintf(b,"%s/",menu_chroot);
+        snprintf(b,sizeof(b),"%s/",menu_chroot);
         path = b;
       }
     }
