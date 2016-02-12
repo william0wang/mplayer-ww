@@ -332,8 +332,8 @@ fsdp_parse (const char *text_description, fsdp_description_t * dsc)
                                             &(repeat->
                                               offsets[k]));
                 i = strchr (i, ' ');
-                if (NULL != i)
-                  i++;
+                if (!i) break;
+                i++;
               }
               if (k < repeat->offsets_count)
               {
