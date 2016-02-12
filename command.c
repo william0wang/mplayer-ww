@@ -1448,6 +1448,9 @@ static int mp_property_sub_pos(m_option_t *prop, int action, void *arg,
 static int mp_property_sub(m_option_t *prop, int action, void *arg,
                            MPContext *mpctx)
 {
+    // d_sub should always be set even if the demuxer does
+    // not have subtitle support, unless no file is currently
+    // opened.
     demux_stream_t *const d_sub = mpctx->d_sub;
     int global_sub_size;
     int source = -1, reset_spu = 0;
@@ -1457,7 +1460,7 @@ static int mp_property_sub(m_option_t *prop, int action, void *arg,
 
     update_global_sub_size(mpctx);
     global_sub_size = mpctx->global_sub_size;
-    if (global_sub_size <= 0)
+    if (global_sub_size <= 0 || !d_sub)
         return M_PROPERTY_UNAVAILABLE;
 
     switch (action) {
@@ -1500,7 +1503,7 @@ static int mp_property_sub(m_option_t *prop, int action, void *arg,
             int id = dvdsub_id;
             // HACK: for DVDs sub->sh/id will be invalid until
             // we actually get the first packet
-            if (d_sub && d_sub->sh)
+            if (d_sub->sh)
                 id = d_sub->id;
             demuxer_sub_lang(mpctx->demuxer, id, lang, sizeof(lang));
             snprintf(*(char **) arg, 63, "(%d) %s", dvdsub_id, lang);
@@ -1550,12 +1553,10 @@ static int mp_property_sub(m_option_t *prop, int action, void *arg,
 
     vobsub_id = -1;
     dvdsub_id = -1;
-    if (d_sub) {
-        if (d_sub->id > -2)
-            reset_spu = 1;
-        d_sub->id = -2;
-        d_sub->sh = NULL;
-    }
+    if (d_sub->id > -2)
+        reset_spu = 1;
+    d_sub->id = -2;
+    d_sub->sh = NULL;
 #ifdef CONFIG_ASS
     ass_track = 0;
 #endif
@@ -1575,7 +1576,7 @@ static int mp_property_sub(m_option_t *prop, int action, void *arg,
         }
     } else if (source == SUB_SOURCE_DEMUX) {
         dvdsub_id = source_pos;
-        if (d_sub && dvdsub_id < MAX_S_STREAMS) {
+        if (dvdsub_id < MAX_S_STREAMS) {
             int i = 0;
             // default: assume 1:1 mapping of sid and stream id
             d_sub->id = dvdsub_id;
