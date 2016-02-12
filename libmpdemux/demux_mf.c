@@ -56,7 +56,7 @@ static int demux_mf_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds){
 
   if ( mf->curr_frame >= mf->nr_of_files ) return 0;
 
-  stat( mf->names[mf->curr_frame],&fs );
+  if (stat( mf->names[mf->curr_frame],&fs ) == -1) return 0;
 //  printf( "[demux_mf] frame: %d (%s,%d)\n",mf->curr_frame,mf->names[mf->curr_frame],fs.st_size );
 
   if ( !( f=fopen( mf->names[mf->curr_frame],"rb" ) ) ) return 0;
