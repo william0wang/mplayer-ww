@@ -129,7 +129,7 @@ mf_t* open_mf(char * filename){
 
    for( i=0;i < gg.gl_pathc;i++ )
     {
-     stat( gg.gl_pathv[i],&fs );
+     if (stat( gg.gl_pathv[i],&fs ) == -1) continue;
      if( S_ISDIR( fs.st_mode ) ) continue;
      mf->names[i]=strdup( gg.gl_pathv[i] );
 //     mp_msg( MSGT_STREAM,MSGL_DBG2,"[mf] added file %d.: %s\n",i,mf->names[i] );
