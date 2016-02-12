@@ -297,7 +297,7 @@ char *ebml_read_header(stream_t *s, int *version)
     while (length > 0) {
         id = ebml_read_id(s, NULL);
         if (id == EBML_ID_INVALID)
-            return NULL;
+            goto err_out;
         length -= 2;
 
         switch (id) {
@@ -305,33 +305,34 @@ char *ebml_read_header(stream_t *s, int *version)
         case EBML_ID_EBMLREADVERSION:
             num = ebml_read_uint(s, &l);
             if (num != EBML_VERSION)
-                return NULL;
+                goto err_out;
             break;
 
             /* we only handle 8 byte lengths at max */
         case EBML_ID_EBMLMAXSIZELENGTH:
             num = ebml_read_uint(s, &l);
             if (num != sizeof(uint64_t))
-                return NULL;
+                goto err_out;
             break;
 
             /* we handle 4 byte IDs at max */
         case EBML_ID_EBMLMAXIDLENGTH:
             num = ebml_read_uint(s, &l);
             if (num != sizeof(uint32_t))
-                return NULL;
+                goto err_out;
             break;
 
         case EBML_ID_DOCTYPE:
+            free(str);
             str = ebml_read_ascii(s, &l);
             if (str == NULL)
-                return NULL;
+                goto err_out;
             break;
 
         case EBML_ID_DOCTYPEREADVERSION:
             num = ebml_read_uint(s, &l);
             if (num == EBML_UINT_INVALID)
-                return NULL;
+                goto err_out;
             if (version)
                 *version = num;
             break;
@@ -342,11 +343,15 @@ char *ebml_read_header(stream_t *s, int *version)
         case EBML_ID_DOCTYPEVERSION:
         default:
             if (ebml_read_skip(s, &l))
-                return NULL;
+                goto err_out;
             break;
         }
         length -= l;
     }
 
     return str;
+
+err_out:
+    free(str);
+    return NULL;
 }
