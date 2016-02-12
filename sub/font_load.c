@@ -32,6 +32,7 @@
 
 raw_file* load_raw(char *name,int verbose){
     int bpp;
+    unsigned size;
     raw_file* raw=malloc(sizeof(raw_file));
     unsigned char head[32];
     FILE *f=fopen(name,"rb");
@@ -44,6 +45,8 @@ raw_file* load_raw(char *name,int verbose){
     if(raw->w == 0) // 2 bytes were not enough for the width... read 4 bytes from the end of the header
     	raw->w = ((head[28]*0x100 + head[29])*0x100 + head[30])*0x100 + head[31];
     if(raw->c>256) goto err_out;                 // too many colors!?
+    if (raw->w > INT_MAX / 4 || (uint64_t)raw->w * raw->h > INT_MAX / 4)
+        goto err_out;
     mp_msg(MSGT_OSD, MSGL_DBG2, "RAW: %s  %d x %d, %d colors\n",name,raw->w,raw->h,raw->c);
     if(raw->c){
         raw->pal=malloc(raw->c*3);
@@ -53,8 +56,12 @@ raw_file* load_raw(char *name,int verbose){
         raw->pal=NULL;
         bpp=3;
     }
-    raw->bmp=malloc(raw->h*raw->w*bpp);
-    fread(raw->bmp,raw->h*raw->w*bpp,1,f);
+    size = raw->h*raw->w*bpp;
+    raw->bmp=malloc(size);
+    if (fread(raw->bmp,size,1,f) != size) {
+        free(raw->bmp);
+        goto err_out;
+    }
     fclose(f);
     return raw;
 
