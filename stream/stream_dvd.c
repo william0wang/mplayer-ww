@@ -885,14 +885,13 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
     d->vts_file=vts_file;
     d->cur_title = dvd_title+1;
 
-    pgc = vts_file->vts_pgcit ? vts_file->vts_pgcit->pgci_srp[ttn].pgc : NULL;
+    pgc = vts_file->vts_pgcit->pgci_srp[ttn].pgc;
     /**
      * Check number of audio channels and types
      */
     {
-      d->nr_of_channels=0;
-      if(vts_file->vts_pgcit) {
         int i;
+      d->nr_of_channels=0;
         for(i=0;i<8;i++)
           if(pgc->audio_control[i] & 0x8000) {
             audio_attr_t * audio = &vts_file->vtsi_mat->vts_audio_attr[i];
@@ -943,7 +942,6 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
 
            d->nr_of_channels++;
          }
-      }
       mp_msg(MSGT_OPEN,MSGL_STATUS,MSGTR_DVDnumAudioChannels,d->nr_of_channels );
     }
 
