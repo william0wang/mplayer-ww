@@ -681,17 +681,18 @@ static int preinit(const char *arg)
     if ( hidis==NULL ){
 	struct stat sbuf;
 	char fname[12];
-	FILE *fp;
+	FILE *fp = NULL;
 	int fd, vt;
 	/* check /dev/vcsa<vt> */
 	/* check only, if no driver is explicit set */
 	fd = dup (fileno (stderr));
-	fstat (fd, &sbuf);
+	if (fstat (fd, &sbuf) != -1) {
 	// vt number stored in device minor
 	vt = sbuf.st_rdev & 0xff;
-	close (fd);
 	sprintf (fname, "/dev/vcsa%2.2i", vt);
 	fp = fopen (fname, "w+");
+	}
+	close (fd);
 	if (fp==NULL){
 	    fprintf(stderr,"VO: [aa] cannot open %s for writing,"
 			"so we'll not use linux driver\n", fname);
