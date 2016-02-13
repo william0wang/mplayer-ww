@@ -1941,8 +1941,10 @@ void glSetupAlphaStippleTex(unsigned pattern) {
 
 void glEnable3DLeft(int type) {
   GLint buffer;
-  if (type & GL_3D_SWAP)
-    return glEnable3DRight(type & ~GL_3D_SWAP);
+  if (type & GL_3D_SWAP) {
+    glEnable3DRight(type & ~GL_3D_SWAP);
+    return;
+  }
   switch (type) {
     case GL_3D_RED_CYAN:
       mpglColorMask(GL_TRUE,  GL_FALSE, GL_FALSE, GL_FALSE);
@@ -1978,8 +1980,10 @@ void glEnable3DLeft(int type) {
 
 void glEnable3DRight(int type) {
   GLint buffer;
-  if (type & GL_3D_SWAP)
-    return glEnable3DLeft(type & ~GL_3D_SWAP);
+  if (type & GL_3D_SWAP) {
+    glEnable3DLeft(type & ~GL_3D_SWAP);
+    return;
+  }
   switch (type) {
     case GL_3D_RED_CYAN:
       mpglColorMask(GL_FALSE, GL_TRUE,  GL_TRUE,  GL_FALSE);
