@@ -621,7 +621,7 @@ static int sh_veu_frame_sel(unsigned int frame)
     return 0;
 }
 
-VDXDriver sh_veu_drv = {
+const VDXDriver sh_veu_drv = {
     "sh_veu",
     NULL,
     .probe = sh_veu_probe,

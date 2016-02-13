@@ -3453,10 +3453,10 @@ static int radeon_set_gkey(const vidix_grkey_t *grkey)
 }
 
 #ifdef RAGE128
-VDXDriver rage128_drv = {
+const VDXDriver rage128_drv = {
   "rage128",
 #else
-VDXDriver radeon_drv = {
+const VDXDriver radeon_drv = {
   "radeon",
 #endif
   NULL,

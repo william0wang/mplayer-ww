@@ -1377,10 +1377,10 @@ static int mga_get_eq( vidix_video_eq_t * eq)
 }
 
 #ifndef CRTC2
-VDXDriver mga_drv = {
+const VDXDriver mga_drv = {
   "mga",
 #else
-VDXDriver mga_crtc2_drv = {
+const VDXDriver mga_crtc2_drv = {
   "mga_crtc2",
 #endif
   NULL,

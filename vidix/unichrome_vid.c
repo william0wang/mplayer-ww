@@ -957,7 +957,7 @@ unichrome_frame_select (unsigned int frame)
   return 0;
 }
 
-VDXDriver unichrome_drv = {
+const VDXDriver unichrome_drv = {
   "unichrome",
   NULL,
   .probe = unichrome_probe,

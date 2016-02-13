@@ -1055,7 +1055,7 @@ static int mach64_set_gkeys(const vidix_grkey_t *grkey)
     return 0;
 }
 
-VDXDriver mach64_drv = {
+const VDXDriver mach64_drv = {
   "mach64",
   NULL,
   .probe = mach64_probe,

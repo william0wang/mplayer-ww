@@ -1107,7 +1107,7 @@ static int nv_get_eq(vidix_video_eq_t *eq_parm) {
   return 0;
 }
 
-VDXDriver nvidia_drv = {
+const VDXDriver nvidia_drv = {
   "nvidia",
   NULL,
   .probe = nv_probe,

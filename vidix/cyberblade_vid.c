@@ -589,7 +589,7 @@ static int cyberblade_frame_sel(unsigned int frame)
 	return 0;
 }
 
-VDXDriver cyberblade_drv = {
+const VDXDriver cyberblade_drv = {
   "cyberblade",
   NULL,
   .probe = cyberblade_probe,

@@ -346,7 +346,7 @@ static int pm2_frame_select(unsigned int frame)
     return 0;
 }
 
-VDXDriver pm2_drv = {
+const VDXDriver pm2_drv = {
   "pm2",
   NULL,
   .probe = pm2_probe,

@@ -547,7 +547,7 @@ int ivtv_frame_sel(unsigned int frame)
 	return 0;
 }
 
-VDXDriver ivtv_drv = {
+const VDXDriver ivtv_drv = {
 	"ivtv",
 	NULL,
 	.probe = ivtv_probe,

@@ -32,20 +32,20 @@
 #include "mp_msg.h"
 #include "config.h"
 
-extern VDXDriver cyberblade_drv;
-extern VDXDriver ivtv_drv;
-extern VDXDriver mach64_drv;
-extern VDXDriver mga_drv;
-extern VDXDriver mga_crtc2_drv;
-extern VDXDriver nvidia_drv;
-extern VDXDriver pm2_drv;
-extern VDXDriver pm3_drv;
-extern VDXDriver radeon_drv;
-extern VDXDriver rage128_drv;
-extern VDXDriver s3_drv;
-extern VDXDriver sh_veu_drv;
-extern VDXDriver sis_drv;
-extern VDXDriver unichrome_drv;
+extern const VDXDriver cyberblade_drv;
+extern const VDXDriver ivtv_drv;
+extern const VDXDriver mach64_drv;
+extern const VDXDriver mga_drv;
+extern const VDXDriver mga_crtc2_drv;
+extern const VDXDriver nvidia_drv;
+extern const VDXDriver pm2_drv;
+extern const VDXDriver pm3_drv;
+extern const VDXDriver radeon_drv;
+extern const VDXDriver rage128_drv;
+extern const VDXDriver s3_drv;
+extern const VDXDriver sh_veu_drv;
+extern const VDXDriver sis_drv;
+extern const VDXDriver unichrome_drv;
 
 static const VDXDriver * const all_drivers[] = {
 #ifdef CONFIG_VIDIX_DRV_CYBERBLADE

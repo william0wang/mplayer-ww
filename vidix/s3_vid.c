@@ -906,7 +906,7 @@ static int s3_frame_sel (unsigned int frame)
   return 0;
 }
 
-VDXDriver s3_drv = {
+const VDXDriver s3_drv = {
   "s3",
   NULL,
   .probe = s3_probe,

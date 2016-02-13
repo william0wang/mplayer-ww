@@ -1492,7 +1492,7 @@ static void set_hue(uint8_t hue)
     setvideoreg(Index_VI_Hue, (hue & 0x08) ? (hue ^ 0x07) : hue);
 }
 
-VDXDriver sis_drv = {
+const VDXDriver sis_drv = {
   "sis",
   NULL,
 
