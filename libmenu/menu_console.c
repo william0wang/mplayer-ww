@@ -81,7 +81,7 @@ struct menu_priv_s {
   int raw_child;
 };
 
-static struct menu_priv_s cfg_dflt = {
+static const struct menu_priv_s cfg_dflt = {
   NULL,
   0,
   0,

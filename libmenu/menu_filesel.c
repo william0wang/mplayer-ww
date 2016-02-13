@@ -71,7 +71,7 @@ struct menu_priv_s {
   char* filter;
 };
 
-static struct menu_priv_s cfg_dflt = {
+static const struct menu_priv_s cfg_dflt = {
   MENU_LIST_PRIV_DFLT,
   NULL,
 

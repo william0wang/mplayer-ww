@@ -73,7 +73,7 @@ static const m_option_t cfg_fields[] = {
 };
 
 
-static struct menu_priv_s cfg_dflt = {
+static const struct menu_priv_s cfg_dflt = {
   MENU_LIST_PRIV_DFLT,
   "Select a channel: ",
   "channels.conf",
