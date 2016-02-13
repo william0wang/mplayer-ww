@@ -72,7 +72,7 @@ typedef struct {
   unsigned int     state;
 } dvdnav_priv_t;
 
-static struct stream_priv_s {
+static const struct stream_priv_s {
   int track;
   char* device;
 } stream_priv_dflts = {

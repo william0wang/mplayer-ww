@@ -60,7 +60,7 @@ void vstream_error(const char *format, ...) {
     mp_msg(MSGT_STREAM, MSGL_ERR, "%s", buf);
 }
 
-static struct stream_priv_s {
+static const struct stream_priv_s {
   char* host;
   char* fsid;
 } stream_priv_dflts = {

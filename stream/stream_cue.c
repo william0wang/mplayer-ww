@@ -52,7 +52,7 @@
 #define MODE2_2336 40
 #define UNKNOWN -1
 
-static struct stream_priv_s {
+static const struct stream_priv_s {
   char* filename;
 } stream_priv_dflts = {
   NULL

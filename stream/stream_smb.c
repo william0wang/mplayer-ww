@@ -27,7 +27,7 @@
 #include "m_option.h"
 #include "m_struct.h"
 
-static struct stream_priv_s {
+static const struct stream_priv_s {
 } stream_priv_dflts = {
 };
 

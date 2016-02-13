@@ -39,7 +39,7 @@
 #include "osdep/osdep.h"
 #include "libmpdemux/demuxer.h"
 
-static struct stream_priv_s {
+static const struct stream_priv_s {
   char* filename;
   char *filename2;
 } stream_priv_dflts = {

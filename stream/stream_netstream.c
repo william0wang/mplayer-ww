@@ -62,7 +62,7 @@
 #include "stream_netstream.h"
 #include "tcp.h"
 
-static struct stream_priv_s {
+static const struct stream_priv_s {
   char* host;
   int port;
   char* url;

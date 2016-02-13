@@ -62,7 +62,7 @@ int dvd_angle=1;
 #endif
 
 
-static struct stream_priv_s {
+static const struct stream_priv_s {
   int title;
   char* device;
 } stream_priv_dflts = {
