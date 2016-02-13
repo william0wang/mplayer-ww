@@ -32,8 +32,6 @@
 #include "mp_msg.h"
 #include "config.h"
 
-static VDXDriver *first_driver = NULL;
-
 extern VDXDriver cyberblade_drv;
 extern VDXDriver ivtv_drv;
 extern VDXDriver mach64_drv;
@@ -49,64 +47,57 @@ extern VDXDriver sh_veu_drv;
 extern VDXDriver sis_drv;
 extern VDXDriver unichrome_drv;
 
-static void vidix_register_driver (VDXDriver *drv)
-{
-  VDXDriver **d;
-
-  d = &first_driver;
-  while (*d != NULL)
-    d = &(*d)->next;
-  *d = drv;
-  drv->next = NULL;
-}
+static const VDXDriver * const all_drivers[] = {
+#ifdef CONFIG_VIDIX_DRV_CYBERBLADE
+  &cyberblade_drv,
+#endif
+#ifdef CONFIG_VIDIX_DRV_IVTV
+  &ivtv_drv,
+#endif
+#ifdef CONFIG_VIDIX_DRV_MACH64
+  &mach64_drv,
+#endif
+#ifdef CONFIG_VIDIX_DRV_MGA
+  &mga_drv,
+#endif
+#ifdef CONFIG_VIDIX_DRV_MGA_CRTC2
+  &mga_crtc2_drv,
+#endif
+#ifdef CONFIG_VIDIX_DRV_NVIDIA
+  &nvidia_drv,
+#endif
+#ifdef CONFIG_VIDIX_DRV_PM2
+  &pm2_drv,
+#endif
+#ifdef CONFIG_VIDIX_DRV_PM3
+  &pm3_drv,
+#endif
+#ifdef CONFIG_VIDIX_DRV_RADEON
+  &radeon_drv,
+#endif
+#ifdef CONFIG_VIDIX_DRV_RAGE128
+  &rage128_drv,
+#endif
+#ifdef CONFIG_VIDIX_DRV_S3
+  &s3_drv,
+#endif
+#ifdef CONFIG_VIDIX_DRV_SH_VEU
+  &sh_veu_drv,
+#endif
+#ifdef CONFIG_VIDIX_DRV_SIS
+  &sis_drv,
+#endif
+#ifdef CONFIG_VIDIX_DRV_UNICHROME
+  &unichrome_drv,
+#endif
+  NULL
+};
 
 void vidix_register_all_drivers (void)
 {
-#ifdef CONFIG_VIDIX_DRV_CYBERBLADE
-  vidix_register_driver (&cyberblade_drv);
-#endif
-#ifdef CONFIG_VIDIX_DRV_IVTV
-  vidix_register_driver (&ivtv_drv);
-#endif
-#ifdef CONFIG_VIDIX_DRV_MACH64
-  vidix_register_driver (&mach64_drv);
-#endif
-#ifdef CONFIG_VIDIX_DRV_MGA
-  vidix_register_driver (&mga_drv);
-#endif
-#ifdef CONFIG_VIDIX_DRV_MGA_CRTC2
-  vidix_register_driver (&mga_crtc2_drv);
-#endif
-#ifdef CONFIG_VIDIX_DRV_NVIDIA
-  vidix_register_driver (&nvidia_drv);
-#endif
-#ifdef CONFIG_VIDIX_DRV_PM2
-  vidix_register_driver (&pm2_drv);
-#endif
-#ifdef CONFIG_VIDIX_DRV_PM3
-  vidix_register_driver (&pm3_drv);
-#endif
-#ifdef CONFIG_VIDIX_DRV_RADEON
-  vidix_register_driver (&radeon_drv);
-#endif
-#ifdef CONFIG_VIDIX_DRV_RAGE128
-  vidix_register_driver (&rage128_drv);
-#endif
-#ifdef CONFIG_VIDIX_DRV_S3
-  vidix_register_driver (&s3_drv);
-#endif
-#ifdef CONFIG_VIDIX_DRV_SH_VEU
-  vidix_register_driver (&sh_veu_drv);
-#endif
-#ifdef CONFIG_VIDIX_DRV_SIS
-  vidix_register_driver (&sis_drv);
-#endif
-#ifdef CONFIG_VIDIX_DRV_UNICHROME
-  vidix_register_driver (&unichrome_drv);
-#endif
 }
 
-static int vidix_probe_driver (VDXContext *ctx, VDXDriver *drv,
+static int vidix_probe_driver (VDXContext *ctx, const VDXDriver *drv,
                                unsigned int cap, int verbose)
 {
   vidix_capability_t vid_cap;
@@ -137,24 +128,24 @@ static int vidix_probe_driver (VDXContext *ctx, VDXDriver *drv,
 
 static void vidix_list_drivers (void)
 {
-  VDXDriver *drv;
+  const VDXDriver *drv;
+  int i = 0;
 
   mp_msg(MSGT_VO, MSGL_STATUS, "[vidixlib] Available VIDIX drivers:\n");
 
-  drv = first_driver;
-  while (drv)
+  while ((drv = all_drivers[i++]))
   {
     vidix_capability_t cap;
     drv->get_caps (&cap);
     mp_msg(MSGT_VO, MSGL_STATUS, "[vidixlib]  * %s - %s\n", drv->name, cap.name);
-    drv = drv->next;
   }
 }
 
 int vidix_find_driver (VDXContext *ctx, const char *name,
                        unsigned int cap, int verbose)
 {
-  VDXDriver *drv;
+  const VDXDriver *drv;
+  int i = 0;
 
   if (name && !strcmp (name, "help"))
   {
@@ -163,8 +154,7 @@ int vidix_find_driver (VDXContext *ctx, const char *name,
     return 0;
   }
 
-  drv = first_driver;
-  while (drv)
+  while ((drv = all_drivers[i++]))
   {
     if (name) /* forced driver */
     {
@@ -184,7 +174,6 @@ int vidix_find_driver (VDXContext *ctx, const char *name,
       if (vidix_probe_driver (ctx, drv, cap, verbose))
         return 1;
     }
-    drv = drv->next;
   }
 
   if (verbose)

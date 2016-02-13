@@ -307,7 +307,6 @@ typedef struct vidix_oem_fx_s
 
 typedef struct VDXDriver {
   const char *name;
-  struct VDXDriver *next;
   int (* probe) (int verbose, int force);
   int (* get_caps) (vidix_capability_t *cap);
   int (*query_fourcc)(vidix_fourcc_t *);
@@ -328,7 +327,7 @@ typedef struct VDXDriver {
 } VDXDriver;
 
 typedef struct VDXContext {
-  VDXDriver *drv;
+  const VDXDriver *drv;
   /* might be filled in by much more info later on */
 } VDXContext;
 
