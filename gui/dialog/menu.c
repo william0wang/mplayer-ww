@@ -235,7 +235,7 @@ typedef struct
 } Languages_t;
 
 #define lng( a,b ) ( (int)(a) * 256 + b )
-static Languages_t Languages[] =
+static const Languages_t Languages[] =
 {
   { lng( 'a','a' ), "aar", "ʿAfár af"                      },
   { lng( 'a','b' ), "abk", "аҧсуа бызшәа"         },
