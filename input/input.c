@@ -68,7 +68,7 @@
 /// the last one) which is actually 9.
 
 /// For the args, the first field is the type (actually int, float or string), the second
-/// is the default value wich is used for optional arguments
+/// is the default value which is used for optional arguments
 
 static const mp_cmd_t mp_cmds[] = {
 #ifdef CONFIG_RADIO
@@ -1295,6 +1295,8 @@ static mp_cmd_t *read_events(int time, int paused)
 #endif
 
 	if (key_fds[i].no_readfunc_retval) {   // getch2 handler special-cased for now
+	    // TODO: this is quite broken, using e.g. -cache -dumpaudio
+	    // with < /dev/null results in 100% CPU usage.
 	    ((void (*)(void))key_fds[i].read_func)();
 	    if (cmd_queue_length)
 		return NULL;
