@@ -2849,6 +2849,10 @@ if test "$cc_vendor" = "gnu" ; then
   cflag_check -Wstrict-prototypes && WARN_CFLAGS="-Wstrict-prototypes $WARN_CFLAGS"
 fi
 
+# This provides significant size savings on gcc.
+# I will cause worse backtraces when debug info is missing though,
+# but having non-stripable debug info is not really a desirable feature.
+cflag_check -fno-asynchronous-unwind-tables && CFLAGS="$CFLAGS -fno-asynchronous-unwind-tables"
 cflag_check -mno-omit-leaf-frame-pointer && cflags_no_omit_leaf_frame_pointer="-mno-omit-leaf-frame-pointer"
 cflag_check -MMD -MP && DEPFLAGS="-MMD -MP"
 
