@@ -108,8 +108,8 @@ extern char *vobsub_name;
 #define OSD_PB_1 0x13
 
 /* now in textform */
-extern char * sub_osd_names[];
-extern char * sub_osd_names_short[];
+extern const char * const sub_osd_names[];
+extern const char * const sub_osd_names_short[];
 
 extern int sub_unicode;
 extern int sub_utf8;

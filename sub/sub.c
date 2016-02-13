@@ -64,7 +64,7 @@ struct osd_text_p {
 };
 //^
 
-char * sub_osd_names[]={
+const char * const sub_osd_names[]={
     MSGTR_VO_SUB_Seekbar,
     MSGTR_VO_SUB_Play,
     MSGTR_VO_SUB_Pause,
@@ -79,7 +79,7 @@ char * sub_osd_names[]={
     MSGTR_VO_SUB_Hue,
     MSGTR_VO_SUB_Balance
 };
-char * sub_osd_names_short[] ={ "", "|>", "||", "[]", "<<" , ">>", "", "", "", "", "", "", "" };
+const char * const sub_osd_names_short[] ={ "", "|>", "||", "[]", "<<" , ">>", "", "", "", "", "", "", "" };
 
 //static int vo_font_loaded=-1;
 font_desc_t* vo_font=NULL;
