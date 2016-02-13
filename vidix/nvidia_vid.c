@@ -49,7 +49,7 @@ static pciinfo_t pci_info;
 #define NV04_BES_SIZE 1024*2000*4
 
 
-static vidix_capability_t nvidia_cap = {
+static const vidix_capability_t nvidia_cap = {
     "NVIDIA RIVA OVERLAY DRIVER",
     "Sascha Sommer <saschasommer@freenet.de>",
     TYPE_OUTPUT,
@@ -355,7 +355,6 @@ static int nv_probe(int verbose, int force){
 			mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] Device is disabled, ignoring\n");
 			continue;
 		}
-		nvidia_cap.device_id = lst[i].device;
 		err = 0;
 		memcpy(&pci_info, &lst[i], sizeof(pciinfo_t));
 		break;
@@ -980,6 +979,7 @@ static void nv_destroy(void){
 
 static int nv_get_caps(vidix_capability_t *to){
     memcpy(to, &nvidia_cap, sizeof(vidix_capability_t));
+    to->device_id = pci_info.device;
     return 0;
 }
 

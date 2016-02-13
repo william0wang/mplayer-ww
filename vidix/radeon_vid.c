@@ -1151,7 +1151,7 @@ static int find_chip(unsigned chip_id)
 static pciinfo_t pci_info;
 static int probed=0;
 
-static vidix_capability_t def_cap =
+static const vidix_capability_t def_cap =
 {
 #ifdef RAGE128
     "BES driver for Rage128 cards",
@@ -1251,7 +1251,6 @@ static int radeon_probe(int verbose, int force)
         probe_fireGL_driver();
 #endif
 	if(idx != -1) besr.chip_flags=ati_card_ids[idx].flags;
-	def_cap.device_id = lst[i].device;
 	err = 0;
 	memcpy(&pci_info,&lst[i],sizeof(pciinfo_t));
 	probed=1;
@@ -1345,14 +1344,14 @@ static int radeon_init(void)
 #ifdef RADEON
   /* according to XFree86 4.2.0, some production M6's return 0 for 8MB */
   if (radeon_ram_size == 0 &&
-      (def_cap.device_id == DEVICE_ATI_RADEON_MOBILITY_M6 ||
-       def_cap.device_id == DEVICE_ATI_RADEON_MOBILITY_M62))
+      (pci_info.device == DEVICE_ATI_RADEON_MOBILITY_M6 ||
+       pci_info.device == DEVICE_ATI_RADEON_MOBILITY_M62))
   {
       mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Working around buggy Radeon Mobility M6 (0 vs. 8MB ram)\n");
       radeon_ram_size = 8192*1024;
   }
   else if (radeon_ram_size == 0 &&
-           (def_cap.device_id == DEVICE_ATI_RS482_RADEON_XPRESS))
+           (pci_info.device == DEVICE_ATI_RS482_RADEON_XPRESS))
   {
       mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Working around buggy RS482 Radeon Xpress 200 Memory Detection\n");
       radeon_ram_size = (INREG(CONFIG_MEMSIZE) + 0x100000) << 2;
@@ -1361,8 +1360,8 @@ static int radeon_init(void)
 #else
   /* Rage Mobility (rage128) also has memsize bug */
   if (radeon_ram_size == 0 &&
-      (def_cap.device_id == DEVICE_ATI_RAGE_MOBILITY_M3 ||
-       def_cap.device_id == DEVICE_ATI_RAGE_MOBILITY_M32))
+      (pci_info.device == DEVICE_ATI_RAGE_MOBILITY_M3 ||
+       pci_info.device == DEVICE_ATI_RAGE_MOBILITY_M32))
   {
       mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Working around Rage Mobility M3 (0 vs. 8MB ram)\n");
       radeon_ram_size = 8192*1024;
@@ -1402,6 +1401,7 @@ static void radeon_destroy(void)
 static int radeon_get_caps(vidix_capability_t *to)
 {
   memcpy(to,&def_cap,sizeof(vidix_capability_t));
+  to->device_id = pci_info.device;
   return 0;
 }
 

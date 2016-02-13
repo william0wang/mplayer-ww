@@ -49,7 +49,7 @@ static pciinfo_t pci_info;
 void *pm3_reg_base;
 static void *pm3_mem;
 
-static vidix_capability_t pm3_cap =
+static const vidix_capability_t pm3_cap =
 {
     "3DLabs GLINT R3/Permedia3 driver",
     "Måns Rullgård <mru@users.sf.net>",
@@ -115,7 +115,6 @@ static int pm3_probe(int verbose, int force)
 			continue;
 		}
 #endif
-		pm3_cap.device_id = lst[i].device;
 		err = 0;
 		memcpy(&pci_info, &lst[i], sizeof(pciinfo_t));
 		break;
@@ -148,6 +147,7 @@ static void pm3_destroy(void)
 static int pm3_get_caps(vidix_capability_t *to)
 {
     memcpy(to, &pm3_cap, sizeof(vidix_capability_t));
+    to->device_id = pci_info.device;
     return 0;
 }
 

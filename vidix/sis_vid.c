@@ -134,7 +134,7 @@ static int sis_frames[VID_PLAY_MAXFRAMES];
 
 static vidix_grkey_t sis_grkey;
 
-static vidix_capability_t sis_cap = {
+static const vidix_capability_t sis_cap = {
     "SiS 300/310/325 Video Driver",
     "Jake Page",
     TYPE_OUTPUT,
@@ -268,12 +268,12 @@ static int sis_probe(int verbose, int force)
 		if (sis_verbose > 0)
 		    mp_msg(MSGT_VO, MSGL_STATUS, "[SiS] Found chip: %s (0x%X)\n",
 			   dname, lst[i].device);
-		sis_device_id = sis_cap.device_id = lst[i].device;
+		sis_device_id = lst[i].device;
 		err = 0;
 		memcpy(&pci_info, &lst[i], sizeof(pciinfo_t));
 
 		sis_has_two_overlays = 0;
-		switch (sis_cap.device_id) {
+		switch (sis_device_id) {
 		case DEVICE_SIS_300:
 		case DEVICE_SIS_630_VGA:
 		    sis_has_two_overlays = 1;
@@ -409,6 +409,7 @@ static void sis_destroy(void)
 static int sis_get_caps(vidix_capability_t * to)
 {
     memcpy(to, &sis_cap, sizeof(vidix_capability_t));
+    to->device_id = sis_device_id;
     return 0;
 }
 

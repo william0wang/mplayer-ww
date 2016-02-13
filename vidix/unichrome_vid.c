@@ -84,7 +84,7 @@ static FILE *logfile = 0;
 /**
  * @brief Unichrome driver vidix capabilities.
  */
-static vidix_capability_t uc_cap = {
+static const vidix_capability_t uc_cap = {
   "VIA CLE266 Unichrome driver",
   "Timothy Lee <timothy@siriushk.com>",
   TYPE_OUTPUT,
@@ -489,7 +489,6 @@ unichrome_probe (int verbose, int force)
 		  mp_msg(MSGT_VO, MSGL_STATUS, "[unichrome] Device is disabled, ignoring\n");
 		  continue;
 		}
-	      uc_cap.device_id = lst[i].device;
 	      err = 0;
 	      memcpy (&pci_info, &lst[i], sizeof (pciinfo_t));
 	      break;
@@ -588,6 +587,7 @@ static int
 unichrome_get_caps (vidix_capability_t * to)
 {
   memcpy (to, &uc_cap, sizeof (vidix_capability_t));
+  to->device_id = pci_info.device;
   return 0;
 }
 

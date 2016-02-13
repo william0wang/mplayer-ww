@@ -240,7 +240,7 @@ static void write_reg(struct uio_map *ump, unsigned long value, int reg_offs)
     reg[reg_offs / 4] = value;
 }
 
-static vidix_capability_t sh_veu_cap = {
+static const vidix_capability_t sh_veu_cap = {
     "SuperH VEU driver",
     "Magnus Damm",
     TYPE_OUTPUT,

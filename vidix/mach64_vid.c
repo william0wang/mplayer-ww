@@ -221,7 +221,7 @@ static void mach64_wait_vsync( void )
 
 }
 
-static vidix_capability_t mach64_cap =
+static const vidix_capability_t mach64_cap =
 {
     "BES driver for Mach64/3DRage cards",
     "Nick Kurshev and Michael Niedermayer",
@@ -445,7 +445,6 @@ static int mach64_probe(int verbose,int force)
 	    if(idx == -1)
 		mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] Assuming it as Mach64\n");
 	}
-	mach64_cap.device_id = lst[i].device;
 	err = 0;
 	memcpy(&pci_info,&lst[i],sizeof(pciinfo_t));
 	probed=1;
@@ -512,10 +511,10 @@ static int mach64_init(void)
   if(supports_planar)	mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] Planar YUV formats are supported :)\n");
   else			mp_msg(MSGT_VO, MSGL_STATUS, "[mach64] Planar YUV formats are not supported :(\n");
 
-  if(   mach64_cap.device_id==DEVICE_ATI_RAGE_MOBILITY_P_M
-     || mach64_cap.device_id==DEVICE_ATI_RAGE_MOBILITY_P_M2
-     || mach64_cap.device_id==DEVICE_ATI_RAGE_MOBILITY_L
-     || mach64_cap.device_id==DEVICE_ATI_RAGE_MOBILITY_L2)
+  if(   pci_info.device==DEVICE_ATI_RAGE_MOBILITY_P_M
+     || pci_info.device==DEVICE_ATI_RAGE_MOBILITY_P_M2
+     || pci_info.device==DEVICE_ATI_RAGE_MOBILITY_L
+     || pci_info.device==DEVICE_ATI_RAGE_MOBILITY_L2)
          supports_lcd_v_stretch=1;
   else
          supports_lcd_v_stretch=0;
@@ -540,6 +539,7 @@ static void mach64_destroy(void)
 static int mach64_get_caps(vidix_capability_t *to)
 {
     memcpy(to, &mach64_cap, sizeof(vidix_capability_t));
+    to->device_id = pci_info.device;
     return 0;
 }
 

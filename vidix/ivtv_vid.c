@@ -73,7 +73,7 @@ int alpha_disable = 0;
 
 /* VIDIX exports */
 
-static vidix_capability_t ivtv_cap =
+static const vidix_capability_t ivtv_cap =
 {
 	"Hauppauge PVR 350 YUV Video",
 	"Lutz Koschorreck",

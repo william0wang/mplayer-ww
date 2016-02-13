@@ -109,7 +109,7 @@ static int mga_irq = -1;
 
 static int mga_next_frame = 0;
 
-static vidix_capability_t mga_cap =
+static const vidix_capability_t mga_cap =
 {
     "Matrox MGA G200/G4x0/G5x0 YUV Video",
     "Aaron Holtzman, Arpad Gereoffy, Alex Beregszaszi, Nick Kurshev",
@@ -1149,8 +1149,6 @@ card_found:
 	probed = 1;
 	memcpy(&pci_info, &lst[i], sizeof(pciinfo_t));
 
-	mga_cap.device_id = pci_info.device; /* set device id in capabilities */
-
 	return 0;
 }
 
@@ -1316,6 +1314,7 @@ static int mga_query_fourcc(vidix_fourcc_t *to)
 static int mga_get_caps(vidix_capability_t *to)
 {
     memcpy(to, &mga_cap, sizeof(vidix_capability_t));
+    to->device_id = pci_info.device; /* set device id in capabilities */
     return 0;
 }
 

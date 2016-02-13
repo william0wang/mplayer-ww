@@ -60,7 +60,7 @@ static void *pm2_mem;
 
 static int pm2_vidmem = PM2_VIDMEM;
 
-static vidix_capability_t pm2_cap =
+static const vidix_capability_t pm2_cap =
 {
     "3DLabs Permedia2 driver",
     "Måns Rullgård <mru@users.sf.net>",
@@ -118,7 +118,6 @@ static int pm2_probe(int verbose, int force)
 	    dname = pci_device_name(lst[i].vendor, lst[i].device);
 	    dname = dname ? dname : "Unknown chip";
 	    mp_msg(MSGT_VO, MSGL_STATUS, "[pm2] Found chip: %s\n", dname);
-	    pm2_cap.device_id = lst[i].device;
 	    err = 0;
 	    memcpy(&pci_info, &lst[i], sizeof(pciinfo_t));
 	    break;
@@ -154,6 +153,7 @@ static void pm2_destroy(void)
 static int pm2_get_caps(vidix_capability_t *to)
 {
     memcpy(to, &pm2_cap, sizeof(vidix_capability_t));
+    to->device_id = pci_info.device;
     return 0;
 }
 

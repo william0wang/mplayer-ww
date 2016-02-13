@@ -100,7 +100,7 @@ typedef struct s3_info s3_info;
 
 static s3_info *info;
 
-static vidix_capability_t s3_cap = {
+static const vidix_capability_t s3_cap = {
   "S3 BES",
   "Reza Jelveh, Michael Kostylev",
   TYPE_OUTPUT,
@@ -581,7 +581,6 @@ static int s3_probe (int verbose, int force)
           mp_msg(MSGT_VO, MSGL_STATUS, "[s3_vid] Device is disabled, ignoring\n");
           continue;
         }
-        s3_cap.device_id = lst[i].device;
         err = 0;
         memcpy (&pci_info, &lst[i], sizeof (pciinfo_t));
         break;
@@ -720,6 +719,7 @@ static void s3_destroy (void)
 static int s3_get_caps (vidix_capability_t * to)
 {
   memcpy (to, &s3_cap, sizeof (vidix_capability_t));
+  to->device_id = pci_info.device;
   return 0;
 }
 
