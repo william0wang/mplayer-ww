@@ -104,7 +104,8 @@ static int lock_fd(int fd) {
 	     strerror(errno));
       return 0;
     }
-  } while(0);
+    break;
+  } while(1);
   mp_msg(MSGT_STREAM,MSGL_DBG2, "Locked (%d)\n",getpid());
 #else
 printf("FIXME? should lock here\n");
