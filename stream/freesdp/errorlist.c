@@ -29,7 +29,7 @@
 
 #include "common.h"
 
-const char *fsdp_error_t_s[] = {
+const char * const fsdp_error_t_s[] = {
   "No error",/** FSDPE_OK **/
   "Illegal character detected",/** FSDPE_ILLEGAL_CHARACTER **/
   "Missing version item", /** FSDPE_MISSING_VERSION **/
