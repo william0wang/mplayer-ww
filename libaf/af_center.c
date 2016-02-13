@@ -121,7 +121,7 @@ static int af_open(af_instance_t* af){
 }
 
 // Description of this filter
-af_info_t af_info_center = {
+const af_info_t af_info_center = {
     "Audio filter for adding a center channel",
     "center",
     "Alex Beregszaszi",

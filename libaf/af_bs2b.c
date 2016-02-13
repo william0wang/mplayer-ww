@@ -265,7 +265,7 @@ static int af_open(af_instance_t *af)
 }
 
 /// Description of this filter
-af_info_t af_info_bs2b = {
+const af_info_t af_info_bs2b = {
     "Bauer stereophonic-to-binaural audio filter",
     "bs2b",
     "Andrew Savchenko",

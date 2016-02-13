@@ -154,7 +154,7 @@ static int af_open(af_instance_t* af){
 }
 
 // Description of this filter
-af_info_t af_info_gate = {
+const af_info_t af_info_gate = {
     "Noise gate audio filter",
     "gate",
     "Anders",

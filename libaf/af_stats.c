@@ -150,7 +150,7 @@ static int af_open(af_instance_t *af)
     return AF_OK;
 }
 
-af_info_t af_info_stats = {
+const af_info_t af_info_stats = {
     "Statistics audio filter",
     "stats",
     "Nicolas George",

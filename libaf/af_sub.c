@@ -180,7 +180,7 @@ static int af_open(af_instance_t* af){
 }
 
 // Description of this filter
-af_info_t af_info_sub = {
+const af_info_t af_info_sub = {
     "Audio filter for adding a sub-base channel",
     "sub",
     "Anders",
