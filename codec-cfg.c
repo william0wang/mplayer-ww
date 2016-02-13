@@ -266,7 +266,7 @@ static int add_to_inout(char *sfmt, char *sflags, unsigned int *outfmt,
                         unsigned char *outflags)
 {
 
-    static char *flagstr[] = {
+    static const char * const flagstr[] = {
         "flip",
         "noflip",
         "yuvhack",
@@ -464,7 +464,7 @@ static int add_comment(char *s, char **d)
 
 static short get_cpuflags(char *s)
 {
-    static char *flagstr[] = {
+    static const char * const flagstr[] = {
         "mmx",
         "sse",
         "3dnow",
