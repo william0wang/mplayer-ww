@@ -215,7 +215,7 @@ int m_property_time_ro(const m_option_t* prop,int action,
                        void* arg,double var);
 
 /// get/print the string
-int m_property_string_ro(const m_option_t* prop,int action,void* arg, char* str);
+int m_property_string_ro(const m_option_t* prop,int action,void* arg, const char* str);
 
 /// get/print a bitrate
 int m_property_bitrate(const m_option_t* prop,int action,void* arg,int rate);
