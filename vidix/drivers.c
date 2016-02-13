@@ -32,7 +32,7 @@
 #include "mp_msg.h"
 #include "config.h"
 
-VDXDriver *first_driver = NULL;
+static VDXDriver *first_driver = NULL;
 
 extern VDXDriver cyberblade_drv;
 extern VDXDriver ivtv_drv;
