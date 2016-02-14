@@ -1216,7 +1216,7 @@ static int gen_sh_video(sh_video_t* sh, mov_track_t* trak, int timescale) {
 		  else
 		  {
 		    mp_msg(MSGT_DEMUX, MSGL_V, "Loading palette from file\n");
-		    for (i = start; i <= end; i++)
+		    for (i = start; i <= end && hdr_ptr < trak->stdata_len - 8; i++)
 		    {
 		      entry = AV_RB16(&trak->stdata[hdr_ptr]);
 		      hdr_ptr += 2;
