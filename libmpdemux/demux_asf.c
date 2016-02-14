@@ -541,9 +541,6 @@ static int demux_asf_fill_buffer(demuxer_t *demux, demux_stream_t *ds){
             } // for segs
             return 1; // success
     }
-
-    mp_msg(MSGT_DEMUX,MSGL_V,"%08"PRIX64":  UNKNOWN TYPE  %02X %02X %02X %02X %02X...\n",(int64_t)demux->filepos,asf->packet[0],asf->packet[1],asf->packet[2],asf->packet[3],asf->packet[4]);
-    return 0;
 }
 
 #include "stheader.h"
