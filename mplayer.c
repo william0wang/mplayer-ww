@@ -1839,7 +1839,7 @@ static float timing_sleep(float time_frame)
         current_module = "sleep_rtc";
         while (time_frame > 0.000) {
             unsigned long rtc_ts;
-            if (read(rtc_fd, &rtc_ts, sizeof(rtc_ts)) <= 0)
+            if (read(rtc_fd, &rtc_ts, sizeof(rtc_ts)) != sizeof(rtc_ts))
                 mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_LinuxRTCReadError, strerror(errno));
             time_frame -= GetRelativeTime();
         }
