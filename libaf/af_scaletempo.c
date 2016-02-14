@@ -290,7 +290,7 @@ static int control(struct af_instance_s* af, int cmd, void* arg)
   switch(cmd){
   case AF_CONTROL_REINIT:{
     af_data_t* data = (af_data_t*)arg;
-    float srate = data->rate / 1000;
+    float srate = data->rate / 1000.0f;
     int nch = data->nch;
     int bps;
     int use_int = 0;
