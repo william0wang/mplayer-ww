@@ -153,7 +153,7 @@ static void scale_image(struct vf_priv_s* priv, mp_image_t *mpi)
     if (!priv->pic->data[0])
         priv->pic->data[0] = av_malloc(priv->pic->linesize[0]*priv->dh);
 
-    sws_scale(priv->ctx, mpi->planes, mpi->stride, 0, priv->dh, priv->pic->data, priv->pic->linesize);
+    sws_scale(priv->ctx, mpi->planes, mpi->stride, 0, mpi->height, priv->pic->data, priv->pic->linesize);
 }
 
 static void start_slice(struct vf_instance *vf, mp_image_t *mpi)
