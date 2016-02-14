@@ -274,7 +274,7 @@ static void avifile_write_header(muxer_t *muxer){
   }
 
   // update AVI header:
-  if(muxer->def_v){
+  {
       int i;
       muxer->avih.dwMicroSecPerFrame=1000000.0*muxer->def_v->h.dwScale/muxer->def_v->h.dwRate;
 //      muxer->avih.dwMaxBytesPerSec=1000000; // dummy!!!!! FIXME
