@@ -623,8 +623,7 @@ if (index_file_load) {
 
   for (i=0; i<priv->idx_size;i++) {
     AVIINDEXENTRY *idx=priv->idx + i;
-    fread(idx, sizeof(AVIINDEXENTRY), 1, fp);
-    if (feof(fp)) {
+    if (fread(idx, 1, sizeof(*idx), fp) != sizeof(*idx)) {
       mp_msg(MSGT_HEADER,MSGL_ERR, MSGTR_MPDEMUX_AVIHDR_PrematureEOF, index_file_load);
       free(priv->idx);
       priv->idx_size = 0;
