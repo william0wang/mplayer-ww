@@ -360,7 +360,7 @@ void listRepl(char ***list, const char *search, const char *replace)
  *
  * @return duplicated list
  */
-char **listDup(const char *const *list)
+char **listDup(const char * const *list)
 {
     char **dup = NULL;
 

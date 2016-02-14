@@ -63,7 +63,7 @@ int fsType;
 
 static gint fsCurrFNameListSelected, fsLastFNameListSelected;
 
-char *const fsVideoAudioFilterNames[][2] = {
+char * const fsVideoAudioFilterNames[][2] = {
     { MSGTR_GUI_FilterVideoAvi,           "*.avi"                                                                                                                                                                                                                                                                                                                                                                                                                  },
     { MSGTR_GUI_FilterVideoDivX,          "*.divx"                                                                                                                                                                                                                                                                                                                                                                                                                 },
     { MSGTR_GUI_FilterVideoFlash,         "*.flv"                                                                                                                                                                                                                                                                                                                                                                                                                  },
@@ -86,7 +86,7 @@ char *const fsVideoAudioFilterNames[][2] = {
 };
 int fsLastVideoAudioFilterSelected = -1;
 
-char *const fsSubtitleFilterNames[][2] = {
+char * const fsSubtitleFilterNames[][2] = {
     { "AQTitle (*.aqt)",                   "*.aqt"                                                      },
     { "Advanced SubStation Alpha (*.ass)", "*.ass"                                                      },
     { "JACOSub (*.jss) ",                  "*.jss"                                                      },
@@ -103,7 +103,7 @@ char *const fsSubtitleFilterNames[][2] = {
 };
 int fsLastSubtitleFilterSelected = -1;
 
-char *const fsAudioFileNames[][2] = {
+char * const fsAudioFileNames[][2] = {
     { MSGTR_GUI_FilterAudioDolbyPCM, "*.ac3,*.pcm"                                                                          },
     { MSGTR_GUI_FilterAudioMPEG,     "*.aac,*.f4a,*.m4a,*.mp2,*.mp3,*.mpga"                                                 },
     { MSGTR_GUI_FilterAudioMatroska, "*.mka"                                                                                },
@@ -116,7 +116,7 @@ char *const fsAudioFileNames[][2] = {
 };
 int fsLastAudioFilterSelected = -1;
 
-char *const fsFontFileNames[][2] = {
+char * const fsFontFileNames[][2] = {
 #ifdef CONFIG_FREETYPE
     { MSGTR_GUI_FilterFontTTF,    "*.ttf"       },
     { MSGTR_GUI_FilterFontType1,  "*.pfb"       },
@@ -129,7 +129,7 @@ char *const fsFontFileNames[][2] = {
 };
 int fsLastFontFilterSelected = -1;
 
-char *const fsImageFilterNames[][2] = {
+char * const fsImageFilterNames[][2] = {
 #ifdef CONFIG_LIBCDIO
     { MSGTR_GUI_FilterImageCD,  "*.cue"       },
     { MSGTR_GUI_FilterImageVCD, "*.cue"       },

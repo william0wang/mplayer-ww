@@ -98,7 +98,7 @@ static void set_fontconfig(void)
  * @param vf video filter to be added or changed
  * @param argvf pointer to an array of (new) parameter/value pairs
  */
-static void add_vf(const char *vf, const char *const *argvf)
+static void add_vf(const char *vf, const char * const *argvf)
 {
     if (vf_settings) {
         int i = 0;

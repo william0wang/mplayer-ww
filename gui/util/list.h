@@ -57,7 +57,7 @@ void *listMgr(int cmd, void *data);
 
 /// @name String list operations
 //@{
-char **listDup(const char *const *list);
+char **listDup(const char * const *list);
 void listFree(char ***list);
 void listRepl(char ***list, const char *search, const char *replace);
 void listSet(char ***list, const char *entry);
