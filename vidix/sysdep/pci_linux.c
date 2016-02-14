@@ -192,7 +192,7 @@ static long pci_config_read_long(
           int func,
           unsigned cmd)
 {
-    long retval;
+    unsigned retval;
     char path[100];
     int fd;
     sprintf(path,"/proc/bus/pci/%02d/%02x.0", bus, dev);
