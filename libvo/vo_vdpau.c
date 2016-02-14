@@ -41,6 +41,7 @@
 #include "video_out.h"
 #define NO_DRAW_FRAME
 #include "video_out_internal.h"
+#include "libmpcodecs/vdpau_frame_data.h"
 #include "libmpcodecs/vf.h"
 #include "x11_common.h"
 #include "aspect.h"

@@ -20,9 +20,6 @@
 #define MPLAYER_IMG_FORMAT_H
 
 #include "config.h"
-#if CONFIG_VDPAU
-#include <vdpau/vdpau.h>
-#endif
 
 /* RGB/BGR Formats */
 
@@ -303,15 +300,6 @@ typedef struct {
     int id;        // stream id. usually 0x1E0
     int timestamp; // pts, 90000 Hz counter based
 } vo_mpegpes_t;
-
-#if CONFIG_VDPAU
-struct vdpau_frame_data {
-    VdpVideoSurface surface;
-    const void *info;
-    unsigned bitstream_buffers_used;
-    const void *bitstream_buffers;
-};
-#endif
 
 const char *vo_format_name(int format);
 

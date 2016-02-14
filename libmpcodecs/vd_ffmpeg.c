@@ -39,6 +39,7 @@
 
 #if CONFIG_VDPAU
 #include "libavcodec/vdpau.h"
+#include "vdpau_frame_data.h"
 #endif
 #include "libavutil/pixdesc.h"
 
