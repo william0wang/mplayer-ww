@@ -13,6 +13,7 @@ MPlayer
     Fixes:
     * fix many crashes with fuzzed files
     * fix errors for multichannels files and pulseaudio >= 6
+    * fix lot of issues reported by Coverity
 
     Other:
     * MPlayer now depends also on libswresample
