@@ -1,5 +1,7 @@
 MPlayer
 
+  1.3.0: "worksforme" February 16, 2016
+
     Decoders, demuxers, streams:
     * HLS streams can be played without ffmpeg:// prefix
     * Removed internal ADPCM decoders for DK3, DK4, MS, MS ima, QT ima
