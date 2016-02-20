@@ -419,7 +419,8 @@ static int get_media_packet (int s, int padding, streaming_ctrl_t *stream_ctrl) 
       return 0;
     }
 
-    streaming_bufferize(stream_ctrl, data, padding);
+    if (streaming_bufferize(stream_ctrl, data, padding) < 0)
+      return -1;
 
   } else {
 
