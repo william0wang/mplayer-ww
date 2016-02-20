@@ -7760,7 +7760,11 @@ if test "$_pvr" = auto && test "$_tv_v4l2" = yes && linux ; then
   cat > $TMPC <<EOF
 #include <sys/time.h>
 #include <linux/videodev2.h>
-int main(void) { struct v4l2_ext_controls ext; return ext.controls->value; }
+int main(void) {
+  struct v4l2_ext_controls ext;
+  struct v4l2_query_ext_ctrl qctrl;
+  return ext.controls->value;
+}
 EOF
   cc_check && _pvr=yes
 fi
