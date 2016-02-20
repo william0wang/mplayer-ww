@@ -385,6 +385,9 @@ Optional features:
   --disable-ass          disable SSA/ASS subtitle support [autodetect]
   --enable-rpath         enable runtime linker path for extra libs [disabled]
   --disable-gnutls       disable GnuTLS [autodetect]
+  --enable-openssl-nondistributable  enable OpenSSL [disable]
+                         due to conflicting MPlayer and OpenSSL licenses, the
+                         resulting binary may be non-distributable.
 
 Codecs:
   --enable-gif              enable GIF support [autodetect]
@@ -848,6 +851,7 @@ _inet6=auto
 _sctp=auto
 _gethostbyname2=auto
 _gnutls=auto
+_openssl=no
 _ftp=auto
 _musepack=no
 _vstream=auto
@@ -1345,6 +1349,7 @@ for ac_option do
   --disable-rpath)      _rpath=no       ;;
   --enable-gnutls)       _gnutls=yes    ;;
   --disable-gnutls)      _gnutls=no     ;;
+  --enable-openssl-nondistributable) _openssl=yes ;;
 
   --enable-fribidi)     _fribidi=yes    ;;
   --disable-fribidi)    _fribidi=no     ;;
@@ -4402,6 +4407,17 @@ else
   def_gnutls='#define CONFIG_GNUTLS 0'
 fi
 echores "$_gnutls"
+
+echocheck "OpenSSL"
+if test "$_openssl" = yes ; then
+  def_openssl='#define CONFIG_OPENSSL 1'
+  libavprotocols="$libavprotocols HTTPS_PROTOCOL TLS_PROTOCOL TLS_OPENSSL_PROTOCOL"
+  extra_cflags="$extra_cflags $($_pkg_config --cflags openssl)"
+  extra_ldflags="$extra_ldflags $($_pkg_config --libs openssl)"
+else
+  def_openssl='#define CONFIG_OPENSSL 0'
+fi
+echores "$_openssl"
 
 echocheck "Samba support (libsmbclient)"
 if test "$_smb" = yes; then
@@ -8689,6 +8705,7 @@ CONFIG_BZLIB    = $bzlib
 CONFIG_CRYSTALHD= $crystalhd
 CONFIG_ENCODERS = yes
 CONFIG_GNUTLS   = $_gnutls
+CONFIG_OPENSSL  = $_openssl
 CONFIG_GPL      = yes
 CONFIG_ICONV    = $_iconv
 CONFIG_MLIB     = $_mlib
@@ -9234,12 +9251,12 @@ $def_erf
 #define CONFIG_FFSERVER 0
 #define CONFIG_FTRAPV 0
 $def_gnutls
+$def_openssl
 #define CONFIG_GPL 1
 #define CONFIG_GRAY 0
 #define CONFIG_LIBMODPLUG 0
 #define CONFIG_LIBVORBIS 0
 #define CONFIG_MEMORY_POISONING 0
-#define CONFIG_OPENSSL 0
 #define CONFIG_POWERPC_PERF 0
 /* For now prefer speed over avoiding potential invalid reads */
 #define CONFIG_SAFE_BITSTREAM_READER 0
