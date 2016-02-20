@@ -664,7 +664,8 @@ static int vbr_init_2pass2(void *sstate)
 		goto err_out;
 
 	/* Get the file version and check against current version */
-	fscanf(state->pass1_file, "# ASCII XviD vbr stat file version %d\n", &n);
+	if (fscanf(state->pass1_file, "# ASCII XviD vbr stat file version %d\n", &n) != 1)
+		goto err_out;
 
 	if(n != VBR_VERSION)
 		goto err_out;
@@ -685,7 +686,8 @@ static int vbr_init_2pass2(void *sstate)
 
 
 	/* Get the number of frames */
-	fscanf(state->pass1_file, "# frames : %d\n", &state->nb_frames);
+	if (fscanf(state->pass1_file, "# frames : %d\n", &state->nb_frames) != 1)
+		goto err_out;
 
 	/* Compute the desired size */
 	state->desired_size = (long long)
@@ -693,7 +695,8 @@ static int vbr_init_2pass2(void *sstate)
 		 (state->fps * 8.0));
 
 	/* Get the number of keyframes */
-	fscanf(state->pass1_file, "# keyframes : %d\n", &state->nb_keyframes);
+	if (fscanf(state->pass1_file, "# keyframes : %d\n", &state->nb_keyframes) != 1)
+		goto err_out;
 
 	/* Allocate memory space for the keyframe_location array */
 	if(state->nb_keyframes < 0 ||
@@ -731,9 +734,10 @@ static int vbr_init_2pass2(void *sstate)
 		int quant, keyframe, frame_hbytes, frame_bytes;
 		int kblocks, mblocks, ublocks;
 
-		fscanf(state->pass1_file, "%d %d %d %d %d %d %d\n",
+		if (fscanf(state->pass1_file, "%d %d %d %d %d %d %d\n",
 		       &quant, &keyframe, &frame_hbytes, &frame_bytes,
-		       &kblocks, &mblocks, &ublocks);
+		       &kblocks, &mblocks, &ublocks) != 7)
+			goto err_out;
 
 		/* Is the frame in the beginning credits */
 		if(util_frametype(state) == FRAME_TYPE_STARTING_CREDITS) {
@@ -925,9 +929,10 @@ static int vbr_init_2pass2(void *sstate)
 		int quant, keyframe, frame_hbytes, frame_bytes;
 		int kblocks, mblocks, ublocks;
 
-		fscanf(state->pass1_file, "%d %d %d %d %d %d %d\n",
+		if (fscanf(state->pass1_file, "%d %d %d %d %d %d %d\n",
 		       &quant, &keyframe, &frame_hbytes, &frame_bytes,
-		       &kblocks, &mblocks, &ublocks);
+		       &kblocks, &mblocks, &ublocks) != 7)
+			goto err_out;
 
 		if(util_frametype(state) != FRAME_TYPE_NORMAL_MOVIE)
 			continue;
@@ -1547,10 +1552,11 @@ static int vbr_update_2pass2(void *sstate,
 	state->last_quant = quant;
 
 	/* Update next frame data */
-	fscanf(state->pass1_file, "%d %d %d %d %d %d %d\n",
+	if (fscanf(state->pass1_file, "%d %d %d %d %d %d %d\n",
 	       &state->pass1_quant, &state->pass1_intra, &next_hbytes,
 	       &state->pass1_bytes, &next_kblocks, &next_mblocks,
-	       &next_ublocks);
+	       &next_ublocks) != 7)
+		return -1;
 
 	/* Save the last Keyframe pos */
 	if(intra)
