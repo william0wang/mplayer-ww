@@ -1524,10 +1524,13 @@ double demuxer_get_current_time(demuxer_t *demuxer)
 {
     double get_time_ans = 0;
     sh_video_t *sh_video = demuxer->video->sh;
+    sh_audio_t *sh_audio = demuxer->audio->sh;
     if (demuxer->stream_pts != MP_NOPTS_VALUE)
         get_time_ans = demuxer->stream_pts;
-    else if (sh_video)
+    else if (sh_video && sh_video->pts != MP_NOPTS_VALUE)
         get_time_ans = sh_video->pts;
+    else if (sh_audio && sh_audio->pts != MP_NOPTS_VALUE)
+        get_time_ans = sh_audio->pts;
     return get_time_ans;
 }
 
