@@ -60,7 +60,7 @@ raw_file* load_raw(char *name,int verbose){
     }
     size = raw->h*raw->w*bpp;
     raw->bmp=malloc(size);
-    if (fread(raw->bmp,size,1,f) != size) {
+    if (fread(raw->bmp,1,size,f) != size) {
         free(raw->bmp);
         goto err_out;
     }
