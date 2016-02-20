@@ -668,8 +668,7 @@ void mp_dvdnav_handle_input(stream_t *stream, int cmd, int *button) {
     case MP_CMD_DVDNAV_PREVMENU: {
       int title=0, part=0;
 
-      dvdnav_current_title_info(nav, &title, &part);
-      if(title) {
+      if(dvdnav_current_title_info(nav, &title, &part) == DVDNAV_STATUS_OK && title) {
         if((status=dvdnav_menu_call(nav, DVD_MENU_Part)) == DVDNAV_STATUS_OK)
           break;
       }
