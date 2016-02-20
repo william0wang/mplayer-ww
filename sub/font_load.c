@@ -54,7 +54,8 @@ raw_file* load_raw(char *name,int verbose){
     mp_msg(MSGT_OSD, MSGL_DBG2, "RAW: %s  %d x %d, %d colors\n",name,raw->w,raw->h,raw->c);
     if(raw->c){
         raw->pal=calloc(raw->c, 3);
-        fread(raw->pal,3,raw->c,f);
+        if (fread(raw->pal,3,raw->c,f) != raw->c)
+          goto err_out;
         bpp=1;
     } else {
         bpp=3;
