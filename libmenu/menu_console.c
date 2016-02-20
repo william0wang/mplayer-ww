@@ -315,8 +315,13 @@ static int run_shell_cmd(menu_t* menu, char* cmd) {
     return 0;
   }
   if(!mpriv->child) { // Chlid process
+    FILE *errf;
     int err_fd = dup(2);
-    FILE* errf = fdopen(err_fd,"w");
+    if (err_fd == -1) {
+      fprintf(stderr,"dup failed : %s\n",strerror(errno));
+      exit(1);
+    }
+    errf = fdopen(err_fd,"w");
     // Bind the std fd to our pipes
     dup2(in[0],0);
     dup2(out[1],1);
