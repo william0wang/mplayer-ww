@@ -111,6 +111,7 @@ typedef struct stationlist_s {
 struct pvr_t {
   int dev_fd;
   char *video_dev;
+  int first;
 
   /* v4l2 params */
   int mute;
@@ -149,6 +150,7 @@ pvr_init (void)
   pvr = calloc (1, sizeof (struct pvr_t));
   pvr->dev_fd = -1;
   pvr->video_dev = strdup (PVR_DEFAULT_DEVICE);
+  pvr->first = 1;
 
   /* v4l2 params */
   pvr->mute = 0;
@@ -1594,6 +1596,26 @@ v4l2_display_settings (struct pvr_t *pvr)
   return 0;
 }
 
+static int
+poll_device (struct pvr_t *pvr, int timeout)
+{
+  struct pollfd pfds[1];
+  int ret;
+
+  pfds[0].fd = pvr->dev_fd;
+  pfds[0].events = POLLIN | POLLPRI;
+
+  ret = poll (pfds, 1, timeout);
+  if (!ret)
+  {
+    mp_msg (MSGT_OPEN, MSGL_WARN,
+            "%s %dms timeout polling stream device\n",
+            LOG_LEVEL_PVR, timeout);
+  }
+
+  return ret;
+}
+
 /* stream layer */
 
 static void
@@ -1611,7 +1633,6 @@ pvr_stream_close (stream_t *stream)
 static int
 pvr_stream_read (stream_t *stream, char *buffer, int size)
 {
-  struct pollfd pfds[1];
   struct pvr_t *pvr;
   int rk, fd, pos;
 
@@ -1627,15 +1648,18 @@ pvr_stream_read (stream_t *stream, char *buffer, int size)
 
   while (pos < size)
   {
-    pfds[0].fd = fd;
-    pfds[0].events = POLLIN | POLLPRI;
-
-    if (!poll (pfds, 1, 500))
+    if (pvr->first)
     {
-      mp_msg (MSGT_OPEN, MSGL_ERR,
-              "%s 500ms timeout polling stream device\n", LOG_LEVEL_PVR);
-      return -1;
+      mp_msg (MSGT_OPEN, MSGL_INFO,
+              "%s Waiting for stream to begin...\n", LOG_LEVEL_PVR);
+      rk = poll_device (pvr, 5000);
+      pvr->first = 0;
     }
+    else
+      rk = poll_device (pvr, 500);
+
+    if (!rk)
+      return -1;
 
     rk = read (fd, &buffer[pos], size-pos);
     if (rk < 0)
