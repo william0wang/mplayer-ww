@@ -54,6 +54,7 @@
 #include <iconv.h>
 #endif
 char *sub_cp=NULL;
+char *enca_sub_cp=NULL;
 #ifdef CONFIG_FRIBIDI
 #include <fribidi/fribidi.h>
 char *fribidi_charset = NULL;   ///character set that will be passed to FriBiDi
@@ -1212,21 +1213,20 @@ void	subcp_open (stream_t *st)
 	char *tocp = "UTF-8";
 
 	if (sub_cp){
-		const char *cp_tmp = sub_cp;
 #ifdef CONFIG_ENCA
 		char enca_lang[3], enca_fallback[100];
 		if (sscanf(sub_cp, "enca:%2s:%99s", enca_lang, enca_fallback) == 2
 		     || sscanf(sub_cp, "ENCA:%2s:%99s", enca_lang, enca_fallback) == 2) {
 		  if (st && st->flags & MP_STREAM_SEEK ) {
-		    cp_tmp = guess_cp(st, enca_lang, enca_fallback);
+		    enca_sub_cp = guess_cp(st, enca_lang, enca_fallback);
 		  } else {
-		    cp_tmp = enca_fallback;
+		    enca_sub_cp = enca_fallback;
 		    if (st)
 		      mp_msg(MSGT_SUBREADER,MSGL_WARN,"SUB: enca failed, stream must be seekable.\n");
 		  }
 		}
 #endif
-		if ((icdsc = iconv_open (tocp, cp_tmp)) != (iconv_t)(-1)){
+		if ((icdsc = iconv_open (tocp, enca_sub_cp)) != (iconv_t)(-1)){
 			mp_msg(MSGT_SUBREADER,MSGL_V,"SUB: opened iconv descriptor.\n");
 			sub_utf8 = 2;
 		} else

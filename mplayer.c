@@ -1085,11 +1085,12 @@ void add_subtitles(char *filename, float fps, int noerr)
     if (filename == NULL || mpctx->set_of_sub_size >= MAX_SUBTITLE_FILES)
         return;
 
+    enca_sub_cp = NULL;
     subd = sub_read_file(filename, fps);
 #ifdef CONFIG_ASS
     if (ass_enabled)
 #ifdef CONFIG_ICONV
-        asst = ass_read_stream(ass_library, filename, sub_cp);
+        asst = ass_read_stream(ass_library, filename, (enca_sub_cp ? enca_sub_cp : sub_cp));
 #else
         asst = ass_read_stream(ass_library, filename, 0);
 #endif
