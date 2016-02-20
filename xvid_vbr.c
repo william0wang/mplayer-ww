@@ -635,8 +635,6 @@ static int vbr_finish_2pass1(void *sstate)
 
 static int vbr_init_2pass2(void *sstate)
 {
-
-	FILE *f;
 	int c, n, pos_firstframe, credits_frames;
 	long long credits1_bytes;
 	long long credits2_bytes;
@@ -649,10 +647,11 @@ static int vbr_init_2pass2(void *sstate)
 	double total2;
 
 	vbr_control_t *state = sstate;
+	state->pass1_file = NULL;
 
 	/* Check the filename */
 	if(state->filename == NULL || state->filename[0] == '\0')
-		return(-1);
+		goto err_out;
 
 	/* Initialize safe defaults for 2pass 2 */
 	state->pass1_file = NULL;
@@ -660,19 +659,15 @@ static int vbr_init_2pass2(void *sstate)
 	state->nb_keyframes = 0;
 
 	/* Open the 1st pass file */
-	if((f = fopen(state->filename, "r")) == NULL)
-		return(-1);
-
-	state->pass1_file = f;
+	state->pass1_file = fopen(state->filename, "r");
+	if(state->pass1_file == NULL)
+		goto err_out;
 
 	/* Get the file version and check against current version */
 	fscanf(state->pass1_file, "# ASCII XviD vbr stat file version %d\n", &n);
 
-	if(n != VBR_VERSION) {
-		fclose(state->pass1_file);
-		state->pass1_file = NULL;
-		return(-1);
-	}
+	if(n != VBR_VERSION)
+		goto err_out;
 
 	/* Skip the blank commented line */
 	c = n = 0;
@@ -681,9 +676,7 @@ static int vbr_init_2pass2(void *sstate)
 		c = fgetc(state->pass1_file);
 
 		if(c == EOF) {
-			fclose(state->pass1_file);
-			state->pass1_file = NULL;
-			return(-1);
+			goto err_out;
 		}
 
 		if(c == '\n') n++;
@@ -707,9 +700,7 @@ static int vbr_init_2pass2(void *sstate)
            state->nb_keyframes >= 0x7fffffff / sizeof(int) ||
            (state->keyframe_locations
 	    = malloc((state->nb_keyframes+1)*sizeof(int))) == NULL) {
-		fclose(state->pass1_file);
-		state->pass1_file = NULL;
-		return(-1);
+		goto err_out;
 	}
 
 	/* Skip the blank commented line and the colum description */
@@ -719,9 +710,7 @@ static int vbr_init_2pass2(void *sstate)
 		c = fgetc(state->pass1_file);
 
 		if(c == EOF) {
-			fclose(state->pass1_file);
-			state->pass1_file = NULL;
-			return(-1);
+			goto err_out;
 		}
 
 		if(c == '\n') n++;
@@ -1160,6 +1149,11 @@ static int vbr_init_2pass2(void *sstate)
 
 	return(0);
 
+err_out:
+	if (state->pass1_file)
+		fclose(state->pass1_file);
+	state->pass1_file = NULL;
+	return -1;
 }
 
 static int vbr_getquant_2pass2(void *sstate)
