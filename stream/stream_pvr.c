@@ -1021,6 +1021,31 @@ static void
 add_v4l2_ext_control (struct v4l2_ext_controls *ctrls, struct pvr_t *pvr,
                       uint32_t id, int32_t value)
 {
+  struct v4l2_query_ext_ctrl qctrl = { .id = id };
+
+  /* add only if the device supports this control */
+  if (ioctl (pvr->dev_fd, VIDIOC_QUERY_EXT_CTRL, &qctrl) < 0)
+  {
+    mp_msg (MSGT_OPEN, MSGL_V,
+            "%s can't set control %d (unsupported)\n",
+            LOG_LEVEL_ENCODER, qctrl.id);
+    return;
+  }
+
+  if (qctrl.type == V4L2_CTRL_TYPE_MENU)
+  {
+    struct v4l2_querymenu qmenu = { .id = id, .index = value };
+
+    /* add only if the value is a valid menu choice */
+    if (ioctl (pvr->dev_fd, VIDIOC_QUERYMENU, &qmenu) < 0)
+    {
+      mp_msg (MSGT_OPEN, MSGL_ERR,
+              "%s can't set %s to %d (invalid menu choice)\n",
+              LOG_LEVEL_ENCODER, qctrl.name, value);
+      return;
+    }
+  }
+
   ctrls->controls[ctrls->count].id = id;
   ctrls->controls[ctrls->count].value = value;
   ctrls->count++;
