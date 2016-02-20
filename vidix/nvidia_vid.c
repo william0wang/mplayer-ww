@@ -881,9 +881,12 @@ static rivatv_info* info;
 
 static int nv_init(void){
 	int mtrr;
+	int chip;
   info = calloc(1,sizeof(rivatv_info));
   info->control_base = map_phys_mem(pci_info.base0, 0x00C00000 + 0x00008000);
-  info->chip.arch =  nvidia_card_ids[find_chip(pci_info.device)].arch;
+  chip = find_chip(pci_info.device);
+  if (chip < 0) chip = 0;
+  info->chip.arch =  nvidia_card_ids[chip].arch;
   mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] arch %x register base %p\n",info->chip.arch,info->control_base);
   info->chip.PFIFO  = (uint32_t *) (info->control_base + 0x00002000);
   info->chip.FIFO   = (uint32_t *) (info->control_base + 0x00800000);

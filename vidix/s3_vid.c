@@ -596,6 +596,7 @@ static int s3_init (void)
 {
   unsigned char cr36;
   int mtrr, videoRam;
+  int chip;
   static unsigned char RamTrioVirge[] = { 4, 0, 3, 8, 2, 6, 1, 0 };
   static unsigned char RamSavage3D[] = { 8, 4, 4, 2 };
   static unsigned char RamSavage4[] = { 2, 4, 8, 12, 16, 32, 64, 32 };
@@ -606,7 +607,9 @@ static int s3_init (void)
 
   info = calloc (1, sizeof (s3_info));
 
-  info->chip.arch = s3_card_ids[find_chip (pci_info.device)].arch;
+  chip = find_chip(pci_info.device);
+  if (chip < 0) chip = 0;
+  info->chip.arch = s3_card_ids[chip].arch;
 
   /* Switch to vga registers */
   OUTPORT8 (0x3c3, INPORT8 (0x3c3) | 0x01);
