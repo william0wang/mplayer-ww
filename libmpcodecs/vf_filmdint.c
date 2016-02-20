@@ -1291,7 +1291,7 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
              (s->low.noise + s->interlaced_low < (s->num_blocks>>8) ||
               s->sad.noise < 160)) ||
             ((show_fields & 12) == 12 &&
-             (ps->low.noise + ps->interlaced_low < (s->num_blocks>>8) ||
+             (ps->low.noise + ps->interlaced_low < (ps->num_blocks>>8) ||
               ps->sad.noise < 160))) {
             p->export_count++;
             dmpi = vf_get_image(vf->next, mpi->imgfmt, MP_IMGTYPE_EXPORT,
