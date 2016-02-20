@@ -603,6 +603,10 @@ static int config(struct vf_instance *vf,
 	}
 	fseek(stats_file, 0, SEEK_END);
 	size= ftell(stats_file);
+	if (size < 0) {
+	    mp_msg(MSGT_MENCODER,MSGL_ERR,"2pass failed: could not get size; filename=%s\n", passtmpfile);
+	    return 0;
+	}
 	fseek(stats_file, 0, SEEK_SET);
 
 	lavc_venc_context->stats_in= av_malloc(size + 1);
