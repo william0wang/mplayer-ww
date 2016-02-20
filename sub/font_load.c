@@ -37,7 +37,7 @@
 raw_file* load_raw(char *name,int verbose){
     int bpp;
     unsigned size;
-    raw_file* raw=malloc(sizeof(raw_file));
+    raw_file* raw=calloc(1, sizeof(*raw));
     unsigned char head[32];
     FILE *f=fopen(name,"rb");
     if(!f) goto err_out;                        // can't open
@@ -53,17 +53,15 @@ raw_file* load_raw(char *name,int verbose){
         goto err_out;
     mp_msg(MSGT_OSD, MSGL_DBG2, "RAW: %s  %d x %d, %d colors\n",name,raw->w,raw->h,raw->c);
     if(raw->c){
-        raw->pal=malloc(raw->c*3);
+        raw->pal=calloc(raw->c, 3);
         fread(raw->pal,3,raw->c,f);
         bpp=1;
     } else {
-        raw->pal=NULL;
         bpp=3;
     }
     size = raw->h*raw->w*bpp;
     raw->bmp=malloc(size);
     if (fread(raw->bmp,1,size,f) != size) {
-        free(raw->bmp);
         goto err_out;
     }
     fclose(f);
@@ -72,6 +70,10 @@ raw_file* load_raw(char *name,int verbose){
 err_out:
     if (f)
       fclose(f);
+    if (raw) {
+      free(raw->pal);
+      free(raw->bmp);
+    }
     free(raw);
     return NULL;
 }
