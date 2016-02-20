@@ -1896,7 +1896,8 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
 
         switch (track->a_formattag) {
         case mmioFOURCC('a', 't', 'r', 'c'):
-            sh_a->wf->nAvgBytesPerSec = atrc_fl2bps[flavor];
+            if (flavor < FF_ARRAY_ELEMS(atrc_fl2bps))
+                sh_a->wf->nAvgBytesPerSec = atrc_fl2bps[flavor];
             sh_a->wf->nBlockAlign = track->sub_packet_size;
             track->audio_buf =
                 calloc(track->sub_packet_h, track->audiopk_size);
@@ -1904,7 +1905,8 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
                 calloc(track->sub_packet_h, sizeof(float));
             break;
         case mmioFOURCC('c', 'o', 'o', 'k'):
-            sh_a->wf->nAvgBytesPerSec = cook_fl2bps[flavor];
+            if (flavor < FF_ARRAY_ELEMS(cook_fl2bps))
+                sh_a->wf->nAvgBytesPerSec = cook_fl2bps[flavor];
             sh_a->wf->nBlockAlign = track->sub_packet_size;
             track->audio_buf =
                 calloc(track->sub_packet_h, track->audiopk_size);
@@ -1912,7 +1914,8 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
                 calloc(track->sub_packet_h, sizeof(float));
             break;
         case mmioFOURCC('s', 'i', 'p', 'r'):
-            sh_a->wf->nAvgBytesPerSec = sipr_fl2bps[flavor];
+            if (flavor < FF_ARRAY_ELEMS(sipr_fl2bps))
+                sh_a->wf->nAvgBytesPerSec = sipr_fl2bps[flavor];
             sh_a->wf->nBlockAlign = track->coded_framesize;
             track->audio_buf =
                 calloc(track->sub_packet_h, track->audiopk_size);
