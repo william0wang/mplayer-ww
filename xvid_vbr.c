@@ -1027,7 +1027,7 @@ static int vbr_init_2pass2(void *sstate)
 	if (state->use_alt_curve) {
 
 		double curve_temp, dbytes;
-		int newquant, percent;
+		int newquant;
 		int oldquant = 1;
 
 		if (state->alt_curve_use_auto_bonus_bias)
@@ -1096,7 +1096,6 @@ static int vbr_init_2pass2(void *sstate)
 				if (newquant != oldquant)
 				{
 					oldquant = newquant;
-					percent = (int)((n - state->average_frame) * 100.0 / state->average_frame);
 				}
 
 			}
