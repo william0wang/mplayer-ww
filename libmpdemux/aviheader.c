@@ -614,7 +614,7 @@ if (index_file_load) {
     goto gen_index;
   }
   fread(&priv->idx_size, sizeof(priv->idx_size), 1, fp);
-  priv->idx=malloc(priv->idx_size*sizeof(AVIINDEXENTRY));
+  priv->idx=calloc(priv->idx_size,sizeof(AVIINDEXENTRY));
   if (!priv->idx) {
     mp_msg(MSGT_HEADER,MSGL_ERR, MSGTR_MPDEMUX_AVIHDR_FailedMallocForIdxFile, index_file_load);
     priv->idx_size = 0;
