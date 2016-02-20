@@ -1225,7 +1225,6 @@ static int radeon_probe(int verbose, int force)
 	const char *dname;
 	idx = find_chip(lst[i].device);
 	if(idx == -1 && force == PROBE_NORMAL) continue;
-	if(idx < 0) idx = 0;
 	dname = pci_device_name(VENDOR_ATI,lst[i].device);
 	dname = dname ? dname : "Unknown chip";
 	mp_msg(MSGT_VO, MSGL_STATUS, RADEON_MSG" Found chip: %s\n",dname);
