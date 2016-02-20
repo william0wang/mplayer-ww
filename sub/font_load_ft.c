@@ -349,7 +349,7 @@ static void outline0(
 }
 
 // gaussian blur
-void blur(
+static void blur(
 	unsigned char *buffer,
 	unsigned short *tmp2,
 	int width,
@@ -938,7 +938,7 @@ int kerning(font_desc_t *desc, int prevc, int c)
     return f266ToInt(kern.x);
 }
 
-font_desc_t* read_font_desc_ft(const char *fname, int face_index, int movie_width, int movie_height, float font_scale_factor)
+static font_desc_t* read_font_desc_ft(const char *fname, int face_index, int movie_width, int movie_height, float font_scale_factor)
 {
     font_desc_t *desc = NULL;
 
