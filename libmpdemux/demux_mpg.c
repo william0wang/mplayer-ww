@@ -318,7 +318,6 @@ static int demux_mpg_read_packet(demuxer_t *demux,int id){
 //  if(id==0x1BA) packet_start_pos=stream_tell(demux->stream);
   if((id<0x1BC || id>=0x1F0) && id != 0x1FD) return -1;
   if(id==0x1BE) return -1; // padding stream
-  if(id==0x1BF) return -1; // private2
 
   len=stream_read_word(demux->stream);
   mp_dbg(MSGT_DEMUX,MSGL_DBG3,"PACKET len=%d",len);
@@ -330,6 +329,9 @@ static int demux_mpg_read_packet(demuxer_t *demux,int id){
 
   mpeg_pts_error=0;
 
+  if(id==0x1BF) { // private2
+    return -1;
+  }
   if(id==0x1BC) {
     parse_psm(demux, len);
     return 0;
@@ -688,6 +690,7 @@ static int demux_mpg_probe(demuxer_t *demuxer) {
   off_t tmppos;
   int file_format = DEMUXER_TYPE_UNKNOWN;
 
+  demuxer->synced = -1;
   tmppos=stream_tell(demuxer->stream);
   tmp=stream_read_dword(demuxer->stream);
   if(tmp==0x1E0 || tmp==0x1C0) {
@@ -832,6 +835,12 @@ unsigned int head=0;
 int skipped=0;
 int max_packs=2048;
 int ret=0;
+uint64_t end_pos = 0;
+if (demux->synced == -1) {
+  // limit to 4 MB during probing
+  end_pos = stream_tell(demux->stream) + 4*1024*1024;
+  demux->synced = 0;
+}
 
 // System stream
 do{
@@ -858,6 +867,8 @@ do{
    }
    demux->filepos+=skipped;
   }
+  if (end_pos && end_pos < demux->filepos)
+    demux->stream->eof = 1;
   if(stream_eof(demux->stream)) break;
   // sure: head=0x000001XX
   mp_dbg(MSGT_DEMUX,MSGL_DBG4,"*** head=0x%X\n",head);
