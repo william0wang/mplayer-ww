@@ -479,8 +479,7 @@ static int preinit(const char *vo_subdevice)
 	// check whether the mga_vid driver has the same
 	// version as we expect
 
-	ioctl(f,MGA_VID_GET_VERSION,&ver);
-	if(MGA_VID_VERSION != ver)
+	if(ioctl(f,MGA_VID_GET_VERSION,&ver) == -1 || MGA_VID_VERSION != ver)
 	{
 		mp_msg(MSGT_VO, MSGL_ERR, MSGTR_LIBVO_MGA_mgavidVersionMismatch, ver, MGA_VID_VERSION);
 		return -1;
