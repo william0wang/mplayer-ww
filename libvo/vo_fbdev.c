@@ -502,6 +502,7 @@ static void set_bpp(struct fb_var_screeninfo *p, int bpp, int rgb)
     case 32:
         p->transp.offset = 24;
         p->transp.length = 8;
+        // fallthrough
     case 24:
         p->red.offset   = 16;
         p->red.length   = 8;

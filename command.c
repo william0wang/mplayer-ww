@@ -1894,6 +1894,7 @@ static int mp_property_sub_forced_only(m_option_t *prop, int action,
     case M_PROPERTY_SET:
         if (!arg)
             return M_PROPERTY_ERROR;
+        // fallthrough
     case M_PROPERTY_STEP_UP:
     case M_PROPERTY_STEP_DOWN:
         m_property_flag(prop, action, arg, &forced_subs_only);

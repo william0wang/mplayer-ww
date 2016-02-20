@@ -87,6 +87,7 @@ static int set_format(struct vf_instance *vf, unsigned int fmt) {
 	break;
     case IMGFMT_IF09:
 	mux_v->bih->biPlanes = 4;
+	// fallthrough
     case IMGFMT_YVU9:
 	mux_v->bih->biBitCount = 9;
 	break;

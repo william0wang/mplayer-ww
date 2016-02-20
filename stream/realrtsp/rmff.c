@@ -477,6 +477,7 @@ rmff_header_t *rmff_scan_header_stream(int fd) {
     switch (chunk_type) {
       case DATA_TAG:
         chunk_size=18;
+        // fallthrough
       case MDPR_TAG:
       case CONT_TAG:
       case RMF_TAG:
