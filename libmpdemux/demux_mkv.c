@@ -1899,33 +1899,33 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
             sh_a->wf->nAvgBytesPerSec = atrc_fl2bps[flavor];
             sh_a->wf->nBlockAlign = track->sub_packet_size;
             track->audio_buf =
-                malloc(track->sub_packet_h * track->audiopk_size);
+                calloc(track->sub_packet_h, track->audiopk_size);
             track->audio_timestamp =
-                malloc(track->sub_packet_h * sizeof(float));
+                calloc(track->sub_packet_h, sizeof(float));
             break;
         case mmioFOURCC('c', 'o', 'o', 'k'):
             sh_a->wf->nAvgBytesPerSec = cook_fl2bps[flavor];
             sh_a->wf->nBlockAlign = track->sub_packet_size;
             track->audio_buf =
-                malloc(track->sub_packet_h * track->audiopk_size);
+                calloc(track->sub_packet_h, track->audiopk_size);
             track->audio_timestamp =
-                malloc(track->sub_packet_h * sizeof(float));
+                calloc(track->sub_packet_h, sizeof(float));
             break;
         case mmioFOURCC('s', 'i', 'p', 'r'):
             sh_a->wf->nAvgBytesPerSec = sipr_fl2bps[flavor];
             sh_a->wf->nBlockAlign = track->coded_framesize;
             track->audio_buf =
-                malloc(track->sub_packet_h * track->audiopk_size);
+                calloc(track->sub_packet_h, track->audiopk_size);
             track->audio_timestamp =
-                malloc(track->sub_packet_h * sizeof(float));
+                calloc(track->sub_packet_h, sizeof(float));
             break;
         case mmioFOURCC('2', '8', '_', '8'):
             sh_a->wf->nAvgBytesPerSec = 3600;
             sh_a->wf->nBlockAlign = track->coded_framesize;
             track->audio_buf =
-                malloc(track->sub_packet_h * track->audiopk_size);
+                calloc(track->sub_packet_h, track->audiopk_size);
             track->audio_timestamp =
-                malloc(track->sub_packet_h * sizeof(float));
+                calloc(track->sub_packet_h, sizeof(float));
             break;
         }
 
