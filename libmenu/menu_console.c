@@ -314,7 +314,7 @@ static int run_shell_cmd(menu_t* menu, char* cmd) {
     close_pipe(err);
     return 0;
   }
-  if(!mpriv->child) { // Chlid process
+  if(!mpriv->child) { // Child process
     FILE *errf;
     int err_fd = dup(2);
     if (err_fd == -1) {
