@@ -28,6 +28,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "libavutil/intreadwrite.h"
+
 #include "font_load.h"
 #include "sub.h"
 #include "mp_msg.h"
@@ -41,11 +43,11 @@ raw_file* load_raw(char *name,int verbose){
     if(!f) goto err_out;                        // can't open
     if(fread(head,32,1,f)<1) goto err_out;        // too small
     if(memcmp(head,"mhwanh",6)) goto err_out;        // not raw file
-    raw->w=head[8]*256+head[9];
-    raw->h=head[10]*256+head[11];
-    raw->c=head[12]*256+head[13];
+    raw->w=AV_RB16(head + 8);
+    raw->h=AV_RB16(head + 10);
+    raw->c=AV_RB16(head + 12);
     if(raw->w == 0) // 2 bytes were not enough for the width... read 4 bytes from the end of the header
-    	raw->w = ((head[28]*0x100 + head[29])*0x100 + head[30])*0x100 + head[31];
+    	raw->w = AV_RB32(head + 28);
     if(raw->c>256) goto err_out;                 // too many colors!?
     if (raw->w > INT_MAX / 4 || (uint64_t)raw->w * raw->h > INT_MAX / 4)
         goto err_out;

@@ -29,7 +29,7 @@
 typedef struct {
     unsigned char *bmp;
     unsigned char *pal;
-    int w,h,c;
+    unsigned w,h,c;
 #ifdef CONFIG_FREETYPE
     int charwidth,charheight,pen,baseline,padding;
     int current_count, current_alloc;
