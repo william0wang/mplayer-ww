@@ -103,8 +103,8 @@ int mp_input_appleir_init (char *dev)
       if (fd < 0)
         continue;
 
-      ioctl (fd, EVIOCGID, &id);
-      if (id.bustype == BUS_USB &&
+      if (ioctl(fd, EVIOCGID, &id) != -1 &&
+          id.bustype == BUS_USB &&
           id.vendor  == USB_VENDOR_APPLE &&
           (id.product == USB_DEV_APPLE_IR ||id.product == USB_DEV_APPLE_IR_2))
       {
