@@ -1018,11 +1018,12 @@ parse_encoder_options (struct pvr_t *pvr)
 }
 
 static void
-add_v4l2_ext_control (struct v4l2_ext_control *ctrl,
+add_v4l2_ext_control (struct v4l2_ext_controls *ctrls, struct pvr_t *pvr,
                       uint32_t id, int32_t value)
 {
-  ctrl->id = id;
-  ctrl->value = value;
+  ctrls->controls[ctrls->count].id = id;
+  ctrls->controls[ctrls->count].value = value;
+  ctrls->count++;
 }
 
 static int
@@ -1030,7 +1031,6 @@ set_encoder_settings (struct pvr_t *pvr)
 {
   struct v4l2_ext_control *ext_ctrl = NULL;
   struct v4l2_ext_controls ctrls;
-  uint32_t count = 0;
 
   if (!pvr)
     return -1;
@@ -1041,53 +1041,53 @@ set_encoder_settings (struct pvr_t *pvr)
   ext_ctrl = (struct v4l2_ext_control *)
     malloc (PVR_MAX_CONTROLS * sizeof (struct v4l2_ext_control));
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_VIDEO_ASPECT,
+  ctrls.ctrl_class = V4L2_CTRL_CLASS_MPEG;
+  ctrls.count = 0;
+  ctrls.controls = ext_ctrl;
+
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_VIDEO_ASPECT,
                         pvr->aspect);
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ,
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ,
                         pvr->samplerate);
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_AUDIO_ENCODING,
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_AUDIO_ENCODING,
                         pvr->layer);
 
   switch (pvr->layer)
   {
   case V4L2_MPEG_AUDIO_ENCODING_LAYER_1:
-    add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_AUDIO_L1_BITRATE,
+    add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_AUDIO_L1_BITRATE,
                           pvr->audio_rate);
     break;
   case V4L2_MPEG_AUDIO_ENCODING_LAYER_2:
-    add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_AUDIO_L2_BITRATE,
+    add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_AUDIO_L2_BITRATE,
                           pvr->audio_rate);
     break;
   case V4L2_MPEG_AUDIO_ENCODING_LAYER_3:
-    add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_AUDIO_L3_BITRATE,
+    add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_AUDIO_L3_BITRATE,
                           pvr->audio_rate);
     break;
   default:
     break;
   }
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_AUDIO_MODE,
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_AUDIO_MODE,
                         pvr->audio_mode);
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_VIDEO_BITRATE,
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_VIDEO_BITRATE,
                         pvr->bitrate);
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_VIDEO_BITRATE_PEAK,
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_VIDEO_BITRATE_PEAK,
                         pvr->bitrate_peak);
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_VIDEO_BITRATE_MODE,
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_VIDEO_BITRATE_MODE,
                         pvr->bitrate_mode);
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_STREAM_TYPE,
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_STREAM_TYPE,
                         pvr->stream_type);
 
   /* set new encoding settings */
-  ctrls.ctrl_class = V4L2_CTRL_CLASS_MPEG;
-  ctrls.count = count;
-  ctrls.controls = ext_ctrl;
-
   if (ioctl (pvr->dev_fd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
   {
     mp_msg (MSGT_OPEN, MSGL_ERR, "%s Error setting MPEG controls (%s).\n",
