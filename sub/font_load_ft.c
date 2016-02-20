@@ -1137,8 +1137,8 @@ void load_font_ft(int width, int height, font_desc_t** fontp, const char *font_n
         fc_pattern = FcFontMatch(0, fc_pattern, &result);
         if (fc_pattern) {
             FcPatternDestroy(fc_pattern2);
-            FcPatternGetBool(fc_pattern, FC_SCALABLE, 0, &scalable);
-            if (scalable != FcTrue) {
+            if (FcPatternGetBool(fc_pattern, FC_SCALABLE, 0, &scalable) == FcResultMatch &&
+                scalable != FcTrue) {
                 FcPatternDestroy(fc_pattern);
                 fc_pattern = FcNameParse("sans-serif");
                 FcConfigSubstitute(0, fc_pattern, FcMatchPattern);
@@ -1148,11 +1148,13 @@ void load_font_ft(int width, int height, font_desc_t** fontp, const char *font_n
                 FcPatternDestroy(fc_pattern2);
             }
             // s doesn't need to be freed according to fontconfig docs
-            FcPatternGetString(fc_pattern, FC_FILE, 0, &s);
-            FcPatternGetInteger(fc_pattern, FC_INDEX, 0, &face_index);
-            *fontp=read_font_desc_ft(s, face_index, width, height, font_scale_factor);
+            if (FcPatternGetString(fc_pattern, FC_FILE, 0, &s) == FcResultMatch &&
+                FcPatternGetInteger(fc_pattern, FC_INDEX, 0, &face_index) == FcResultMatch) {
+                *fontp=read_font_desc_ft(s, face_index, width, height, font_scale_factor);
+                FcPatternDestroy(fc_pattern);
+                return;
+            }
             FcPatternDestroy(fc_pattern);
-            return;
         }
         // Failed to match any font, try without fontconfig
         mp_msg(MSGT_OSD, MSGL_ERR, MSGTR_LIBVO_FONT_LOAD_FT_FontconfigNoMatch);
