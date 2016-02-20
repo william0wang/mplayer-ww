@@ -1630,9 +1630,15 @@ pvr_stream_read (stream_t *stream, char *buffer, int size)
     pfds[0].fd = fd;
     pfds[0].events = POLLIN | POLLPRI;
 
-    rk = size - pos;
+    if (!poll (pfds, 1, 500))
+    {
+      mp_msg (MSGT_OPEN, MSGL_ERR,
+              "%s 500ms timeout polling stream device\n", LOG_LEVEL_PVR);
+      return -1;
+    }
 
-    if (poll (pfds, 1, 500) <= 0)
+    rk = read (fd, &buffer[pos], size-pos);
+    if (rk < 0)
     {
       mp_msg (MSGT_OPEN, MSGL_ERR,
               "%s failed with errno %d when reading %d bytes\n",
@@ -1640,13 +1646,12 @@ pvr_stream_read (stream_t *stream, char *buffer, int size)
       break;
     }
 
-    rk = read (fd, &buffer[pos], rk);
-    if (rk > 0)
-    {
-      pos += rk;
-      mp_msg (MSGT_OPEN, MSGL_DBG3,
-              "%s read (%d) bytes\n", LOG_LEVEL_PVR, pos);
-    }
+    if (!rk)
+      break;
+
+    pos += rk;
+    mp_msg (MSGT_OPEN, MSGL_DBG3,
+            "%s read (%d) bytes\n", LOG_LEVEL_PVR, pos);
   }
 
   if (!pos)
