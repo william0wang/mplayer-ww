@@ -811,6 +811,10 @@ parse_encoder_options (struct pvr_t *pvr)
     pvr->layer = V4L2_MPEG_AUDIO_ENCODING_LAYER_2;
   else if (pvr_param_audio_layer == 3)
     pvr->layer = V4L2_MPEG_AUDIO_ENCODING_LAYER_3;
+  else if (pvr_param_audio_layer == 4)
+    pvr->layer = V4L2_MPEG_AUDIO_ENCODING_AAC;
+  else if (pvr_param_audio_layer == 5)
+    pvr->layer = V4L2_MPEG_AUDIO_ENCODING_AC3;
 
   /* -pvr abitrate=x */
   if (pvr_param_audio_bitrate != 0)
@@ -962,6 +966,75 @@ parse_encoder_options (struct pvr_t *pvr)
         break;
       case 320:
         pvr->audio_rate = V4L2_MPEG_AUDIO_L3_BITRATE_320K;
+        break;
+      default:
+        break;
+      }
+    }
+
+    else if (pvr->layer == V4L2_MPEG_AUDIO_ENCODING_AAC)
+      pvr->audio_rate = pvr_param_audio_bitrate;
+
+    else if (pvr->layer == V4L2_MPEG_AUDIO_ENCODING_AC3)
+    {
+      switch (pvr_param_audio_bitrate)
+      {
+      case 32:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_32K;
+        break;
+      case 40:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_40K;
+        break;
+      case 48:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_48K;
+        break;
+      case 56:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_56K;
+        break;
+      case 64:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_64K;
+        break;
+      case 80:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_80K;
+        break;
+      case 96:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_96K;
+        break;
+      case 112:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_112K;
+        break;
+      case 128:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_128K;
+        break;
+      case 160:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_160K;
+        break;
+      case 192:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_192K;
+        break;
+      case 224:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_224K;
+        break;
+      case 256:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_256K;
+        break;
+      case 320:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_320K;
+        break;
+      case 384:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_384K;
+        break;
+      case 448:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_448K;
+        break;
+      case 512:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_512K;
+        break;
+      case 576:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_576K;
+        break;
+      case 640:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_640K;
         break;
       default:
         break;
