@@ -2829,6 +2829,7 @@ You can specify your language using a two letter language code to
 make ENCA detect the codepage automatically.
 If unsure, enter anything and watch mplayer \-v output for available
 languages.
+Use __ (two underscores) if your language is not supported.
 Fallback codepage specifies the codepage to use, when autodetection fails.
 .sp 1
 .I EXAMPLE:
@@ -2839,6 +2840,8 @@ Guess the encoding, assuming the subtitles are Czech, fall back on
 latin 2, if the detection fails.
 .IPs "\-subcp enca:pl:cp1250"
 Guess the encoding for Polish, fall back on cp1250.
+.IPs "\-subcp enca:__:latin1"
+Generic detection (mostly unicode) with latin1 fallback.
 .RE
 .PD 1
 .
