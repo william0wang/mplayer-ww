@@ -189,6 +189,8 @@ static const struct {
     {"422P12",      IMGFMT_422P12},
     {"422P10",      IMGFMT_422P10},
     {"422P9",       IMGFMT_422P9},
+    {"440P12",      IMGFMT_440P12},
+    {"440P10",      IMGFMT_440P10},
     {"420P16",      IMGFMT_420P16},
     {"420P14",      IMGFMT_420P14},
     {"420P12",      IMGFMT_420P12},
@@ -241,6 +243,7 @@ static const struct {
     {"GBR24P",      IMGFMT_GBR24P},
     {"GBR12P",      IMGFMT_GBR12P},
     {"GBR14P",      IMGFMT_GBR14P},
+    {"GBR10P",      IMGFMT_GBR10P},
 
     {"MPES",        IMGFMT_MPEGPES},
     {"ZRMJPEGNI",   IMGFMT_ZRMJPEGNI},
