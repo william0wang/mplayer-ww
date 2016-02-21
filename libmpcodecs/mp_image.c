@@ -144,6 +144,10 @@ void mp_image_setfmt(mp_image_t* mpi,unsigned int out_fmt){
         mpi->bpp=24;
         mpi->flags|=MP_IMGFLAG_PLANAR;
         return;
+    } else if (out_fmt == IMGFMT_GBR10P) {
+        mpi->bpp=30;
+        mpi->flags|=MP_IMGFLAG_PLANAR;
+        return;
     } else if (out_fmt == IMGFMT_GBR12P) {
         mpi->bpp=36;
         mpi->flags|=MP_IMGFLAG_PLANAR;
@@ -206,6 +210,10 @@ void mp_image_setfmt(mp_image_t* mpi,unsigned int out_fmt){
     case IMGFMT_420P10_BE:
     case IMGFMT_420P9_LE:
     case IMGFMT_420P9_BE:
+    case IMGFMT_440P12_LE:
+    case IMGFMT_440P12_BE:
+    case IMGFMT_440P10_LE:
+    case IMGFMT_440P10_BE:
         return;
     case IMGFMT_Y16_LE:
     case IMGFMT_Y16_BE:
