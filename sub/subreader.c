@@ -1224,8 +1224,12 @@ void	subcp_open (stream_t *st)
 		    if (st)
 		      mp_msg(MSGT_SUBREADER,MSGL_WARN,"SUB: enca failed, stream must be seekable.\n");
 		  }
-		}
+		  if (!enca_sub_cp) return;
+		} else
 #endif
+		{
+		  enca_sub_cp = sub_cp;
+		}
 		if ((icdsc = iconv_open (tocp, enca_sub_cp)) != (iconv_t)(-1)){
 			mp_msg(MSGT_SUBREADER,MSGL_V,"SUB: opened iconv descriptor.\n");
 			sub_utf8 = 2;
