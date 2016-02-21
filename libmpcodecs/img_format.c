@@ -169,6 +169,12 @@ int mp_get_chroma_shift(int format, int *x_shift, int *y_shift, int *component_b
         case 0x53:
             bits = 9;
             break;
+        case 0x54:
+            bits = 14;
+            break;
+        case 0x55:
+            bits = 12;
+            break;
         default:
             err = 1;
             break;

@@ -224,8 +224,8 @@
 #define IMGFMT_IS_YUVP16_NE(fmt) IMGFMT_IS_YUVP16_LE(fmt)
 #endif
 
-#define IMGFMT_IS_YUVP16_LE(fmt) (((fmt - 0x51000034) & 0xfc0000ff) == 0)
-#define IMGFMT_IS_YUVP16_BE(fmt) (((fmt - 0x34000051) & 0xff0000fc) == 0)
+#define IMGFMT_IS_YUVP16_LE(fmt) (((fmt - 0x51000034) & 0xf80000ff) == 0)
+#define IMGFMT_IS_YUVP16_BE(fmt) (((fmt - 0x34000051) & 0xff0000f8) == 0)
 #define IMGFMT_IS_YUVP16(fmt)    (IMGFMT_IS_YUVP16_LE(fmt) || IMGFMT_IS_YUVP16_BE(fmt))
 
 /**
