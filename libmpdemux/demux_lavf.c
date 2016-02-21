@@ -444,17 +444,13 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
             sh_sub_t* sh_sub;
             char type;
             if (codec->codec_id == AV_CODEC_ID_TEXT
-#if LIBAVUTIL_VERSION_MICRO >= 100
                 || codec->codec_id == AV_CODEC_ID_SUBRIP
-#endif /* LIBAVUTIL_VERSION_MICRO >= 100 */
                 )
                 type = 't';
             else if (codec->codec_id == AV_CODEC_ID_MOV_TEXT)
                 type = 'm';
             else if (codec->codec_id == AV_CODEC_ID_SSA
-#if LIBAVUTIL_VERSION_MICRO >= 100
                      || codec->codec_id == AV_CODEC_ID_ASS
-#endif /* LIBAVUTIL_VERSION_MICRO >= 100 */
                 )
                 type = 'a';
             else if (codec->codec_id == AV_CODEC_ID_DVD_SUBTITLE)
@@ -467,10 +463,8 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
                 type = 'd';
             else if (codec->codec_id == AV_CODEC_ID_HDMV_PGS_SUBTITLE)
                 type = 'p';
-#if LIBAVUTIL_VERSION_MICRO >= 100
             else if (codec->codec_id == AV_CODEC_ID_EIA_608)
                 type = 'c';
-#endif /* LIBAVUTIL_VERSION_MICRO >= 100 */
             else if(codec->codec_tag == MKTAG('c', '6', '0', '8'))
                 type = 'c';
             else
