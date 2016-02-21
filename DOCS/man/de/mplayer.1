@@ -2758,6 +2758,7 @@ Du kannst eine Sprache im 2-Zeichen-Sprachcode angeben, um ENCA automatisch
 eine Codepage erkennen zu lassen.
 Wenn du nicht sicher bist, gib irgendetwas ein und sieh dir die Ausgaben von
 mplayer \-v an, um die verfügbaren Sprachen zu sehen.
+Benutze __ (zwei Unterstriche), falls deine Sprache nicht unterstützt wird.
 Die alternative Codepage gibt die zu benutzende Codepage an, falls die
 automatische Erkennung versagt.
 .sp 1
@@ -2769,6 +2770,8 @@ Nimm an, die Untertitel seien Tschechisch, und rate die Kodierung.
 Wenn die Erkennung versagt, benutze latin2.
 .IPs "\-subcp enca:pl:cp1250"
 Rate die Kodierung für Polnisch, benutze sonst cp1250.
+.IPs "\-subcp enca:__:latin1"
+Allgemeine Erkennung (meistens Unicode) mit latin1 als Alternative.
 .RE
 .PD 1
 .
