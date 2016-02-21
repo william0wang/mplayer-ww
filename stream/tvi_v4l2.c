@@ -1412,13 +1412,13 @@ static int get_capture_buffer_size(priv_t *priv)
     int cnt;
 
     if (priv->tv_param->buffer_size >= 0) {
-        bufsize = priv->tv_param->buffer_size*1024*1024;
+        bufsize = priv->tv_param->buffer_size*1024ull*1024;
     } else {
 #ifdef HAVE_SYS_SYSINFO_H
         struct sysinfo si;
 
         sysinfo(&si);
-        bufsize = (si.freeram/2)*si.mem_unit;
+        bufsize = (si.freeram/2ull)*si.mem_unit;
         if ( bufsize < 16*1024*1024)
 #endif
         bufsize = 16*1024*1024;
