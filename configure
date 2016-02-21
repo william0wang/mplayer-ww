@@ -7762,7 +7762,6 @@ if test "$_pvr" = auto && test "$_tv_v4l2" = yes && linux ; then
 #include <linux/videodev2.h>
 int main(void) {
   struct v4l2_ext_controls ext;
-  struct v4l2_query_ext_ctrl qctrl;
   return ext.controls->value;
 }
 EOF

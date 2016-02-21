@@ -1096,6 +1096,7 @@ static void
 add_v4l2_ext_control (struct v4l2_ext_controls *ctrls, struct pvr_t *pvr,
                       uint32_t id, int32_t value)
 {
+#ifdef VIDIOC_QUERY_EXT_CTRL
   struct v4l2_query_ext_ctrl qctrl = { .id = id };
 
   /* add only if the device supports this control */
@@ -1120,6 +1121,7 @@ add_v4l2_ext_control (struct v4l2_ext_controls *ctrls, struct pvr_t *pvr,
       return;
     }
   }
+#endif
 
   ctrls->controls[ctrls->count].id = id;
   ctrls->controls[ctrls->count].value = value;
