@@ -230,7 +230,7 @@ GtkWidget * AddSeparator( GtkWidget * Menu )
 typedef struct
 {
  int id;
- const char * id2;
+ const char id2[3];
  const char * name;
 } Languages_t;
 
@@ -438,7 +438,7 @@ static const char * GetLanguage( void *language, int type )
     else if ( p[3] != 0) return language;
   }
  for ( i=0;i<sizeof( Languages ) / sizeof( Languages_t );i++ )
-  if ( type == GET_LANG_INT ? Languages[i].id == l : strcasecmp(Languages[i].id2, p) == 0 ) return Languages[i].name;
+  if ( type == GET_LANG_INT ? Languages[i].id == l : strncasecmp(Languages[i].id2, p, sizeof(Languages[i].id2)) == 0 ) return Languages[i].name;
  return MSGTR_GUI_Unknown;
 }
 #undef lng
