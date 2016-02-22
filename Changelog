@@ -1,5 +1,21 @@
 MPlayer
 
+    Decoders, demuxers, streams:
+    * More pixel formats are supported for VP9
+    * pvr:// support for the Hauppauge HD PVR model 1212
+    * Speed up detection of mpg format while streaming (limit probe to 4 MB)
+    * demuxer: fall back to audio pts if all others are unavailable (#1928)
+
+    Fixes:
+    * fix more issues reported by Coverity
+    * fix -subcp enca: with external ASS subtitles (#2281)
+    * fix reading of bitmap fonts
+
+    Other:
+    * MPlayer can link against OpenSSL instead of GnuTLS for https support
+      (Warning: the resulting binary can not be redistributed)
+
+
   1.3.0: "worksforme" February 16, 2016
 
     Decoders, demuxers, streams:
