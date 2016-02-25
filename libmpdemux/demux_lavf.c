@@ -367,9 +367,14 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
             if(!sh_video) break;
             stream_type = "video";
             priv->vstreams[priv->video_streams] = i;
-            bih=calloc(sizeof(*bih) + codec->extradata_size,1);
+            // always reserve space for palette
+            sh_video->bih_size = sizeof(*bih) + codec->extradata_size + 1024;
+            bih=calloc(sh_video->bih_size,1);
 
             if (codec->codec_id == AV_CODEC_ID_RAWVIDEO) {
+                if (codec->bits_per_coded_sample && codec->bits_per_coded_sample > 0 &&
+                    codec->codec_tag == MKTAG('r', 'a', 'w', 32))
+                    codec->codec_tag = 0;
                 switch (codec->pix_fmt) {
                     case AV_PIX_FMT_RGB24:
                         codec->codec_tag= MKTAG(24, 'B', 'G', 'R');
@@ -575,6 +580,7 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
         avfc->pb = priv->pb;
     }
 
+    av_dict_set(&opts, "fflags", "+keepside", 0);
     if(avformat_open_input(&avfc, mp_filename, priv->avif, &opts)<0){
         mp_msg(MSGT_HEADER,MSGL_ERR,"LAVF_header: av_open_input_stream() failed\n");
         return NULL;
@@ -671,10 +677,18 @@ static int demux_lavf_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
         }
     } else if(id==demux->video->id){
         // video
+        sh_video_t *sh;
         ds=demux->video;
         if(!ds->sh){
             ds->sh=demux->v_streams[id];
             mp_msg(MSGT_DEMUX,MSGL_V,"Auto-selected LAVF video ID = %d\n",ds->id);
+        }
+        sh = ds->sh;
+        if (sh && sh->bih) {
+            int size = 0;
+            const uint8_t *pal = av_packet_get_side_data(&pkt, AV_PKT_DATA_PALETTE, &size);
+            if (pal && size)
+                memcpy(((uint8_t *)sh->bih) + sh->bih->biSize, pal, FFMIN(size, 1024));
         }
     } else if(id==demux->sub->id){
         // subtitle
@@ -685,6 +699,7 @@ static int demux_lavf_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
         return 1;
     }
 
+        av_packet_merge_side_data(&pkt);
         dp=new_demux_packet(pkt.size);
         memcpy(dp->buffer, pkt.data, pkt.size);
         av_free_packet(&pkt);
