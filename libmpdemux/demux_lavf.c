@@ -367,6 +367,12 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
             if(!sh_video) break;
             stream_type = "video";
             priv->vstreams[priv->video_streams] = i;
+            if (codec->extradata_size >= 9 &&
+                !memcmp(codec->extradata + codec->extradata_size - 9, "BottomUp", 9))
+            {
+                codec->extradata_size -= 9;
+                sh_video->flipped_input ^= 1;
+            }
             // always reserve space for palette
             sh_video->bih_size = sizeof(*bih) + codec->extradata_size + 1024;
             bih=calloc(sh_video->bih_size,1);

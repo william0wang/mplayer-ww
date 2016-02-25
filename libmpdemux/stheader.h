@@ -111,6 +111,7 @@ typedef struct sh_video {
   float stream_aspect;  // aspect ratio stored in the media headers (e.g. in DVD IFO files)
   int i_bps;              // == bitrate  (compressed bytes/sec)
   int disp_w,disp_h;      // display size (filled by fileformat parser)
+  int flipped_input;
   // output driver/filters: (set by libmpcodecs core)
   unsigned int outfmtidx;
   struct vf_instance *vfilter;          // the video filter chain, used for this video stream

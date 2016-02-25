@@ -289,6 +289,7 @@ int mpcodecs_config_vo(sh_video_t *sh, int w, int h,
     }
     if (vo_flags & VFCAP_FLIPPED)
         flip ^= 1;
+    flip ^= sh->flipped_input;
     if (flip && !(vo_flags & VFCAP_FLIP)) {
         // we need to flip, but no flipping filter avail.
         vf_add_before_vo(&vf, "flip", NULL);
