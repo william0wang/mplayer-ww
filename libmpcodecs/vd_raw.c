@@ -109,10 +109,11 @@ static mp_image_t* decode(sh_video_t *sh,void* data,int len,int flags){
        	}
     } else {
 	mpi->planes[0]=data;
-	mpi->stride[0]=mpi->width*(mpi->bpp/8);
+	mpi->stride[0]=(mpi->width*mpi->bpp + 7)/8;
 	// .AVI files has uncompressed lines 4-byte aligned:
 	if(sh->format==0 || sh->format==3) mpi->stride[0]=(mpi->stride[0]+3)&(~3);
-	if(mpi->imgfmt==IMGFMT_RGB8 || mpi->imgfmt==IMGFMT_BGR8){
+	if(mpi->imgfmt==IMGFMT_RGB8 || mpi->imgfmt==IMGFMT_BGR8 ||
+           mpi->imgfmt==IMGFMT_RGB4 || mpi->imgfmt==IMGFMT_BGR4){
 	    // export palette:
 	    mpi->planes[1]=sh->bih ? (unsigned char*)(sh->bih+1) : NULL;
 #if 0
