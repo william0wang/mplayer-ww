@@ -719,6 +719,12 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic, int isreference){
         mp_msg(MSGT_DECVIDEO, MSGL_DBG2, type== MP_IMGTYPE_IPB ? "using IPB\n" : "using IP\n");
     }
 
+    // Make sure to not leak dead pointers.
+    pic->data[0]= NULL;
+    pic->data[1]= NULL;
+    pic->data[2]= NULL;
+    pic->data[3]= NULL;
+
     if (ctx->best_csp == IMGFMT_RGB8 || ctx->best_csp == IMGFMT_BGR8)
         flags |= MP_IMGFLAG_RGB_PALETTE;
     mpi= mpcodecs_get_image(sh, type, flags, width, height);

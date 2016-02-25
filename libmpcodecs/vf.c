@@ -372,6 +372,9 @@ mp_image_t* vf_get_image(vf_instance_t* vf, unsigned int outfmt, int mp_imgtype,
                 av_freep(&mpi->planes[0]);
                 if (mpi->flags & MP_IMGFLAG_RGB_PALETTE)
                     av_freep(&mpi->planes[1]);
+                mpi->planes[1] = NULL;
+                mpi->planes[2] = NULL;
+                mpi->planes[3] = NULL;
                 mpi->flags&=~MP_IMGFLAG_ALLOCATED;
                 mpi->bpp = 0;
                 mp_msg(MSGT_VFILTER,MSGL_V,"vf.c: have to REALLOCATE buffer memory in vf_%s :(\n",
