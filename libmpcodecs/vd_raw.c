@@ -51,7 +51,7 @@ static int init(sh_video_t *sh){
     // set format fourcc for raw RGB:
     if(sh->bih && sh->bih->biCompression==0){	// set based on bit depth
 	switch(sh->bih->biBitCount){
-	case 1:  sh->bih->biCompression=IMGFMT_BGR1; break;
+	case 1:  sh->bih->biCompression=IMGFMT_RGB1; break;
 	case 4:  sh->bih->biCompression=IMGFMT_BGR4; break;
 	case 8:  sh->bih->biCompression=IMGFMT_BGR8; break;
 	case 15: sh->bih->biCompression=IMGFMT_BGR15; break;
