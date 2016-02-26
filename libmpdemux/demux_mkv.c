@@ -2244,6 +2244,7 @@ static int demux_mkv_read_block_lacing(uint8_t *buffer, uint64_t *size,
     *all_lace_sizes = NULL;
     lace_size = NULL;
     /* lacing flags */
+    if (!*size) goto err_out;
     flags = *buffer++;
     (*size)--;
 
@@ -2257,6 +2258,7 @@ static int demux_mkv_read_block_lacing(uint8_t *buffer, uint64_t *size,
     case 1:                    /* xiph lacing */
     case 2:                    /* fixed-size lacing */
     case 3:                    /* EBML lacing */
+        if (!*size) goto err_out;
         *laces = *buffer++;
         (*size)--;
         (*laces)++;
@@ -2268,10 +2270,12 @@ static int demux_mkv_read_block_lacing(uint8_t *buffer, uint64_t *size,
                 lace_size[i] = 0;
                 do {
                     lace_size[i] += *buffer;
+                    if (!*size) goto err_out;
                     (*size)--;
                 } while (*buffer++ == 0xFF);
                 total += lace_size[i];
             }
+            if (*size < total) goto err_out;
             lace_size[i] = *size - total;
             break;
 
@@ -2284,10 +2288,7 @@ static int demux_mkv_read_block_lacing(uint8_t *buffer, uint64_t *size,
         {
             int l;
             uint64_t num = ebml_read_vlen_uint(buffer, &l);
-            if (num == EBML_UINT_INVALID) {
-                free(lace_size);
-                return 1;
-            }
+            if (num == EBML_UINT_INVALID || *size < l) goto err_out;
             buffer += l;
             *size -= l;
 
@@ -2295,15 +2296,13 @@ static int demux_mkv_read_block_lacing(uint8_t *buffer, uint64_t *size,
             for (i = 1; i < *laces - 1; i++) {
                 int64_t snum;
                 snum = ebml_read_vlen_int(buffer, &l);
-                if (snum == EBML_INT_INVALID) {
-                    free(lace_size);
-                    return 1;
-                }
+                if (snum == EBML_INT_INVALID || *size < l) goto err_out;
                 buffer += l;
                 *size -= l;
                 lace_size[i] = lace_size[i - 1] + snum;
                 total += lace_size[i];
             }
+            if (*size < total) goto err_out;
             lace_size[i] = *size - total;
             break;
         }
@@ -2312,6 +2311,10 @@ static int demux_mkv_read_block_lacing(uint8_t *buffer, uint64_t *size,
     }
     *all_lace_sizes = lace_size;
     return 0;
+
+err_out:
+    free(lace_size);
+    return 1;
 }
 
 static void handle_subtitles(demuxer_t *demuxer, mkv_track_t *track,
