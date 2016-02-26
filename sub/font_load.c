@@ -49,7 +49,8 @@ raw_file* load_raw(char *name,int verbose){
     if(raw->w == 0) // 2 bytes were not enough for the width... read 4 bytes from the end of the header
     	raw->w = AV_RB32(head + 28);
     if(raw->c>256) goto err_out;                 // too many colors!?
-    if (raw->w > INT_MAX / 4 || (uint64_t)raw->w * raw->h > INT_MAX / 4)
+    if (!raw->w || !raw->h ||
+        raw->w > INT_MAX / 4 || raw->h > INT_MAX / 4 / raw->w)
         goto err_out;
     mp_msg(MSGT_OSD, MSGL_DBG2, "RAW: %s  %d x %d, %d colors\n",name,raw->w,raw->h,raw->c);
     if(raw->c){
