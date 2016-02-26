@@ -2314,7 +2314,7 @@ void dump_srt(sub_data* subd, float fps){
 	temp=onesub->start;
 	if (!subd->sub_uses_time)
 	    temp = temp * 100 / sub_fps;
-	temp -= sub_delay * 100;
+	temp += sub_delay * 100;
 	h=temp/360000;temp%=360000;	//h =1*100*60*60
 	m=temp/6000;  temp%=6000;	//m =1*100*60
 	s=temp/100;   temp%=100;	//s =1*100
@@ -2324,7 +2324,7 @@ void dump_srt(sub_data* subd, float fps){
 	temp=onesub->end;
 	if (!subd->sub_uses_time)
 	    temp = temp * 100 / sub_fps;
-	temp -= sub_delay * 100;
+	temp += sub_delay * 100;
 	h=temp/360000;temp%=360000;
 	m=temp/6000;  temp%=6000;
 	s=temp/100;   temp%=100;
@@ -2346,7 +2346,7 @@ void dump_mpsub(sub_data* subd, float fps){
 	float a,b;
         subtitle *subs = subd->subtitles;
 
-	mpsub_position = subd->sub_uses_time? (sub_delay*100) : (sub_delay*fps);
+	mpsub_position = subd->sub_uses_time? (-sub_delay*100) : (-sub_delay*fps);
 	if (sub_fps==0) sub_fps=fps;
 
 	fd=fopen ("dump.mpsub", "w");
@@ -2412,8 +2412,8 @@ void dump_microdvd(sub_data* subd, float fps) {
 	    start = start * sub_fps / fps;
 	    end = end * sub_fps / fps;
 	}
-	start -= delay;
-	end -= delay;
+	start += delay;
+	end += delay;
 	fprintf(fd, "{%d}{%d}", start, end);
 	for (j = 0; j < subs[i].lines; ++j)
 	    fprintf(fd, "%s%s", j ? "|" : "", subs[i].text[j]);
@@ -2447,7 +2447,7 @@ void dump_jacosub(sub_data* subd, float fps) {
 	temp=onesub->start;
 	if (!subd->sub_uses_time)
 	    temp = temp * 100 / sub_fps;
-	temp -= sub_delay * 100;
+	temp += sub_delay * 100;
 	h=temp/360000;temp%=360000;	//h =1*100*60*60
 	m=temp/6000;  temp%=6000;	//m =1*100*60
 	s=temp/100;   temp%=100;	//s =1*100
@@ -2457,7 +2457,7 @@ void dump_jacosub(sub_data* subd, float fps) {
 	temp=onesub->end;
 	if (!subd->sub_uses_time)
 	    temp = temp * 100 / sub_fps;
-	temp -= sub_delay * 100;
+	temp += sub_delay * 100;
 	h=temp/360000;temp%=360000;
 	m=temp/6000;  temp%=6000;
 	s=temp/100;   temp%=100;
@@ -2505,7 +2505,7 @@ void dump_sami(sub_data* subd, float fps) {
 	temp=onesub->start;
 	if (!subd->sub_uses_time)
 	    temp = temp * 100 / sub_fps;
-	temp -= sub_delay * 100;
+	temp += sub_delay * 100;
 	fprintf(fd,"\t<SYNC Start=%lu>\n"
 		    "\t  <P>", temp * 10);
 
@@ -2517,7 +2517,7 @@ void dump_sami(sub_data* subd, float fps) {
 	temp=onesub->end;
 	if (!subd->sub_uses_time)
 	    temp = temp * 100 / sub_fps;
-	temp -= sub_delay * 100;
+	temp += sub_delay * 100;
 	fprintf(fd,"\t<SYNC Start=%lu>\n"
 		    "\t  <P>&nbsp;\n", temp * 10);
     }
