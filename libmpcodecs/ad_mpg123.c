@@ -331,6 +331,8 @@ static int decode_a_bit(sh_audio_t *sh, unsigned char *buf, int count)
                     break; /* Do not switch format during a chunk. */
 
                 ret = set_format(sh, con);
+                if (ret == MPG123_ERR || ret == MPG123_DONE)
+                    break;
             }
         }
 
