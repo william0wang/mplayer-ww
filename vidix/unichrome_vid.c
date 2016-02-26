@@ -515,7 +515,7 @@ unichrome_init (void)
   enable_app_io ();
 
   outb (0x2f, 0x3c4);
-  tmp = inb (0x3c5) << 0x18;
+  tmp = (unsigned)(inb (0x3c5)) << 0x18;
   vio = map_phys_mem (tmp, 0x1000);
 
   outb (0x16, 0x3c4);
