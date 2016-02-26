@@ -364,14 +364,12 @@ static int demux_ty_fill_buffer( demuxer_t *demux, demux_stream_t *dsds )
       demux->movi_end = demux->stream->end_pos;
       tivo->size = demux->stream->end_pos;
    }
-   else
+   else if ( tivo->readHeader == 0 )
    {
       // If its a local file, try to find the Part Headers, so we can
       // calculate the ACTUAL stream size
       // If we can't find it, go off with the file size and hope the
       // extract program did the "right thing"
-      if ( tivo->readHeader == 0 )
-      {
          off_t filePos;
          tivo->readHeader = 1;
 
@@ -380,44 +378,27 @@ static int demux_ty_fill_buffer( demuxer_t *demux, demux_stream_t *dsds )
 
          readSize = stream_read( demux->stream, chunk, CHUNKSIZE );
 
-         if ( memcmp( chunk, TMF_SIG, sizeof( TMF_SIG ) ) == 0 )
+         if ( readSize >= sizeof( TMF_SIG ) &&
+              memcmp( chunk, TMF_SIG, sizeof( TMF_SIG ) ) == 0 )
          {
             mp_msg( MSGT_DEMUX, MSGL_DBG3, "ty:Detected a tmf\n" );
             tivo->tmf = 1;
             ty_tmf_filetoparts( demux, tivo );
-            readSize = tmf_load_chunk( demux, tivo, chunk, 0 );
+            if (tivo->tmf_totalparts > 0) {
+                tivo->size = tivo->tmfparts[tivo->tmf_totalparts - 1].startOffset +
+                             tivo->tmfparts[tivo->tmf_totalparts - 1].fileSize;
+            }
          }
-
-         if ( readSize == CHUNKSIZE && AV_RB32(chunk) == TIVO_PES_FILEID )
+         else if ( readSize == CHUNKSIZE && AV_RB32(chunk) == TIVO_PES_FILEID )
          {
-               off_t numberParts;
-
-               readSize = 0;
-
-               if ( tivo->tmf != 1 )
-               {
-                  off_t offset;
-
-                  numberParts = demux->stream->end_pos / TIVO_PART_LENGTH;
-                  offset = numberParts * TIVO_PART_LENGTH;
+               off_t numberParts = (demux->stream->end_pos - CHUNKSIZE) / TIVO_PART_LENGTH;
+               off_t offset = numberParts * TIVO_PART_LENGTH;
 
                   mp_msg( MSGT_DEMUX, MSGL_DBG3, "ty:ty/ty+Number Parts %"PRId64"\n",
                     (int64_t)numberParts );
 
-                  if ( offset + CHUNKSIZE < demux->stream->end_pos )
-                  {
                      stream_seek( demux->stream, offset );
                      readSize = stream_read( demux->stream, chunk, CHUNKSIZE );
-                  }
-               }
-               else
-               {
-                  numberParts = tivo->tmf_totalparts;
-                  offset = numberParts * TIVO_PART_LENGTH;
-                  readSize = tmf_load_chunk( demux, tivo, chunk,
-                     numberParts * ( TIVO_PART_LENGTH - CHUNKSIZE ) /
-                     CHUNKSIZE );
-               }
 
                if ( readSize == CHUNKSIZE && AV_RB32(chunk) == TIVO_PES_FILEID )
                {
@@ -436,7 +417,7 @@ static int demux_ty_fill_buffer( demuxer_t *demux, demux_stream_t *dsds )
          stream_seek( demux->stream, filePos );
          demux->filepos = stream_tell( demux->stream );
          tivo->whichChunk = filePos / CHUNKSIZE;
-      }
+
       demux->movi_start = 0;
       demux->movi_end = tivo->size;
    }
