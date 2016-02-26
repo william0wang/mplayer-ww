@@ -332,7 +332,7 @@ static int prev_visibility;
 
 static void eosd_ass_update(struct mp_eosd_source *src, const struct mp_eosd_settings *res, double ts)
 {
-	long long ts_ms = (ts + sub_delay) * 1000 + .5;
+	long long ts_ms = (ts - sub_delay) * 1000 + .5;
 	ASS_Image *aimg;
 	struct mp_eosd_image *img;
 	if (res->changed || !src->initialized || ass_force_reload) {
