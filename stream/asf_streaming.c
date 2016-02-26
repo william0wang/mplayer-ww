@@ -579,7 +579,7 @@ static HTTP_header_t *asf_http_request(streaming_ctrl_t *streaming_ctrl) {
 					if(stream_id == asf_http_ctrl->audio_id) {
 						enable = 0;
 					} else {
-						enable = 2;
+						//enable = 2;
 						continue;
 					}
 					asf_nb_stream++;
@@ -592,7 +592,7 @@ static HTTP_header_t *asf_http_request(streaming_ctrl_t *streaming_ctrl) {
 					if(stream_id == asf_http_ctrl->video_id) {
 						enable = 0;
 					} else {
-						enable = 2;
+						//enable = 2;
 						continue;
 					}
 					asf_nb_stream++;
