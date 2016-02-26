@@ -293,6 +293,11 @@ static int decode_a_bit(sh_audio_t *sh, unsigned char *buf, int count)
         if(con->new_format)
             ret = set_format(sh, con);
 
+        /* Theoretically, mpg123 could return MPG123_DONE, so be prepared.
+         * Should not happen in our usage, but it is a valid return code. */
+        if (ret == MPG123_ERR || ret == MPG123_DONE)
+            break;
+
         /* Feed the decoder. This will only fire from the second round on. */
         if (ret == MPG123_NEED_MORE) {
             int incount;
@@ -328,10 +333,6 @@ static int decode_a_bit(sh_audio_t *sh, unsigned char *buf, int count)
                 ret = set_format(sh, con);
             }
         }
-        /* Theoretically, mpg123 could return MPG123_DONE, so be prepared.
-         * Should not happen in our usage, but it is a valid return code. */
-        else if (ret == MPG123_ERR || ret == MPG123_DONE)
-            break;
 
         /* Try to decode a bit. This is the return value that counts
          * for the loop condition. */
