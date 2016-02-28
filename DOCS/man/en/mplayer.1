@@ -2614,6 +2614,7 @@ subtitles.
 .TP
 .B \-noautosub
 Turns off automatic subtitle file loading.
+Note: VOBsub subtitles are not affected.
 .
 .TP
 .B \-osd\-duration <time>
@@ -2765,7 +2766,7 @@ subreader.h.
 .
 .TP
 .B \-sub\-fuzziness <mode>
-Adjust matching fuzziness when searching for subtitles:
+Adjust matching fuzziness when searching for subtitles (does not apply to VOBsub):
 .PD 0
 .RSs
 .IPs 0
