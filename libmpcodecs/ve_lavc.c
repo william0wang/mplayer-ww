@@ -874,6 +874,7 @@ static void uninit(struct vf_instance *vf){
     av_freep(&lavc_venc_context->rc_override);
 
     avcodec_free_context(&vf->priv->context);
+    free(vf->priv);
 }
 
 //===========================================================================//
