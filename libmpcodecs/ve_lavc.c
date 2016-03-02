@@ -370,7 +370,7 @@ static int config(struct vf_instance *vf,
     lavc_venc_context->rc_qsquish= lavc_param_rc_qsquish;
     lavc_venc_context->rc_qmod_amp= lavc_param_rc_qmod_amp;
     lavc_venc_context->rc_qmod_freq= lavc_param_rc_qmod_freq;
-    lavc_venc_context->rc_eq= lavc_param_rc_eq;
+    lavc_venc_context->rc_eq= av_strdup(lavc_param_rc_eq);
 
     mux_v->max_rate=
     lavc_venc_context->rc_max_rate= lavc_param_rc_max_rate*1000;
