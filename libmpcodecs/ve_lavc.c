@@ -455,7 +455,7 @@ static int config(struct vf_instance *vf,
             return 0;
         }
         lavc_venc_context->rc_override=
-            realloc(lavc_venc_context->rc_override, sizeof(RcOverride)*(i+1));
+            av_reallocp_array(lavc_venc_context->rc_override, i+1, sizeof(*lavc_venc_context->rc_override));
         lavc_venc_context->rc_override[i].start_frame= start;
         lavc_venc_context->rc_override[i].end_frame  = end;
         if(q>0){
