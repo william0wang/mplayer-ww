@@ -1733,6 +1733,9 @@ if(sh_audio){ uninit_audio(sh_audio);sh_audio=NULL; }
 if(sh_video){ uninit_video(sh_video);sh_video=NULL; }
 if(demuxer) free_demuxer(demuxer);
 if(stream) free_stream(stream); // kill cache thread
+if(mux_v) free(mux_v->buffer);
+if(mux_a) free(mux_a->buffer);
+common_uninit();
 
 return interrupted;
 }

@@ -83,6 +83,7 @@ int cfg_include(m_option_t *conf, const char *filename);
 
 void common_preinit(int *argc_ptr, char **argv_ptr[]);
 int common_init(void);
+void common_uninit(void);
 
 double calc_a_pts(struct sh_audio *sh_audio, demux_stream_t *d_audio);
 

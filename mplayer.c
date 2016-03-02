@@ -718,22 +718,7 @@ void exit_player_with_rc(enum exit_reason how, int rc)
     vo_uninit(); // Close the X11 connection (if any is open).
 #endif
 
-#ifdef CONFIG_FREETYPE
-    current_module = "uninit_font";
-    if (sub_font && sub_font != vo_font)
-        free_font_desc(sub_font);
-    sub_font = NULL;
-    if (vo_font)
-        free_font_desc(vo_font);
-    vo_font = NULL;
-    done_freetype();
-#endif
-    free_osd_list();
-
-#ifdef CONFIG_ASS
-    ass_library_done(ass_library);
-    ass_library = NULL;
-#endif
+    common_uninit();
 
     current_module = "exit_player";
 

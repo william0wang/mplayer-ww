@@ -643,6 +643,26 @@ int common_init(void)
     return 1;
 }
 
+void common_uninit(void)
+{
+#ifdef CONFIG_FREETYPE
+    current_module = "uninit_font";
+    if (sub_font && sub_font != vo_font)
+        free_font_desc(sub_font);
+    sub_font = NULL;
+    if (vo_font)
+        free_font_desc(vo_font);
+    vo_font = NULL;
+    done_freetype();
+#endif
+    free_osd_list();
+
+#ifdef CONFIG_ASS
+    ass_library_done(ass_library);
+    ass_library = NULL;
+#endif
+}
+
 /// Returns a_pts
 double calc_a_pts(sh_audio_t *sh_audio, demux_stream_t *d_audio)
 {
