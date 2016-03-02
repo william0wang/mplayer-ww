@@ -845,7 +845,9 @@ static int encode_frame(struct vf_instance *vf, AVFrame *pic, double pts){
             pict_type_char[lavc_venc_context->coded_frame->pict_type]
             );
     }
-    return pkt.size;
+    res = pkt.size;
+    av_packet_unref(&pkt);
+    return res;
 }
 
 static void uninit(struct vf_instance *vf){
