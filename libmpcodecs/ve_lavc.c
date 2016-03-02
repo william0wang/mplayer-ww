@@ -336,7 +336,9 @@ static int config(struct vf_instance *vf,
 	mux_v->bih->biWidth, mux_v->bih->biHeight, mux_v->bih->biCompression,
 	    (char *)&mux_v->bih->biCompression);
 
+    vf->priv->pic->width =
     lavc_venc_context->width = width;
+    vf->priv->pic->height =
     lavc_venc_context->height = height;
     if (lavc_param_vbitrate > 16000) /* != -1 */
 	lavc_venc_context->bit_rate = lavc_param_vbitrate;
@@ -586,6 +588,7 @@ static int config(struct vf_instance *vf,
     }
 
     mux_v->imgfmt = lavc_param_format;
+    vf->priv->pic->format =
     lavc_venc_context->pix_fmt = imgfmt2pixfmt(lavc_param_format);
     if (lavc_venc_context->pix_fmt == AV_PIX_FMT_NONE)
         return 0;
