@@ -138,6 +138,7 @@ extern int mp_msg_level_all;
 
 
 void mp_msg_init(void);
+void mp_msg_uninit(void);
 int mp_msg_test(int mod, int lev);
 
 #include "config.h"

@@ -755,6 +755,8 @@ void exit_player_with_rc(enum exit_reason how, int rc)
         m_config_free(mconfig);
     mconfig = NULL;
 
+    mp_msg_uninit();
+
     exit(rc);
 }
 

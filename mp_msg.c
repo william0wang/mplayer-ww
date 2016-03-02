@@ -44,6 +44,7 @@ int mp_msg_module = 0;
 char *mp_msg_charset = NULL;
 static char *old_charset = NULL;
 static iconv_t msgiconv;
+static iconv_t inv_msgiconv = (iconv_t)(-1);
 #endif
 
 const char* filename_recode(const char* filename)
@@ -51,7 +52,6 @@ const char* filename_recode(const char* filename)
 #if !defined(CONFIG_ICONV) || !defined(MSG_CHARSET)
     return filename;
 #else
-    static iconv_t inv_msgiconv = (iconv_t)(-1);
     static char recoded_filename[MSGSIZE_MAX];
     size_t filename_len, max_path;
     char* precoded;
@@ -88,6 +88,17 @@ void mp_msg_init(void){
     mp_msg_charset = getenv("MPLAYER_CHARSET");
     if (!mp_msg_charset)
       mp_msg_charset = get_term_charset();
+#endif
+}
+
+void mp_msg_uninit(void)
+{
+#ifdef CONFIG_ICONV
+    if (old_charset) {
+        free(old_charset);
+        iconv_close(msgiconv);
+    }
+    if (inv_msgiconv != (iconv_t)(-1)) iconv_close(inv_msgiconv);
 #endif
 }
 

@@ -1736,6 +1736,7 @@ if(stream) free_stream(stream); // kill cache thread
 if(mux_v) free(mux_v->buffer);
 if(mux_a) free(mux_a->buffer);
 common_uninit();
+mp_msg_uninit();
 
 return interrupted;
 }
