@@ -1199,7 +1199,7 @@ do {                                                                    \
     }                                                                   \
 } while (0)
 
-    if (avctx->codec_type == AVMEDIA_TYPE_VIDEO) {
+    {
         const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(frame->format);
 
         planes = av_pix_fmt_count_planes(frame->format);
@@ -1218,27 +1218,6 @@ do {                                                                    \
 
             WRAP_PLANE(frame->buf[i], frame->data[i], plane_size);
         }
-    } else {
-        int planar = av_sample_fmt_is_planar(frame->format);
-        planes = planar ? avctx->channels : 1;
-
-        if (planes > FF_ARRAY_ELEMS(frame->buf)) {
-            frame->nb_extended_buf = planes - FF_ARRAY_ELEMS(frame->buf);
-            frame->extended_buf = av_malloc_array(sizeof(*frame->extended_buf),
-                                            frame->nb_extended_buf);
-            if (!frame->extended_buf) {
-                ret = AVERROR(ENOMEM);
-                goto fail;
-            }
-        }
-
-        for (i = 0; i < FFMIN(planes, FF_ARRAY_ELEMS(frame->buf)); i++)
-            WRAP_PLANE(frame->buf[i], frame->extended_data[i], frame->linesize[0]);
-
-        for (i = 0; i < frame->nb_extended_buf; i++)
-            WRAP_PLANE(frame->extended_buf[i],
-                       frame->extended_data[i + FF_ARRAY_ELEMS(frame->buf)],
-                       frame->linesize[0]);
     }
 
     av_buffer_unref(&dummy_buf);
