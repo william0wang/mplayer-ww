@@ -531,7 +531,7 @@ static void uninit(sh_video_t *sh){
         av_freep(&avctx->slice_offset);
     }
 
-    av_freep(&avctx);
+    avcodec_free_context(&avctx);
     av_frame_free(&ctx->pic);
     free(ctx);
 }
