@@ -337,9 +337,9 @@ static int init(sh_video_t *sh){
     if (!ctx)
         return 0;
 
-    lavc_codec = avcodec_find_decoder_by_name(sh->codec->dll);
+    lavc_codec = avcodec_find_decoder_by_name(codec_idx2str(sh->codec->dll_idx));
     if(!lavc_codec){
-        mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_MissingLAVCcodec, sh->codec->dll);
+        mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_MissingLAVCcodec, codec_idx2str(sh->codec->dll_idx));
         uninit(sh);
         return 0;
     }

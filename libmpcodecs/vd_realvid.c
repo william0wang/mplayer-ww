@@ -265,6 +265,7 @@ static int init(sh_video_t *sh){
 	unsigned char* extrahdr=(unsigned char*)(sh->bih+1);
 	unsigned int extrahdr_size = sh->bih->biSize - sizeof(*sh->bih);
 	struct rv_init_t init_data;
+	const char *dll = codec_idx2str(sh->codec->dll_idx);
 
 	if(extrahdr_size < 8) {
 	    mp_msg(MSGT_DECVIDEO,MSGL_ERR,"realvideo: extradata too small (%u)\n", extrahdr_size);
@@ -274,20 +275,20 @@ static int init(sh_video_t *sh){
 
 	mp_msg(MSGT_DECVIDEO,MSGL_V,"realvideo codec id: 0x%08X  sub-id: 0x%08X\n",init_data.format,init_data.subformat);
 
-	path = malloc(strlen(codec_path) + strlen(sh->codec->dll) + 2);
+	path = malloc(strlen(codec_path) + strlen(dll) + 2);
 	if (!path) return 0;
-	sprintf(path, "%s/%s", codec_path, sh->codec->dll);
+	sprintf(path, "%s/%s", codec_path, dll);
 
 	/* first try to load linux dlls, if failed and we're supporting win32 dlls,
 	   then try to load the windows ones */
 #ifdef HAVE_LIBDL
-	if(strstr(sh->codec->dll,".dll") || !load_syms_linux(path))
+	if(strstr(dll,".dll") || !load_syms_linux(path))
 #endif
 #ifdef CONFIG_WIN32DLL
-	    if (!load_syms_windows(sh->codec->dll))
+	    if (!load_syms_windows(dll))
 #endif
 	{
-		mp_msg(MSGT_DECVIDEO,MSGL_ERR,MSGTR_MissingDLLcodec,sh->codec->dll);
+		mp_msg(MSGT_DECVIDEO,MSGL_ERR,MSGTR_MissingDLLcodec,dll);
 		mp_msg(MSGT_DECVIDEO,MSGL_HINT,"Read the RealVideo section of the DOCS!\n");
 		free(path);
 		return 0;

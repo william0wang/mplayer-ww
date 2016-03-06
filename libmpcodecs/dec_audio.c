@@ -159,6 +159,7 @@ static int init_audio(sh_audio_t *sh_audio, char *codecname, char *afm,
     }
     sh_audio->codec = NULL;
     while (1) {
+        const char *drv;
 	const ad_functions_t *mpadec;
 	int i;
 	sh_audio->ad_driver = 0;
@@ -169,22 +170,22 @@ static int init_audio(sh_audio_t *sh_audio, char *codecname, char *afm,
 						 sh_audio->wf ? (&i) : NULL,
 						 sh_audio->codec, force)))
 	    break;
+        drv = codec_idx2str(sh_audio->codec->drv_idx);
 	if (sh_audio->wf)
 	    sh_audio->wf->wFormatTag = i;
 	// ok we found one codec
-	if (stringset_test(selected, sh_audio->codec->name))
+	if (stringset_test(selected, codec_idx2str(sh_audio->codec->name_idx)))
 	    continue;	// already tried & failed
-	if (codecname && strcmp(sh_audio->codec->name, codecname))
+	if (codecname && strcmp(codec_idx2str(sh_audio->codec->name_idx), codecname))
 	    continue;	// -ac
-	if (afm && strcmp(sh_audio->codec->drv, afm))
+	if (afm && strcmp(drv, afm))
 	    continue;	// afm doesn't match
 	if (!force && sh_audio->codec->status < status)
 	    continue;	// too unstable
-	stringset_add(selected, sh_audio->codec->name);	// tagging it
+	stringset_add(selected, codec_idx2str(sh_audio->codec->name_idx));	// tagging it
 	// ok, it matches all rules, let's find the driver!
 	for (i = 0; mpcodecs_ad_drivers[i] != NULL; i++)
-	    if (!strcmp(mpcodecs_ad_drivers[i]->info->short_name,
-		 sh_audio->codec->drv))
+	    if (!strcmp(mpcodecs_ad_drivers[i]->info->short_name, drv))
 		break;
 	mpadec = mpcodecs_ad_drivers[i];
 #ifdef CONFIG_DYNAMIC_PLUGINS
@@ -196,37 +197,37 @@ static int init_audio(sh_audio_t *sh_audio, char *codecname, char *afm,
 	    ad_info_t *info_sym;
 
 	    buf_len =
-		strlen(MPLAYER_LIBDIR) + strlen(sh_audio->codec->drv) + 16;
+		strlen(MPLAYER_LIBDIR) + strlen(drv) + 16;
 	    buf = malloc(buf_len);
 	    if (!buf)
 		break;
-	    snprintf(buf, buf_len, "%s/mplayer/ad_%s.so", MPLAYER_LIBDIR,
-		     sh_audio->codec->drv);
+	    snprintf(buf, buf_len, "%s/mplayer/ad_%s.so", MPLAYER_LIBDIR, drv);
 	    mp_msg(MSGT_DECAUDIO, MSGL_DBG2,
 		   "Trying to open external plugin: %s\n", buf);
 	    sh_audio->dec_handle = dlopen(buf, RTLD_LAZY);
 	    if (!sh_audio->dec_handle)
 		break;
-	    snprintf(buf, buf_len, "mpcodecs_ad_%s", sh_audio->codec->drv);
+	    snprintf(buf, buf_len, "mpcodecs_ad_%s", drv);
 	    funcs_sym = dlsym(sh_audio->dec_handle, buf);
 	    if (!funcs_sym || !funcs_sym->info || !funcs_sym->preinit
 		|| !funcs_sym->init || !funcs_sym->uninit
 		|| !funcs_sym->control || !funcs_sym->decode_audio)
 		break;
 	    info_sym = funcs_sym->info;
-	    if (strcmp(info_sym->short_name, sh_audio->codec->drv))
+	    if (strcmp(info_sym->short_name, drv))
 		break;
 	    free(buf);
 	    mpadec = funcs_sym;
 	    mp_msg(MSGT_DECAUDIO, MSGL_V,
 		   "Using external decoder plugin (%s/mplayer/ad_%s.so)!\n",
-		   MPLAYER_LIBDIR, sh_audio->codec->drv);
+		   MPLAYER_LIBDIR, drv);
 	}
 #endif
 	if (!mpadec) {		// driver not available (==compiled in)
 	    mp_msg(MSGT_DECAUDIO, MSGL_ERR,
 		   MSGTR_AudioCodecFamilyNotAvailableStr,
-		   sh_audio->codec->name, sh_audio->codec->drv);
+		   codec_idx2str(sh_audio->codec->name_idx),
+                   codec_idx2str(sh_audio->codec->drv_idx));
 	    continue;
 	}
 	/* only allow dummy codecs if specified via -ac */
@@ -305,7 +306,9 @@ int init_best_audio_codec(sh_audio_t *sh_audio, char **audio_codec_list,
     }
 
     mp_msg(MSGT_DECAUDIO, MSGL_INFO, MSGTR_SelectedAudioCodec,
-	   sh_audio->codec->name, sh_audio->codec->drv, sh_audio->codec->info);
+	   codec_idx2str(sh_audio->codec->name_idx),
+	   codec_idx2str(sh_audio->codec->drv_idx),
+	   codec_idx2str(sh_audio->codec->info_idx));
     return 1;   // success
 }
 
@@ -319,7 +322,7 @@ void uninit_audio(sh_audio_t *sh_audio)
     }
     if (sh_audio->initialized) {
 	mp_msg(MSGT_DECAUDIO, MSGL_V, "Uninit audio: %s\n",
-	       sh_audio->codec->drv);
+	       codec_idx2str(sh_audio->codec->drv_idx));
 	sh_audio->ad_driver->uninit(sh_audio);
 #ifdef CONFIG_DYNAMIC_PLUGINS
 	if (sh_audio->dec_handle)

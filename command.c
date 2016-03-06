@@ -787,7 +787,7 @@ static int mp_property_audio_codec(m_option_t *prop, int action,
 {
     if (!mpctx->sh_audio || !mpctx->sh_audio->codec)
         return M_PROPERTY_UNAVAILABLE;
-    return m_property_string_ro(prop, action, arg, mpctx->sh_audio->codec->name);
+    return m_property_string_ro(prop, action, arg, codec_idx2str(mpctx->sh_audio->codec->name_idx));
 }
 
 /// Audio bitrate (RO)
@@ -1373,7 +1373,7 @@ static int mp_property_video_codec(m_option_t *prop, int action,
 {
     if (!mpctx->sh_video || !mpctx->sh_video->codec)
         return M_PROPERTY_UNAVAILABLE;
-    return m_property_string_ro(prop, action, arg, mpctx->sh_video->codec->name);
+    return m_property_string_ro(prop, action, arg, codec_idx2str(mpctx->sh_video->codec->name_idx));
 }
 
 

@@ -467,8 +467,8 @@ char *get_metadata(metadata_t type)
         return mp_asprintf("%d x %d", sh_video->disp_w, sh_video->disp_h);
 
     case META_AUDIO_CODEC:
-        if (sh_audio->codec && sh_audio->codec->name)
-            return strdup(sh_audio->codec->name);
+        if (sh_audio->codec && sh_audio->codec->name_idx)
+            return strdup(codec_idx2str(sh_audio->codec->name_idx));
         break;
 
     case META_AUDIO_BITRATE:
@@ -2407,7 +2407,7 @@ int reinit_video_chain(void)
     initialized_flags |= INITIALIZED_VCODEC;
 
     if (sh_video->codec)
-        mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VIDEO_CODEC=%s\n", sh_video->codec->name);
+        mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VIDEO_CODEC=%s\n", codec_idx2str(sh_video->codec->name_idx));
 
     sh_video->last_pts = MP_NOPTS_VALUE;
     sh_video->num_buffered_pts = 0;
@@ -3648,7 +3648,7 @@ goto_enable_cache:
         if (mpctx->sh_audio) {
             reinit_audio_chain();
             if (mpctx->sh_audio && mpctx->sh_audio->codec)
-                mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_AUDIO_CODEC=%s\n", mpctx->sh_audio->codec->name);
+                mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_AUDIO_CODEC=%s\n", codec_idx2str(mpctx->sh_audio->codec->name_idx));
             if (mpctx->audio_out)
                 mpctx->audio_out->control(AOCONTROL_FILENAME, (void *)(vo_wintitle ? vo_wintitle : mp_basename(filename)));
         }

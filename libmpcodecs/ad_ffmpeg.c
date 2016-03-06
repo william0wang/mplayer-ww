@@ -106,9 +106,9 @@ static int init(sh_audio_t *sh_audio)
     mp_msg(MSGT_DECAUDIO,MSGL_V,"FFmpeg's libavcodec audio codec\n");
     init_avcodec();
 
-    lavc_codec = avcodec_find_decoder_by_name(sh_audio->codec->dll);
+    lavc_codec = avcodec_find_decoder_by_name(codec_idx2str(sh_audio->codec->dll_idx));
     if(!lavc_codec){
-	mp_msg(MSGT_DECAUDIO,MSGL_ERR,MSGTR_MissingLAVCcodec,sh_audio->codec->dll);
+	mp_msg(MSGT_DECAUDIO,MSGL_ERR,MSGTR_MissingLAVCcodec,codec_idx2str(sh_audio->codec->dll_idx));
 	return 0;
     }
 

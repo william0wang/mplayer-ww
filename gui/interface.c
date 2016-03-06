@@ -869,7 +869,7 @@ int gui(int what, void *data)
         nfree(guiInfo.CodecName);
 
         if (guiInfo.sh_video)
-            guiInfo.CodecName = strdup(guiInfo.sh_video->codec->name);
+            guiInfo.CodecName = strdup(codec_idx2str(guiInfo.sh_video->codec->name_idx));
 
         state = (isSeekableStreamtype ? btnReleased : btnDisabled);
         btnSet(evForward10sec, state);

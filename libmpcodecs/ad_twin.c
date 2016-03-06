@@ -182,7 +182,7 @@ int preinit(sh_audio_t *sh_audio)
   vqf_priv_t *priv;
   if(!(sh_audio->context=malloc(sizeof(vqf_priv_t)))) return 0;
   priv=sh_audio->context;
-  if(!load_dll(sh_audio->codec->dll))
+  if(!load_dll(codec_idx2str(sh_audio->codec->dll_idx)))
   {
     mp_msg(MSGT_DECAUDIO, MSGL_ERR, "win32.dll looks broken :(\n");
     return 0;
@@ -191,7 +191,7 @@ int preinit(sh_audio_t *sh_audio)
     mp_msg(MSGT_DECAUDIO, MSGL_ERR, "TWinVQ initialization fail\n");
     return 0;
   }
-  mp_msg(MSGT_DECAUDIO, MSGL_INFO, "INFO: TWinVQ (%s) audio codec init OK!\n",sh_audio->codec->dll);
+  mp_msg(MSGT_DECAUDIO, MSGL_INFO, "INFO: TWinVQ (%s) audio codec init OK!\n",codec_idx2str(sh_audio->codec->dll_idx));
   priv->skip_cnt = 2;
   return 1;
 }

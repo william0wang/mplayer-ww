@@ -125,7 +125,7 @@ static int init(sh_audio_t *sh)
     lavf_ctx->duration   = AV_NOPTS_VALUE;
     lavf_ctx->start_time = AV_NOPTS_VALUE;
     for (i = 0; fmt_id_type[i].name; i++) {
-        if (!strcmp(sh->codec->dll, fmt_id_type[i].name)) {
+        if (!strcmp(codec_idx2str(sh->codec->dll_idx), fmt_id_type[i].name)) {
             lavf_ctx->streams[0]->codec->codec_id = fmt_id_type[i].id;
             break;
         }

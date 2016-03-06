@@ -175,7 +175,7 @@ void uninit_video(sh_video_t *sh_video)
 {
     if (!sh_video->initialized)
         return;
-    mp_msg(MSGT_DECVIDEO, MSGL_V, "Uninit video: %s\n", sh_video->codec->drv);
+    mp_msg(MSGT_DECVIDEO, MSGL_V, "Uninit video: %s\n", codec_idx2str(sh_video->codec->drv_idx));
     mpvdec->uninit(sh_video);
     mpvdec = NULL;
 #ifdef CONFIG_DYNAMIC_PLUGINS
@@ -213,6 +213,7 @@ static int init_video(sh_video_t *sh_video, char *codecname, char *vfm,
     }
 
     while (1) {
+        const char *drv;
         int i;
         int orig_w, orig_h;
         // restore original fourcc:
@@ -223,22 +224,22 @@ static int init_video(sh_video_t *sh_video, char *codecname, char *vfm,
                                sh_video->bih ? ((unsigned int *) &sh_video->bih->biCompression) : NULL,
                                sh_video->codec, force)))
             break;
+        drv = codec_idx2str(sh_video->codec->drv_idx);
         // ok we found one codec
-        if (stringset_test(selected, sh_video->codec->name))
+        if (stringset_test(selected, codec_idx2str(sh_video->codec->name_idx)))
             continue;           // already tried & failed
-        if (codecname && strcmp(sh_video->codec->name, codecname))
+        if (codecname && strcmp(codec_idx2str(sh_video->codec->name_idx), codecname))
             continue;           // -vc
-        if (vfm && strcmp(sh_video->codec->drv, vfm))
+        if (vfm && strcmp(drv, vfm))
             continue;           // vfm doesn't match
         if (!force && sh_video->codec->status < status)
             continue;           // too unstable
-        stringset_add(selected, sh_video->codec->name); // tagging it
+        stringset_add(selected, codec_idx2str(sh_video->codec->name_idx)); // tagging it
         // ok, it matches all rules, let's find the driver!
         for (i = 0; mpcodecs_vd_drivers[i] != NULL; i++)
 //          if(mpcodecs_vd_drivers[i]->info->id==sh_video->codec->driver) break;
             if (!strcmp
-                (mpcodecs_vd_drivers[i]->info->short_name,
-                 sh_video->codec->drv))
+                (mpcodecs_vd_drivers[i]->info->short_name, drv))
                 break;
         mpvdec = mpcodecs_vd_drivers[i];
 #ifdef CONFIG_DYNAMIC_PLUGINS
@@ -250,37 +251,36 @@ static int init_video(sh_video_t *sh_video, char *codecname, char *vfm,
             vd_info_t *info_sym;
 
             buf_len = strlen(MPLAYER_LIBDIR) +
-                      strlen(sh_video->codec->drv) + 16;
+                      strlen(drv) + 16;
             buf = malloc(buf_len);
             if (!buf)
                 break;
-            snprintf(buf, buf_len, "%s/mplayer/vd_%s.so", MPLAYER_LIBDIR,
-                     sh_video->codec->drv);
+            snprintf(buf, buf_len, "%s/mplayer/vd_%s.so", MPLAYER_LIBDIR, drv);
             mp_msg(MSGT_DECVIDEO, MSGL_DBG2,
                    "Trying to open external plugin: %s\n", buf);
             sh_video->dec_handle = dlopen(buf, RTLD_LAZY);
             if (!sh_video->dec_handle)
                 break;
-            snprintf(buf, buf_len, "mpcodecs_vd_%s", sh_video->codec->drv);
+            snprintf(buf, buf_len, "mpcodecs_vd_%s", drv);
             funcs_sym = dlsym(sh_video->dec_handle, buf);
             if (!funcs_sym || !funcs_sym->info || !funcs_sym->init
                 || !funcs_sym->uninit || !funcs_sym->control
                 || !funcs_sym->decode)
                 break;
             info_sym = funcs_sym->info;
-            if (strcmp(info_sym->short_name, sh_video->codec->drv))
+            if (strcmp(info_sym->short_name, drv))
                 break;
             free(buf);
             mpvdec = funcs_sym;
             mp_msg(MSGT_DECVIDEO, MSGL_V,
                    "Using external decoder plugin (%s/mplayer/vd_%s.so)!\n",
-                   MPLAYER_LIBDIR, sh_video->codec->drv);
+                   MPLAYER_LIBDIR, drv);
         }
 #endif
         if (!mpvdec) {          // driver not available (==compiled in)
             mp_msg(MSGT_DECVIDEO, MSGL_WARN,
                    MSGTR_VideoCodecFamilyNotAvailableStr,
-                   sh_video->codec->name, sh_video->codec->drv);
+                   codec_idx2str(sh_video->codec->name_idx), drv);
             continue;
         }
         /* only allow dummy codecs if specified via -vc */
@@ -381,7 +381,9 @@ int init_best_video_codec(sh_video_t *sh_video, char **video_codec_list,
     }
 
     mp_msg(MSGT_DECVIDEO, MSGL_INFO, MSGTR_SelectedVideoCodec,
-           sh_video->codec->name, sh_video->codec->drv, sh_video->codec->info);
+           codec_idx2str(sh_video->codec->name_idx),
+           codec_idx2str(sh_video->codec->drv_idx),
+           codec_idx2str(sh_video->codec->info_idx));
     return 1;                   // success
 }
 
