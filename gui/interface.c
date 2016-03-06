@@ -1262,7 +1262,7 @@ void mplayer(int what, float value, void *data)
 
         mp_cmd       = calloc(1, sizeof(*mp_cmd));
         mp_cmd->id   = MP_CMD_PANSCAN;
-        mp_cmd->name = strdup("panscan");
+        ARRAY_STRCPY(mp_cmd->name, "panscan");
         mp_cmd->args[0].v.f = value;
         mp_cmd->args[1].v.i = 1;
         mp_input_queue_cmd(mp_cmd);

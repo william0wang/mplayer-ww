@@ -578,7 +578,7 @@ void uiPause(void)
 
         if (cmd) {
             cmd->id   = MP_CMD_PAUSE;
-            cmd->name = strdup("pause");
+            ARRAY_STRCPY(cmd->name, "pause");
             mp_input_queue_cmd(cmd);
         }
     } else

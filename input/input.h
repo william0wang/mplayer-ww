@@ -174,7 +174,7 @@ typedef enum {
 #define MP_CMD_ARG_VOID 3
 
 #ifndef MP_CMD_MAX_ARGS
-#define MP_CMD_MAX_ARGS 10
+#define MP_CMD_MAX_ARGS 6
 #endif
 
 // Error codes for the drivers
@@ -201,6 +201,20 @@ typedef enum {
 #define MP_MAX_KEY_DOWN 32
 #endif
 
+#if (defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 460)) || \
+    (defined(__clang__) && (__clang_major__ * 100 + __clang_minor__ >= 306))
+// The type checks are pretty horrible but the only reliable method,
+// checking type of d is char[sizeof(d)] doesn't work in gcc for example
+#define ARRAY_STRCPY(d, s) do { \
+    _Static_assert(sizeof(d) >= sizeof(s), "Destination array too small!"); \
+    _Static_assert(_Generic(&(d), char(*)[]:1, default:0), "Destination not an array!"); \
+    _Static_assert(_Generic(&(s), char(*)[]:1, default:0), "Source not an array!"); \
+    memcpy(d, s, sizeof(s)); \
+} while(0)
+#else
+#define ARRAY_STRCPY(d, s) memcpy(d, s, sizeof(s))
+#endif
+
 typedef union mp_cmd_arg_value {
   int i;
   float f;
@@ -215,7 +229,7 @@ typedef struct mp_cmd_arg {
 
 typedef struct mp_cmd {
   int id;
-  char* name;
+  char name[24];
   int nargs;
   mp_cmd_arg_t args[MP_CMD_MAX_ARGS];
   int pausing;

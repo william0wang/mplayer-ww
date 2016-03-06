@@ -212,7 +212,7 @@ static const mp_cmd_t mp_cmds[] = {
 
   { MP_CMD_GUI, "gui", 1, { {MP_CMD_ARG_STRING, {0}}, {-1,{0}} } },
 
-  { 0, NULL, 0, {} }
+  { 0, "", 0, {} }
 };
 
 /// The names of the keys as used in input.conf
@@ -819,19 +819,19 @@ mp_input_parse_cmd(char* str) {
   if(l == 0)
     return NULL;
 
-  for(i=0; mp_cmds[i].name != NULL; i++) {
+  for(i=0; mp_cmds[i].name[0]; i++) {
     if(strncasecmp(mp_cmds[i].name,str,l) == 0)
       break;
   }
 
-  if(mp_cmds[i].name == NULL)
+  if(!mp_cmds[i].name[0])
     return NULL;
 
   cmd_def = &mp_cmds[i];
 
   cmd = calloc(1, sizeof(mp_cmd_t));
   cmd->id = cmd_def->id;
-  cmd->name = strdup(cmd_def->name);
+  memcpy(cmd->name, cmd_def->name, sizeof(cmd->name));
   if (pausing == -1) {
     switch (cmd->id) {
       case MP_CMD_KEYDOWN_EVENTS:
@@ -1434,8 +1434,6 @@ mp_cmd_free(mp_cmd_t* cmd) {
 //#endif
   if ( !cmd ) return;
 
-  free(cmd->name);
-
   for(i=0; i < MP_CMD_MAX_ARGS && cmd->args[i].type != -1; i++) {
     if(cmd->args[i].type == MP_CMD_ARG_STRING)
       free(cmd->args[i].v.s);
@@ -1453,8 +1451,6 @@ mp_cmd_clone(mp_cmd_t* cmd) {
 
   ret = malloc(sizeof(mp_cmd_t));
   memcpy(ret,cmd,sizeof(mp_cmd_t));
-  if(cmd->name)
-    ret->name = strdup(cmd->name);
   for(i = 0;  i < MP_CMD_MAX_ARGS && cmd->args[i].type != -1; i++) {
     if(cmd->args[i].type == MP_CMD_ARG_STRING && cmd->args[i].v.s != NULL)
       ret->args[i].v.s = strdup(cmd->args[i].v.s);
@@ -1873,7 +1869,7 @@ static int mp_input_print_cmd_list(m_option_t* cfg) {
   int i,j;
   const char* type;
 
-  for(i = 0; (cmd = &mp_cmds[i])->name != NULL ; i++) {
+  for(i = 0; (cmd = &mp_cmds[i])->name[0] ; i++) {
     printf("%-20.20s",cmd->name);
     for(j= 0 ; j < MP_CMD_MAX_ARGS && cmd->args[j].type != -1 ; j++) {
       switch(cmd->args[j].type) {
