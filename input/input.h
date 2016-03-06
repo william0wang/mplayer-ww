@@ -198,7 +198,7 @@ typedef enum {
 #define MP_KEY_RELEASE_ALL (1<<27)
 
 #ifndef MP_MAX_KEY_DOWN
-#define MP_MAX_KEY_DOWN 32
+#define MP_MAX_KEY_DOWN 8
 #endif
 
 #if (defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 460)) || \
