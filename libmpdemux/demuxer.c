@@ -722,8 +722,15 @@ int ds_fill_buffer(demux_stream_t *ds)
         // This needs to be enough for at least 1 second of packets
         // since libavformat mov demuxer does not try to interleave
         // with more than 1s precision.
-        if (!force_ni && ds->fill_count > 80)
+        if (!force_ni && ds->fill_count > 80) {
+            static int once;
+            if (!once) {
+                mp_msg(MSGT_DEMUXER, MSGL_WARN, "Possibly bad interleaving detected.\n"
+                       "Use -ni option if this causes playback issues and avoid or fix the program that created the file.\n");
+                once = 1;
+            }
             break;
+        }
         // avoid printing the "too many ..." message over and over
         if (ds->eof)
             break;
