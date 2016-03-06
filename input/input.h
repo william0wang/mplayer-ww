@@ -243,7 +243,7 @@ typedef struct mp_cmd_bind {
 
 typedef struct mp_key_name {
   int key;
-  char* name;
+  char name[20];
 } mp_key_name_t;
 
 // These typedefs are for the drivers. They are the functions used to retrieve

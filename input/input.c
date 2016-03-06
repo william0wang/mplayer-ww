@@ -372,7 +372,7 @@ static const mp_key_name_t key_names[] = {
 
   { KEY_CLOSE_WIN, "CLOSE_WIN" },
 
-  { 0, NULL }
+  { 0, "" }
 };
 
 // This is the default binding. The content of input.conf overrides these.
@@ -1465,7 +1465,7 @@ static char*
 mp_input_get_key_name(int key) {
   int i;
 
-  for(i = 0; key_names[i].name != NULL; i++) {
+  for(i = 0; key_names[i].name[0]; i++) {
     if(key_names[i].key == key)
       return key_names[i].name;
   }
@@ -1491,7 +1491,7 @@ mp_input_get_key_from_name(const char *name) {
   } else if(len > 2 && strncasecmp("0x",name,2) == 0)
     return strtol(name,NULL,16);
 
-  for(i = 0; key_names[i].name != NULL; i++) {
+  for(i = 0; key_names[i].name[0]; i++) {
     if(strcasecmp(key_names[i].name,name) == 0)
       return key_names[i].key;
   }
@@ -1859,7 +1859,7 @@ mp_input_register_options(m_config_t* cfg) {
 static int mp_input_print_key_list(m_option_t* cfg) {
   int i;
   printf("\n");
-  for(i= 0; key_names[i].name != NULL ; i++)
+  for(i= 0; key_names[i].name[0] ; i++)
     printf("%s\n",key_names[i].name);
   exit(0);
 }
