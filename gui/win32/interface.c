@@ -348,7 +348,7 @@ static void guiSetEvent(int event)
         {
             mp_cmd_t * cmd = calloc(1, sizeof(*cmd));
             cmd->id=MP_CMD_MUTE;
-            cmd->name=strdup("mute");
+            ARRAY_STRCPY(cmd->name, "mute");
             mp_input_queue_cmd(cmd);
             break;
         }
@@ -405,7 +405,7 @@ void uiPause( void )
    {
        mp_cmd_t * cmd = calloc(1, sizeof(*cmd));
        cmd->id=MP_CMD_PAUSE;
-       cmd->name=strdup("pause");
+       ARRAY_STRCPY(cmd->name, "pause");
        mp_input_queue_cmd(cmd);
    } else guiInfo.Playing = GUI_PLAY;
 }
