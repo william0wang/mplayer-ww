@@ -2868,7 +2868,12 @@ fi
 # This provides significant size savings on gcc.
 # I will cause worse backtraces when debug info is missing though,
 # but having non-stripable debug info is not really a desirable feature.
+# Unfortunately MinGW toolchains seem to have a bug where it tries
+# to use SjLj exception handling even if not supported by the toolchain,
+# causing linking failure for C++ code like demux_rtp.cpp
+if ! mingw32 ; then
 cflag_check -fno-asynchronous-unwind-tables && CFLAGS="$CFLAGS -fno-asynchronous-unwind-tables"
+fi
 cflag_check -mno-omit-leaf-frame-pointer && cflags_no_omit_leaf_frame_pointer="-mno-omit-leaf-frame-pointer"
 cflag_check -MMD -MP && DEPFLAGS="-MMD -MP"
 
