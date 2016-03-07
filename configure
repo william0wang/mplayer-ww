@@ -3615,20 +3615,32 @@ fi
 echocheck "struct ipv6_mreq"
 _struct_ipv6_mreq=no
 def_struct_ipv6_mreq="#define HAVE_STRUCT_IPV6_MREQ 0"
-for header in "netinet/in.h" "ws2tcpip.h" ; do
-  statement_check $header 'struct ipv6_mreq mreq6' && _struct_ipv6_mreq=yes &&
-    def_struct_ipv6_mreq="#define HAVE_STRUCT_IPV6_MREQ 1" && break
-done
+cat > $TMPC << EOF
+#if HAVE_WINSOCK2_H
+#include <ws2tcpip.h>
+#else
+#include <netinet/in.h>
+#endif
+int main(void) { struct ipv6_mreq mreq6; return 0; }
+EOF
+cc_check $cc_check_winsock2_h && _struct_ipv6_mreq=yes &&
+  def_struct_ipv6_mreq="#define HAVE_STRUCT_IPV6_MREQ 1"
 echores "$_struct_ipv6_mreq"
 
 
 echocheck "struct sockaddr_in6"
 _struct_sockaddr_in6=no
 def_struct_sockaddr_in6="#define HAVE_STRUCT_SOCKADDR_IN6 0"
-for header in "netinet/in.h" "ws2tcpip.h" ; do
-  statement_check $header 'struct sockaddr_in6 addr' && _struct_sockaddr_in6=yes &&
-    def_struct_sockaddr_in6="#define HAVE_STRUCT_SOCKADDR_IN6 1" && break
-done
+cat > $TMPC << EOF
+#if HAVE_WINSOCK2_H
+#include <ws2tcpip.h>
+#else
+#include <netinet/in.h>
+#endif
+int main(void) { struct sockaddr_in6 addr; return 0; }
+EOF
+cc_check $cc_check_winsock2_h && _struct_sockaddr_in6=yes &&
+  def_struct_sockaddr_in6="#define HAVE_STRUCT_SOCKADDR_IN6 1"
 echores "$_struct_sockaddr_in6"
 
 
@@ -3685,9 +3697,16 @@ echores "$inet_aton"
 
 echocheck "socklen_t"
 _socklen_t=no
-for header in "sys/socket.h" "ws2tcpip.h" "sys/types.h" ; do
-  statement_check $header 'socklen_t v = 0' && _socklen_t=yes && break
-done
+cat > $TMPC << EOF
+#if HAVE_WINSOCK2_H
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h>
+#include <sys/types.h>
+#endif
+int main(void) { socklen_t v = 0; return 0; }
+EOF
+cc_check $cc_check_winsock2_h && _socklen_t=yes
 if test "$_socklen_t" = yes ; then
   def_socklen_t='#define HAVE_SOCKLEN_T 1'
 else
