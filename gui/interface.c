@@ -1260,8 +1260,8 @@ void mplayer(int what, float value, void *data)
     {
         mp_cmd_t *mp_cmd;
 
-        mp_cmd       = calloc(1, sizeof(*mp_cmd));
-        mp_cmd->id   = MP_CMD_PANSCAN;
+        mp_cmd     = calloc(1, sizeof(*mp_cmd));
+        mp_cmd->id = MP_CMD_PANSCAN;
         ARRAY_STRCPY(mp_cmd->name, "panscan");
         mp_cmd->args[0].v.f = value;
         mp_cmd->args[1].v.i = 1;

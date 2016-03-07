@@ -577,7 +577,7 @@ void uiPause(void)
         mp_cmd_t *cmd = calloc(1, sizeof(*cmd));
 
         if (cmd) {
-            cmd->id   = MP_CMD_PAUSE;
+            cmd->id = MP_CMD_PAUSE;
             ARRAY_STRCPY(cmd->name, "pause");
             mp_input_queue_cmd(cmd);
         }
