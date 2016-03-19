@@ -1,4 +1,4 @@
-.\" sync with en/mplayer.1 rev. 37436
+.\" sync with en/mplayer.1 rev. 37815
 .\" MPlayer (C) 2000-2016 MPlayer Team
 .\" This man page was/is translated by JRaSH<jrash06 at gmail.com>
 .
@@ -2613,7 +2613,8 @@ SSA/ASS 渲染器能在那里放置字幕（与 \-ass\-use\-margins 组合使用
 .
 .TP
 .B \-noautosub
-关闭自动载入字幕文件的行为。
+关闭自动载入字幕文件的行为。\
+注意：VOBsub 字幕不受影响。
 .
 .TP
 .B \-osd\-duration <时间>
@@ -2765,7 +2766,7 @@ DVD/\:VOBsub 的抗锯齿/\:缩放模式。\
 .
 .TP
 .B \-sub\-fuzziness <模式>
-调整搜索字幕时模糊匹配的程度：
+调整搜索字幕时模糊匹配的程度（不适用于 VOBsub）：
 .PD 0
 .RSs
 .IPs 0
@@ -2829,6 +2830,7 @@ DVD/\:VOBsub 的抗锯齿/\:缩放模式。\
 编码页。\
 如果不确定用哪个参数，可随便输入点什么，然后\
 查看 mplayer \-v 输出的可用语言。\
+如果不支持你的语言，可使用 __（两个下划线）。\
 备用编码页指定自动检测失败时使用的编码页。
 .sp 1
 .I 示例：
@@ -2839,6 +2841,8 @@ DVD/\:VOBsub 的抗锯齿/\:缩放模式。\
 使用 latin 2 作为备用。
 .IPs "\-subcp enca:pl:cp1250"
 猜测波兰语的编码方式，cp1250 作为备用方式。
+.IPs "\-subcp enca:__:latin1"
+使用通用语言检测（大部分为 unicode），以 latin1 为备用方式。
 .RE
 .PD 1
 .
