@@ -734,13 +734,13 @@ int ds_fill_buffer(demux_stream_t *ds)
         // avoid printing the "too many ..." message over and over
         if (ds->eof)
             break;
-        if (apacks >= MAX_PACKS || abytes >= MAX_PACK_BYTES) {
+        if (!force_ni && (apacks >= MAX_PACKS || abytes >= MAX_PACK_BYTES)) {
             mp_msg(MSGT_DEMUXER, MSGL_ERR, MSGTR_TooManyAudioInBuffer,
                    apacks, abytes);
             mp_msg(MSGT_DEMUXER, MSGL_HINT, MSGTR_MaybeNI);
             break;
         }
-        if (vpacks >= MAX_PACKS || vbytes >= MAX_PACK_BYTES) {
+        if (!force_ni && (vpacks >= MAX_PACKS || vbytes >= MAX_PACK_BYTES)) {
             mp_msg(MSGT_DEMUXER, MSGL_ERR, MSGTR_TooManyVideoInBuffer,
                    vpacks, vbytes);
             mp_msg(MSGT_DEMUXER, MSGL_HINT, MSGTR_MaybeNI);
@@ -948,15 +948,15 @@ double ds_get_next_pts(demux_stream_t *ds)
     // if we have not read from the "current" packet, consider it
     // as the next, otherwise we never get the pts for the first packet.
     while (!ds->first && (!ds->current || ds->buffer_pos)) {
-        if (demux->audio->packs >= MAX_PACKS
-            || demux->audio->bytes >= MAX_PACK_BYTES) {
+        if (!force_ni && (demux->audio->packs >= MAX_PACKS
+            || demux->audio->bytes >= MAX_PACK_BYTES)) {
             mp_msg(MSGT_DEMUXER, MSGL_ERR, MSGTR_TooManyAudioInBuffer,
                    demux->audio->packs, demux->audio->bytes);
             mp_msg(MSGT_DEMUXER, MSGL_HINT, MSGTR_MaybeNI);
             return MP_NOPTS_VALUE;
         }
-        if (demux->video->packs >= MAX_PACKS
-            || demux->video->bytes >= MAX_PACK_BYTES) {
+        if (!force_ni && (demux->video->packs >= MAX_PACKS
+            || demux->video->bytes >= MAX_PACK_BYTES)) {
             mp_msg(MSGT_DEMUXER, MSGL_ERR, MSGTR_TooManyVideoInBuffer,
                    demux->video->packs, demux->video->bytes);
             mp_msg(MSGT_DEMUXER, MSGL_HINT, MSGTR_MaybeNI);

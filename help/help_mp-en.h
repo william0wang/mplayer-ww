@@ -1386,8 +1386,8 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_VideoStreamRedefined "WARNING: Video stream header %d redefined.\n"
 #define MSGTR_TooManyAudioInBuffer "\nToo many audio packets in the buffer: (%d in %d bytes).\n"
 #define MSGTR_TooManyVideoInBuffer "\nToo many video packets in the buffer: (%d in %d bytes).\n"
-#define MSGTR_MaybeNI "Maybe you are playing a non-interleaved stream/file or the codec failed?\n" \
-                      "For AVI files, try to force non-interleaved mode with the -ni option.\n"
+#define MSGTR_MaybeNI "Maybe badly- or non-interleaved stream/file or the codec failed?\n" \
+                      "Fix the file or try the -ni option (can cause high memory usage).\n"
 #define MSGTR_WorkAroundBlockAlignHeaderBug "AVI: Working around CBR-MP3 nBlockAlign header bug!\n"
 #define MSGTR_SwitchToNi "\nBadly interleaved AVI file detected - switching to -ni mode...\n"
 #define MSGTR_InvalidAudioStreamNosound "AVI: invalid audio stream ID: %d - ignoring (nosound)\n"
