@@ -605,9 +605,9 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_TooManyAudioInBuffer "\nZu viele Audiopakete im Puffer: (%d in %d Bytes).\n"
 #define MSGTR_TooManyVideoInBuffer "\nZu viele Videopakete im Puffer: (%d in %d Bytes).\n"
 #define MSGTR_MaybeNI \
-"Vielleicht spielst du eine(n) nicht-interleaved Stream/Datei, oder der \n"\
-"Codec funktioniert nicht. Versuche bei AVI-Dateien, den nicht-interleaved \n"\
-"Modus mit der Option -ni zu erzwingen.\n"
+"Stream/Datei schlecht oder nicht interleaved, oder der Codec funktioniert\n" \
+"nicht? Datei sollte in Ordnung gebracht oder Option -ni ausprobiert werden\n" \
+"(kann hohen Speicherbedarf verursachen).\n"
 #define MSGTR_WorkAroundBlockAlignHeaderBug "AVI: Umgehe CBR-MP3 nBlockAlign-Header Bug!\n"
 #define MSGTR_SwitchToNi "\nSchlecht interleavte AVI-Datei erkannt, wechsele in den -ni Modus!\n"
 #define MSGTR_InvalidAudioStreamNosound "AVI: Ungültige Audiostream-ID: %d - ignoriert (nosound)\n"
