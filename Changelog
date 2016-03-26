@@ -5,11 +5,18 @@ MPlayer
     * pvr:// support for the Hauppauge HD PVR model 1212
     * Speed up detection of mpg format while streaming (limit probe to 4 MB)
     * demuxer: fall back to audio pts if all others are unavailable (#1928)
+    * raw video: add support for < 8bpp RGB, support for paletted raw video,
+      fix fliped raw video in non-avi containers
+    * increase -lavdopts threads limit to 32
+    * warn for badly interleaved files, and make -ni more aggressive
+    * support GBR pixel formats for HEVC
 
     Fixes:
     * fix more issues reported by Coverity
+    * expand error checking, and fix many memleaks
     * fix -subcp enca: with external ASS subtitles (#2281)
     * fix reading of bitmap fonts
+    * fix -subdelay applied inverted
 
     Other:
     * MPlayer can link against OpenSSL instead of GnuTLS for https support
