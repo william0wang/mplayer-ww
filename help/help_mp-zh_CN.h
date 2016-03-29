@@ -1,4 +1,4 @@
-// Synced with help_mp-en.h rev. 37475
+// Synced with help_mp-en.h rev. 37846
 //
 // Translated by JRaSH <jrash06@gmail.com>
 
@@ -1386,8 +1386,8 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_VideoStreamRedefined "警告: 重复定义了视频流头部 %d。\n"
 #define MSGTR_TooManyAudioInBuffer "\n缓冲中音频包太多（%d 个包存在于 %d 字节中）。\n"
 #define MSGTR_TooManyVideoInBuffer "\n缓冲中视频包太多（%d 个包存在于 %d 字节中）。\n"
-#define MSGTR_MaybeNI "可能播放了一个非交错合并的媒体流/文件，或者是编解码运行失败？\n" \
-                      "对于 AVI 文件，可尝试用 -ni 选项强制使用非交错模式。\n"
+#define MSGTR_MaybeNI "可能播放了一个非交错合并或合并异常的媒体流/文件，或者是编解码器运行失败？\n" \
+                      "修复该文件或尝试用 -ni 选项（可能造成内存用量巨大）。\n"
 #define MSGTR_WorkAroundBlockAlignHeaderBug "AVI：避开 CBR-MP3 nBlockAlign 头部缺陷！\n"
 #define MSGTR_SwitchToNi "\n检测到未正确交错合并的 AVI 文件 - 切换到 -ni 模式...\n"
 #define MSGTR_InvalidAudioStreamNosound "AVI：无效的音频流 ID: %d - 忽略 (nosound)\n"
