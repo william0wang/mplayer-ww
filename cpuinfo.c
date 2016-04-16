@@ -276,7 +276,7 @@ main(void)
             CPUID_FEATURE_DEF(13, "wdt", "Watchdog Timer Support"),
             CPUID_FEATURE_DEF(15, "lwp", "Lightweight Profiling"),
             CPUID_FEATURE_DEF(16, "fma4", "Fused Multiple Add with 4 Operands"),
-            CPUID_FEATURE_DEF(16, "tce", "Translation cache extension"),
+            CPUID_FEATURE_DEF(17, "tce", "Translation cache extension"),
             CPUID_FEATURE_DEF(19, "nodeid_msr", "Support for MSRC001_100C"),
             CPUID_FEATURE_DEF(21, "tbm", "Trailing Bit Manipulation"),
             CPUID_FEATURE_DEF(22, "topoext", "CPUID Fn 8000001d - 8000001e"),
