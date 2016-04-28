@@ -304,6 +304,17 @@ static demuxer_t* demux_open_gif(demuxer_t* demuxer)
     return NULL;
   }
 
+  // Validate image size, most code in this demuxer assumes w*h <= INT_MAX
+  if ((int64_t)gif->SWidth * gif->SHeight > INT_MAX) {
+    mp_msg(MSGT_DEMUX, MSGL_ERR,
+           "[demux_gif] Unsupported picture size %dx%d.\n", gif->SWidth,
+           gif->SHeight);
+    if (DGifCloseFile(gif) == GIF_ERROR)
+      print_gif_error(NULL);
+    free(priv);
+    return NULL;
+  }
+
   // create a new video stream header
   sh_video = new_sh_video(demuxer, 0);
 
