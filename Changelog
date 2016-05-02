@@ -10,6 +10,9 @@ MPlayer
     * increase -lavdopts threads limit to 32
     * warn for badly interleaved files, and make -ni more aggressive
     * support GBR pixel formats for HEVC
+    * FFmpeg audio decoders: g721, g732
+    * FFmpeg video decoders: more Matrox mpeg2 formats (M702-3-4-5), Truemotion
+      RT
 
     Fixes:
     * fix more issues reported by Coverity
