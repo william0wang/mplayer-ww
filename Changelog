@@ -1,7 +1,7 @@
 MPlayer
 
     Decoders, demuxers, streams:
-    * More pixel formats are supported for VP9
+    * More pixel formats are supported for VP9, RSCC, Screenpresso
     * pvr:// support for the Hauppauge HD PVR model 1212
     * Speed up detection of mpg format while streaming (limit probe to 4 MB)
     * demuxer: fall back to audio pts if all others are unavailable (#1928)
