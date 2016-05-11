@@ -12,7 +12,7 @@ MPlayer
     * support GBR pixel formats for HEVC
     * FFmpeg audio decoders: g721, g732
     * FFmpeg video decoders: more Matrox mpeg2 formats (M702-3-4-5), Truemotion
-      RT, Matrox Uncompressed SD
+      RT, Matrox Uncompressed SD/HD
 
     Fixes:
     * fix more issues reported by Coverity
