@@ -1597,7 +1597,7 @@ libavprotocols=$(echo $libavprotocols_all)
 libavfilters=$(echo $libavfilters_all)
 
 libavdecoders=$(filter_out_component decoder 'LIB[A-Z0-9_]* H264_QSV MJPEG_QSV MPEG2_MMAL MPEG4_MMAL MPEG2_QSV HEVC_QSV VC1_MMAL VC1_QSV H264_MMAL H264_MEDIACODEC [A-Z0-9_]*_AT')
-libavencoders=$(filter_out_component encoder 'LIB[A-Z0-9_]* H264_QSV MJPEG_QSV MPEG2_QSV HEVC_QSV VC1_MMAL VC1_QSV NVENC[A-Z0-9_]* H264_NVENC[A-Z0-9_]* HEVC_NVENC[A-Z0-9_]* HAP H264_VIDEOTOOLBOX H264_VAAPI HEVC_VAAPI MJPEG_VAAPI [A-Z0-9_]*_AT')
+libavencoders=$(filter_out_component encoder 'LIB[A-Z0-9_]* H264_QSV MJPEG_QSV MPEG2_QSV HEVC_QSV VC1_MMAL VC1_QSV NVENC[A-Z0-9_]* H264_NVENC[A-Z0-9_]* HEVC_NVENC[A-Z0-9_]* HAP H264_VIDEOTOOLBOX H264_VAAPI HEVC_VAAPI MJPEG_VAAPI H264_OMX MPEG4_OMX [A-Z0-9_]*_AT')
 libavdemuxers=$(filter_out_component demuxer 'AVISYNTH LIB[A-Z0-9_]* REDIR')
 libavmuxers=$(filter_out_component muxer 'CHROMAPRINT LIB[A-Z0-9_]* RTP RTSP SAP')
 libavprotocols=$(filter_out_component protocol 'BLURAY FFRTMPCRYPT HTTPS LIB[A-Z0-9_]* TLS TLS_GNUTLS TLS_OPENSSL TLS_SECURETRANSPORT TLS_SCHANNEL')
