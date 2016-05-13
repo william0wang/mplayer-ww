@@ -1554,7 +1554,6 @@ echocheck "ffmpeg/libavcodec/allcodecs.c"
 libavdecoders_all=$(list_subparts  DEC      decoder  codec/allcodecs.c)
 libavencoders_all=$(list_subparts  ENC      encoder  codec/allcodecs.c)
 libavparsers_all=$(list_subparts   PARSER   parser   codec/allcodecs.c)
-libavbsfs_all=$(list_subparts      BSF      bsf      codec/allcodecs.c)
 libavhwaccels_all=$(list_subparts  HWACCEL  hwaccel  codec/allcodecs.c)
 test $? -eq 0 && _list_subparts=found || _list_subparts="not found"
 echores "$_list_subparts"
@@ -1564,6 +1563,11 @@ libavdemuxers_all=$(list_subparts  DEMUX    demuxer  format/allformats.c)
 libavmuxers_all=$(list_subparts    _MUX     muxer    format/allformats.c)
 test $? -eq 0 && _list_subparts=found || _list_subparts="not found"
 echores "$_list_subparts"
+
+echocheck "ffmpeg/libavcodec/bitsteram_filters.c"
+libavbsfs_all=$(list_subparts_extern AVBitStreamFilter bsf codec/bitstream_filters.c)
+test $? -eq 0 && _list_subparts_extern=found || _list_subparts_extern="not found"
+echores "$_list_subparts_extern"
 
 echocheck "ffmpeg/libavformat/protocols.c"
 libavprotocols_all=$(list_subparts_extern URLProtocol protocol format/protocols.c)
@@ -1624,6 +1628,24 @@ for ac_option do
   esac
 done
 
+# generate the lists of enabled components for ffmpeg
+print_enabled_components(){
+    file=$1
+    struct_name=$2
+    name=$3
+    shift 3
+    list=$(echo $* | tolower)
+    echo "static const $struct_name *$name[] = {" > $TMPH
+    for c in $list; do
+        printf "    &ff_%s,\n" $c >> $TMPH
+    done
+    echo "    NULL };" >> $TMPH
+    cmp -s $TMPH ffmpeg/$file && return
+    cp $TMPH ffmpeg/$file
+}
+
+print_enabled_components libavcodec/bsf_list.c AVBitStreamFilter bitstream_filters $libavbsfs
+print_enabled_components libavformat/protocol_list.c URLProtocol url_protocols $libavprotocols
 
 # Checking CC version...
 # Intel C++ Compilers (no autoselect, use CC=/some/binary ./configure)
