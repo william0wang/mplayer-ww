@@ -1628,24 +1628,6 @@ for ac_option do
   esac
 done
 
-# generate the lists of enabled components for ffmpeg
-print_enabled_components(){
-    file=$1
-    struct_name=$2
-    name=$3
-    shift 3
-    list=$(echo $* | tolower)
-    echo "static const $struct_name *$name[] = {" > $TMPH
-    for c in $list; do
-        printf "    &ff_%s,\n" $c >> $TMPH
-    done
-    echo "    NULL };" >> $TMPH
-    cmp -s $TMPH ffmpeg/$file && return
-    cp $TMPH ffmpeg/$file
-}
-
-print_enabled_components libavcodec/bsf_list.c AVBitStreamFilter bitstream_filters $libavbsfs
-print_enabled_components libavformat/protocol_list.c URLProtocol url_protocols $libavprotocols
 
 # Checking CC version...
 # Intel C++ Compilers (no autoselect, use CC=/some/binary ./configure)
@@ -4457,7 +4439,7 @@ if test "$_gnutls" = auto ; then
 fi
 if test "$_gnutls" = yes ; then
   def_gnutls='#define CONFIG_GNUTLS 1'
-  libavprotocols="$libavprotocols HTTPS_PROTOCOL TLS_PROTOCOL TLS_GNUTLS_PROTOCOL"
+  libavprotocols="$libavprotocols HTTPS_PROTOCOL TLS_GNUTLS_PROTOCOL"
   extra_cflags="$extra_cflags $($_pkg_config --cflags gnutls)"
   extra_ldflags="$extra_ldflags $($_pkg_config --libs gnutls)"
 else
@@ -4468,7 +4450,7 @@ echores "$_gnutls"
 echocheck "OpenSSL"
 if test "$_openssl" = yes ; then
   def_openssl='#define CONFIG_OPENSSL 1'
-  libavprotocols="$libavprotocols HTTPS_PROTOCOL TLS_PROTOCOL TLS_OPENSSL_PROTOCOL"
+  libavprotocols="$libavprotocols HTTPS_PROTOCOL TLS_OPENSSL_PROTOCOL"
   extra_cflags="$extra_cflags $($_pkg_config --cflags openssl)"
   extra_ldflags="$extra_ldflags $($_pkg_config --libs openssl)"
 else
@@ -9493,6 +9475,25 @@ cat > ffmpeg/config.h << EOF
 #include "../config.h"
 EOF
 touch ffmpeg/.config
+
+# generate the lists of enabled components for ffmpeg
+print_enabled_components(){
+    file=$1
+    struct_name=$2
+    name=$3
+    shift 3
+    list=$(echo $* | tolower)
+    echo "static const $struct_name *$name[] = {" > $TMPH
+    for c in $list; do
+        printf "    &ff_%s,\n" $c >> $TMPH
+    done
+    echo "    NULL };" >> $TMPH
+    cmp -s $TMPH ffmpeg/$file && return
+    cp $TMPH ffmpeg/$file
+}
+
+print_enabled_components libavcodec/bsf_list.c AVBitStreamFilter bitstream_filters $libavbsfs
+print_enabled_components libavformat/protocol_list.c URLProtocol url_protocols $libavprotocols
 
 fi
 
