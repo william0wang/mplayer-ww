@@ -173,7 +173,6 @@ static void row_fdct_c(int16_t *data, const uint8_t *pixels, int line_size, int 
 #define store_slice_s store_slice_c
 #define store_slice2_s store_slice2_c
 #define mul_thrmat_s mul_thrmat_c
-#define column_fidct_s column_fidct_c
 #define row_idct_s row_idct_c
 #define row_fdct_s row_fdct_c
 
@@ -393,7 +392,6 @@ static void mul_thrmat_mmx(struct vf_priv_s *p, int q)
         );
 }
 
-static void column_fidct_mmx(int16_t* thr_adr,  int16_t *data,  int16_t *output,  int cnt);
 static void row_idct_mmx(int16_t* workspace,
                          int16_t* output_adr,  int output_stride,  int cnt);
 static void row_fdct_mmx(int16_t *data,  const uint8_t *pixels,  int line_size,  int cnt);
@@ -401,10 +399,17 @@ static void row_fdct_mmx(int16_t *data,  const uint8_t *pixels,  int line_size, 
 #define store_slice_s store_slice_mmx
 #define store_slice2_s store_slice2_mmx
 #define mul_thrmat_s mul_thrmat_mmx
-#define column_fidct_s column_fidct_mmx
 #define row_idct_s row_idct_mmx
 #define row_fdct_s row_fdct_mmx
 #endif // HAVE_MMX_INLINE
+
+#if !HAVE_MMXEXT_INLINE
+static void column_fidct_c(int16_t* thr_adr,  int16_t *data,  int16_t *output,  int cnt);
+#define column_fidct_s column_fidct_c
+#else
+static void column_fidct_mmx(int16_t* thr_adr,  int16_t *data,  int16_t *output,  int cnt);
+#define column_fidct_s column_fidct_mmx
+#endif
 
 static void filter(struct vf_priv_s *p, uint8_t *dst, uint8_t *src,
                    int dst_stride, int src_stride,
@@ -728,7 +733,9 @@ DECLARE_ASM_CONST(8, uint64_t, MM_FIX_0_198912367)=FIX64(0.198912367, 14);
 DECLARE_ASM_CONST(8, uint64_t, MM_DESCALE_RND)=C64(4);
 DECLARE_ASM_CONST(8, uint64_t, MM_2)=C64(2);
 
-#else /* !HAVE_MMXEXT_INLINE */
+#endif /* !HAVE_MMX_INLINE */
+
+#if !HAVE_MMX_INLINE || !HAVE_MMXEXT_INLINE
 
 typedef int32_t int_simd16_t;
 static const int16_t FIX_0_382683433=FIX(0.382683433, 14);
