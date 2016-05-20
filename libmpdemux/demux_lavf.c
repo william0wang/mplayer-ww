@@ -530,7 +530,7 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
     AVDictionaryEntry *t = NULL;
     lavf_priv_t *priv= demuxer->priv;
     int i;
-    char mp_filename[256]="mp:";
+    char mp_filename[2048]="mp:";
 
     stream_seek(demuxer->stream, 0);
 
