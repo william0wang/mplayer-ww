@@ -7944,7 +7944,7 @@ EOF
     fi
     echores "$_xshape"
 
-    # Check for GTK2
+    # Check for GTK+ 2
     echocheck "GTK+ version"
 
     if $_pkg_config --exists gtk+-2.0 ; then
@@ -7959,7 +7959,9 @@ EOF
         die "$_gtk"
       fi
 
-      # Check for GLIB2
+      # Check for specific minimum version of GLib
+      # (version 2.4.0, required by GTK+ 2.4.0, would have been
+      # checked automatically, but doesn't meet our requirements)
       echocheck "GLib version"
       if $_pkg_config --exists glib-2.0 ; then
         _glib=$($_pkg_config --modversion "glib-2.0 >= 2.6.0" 2>&1)
