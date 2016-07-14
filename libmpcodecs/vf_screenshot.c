@@ -80,9 +80,11 @@ static int config(struct vf_instance *vf,
     av_fast_malloc(&vf->priv->outbuffer, &vf->priv->outbuffer_size, d_width * d_height * 3 * 2);
     if (!vf->priv->avctx) {
         vf->priv->avctx = avcodec_alloc_context3(NULL);
-        vf->priv->avctx->pix_fmt = PIX_FMT_RGB24;
+        vf->priv->avctx->pix_fmt = AV_PIX_FMT_RGB24;
         vf->priv->avctx->width = d_width;
         vf->priv->avctx->height = d_height;
+        vf->priv->avctx->time_base.num = 1;
+        vf->priv->avctx->time_base.den = 1;
         vf->priv->avctx->compression_level = compression_level;
         if (avcodec_open2(vf->priv->avctx, avcodec_find_encoder(AV_CODEC_ID_PNG), NULL)) {
             mp_msg(MSGT_VFILTER, MSGL_FATAL, "Could not open libavcodec PNG encoder\n");
@@ -113,6 +115,9 @@ static void write_png(struct vf_priv_s *priv)
     av_init_packet(&pkt);
     pkt.data = priv->outbuffer;
     pkt.size = priv->outbuffer_size;
+    priv->pic->width = priv->avctx->width;
+    priv->pic->height = priv->avctx->height;
+    priv->pic->format = priv->avctx->pix_fmt;
     res = avcodec_encode_video2(priv->avctx, &pkt, priv->pic, &got_pkt);
     if (res < 0 || !got_pkt || pkt.size <= 0) {
         mp_msg(MSGT_VFILTER,MSGL_ERR,"\nFailed to encode screenshot %s!\n", fname);
@@ -189,7 +194,7 @@ static void scale_image(struct vf_priv_s* priv, mp_image_t *mpi)
     if (!priv->pic->data[0])
         priv->pic->data[0] = av_malloc(priv->pic->linesize[0]*priv->dh);
 
-    sws_scale(priv->ctx, mpi->planes, mpi->stride, 0, priv->dh, priv->pic->data, priv->pic->linesize);
+    sws_scale(priv->ctx, mpi->planes, mpi->stride, 0, mpi->height, priv->pic->data, priv->pic->linesize);
 }
 
 static void start_slice(struct vf_instance *vf, mp_image_t *mpi)

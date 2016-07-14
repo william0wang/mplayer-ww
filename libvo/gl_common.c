@@ -493,7 +493,7 @@ static const extfunc_desc_t extfuncs[] = {
   {&mpglDeleteBuffers, NULL, {"glDeleteBuffers", "glDeleteBuffersARB", NULL}},
   {&mpglBindBuffer, NULL, {"glBindBuffer", "glBindBufferARB", NULL}},
   {&mpglMapBuffer, NULL, {"glMapBuffer", "glMapBufferARB", NULL}},
-  {&mpglMapBufferRange, NULL, {"glMapBufferRange", "glMapBufferRangeARB", NULL}},
+  {&mpglMapBufferRange, "ARB_map_buffer_range", {"glMapBufferRange", "glMapBufferRangeARB", NULL}},
   {&mpglUnmapBuffer, NULL, {"glUnmapBuffer", "glUnmapBufferARB", NULL}},
   {&mpglBufferData, NULL, {"glBufferData", "glBufferDataARB", NULL}},
   {&mpglCombinerParameterfv, "NV_register_combiners", {"glCombinerParameterfv", "glCombinerParameterfvNV", NULL}},
@@ -1941,8 +1941,10 @@ void glSetupAlphaStippleTex(unsigned pattern) {
 
 void glEnable3DLeft(int type) {
   GLint buffer;
-  if (type & GL_3D_SWAP)
-    return glEnable3DRight(type & ~GL_3D_SWAP);
+  if (type & GL_3D_SWAP) {
+    glEnable3DRight(type & ~GL_3D_SWAP);
+    return;
+  }
   switch (type) {
     case GL_3D_RED_CYAN:
       mpglColorMask(GL_TRUE,  GL_FALSE, GL_FALSE, GL_FALSE);
@@ -1978,8 +1980,10 @@ void glEnable3DLeft(int type) {
 
 void glEnable3DRight(int type) {
   GLint buffer;
-  if (type & GL_3D_SWAP)
-    return glEnable3DLeft(type & ~GL_3D_SWAP);
+  if (type & GL_3D_SWAP) {
+    glEnable3DLeft(type & ~GL_3D_SWAP);
+    return;
+  }
   switch (type) {
     case GL_3D_RED_CYAN:
       mpglColorMask(GL_FALSE, GL_TRUE,  GL_TRUE,  GL_FALSE);
@@ -2444,6 +2448,7 @@ static void *eglgpa(const GLubyte *name) {
       "/usr/lib/libGLESv2.so",
       "/usr/lib/x86_64-linux-gnu/libGLESv2.so",
       "/usr/lib/i386-linux-gnu/libGLESv2.so",
+      "/usr/lib/arm-linux-gnueabihf/libGLESv2.so",
       NULL};
     int i;
     void *h = NULL;

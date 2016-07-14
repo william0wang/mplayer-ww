@@ -157,12 +157,13 @@ static int init(sh_video_t *sh){
 //    unsigned int outfmt=sh->codec->outfmt[sh->outfmtidx];
     int i, o_bih_len;
     vd_vfw_ctx *priv;
+    const char *dll = codec_idx2str(sh->codec->dll_idx);
 
     /* Hack for VSSH codec: new dll can't decode old files
      * In my samples old files have no extradata, so use that info
      * to decide what dll should be used (here and in vd_dshow).
      */
-    if (!strcmp(sh->codec->dll, "vssh264.dll") && (sh->bih->biSize > 40))
+    if (!strcmp(dll, "vssh264.dll") && (sh->bih->biSize > 40))
       return 0;
 
     priv = malloc(sizeof(vd_vfw_ctx));
@@ -174,10 +175,10 @@ static int init(sh_video_t *sh){
     mp_msg(MSGT_WIN32,MSGL_V,"======= Win32 (VFW) VIDEO Codec init =======\n");
 
 
-//    win32_codec_name = sh->codec->dll;
+//    win32_codec_name = dll;
 //    sh->hic = ICOpen( 0x63646976, sh->bih->biCompression, ICMODE_FASTDECOMPRESS);
 //    priv->handle = ICOpen( 0x63646976, sh->bih->biCompression, ICMODE_DECOMPRESS);
-    priv->handle = ICOpen( (long)(sh->codec->dll), sh->bih->biCompression, ICMODE_DECOMPRESS);
+    priv->handle = ICOpen( (long)(dll), sh->bih->biCompression, ICMODE_DECOMPRESS);
     if(!priv->handle){
 	mp_msg(MSGT_WIN32,MSGL_ERR,"ICOpen failed! unknown codec / wrong parameters?\n");
 	return 0;

@@ -34,7 +34,6 @@ float drc_level = 1.0;
 /* Missed vorbis, mad, dshow */
 
 extern const ad_functions_t mpcodecs_ad_mpg123;
-extern const ad_functions_t mpcodecs_ad_mp3lib;
 extern const ad_functions_t mpcodecs_ad_ffmpeg;
 extern const ad_functions_t mpcodecs_ad_liba52;
 extern const ad_functions_t mpcodecs_ad_hwac3;
@@ -42,10 +41,6 @@ extern const ad_functions_t mpcodecs_ad_hwmpa;
 extern const ad_functions_t mpcodecs_ad_pcm;
 extern const ad_functions_t mpcodecs_ad_dvdpcm;
 extern const ad_functions_t mpcodecs_ad_alaw;
-extern const ad_functions_t mpcodecs_ad_imaadpcm;
-extern const ad_functions_t mpcodecs_ad_msadpcm;
-extern const ad_functions_t mpcodecs_ad_dk3adpcm;
-extern const ad_functions_t mpcodecs_ad_dk4adpcm;
 extern const ad_functions_t mpcodecs_ad_dshow;
 extern const ad_functions_t mpcodecs_ad_dmo;
 extern const ad_functions_t mpcodecs_ad_acm;
@@ -78,9 +73,6 @@ const ad_functions_t * const mpcodecs_ad_drivers[] =
   &mpcodecs_ad_pcm,
   &mpcodecs_ad_dvdpcm,
   &mpcodecs_ad_alaw,
-  &mpcodecs_ad_imaadpcm,
-  &mpcodecs_ad_msadpcm,
-  &mpcodecs_ad_dk3adpcm,
 #ifdef CONFIG_WIN32DLL
   &mpcodecs_ad_dshow,
   &mpcodecs_ad_dmo,

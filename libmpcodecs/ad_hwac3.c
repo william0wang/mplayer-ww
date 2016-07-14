@@ -49,7 +49,7 @@ LIBAD_EXTERN(hwac3)
 
 
 static int dts_syncinfo(uint8_t *indata_ptr, int *flags, int *sample_rate, int *bit_rate);
-static int decode_audio_dts(unsigned char *indata_ptr, int len, unsigned char *buf);
+static int decode_audio_dts(unsigned char *indata_ptr, int len, unsigned char *buf, int outsize);
 
 
 static int a52_syncinfo (uint8_t *buf, int *sample_rate, int *bit_rate)
@@ -138,7 +138,7 @@ static int ac3dts_fillbuff(sh_audio_t *sh_audio)
       }
     }
     /* bad file => resync*/
-    memcpy(sh_audio->a_in_buffer, sh_audio->a_in_buffer + 1, 11);
+    memmove(sh_audio->a_in_buffer, sh_audio->a_in_buffer + 1, 11);
     --sh_audio->a_in_buffer_len;
   }
   mp_msg(MSGT_DECAUDIO, MSGL_DBG2, "ac3dts: %s len=%d  flags=0x%X  %d Hz %d bit/s\n", isdts == 1 ? "DTS" : isdts == 0 ? "AC3" : "unknown", length, flags, sample_rate, bit_rate);
@@ -168,6 +168,11 @@ static int preinit(sh_audio_t *sh)
 
 static int init(sh_audio_t *sh_audio)
 {
+  demux_stream_t *ds = sh_audio->ds;
+
+  /* Ensure that the demuxer buffer is not empty */
+  if(ds->buffer_pos >= ds->buffer_size && !ds_fill_buffer(ds))
+    return 0;
   /* Dolby AC3 passthrough:*/
   if(ac3dts_fillbuff(sh_audio) < 0)
   {
@@ -205,10 +210,12 @@ static int decode_audio(sh_audio_t *sh_audio,unsigned char *buf,int minlen,int m
 
   if(isdts == 1)
   {
-    return decode_audio_dts(sh_audio->a_in_buffer, len, buf);
+    return decode_audio_dts(sh_audio->a_in_buffer, len, buf, maxlen);
   }
   else if(isdts == 0)
   {
+    if (maxlen < 6144) return -1;
+    if (len > 6144 - 8) return -1;
     AV_WB16(buf,     0xF872);   // iec 61937 syncword 1
     AV_WB16(buf + 2, 0x4E1F);   // iec 61937 syncword 2
     buf[4] = sh_audio->a_in_buffer[5] & 0x7; // bsmod
@@ -481,7 +488,7 @@ static int convert_14bits_to_16bits(const unsigned char *src,
   return (unsigned char *)p - dest;
 }
 
-static int decode_audio_dts(unsigned char *indata_ptr, int len, unsigned char *buf)
+static int decode_audio_dts(unsigned char *indata_ptr, int len, unsigned char *buf, int outsize)
 {
   int nblks;
   int fsize;
@@ -492,7 +499,7 @@ static int decode_audio_dts(unsigned char *indata_ptr, int len, unsigned char *b
   uint16_t *buf16 = (uint16_t *)buf;
 
   fsize = dts_decode_header(indata_ptr, &rate, &nblks, &sfreq);
-  if(fsize < 0)
+  if(fsize < 0 || fsize > len || outsize < fsize + 8 || outsize < nblks * 32 * 2 * 2)
     return -1;
   nr_samples = nblks * 32;
 

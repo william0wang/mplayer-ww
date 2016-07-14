@@ -107,7 +107,7 @@ static int mpsink_query_formats(AVFilterContext *ctx)
         if (vf->next->query_format(vf->next, ifmt) > 0)
             sup[nsup++] = all->formats[i];
     }
-    sup[nsup++] = PIX_FMT_NONE;
+    sup[nsup++] = AV_PIX_FMT_NONE;
     avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(sup));
     av_free(sup);
     return 0;
@@ -186,7 +186,7 @@ static int mpsrc_init(AVFilterContext *ctx,
 static int mpsrc_query_formats(AVFilterContext *ctx)
 {
     struct mpsrc_priv *c = ctx->priv;
-    enum AVPixelFormat pix_fmts[] = { c->vf->priv->in_pixfmt, PIX_FMT_NONE };
+    enum AVPixelFormat pix_fmts[] = { c->vf->priv->in_pixfmt, AV_PIX_FMT_NONE };
     avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(pix_fmts));
     return 0;
 }

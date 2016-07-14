@@ -742,16 +742,19 @@ static int gen_sh_audio(sh_audio_t* sh, mov_track_t* trak, int timescale) {
 		    int fcc=char2int(trak->stdata,48);
 		    // we have extra audio headers!!!
 		    mp_msg(MSGT_DEMUX,MSGL_V,"Audio extra header: len=%d  fcc=0x%X\n",len,fcc);
-		    if((len >= 4) &&
-		       (char2int(trak->stdata,52) >= 12) &&
+		    if (len > 8 && len <= trak->stdata_len - 44) {
+		    if((char2int(trak->stdata,52) >= 12) &&
 		       (char2int(trak->stdata,52+4) == MOV_FOURCC('f','r','m','a'))) {
+			int frma_len = char2int(trak->stdata,52);
 			switch(char2int(trak->stdata,52+8)) {
 			 case MOV_FOURCC('a','l','a','c'):
-			  if (len >= 36 + char2int(trak->stdata,52)) {
-			    sh->codecdata_len = char2int(trak->stdata,52+char2int(trak->stdata,52));
+			  if (len >= 36 && frma_len > 0 && frma_len <= len - 36) {
+			    sh->codecdata_len = char2int(trak->stdata,52+frma_len);
+			    if (sh->codecdata_len < 0 || sh->codecdata_len > len - 8 - frma_len)
+				sh->codecdata_len = len - 8 - frma_len;
 			    mp_msg(MSGT_DEMUX, MSGL_V, "MOV: Found alac atom (%d)!\n", sh->codecdata_len);
 			    sh->codecdata = malloc(sh->codecdata_len);
-			    memcpy(sh->codecdata, &trak->stdata[52+char2int(trak->stdata,52)], sh->codecdata_len);
+			    memcpy(sh->codecdata, &trak->stdata[52+frma_len], sh->codecdata_len);
 			  }
 			  break;
 			 case MOV_FOURCC('i','n','2','4'):
@@ -766,18 +769,15 @@ static int gen_sh_audio(sh_audio_t* sh, mov_track_t* trak, int timescale) {
 			  }
 		          break;
 		         default:
-			  if (len > 8 && len + 44 <= trak->stdata_len) {
 				sh->codecdata_len = len-8;
 				sh->codecdata = malloc(sh->codecdata_len);
 				memcpy(sh->codecdata, trak->stdata+44+8, sh->codecdata_len);
-			  }
 		        }
 		    } else {
-		      if (len > 8 && len + 44 <= trak->stdata_len) {
 		    sh->codecdata_len = len-8;
 		    sh->codecdata = malloc(sh->codecdata_len);
 		    memcpy(sh->codecdata, trak->stdata+44+8, sh->codecdata_len);
-		      }
+		    }
 		    }
 		  }
 		}
@@ -1216,7 +1216,7 @@ static int gen_sh_video(sh_video_t* sh, mov_track_t* trak, int timescale) {
 		  else
 		  {
 		    mp_msg(MSGT_DEMUX, MSGL_V, "Loading palette from file\n");
-		    for (i = start; i <= end; i++)
+		    for (i = start; i <= end && hdr_ptr < trak->stdata_len - 8; i++)
 		    {
 		      entry = AV_RB16(&trak->stdata[hdr_ptr]);
 		      hdr_ptr += 2;

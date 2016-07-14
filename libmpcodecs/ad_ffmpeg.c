@@ -46,6 +46,7 @@ LIBAD_EXTERN(ffmpeg)
 
 #include "libavcodec/avcodec.h"
 #include "libavutil/dict.h"
+#include "libavutil/channel_layout.h"
 
 struct adctx {
     int last_samplerate;
@@ -105,9 +106,9 @@ static int init(sh_audio_t *sh_audio)
     mp_msg(MSGT_DECAUDIO,MSGL_V,"FFmpeg's libavcodec audio codec\n");
     init_avcodec();
 
-    lavc_codec = avcodec_find_decoder_by_name(sh_audio->codec->dll);
+    lavc_codec = avcodec_find_decoder_by_name(codec_idx2str(sh_audio->codec->dll_idx));
     if(!lavc_codec){
-	mp_msg(MSGT_DECAUDIO,MSGL_ERR,MSGTR_MissingLAVCcodec,sh_audio->codec->dll);
+	mp_msg(MSGT_DECAUDIO,MSGL_ERR,MSGTR_MissingLAVCcodec,codec_idx2str(sh_audio->codec->dll_idx));
 	return 0;
     }
 
@@ -127,10 +128,7 @@ static int init(sh_audio_t *sh_audio)
 	lavc_context->bits_per_coded_sample = sh_audio->wf->wBitsPerSample;
     }
     lavc_context->channel_layout = sh_audio->channel_layout;
-    if (audio_output_channels == 1)
-        lavc_context->request_channel_layout = AV_CH_LAYOUT_MONO;
-    else if (audio_output_channels == 2)
-        lavc_context->request_channel_layout = AV_CH_LAYOUT_STEREO;
+    lavc_context->request_channel_layout = av_get_default_channel_layout(audio_output_channels);
     lavc_context->codec_tag = sh_audio->format; //FOURCC
     lavc_context->codec_id = lavc_codec->id; // not sure if required, imho not --A'rpi
 

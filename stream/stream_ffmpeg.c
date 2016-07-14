@@ -96,6 +96,7 @@ static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
     int dummy;
 
     init_avformat();
+    avformat_network_init();
     if (mode == STREAM_READ)
         flags = AVIO_FLAG_READ;
     else if (mode == STREAM_WRITE)

@@ -97,6 +97,9 @@
 #ifdef CONFIG_TV
 #include "pixmaps/tv.xpm"
 #endif
+#if defined(CONFIG_LIBCDIO) || defined(CONFIG_DVDREAD)
+#include "pixmaps/playimage.xpm"
+#endif
 #include "pixmaps/empty1px.xpm"
 #include "pixmaps/rotate.xpm"
 #include "pixmaps/rotate0.xpm"
@@ -227,12 +230,12 @@ GtkWidget * AddSeparator( GtkWidget * Menu )
 typedef struct
 {
  int id;
- const char * id2;
+ const char id2[3];
  const char * name;
 } Languages_t;
 
 #define lng( a,b ) ( (int)(a) * 256 + b )
-static Languages_t Languages[] =
+static const Languages_t Languages[] =
 {
   { lng( 'a','a' ), "aar", "ʿAfár af"                      },
   { lng( 'a','b' ), "abk", "аҧсуа бызшәа"         },
@@ -435,7 +438,7 @@ static const char * GetLanguage( void *language, int type )
     else if ( p[3] != 0) return language;
   }
  for ( i=0;i<sizeof( Languages ) / sizeof( Languages_t );i++ )
-  if ( type == GET_LANG_INT ? Languages[i].id == l : strcasecmp(Languages[i].id2, p) == 0 ) return Languages[i].name;
+  if ( type == GET_LANG_INT ? Languages[i].id == l : strncasecmp(Languages[i].id2, p, sizeof(Languages[i].id2)) == 0 ) return Languages[i].name;
  return MSGTR_GUI_Unknown;
 }
 #undef lng
@@ -595,6 +598,9 @@ GtkWidget * CreatePopUpMenu( void )
         MenuItem=AddMenuItem( window1, (const char*)empty1px_xpm, DVDSubtitleLanguageMenu,MSGTR_GUI__none_,evNone );
         gtk_widget_set_sensitive( MenuItem,FALSE );
        }
+#endif
+#if defined(CONFIG_LIBCDIO) || defined(CONFIG_DVDREAD)
+    AddMenuItem( window1, (const char*)playimage_xpm, SubMenu,MSGTR_GUI_Image"...    ", evPlayImage );
 #endif
     AddMenuItem( window1, (const char*)url_xpm, SubMenu,MSGTR_GUI_URL"...", evLoadURL );
 #ifdef CONFIG_TV

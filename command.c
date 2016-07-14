@@ -838,7 +838,7 @@ static int mp_property_audio_codec(m_option_t *prop, int action,
 {
     if (!mpctx->sh_audio || !mpctx->sh_audio->codec)
         return M_PROPERTY_UNAVAILABLE;
-    return m_property_string_ro(prop, action, arg, mpctx->sh_audio->codec->name);
+    return m_property_string_ro(prop, action, arg, codec_idx2str(mpctx->sh_audio->codec->name_idx));
 }
 
 /// Audio bitrate (RO)
@@ -1464,7 +1464,7 @@ static int mp_property_video_codec(m_option_t *prop, int action,
 {
     if (!mpctx->sh_video || !mpctx->sh_video->codec)
         return M_PROPERTY_UNAVAILABLE;
-    return m_property_string_ro(prop, action, arg, mpctx->sh_video->codec->name);
+    return m_property_string_ro(prop, action, arg, codec_idx2str(mpctx->sh_video->codec->name_idx));
 }
 
 
@@ -1539,6 +1539,9 @@ static int mp_property_sub_pos(m_option_t *prop, int action, void *arg,
 static int mp_property_sub(m_option_t *prop, int action, void *arg,
                            MPContext *mpctx)
 {
+    // d_sub should always be set even if the demuxer does
+    // not have subtitle support, unless no file is currently
+    // opened.
     demux_stream_t *const d_sub = mpctx->d_sub;
     int global_sub_size;
     int source = -1, reset_spu = 0;
@@ -1548,7 +1551,7 @@ static int mp_property_sub(m_option_t *prop, int action, void *arg,
 
     update_global_sub_size(mpctx);
     global_sub_size = mpctx->global_sub_size;
-    if (global_sub_size <= 0)
+    if (global_sub_size <= 0 || !d_sub)
         return M_PROPERTY_UNAVAILABLE;
 
     switch (action) {
@@ -1591,7 +1594,7 @@ static int mp_property_sub(m_option_t *prop, int action, void *arg,
             int id = dvdsub_id;
             // HACK: for DVDs sub->sh/id will be invalid until
             // we actually get the first packet
-            if (d_sub && d_sub->sh)
+            if (d_sub->sh)
                 id = d_sub->id;
             demuxer_sub_lang(mpctx->demuxer, id, lang, sizeof(lang));
             snprintf(*(char **) arg, 63, "(%d) %s", dvdsub_id, lang);
@@ -1648,12 +1651,10 @@ static int mp_property_sub(m_option_t *prop, int action, void *arg,
 
     vobsub_id = -1;
     dvdsub_id = -1;
-    if (d_sub) {
-        if (d_sub->id > -2)
-            reset_spu = 1;
-        d_sub->id = -2;
-        d_sub->sh = NULL;
-    }
+    if (d_sub->id > -2)
+        reset_spu = 1;
+    d_sub->id = -2;
+    d_sub->sh = NULL;
 #ifdef CONFIG_ASS
     ass_track = 0;
 #endif
@@ -1680,7 +1681,7 @@ static int mp_property_sub(m_option_t *prop, int action, void *arg,
         }
     } else if (source == SUB_SOURCE_DEMUX) {
         dvdsub_id = source_pos;
-        if (d_sub && dvdsub_id < MAX_S_STREAMS) {
+        if (dvdsub_id < MAX_S_STREAMS) {
             int i = 0;
             // default: assume 1:1 mapping of sid and stream id
             d_sub->id = dvdsub_id;
@@ -2015,6 +2016,7 @@ static int mp_property_sub_forced_only(m_option_t *prop, int action,
     case M_PROPERTY_SET:
         if (!arg)
             return M_PROPERTY_ERROR;
+        // fallthrough
     case M_PROPERTY_STEP_UP:
     case M_PROPERTY_STEP_DOWN:
         m_property_flag(prop, action, arg, &forced_subs_only);
@@ -2809,6 +2811,7 @@ static void overlay_add(char *file, int id, int x, int y, unsigned col)
     if (bpp != 1 || maxval != 255) {
         mp_msg(MSGT_CPLAYER, MSGL_ERR,
                "overlay_add: file format not supported.\n");
+        free(data);
         return;
     }
     if (!overlay_source_registered) {

@@ -42,7 +42,7 @@
 #include "m_struct.h"
 #include "tcp.h"
 
-static struct stream_priv_s {
+static const struct stream_priv_s {
   char* user;
   char* pass;
   char* host;

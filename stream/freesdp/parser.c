@@ -325,7 +325,7 @@ fsdp_parse (const char *text_description, fsdp_description_t * dsc)
               i = longfsdp_buf;
               for (k = 0;
                    (k < repeat->offsets_count)
-                     && (result == FSDPE_OK); k++)
+                     && (result == FSDPE_OK) && i; k++)
               {
                 result =
                   fsdp_repeat_time_to_uint (i,

@@ -197,54 +197,19 @@ void subassconvert_subrip(const char *orig, char *dest, size_t dest_buffer_size)
             int has_valid_attr = 0;
 
             *tag = tag[-1]; // keep values from previous tag
-            line += 6;
+            line += 5;      // don't skip space!
 
             while (*line && *line != '>') {
-                if (strncmp(line, "size=", 5) == 0) {
-                    line += 5;
+                if (strncmp(line, " size=", 6) == 0) {
+                    line += 6;
                     if (*line == '"') line++;
                     tag->size = strtol(line, &line, 10);
                     if (!tag->size)
                         break;
                     append_text(&new_line, "{\\fs%d}", tag->size);
                     has_valid_attr = 1;
-                } else if (strncmp(line, "color=", 6) == 0) {
-                    line += 6;
-                    if (*line == '"') line++;
-                    if (*line == '#') {
-                        // #RRGGBB format
-                        line++;
-                        tag->color = strtol(line, &line, 16) & 0x00ffffff;
-                        tag->color = ((tag->color & 0xff) << 16) |
-                                      (tag->color & 0xff00) |
-                                     ((tag->color & 0xff0000) >> 16) |
-                                     SUBRIP_FLAG_COLOR;
-                    } else {
-                        // Standard web colors
-                        int i;
-                        for (i = 0; i < FF_ARRAY_ELEMS(subrip_web_colors); i++) {
-                            const char *color = subrip_web_colors[i].s;
-                            const int len = strlen(color);
-                            if (strncasecmp(line, color, len) == 0) {
-                                tag->color = SUBRIP_FLAG_COLOR | subrip_web_colors[i].v;
-                                line += len;
-                                break;
-                            }
-                        }
-
-                        if (i == FF_ARRAY_ELEMS(subrip_web_colors)) {
-                            /* We didn't find any matching color */
-                            line += strcspn(line, "\" >");
-                            mp_msg(MSGT_SUBREADER, MSGL_WARN,
-                                   MSGTR_SUBTITLES_SubRip_UnknownFontColor, orig);
-                            append_text(&new_line, "{\\c}");
-                            continue;
-                        }
-                    }
-                    append_text(&new_line, "{\\c&H%06X&}", tag->color & 0xffffff);
-                    has_valid_attr = 1;
-                } else if (strncmp(line, "color=", 6) == 0) {
-                    line += 6;
+                } else if (strncmp(line, "color=", 7) == 0) {
+                    line += 7;
                     if (*line == '#') {
                         // #RRGGBB format
                         line++;
@@ -284,10 +249,10 @@ void subassconvert_subrip(const char *orig, char *dest, size_t dest_buffer_size)
                     append_text(&new_line, "{\\c&H%06X&}", tag->color & 0xffffff);
 					line--;
                     has_valid_attr = 1;
-                } else if (strncmp(line, "face=\"", 6) == 0) {
+                } else if (strncmp(line, " face=\"", 7) == 0) {
                     /* Font face attribute */
                     int len;
-                    line += 6;
+                    line += 7;
                     len = indexof(line, '"');
                     if (len <= 0)
                         break;

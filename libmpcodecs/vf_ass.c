@@ -50,7 +50,7 @@
 #include "sub/eosd.h"
 
 #include "cpudetect.h"
-#include "libavutil/x86/asm.h"
+#include "mpx86asm.h"
 
 #define _r(c)  ((c)>>24)
 #define _g(c)  (((c)>>16)&0xFF)

@@ -51,7 +51,8 @@
  *
  * @param how 0 (cut file path and extension),
  *            1 (additionally, convert lower case) or
- *            2 (additionally, convert upper case)
+ *            2 (additionally, convert upper case) or
+ *            4 (unaltered title if available, otherwise like 0)
  * @param fname memory location of a buffer to receive the converted Filename
  * @param maxlen size of the @a fname buffer
  *
@@ -66,7 +67,9 @@ static char *TranslateFilename(int how, char *fname, size_t maxlen)
     switch (guiInfo.StreamType) {
     case STREAMTYPE_FILE:
 
-        if (guiInfo.Filename && *guiInfo.Filename) {
+        if ((how == 4) && guiInfo.Title)
+            av_strlcpy(fname, guiInfo.Title, maxlen);
+        else if (guiInfo.Filename && *guiInfo.Filename) {
             p = strrchr(guiInfo.Filename, '/');
 
             if (p)
@@ -121,6 +124,15 @@ static char *TranslateFilename(int how, char *fname, size_t maxlen)
             stream_control(stream, STREAM_CTRL_GET_CURRENT_CHANNEL, &p);
 
         av_strlcpy(fname, p, maxlen);
+        break;
+
+    case STREAMTYPE_BINCUE:
+
+        if (guiInfo.Track)
+            snprintf(fname, maxlen, MSGTR_GUI_TitleN, guiInfo.Track - guiInfo.Angles);
+        else
+            *fname = 0;
+
         break;
 
     default:
@@ -261,6 +273,11 @@ MMMM_SS:        snprintf(trans, sizeof(trans), "%04d:%02d", t / 60, t % 60);
                 av_strlcat(translation, trans, sizeof(translation));
                 break;
 
+            case 'O':
+                TranslateFilename(4, trans, sizeof(trans));
+                av_strlcat(translation, trans, sizeof(translation));
+                break;
+
             case 'l': // legacy
             case 'p':
                 if (guiInfo.Playing == GUI_PLAY)
@@ -318,6 +335,10 @@ MMMM_SS:        snprintf(trans, sizeof(trans), "%04d:%02d", t / 60, t % 60);
                 case STREAMTYPE_TV:
                 case STREAMTYPE_DVB:
                     av_strlcat(translation, "b", sizeof(translation));
+                    break;
+
+                case STREAMTYPE_BINCUE:
+                    av_strlcat(translation, "c", sizeof(translation));
                     break;
 
                 default:

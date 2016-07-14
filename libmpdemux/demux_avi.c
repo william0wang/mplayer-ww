@@ -410,13 +410,13 @@ do{
   if(stream_eof(demux->stream)) return 0;
 
   if(id==mmioFOURCC('L','I','S','T')){
-      id=stream_read_dword_le(demux->stream);      // list type
+      stream_read_dword_le(demux->stream);      // list type
       continue;
   }
 
   if(id==mmioFOURCC('R','I','F','F')){
       mp_msg(MSGT_DEMUX,MSGL_V,"additional RIFF header...\n");
-      id=stream_read_dword_le(demux->stream);      // "AVIX"
+      stream_read_dword_le(demux->stream);      // "AVIX"
       continue;
   }
 
@@ -575,8 +575,8 @@ static demuxer_t* demux_open_avi(demuxer_t* demuxer){
            "AVI video size=%"PRId64" (%zu) audio size=%"PRId64" (%zu)\n",
            vsize, vsamples, asize, asamples);
     priv->numberofframes=vsamples;
-    sh_video->i_bps=((float)vsize/(float)vsamples)*(float)sh_video->video.dwRate/(float)sh_video->video.dwScale;
-    if(sh_audio) sh_audio->i_bps=((float)asize/(float)asamples)*(float)sh_audio->audio.dwRate/(float)sh_audio->audio.dwScale;
+    if (vsamples) sh_video->i_bps=((float)vsize/(float)vsamples)*(float)sh_video->video.dwRate/(float)sh_video->video.dwScale;
+    if(sh_audio && asamples) sh_audio->i_bps=((float)asize/(float)asamples)*(float)sh_audio->audio.dwRate/(float)sh_audio->audio.dwScale;
   } else {
     // guessing, results may be inaccurate:
     int64_t vsize;

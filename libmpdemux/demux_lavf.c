@@ -83,6 +83,7 @@ typedef struct lavf_priv {
     int sstreams[MAX_S_STREAMS];
     int cur_program;
     int nb_streams_last;
+    int use_lavf_netstream;
 }lavf_priv_t;
 
 static int mp_read(void *opaque, uint8_t *buf, int size) {
@@ -212,7 +213,12 @@ static int lavf_check_file(demuxer_t *demuxer){
 		if(is_rar_stream && !strcmp("matroska,webm", priv->avif->name))
 			return 0;
         mp_msg(MSGT_HEADER,MSGL_V,"LAVF_check: %s\n", priv->avif->long_name);
-	}
+        if (!strcmp(priv->avif->name, "hls,applehttp")) {
+            mp_msg(MSGT_HEADER,MSGL_V,"LAVF: network streaming with lavf\n");
+            avformat_network_init();
+            priv->use_lavf_netstream  = 1;
+        }
+    }
 
     return DEMUXER_TYPE_LAVF;
 }
@@ -367,14 +373,25 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
             if(!sh_video) break;
             stream_type = "video";
             priv->vstreams[priv->video_streams] = i;
-            bih=calloc(sizeof(*bih) + codec->extradata_size,1);
+            if (codec->extradata_size >= 9 &&
+                !memcmp(codec->extradata + codec->extradata_size - 9, "BottomUp", 9))
+            {
+                codec->extradata_size -= 9;
+                sh_video->flipped_input ^= 1;
+            }
+            // always reserve space for palette
+            sh_video->bih_size = sizeof(*bih) + codec->extradata_size + 1024;
+            bih=calloc(sh_video->bih_size,1);
 
             if (codec->codec_id == AV_CODEC_ID_RAWVIDEO) {
+                if (codec->bits_per_coded_sample && codec->bits_per_coded_sample > 0 &&
+                    codec->codec_tag == MKTAG('r', 'a', 'w', 32))
+                    codec->codec_tag = 0;
                 switch (codec->pix_fmt) {
-                    case PIX_FMT_RGB24:
+                    case AV_PIX_FMT_RGB24:
                         codec->codec_tag= MKTAG(24, 'B', 'G', 'R');
                         break;
-                    case PIX_FMT_BGR24:
+                    case AV_PIX_FMT_BGR24:
                         codec->codec_tag= MKTAG(24, 'R', 'G', 'B');
                         break;
                 }
@@ -416,7 +433,10 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
                 sh_video->default_track = 1;
             if (rot && rot->value)
                 mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VID_%d_ROTATE=%s\n", priv->video_streams, rot->value);
-            mp_msg(MSGT_DEMUX,MSGL_DBG2,"aspect= %d*%d/(%d*%d)\n",
+            mp_msg(MSGT_DEMUX,MSGL_DBG2,"stream aspect= %d*%d/(%d*%d)\n",
+                codec->width, st->sample_aspect_ratio.num,
+                codec->height, st->sample_aspect_ratio.den);
+            mp_msg(MSGT_DEMUX,MSGL_DBG2,"codec aspect= %d*%d/(%d*%d)\n",
                 codec->width, codec->sample_aspect_ratio.num,
                 codec->height, codec->sample_aspect_ratio.den);
 
@@ -444,17 +464,13 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
             sh_sub_t* sh_sub;
             char type;
             if (codec->codec_id == AV_CODEC_ID_TEXT
-#if LIBAVUTIL_VERSION_MICRO >= 100
                 || codec->codec_id == AV_CODEC_ID_SUBRIP
-#endif /* LIBAVUTIL_VERSION_MICRO >= 100 */
                 )
                 type = 't';
             else if (codec->codec_id == AV_CODEC_ID_MOV_TEXT)
                 type = 'm';
             else if (codec->codec_id == AV_CODEC_ID_SSA
-#if LIBAVUTIL_VERSION_MICRO >= 100
                      || codec->codec_id == AV_CODEC_ID_ASS
-#endif /* LIBAVUTIL_VERSION_MICRO >= 100 */
                 )
                 type = 'a';
             else if (codec->codec_id == AV_CODEC_ID_DVD_SUBTITLE)
@@ -467,10 +483,8 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
                 type = 'd';
             else if (codec->codec_id == AV_CODEC_ID_HDMV_PGS_SUBTITLE)
                 type = 'p';
-#if LIBAVUTIL_VERSION_MICRO >= 100
             else if (codec->codec_id == AV_CODEC_ID_EIA_608)
                 type = 'c';
-#endif /* LIBAVUTIL_VERSION_MICRO >= 100 */
             else if(codec->codec_tag == MKTAG('c', '6', '0', '8'))
                 type = 'c';
             else
@@ -525,7 +539,7 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
     AVDictionaryEntry *t = NULL;
     lavf_priv_t *priv= demuxer->priv;
     int i;
-    char mp_filename[256]="mp:";
+    char mp_filename[2048]="mp:";
 
     stream_seek(demuxer->stream, 0);
 
@@ -564,6 +578,8 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
             av_strlcpy(mp_filename, demuxer->stream->url + 9, sizeof(mp_filename));
         else if (!strncmp(demuxer->stream->url, "rtsp://", 7))
             av_strlcpy(mp_filename, demuxer->stream->url, sizeof(mp_filename));
+        else if (priv->use_lavf_netstream)
+            av_strlcpy(mp_filename, demuxer->stream->url, sizeof(mp_filename));
         else
             av_strlcat(mp_filename, demuxer->stream->url, sizeof(mp_filename));
     } else
@@ -579,6 +595,7 @@ static demuxer_t* demux_open_lavf(demuxer_t *demuxer){
         avfc->pb = priv->pb;
     }
 
+    av_dict_set(&opts, "fflags", "+keepside", 0);
     if(avformat_open_input(&avfc, mp_filename, priv->avif, &opts)<0){
         mp_msg(MSGT_HEADER,MSGL_ERR,"LAVF_header: av_open_input_stream() failed\n");
         return NULL;
@@ -681,10 +698,18 @@ static int demux_lavf_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
         }
     } else if(id==demux->video->id){
         // video
+        sh_video_t *sh;
         ds=demux->video;
         if(!ds->sh){
             ds->sh=demux->v_streams[id];
             mp_msg(MSGT_DEMUX,MSGL_V,"Auto-selected LAVF video ID = %d\n",ds->id);
+        }
+        sh = ds->sh;
+        if (sh && sh->bih) {
+            int size = 0;
+            const uint8_t *pal = av_packet_get_side_data(&pkt, AV_PKT_DATA_PALETTE, &size);
+            if (pal && size)
+                memcpy(((uint8_t *)sh->bih) + sh->bih->biSize, pal, FFMIN(size, 1024));
         }
     } else if(id==demux->sub->id){
         // subtitle
@@ -695,16 +720,10 @@ static int demux_lavf_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
         return 1;
     }
 
-    if(pkt.destruct == av_destruct_packet && !CONFIG_MEMALIGN_HACK){
-        dp=new_demux_packet(0);
-        dp->len=pkt.size;
-        dp->buffer=pkt.data;
-        pkt.destruct= NULL;
-    }else{
+        av_packet_merge_side_data(&pkt);
         dp=new_demux_packet(pkt.size);
         memcpy(dp->buffer, pkt.data, pkt.size);
         av_free_packet(&pkt);
-    }
 
     if(pkt.pts != AV_NOPTS_VALUE){
         dp->pts=pkt.pts * av_q2d(priv->avfc->streams[id]->time_base);

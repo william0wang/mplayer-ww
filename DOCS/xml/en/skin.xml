@@ -606,6 +606,10 @@ blocks.
     <entry>filename</entry>
   </row>
   <row>
+    <entry>$O</entry>
+    <entry>filename (if no title name available) otherwise title</entry>
+  </row>
+  <row>
     <entry>$f</entry>
     <entry>filename in lower case</entry>
   </row>
@@ -618,7 +622,7 @@ blocks.
     <entry>
     a character according to the stream type (file: <keycap>f</keycap>,
     CD: <keycap>a</keycap>, Video CD: <keycap>v</keycap>, DVD: <keycap>d</keycap>,
-    URL: <keycap>u</keycap>, TV/DVB: <keycap>b</keycap>)
+    URL: <keycap>u</keycap>, TV/DVB: <keycap>b</keycap>, CUE: <keycap>c</keycap>)
     </entry>
   </row>
   <row>
@@ -838,6 +842,7 @@ symbols (and thus require a different font).
   <row><entry><keycap>d</keycap></entry><entry>stream is a DVD</entry></row>
   <row><entry><keycap>u</keycap></entry><entry>stream is a URL</entry></row>
   <row><entry><keycap>b</keycap></entry><entry>stream is a TV/DVB broadcast</entry></row>
+  <row><entry><keycap>c</keycap></entry><entry>stream is a cue sheet</entry></row>
 </tbody>
 </tgroup>
 </informaltable>
@@ -905,7 +910,7 @@ menu entries.
 <varlistentry>
   <term><emphasis role="bold">evLoad</emphasis></term>
   <listitem><para>
-  Load a file (by opening a file browser window, where you can choose a file).
+  Load a file (by opening a file selector dialog box, where you can choose a file).
   </para></listitem>
 </varlistentry>
 
@@ -963,6 +968,14 @@ menu entries.
   <term><emphasis role="bold">evPlayDVD</emphasis></term>
   <listitem><para>
   Tries to open the disc in the given DVD-ROM drive.
+  </para></listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><emphasis role="bold">evPlayImage</emphasis></term>
+  <listitem><para>
+  Loads an CD/(S)VCD/DVD image or DVD copy (with the file selector) and plays it
+  as if it were a real disc.
   </para></listitem>
 </varlistentry>
 

@@ -211,9 +211,10 @@ static int parse_channels(radio_priv_t* priv,float freq_channel,float* pfreq){
             priv->radio_channel_current->next->next = NULL;
             priv->radio_channel_current = priv->radio_channel_current->next;
         }
-        if (priv->radio_channel_current->prev)
+        if (priv->radio_channel_current->prev) {
             priv->radio_channel_current->prev->next = NULL;
-        free(priv->radio_channel_current);
+            free(priv->radio_channel_current);
+        }
 
         if (freq_channel)
             channel = freq_channel;
@@ -1112,6 +1113,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
     if (!priv)
         return STREAM_ERROR;
 
+    stream->priv=priv;
 
     priv->radio_param=opts;
 
@@ -1154,7 +1156,6 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
 
     stream->start_pos=0;
     stream->end_pos=0;
-    stream->priv=priv;
     stream->close=close_s;
     stream->fill_buffer=fill_buffer_s;
 

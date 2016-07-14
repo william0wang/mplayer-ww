@@ -217,7 +217,7 @@ wsXDNDProcessClientMessage(XClientMessageEvent *event)
 
   if (event->message_type == XA_XdndDrop) {
     if ((Window) event->data.l[0] != XGetSelectionOwner(wsDisplay, XA_XdndSelection)){
-      puts("Wierd selection owner... QT?");
+      puts("Weird selection owner... QT?");
     }
     if (atom_support != None) {
       XConvertSelection(wsDisplay, XA_XdndSelection, atom_support,

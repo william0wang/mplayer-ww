@@ -893,7 +893,7 @@ static void sws_spu_image(unsigned char *d1, unsigned char *d2, int dw, int dh,
 		oldvar = spu_gaussvar;
 	}
 
-	ctx=sws_getContext(sw, sh, PIX_FMT_GRAY8, dw, dh, PIX_FMT_GRAY8, SWS_GAUSS, &filter, NULL, NULL);
+	ctx=sws_getContext(sw, sh, AV_PIX_FMT_GRAY8, dw, dh, AV_PIX_FMT_GRAY8, SWS_GAUSS, &filter, NULL, NULL);
 	sws_scale(ctx,&s1,&ss,0,sh,&d1,&ds);
 	for (i=ss*sh-1; i>=0; i--) s2[i] = -s2[i];
 	sws_scale(ctx,&s2,&ss,0,sh,&d2,&ds);
@@ -1434,9 +1434,12 @@ void spudec_packet_send(void *spu, packet_t *packet, double pts, double endpts)
 {
   packet->start_pts = 0;
   packet->end_pts = 0x7fffffff;
-  if (pts != MP_NOPTS_VALUE && pts < 0xffffffffu / 90000)
+  // Note: valid timestamps from e.g. DVB subtitles can
+  // overflow. Just ignoring the overflow seems to work
+  // best for now, but should be fixed properly at some point.
+  if (pts != MP_NOPTS_VALUE)
     packet->start_pts = pts * 90000;
-  if (endpts != MP_NOPTS_VALUE && endpts < 0xffffffffu / 90000)
+  if (endpts != MP_NOPTS_VALUE)
     packet->end_pts = endpts * 90000;
   spudec_queue_packet(spu, packet);
 }

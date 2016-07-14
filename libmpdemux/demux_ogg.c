@@ -1301,7 +1301,7 @@ static int demux_ogg_fill_buffer(demuxer_t *d, demux_stream_t *dsds)
 demuxer_t *init_avi_with_ogg(demuxer_t *demuxer)
 {
     demuxer_t *od;
-    ogg_demuxer_t *ogg_d;
+    ogg_demuxer_t *ogg_d = NULL;
     stream_t *s;
     uint32_t hdrsizes[3];
     demux_packet_t *dp;
@@ -1347,11 +1347,15 @@ demuxer_t *init_avi_with_ogg(demuxer_t *demuxer)
         if (np < 0) {
             mp_msg(MSGT_DEMUX, MSGL_ERR,
                    "AVI Ogg error : Can't init using first stream packets\n");
-            free(ogg_d);
             goto fallback;
         }
         // Add some data
         plen = ds_get_packet(demuxer->audio, &p);
+        if (plen < 0) {
+            mp_msg(MSGT_DEMUX, MSGL_ERR,
+                   "AVI Ogg error : Invalid first stream packets\n");
+            goto fallback;
+        }
         buf  = ogg_sync_buffer(&ogg_d->sync, plen);
         memcpy(buf, p, plen);
         ogg_sync_wrote(&ogg_d->sync, plen);
@@ -1389,6 +1393,7 @@ demuxer_t *init_avi_with_ogg(demuxer_t *demuxer)
     return new_demuxers_demuxer(demuxer, od, demuxer);
 
 fallback:
+    free(ogg_d);
     demuxer->audio->id = -2;
     return demuxer;
 

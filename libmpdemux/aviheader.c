@@ -284,6 +284,9 @@ while(1){
         sh_video->fps=(float)sh_video->video.dwRate/(float)sh_video->video.dwScale;
         sh_video->frametime=(float)sh_video->video.dwScale/(float)sh_video->video.dwRate;
         sh_video->format = sh_video->bih->biCompression;
+        if (sh_video->bih->biCompression == 0 && sh_video->bih->biHeight > 0)
+            sh_video->flipped_input ^= 1;
+        sh_video->bih->biHeight = FFABS(sh_video->bih->biHeight);
 //        if(demuxer->video->id==-1) demuxer->video->id=stream_id;
         // IdxFix:
         idxfix_videostream=stream_id;
@@ -341,6 +344,8 @@ while(1){
 	if (sh_audio->format == 1 &&
 	    last_fccHandler == mmioFOURCC('A', 'x', 'a', 'n'))
 	    sh_audio->format = last_fccHandler;
+	if (sh_audio->format == 0x11 && sh_audio->wf->wBitsPerSample == 8)
+	    sh_audio->format = 0x116b727a; // Zork PCM, format conflicts with IMA ADPCM
 	sh_audio->i_bps=sh_audio->wf->nAvgBytesPerSec;
         chunksize=0;
         if( mp_msg_test(MSGT_HEADER,MSGL_V) ) print_wave_header(sh_audio->wf,MSGL_V);
@@ -606,13 +611,13 @@ if (index_file_load) {
     mp_msg(MSGT_HEADER,MSGL_ERR, MSGTR_MPDEMUX_AVIHDR_CantReadIdxFile, index_file_load, strerror(errno));
     goto gen_index;
   }
-  fread(&magic, 6, 1, fp);
-  if (strncmp(magic, "MPIDX1", 6)) {
+  if (fread(&magic, 6, 1, fp) != 1 ||
+      strncmp(magic, "MPIDX1", 6) ||
+      fread(&priv->idx_size, sizeof(priv->idx_size), 1, fp) != 1) {
     mp_msg(MSGT_HEADER,MSGL_ERR, MSGTR_MPDEMUX_AVIHDR_NotValidMPidxFile, index_file_load);
     goto gen_index;
   }
-  fread(&priv->idx_size, sizeof(priv->idx_size), 1, fp);
-  priv->idx=malloc(priv->idx_size*sizeof(AVIINDEXENTRY));
+  priv->idx=calloc(priv->idx_size,sizeof(AVIINDEXENTRY));
   if (!priv->idx) {
     mp_msg(MSGT_HEADER,MSGL_ERR, MSGTR_MPDEMUX_AVIHDR_FailedMallocForIdxFile, index_file_load);
     priv->idx_size = 0;
@@ -621,8 +626,7 @@ if (index_file_load) {
 
   for (i=0; i<priv->idx_size;i++) {
     AVIINDEXENTRY *idx=priv->idx + i;
-    fread(idx, sizeof(AVIINDEXENTRY), 1, fp);
-    if (feof(fp)) {
+    if (fread(idx, 1, sizeof(*idx), fp) != sizeof(*idx)) {
       mp_msg(MSGT_HEADER,MSGL_ERR, MSGTR_MPDEMUX_AVIHDR_PrematureEOF, index_file_load);
       free(priv->idx);
       priv->idx_size = 0;

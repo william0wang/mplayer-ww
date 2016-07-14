@@ -37,7 +37,7 @@
 #include "vf.h"
 #include "libvo/fastmemcpy.h"
 #include "libavutil/mem.h"
-#include "libavutil/x86/asm.h"
+#include "mpx86asm.h"
 
 #define MAX_NOISE 4096
 #define MAX_SHIFT 1024

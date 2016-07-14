@@ -81,7 +81,7 @@ struct menu_priv_s {
   int raw_child;
 };
 
-static struct menu_priv_s cfg_dflt = {
+static const struct menu_priv_s cfg_dflt = {
   NULL,
   0,
   0,
@@ -314,9 +314,14 @@ static int run_shell_cmd(menu_t* menu, char* cmd) {
     close_pipe(err);
     return 0;
   }
-  if(!mpriv->child) { // Chlid process
+  if(!mpriv->child) { // Child process
+    FILE *errf;
     int err_fd = dup(2);
-    FILE* errf = fdopen(err_fd,"w");
+    if (err_fd == -1) {
+      fprintf(stderr,"dup failed : %s\n",strerror(errno));
+      exit(1);
+    }
+    errf = fdopen(err_fd,"w");
     // Bind the std fd to our pipes
     dup2(in[0],0);
     dup2(out[1],1);

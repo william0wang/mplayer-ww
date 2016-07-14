@@ -1,0 +1,33 @@
+This is a short summary of the svn commands used to manage a release in svn.
+
+
+Merge changes from trunk to release branch
+ * in release branch checkout dir
+   - Merge a single commit r12345
+     svn merge ^/trunk -c 12345
+   - Merge multiple commits from r12345 to r12350
+     svn merge ^/trunk -r12344:r12350
+                             ^ Not a typo
+   - Merge a single file from r12345
+     svn merge ^trunk/myfile.ext myfile.ext -c 12345
+   - Revert a single commit r12345
+     svn merge ^/trunk -c -12345
+   - For problem "svn: E195020: Cannot merge into mixed-revision working copy"
+     svn update
+   - In nothing happens on merge commands (on clean tree only!)
+     svn revert .
+
+
+Copy a file from trunk to release branch
+   - Copy myfile.ext to release branch 1.2
+     svn copy ^/trunk/myfile.ext ^/branches/1.2/myfile.ext
+
+
+Create a release branch
+    - Create release branch 1.2 from trunk
+      svn copy ^/trunk ^/branches/1.2
+
+
+Tag a release
+    - Tag 1.2.1 from 1.2 branch
+      svn copy ^/branches/1.2 ^/tags/MPlayer-1.2.1

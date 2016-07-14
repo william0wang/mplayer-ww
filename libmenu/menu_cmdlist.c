@@ -55,7 +55,7 @@ struct menu_priv_s {
 
 #define ST_OFF(m) M_ST_OFF(struct menu_priv_s, m)
 
-static struct menu_priv_s cfg_dflt = {
+static const struct menu_priv_s cfg_dflt = {
   MENU_LIST_PRIV_DFLT,
 };
 

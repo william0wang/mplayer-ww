@@ -21,7 +21,11 @@
 
 #include <stdio.h>
 
+#include "list.h"
+
 float constrain(float value);
+plItem **cue_playlist(const char *fname);
 char *fgetstr(char *str, int size, FILE *file);
+float msf2sec(const char *msf);
 
 #endif /* MPLAYER_GUI_MISC_H */

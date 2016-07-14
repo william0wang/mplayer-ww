@@ -67,7 +67,7 @@ static int af_open(af_instance_t* af){
 }
 
 // Description of this filter
-af_info_t af_info_dummy = {
+const af_info_t af_info_dummy = {
     "dummy",
     "dummy",
     "Anders",

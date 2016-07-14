@@ -586,8 +586,8 @@ char *get_metadata(metadata_t type)
         return mp_asprintf("%d x %d", sh_video->disp_w, sh_video->disp_h);
 
     case META_AUDIO_CODEC:
-        if (sh_audio->codec && sh_audio->codec->name)
-            return strdup(sh_audio->codec->name);
+        if (sh_audio->codec && sh_audio->codec->name_idx)
+            return strdup(codec_idx2str(sh_audio->codec->name_idx));
         break;
 
     case META_AUDIO_BITRATE:
@@ -1459,22 +1459,7 @@ void exit_player_with_rc(enum exit_reason how, int rc)
     vo_uninit(); // Close the X11 connection (if any is open).
 #endif
 
-#ifdef CONFIG_FREETYPE
-    current_module = "uninit_font";
-    if (sub_font && sub_font != vo_font)
-        free_font_desc(sub_font);
-    sub_font = NULL;
-    if (vo_font)
-        free_font_desc(vo_font);
-    vo_font = NULL;
-    done_freetype();
-#endif
-    free_osd_list();
-
-#ifdef CONFIG_ASS
-    ass_library_done(ass_library);
-    ass_library = NULL;
-#endif
+    common_uninit();
 
     current_module = "exit_player";
 
@@ -1511,6 +1496,8 @@ void exit_player_with_rc(enum exit_reason how, int rc)
         m_config_free(mconfig);
     mconfig = NULL;
 
+    mp_msg_uninit();
+
 #ifdef __MINGW32__
 	win_uninit(rc);
 #endif
@@ -1530,6 +1517,9 @@ static void child_sighandler(int x)
     do {
         pid = waitpid(-1, NULL, WNOHANG);
     } while (pid > 0);
+    // Without this, we will be called only once at
+    // least on Linux 3.16.
+    signal(SIGCHLD, child_sighandler);
 }
 
 #endif
@@ -1830,6 +1820,7 @@ void add_subtitles(char *filename, float fps, int noerr)
     if (filename == NULL || mpctx->set_of_sub_size >= MAX_SUBTITLE_FILES)
         return;
 
+    enca_sub_cp = NULL;
 	if(!always_use_ass && !fake_video) {
 		sp = strrchr(filename, '.');
 		if(sp) {
@@ -1849,7 +1840,7 @@ void add_subtitles(char *filename, float fps, int noerr)
 #ifdef CONFIG_ASS
     if (ass_enabled && is_ass_format)
 #ifdef CONFIG_ICONV
-        asst = ass_read_stream(ass_library, filename, sub_cp);
+        asst = ass_read_stream(ass_library, filename, (enca_sub_cp ? enca_sub_cp : sub_cp));
 #else
         asst = ass_read_stream(ass_library, filename, 0);
 #endif
@@ -2308,7 +2299,7 @@ void set_osd_bar(int type, const char *name, double min, double max, double val)
         return;
 
     if (mpctx->sh_video) {
-        osd_visible = (GetTimerMS() + 1000) | 1;
+        osd_visible = (GetTimerMS() + osd_duration) | 1;
         vo_osd_progbar_type  = type;
         vo_osd_progbar_value = 256 * (val - min) / (max - min);
         vo_osd_changed(OSDTYPE_PROGBAR);
@@ -2703,7 +2694,7 @@ static float timing_sleep(float time_frame)
         current_module = "sleep_rtc";
         while (time_frame > 0.000) {
             unsigned long rtc_ts;
-            if (read(rtc_fd, &rtc_ts, sizeof(rtc_ts)) <= 0)
+            if (read(rtc_fd, &rtc_ts, sizeof(rtc_ts)) != sizeof(rtc_ts))
                 mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_LinuxRTCReadError, strerror(errno));
             time_frame -= GetRelativeTime();
         }
@@ -2737,7 +2728,7 @@ static int select_subtitle(MPContext *mpctx)
     mpctx->global_sub_pos = -1; // no subs by default
 
     if (mpctx->sh_video && !fake_video)
-        if(!strcasecmp(mpctx->demuxer->desc->name, "dshow") || 
+        if(!strcasecmp(mpctx->demuxer->desc->name, "dshow") ||
 	          !strcasecmp(mpctx->demuxer->desc->name, "dshowpref"))
 		    return;
 
@@ -3005,7 +2996,6 @@ static int fill_audio_out_buffers(void)
     int playflags = 0;
     int audio_eof = 0;
     int bytes_to_write;
-    int format_change = 0;
     int timeout = 0;
     sh_audio_t *const sh_audio = mpctx->sh_audio;
 
@@ -3044,11 +3034,11 @@ static int fill_audio_out_buffers(void)
         // Fill buffer if needed:
         current_module = "decode_audio";
         t = GetTimer();
-        if (!format_change) {
+        if (!sh_audio->a_buffer_format_change) {
             res = mp_decode_audio(sh_audio, playsize);
-            format_change = res == -2;
+            sh_audio->a_buffer_format_change = res == -2;
         }
-        if (!format_change && res < 0) // EOF or error
+        if (!sh_audio->a_buffer_format_change && res < 0) // EOF or error
             if (mpctx->d_audio->eof) {
                 audio_eof = 1;
                 if (sh_audio->a_out_buffer_len == 0)
@@ -3059,7 +3049,7 @@ static int fill_audio_out_buffers(void)
         audio_time_usage += tt;
         if (playsize > sh_audio->a_out_buffer_len) {
             playsize = sh_audio->a_out_buffer_len;
-            if (audio_eof || format_change)
+            if (audio_eof || sh_audio->a_buffer_format_change)
                 playflags |= AOPLAY_FINAL_CHUNK;
         }
         if (!playsize)
@@ -3079,19 +3069,21 @@ static int fill_audio_out_buffers(void)
             memmove(sh_audio->a_out_buffer, &sh_audio->a_out_buffer[playsize],
                     sh_audio->a_out_buffer_len);
             mpctx->delay += playback_speed * playsize / (double)ao_data.bps;
-        } else if ((format_change || audio_eof) && mpctx->audio_out->get_delay() < .04) {
+        } else if ((sh_audio->a_buffer_format_change || audio_eof) &&
+                   mpctx->audio_out->get_delay() < .04) {
             // Sanity check to avoid hanging in case current ao doesn't output
             // partial chunks and doesn't check for AOPLAY_FINAL_CHUNK
             mp_msg(MSGT_CPLAYER, MSGL_WARN, MSGTR_AudioOutputTruncated);
             sh_audio->a_out_buffer_len = 0;
         }
     }
-    if (format_change) {
+    if (sh_audio->a_buffer_format_change && !sh_audio->a_out_buffer_len) {
         uninit_player(INITIALIZED_AO);
         af_uninit(sh_audio->afilter);
         free(sh_audio->afilter);
         sh_audio->afilter = NULL;
         reinit_audio_chain();
+        sh_audio->a_buffer_format_change = 0;
     }
     return 1;
 }
@@ -3189,6 +3181,27 @@ int reinit_video_chain(void)
 {
     sh_video_t *const sh_video = mpctx->sh_video;
     double ar = -1.0;
+    if (!video_read_properties(mpctx->sh_video)) {
+        mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_CannotReadVideoProperties);
+        goto err_out;
+    } else {
+        mp_msg(MSGT_CPLAYER, MSGL_V, MSGTR_FilefmtFourccSizeFpsFtime,
+               mpctx->demuxer->file_format, mpctx->sh_video->format, mpctx->sh_video->disp_w, mpctx->sh_video->disp_h,
+               mpctx->sh_video->fps, mpctx->sh_video->frametime
+               );
+
+        /* need to set fps here for output encoders to pick it up in their init */
+        if (force_fps) {
+            mpctx->sh_video->fps       = force_fps;
+            mpctx->sh_video->frametime = 1.0f / mpctx->sh_video->fps;
+        }
+        vo_fps = mpctx->sh_video->fps;
+
+        if (!mpctx->sh_video->fps && !force_fps && !correct_pts) {
+            mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_FPSnotspecified);
+            correct_pts = 1;
+        }
+    }
     //================== Init VIDEO (codec & libvo) ==========================
     if (!fixed_vo || !(initialized_flags & INITIALIZED_VO)) {
         current_module = "preinit_libvo";
@@ -3272,7 +3285,7 @@ int reinit_video_chain(void)
 				!strcasecmp(sh_video->codec->name, "coreavcwindows")) {
     	    codec_swap_uv = 1;
         }
-        mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VIDEO_CODEC=%s\n", sh_video->codec->name);
+        mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VIDEO_CODEC=%s\n", codec_idx2str(sh_video->codec->name_idx));
     }
 
     last_pts = -303;
@@ -4009,6 +4022,8 @@ int main(int argc, char *argv[])
 
     // Catch signals
 #ifndef __MINGW32__
+    // TODO: use newer POSIX SIG_IGN behaviour instead to
+    // automatically handle children?
     signal(SIGCHLD, child_sighandler);
 #endif
 
@@ -4567,27 +4582,7 @@ goto_enable_cache:
 
     if (mpctx->sh_video) {
         current_module = "video_read_properties";
-        if (!video_read_properties(mpctx->sh_video)) {
-            mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_CannotReadVideoProperties);
-            mpctx->sh_video = mpctx->d_video->sh = NULL;
-        } else {
-            mp_msg(MSGT_CPLAYER, MSGL_V, MSGTR_FilefmtFourccSizeFpsFtime,
-                   mpctx->demuxer->file_format, mpctx->sh_video->format, mpctx->sh_video->disp_w, mpctx->sh_video->disp_h,
-                   mpctx->sh_video->fps, mpctx->sh_video->frametime
-                   );
-
-            /* need to set fps here for output encoders to pick it up in their init */
-            if (force_fps) {
-                mpctx->sh_video->fps       = force_fps;
-                mpctx->sh_video->frametime = 1.0f / mpctx->sh_video->fps;
-            }
-            vo_fps = mpctx->sh_video->fps;
-
-            if (!mpctx->sh_video->fps && !force_fps && !correct_pts) {
-                mp_msg(MSGT_CPLAYER, MSGL_ERR, MSGTR_FPSnotspecified);
-                correct_pts = 1;
-            }
-        }
+        reinit_video_chain();
     }
 
     if (!mpctx->sh_video && !mpctx->sh_audio) {
@@ -4622,7 +4617,7 @@ goto_enable_cache:
 			open_with_dshow_demux = 1;
 			goto goto_re_open_stream;
 		}
-	
+
 		if(mpctx->sh_video && !is_auto_stream_cache && is_vista) {
 			stream_len_ex = demuxer_get_time_length(mpctx->demuxer);
 			if(stream_len_ex > 1) {
@@ -4757,9 +4752,6 @@ goto_enable_cache:
         }
     }
 
-    if (mpctx->sh_video)
-        reinit_video_chain();
-
     if (mpctx->sh_video) {
         if (vo_flags & 0x08 && vo_spudec)
             spudec_set_hw_spu(vo_spudec, mpctx->video_out);
@@ -4774,7 +4766,7 @@ goto_enable_cache:
     current_module = "main";
 
 	if (!mpctx->sh_video && !fake_video) {
-	
+
 	    if(!show_status)
 	        osd_level = 3;
 	    mpctx->sh_video = malloc(sizeof(sh_video_t));
@@ -4819,7 +4811,7 @@ goto_enable_cache:
         if (mpctx->sh_audio) {
             reinit_audio_chain();
             if (mpctx->sh_audio && mpctx->sh_audio->codec)
-                mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_AUDIO_CODEC=%s\n", mpctx->sh_audio->codec->name);
+                mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_AUDIO_CODEC=%s\n", codec_idx2str(mpctx->sh_audio->codec->name_idx));
             if (mpctx->audio_out)
                 mpctx->audio_out->control(AOCONTROL_FILENAME, (void *)(vo_wintitle ? vo_wintitle : mp_basename(filename)));
         }
@@ -4850,7 +4842,7 @@ goto_enable_cache:
             mp_msg(MSGT_CPLAYER, MSGL_INFO, MSGTR_Video_NoVideo);
             mp_msg(MSGT_CPLAYER, MSGL_V, "Freeing %d unused video chunks.\n", mpctx->d_video->packs);
             ds_free_packs(mpctx->d_video);
-            mpctx->d_video->id = -2;
+            //mpctx->d_video->id = -2;
             //if(!fixed_vo) uninit_player(INITIALIZED_VO);
         }
 
@@ -4899,13 +4891,13 @@ goto_enable_cache:
         }
 
 		adjust_stream_offset_ex(get_stream_offset_ex());
-		
+
 		mixer_setvolume(&mpctx->mixer, (float)save_volume, (float)save_volume);
 		update_sub_list(0);
-		
+
 		guiCommand(CMD_UPDATE_TITLE, (int)(mpctx->stream));
 		guiCommand(CMD_UPDATE_SUBMENU, mpctx->global_sub_pos);
-		
+
         if (reload && (save_sec>0)) {
             seek(mpctx, save_sec, SEEK_ABSOLUTE);
             end_at.pos += save_sec;
@@ -4917,7 +4909,7 @@ goto_enable_cache:
             end_at.pos += seek_to_time;
 			seek_to_time = 0;
 		}
-		
+
 		if(end_pos > 0) {
 		    end_at.type = END_AT_TIME;
 		    end_at.pos = stream_len_ex - end_pos;
@@ -4944,6 +4936,15 @@ goto_enable_cache:
                 mpctx->sh_audio     = mpctx->d_audio->sh;
                 mpctx->sh_audio->ds = mpctx->d_audio;
                 reinit_audio_chain();
+            }
+            // Note: the video_id != -2 is only there because
+            // some demuxers do not have support for disabling
+            // video.
+            if (video_id != -2 && mpctx->d_video->id != -2 &&
+                !mpctx->sh_video && mpctx->d_video->sh) {
+                mpctx->sh_video     = mpctx->d_video->sh;
+                mpctx->sh_video->ds = mpctx->d_video;
+                reinit_video_chain();
             }
 
 /*========================== PLAY AUDIO ============================*/
@@ -5158,7 +5159,7 @@ goto_enable_cache:
                     percent = percent_value;
                 if (oldpercent != percent)
                     guiCommand(CMD_UPDATE_SEEK, oldpercent = percent);
-    
+
                 while (!brk_cmd && (cmd = mp_input_get_cmd(0, 0, 0)) != NULL) {
                     brk_cmd = run_command(mpctx, cmd);
                     if (cmd->id == MP_CMD_EDL_LOADFILE) {
@@ -5275,7 +5276,7 @@ goto_next_file:  // don't jump here after ao/vo/getch initialization!
     uninit_player(INITIALIZED_ALL - (INITIALIZED_GUI + INITIALIZED_INPUT + (fixed_vo ? INITIALIZED_VO : 0)));
 
 	guiCommand(CMD_DEL_SUBMENU, 0);
-	
+
 	if (reload) {
 	    load_config_ex();
 	    mp_msg_init();

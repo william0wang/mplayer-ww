@@ -26,7 +26,7 @@
 #include "mp_msg.h"
 #include "cpudetect.h"
 #include "libavutil/common.h"
-#include "libavutil/x86/asm.h"
+#include "mpx86asm.h"
 #include "mpbswap.h"
 
 #include "img_format.h"
@@ -168,7 +168,7 @@ static unsigned int checksum_plane(unsigned char *p, unsigned char *z,
       t=be2me_32(wsum);
 #endif
 
-      for(sum^=(t<<shift|t>>(32-shift)); p<e;)
+      for(sum^=(t<<shift|t>>((32-shift)&31)); p<e;)
          sum^=*p++<<(shift=(shift-8)&31);
       }
 

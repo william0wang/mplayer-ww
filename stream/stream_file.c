@@ -53,7 +53,7 @@
 int is_rar_stream = 0;
 int enable_file_mapping = 1;
 
-static struct stream_priv_s {
+static const struct stream_priv_s {
   char* filename;
   char *filename2;
 } stream_priv_dflts = {

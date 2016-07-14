@@ -502,6 +502,7 @@ static void set_bpp(struct fb_var_screeninfo *p, int bpp, int rgb)
     case 32:
         p->transp.offset = 24;
         p->transp.length = 8;
+        // fallthrough
     case 24:
         p->red.offset   = 16;
         p->red.length   = 8;
@@ -900,6 +901,10 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
         if (ioctl(fb_dev_fd, FBIOPUTCMAP, cmap)) {
             mp_msg(MSGT_VO, MSGL_ERR, "can't put cmap: %s\n",
                    strerror(errno));
+            free(cmap->red);
+            free(cmap->green);
+            free(cmap->blue);
+            free(cmap);
             return 1;
         }
         fb_cmap_changed = 1;

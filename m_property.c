@@ -373,11 +373,11 @@ int m_property_time_ro(const m_option_t* prop,int action,
     return m_property_double_ro(prop,action,arg,var);
 }
 
-int m_property_string_ro(const m_option_t* prop,int action,void* arg,char* str) {
+int m_property_string_ro(const m_option_t* prop,int action,void* arg,const char* str) {
     switch(action) {
     case M_PROPERTY_GET:
         if(!arg) return 0;
-        *(char**)arg = str;
+        *(const char**)arg = str;
         return 1;
     case M_PROPERTY_PRINT:
         if(!arg) return 0;

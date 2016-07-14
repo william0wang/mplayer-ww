@@ -1,4 +1,4 @@
-// Synced with help_mp-en.h rev. 37272
+// Synced with help_mp-en.h rev. 37846
 //
 // Translated by JRaSH <jrash06@gmail.com>
 
@@ -651,7 +651,10 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_FilterFontBitmap "位图字体文件（*.desc）"
 #define MSGTR_GUI_FilterFontTTF "TrueType 字体文件（*.ttf）"
 #define MSGTR_GUI_FilterFontType1 "Type1 字体文件（*.pfb）"
-#define MSGTR_GUI_FilterImageVCD "VCD/SVCD 镜像文件"
+#define MSGTR_GUI_FilterImageCD "CD 镜像索引表"
+#define MSGTR_GUI_FilterImageCue "CD/VCD/SVCD 镜像索引表"
+#define MSGTR_GUI_FilterImageDVD "DVD 镜像/拷贝"
+#define MSGTR_GUI_FilterImageVCD "VCD/SVCD 镜像索引表"
 #define MSGTR_GUI_FilterMediumMatroska "Matroska 媒体文件"
 #define MSGTR_GUI_FilterMediumOgg "Ogg 媒体文件"
 #define MSGTR_GUI_FilterMediumQuickTime "QuickTime 媒体文件"
@@ -680,6 +683,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_FrontRight "前右"
 #define MSGTR_GUI_HideVideoWindow "播放后隐藏视频窗口"
 #define MSGTR_GUI_Hue "色调"
+#define MSGTR_GUI_Image "镜像"
 #define MSGTR_GUI_Information "信息"
 #define MSGTR_GUI_Lavc "lavc（实时 mpeg1 编码）"
 #define MSGTR_GUI_MaximumUsageSpareCPU "空闲 CPU 时间的最大使用量"
@@ -785,6 +789,7 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_GUI_SelectedFiles "所选文件"
 #define MSGTR_GUI_SelectFile "选择文件"
 #define MSGTR_GUI_SelectFont "选择字体"
+#define MSGTR_GUI_SelectImage "选择镜像"
 #define MSGTR_GUI_SelectSubtitle "选择字幕"
 #define MSGTR_GUI_SizeDouble "双倍尺寸"
 #define MSGTR_GUI_SizeFullscreen "全屏"
@@ -1381,8 +1386,8 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_VideoStreamRedefined "警告: 重复定义了视频流头部 %d。\n"
 #define MSGTR_TooManyAudioInBuffer "\n缓冲中音频包太多（%d 个包存在于 %d 字节中）。\n"
 #define MSGTR_TooManyVideoInBuffer "\n缓冲中视频包太多（%d 个包存在于 %d 字节中）。\n"
-#define MSGTR_MaybeNI "可能播放了一个非交错合并的媒体流/文件，或者是编解码运行失败？\n" \
-                      "对于 AVI 文件，可尝试用 -ni 选项强制使用非交错模式。\n"
+#define MSGTR_MaybeNI "可能播放了一个非交错合并或合并异常的媒体流/文件，或者是编解码器运行失败？\n" \
+                      "修复该文件或尝试用 -ni 选项（可能造成内存用量巨大）。\n"
 #define MSGTR_WorkAroundBlockAlignHeaderBug "AVI：避开 CBR-MP3 nBlockAlign 头部缺陷！\n"
 #define MSGTR_SwitchToNi "\n检测到未正确交错合并的 AVI 文件 - 切换到 -ni 模式...\n"
 #define MSGTR_InvalidAudioStreamNosound "AVI：无效的音频流 ID: %d - 忽略 (nosound)\n"
@@ -1832,7 +1837,8 @@ static const char help_text[] = MSGTR_Help;
 #define MSGTR_MPDEMUX_CDDB_NoCDInDrive "驱动器里没有 CD。\n"
 
 // stream_cue.c
-#define MSGTR_MPDEMUX_CUEREAD_UnexpectedCuefileLine "[bincue] cue 文件中不应出现的一行内容：%s\n"
+#define MSGTR_MPDEMUX_CUEREAD_UnexpectedCuefileLine "[bincue] cue 文件中有内容异常的一行：%s"
+#define MSGTR_MPDEMUX_CUEREAD_BinFilenameFound "[bincue] 未找到文件描述内容：%s"
 #define MSGTR_MPDEMUX_CUEREAD_BinFilenameTested "[bincue] 已测试 bin 文件名：%s\n"
 #define MSGTR_MPDEMUX_CUEREAD_CannotFindBinFile "[bincue] 无法找到 bin 文件 - 正在放弃尝试。\n"
 #define MSGTR_MPDEMUX_CUEREAD_UsingBinFile "[bincue] 正在使用 bin 文件 %s。\n"

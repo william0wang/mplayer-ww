@@ -41,7 +41,7 @@
 #include "libavutil/avutil.h"
 #include "libavutil/common.h"
 #include "libavutil/mem.h"
-#include "libavutil/x86/asm.h"
+#include "mpx86asm.h"
 
 struct vf_priv_s {
     int thresh;

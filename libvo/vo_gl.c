@@ -238,6 +238,8 @@ static void resize(void) {
     geometry(&left, &top, &w, &h, vo_dwidth, vo_dheight);
     top = vo_dheight - h - top;
     mpglViewport(left + x_offset, top + y_offset, w, h - y_height);
+  } else if (vo_fs) {
+    mpglViewport(vo_fs_border_l, vo_fs_border_b, vo_dwidth, vo_dheight);
   } else
     mpglViewport(x_offset, y_offset, vo_dwidth, vo_dheight - y_height);
 
@@ -1434,7 +1436,8 @@ static int preinit_internal(const char *arg, int allow_sw)
               "  customtrect\n"
               "    use texture_rectangle for customtex texture\n"
               "  mipmapgen\n"
-              "    generate mipmaps for the video image (use with TXB in customprog)\n"
+              "    generate mipmaps for the video image (use with TXB in customprog)\n" );
+      mp_msg(MSGT_VO, MSGL_FATAL,
               "  osdcolor=<0xAARRGGBB>\n"
               "    use the given color for the OSD\n"
               "  stereo=<n> (add 32 to swap left and right)\n"
@@ -1550,7 +1553,7 @@ static int control(uint32_t request, void *data)
       if (scaled_osd) {r->w = image_width; r->h = image_height;}
       else if (aspect_scaling()) {
         r->ml = ass_border_l;
-        r->ml = ass_border_r;
+        r->mr = ass_border_r;
         r->mt = ass_border_t;
         r->mb = ass_border_b;
       } else if(!vo_fs && show_controlbar && full_view && !gl_new_window)

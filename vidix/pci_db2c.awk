@@ -54,7 +54,7 @@ BEGIN {
     if (with_pci_db) {
         print "#include \"pci_dev_ids.c\"" > names_c_file
         print "" > names_c_file
-        print "static struct vendor_id_s vendor_ids[] = {" > names_c_file
+        print "static const struct vendor_id_s vendor_ids[] = {" > names_c_file
     }
     first_pass = 1;
     init_name_db();

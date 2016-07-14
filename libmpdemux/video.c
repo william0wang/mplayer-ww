@@ -576,7 +576,7 @@ int video_read_frame(sh_video_t* sh_video,float* frame_time_ptr,unsigned char** 
 
           i = (i >> 1) & 0x3f;
           if (in_picture) {
-            if ((i >= 32 && i <= 35) || i == 39 || (i >= 41 && i <= 44) || (i >= 48 || i <= 55)) break;
+            if ((i >= 32 && i <= 35) || i == 39 || (i >= 41 && i <= 44) || (i >= 48 && i <= 55)) break;
             if (i <= 9 || (i >= 16 && i <= 21)) {
               // TODO: check first slice segment flag - need to peek 2 bytes ahead
 //              if (demux_peekc(d_video) & 0x80)

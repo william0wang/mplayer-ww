@@ -39,6 +39,7 @@ enum {
     evPlayCD,
     evPlayVCD,
     evPlayDVD,
+    evPlayImage,
     evLoadURL,
     evPlayTV,
     evPlaySwitchToPause,

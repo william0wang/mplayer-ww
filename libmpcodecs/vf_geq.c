@@ -150,7 +150,7 @@ static int vf_open(vf_instance_t *vf, char *args){
     if (!eq[2][0]) strncpy(eq[2], eq[1], sizeof(eq[0])-1);
 
     for(plane=0; plane<3; plane++){
-        static const char *const_names[]={
+        static const char * const const_names[]={
             "PI",
             "E",
             "X",
@@ -162,7 +162,7 @@ static int vf_open(vf_instance_t *vf, char *args){
             "SH",
             NULL
         };
-        static const char *func2_names[]={
+        static const char * const func2_names[]={
             "lum",
             "cb",
             "cr",

@@ -635,8 +635,6 @@ static int vbr_finish_2pass1(void *sstate)
 
 static int vbr_init_2pass2(void *sstate)
 {
-
-	FILE *f;
 	int c, n, pos_firstframe, credits_frames;
 	long long credits1_bytes;
 	long long credits2_bytes;
@@ -649,10 +647,11 @@ static int vbr_init_2pass2(void *sstate)
 	double total2;
 
 	vbr_control_t *state = sstate;
+	state->pass1_file = NULL;
 
 	/* Check the filename */
 	if(state->filename == NULL || state->filename[0] == '\0')
-		return(-1);
+		goto err_out;
 
 	/* Initialize safe defaults for 2pass 2 */
 	state->pass1_file = NULL;
@@ -660,19 +659,16 @@ static int vbr_init_2pass2(void *sstate)
 	state->nb_keyframes = 0;
 
 	/* Open the 1st pass file */
-	if((f = fopen(state->filename, "r")) == NULL)
-		return(-1);
-
-	state->pass1_file = f;
+	state->pass1_file = fopen(state->filename, "r");
+	if(state->pass1_file == NULL)
+		goto err_out;
 
 	/* Get the file version and check against current version */
-	fscanf(state->pass1_file, "# ASCII XviD vbr stat file version %d\n", &n);
+	if (fscanf(state->pass1_file, "# ASCII XviD vbr stat file version %d\n", &n) != 1)
+		goto err_out;
 
-	if(n != VBR_VERSION) {
-		fclose(state->pass1_file);
-		state->pass1_file = NULL;
-		return(-1);
-	}
+	if(n != VBR_VERSION)
+		goto err_out;
 
 	/* Skip the blank commented line */
 	c = n = 0;
@@ -681,9 +677,7 @@ static int vbr_init_2pass2(void *sstate)
 		c = fgetc(state->pass1_file);
 
 		if(c == EOF) {
-			fclose(state->pass1_file);
-			state->pass1_file = NULL;
-			return(-1);
+			goto err_out;
 		}
 
 		if(c == '\n') n++;
@@ -692,7 +686,8 @@ static int vbr_init_2pass2(void *sstate)
 
 
 	/* Get the number of frames */
-	fscanf(state->pass1_file, "# frames : %d\n", &state->nb_frames);
+	if (fscanf(state->pass1_file, "# frames : %d\n", &state->nb_frames) != 1)
+		goto err_out;
 
 	/* Compute the desired size */
 	state->desired_size = (long long)
@@ -700,16 +695,15 @@ static int vbr_init_2pass2(void *sstate)
 		 (state->fps * 8.0));
 
 	/* Get the number of keyframes */
-	fscanf(state->pass1_file, "# keyframes : %d\n", &state->nb_keyframes);
+	if (fscanf(state->pass1_file, "# keyframes : %d\n", &state->nb_keyframes) != 1)
+		goto err_out;
 
 	/* Allocate memory space for the keyframe_location array */
 	if(state->nb_keyframes < 0 ||
            state->nb_keyframes >= 0x7fffffff / sizeof(int) ||
            (state->keyframe_locations
 	    = malloc((state->nb_keyframes+1)*sizeof(int))) == NULL) {
-		fclose(state->pass1_file);
-		state->pass1_file = NULL;
-		return(-1);
+		goto err_out;
 	}
 
 	/* Skip the blank commented line and the colum description */
@@ -719,9 +713,7 @@ static int vbr_init_2pass2(void *sstate)
 		c = fgetc(state->pass1_file);
 
 		if(c == EOF) {
-			fclose(state->pass1_file);
-			state->pass1_file = NULL;
-			return(-1);
+			goto err_out;
 		}
 
 		if(c == '\n') n++;
@@ -742,9 +734,10 @@ static int vbr_init_2pass2(void *sstate)
 		int quant, keyframe, frame_hbytes, frame_bytes;
 		int kblocks, mblocks, ublocks;
 
-		fscanf(state->pass1_file, "%d %d %d %d %d %d %d\n",
+		if (fscanf(state->pass1_file, "%d %d %d %d %d %d %d\n",
 		       &quant, &keyframe, &frame_hbytes, &frame_bytes,
-		       &kblocks, &mblocks, &ublocks);
+		       &kblocks, &mblocks, &ublocks) != 7)
+			goto err_out;
 
 		/* Is the frame in the beginning credits */
 		if(util_frametype(state) == FRAME_TYPE_STARTING_CREDITS) {
@@ -936,9 +929,10 @@ static int vbr_init_2pass2(void *sstate)
 		int quant, keyframe, frame_hbytes, frame_bytes;
 		int kblocks, mblocks, ublocks;
 
-		fscanf(state->pass1_file, "%d %d %d %d %d %d %d\n",
+		if (fscanf(state->pass1_file, "%d %d %d %d %d %d %d\n",
 		       &quant, &keyframe, &frame_hbytes, &frame_bytes,
-		       &kblocks, &mblocks, &ublocks);
+		       &kblocks, &mblocks, &ublocks) != 7)
+			goto err_out;
 
 		if(util_frametype(state) != FRAME_TYPE_NORMAL_MOVIE)
 			continue;
@@ -1033,7 +1027,7 @@ static int vbr_init_2pass2(void *sstate)
 	if (state->use_alt_curve) {
 
 		double curve_temp, dbytes;
-		int newquant, percent;
+		int newquant;
 		int oldquant = 1;
 
 		if (state->alt_curve_use_auto_bonus_bias)
@@ -1102,7 +1096,6 @@ static int vbr_init_2pass2(void *sstate)
 				if (newquant != oldquant)
 				{
 					oldquant = newquant;
-					percent = (int)((n - state->average_frame) * 100.0 / state->average_frame);
 				}
 
 			}
@@ -1160,6 +1153,11 @@ static int vbr_init_2pass2(void *sstate)
 
 	return(0);
 
+err_out:
+	if (state->pass1_file)
+		fclose(state->pass1_file);
+	state->pass1_file = NULL;
+	return -1;
 }
 
 static int vbr_getquant_2pass2(void *sstate)
@@ -1553,10 +1551,11 @@ static int vbr_update_2pass2(void *sstate,
 	state->last_quant = quant;
 
 	/* Update next frame data */
-	fscanf(state->pass1_file, "%d %d %d %d %d %d %d\n",
+	if (fscanf(state->pass1_file, "%d %d %d %d %d %d %d\n",
 	       &state->pass1_quant, &state->pass1_intra, &next_hbytes,
 	       &state->pass1_bytes, &next_kblocks, &next_mblocks,
-	       &next_ublocks);
+	       &next_ublocks) != 7)
+		return -1;
 
 	/* Save the last Keyframe pos */
 	if(intra)

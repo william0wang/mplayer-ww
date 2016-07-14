@@ -68,8 +68,9 @@ static const char *fExist(const char *fname)
  * @param fname filename (with path)
  * @param img memory location to store the image data
  *
- * @return 0 (ok), 1 (decoding error), 2 (open error), 3 (file too big),
- *                 4 (out of memory), 5 (read error), 6 (avcodec alloc error)
+ * @return 0 (ok), 1 (decoding error), 2 (file open error), 3 (file too big),
+ *                 4 (out of memory), 5 (read error), 6 (avcodec alloc error),
+ *                 7 (avcodec open error)
  */
 static int pngRead(const char *fname, guiImage *img)
 {
@@ -121,7 +122,13 @@ static int pngRead(const char *fname, guiImage *img)
     }
 
     avcodec_register_all();
-    avcodec_open2(avctx, avcodec_find_decoder(AV_CODEC_ID_PNG), NULL);
+
+    if (avcodec_open2(avctx, avcodec_find_decoder(AV_CODEC_ID_PNG), NULL) < 0) {
+        av_free(frame);
+        av_free(avctx);
+        av_free(data);
+        return 7;
+    }
 
     av_init_packet(&pkt);
     pkt.data = data;
@@ -134,19 +141,19 @@ static int pngRead(const char *fname, guiImage *img)
     memset(img, 0, sizeof(*img));
 
     switch (avctx->pix_fmt) {
-    case PIX_FMT_GRAY8:
+    case AV_PIX_FMT_GRAY8:
         img->Bpp = 8;
         break;
 
-    case PIX_FMT_GRAY16BE:
+    case AV_PIX_FMT_GRAY16BE:
         img->Bpp = 16;
         break;
 
-    case PIX_FMT_RGB24:
+    case AV_PIX_FMT_RGB24:
         img->Bpp = 24;
         break;
 
-    case PIX_FMT_RGBA:
+    case AV_PIX_FMT_RGBA:
         img->Bpp = 32;
         break;
 

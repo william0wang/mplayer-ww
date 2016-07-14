@@ -47,9 +47,9 @@ static int init(sh_audio_t *sh)
 static int preinit(sh_audio_t *sh_audio)
 {
   DS_AudioDecoder* ds_adec;
-  if(!(ds_adec=DS_AudioDecoder_Open(sh_audio->codec->dll,&sh_audio->codec->guid,sh_audio->wf)))
+  if(!(ds_adec=DS_AudioDecoder_Open(codec_idx2str(sh_audio->codec->dll_idx),&sh_audio->codec->guid,sh_audio->wf)))
   {
-    mp_msg(MSGT_DECAUDIO,MSGL_ERR,MSGTR_MissingDLLcodec,sh_audio->codec->dll);
+    mp_msg(MSGT_DECAUDIO,MSGL_ERR,MSGTR_MissingDLLcodec,codec_idx2str(sh_audio->codec->dll_idx));
     return 0;
   }
     sh_audio->i_bps=sh_audio->wf->nAvgBytesPerSec;

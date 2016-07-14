@@ -34,7 +34,6 @@
 #include "gui/app/gui.h"
 #include "gui/dialog/dialog.h"
 #include "gui/skin/skin.h"
-#include "gui/util/list.h"
 #include "gui/util/mem.h"
 #include "gui/util/string.h"
 #include "gui/wm/ws.h"
@@ -84,10 +83,11 @@ static void MediumPrepare(int type)
     case STREAMTYPE_FILE:
     case STREAMTYPE_STREAM:
     case STREAMTYPE_PLAYLIST:
+        guiInfo.Angles = 0;
+    case STREAMTYPE_BINCUE:
         guiInfo.AudioStreams = 0;
         guiInfo.Subtitles    = 0;
         guiInfo.Chapters     = 0;
-        guiInfo.Angles       = 0;
         break;
     }
 }
@@ -210,6 +210,7 @@ play:
                 if (!guiInfo.Track)
                     guiInfo.Track = (guiInfo.StreamType == STREAMTYPE_VCD ? 2 : 1);
 
+            case STREAMTYPE_BINCUE:   // track 0 is OK and will auto-select first media data track
                 guiInfo.MediumChanged = GUI_MEDIUM_SAME;
 
                 break;
@@ -248,6 +249,10 @@ play:
 
     case evLoadAudioFile:
         gtkShow(evLoadAudioFile, NULL);
+        break;
+
+    case evPlayImage:
+        gtkShow(evPlayImage, NULL);
         break;
 
     case evPrev:
@@ -304,7 +309,7 @@ play:
 
     case evSetMoviePosition:
         guiInfo.Position = param;
-        uiAbsSeek(guiInfo.Position);
+        uiPctSeek(guiInfo.Position);
         break;
 
     case evIncVolume:
@@ -572,8 +577,8 @@ void uiPause(void)
         mp_cmd_t *cmd = calloc(1, sizeof(*cmd));
 
         if (cmd) {
-            cmd->id   = MP_CMD_PAUSE;
-            cmd->name = strdup("pause");
+            cmd->id = MP_CMD_PAUSE;
+            ARRAY_STRCPY(cmd->name, "pause");
             mp_input_queue_cmd(cmd);
         }
     } else
@@ -597,6 +602,19 @@ void uiState(void)
 /**
  * @brief Seek new playback position.
  *
+ *        The new position is an absolute one.
+ *
+ * @param sec playback time in seconds to position to
+ */
+void uiAbsSeek(float sec)
+{
+    rel_seek_secs = sec;
+    abs_seek_pos  = SEEK_ABSOLUTE;
+}
+
+/**
+ * @brief Seek new playback position.
+ *
  *        The new position is a relative one.
  *
  * @param sec seconds to seek (either forward (> 0) or backward (< 0))
@@ -614,7 +632,7 @@ void uiRelSeek(float sec)
  *
  * @param percent percentage of playback time to position to
  */
-void uiAbsSeek(float percent)
+void uiPctSeek(float percent)
 {
     rel_seek_secs = percent / 100.0;
     abs_seek_pos  = SEEK_ABSOLUTE | SEEK_FACTOR;
@@ -693,6 +711,25 @@ void uiChangeSkin(char *name)
 }
 
 /**
+ * @brief Set the file to be played from a playlist item.
+ *
+ * @note This allows a file to be played partially (seeking before playback
+ *       and stopping before its end).
+ *
+ * @param item pointer to the playlist item
+ *
+ * @note All #guiInfo members associated with the file will be cleared.
+ */
+void uiSetFileFromPlaylist(plItem *item)
+{
+    uiSetFile(item->path, item->name, STREAMTYPE_FILE);
+    guiInfo.Start = item->start;
+    guiInfo.Stop  = item->stop;
+    guiInfo.Title = gstrdup(item->title);
+    guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, item);
+}
+
+/**
  * @brief Set the file to be played.
  *
  * @param dir directory (optional, else NULL)
@@ -737,10 +774,14 @@ void uiUnsetMedia(int totals)
     guiInfo.AudioChannels    = 0;
     guiInfo.AudioPassthrough = False;
     guiInfo.RunningTime      = 0;
+    guiInfo.Start = 0;
+    guiInfo.Stop  = 0;
 
     if (totals) {
         guiInfo.Chapters = 0;
-        guiInfo.Angles   = 0;
+
+        if (guiInfo.StreamType != STREAMTYPE_BINCUE)
+            guiInfo.Angles = 0;
     } else {
         guiInfo.Track   = 0;
         guiInfo.Chapter = 0;
@@ -748,8 +789,10 @@ void uiUnsetMedia(int totals)
     }
 
     nfree(guiInfo.CodecName);
+    nfree(guiInfo.Title);
     nfree(guiInfo.AudioFilename);
     nfree(guiInfo.SubtitleFilename);
+    nfree(guiInfo.ImageFilename);
 }
 
 /**
@@ -776,9 +819,8 @@ void uiCurr(void)
         curr = listMgr(PLAYLIST_ITEM_GET_CURR, 0);
 
         if (curr) {
-            uiSetFile(curr->path, curr->name, STREAMTYPE_FILE);
+            uiSetFileFromPlaylist(curr);
             guiInfo.PlaylistNext = False;
-            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, curr);
             break;
         }
 
@@ -841,14 +883,22 @@ void uiPrev(void)
 
         return;
 
+    case STREAMTYPE_BINCUE:
+
+        if (--guiInfo.Track == 0) {
+            guiInfo.Track = 1 + guiInfo.Angles;
+            stop = True;
+        }
+
+        break;
+
     default:
 
         prev = listMgr(PLAYLIST_ITEM_GET_PREV, 0);
 
         if (prev) {
-            uiSetFile(prev->path, prev->name, STREAMTYPE_FILE);
+            uiSetFileFromPlaylist(prev);
             guiInfo.PlaylistNext = !guiInfo.Playing;
-            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, prev);
             break;
         }
 
@@ -878,6 +928,7 @@ void uiNext(void)
     switch (guiInfo.StreamType) {
     case STREAMTYPE_CDDA:
     case STREAMTYPE_VCD:
+    case STREAMTYPE_BINCUE:
 
         if (++guiInfo.Track > guiInfo.Tracks) {
             guiInfo.Track = guiInfo.Tracks;
@@ -914,9 +965,8 @@ void uiNext(void)
         next = listMgr(PLAYLIST_ITEM_GET_NEXT, 0);
 
         if (next) {
-            uiSetFile(next->path, next->name, STREAMTYPE_FILE);
+            uiSetFileFromPlaylist(next);
             guiInfo.PlaylistNext = !guiInfo.Playing;
-            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
             break;
         }
 

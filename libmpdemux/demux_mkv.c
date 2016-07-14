@@ -853,7 +853,7 @@ static int demux_mkv_read_trackentry(demuxer_t *demuxer)
             uint64_t num = ebml_read_length(s, &x);
             // audit: cheap guard against overflows later..
             if (num > SIZE_MAX - 1000)
-                return 0;
+                goto err_out;
             l = x + num;
             track->private_data = malloc(num + AV_LZO_INPUT_PADDING);
             if (stream_read(s, track->private_data, num) != (int) num)
@@ -1135,6 +1135,7 @@ static int demux_mkv_read_chapters(demuxer_t *demuxer)
 
                                 switch (ebml_read_id(s, &il)) {
                                 case MATROSKA_ID_CHAPSTRING:
+                                    free(name);
                                     name = ebml_read_utf8(s, &l);
                                     break;
                                 default:
@@ -1495,6 +1496,7 @@ typedef struct {
 } videocodec_info_t;
 
 static const videocodec_info_t vinfo[] = {
+    {MKV_V_HEVC,      mmioFOURCC('h', 'e', 'v', '1'), 1},
     {MKV_V_MPEG1,     mmioFOURCC('m', 'p', 'g', '1'), 0},
     {MKV_V_MPEG2,     mmioFOURCC('m', 'p', 'g', '2'), 0},
     {MKV_V_MPEG4_SP,  mmioFOURCC('m', 'p', '4', 'v'), 1},
@@ -1503,6 +1505,7 @@ static const videocodec_info_t vinfo[] = {
     {MKV_V_MPEG4_AVC, mmioFOURCC('a', 'v', 'c', '1'), 1},
     {MKV_V_THEORA,    mmioFOURCC('t', 'h', 'e', 'o'), 1},
     {MKV_V_VP8,       mmioFOURCC('V', 'P', '8', '0'), 0},
+    {MKV_V_VP9,       mmioFOURCC('V', 'P', '9', '0'), 0},
     {NULL, 0, 0}
 };
 
@@ -1678,8 +1681,7 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
         WAVEFORMATEX *wf = (WAVEFORMATEX *) track->private_data;
         if (track->private_size > USHRT_MAX + sizeof(WAVEFORMATEX)) {
             mp_msg(MSGT_DEMUX, MSGL_ERR, "[mkv] Integer overflow!\n");
-            free_sh_audio(demuxer, track->tnum);
-            return 1;
+            goto err_out;
         }
         sh_a->wf = realloc(sh_a->wf, track->private_size);
         sh_a->wf->wFormatTag = le2me_16(wf->wFormatTag);
@@ -1725,7 +1727,7 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
             track->a_formattag = mmioFOURCC('M', 'P', '4', 'A');
         else if (!strcmp(track->codec_id, MKV_A_VORBIS)) {
             if (track->private_data == NULL)
-                return 1;
+                goto err_out;
             track->a_formattag = mmioFOURCC('v', 'r', 'b', 's');
         } else if (!strcmp(track->codec_id, MKV_A_QDMC))
             track->a_formattag = mmioFOURCC('Q', 'D', 'M', 'C');
@@ -1741,7 +1743,7 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
             if (track->private_data == NULL || track->private_size == 0) {
                 mp_msg(MSGT_DEMUX, MSGL_WARN,
                        MSGTR_MPDEMUX_MKV_FlacTrackDoesNotContainValidHeaders);
-                return 1;
+                goto err_out;
             }
             track->a_formattag = mmioFOURCC('f', 'L', 'a', 'C');
         } else if (track->private_size >= RAPROPERTIES4_SIZE) {
@@ -1758,8 +1760,7 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
         } else {
             mp_msg(MSGT_DEMUX, MSGL_WARN, MSGTR_MPDEMUX_MKV_UnknownAudioCodec,
                    track->codec_id, track->tnum);
-            free_sh_audio(demuxer, track->tnum);
-            return 1;
+            goto err_out;
         }
     }
 
@@ -1798,8 +1799,7 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
         if (track->private_data != NULL) {
             if (track->private_size > INT_MAX) {
                 mp_msg(MSGT_DEMUX, MSGL_ERR, "[mkv] Integer overflow!\n");
-                free_sh_audio(demuxer, track->tnum);
-                return 1;
+                goto err_out;
             }
             sh_a->codecdata = malloc(track->private_size);
             memcpy(sh_a->codecdata, track->private_data, track->private_size);
@@ -1815,8 +1815,7 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
             && (NULL != track->private_data)) {
             if (track->private_size > INT_MAX) {
                 mp_msg(MSGT_DEMUX, MSGL_ERR, "[mkv] Integer overflow!\n");
-                free_sh_audio(demuxer, track->tnum);
-                return 1;
+                goto err_out;
             }
             sh_a->codecdata = malloc(track->private_size);
             memcpy(sh_a->codecdata, track->private_data, track->private_size);
@@ -1858,8 +1857,7 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
     } else if (track->a_formattag == mmioFOURCC('v', 'r', 'b', 's')) {  /* VORBIS */
         if (track->private_size > USHRT_MAX) {
             mp_msg(MSGT_DEMUX, MSGL_ERR, "[mkv] Integer overflow!\n");
-            free_sh_audio(demuxer, track->tnum);
-            return 1;
+            goto err_out;
         }
         sh_a->wf->cbSize = track->private_size;
         sh_a->wf = realloc(sh_a->wf, sizeof(*sh_a->wf) + sh_a->wf->cbSize);
@@ -1869,7 +1867,8 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
                && !strncmp(track->codec_id, MKV_A_REALATRC, 7)) {
         /* Common initialization for all RealAudio codecs */
         unsigned char *src = track->private_data;
-        int codecdata_length, version;
+        unsigned char *src_end = src + track->private_size;
+        unsigned codecdata_length, version;
         int flavor;
 
         sh_a->wf->nAvgBytesPerSec = 0;  /* FIXME !? */
@@ -1882,52 +1881,62 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
         track->sub_packet_size = AV_RB16(src + 44);
         if (version == 4) {
             src += RAPROPERTIES4_SIZE;
+            if (src[0] + 1 > src_end - src) goto err_out;
             src += src[0] + 1;
+            if (src[0] + 1 > src_end - src) goto err_out;
             src += src[0] + 1;
-        } else
+        } else {
+            if (RAPROPERTIES5_SIZE > src_end - src) goto err_out;
             src += RAPROPERTIES5_SIZE;
+        }
 
+        if (4 > src_end - src) goto err_out;
         src += 3;
         if (version == 5)
             src++;
+        if (4 > src_end - src) goto err_out;
         codecdata_length = AV_RB32(src);
         src += 4;
+        codecdata_length = FFMIN(codecdata_length, src_end - src);
         sh_a->wf->cbSize = codecdata_length;
         sh_a->wf = realloc(sh_a->wf, sizeof(*sh_a->wf) + sh_a->wf->cbSize);
         memcpy(((char *) (sh_a->wf + 1)), src, codecdata_length);
 
         switch (track->a_formattag) {
         case mmioFOURCC('a', 't', 'r', 'c'):
-            sh_a->wf->nAvgBytesPerSec = atrc_fl2bps[flavor];
+            if (flavor < FF_ARRAY_ELEMS(atrc_fl2bps))
+                sh_a->wf->nAvgBytesPerSec = atrc_fl2bps[flavor];
             sh_a->wf->nBlockAlign = track->sub_packet_size;
             track->audio_buf =
-                malloc(track->sub_packet_h * track->audiopk_size);
+                calloc(track->sub_packet_h, track->audiopk_size);
             track->audio_timestamp =
-                malloc(track->sub_packet_h * sizeof(float));
+                calloc(track->sub_packet_h, sizeof(float));
             break;
         case mmioFOURCC('c', 'o', 'o', 'k'):
-            sh_a->wf->nAvgBytesPerSec = cook_fl2bps[flavor];
+            if (flavor < FF_ARRAY_ELEMS(cook_fl2bps))
+                sh_a->wf->nAvgBytesPerSec = cook_fl2bps[flavor];
             sh_a->wf->nBlockAlign = track->sub_packet_size;
             track->audio_buf =
-                malloc(track->sub_packet_h * track->audiopk_size);
+                calloc(track->sub_packet_h, track->audiopk_size);
             track->audio_timestamp =
-                malloc(track->sub_packet_h * sizeof(float));
+                calloc(track->sub_packet_h, sizeof(float));
             break;
         case mmioFOURCC('s', 'i', 'p', 'r'):
-            sh_a->wf->nAvgBytesPerSec = sipr_fl2bps[flavor];
+            if (flavor < FF_ARRAY_ELEMS(sipr_fl2bps))
+                sh_a->wf->nAvgBytesPerSec = sipr_fl2bps[flavor];
             sh_a->wf->nBlockAlign = track->coded_framesize;
             track->audio_buf =
-                malloc(track->sub_packet_h * track->audiopk_size);
+                calloc(track->sub_packet_h, track->audiopk_size);
             track->audio_timestamp =
-                malloc(track->sub_packet_h * sizeof(float));
+                calloc(track->sub_packet_h, sizeof(float));
             break;
         case mmioFOURCC('2', '8', '_', '8'):
             sh_a->wf->nAvgBytesPerSec = 3600;
             sh_a->wf->nBlockAlign = track->coded_framesize;
             track->audio_buf =
-                malloc(track->sub_packet_h * track->audiopk_size);
+                calloc(track->sub_packet_h, track->audiopk_size);
             track->audio_timestamp =
-                malloc(track->sub_packet_h * sizeof(float));
+                calloc(track->sub_packet_h, sizeof(float));
             break;
         }
 
@@ -1990,11 +1999,14 @@ static int demux_mkv_open_audio(demuxer_t *demuxer, mkv_track_t *track,
         memcpy((char *)(sh_a->wf + 1),(char *)&tta_head,sh_a->wf->cbSize);
     } else if (!track->ms_compat
                || (track->private_size < sizeof(*sh_a->wf))) {
-        free_sh_audio(demuxer, track->tnum);
-        return 1;
+        goto err_out;
     }
 
     return 0;
+
+err_out:
+    free_sh_audio(demuxer, track->tnum);
+    return 1;
 }
 
 static int demux_mkv_open_sub(demuxer_t *demuxer, mkv_track_t *track,
@@ -2267,6 +2279,7 @@ static int demux_mkv_read_block_lacing(uint8_t *buffer, uint64_t *size,
     *all_lace_sizes = NULL;
     lace_size = NULL;
     /* lacing flags */
+    if (!*size) goto err_out;
     flags = *buffer++;
     (*size)--;
 
@@ -2280,6 +2293,7 @@ static int demux_mkv_read_block_lacing(uint8_t *buffer, uint64_t *size,
     case 1:                    /* xiph lacing */
     case 2:                    /* fixed-size lacing */
     case 3:                    /* EBML lacing */
+        if (!*size) goto err_out;
         *laces = *buffer++;
         (*size)--;
         (*laces)++;
@@ -2291,10 +2305,12 @@ static int demux_mkv_read_block_lacing(uint8_t *buffer, uint64_t *size,
                 lace_size[i] = 0;
                 do {
                     lace_size[i] += *buffer;
+                    if (!*size) goto err_out;
                     (*size)--;
                 } while (*buffer++ == 0xFF);
                 total += lace_size[i];
             }
+            if (*size < total) goto err_out;
             lace_size[i] = *size - total;
             break;
 
@@ -2307,10 +2323,7 @@ static int demux_mkv_read_block_lacing(uint8_t *buffer, uint64_t *size,
         {
             int l;
             uint64_t num = ebml_read_vlen_uint(buffer, &l);
-            if (num == EBML_UINT_INVALID) {
-                free(lace_size);
-                return 1;
-            }
+            if (num == EBML_UINT_INVALID || *size < l) goto err_out;
             buffer += l;
             *size -= l;
 
@@ -2318,15 +2331,13 @@ static int demux_mkv_read_block_lacing(uint8_t *buffer, uint64_t *size,
             for (i = 1; i < *laces - 1; i++) {
                 int64_t snum;
                 snum = ebml_read_vlen_int(buffer, &l);
-                if (snum == EBML_INT_INVALID) {
-                    free(lace_size);
-                    return 1;
-                }
+                if (snum == EBML_INT_INVALID || *size < l) goto err_out;
                 buffer += l;
                 *size -= l;
                 lace_size[i] = lace_size[i - 1] + snum;
                 total += lace_size[i];
             }
+            if (*size < total) goto err_out;
             lace_size[i] = *size - total;
             break;
         }
@@ -2335,6 +2346,10 @@ static int demux_mkv_read_block_lacing(uint8_t *buffer, uint64_t *size,
     }
     *all_lace_sizes = lace_size;
     return 0;
+
+err_out:
+    free(lace_size);
+    return 1;
 }
 
 static void handle_subtitles(demuxer_t *demuxer, mkv_track_t *track,

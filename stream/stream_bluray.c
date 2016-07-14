@@ -54,7 +54,7 @@ struct bluray_priv_s {
     int current_title;
 };
 
-static struct stream_priv_s {
+static const struct stream_priv_s {
     int title;
     char *device;
 } bluray_stream_priv_dflts = {

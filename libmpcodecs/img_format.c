@@ -57,6 +57,7 @@ const char *vo_format_name(int format)
     case IMGFMT_XYZ12LE: return "XYZ 36-bit LE";
     case IMGFMT_XYZ12BE: return "XYZ 36-bit BE";
     case IMGFMT_GBR24P:  return "Planar GBR 24-bit";
+    case IMGFMT_GBR10P:  return "Planar GBR 30-bit";
     case IMGFMT_GBR12P:  return "Planar GBR 36-bit";
     case IMGFMT_GBR14P:  return "Planar GBR 42-bit";
     case IMGFMT_YVU9:    return "Planar YVU9";
@@ -80,6 +81,10 @@ const char *vo_format_name(int format)
     case IMGFMT_420P10_BE: return "Planar 420P 10-bit big-endian";
     case IMGFMT_420P9_LE:  return "Planar 420P 9-bit little-endian";
     case IMGFMT_420P9_BE:  return "Planar 420P 9-bit big-endian";
+    case IMGFMT_440P12_LE: return "Planar 440P 12-bit little-endian";
+    case IMGFMT_440P12_BE: return "Planar 440P 12-bit big-endian";
+    case IMGFMT_440P10_LE: return "Planar 440P 10-bit little-endian";
+    case IMGFMT_440P10_BE: return "Planar 440P 10-bit big-endian";
     case IMGFMT_422P16_LE: return "Planar 422P 16-bit little-endian";
     case IMGFMT_422P16_BE: return "Planar 422P 16-bit big-endian";
     case IMGFMT_422P14_LE: return "Planar 422P 14-bit little-endian";
@@ -142,6 +147,7 @@ const char *vo_format_name(int format)
     case IMGFMT_VDPAU_MPEG4:     return "MPEG-4 Part 2 VDPAU acceleration";
     case IMGFMT_VDPAU_WMV3:      return "WMV3 VDPAU acceleration";
     case IMGFMT_VDPAU_VC1:       return "VC1 VDPAU acceleration";
+    case IMGFMT_VDPAU_HEVC:      return "HEVC VDPAU acceleration";
     }
     snprintf(unknown_format,20,"Unknown 0x%04x",format);
     return unknown_format;
@@ -167,6 +173,12 @@ int mp_get_chroma_shift(int format, int *x_shift, int *y_shift, int *component_b
             break;
         case 0x53:
             bits = 9;
+            break;
+        case 0x54:
+            bits = 14;
+            break;
+        case 0x55:
+            bits = 12;
             break;
         default:
             err = 1;

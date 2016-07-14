@@ -1,6 +1,6 @@
 \" synced with 1.685
 \" synced with Revision: 34821
-.\" MPlayer (C) 2000-2015 El equipo de MPlayer
+.\" MPlayer (C) 2000-2016 El equipo de MPlayer
 .\" Esta página de manual ha sido escrita por Gabucino, Diego Biurrun,
 .\" Jonas Jermann y traducida al español por Juan Martín López.
 .\" Revisado por Juan A. Javierre
@@ -80,7 +80,7 @@ mencoder \- codificador de películas
 .
 .br
 .B mplayer
-[dvd|dvdnav]://[título|[título_inicial]-título_final] [/dispositivo]
+[dvd|dvdnav]://[título|[título_inicial]\-título_final] [/dispositivo]
 [opciones]
 .
 .br
@@ -524,7 +524,7 @@ las que se pasan por línea de comandos sustituyen a éstas.
 La sintaxis del fichero de configuración es 'opción=<valor>', todo lo que haya
 después de un '#' se considera un comentario.
 Se pueden activar las opciones que funcionan sin valores poniendo su valor a
-'yes' o '1' o 'true' y desactivarlas poniendo su valor a 'no' o '0' o 'false'.
+\&'yes' o '1' o 'true' y desactivarlas poniendo su valor a 'no' o '0' o 'false'.
 Se pueden especificar de este modo incluso las subopciones.
 .PP
 También se pueden escribir ficheros de configuración para medios específicos.
@@ -1689,7 +1689,7 @@ Especifica el ratio de la entrada:
 .IPs arate=<32000\-48000>
 Especifica el ratio de codificación del audio (por defecto: 48000 Hz,
 disponibles: 32000, 44100 y 48000 Hz).
-.IPs alayer=<1\-3>
+.IPs alayer=<1\-5>
 Especifica la capa de codificación MPEG para el audio (por defecto: 2).
 .IPs abitrate=<32\-448>
 Especifica el bitrate de codificación del audio (por defecto: 384).
@@ -2626,7 +2626,7 @@ el porcentaje es en relación con el total.
 .B \-volume <-1\-100> (vea también \-af volume)
 Establece el volumen inicial en el mezclador, ya sea por hardware o
 software (si se usa con \-softvol).
-Un valor de -1 (que es el valor por defecto) no cambiará el volumen.
+Un valor de \-1 (que es el valor por defecto) no cambiará el volumen.
 .
 .
 .
@@ -5041,7 +5041,7 @@ filtro de postprocesado simple
 .RSs
 .IPs quality
 0\-6 (por defecto: 3)
-.OPs "qp\ \ \ "
+.IPs "qp\ \ \ "
 parámetro para forzar la cuantización (por defecto: 0, usa qp del video)
 .IPs "modo\ \ \ "
 0: umbral fuerte (por defecto)
@@ -7804,7 +7804,7 @@ Vea el archivo AUTORES para obtener una lista de muchos otros
 contribuyentes.
 .
 .TP
-MPlayer es (C) 2000\-2015
+MPlayer es (C) 2000\-2016
 .B El Equipo MPlayer
 .
 .TP

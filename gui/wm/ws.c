@@ -79,7 +79,7 @@ static wsWindow *wsWindowList[wsWLCount];
 static int wsUseXShm   = True;
 static int wsUseXShape = True;
 
-static enum AVPixelFormat out_pix_fmt = PIX_FMT_NONE;
+static enum AVPixelFormat out_pix_fmt = AV_PIX_FMT_NONE;
 
 /* --- */
 
@@ -275,21 +275,21 @@ void wsInit(Display *display)
 #endif
 
     if (wsScreenDepth == 32 && wsRedMask == 0xff0000 && wsGreenMask == 0x00ff00 && wsBlueMask == 0x0000ff)
-        out_pix_fmt = PIX_FMT_RGB32;
+        out_pix_fmt = AV_PIX_FMT_RGB32;
     else if (wsScreenDepth == 32 && wsRedMask == 0x0000ff && wsGreenMask == 0x00ff00 && wsBlueMask == 0xff0000)
-        out_pix_fmt = PIX_FMT_BGR32;
+        out_pix_fmt = AV_PIX_FMT_BGR32;
     else if (wsScreenDepth == 24 && wsRedMask == 0xff0000 && wsGreenMask == 0x00ff00 && wsBlueMask == 0x0000ff)
-        out_pix_fmt = PIX_FMT_RGB24;
+        out_pix_fmt = AV_PIX_FMT_RGB24;
     else if (wsScreenDepth == 24 && wsRedMask == 0x0000ff && wsGreenMask == 0x00ff00 && wsBlueMask == 0xff0000)
-        out_pix_fmt = PIX_FMT_BGR24;
+        out_pix_fmt = AV_PIX_FMT_BGR24;
     else if (wsScreenDepth == 16 && wsRedMask == 0xf800 && wsGreenMask == 0x7e0 && wsBlueMask == 0x1f)
-        out_pix_fmt = PIX_FMT_RGB565;
+        out_pix_fmt = AV_PIX_FMT_RGB565;
     else if (wsScreenDepth == 16 && wsRedMask == 0x1f && wsGreenMask == 0x7e0 && wsBlueMask == 0xf800)
-        out_pix_fmt = PIX_FMT_BGR565;
+        out_pix_fmt = AV_PIX_FMT_BGR565;
     else if (wsScreenDepth == 15 && wsRedMask == 0x7c00 && wsGreenMask == 0x3e0 && wsBlueMask == 0x1f)
-        out_pix_fmt = PIX_FMT_RGB555;
+        out_pix_fmt = AV_PIX_FMT_RGB555;
     else if (wsScreenDepth == 15 && wsRedMask == 0x1f && wsGreenMask == 0x3e0 && wsBlueMask == 0x7c00)
-        out_pix_fmt = PIX_FMT_BGR555;
+        out_pix_fmt = AV_PIX_FMT_BGR555;
 }
 
 void wsDone(void)
@@ -1049,29 +1049,29 @@ void wsWindowBackground(wsWindow *win, int r, int g, int b)
     int color = 0;
 
     switch (out_pix_fmt) {
-    case PIX_FMT_RGB32:
-    case PIX_FMT_RGB24:
+    case AV_PIX_FMT_RGB32:
+    case AV_PIX_FMT_RGB24:
         color = (r << 16) + (g << 8) + b;
         break;
 
-    case PIX_FMT_BGR32:
-    case PIX_FMT_BGR24:
+    case AV_PIX_FMT_BGR32:
+    case AV_PIX_FMT_BGR24:
         color = (b << 16) + (g << 8) + r;
         break;
 
-    case PIX_FMT_RGB565:
+    case AV_PIX_FMT_RGB565:
         color = pack_rgb16(r, g, b);
         break;
 
-    case PIX_FMT_BGR565:
+    case AV_PIX_FMT_BGR565:
         color = pack_rgb16(b, g, r);
         break;
 
-    case PIX_FMT_RGB555:
+    case AV_PIX_FMT_RGB555:
         color = pack_rgb15(r, g, b);
         break;
 
-    case PIX_FMT_BGR555:
+    case AV_PIX_FMT_BGR555:
         color = pack_rgb15(b, g, r);
         break;
 
@@ -1210,7 +1210,7 @@ void wsWindowFullscreen(wsWindow *win)
     }
 
     /* some window managers lose ontop after fullscreen */
-    if (!win->isFullScreen & vo_ontop)
+    if (!win->isFullScreen && vo_ontop)
         wsWindowLayer(wsDisplay, win->WindowID, vo_ontop);
 
     wsWindowRaiseTop(wsDisplay, win->WindowID);
@@ -1322,6 +1322,7 @@ void wsImageCreate(wsWindow *win, int w, int h)
         win->xImage->data     = win->Shminfo.shmaddr;
         win->Shminfo.readOnly = False;
         XShmAttach(wsDisplay, &win->Shminfo);
+        XSync(wsDisplay, False);
         shmctl(win->Shminfo.shmid, IPC_RMID, 0);
     } else
 #endif
@@ -1367,7 +1368,7 @@ void wsImageRender(wsWindow *win, unsigned char *img)
     int dst_stride[4];
     int i;
 
-    sws_ctx = sws_getCachedContext(sws_ctx, win->xImage->width, win->xImage->height, PIX_FMT_RGB32,
+    sws_ctx = sws_getCachedContext(sws_ctx, win->xImage->width, win->xImage->height, AV_PIX_FMT_RGB32,
                                    win->xImage->width, win->xImage->height, out_pix_fmt,
                                    SWS_POINT, NULL, NULL, NULL);
     av_image_fill_linesizes(dst_stride, out_pix_fmt, win->xImage->width);

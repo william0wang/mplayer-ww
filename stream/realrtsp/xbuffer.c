@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
+#include <limits.h>
 #include "xbuffer.h"
 
 
@@ -69,7 +70,7 @@ void *xbuffer_free(void *buf) {
 
 
 void *xbuffer_copyin(void *buf, int index, const void *data, int len) {
-    if (!buf || !data) {
+    if (!buf || !data || index < 0 || len < 0 || len > INT_MAX - index) {
     return NULL;
   }
 
@@ -91,6 +92,9 @@ void *xbuffer_ensure_size(void *buf, int size) {
 
   xbuf = ((xbuffer_header_t*)(((uint8_t*)buf)-XBUFFER_HEADER_SIZE));
 
+  if (size < 0 || size > INT_MAX - XBUFFER_HEADER_SIZE - xbuf->chunk_size)
+    return NULL;
+
   if (xbuf->size < size) {
     new_size = size + xbuf->chunk_size - (size % xbuf->chunk_size);
     xbuf->size = new_size;
@@ -104,12 +108,16 @@ void *xbuffer_ensure_size(void *buf, int size) {
 
 
 void *xbuffer_strcat(void *buf, char *data) {
-
+  size_t blen, dlen;
   if (!buf || !data) {
     return NULL;
   }
+  blen = strlen(buf);
+  dlen = strlen(data);
+  if (blen >= INT_MAX || dlen > INT_MAX - 1 - blen)
+    return NULL;
 
-  buf = xbuffer_ensure_size(buf, strlen(buf)+strlen(data)+1);
+  buf = xbuffer_ensure_size(buf, blen+dlen+1);
 
   strcat(buf, data);
 

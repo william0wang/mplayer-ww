@@ -43,7 +43,7 @@ typedef struct {
   uint8_t *refimg;
 } gif_priv_t;
 
-#define GIF_SIGNATURE (('G' << 16) | ('I' << 8) | 'F')
+#define GIF_SIGNATURE (('G' << 24) | ('I' << 16) | ('F' << 8) | '8')
 
 #if defined GIFLIB_MAJOR && GIFLIB_MAJOR >= 5
 #define DGifOpen(a, b) DGifOpen(a, b, NULL)
@@ -60,7 +60,7 @@ typedef struct {
 static void print_gif_error(GifFileType *gif)
 {
   int err = GifError();
-  char *err_str = GifErrorString();
+  const char *err_str = GifErrorString();
 
   if (err_str)
     mp_msg(MSGT_DEMUX, MSGL_ERR, "\n[gif] GIF-LIB error: %s.\n", err_str);
@@ -84,8 +84,11 @@ static int my_read_gif(GifFileType *gif, uint8_t *buf, int len)
 
 static int gif_check_file(demuxer_t *demuxer)
 {
-  if (stream_read_int24(demuxer->stream) == GIF_SIGNATURE)
-    return DEMUXER_TYPE_GIF;
+  if (stream_read_dword(demuxer->stream) == GIF_SIGNATURE) {
+    int sig = stream_read_word(demuxer->stream);
+    if ((((sig & 0xff00) == 0x3700) || ((sig & 0xff00) == 0x3900)) && (sig & 0xff) == 'a')
+      return DEMUXER_TYPE_GIF;
+  }
   return 0;
 }
 
@@ -143,7 +146,7 @@ static int demux_gif_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
       }
       if (code == 0xF9) {
         int frametime = 0;
-        if (p[0] == 4) // is the length correct?
+        if (p && p[0] == 4) // is the length correct?
         {
           transparency = p[1] & 1;
           refmode = (p[1] >> 2) & 3;
@@ -204,6 +207,12 @@ static int demux_gif_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds)
 
   effective_map = gif->Image.ColorMap;
   if (effective_map == NULL) effective_map = gif->SColorMap;
+  if (effective_map == NULL) {
+    mp_msg(MSGT_DEMUX, MSGL_ERR, "[demux_gif] No local nor global colormap.\n");
+    free(buf);
+    free_demux_packet(dp);
+    return 0;
+  }
 
   {
     int y;
@@ -291,6 +300,17 @@ static demuxer_t* demux_open_gif(demuxer_t* demuxer)
 #endif
   if (!gif) {
     print_gif_error(NULL);
+    free(priv);
+    return NULL;
+  }
+
+  // Validate image size, most code in this demuxer assumes w*h <= INT_MAX
+  if ((int64_t)gif->SWidth * gif->SHeight > INT_MAX) {
+    mp_msg(MSGT_DEMUX, MSGL_ERR,
+           "[demux_gif] Unsupported picture size %dx%d.\n", gif->SWidth,
+           gif->SHeight);
+    if (DGifCloseFile(gif) == GIF_ERROR)
+      print_gif_error(NULL);
     free(priv);
     return NULL;
   }

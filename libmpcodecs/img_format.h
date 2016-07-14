@@ -59,6 +59,8 @@
 #define IMGFMT_XYZ12BE (IMGFMT_XYZ|12|128)
 
 #define IMGFMT_GBR24P (('G'<<24)|('B'<<16)|('R'<<8)|24)
+#define IMGFMT_GBR10PLE (('G'<<24)|('B'<<16)|('R'<<8)|30)
+#define IMGFMT_GBR10PBE (('G'<<24)|('B'<<16)|('R'<<8)|30|128)
 #define IMGFMT_GBR12PLE (('G'<<24)|('B'<<16)|('R'<<8)|36)
 #define IMGFMT_GBR12PBE (('G'<<24)|('B'<<16)|('R'<<8)|36|128)
 #define IMGFMT_GBR14PLE (('G'<<24)|('B'<<16)|('R'<<8)|42)
@@ -85,6 +87,7 @@
 #define IMGFMT_BGR16BE IMGFMT_BGR16
 #define IMGFMT_BGR16LE (IMGFMT_BGR16|128)
 #define IMGFMT_XYZ12  IMGFMT_XYZ12BE
+#define IMGFMT_GBR10P IMGFMT_GBR10PBE
 #define IMGFMT_GBR12P IMGFMT_GBR12PBE
 #define IMGFMT_GBR14P IMGFMT_GBR14PBE
 #else
@@ -108,6 +111,7 @@
 #define IMGFMT_BGR16BE (IMGFMT_BGR16|128)
 #define IMGFMT_BGR16LE IMGFMT_BGR16
 #define IMGFMT_XYZ12  IMGFMT_XYZ12LE
+#define IMGFMT_GBR10P IMGFMT_GBR10PLE
 #define IMGFMT_GBR12P IMGFMT_GBR12PLE
 #define IMGFMT_GBR14P IMGFMT_GBR14PLE
 #endif
@@ -176,6 +180,10 @@
 #define IMGFMT_422P10_BE 0x34323252
 #define IMGFMT_422P9_LE  0x53323234
 #define IMGFMT_422P9_BE  0x34323253
+#define IMGFMT_440P12_LE 0x55303434
+#define IMGFMT_440P12_BE 0x34343055
+#define IMGFMT_440P10_LE 0x52303434
+#define IMGFMT_440P10_BE 0x34343052
 #define IMGFMT_420P16_LE 0x51303234
 #define IMGFMT_420P16_BE 0x34323051
 #define IMGFMT_420P14_LE 0x54303234
@@ -197,6 +205,8 @@
 #define IMGFMT_422P12 IMGFMT_422P12_BE
 #define IMGFMT_422P10 IMGFMT_422P10_BE
 #define IMGFMT_422P9  IMGFMT_422P9_BE
+#define IMGFMT_440P12 IMGFMT_440P12_BE
+#define IMGFMT_440P10 IMGFMT_440P10_BE
 #define IMGFMT_420P16 IMGFMT_420P16_BE
 #define IMGFMT_420P14 IMGFMT_420P14_BE
 #define IMGFMT_420P12 IMGFMT_420P12_BE
@@ -215,6 +225,8 @@
 #define IMGFMT_422P12 IMGFMT_422P12_LE
 #define IMGFMT_422P10 IMGFMT_422P10_LE
 #define IMGFMT_422P9  IMGFMT_422P9_LE
+#define IMGFMT_440P12 IMGFMT_440P12_LE
+#define IMGFMT_440P10 IMGFMT_440P10_LE
 #define IMGFMT_420P16 IMGFMT_420P16_LE
 #define IMGFMT_420P14 IMGFMT_420P14_LE
 #define IMGFMT_420P12 IMGFMT_420P12_LE
@@ -224,8 +236,8 @@
 #define IMGFMT_IS_YUVP16_NE(fmt) IMGFMT_IS_YUVP16_LE(fmt)
 #endif
 
-#define IMGFMT_IS_YUVP16_LE(fmt) (((fmt - 0x51000034) & 0xfc0000ff) == 0)
-#define IMGFMT_IS_YUVP16_BE(fmt) (((fmt - 0x34000051) & 0xff0000fc) == 0)
+#define IMGFMT_IS_YUVP16_LE(fmt) (((fmt - 0x51000034) & 0xf80000ff) == 0)
+#define IMGFMT_IS_YUVP16_BE(fmt) (((fmt - 0x34000051) & 0xff0000f8) == 0)
 #define IMGFMT_IS_YUVP16(fmt)    (IMGFMT_IS_YUVP16_LE(fmt) || IMGFMT_IS_YUVP16_BE(fmt))
 
 /**
@@ -290,6 +302,7 @@ static inline int normalize_yuvp16(int fmt) {
 #define IMGFMT_VDPAU_WMV3          (IMGFMT_VDPAU|0x04)
 #define IMGFMT_VDPAU_VC1           (IMGFMT_VDPAU|0x05)
 #define IMGFMT_VDPAU_MPEG4         (IMGFMT_VDPAU|0x06)
+#define IMGFMT_VDPAU_HEVC          (IMGFMT_VDPAU|0x07)
 
 #define IMGFMT_IS_HWACCEL(fmt) (IMGFMT_IS_VDPAU(fmt) || IMGFMT_IS_XVMC(fmt))
 
@@ -299,13 +312,6 @@ typedef struct {
     int id;        // stream id. usually 0x1E0
     int timestamp; // pts, 90000 Hz counter based
 } vo_mpegpes_t;
-
-struct vdpau_frame_data {
-    struct vdpau_render_state *render_state;
-    const void *info;
-    unsigned bitstream_buffers_used;
-    const void *bitstream_buffers;
-};
 
 const char *vo_format_name(int format);
 

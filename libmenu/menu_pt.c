@@ -53,7 +53,7 @@ struct menu_priv_s {
   int auto_close;
 };
 
-static struct menu_priv_s cfg_dflt = {
+static const struct menu_priv_s cfg_dflt = {
   MENU_LIST_PRIV_DFLT,
   "Jump to",
   0

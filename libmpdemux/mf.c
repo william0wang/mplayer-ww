@@ -31,11 +31,7 @@
 
 #include "config.h"
 
-#ifdef HAVE_GLOB
-#include <glob.h>
-#else
 #include "osdep/glob.h"
-#endif
 #include "osdep/strsep.h"
 
 #include "mp_msg.h"
@@ -133,7 +129,7 @@ mf_t* open_mf(char * filename){
 
    for( i=0;i < gg.gl_pathc;i++ )
     {
-     stat( gg.gl_pathv[i],&fs );
+     if (stat( gg.gl_pathv[i],&fs ) == -1) continue;
      if( S_ISDIR( fs.st_mode ) ) continue;
      mf->names[i]=strdup( gg.gl_pathv[i] );
 //     mp_msg( MSGT_STREAM,MSGL_DBG2,"[mf] added file %d.: %s\n",i,mf->names[i] );

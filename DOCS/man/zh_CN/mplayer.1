@@ -1,5 +1,5 @@
-.\" sync with en/mplayer.1 rev. 37262
-.\" MPlayer (C) 2000-2015 MPlayer Team
+.\" sync with en/mplayer.1 rev. 37846
+.\" MPlayer (C) 2000-2016 MPlayer Team
 .\" This man page was/is translated by JRaSH<jrash06 at gmail.com>
 .
 .\" --------------------------------------------------------------------------
@@ -1293,9 +1293,9 @@ MPlayer 解析及使用播放列表文件的方式不具备防范恶意构建文
 安全性。\
 这些文件可能触发危险行为。\
 该隐患存在于迄今所有的 MPlayer 的版本中，但不幸的是之前未能\
-将此情况妥善写入文档中，而且一些用户已受此误导而将 -playlist 用于\
+将此情况妥善写入文档中，而且一些用户已受此误导而将 \-playlist 用于\
 不可信来源的参数。\
-请勿将 -playlist 用于任意的因特网来源或你不信任的文件！
+请勿将 \-playlist 用于任意的因特网来源或你不信任的文件！
 .br
 .I 注意：
 该选项处理为一项条目，其后的选项仅应用于该播放列表\
@@ -1848,7 +1848,9 @@ MPlayer 并不防止加载产生自不同 AVI 文件的索引，\
 特别是强制使用非交错格式的 AVI 解析器（可使某些损坏的 AVI 文件\
 重新可以播放）。\
 也可能有助于播放一些默认方式下交替而非同时播放音频和\
-视频的文件。
+视频的文件。\
+该选项可能急剧增加内存使用量，所以最好还是修复相关文件的\
+流交错合并格式。
 .
 .TP
 .B \-nobps（仅用于 AVI）
@@ -1912,7 +1914,7 @@ Hauppauge WinTV PVR\-150/250/350/500 和所有基于 IVTV 的卡\
 .IPs arate=<32000\-48000>
 指定编码音频的码率（默认值：48000 Hz，可用值：32000、\
 44100 和 48000 Hz)。
-.IPs alayer=<1\-3>
+.IPs alayer=<1\-5>
 指定 MPEG 音频编码层级（默认值：2）。
 .IPs abitrate=<32\-448>
 指定音频编码比特率（以 kbps 为单位）（默认值：384）。
@@ -2185,7 +2187,7 @@ radio://1, radio://104.4, radio_set_channel 1
 .I 注意：
 对于 bsdbt848 驱动，可以同时给出 bktr 和调谐器设备的名称，\
 使用逗号分隔两者，其中调谐器在 bktr 设备之后\
-（例如：-tv device=/dev/bktr1,/dev/tuner1）。
+（例如：\-tv device=/dev/bktr1,/dev/tuner1）。
 .IPs input=<参数值>
 指定输入源（默认值：0（电视），参见控制屏幕输出了解可用的输入源列表）。
 .IPs freq=<参数值>
@@ -2353,7 +2355,7 @@ ALSA 的硬件代码中须将‘:’替换为‘.’。
 .TP
 .B \-tvscan <选项1:选项2:...>（仅用于电视播放及 MPlayer 中）
 调整电视频道扫描器。\
-MPlayer 将同时打印“-tv channels=”选项中的值，\
+MPlayer 将同时打印“\-tv channels=”选项中的值，\
 包括已有的以及刚找到的频道。
 .sp 1
 可用子选项有：
@@ -2613,7 +2615,8 @@ SSA/ASS 渲染器能在那里放置字幕（与 \-ass\-use\-margins 组合使用
 .
 .TP
 .B \-noautosub
-关闭自动载入字幕文件的行为。
+关闭自动载入字幕文件的行为。\
+注意：VOBsub 字幕不受影响。
 .
 .TP
 .B \-osd\-duration <时间>
@@ -2765,7 +2768,7 @@ DVD/\:VOBsub 的抗锯齿/\:缩放模式。\
 .
 .TP
 .B \-sub\-fuzziness <模式>
-调整搜索字幕时模糊匹配的程度：
+调整搜索字幕时模糊匹配的程度（不适用于 VOBsub）：
 .PD 0
 .RSs
 .IPs 0
@@ -2811,7 +2814,7 @@ DVD/\:VOBsub 的抗锯齿/\:缩放模式。\
 .TP
 .B \-subcp <编码页>（仅用于 iconv）
 如果系统支持 iconv(3)，可使用该选项指定字幕的\
-编码页。其优先级高于 -utf8 和 -unicode 选\
+编码页。其优先级高于 \-utf8 和 \-unicode 选\
 项。
 .sp 1
 .I 示例：
@@ -2829,6 +2832,7 @@ DVD/\:VOBsub 的抗锯齿/\:缩放模式。\
 编码页。\
 如果不确定用哪个参数，可随便输入点什么，然后\
 查看 mplayer \-v 输出的可用语言。\
+如果不支持你的语言，可使用 __（两个下划线）。\
 备用编码页指定自动检测失败时使用的编码页。
 .sp 1
 .I 示例：
@@ -2839,6 +2843,8 @@ DVD/\:VOBsub 的抗锯齿/\:缩放模式。\
 使用 latin 2 作为备用。
 .IPs "\-subcp enca:pl:cp1250"
 猜测波兰语的编码方式，cp1250 作为备用方式。
+.IPs "\-subcp enca:__:latin1"
+使用通用语言检测（大部分为 unicode），以 latin1 为备用方式。
 .RE
 .PD 1
 .
@@ -2960,7 +2966,7 @@ support iconv(3) 以使用该选项可正常工作。）
 .
 .TP
 .B \-unicode
-告诉 MPlayer 将字幕文件作为 unicode 文本处理。（只有当 -subcp 和 -utf8 都未\
+告诉 MPlayer 将字幕文件作为 unicode 文本处理。（只有当 \-subcp 和 \-utf8 都未\
 使用时，该选项才可生效）
 .
 .TP
@@ -2971,8 +2977,8 @@ support iconv(3) 以使用该选项可正常工作。）
 .
 .TP
 .B "\-utf8 \ \ "
-告诉 MPlayer 将字幕文件作为 UTF-8 文本来处理。（只有当 -subcp 未指定时该选项才\
-生效，并且其优先级高于 -unicode。）
+告诉 MPlayer 将字幕文件作为 UTF-8 文本来处理。（只有当 \-subcp 未指定时该选项才\
+生效，并且其优先级高于 \-unicode。）
 .
 .TP
 .B \-vobsub <无后缀名的 VOBsub 文件名>
@@ -3043,7 +3049,7 @@ SOUND_DEVICE_NAMES。\
 .B \-volume <-1\-100>（另见 \-af volume）
 设置硬件或软件（如果使用了 \-softvol）混音器\
 的起始音量。\
-值为 -1（默认值）将不改变音量。
+值为 \-1（默认值）将不改变音量。
 .
 .
 .
@@ -3511,26 +3517,38 @@ VESA 帧缓冲不支持改变模式。
 .PD 1
 .
 .TP
+.B \-fs-border-left   <像素数>
+.TP
+.B \-fs-border-right  <像素数>
+.TP
+.B \-fs-border-top    <像素数>
+.TP
+.B \-fs-border-bottom <像素数>
+指定全屏模式下额外边框的宽度。\
+该边框用于所有显示的元素：视频、OSD 和 EOSD。\
+像素数是相对于屏幕分辨率的像素量而指定的。\
+目前仅 gl 视频输出驱动支持。
+.TP
 .B \-gamma <\-100\-100>
 调整视频信号的伽玛校正值（默认值：0）。\
 不是所有视频输出驱动都支持。
 .
 .TP
-.B \-geometry x[%][:y[%]] 或 [WxH][+-x+-y]
+.B \-geometry x[%][:y[%]] 或 [WxH][+\-x+\-y]
 调整屏幕上输出的初始位置。\
 x 和 y 指定的是从屏幕左上角到所显示图像的左上角\
 以像素为单位的距离。不过如果在参数值后有百分号\
 标记，就变为在该方向上以屏幕尺寸的百分数计量的\
 距离。\
 也支持标准 X11 的 \-geometry 选项的格式。在这种方式下，\
-诸如‘+10-50’表示“放在距左边界 10 个像素，\
-距下边界 50 个像素的地方”，而‘--20+-10’表示“放在越出\
+诸如‘+10\-50’表示“放在距左边界 10 个像素，\
+距下边界 50 个像素的地方”，而‘\-\-20+\-10’表示“放在越出\
 右边界 20 个像素，越出上边界 10 个像素的地方。”\
 如果使用 \-wid 选项指定了外部窗口，\
 那么 x 和 y 坐标是相对于窗口而非\
 屏幕的左上角。\
-使用完全支持 \-xineramascreen 的视频输出的驱动（direct3d、gl、gl_tiled、\
-vdpau、x11、xv、xvmc、corevideo）时，坐标是相对于 \-xineramascreen 选项\
+使用完全支持 \-screen 的视频输出的驱动（direct3d、gl、gl_tiled、\
+vdpau、x11、xv、xvmc、corevideo）时，坐标是相对于 \-screen 选项\
 所给屏幕的值。
 .br
 .I 注意：
@@ -3647,14 +3665,14 @@ ggi 和 gl_tiled 的驱动都支持。
 该功能是实验性的。
 .
 .TP
-.B \-border\-pos\-x <0.0\-1.0>（仅用于 -vo gl,xv,xvmc,vdpau,direct3d，默认值为 0.5）
+.B \-border\-pos\-x <0.0\-1.0>（仅用于 \-vo gl,xv,xvmc,vdpau,direct3d，默认值为 0.5）
 当使用黑边以调整画面大小适应屏幕宽高比时，该选项用于确定在何处摆放黑边。\
 值为 0.0 时将黑边放在右边，1.0 则放在左边。\
 值超出 0.0 \- 1.0 的范围时将在所对应的一边额外增加黑边的宽度并使另一边的部分画面\
 被移除。
 .
 .TP
-.B \-border\-pos\-y <0.0\-1.0>（仅用于 -vo gl,xv,xvmc,vdpau,direct3d only，默认值为 0.5）
+.B \-border\-pos\-y <0.0\-1.0>（仅用于 \-vo gl,xv,xvmc,vdpau,direct3d only，默认值为 0.5）
 与 \-border\-pos\-x 相似，但用于上下位置的黑边。\
 值为 0.0 时将黑边放在底部，1.0 则放在底部。
 .
@@ -3663,7 +3681,7 @@ ggi 和 gl_tiled 的驱动都支持。
 将显示的图像旋转 90、180 或 270 度。\
 也旋转 OSD，而不只是视频图像本身。\
 当前只有 gl 视频输出驱动支持。\
-对于其它视频输出类型可以使用 -vf ass,expand=osd=1,rotate=n。以后甚至可以自动应用这一行为。
+对于其它视频输出类型可以使用 \-vf ass,expand=osd=1,rotate=n。以后甚至可以自动应用这一行为。
 .
 .TP
 .B \-refreshrate <Hz>
@@ -3730,7 +3748,7 @@ dga、x11、xv、sdl 和 directx 视频输出驱动支持该选项。\
 程序管理。
 .
 .TP
-.B \-xineramascreen <\-2\-...>
+.B \-screen <\-2\-...>（\-xineramascreen 的别名）
 在 Xinerama 配置过程中（即单个桌面跨越多个显示终端显示），\
 该选项告诉 MPlayer 将影片显示在哪个屏幕上。\
 值为 \-2 表示跨越整个虚拟显示终端全屏幕显示（在这种\
@@ -4117,7 +4135,7 @@ Mac OS X CoreVideo 视频输出驱动
 .PD 0
 .RSs
 .IPs device_id=<数值>
-过时选项，可使用 \-xineramascreen 代替。
+过时选项，可使用 \-screen 代替。
 选择用于全屏模式的显示设备，或将其设为 \-1 以总是使用视频窗口所在的屏幕\
 （默认值：\-1 \- 自动选择）。
 .IPs shared_buffer
@@ -4216,9 +4234,9 @@ OpenGL 视频输出驱动，简单版本。\
 .PD 0
 .RSs
 .IPs backend=<n>
-选择要使用的后端/OpenGL的实现方式（默认值：-1）。
+选择要使用的后端/OpenGL的实现方式（默认值：\-1）。
 .RSss
--1：自动选择
+\-1：自动选择
 .br
 0：Win32/WGL
 .br
@@ -4787,7 +4805,7 @@ iTVC16）MPEG 解码器芯片（Hauppauge WinTV PVR-150/250/350/500）\
 使用的格式与 mjpegtools 所用的相同，所以有助于想用 mjpegtools 套装软件\
 处理视频的情况。\
 该选项支持 YV12 格式。\
-如果源文件格式不同且为隔行扫描格式，则注意要使用 -vf scale=::1 以确保转换时\
+如果源文件格式不同且为隔行扫描格式，则注意要使用 \-vf scale=::1 以确保转换时\
 使用隔行扫描模式。\
 可与 \-fixed\-vo 选项组合使用以拼接具有相同宽高值和\
 频率的文件。
@@ -6206,15 +6224,15 @@ unsigned long long counter   /*用于保持同步, 每当有新
 这些统计信息特别用于帮助调节音量\
 以防止削波。\
 音量以 dB 为单位打印并与用于音量的音频过滤器相兼容，\
-这些数值总是向 -0dB 方向取整。
+这些数值总是向 \-0dB 方向取整。
 .sp 1
 ‘n_samples’字段是过滤器读到的采样总数。\
 ‘mean_volume’字段是均方值的平方根。\
 ‘max_volume’字段的含义与其名完全一致（最大音量）。\
-‘histogram_Xdb’字段统计的是会有多少采样的值是 -XdB，此时 X 为\
+‘histogram_Xdb’字段统计的是会有多少采样的值是 \-XdB，此时 X 为\
 刚好低于最大音量的值。
 .sp 1
-例如，如果 max_volume 为 -7dB 并且 histogram_7dB 为 19，则‘volume=7’不会\
+例如，如果 max_volume 为 \-7dB 并且 histogram_7dB 为 19，则‘volume=7’不会\
 导致削波，而‘volume=8’将在刚好 19 个采样中导致削波。
 .
 .
@@ -7143,7 +7161,7 @@ FFmpeg 的解除隔行扫描过滤器，与 \-vf pp=fd 相同
 .I 示例：
 .br
 overlay="movie=$small_video, scale=160:120 [ca]; [in] [ca] overlay=16:8"
-mplayer -vf lavfi='$overlay' $big_video
+mplayer \-vf lavfi='$overlay' $big_video
 .
 .TP
 .B kerndeint[=阈值[:映射[:次序[:锐化[:双向]]]]]
@@ -8103,7 +8121,7 @@ stereo3d 选项用于转换不同的立体图像格式。
 在行交错的 3D 显示终端上显示全屏画面，\
 都需在视频未具有正确的高度时使用“scale”\
 过滤器将其缩放至准确的高度。典型的情况是，\
-高度为 1080 行（所以要使用诸如“-vf scale=1440:1080,stereo3d=sbsl:irl”\
+高度为 1080 行（所以要使用诸如“\-vf scale=1440:1080,stereo3d=sbsl:irl”\
 以处理 720p 平行排列方式编码的影片）。
 .RE
 .PD 1
@@ -8126,7 +8144,7 @@ stereo3d 选项用于转换不同的立体图像格式。
 应用变化坡度的周边区域大小。\
 较大的半径值带来较平缓的变化坡度，但同时使过滤器无法修改\
 靠近颜色变化丰富区域的像素（默认值：16）。
-.RE.
+.RE
 .
 .TP
 .B fixpts[=若干选项]
@@ -8167,7 +8185,7 @@ stereo3d 选项用于转换不同的立体图像格式。
 .sp 1
 .RS
 .I 注意：
-将该过滤器与任何种类的定位选项（包括 -ss 和 EDL）\
+将该过滤器与任何种类的定位选项（包括 \-ss 和 EDL）\
 一同使用可能会产生意想不到的结果。
 .RE
 .
@@ -12413,7 +12431,7 @@ rar p test-SVCD.rar | mencoder \-ovc lavc \-lavcopts vcodec=mpeg4:vbitrate=800 \
 MPlayer 最初由 Arpad Gereoffy 制作。\
 参见 AUTHORS 文件以查看其它众多贡献者的部分列表。
 .PP
-MPlayer 为 (C) 2000\-2015 MPlayer 团队所有
+MPlayer 为 (C) 2000\-2016 MPlayer 团队所有
 .PP
 本（英文）手册主要由 Gabucino、Jonas Jermann 和 Diego Biurrun 编写，\
 由 Diego Biurrun 维护。中文版由 JRaSH <jrash06 AT 163.com> 翻译。\

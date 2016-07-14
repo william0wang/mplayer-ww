@@ -186,6 +186,10 @@ const m_option_t mplayer_opts[]={
     {"panscanrange", &vo_panscanrange, CONF_TYPE_FLOAT, CONF_RANGE, -19.0, 99.0, NULL},
     {"border-pos-x", &vo_border_pos_x, CONF_TYPE_FLOAT, CONF_RANGE, -1, 2, NULL},
     {"border-pos-y", &vo_border_pos_y, CONF_TYPE_FLOAT, CONF_RANGE, -1, 2, NULL},
+    {"fs-border-left",   &vo_fs_border_l, CONF_TYPE_INT, CONF_RANGE, 0, INT_MAX, NULL},
+    {"fs-border-right",  &vo_fs_border_r, CONF_TYPE_INT, CONF_RANGE, 0, INT_MAX, NULL},
+    {"fs-border-top",    &vo_fs_border_t, CONF_TYPE_INT, CONF_RANGE, 0, INT_MAX, NULL},
+    {"fs-border-bottom", &vo_fs_border_b, CONF_TYPE_INT, CONF_RANGE, 0, INT_MAX, NULL},
     {"monitor-orientation", &vo_rotate, CONF_TYPE_INT, CONF_RANGE, 0, 3, NULL},
 
     {"grabpointer", &vo_grabpointer, CONF_TYPE_FLAG, 0, 0, 1, NULL},
@@ -208,6 +212,7 @@ const m_option_t mplayer_opts[]={
     {"nomouseinput", &vo_nomouse_input, CONF_TYPE_FLAG,0, 0, 1, NULL},
 
     {"xineramascreen", &xinerama_screen, CONF_TYPE_INT, CONF_RANGE, -2, 32, NULL},
+    {"screen",         &xinerama_screen, CONF_TYPE_INT, CONF_RANGE, -2, 32, NULL},
 
     {"brightness",&vo_gamma_brightness, CONF_TYPE_INT, CONF_RANGE, -100, 100, NULL},
     {"saturation",&vo_gamma_saturation, CONF_TYPE_INT, CONF_RANGE, -100, 100, NULL},

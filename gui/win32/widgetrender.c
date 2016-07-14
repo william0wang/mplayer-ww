@@ -128,7 +128,8 @@ static void stringreplace(char *dest, const char *what, const char *format, ... 
  *
  * @param how 0 (cut file path and extension),
  *            1 (additionally, convert lower case) or
- *            2 (additionally, convert upper case)
+ *            2 (additionally, convert upper case) or
+ *            4 (unaltered title if available, otherwise like 0)
  * @param fname memory location of a buffer to receive the converted Filename
  * @param maxlen size of the @a fname buffer
  *
@@ -144,7 +145,9 @@ static char *TranslateFilename (int how, char *fname, size_t maxlen)
     {
         case STREAMTYPE_FILE:
 
-            if (guiInfo.Filename && *guiInfo.Filename)
+            if ((how == 4) && guiInfo.Title)
+                av_strlcpy(fname, guiInfo.Title, maxlen);
+            else if (guiInfo.Filename && *guiInfo.Filename)
             {
                 p = strrchr(guiInfo.Filename, '\\');
 
@@ -237,6 +240,7 @@ static char *generatetextfromlabel(widget *item)
     stringreplace(text, "$D", "%3.0f", guiInfo.Balance);
     stringreplace(text, "$t", "%.2i", guiInfo.Track);
     stringreplace(text, "$o", "%s", acp(TranslateFilename(0, tmp, sizeof(tmp))));
+    stringreplace(text, "$O", "%s", acp(TranslateFilename(4, tmp, sizeof(tmp))));
     stringreplace(text, "$x", "%i", guiInfo.VideoWidth);
     stringreplace(text, "$y", "%i", guiInfo.VideoHeight);
     stringreplace(text, "$C", "%s", guiInfo.sh_video ? codecname : "");

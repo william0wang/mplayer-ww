@@ -111,6 +111,7 @@ typedef struct stationlist_s {
 struct pvr_t {
   int dev_fd;
   char *video_dev;
+  int first;
 
   /* v4l2 params */
   int mute;
@@ -149,6 +150,7 @@ pvr_init (void)
   pvr = calloc (1, sizeof (struct pvr_t));
   pvr->dev_fd = -1;
   pvr->video_dev = strdup (PVR_DEFAULT_DEVICE);
+  pvr->first = 1;
 
   /* v4l2 params */
   pvr->mute = 0;
@@ -443,7 +445,7 @@ parse_setup_stationlist (struct pvr_t *pvr)
     return -1;
   }
 
-  if (copycreate_stationlist (&(pvr->stationlist), -1) < 0)
+  if (copycreate_stationlist (&(pvr->stationlist), 0) < 0)
   {
     mp_msg (MSGT_OPEN, MSGL_FATAL,
             "%s No memory allocated for station list, giving up\n",
@@ -811,6 +813,10 @@ parse_encoder_options (struct pvr_t *pvr)
     pvr->layer = V4L2_MPEG_AUDIO_ENCODING_LAYER_2;
   else if (pvr_param_audio_layer == 3)
     pvr->layer = V4L2_MPEG_AUDIO_ENCODING_LAYER_3;
+  else if (pvr_param_audio_layer == 4)
+    pvr->layer = V4L2_MPEG_AUDIO_ENCODING_AAC;
+  else if (pvr_param_audio_layer == 5)
+    pvr->layer = V4L2_MPEG_AUDIO_ENCODING_AC3;
 
   /* -pvr abitrate=x */
   if (pvr_param_audio_bitrate != 0)
@@ -967,6 +973,75 @@ parse_encoder_options (struct pvr_t *pvr)
         break;
       }
     }
+
+    else if (pvr->layer == V4L2_MPEG_AUDIO_ENCODING_AAC)
+      pvr->audio_rate = pvr_param_audio_bitrate;
+
+    else if (pvr->layer == V4L2_MPEG_AUDIO_ENCODING_AC3)
+    {
+      switch (pvr_param_audio_bitrate)
+      {
+      case 32:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_32K;
+        break;
+      case 40:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_40K;
+        break;
+      case 48:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_48K;
+        break;
+      case 56:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_56K;
+        break;
+      case 64:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_64K;
+        break;
+      case 80:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_80K;
+        break;
+      case 96:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_96K;
+        break;
+      case 112:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_112K;
+        break;
+      case 128:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_128K;
+        break;
+      case 160:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_160K;
+        break;
+      case 192:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_192K;
+        break;
+      case 224:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_224K;
+        break;
+      case 256:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_256K;
+        break;
+      case 320:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_320K;
+        break;
+      case 384:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_384K;
+        break;
+      case 448:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_448K;
+        break;
+      case 512:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_512K;
+        break;
+      case 576:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_576K;
+        break;
+      case 640:
+        pvr->audio_rate = V4L2_MPEG_AUDIO_AC3_BITRATE_640K;
+        break;
+      default:
+        break;
+      }
+    }
   }
 
   /* -pvr amode=x */
@@ -1018,11 +1093,39 @@ parse_encoder_options (struct pvr_t *pvr)
 }
 
 static void
-add_v4l2_ext_control (struct v4l2_ext_control *ctrl,
+add_v4l2_ext_control (struct v4l2_ext_controls *ctrls, struct pvr_t *pvr,
                       uint32_t id, int32_t value)
 {
-  ctrl->id = id;
-  ctrl->value = value;
+#ifdef VIDIOC_QUERY_EXT_CTRL
+  struct v4l2_query_ext_ctrl qctrl = { .id = id };
+
+  /* add only if the device supports this control */
+  if (ioctl (pvr->dev_fd, VIDIOC_QUERY_EXT_CTRL, &qctrl) < 0)
+  {
+    mp_msg (MSGT_OPEN, MSGL_V,
+            "%s can't set control %d (unsupported)\n",
+            LOG_LEVEL_ENCODER, qctrl.id);
+    return;
+  }
+
+  if (qctrl.type == V4L2_CTRL_TYPE_MENU)
+  {
+    struct v4l2_querymenu qmenu = { .id = id, .index = value };
+
+    /* add only if the value is a valid menu choice */
+    if (ioctl (pvr->dev_fd, VIDIOC_QUERYMENU, &qmenu) < 0)
+    {
+      mp_msg (MSGT_OPEN, MSGL_ERR,
+              "%s can't set %s to %d (invalid menu choice)\n",
+              LOG_LEVEL_ENCODER, qctrl.name, value);
+      return;
+    }
+  }
+#endif
+
+  ctrls->controls[ctrls->count].id = id;
+  ctrls->controls[ctrls->count].value = value;
+  ctrls->count++;
 }
 
 static int
@@ -1030,7 +1133,6 @@ set_encoder_settings (struct pvr_t *pvr)
 {
   struct v4l2_ext_control *ext_ctrl = NULL;
   struct v4l2_ext_controls ctrls;
-  uint32_t count = 0;
 
   if (!pvr)
     return -1;
@@ -1041,53 +1143,53 @@ set_encoder_settings (struct pvr_t *pvr)
   ext_ctrl = (struct v4l2_ext_control *)
     malloc (PVR_MAX_CONTROLS * sizeof (struct v4l2_ext_control));
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_VIDEO_ASPECT,
+  ctrls.ctrl_class = V4L2_CTRL_CLASS_MPEG;
+  ctrls.count = 0;
+  ctrls.controls = ext_ctrl;
+
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_VIDEO_ASPECT,
                         pvr->aspect);
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ,
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ,
                         pvr->samplerate);
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_AUDIO_ENCODING,
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_AUDIO_ENCODING,
                         pvr->layer);
 
   switch (pvr->layer)
   {
   case V4L2_MPEG_AUDIO_ENCODING_LAYER_1:
-    add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_AUDIO_L1_BITRATE,
+    add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_AUDIO_L1_BITRATE,
                           pvr->audio_rate);
     break;
   case V4L2_MPEG_AUDIO_ENCODING_LAYER_2:
-    add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_AUDIO_L2_BITRATE,
+    add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_AUDIO_L2_BITRATE,
                           pvr->audio_rate);
     break;
   case V4L2_MPEG_AUDIO_ENCODING_LAYER_3:
-    add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_AUDIO_L3_BITRATE,
+    add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_AUDIO_L3_BITRATE,
                           pvr->audio_rate);
     break;
   default:
     break;
   }
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_AUDIO_MODE,
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_AUDIO_MODE,
                         pvr->audio_mode);
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_VIDEO_BITRATE,
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_VIDEO_BITRATE,
                         pvr->bitrate);
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_VIDEO_BITRATE_PEAK,
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_VIDEO_BITRATE_PEAK,
                         pvr->bitrate_peak);
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_VIDEO_BITRATE_MODE,
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_VIDEO_BITRATE_MODE,
                         pvr->bitrate_mode);
 
-  add_v4l2_ext_control (&ext_ctrl[count++], V4L2_CID_MPEG_STREAM_TYPE,
+  add_v4l2_ext_control (&ctrls, pvr, V4L2_CID_MPEG_STREAM_TYPE,
                         pvr->stream_type);
 
   /* set new encoding settings */
-  ctrls.ctrl_class = V4L2_CTRL_CLASS_MPEG;
-  ctrls.count = count;
-  ctrls.controls = ext_ctrl;
-
   if (ioctl (pvr->dev_fd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
   {
     mp_msg (MSGT_OPEN, MSGL_ERR, "%s Error setting MPEG controls (%s).\n",
@@ -1402,6 +1504,7 @@ v4l2_list_capabilities (struct pvr_t *pvr)
 
   /* list available norms */
   vs.index = 0;
+  err = 1;
   mp_msg (MSGT_OPEN, MSGL_INFO, "%s Available norms: ", LOG_LEVEL_V4L2);
   while (ioctl (pvr->dev_fd, VIDIOC_ENUMSTD, &vs) >= 0)
   {
@@ -1495,6 +1598,26 @@ v4l2_display_settings (struct pvr_t *pvr)
   return 0;
 }
 
+static int
+poll_device (struct pvr_t *pvr, int timeout)
+{
+  struct pollfd pfds[1];
+  int ret;
+
+  pfds[0].fd = pvr->dev_fd;
+  pfds[0].events = POLLIN | POLLPRI;
+
+  ret = poll (pfds, 1, timeout);
+  if (!ret)
+  {
+    mp_msg (MSGT_OPEN, MSGL_WARN,
+            "%s %dms timeout polling stream device\n",
+            LOG_LEVEL_PVR, timeout);
+  }
+
+  return ret;
+}
+
 /* stream layer */
 
 static void
@@ -1512,7 +1635,6 @@ pvr_stream_close (stream_t *stream)
 static int
 pvr_stream_read (stream_t *stream, char *buffer, int size)
 {
-  struct pollfd pfds[1];
   struct pvr_t *pvr;
   int rk, fd, pos;
 
@@ -1528,12 +1650,21 @@ pvr_stream_read (stream_t *stream, char *buffer, int size)
 
   while (pos < size)
   {
-    pfds[0].fd = fd;
-    pfds[0].events = POLLIN | POLLPRI;
+    if (pvr->first)
+    {
+      mp_msg (MSGT_OPEN, MSGL_INFO,
+              "%s Waiting for stream to begin...\n", LOG_LEVEL_PVR);
+      rk = poll_device (pvr, 5000);
+      pvr->first = 0;
+    }
+    else
+      rk = poll_device (pvr, 500);
 
-    rk = size - pos;
+    if (!rk)
+      return -1;
 
-    if (poll (pfds, 1, 500) <= 0)
+    rk = read (fd, &buffer[pos], size-pos);
+    if (rk < 0)
     {
       mp_msg (MSGT_OPEN, MSGL_ERR,
               "%s failed with errno %d when reading %d bytes\n",
@@ -1541,13 +1672,12 @@ pvr_stream_read (stream_t *stream, char *buffer, int size)
       break;
     }
 
-    rk = read (fd, &buffer[pos], rk);
-    if (rk > 0)
-    {
-      pos += rk;
-      mp_msg (MSGT_OPEN, MSGL_DBG3,
-              "%s read (%d) bytes\n", LOG_LEVEL_PVR, pos);
-    }
+    if (!rk)
+      break;
+
+    pos += rk;
+    mp_msg (MSGT_OPEN, MSGL_DBG3,
+            "%s read (%d) bytes\n", LOG_LEVEL_PVR, pos);
   }
 
   if (!pos)

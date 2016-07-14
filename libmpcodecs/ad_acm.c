@@ -96,7 +96,7 @@ static int preinit(sh_audio_t *sh_audio)
 	print_wave_header(priv->o_wf, MSGL_V);
     }
 
-    MSACM_RegisterDriver((const char *)sh_audio->codec->dll, in_fmt->wFormatTag, 0);
+    MSACM_RegisterDriver(codec_idx2str(sh_audio->codec->dll_idx), in_fmt->wFormatTag, 0);
     ret = acmStreamOpen(&priv->handle, (HACMDRIVER)NULL, in_fmt,
 			priv->o_wf, NULL, 0, 0, 0);
     if (ret)

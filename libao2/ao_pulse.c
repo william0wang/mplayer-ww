@@ -53,6 +53,8 @@ static struct pa_threaded_mainloop *mainloop;
 
 static int broken_pause;
 
+static size_t bytes_per_sample;
+
 LIBAO_EXTERN(pulse)
 
 #define GENERIC_ERR_MSG(ctx, str) \
@@ -201,6 +203,8 @@ static int init(int rate_hz, int channels, int format, int flags) {
     }
 
     pa_channel_map_init_auto(&map, ss.channels, PA_CHANNEL_MAP_ALSA);
+    bytes_per_sample = af_fmt2bits(ao_data.format) / 8;
+    bytes_per_sample *= ao_data.channels;
     ao_data.bps = pa_bytes_per_second(&ss);
 
     if (!(mainloop = pa_threaded_mainloop_new())) {
@@ -297,6 +301,11 @@ static void uninit(int immed) {
 
 /** Play the specified data to the pulseaudio server */
 static int play(void* data, int len, int flags) {
+    //Align length to frame size
+    len=len - (len % bytes_per_sample);
+    if (len==0) {
+      return 0;
+    }
     pa_threaded_mainloop_lock(mainloop);
     if (pa_stream_write(stream, data, len, NULL, 0, PA_SEEK_RELATIVE) < 0) {
         GENERIC_ERR_MSG(context, "pa_stream_write() failed");
