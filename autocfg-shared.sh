@@ -32,5 +32,9 @@ if test $_gcc != no; then
     _config+="    --cc=$_gcc "
 fi
 
+cd ffmpeg
+./autocfg.sh
+cd ..
+
 ./configure $_config
 

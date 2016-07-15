@@ -174,7 +174,7 @@ static void write_text_table(FILE *fd , const char *name, const char *format, ..
 		vsnprintf(tmp, INFO_MAX, format, va);
 		va_end(va);
 	}
-	
+
 	fprintf(fd ," ,_,%s,_,%s\n", name, tmp);
 }
 
@@ -226,7 +226,7 @@ static void write_html_table(FILE *fd , const char *name, const char *format, ..
 		vsnprintf(tmp, INFO_MAX, format, va);
 		va_end(va);
 	}
-	
+
 	fprintf(fd ,"<div class=\"info\"><div class=\"info_name\">%s</div>\n", name);
 	fprintf(fd ,"<div class=\"info_val\">%s</div></div>\n", tmp);
 }
@@ -503,7 +503,7 @@ static int create_html(const char *htmlfile)
 	FILE *fd = NULL;
 	if ( ( fd = fopen(htmlfile,"w") ) == NULL )
 		return 0;
-	
+
 	initlang();
 	write_text_table_head(fd,str_normal);
 	write_text_table(fd,str_name,filename);
@@ -538,7 +538,7 @@ static int create_html(const char *htmlfile)
 			snprintf(muxer, 64, "%s", mpctx->demuxer->desc->name);
 		}
 		write_text_table(fd, str_demuxer, muxer);
-	
+
 		if(mpctx->demuxer->type == DEMUXER_TYPE_MATROSKA)
 		{
 			mkv_d = (mkv_demuxer_t *)mpctx->demuxer->priv;
@@ -582,7 +582,7 @@ static int create_html(const char *htmlfile)
 		write_text_table(fd,str_aspect,"%1.4f",get_aspect(mpctx->sh_video->aspect));
 		write_text_table(fd,str_bitrate,"%d Kbps",get_video_bps(mpctx->sh_video->i_bps*8 / 1024));
 		write_text_table(fd,str_fps,"%5.3f",mpctx->sh_video->fps);
-		write_text_table(fd,str_codec,"[%s] %s",mpctx->sh_video->codec->name ,mpctx->sh_video->codec->info);
+		write_text_table(fd,str_codec,"[%s] %s",codec_idx2str(mpctx->sh_video->codec->name_idx) ,codec_idx2str(mpctx->sh_video->codec->info_idx));
 	}
 	if (mpctx->sh_audio)
 	{
@@ -592,7 +592,7 @@ static int create_html(const char *htmlfile)
 		write_text_table(fd,str_bitrate,"%d Kbps",mpctx->sh_audio->i_bps*8 / 1000);
 		write_text_table(fd,str_rate,"%d Hz",mpctx->sh_audio->samplerate);
 		write_text_table(fd,str_nch,"%d",mpctx->sh_audio->channels);
-		write_text_table(fd,str_codec,"[%s] %s",mpctx->sh_audio->codec->name ,mpctx->sh_audio->codec->info);
+		write_text_table(fd,str_codec,"[%s] %s",codec_idx2str(mpctx->sh_video->codec->name_idx) ,codec_idx2str(mpctx->sh_video->codec->info_idx));
 	}
 	if(mpctx->demuxer && mpctx->demuxer->info) {
 		info = mpctx->demuxer->info;
@@ -727,7 +727,7 @@ static void initlist(HWND hDlg)
 		addinfo(hDlg, 0,  str_aspect,"%1.4f",get_aspect(mpctx->sh_video->aspect));
 		addinfo(hDlg, 0,  str_bitrate,"%d Kbps",get_video_bps(mpctx->sh_video->i_bps*8 / 1024));
 		addinfo(hDlg, 0,  str_fps,"%5.3f",mpctx->sh_video->fps);
-		addinfo(hDlg, 0,  str_codec,"[%s] %s",mpctx->sh_video->codec->name ,mpctx->sh_video->codec->info);
+		addinfo(hDlg, 0,  str_codec,"[%s] %s",codec_idx2str(mpctx->sh_video->codec->name_idx) ,codec_idx2str(mpctx->sh_video->codec->info_idx));
 	}
 	if (mpctx->sh_audio)
 	{
@@ -737,7 +737,7 @@ static void initlist(HWND hDlg)
 		addinfo(hDlg, 0,  str_bitrate,"%d Kbps",mpctx->sh_audio->i_bps*8 / 1000);
 		addinfo(hDlg, 0,  str_rate,"%d Hz",mpctx->sh_audio->samplerate);
 		addinfo(hDlg, 0,  str_nch,"%d",mpctx->sh_audio->channels);
-		addinfo(hDlg, 0,  str_codec,"[%s] %s",mpctx->sh_audio->codec->name ,mpctx->sh_audio->codec->info);
+		addinfo(hDlg, 0,  str_codec,"[%s] %s",codec_idx2str(mpctx->sh_video->codec->name_idx) ,codec_idx2str(mpctx->sh_video->codec->info_idx));
 	}
 	if(mpctx->demuxer && mpctx->demuxer->info) {
 		info = mpctx->demuxer->info;
@@ -781,7 +781,7 @@ static DWORD WINAPI threadProc(LPVOID lpParam){
 	SetThreadPriority(hInfoThread, THREAD_PRIORITY_LOWEST);
 	if(!filename)
 		return 1;
-	
+
 	if(info_to_html)
 	{
 		char *infofile = get_path("\\tools\\media_info.txt");

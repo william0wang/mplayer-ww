@@ -1360,8 +1360,6 @@ int sub_utf8_prev=0;
 
 #ifdef CONFIG_ICONV
 
-static const char* guess_cp(stream_t *st, const char *preferred_language, const char *fallback);
-
 void	subcp_open (stream_t *st)
 {
 	char *tocp = "UTF-8";
@@ -1621,7 +1619,7 @@ const char* guess_buffer_cp(unsigned char* buffer, int buflen, const char *prefe
 }
 
 #define MAX_GUESS_BUFFER_SIZE (256*1024)
-static const char* guess_cp(stream_t *st, const char *preferred_language, const char *fallback)
+const char* guess_cp(stream_t *st, const char *preferred_language, const char *fallback)
 {
     size_t buflen;
     unsigned char *buffer;

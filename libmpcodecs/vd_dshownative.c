@@ -102,7 +102,7 @@ static int init(sh_video_t *sh)
     if (sh->ds->demuxer->filename)
         GetFullPathNameA(sh->ds->demuxer->filename, MAX_PATH, fname, NULL);
 
-    if (!(dsn.codec = dsn.DSOpenVideoCodec(sh->codec->dll, sh->codec->guid, sh->bih,
+    if (!(dsn.codec = dsn.DSOpenVideoCodec(codec_idx2str(sh->codec->dll_idx), sh->codec->guid, sh->bih,
                                            sh->codec->outfmt[sh->outfmtidx], sh->fps, fname, is_mpegts_format, &err)))
     {
         mp_msg(MSGT_DECVIDEO, MSGL_ERR, "[dshownative] Codec init failed: %s\n", dsn.DSStrError(err));

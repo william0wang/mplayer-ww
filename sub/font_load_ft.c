@@ -1112,6 +1112,15 @@ int done_freetype(void)
 
 void load_font_ft(int width, int height, font_desc_t** fontp, const char *font_name, float font_scale_factor)
 {
+#ifdef CONFIG_FONTCONFIG
+    FcPattern *fc_pattern;
+    FcPattern *fc_pattern2;
+    FcChar8 *s;
+    int face_index;
+    FcBool scalable;
+    FcResult result = FcResultMatch;
+#endif
+
     font_desc_t *vo_font = *fontp;
     vo_image_width = width;
     vo_image_height = height;

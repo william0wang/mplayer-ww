@@ -387,11 +387,11 @@ static int init(sh_video_t *sh){
         }
         lavc_param_threads = numberOfCPUs;
 #endif
-        if(lavc_codec->id == CODEC_ID_H264 || lavc_codec->id == CODEC_ID_MPEG2TS ||
-				lavc_codec->id == CODEC_ID_MPEG2VIDEO_XVMC) {
+        if(lavc_codec->id == AV_CODEC_ID_H264 || lavc_codec->id == AV_CODEC_ID_MPEG2TS ||
+				lavc_codec->id == AV_CODEC_ID_MPEG2VIDEO_XVMC) {
             if (lavc_param_threads > 16) lavc_param_threads = 16;
-            if (lavc_param_threads > 1 && (lavc_codec->id == CODEC_ID_MPEG2VIDEO ||
-              lavc_codec->id == CODEC_ID_MPEG2TS || lavc_codec->id == CODEC_ID_MPEG2VIDEO_XVMC))
+            if (lavc_param_threads > 1 && (lavc_codec->id == AV_CODEC_ID_MPEG2VIDEO ||
+              lavc_codec->id == AV_CODEC_ID_MPEG2TS || lavc_codec->id == AV_CODEC_ID_MPEG2VIDEO_XVMC))
                 vd_use_slices = 0;
             mp_msg(MSGT_DECVIDEO, MSGL_INFO, "Spawning %d decoding thread%s...\n", lavc_param_threads, lavc_param_threads == 1 ? "" : "s");
         } else {

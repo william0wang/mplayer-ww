@@ -395,8 +395,8 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
                         codec->codec_tag= MKTAG(24, 'R', 'G', 'B');
                         break;
                 }
-            } else if(is_matroska_format && (codec->codec_id == CODEC_ID_RV40 ||
-				codec->codec_id == CODEC_ID_RV30 || codec->codec_id == CODEC_ID_RV20)) {
+            } else if(is_matroska_format && (codec->codec_id == AV_CODEC_ID_RV40 ||
+				codec->codec_id == AV_CODEC_ID_RV30 || codec->codec_id == AV_CODEC_ID_RV20)) {
 					mkv_realdemux = 1;
 			}
             codec->codec_tag = mp_codec_id2tag(codec->codec_id, codec->codec_tag, 0);

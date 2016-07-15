@@ -3280,9 +3280,10 @@ int reinit_video_chain(void)
     initialized_flags |= INITIALIZED_VCODEC;
 
     if (sh_video->codec) {
-	    if(!strcasecmp(sh_video->codec->name, "wmv11dmo") || !strcasecmp(sh_video->codec->name, "wmvvc1dmo") ||
-                !strcasecmp(sh_video->codec->name, "wmvdmo") || !strcasecmp(sh_video->codec->name, "wmv9dmo") ||
-				!strcasecmp(sh_video->codec->name, "coreavcwindows")) {
+        const char *codec_name = codec_idx2str(sh_video->codec->name_idx);
+	    if(!strcasecmp(codec_name, "wmv11dmo") || !strcasecmp(codec_name, "wmvvc1dmo") ||
+                !strcasecmp(codec_name, "wmvdmo") || !strcasecmp(codec_name, "wmv9dmo") ||
+				!strcasecmp(codec_name, "coreavcwindows")) {
     	    codec_swap_uv = 1;
         }
         mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_VIDEO_CODEC=%s\n", codec_idx2str(sh_video->codec->name_idx));
