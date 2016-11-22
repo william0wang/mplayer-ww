@@ -1,0 +1,6 @@
+{
+  "name": "MPlayer-WW",
+  "tagline": "MPlayer-WW for windows",
+  "body": "### MPlayer-WW for windows.\r\n\r\n* Multithreaded H264、MPEG-2 Decoder (ffmpeg-mt).\r\n* Support DirectShow Demuxer and Decoder.\r\n* Fully compatible with CoreAVC Decoder.\r\n* PMP Demuxer for PSP media file.\r\n* Better compatibility with TS, TP, HDTV.\r\n* Skin and Windows Native Theme Support.\r\n* Support Winamp's DSP plugins.\r\n* Native Playlist and Video Equalizer Window.\r\n* MEditor2 (MPlayer Preference) Graphic Setting Program.\r\n* Direct3D and OpenGL Video Output.\r\n* Auto Play Next file and so on (thinks for KK's patch)\r\n\r\n### Download The Latest Version:\r\n[MPlayer SVN-r37356(20150113)](http://sourceforge.net/projects/mplayer-ww/files/MPlayer_Release/Revision%2037356/mplayer_lite_r37356.7z/download)\r\n\r\n### Support or Contact\r\nHaving trouble? Check out our [project](https://github.com/william0wang/mplayer-ww/) or [contact support](https://github.com/william0wang/mplayer-ww/issues).\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
