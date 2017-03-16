@@ -119,8 +119,10 @@ typedef struct {
     stream_language_t Subtitle[32];
 
     char *Filename;           // public, read access by MPlayer
+    char *Title;
     char *AudioFilename;
     char *SubtitleFilename;
+    char *ImageFilename;
 
     int Tracks;
     int Track;                // public, read access by MPlayer
@@ -140,6 +142,9 @@ typedef struct {
 
     int MediumChanged;        // public, read access by MPlayer
     int PlaylistNext;
+
+    int Start;
+    int Stop;
 } guiInterface_t;
 
 extern guiInterface_t guiInfo;

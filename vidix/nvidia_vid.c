@@ -49,7 +49,7 @@ static pciinfo_t pci_info;
 #define NV04_BES_SIZE 1024*2000*4
 
 
-static vidix_capability_t nvidia_cap = {
+static const vidix_capability_t nvidia_cap = {
     "NVIDIA RIVA OVERLAY DRIVER",
     "Sascha Sommer <saschasommer@freenet.de>",
     TYPE_OUTPUT,
@@ -355,7 +355,6 @@ static int nv_probe(int verbose, int force){
 			mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] Device is disabled, ignoring\n");
 			continue;
 		}
-		nvidia_cap.device_id = lst[i].device;
 		err = 0;
 		memcpy(&pci_info, &lst[i], sizeof(pciinfo_t));
 		break;
@@ -882,9 +881,12 @@ static rivatv_info* info;
 
 static int nv_init(void){
 	int mtrr;
+	int chip;
   info = calloc(1,sizeof(rivatv_info));
   info->control_base = map_phys_mem(pci_info.base0, 0x00C00000 + 0x00008000);
-  info->chip.arch =  nvidia_card_ids[find_chip(pci_info.device)].arch;
+  chip = find_chip(pci_info.device);
+  if (chip < 0) chip = 0;
+  info->chip.arch =  nvidia_card_ids[chip].arch;
   mp_msg(MSGT_VO, MSGL_STATUS, "[nvidia_vid] arch %x register base %p\n",info->chip.arch,info->control_base);
   info->chip.PFIFO  = (uint32_t *) (info->control_base + 0x00002000);
   info->chip.FIFO   = (uint32_t *) (info->control_base + 0x00800000);
@@ -980,6 +982,7 @@ static void nv_destroy(void){
 
 static int nv_get_caps(vidix_capability_t *to){
     memcpy(to, &nvidia_cap, sizeof(vidix_capability_t));
+    to->device_id = pci_info.device;
     return 0;
 }
 
@@ -1107,7 +1110,7 @@ static int nv_get_eq(vidix_video_eq_t *eq_parm) {
   return 0;
 }
 
-VDXDriver nvidia_drv = {
+const VDXDriver nvidia_drv = {
   "nvidia",
   NULL,
   .probe = nv_probe,

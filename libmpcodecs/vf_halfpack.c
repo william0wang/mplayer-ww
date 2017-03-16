@@ -38,7 +38,7 @@ struct vf_priv_s {
 	struct SwsContext *ctx;
 };
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
 static void halfpack_MMX(unsigned char *dst, unsigned char *src[3],
 		     int dststride, int srcstride[3],
 		     int w, int h)
@@ -198,8 +198,8 @@ static int config(struct vf_instance *vf,
 		sws_freeContext(vf->priv->ctx);
 		// get unscaled 422p -> yuy2 conversion
 		vf->priv->ctx =
-			sws_getContext(width, height / 2, PIX_FMT_YUV422P,
-			               width, height / 2, PIX_FMT_YUYV422,
+			sws_getContext(width, height / 2, AV_PIX_FMT_YUV422P,
+			               width, height / 2, AV_PIX_FMT_YUYV422,
 			               SWS_POINT | SWS_PRINT_INFO,
 			               NULL, NULL, NULL);
 	}
@@ -238,7 +238,7 @@ static int vf_open(vf_instance_t *vf, char *args)
 	if (args) sscanf(args, "%d", &vf->priv->field);
 
 	halfpack = halfpack_C;
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
 	if(gCpuCaps.hasMMX) halfpack = halfpack_MMX;
 #endif
 	return 1;

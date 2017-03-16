@@ -51,9 +51,9 @@ static int preinit(sh_audio_t *sh_audio)
   DMO_AudioDecoder* ds_adec;
   int chans=(audio_output_channels==sh_audio->wf->nChannels) ?
       audio_output_channels : (sh_audio->wf->nChannels>=2 ? 2 : 1);
-  if(!(ds_adec=DMO_AudioDecoder_Open(sh_audio->codec->dll,&sh_audio->codec->guid,sh_audio->wf,chans)))
+  if(!(ds_adec=DMO_AudioDecoder_Open(codec_idx2str(sh_audio->codec->dll_idx),&sh_audio->codec->guid,sh_audio->wf,chans)))
   {
-    mp_msg(MSGT_DECAUDIO,MSGL_ERR,MSGTR_MissingDLLcodec,sh_audio->codec->dll);
+    mp_msg(MSGT_DECAUDIO,MSGL_ERR,MSGTR_MissingDLLcodec,codec_idx2str(sh_audio->codec->dll_idx));
     return 0;
   }
     sh_audio->i_bps=sh_audio->wf->nAvgBytesPerSec;

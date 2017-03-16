@@ -250,11 +250,12 @@ void *ass_guess_buffer_cp(ASS_Library *library, unsigned char *buffer,
         analyser = enca_analyser_alloc(languages[i]);
         encoding = enca_analyse_const(analyser, buffer, buflen);
         tmp = enca_charset_name(encoding.charset, ENCA_NAME_STYLE_ICONV);
+        enca_analyser_free(analyser);
         if (tmp && encoding.charset != ENCA_CS_UNKNOWN) {
             detected_sub_cp = strdup(tmp);
             ass_msg(library, MSGL_INFO, "ENCA detected charset: %s", tmp);
+            break;
         }
-        enca_analyser_free(analyser);
     }
 
     free(languages);

@@ -273,7 +273,7 @@ const m_option_t lavcopts_conf[]={
 	{"intra_matrix", &lavc_param_intra_matrix, CONF_TYPE_STRING, 0, 0, 0, NULL},
 	{"inter_matrix", &lavc_param_inter_matrix, CONF_TYPE_STRING, 0, 0, 0, NULL},
 	{"cbp", "Please use o=mpv_flags=+cbp_rd instead of cbp.\n", CONF_TYPE_PRINT, 0, 0, 0, NULL},
-	{"mv0", &lavc_param_mv0, CONF_TYPE_FLAG, 0, 0, CODEC_FLAG_MV0, NULL},
+	{"mv0", "Please use o=mpv_flags=+mv0 instead of mv0.\n", CONF_TYPE_PRINT, 0, 0, 0, NULL},
 	{"nr", &lavc_param_noise_reduction, CONF_TYPE_INT, CONF_RANGE, 0, 1000000, NULL},
 	{"qprd", "Please use o=mpv_flags=+qp_rd instead of qprd.\n", CONF_TYPE_PRINT, 0, 0, 0, NULL},
 	{"ss", &lavc_param_ss, CONF_TYPE_FLAG, 0, 0, 1, NULL},
@@ -336,7 +336,9 @@ static int config(struct vf_instance *vf,
 	mux_v->bih->biWidth, mux_v->bih->biHeight, mux_v->bih->biCompression,
 	    (char *)&mux_v->bih->biCompression);
 
+    vf->priv->pic->width =
     lavc_venc_context->width = width;
+    vf->priv->pic->height =
     lavc_venc_context->height = height;
     if (lavc_param_vbitrate > 16000) /* != -1 */
 	lavc_venc_context->bit_rate = lavc_param_vbitrate;
@@ -370,7 +372,7 @@ static int config(struct vf_instance *vf,
     lavc_venc_context->rc_qsquish= lavc_param_rc_qsquish;
     lavc_venc_context->rc_qmod_amp= lavc_param_rc_qmod_amp;
     lavc_venc_context->rc_qmod_freq= lavc_param_rc_qmod_freq;
-    lavc_venc_context->rc_eq= lavc_param_rc_eq;
+    lavc_venc_context->rc_eq= av_strdup(lavc_param_rc_eq);
 
     mux_v->max_rate=
     lavc_venc_context->rc_max_rate= lavc_param_rc_max_rate*1000;
@@ -453,7 +455,7 @@ static int config(struct vf_instance *vf,
             return 0;
         }
         lavc_venc_context->rc_override=
-            realloc(lavc_venc_context->rc_override, sizeof(RcOverride)*(i+1));
+            av_reallocp_array(lavc_venc_context->rc_override, i+1, sizeof(*lavc_venc_context->rc_override));
         lavc_venc_context->rc_override[i].start_frame= start;
         lavc_venc_context->rc_override[i].end_frame  = end;
         if(q>0){
@@ -586,8 +588,9 @@ static int config(struct vf_instance *vf,
     }
 
     mux_v->imgfmt = lavc_param_format;
+    vf->priv->pic->format =
     lavc_venc_context->pix_fmt = imgfmt2pixfmt(lavc_param_format);
-    if (lavc_venc_context->pix_fmt == PIX_FMT_NONE)
+    if (lavc_venc_context->pix_fmt == AV_PIX_FMT_NONE)
         return 0;
 
     if(!stats_file) {
@@ -603,6 +606,10 @@ static int config(struct vf_instance *vf,
 	}
 	fseek(stats_file, 0, SEEK_END);
 	size= ftell(stats_file);
+	if (size < 0) {
+	    mp_msg(MSGT_MENCODER,MSGL_ERR,"2pass failed: could not get size; filename=%s\n", passtmpfile);
+	    return 0;
+	}
 	fseek(stats_file, 0, SEEK_SET);
 
 	lavc_venc_context->stats_in= av_malloc(size + 1);
@@ -641,7 +648,7 @@ static int config(struct vf_instance *vf,
 	  lavc_venc_context->flags &= ~CODEC_FLAG_QPEL;
 	  lavc_venc_context->flags &= ~CODEC_FLAG_4MV;
 	  lavc_venc_context->trellis = 0;
-	  lavc_venc_context->flags &= ~CODEC_FLAG_MV0;
+	  av_dict_set(&opts, "mpv_flags", "-mv0", 0);
 	  av_dict_set(&opts, "mpv_flags", "-qp_rd-cbp_rd", 0);
 	}
 	break;
@@ -841,7 +848,9 @@ static int encode_frame(struct vf_instance *vf, AVFrame *pic, double pts){
             pict_type_char[lavc_venc_context->coded_frame->pict_type]
             );
     }
-    return pkt.size;
+    res = pkt.size;
+    av_packet_unref(&pkt);
+    return res;
 }
 
 static void uninit(struct vf_instance *vf){
@@ -869,7 +878,9 @@ static void uninit(struct vf_instance *vf){
     /* free rc_override */
     av_freep(&lavc_venc_context->rc_override);
 
-    av_freep(&vf->priv->context);
+    avcodec_free_context(&vf->priv->context);
+    av_frame_free(&vf->priv->pic);
+    free(vf->priv);
 }
 
 //===========================================================================//
@@ -987,7 +998,7 @@ static int vf_open(vf_instance_t *vf, char* args){
 	return 0;
     }
 
-    vf->priv->pic = avcodec_alloc_frame();
+    vf->priv->pic = av_frame_alloc();
     vf->priv->context = avcodec_alloc_context3(vf->priv->codec);
     vf->priv->context->codec_id = vf->priv->codec->id;
 

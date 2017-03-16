@@ -106,8 +106,10 @@ static int init(sh_audio_t *sh)
       switch(sh->samplesize){
 	case 1: // 8Bit
 	  mp_msg(MSGT_DECAUDIO,MSGL_WARN,"FAAD: 8Bit samplesize not supported by FAAD, assuming 16Bit!\n");
+          // fallthrough
 	default:
 	  sh->samplesize=2;
+          // fallthrough
 	case 2: // 16Bit
 	  faac_conf->outputFormat = FAAD_FMT_16BIT;
 	  break;

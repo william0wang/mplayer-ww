@@ -1140,7 +1140,7 @@ int tv_step_chanlist(tvi_handle_t *tvh)
     return 1;
 }
 
-demuxer_desc_t demuxer_desc_tv = {
+const demuxer_desc_t demuxer_desc_tv = {
   "Tv card demuxer",
   "tv",
   "TV",

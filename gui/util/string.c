@@ -100,6 +100,25 @@ char *strswap(char *in, char from, char to)
 }
 
 /**
+ * @brief Skip all leading space characters in a string.
+ *
+ * @param in string to be processed
+ *
+ * @return trailing part of @a in starting with the first non-space character
+ */
+const char *ltrim(const char *in)
+{
+    while (*in) {
+        if (*in == ' ')
+            in++;
+        else
+            break;
+    }
+
+    return in;
+}
+
+/**
  * @brief Remove all space characters from a string,
  *        but leave text enclosed in quotation marks untouched.
  *
@@ -109,7 +128,7 @@ char *strswap(char *in, char from, char to)
  *
  * @note This is an in-place processing.
  */
-char *trim(char *in)
+char *despace(char *in)
 {
     char *src, *dest;
     int freeze = False;
@@ -164,6 +183,29 @@ char *decomment(char *in)
         }
 
         p++;
+    }
+
+    return in;
+}
+
+/**
+ * @brief Remove enclosed quotation marks from a string.
+ *
+ * @param in string to be processed
+ *
+ * @return processed string
+ *
+ * @note This is an in-place processing.
+ */
+char *dequote(char *in)
+{
+    if (*in == '"') {
+        size_t end = strlen(in) - 1;
+
+        if (in[end] == '"') {
+            in[end] = 0;
+            in++;
+        }
     }
 
     return in;

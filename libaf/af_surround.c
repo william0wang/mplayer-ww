@@ -263,7 +263,7 @@ static int af_open(af_instance_t* af){
   return AF_OK;
 }
 
-af_info_t af_info_surround =
+const af_info_t af_info_surround =
 {
         "Surround decoder filter",
         "surround",

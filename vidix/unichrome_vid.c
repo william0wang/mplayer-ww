@@ -84,7 +84,7 @@ static FILE *logfile = 0;
 /**
  * @brief Unichrome driver vidix capabilities.
  */
-static vidix_capability_t uc_cap = {
+static const vidix_capability_t uc_cap = {
   "VIA CLE266 Unichrome driver",
   "Timothy Lee <timothy@siriushk.com>",
   TYPE_OUTPUT,
@@ -489,7 +489,6 @@ unichrome_probe (int verbose, int force)
 		  mp_msg(MSGT_VO, MSGL_STATUS, "[unichrome] Device is disabled, ignoring\n");
 		  continue;
 		}
-	      uc_cap.device_id = lst[i].device;
 	      err = 0;
 	      memcpy (&pci_info, &lst[i], sizeof (pciinfo_t));
 	      break;
@@ -516,7 +515,7 @@ unichrome_init (void)
   enable_app_io ();
 
   outb (0x2f, 0x3c4);
-  tmp = inb (0x3c5) << 0x18;
+  tmp = (unsigned)(inb (0x3c5)) << 0x18;
   vio = map_phys_mem (tmp, 0x1000);
 
   outb (0x16, 0x3c4);
@@ -588,6 +587,7 @@ static int
 unichrome_get_caps (vidix_capability_t * to)
 {
   memcpy (to, &uc_cap, sizeof (vidix_capability_t));
+  to->device_id = pci_info.device;
   return 0;
 }
 
@@ -807,6 +807,9 @@ unichrome_config_playback (vidix_playback_t * info)
       pitch = ALIGN_TO (src_w << 2, 32);
       uv_size = 0;
       break;
+
+    default: // should have been caught by is_supported_fourcc above
+      return -1;
     }
   if ((src_w > 4096) || (src_h > 4096) ||
       (src_w < 32) || (src_h < 1) || (pitch > 0x1fff))
@@ -954,7 +957,7 @@ unichrome_frame_select (unsigned int frame)
   return 0;
 }
 
-VDXDriver unichrome_drv = {
+const VDXDriver unichrome_drv = {
   "unichrome",
   NULL,
   .probe = unichrome_probe,

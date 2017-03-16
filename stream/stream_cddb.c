@@ -480,7 +480,6 @@ static int cddb_read_cache(cddb_data_t *cddb_data)
 static int cddb_write_cache(cddb_data_t *cddb_data)
 {
     // We have the file, save it for cache.
-    struct stat file_stat;
     char file_name[100];
     int file_fd, ret;
     int wrote = 0;
@@ -488,23 +487,15 @@ static int cddb_write_cache(cddb_data_t *cddb_data)
     if (cddb_data == NULL || cddb_data->cache_dir == NULL)
         return -1;
 
-    // Check if the CDDB cache dir exist
-    ret = stat(cddb_data->cache_dir, &file_stat);
-    if (ret < 0) {
-        // Directory not present, create it.
+        // Create directory if not present
         ret = mkdir(cddb_data->cache_dir, 0755);
-#ifdef __MINGW32__
         if (ret < 0 && errno != EEXIST) {
-#else
-        if (ret < 0) {
-#endif
             perror("mkdir");
             mp_msg(MSGT_DEMUX, MSGL_ERR,
                    MSGTR_MPDEMUX_CDDB_FailedToCreateDirectory,
                    cddb_data->cache_dir);
             return -1;
         }
-    }
 
     snprintf(file_name, sizeof(file_name), "%s%08lx", cddb_data->cache_dir, cddb_data->disc_id);
 

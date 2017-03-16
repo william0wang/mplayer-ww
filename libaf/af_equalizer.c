@@ -240,7 +240,7 @@ static int af_open(af_instance_t* af){
 }
 
 // Description of this filter
-af_info_t af_info_equalizer = {
+const af_info_t af_info_equalizer = {
   "Equalizer audio filter",
   "equalizer",
   "Anders",

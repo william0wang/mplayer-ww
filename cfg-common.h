@@ -152,7 +152,7 @@ const m_option_t tvopts_conf[]={
 const m_option_t pvropts_conf[]={
     {"aspect", &pvr_param_aspect_ratio, CONF_TYPE_INT, 0, 1, 4, NULL},
     {"arate", &pvr_param_sample_rate, CONF_TYPE_INT, 0, 32000, 48000, NULL},
-    {"alayer", &pvr_param_audio_layer, CONF_TYPE_INT, 0, 1, 2, NULL},
+    {"alayer", &pvr_param_audio_layer, CONF_TYPE_INT, 0, 1, 5, NULL},
     {"abitrate", &pvr_param_audio_bitrate, CONF_TYPE_INT, 0, 32, 448, NULL},
     {"amode", &pvr_param_audio_mode, CONF_TYPE_STRING, 0, 0, 0, NULL},
     {"vbitrate", &pvr_param_bitrate, CONF_TYPE_INT, 0, 0, 0, NULL},
@@ -420,7 +420,7 @@ const m_option_t common_opts[] = {
 
     {"edl", &edl_filename,  CONF_TYPE_STRING, 0, 0, 0, NULL},
 
-    // AVI specific: force non-interleaved mode
+    // force non-interleaved mode
     {"ni", &force_ni, CONF_TYPE_FLAG, 0, 0, 1, NULL},
     {"noni", &force_ni, CONF_TYPE_FLAG, 0, 1, 0, NULL},
 

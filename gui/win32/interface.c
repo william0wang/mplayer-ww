@@ -24,7 +24,11 @@
 #include "config.h"
 
 #if defined(CONFIG_LIBCDIO)
+#if HAVE_CDIO_PARANOIA_H
 #include <cdio/cdda.h>
+#elif HAVE_CDIO_PARANOIA_PARANOIA_H
+#include <cdio/paranoia/cdda.h>
+#endif
 #elif defined(CONFIG_CDDA)
 #include <cdda_interface.h>
 #endif
@@ -181,7 +185,7 @@ int parse_filename(char *file, play_tree_t *playtree, m_config_t *mconfig, int c
     if(clear)
         mygui->playlist->clear_playlist(mygui->playlist);
 
-    if(strstr(file, ".m3u") || strstr(file, ".pls"))
+    if(strstr(file, ".m3u") || strstr(file, ".m4u") || strstr(file, ".mxu") || strstr(file, ".pls"))
     {
         playtree = parse_playlist_file(file);
         guiPlaylist(GUI_PLAYLIST_ADD, playtree, mconfig, 0);
@@ -321,9 +325,6 @@ static void guiSetEvent(int event)
             if (guiInfo.Playing == GUI_STOP)
                 break;
 
-            if (guiInfo.Balance == 50.0f)
-                mixer_setvolume(mixer, guiInfo.Volume, guiInfo.Volume);
-
             l = guiInfo.Volume * (100.0 - guiInfo.Balance) / 50.0;
             r = guiInfo.Volume * guiInfo.Balance / 50.0;
 
@@ -336,7 +337,7 @@ static void guiSetEvent(int event)
                 mixer_getvolume(mixer, &l, &r);
                 if (r == l)
                 {
-                    mp_msg(MSGT_GPLAYER, MSGL_V, "[GUI] Mixer doesn't support balanced audio\n");
+                    mp_msg(MSGT_GPLAYER, MSGL_V, "[GUI] Mixer doesn't support unbalanced audio\n");
                     mixer_setvolume(mixer, guiInfo.Volume, guiInfo.Volume);
                     guiInfo.Balance = 50.0f;
                 }
@@ -347,7 +348,7 @@ static void guiSetEvent(int event)
         {
             mp_cmd_t * cmd = calloc(1, sizeof(*cmd));
             cmd->id=MP_CMD_MUTE;
-            cmd->name=strdup("mute");
+            ARRAY_STRCPY(cmd->name, "mute");
             mp_input_queue_cmd(cmd);
             break;
         }
@@ -404,7 +405,7 @@ void uiPause( void )
    {
        mp_cmd_t * cmd = calloc(1, sizeof(*cmd));
        cmd->id=MP_CMD_PAUSE;
-       cmd->name=strdup("pause");
+       ARRAY_STRCPY(cmd->name, "pause");
        mp_input_queue_cmd(cmd);
    } else guiInfo.Playing = GUI_PLAY;
 }
@@ -537,6 +538,9 @@ void guiInit(void)
     /* Wait until the gui is created */
     while(!mygui) Sleep(100);
     mp_msg(MSGT_GPLAYER, MSGL_V, "[GUI] GUI thread started.\n");
+
+    guiInfo.Volume = mygui->default_volume;
+    guiInfo.Balance = mygui->default_balance;
 }
 
 void guiDone(void)
@@ -636,6 +640,8 @@ int gui(int what, void *data)
                 guiInfo.AudioChannels = 0;
                 guiInfo.AudioPassthrough = FALSE;
             }
+            guiSetEvent(evSetVolume);
+            guiSetEvent(evSetBalance);
             if(IsWindowVisible(mygui->videowindow) && !guiInfo.VideoWindow)
                 ShowWindow(mygui->videowindow, SW_HIDE);
             break;
@@ -648,7 +654,7 @@ int gui(int what, void *data)
             guiInfo.sh_video = data;
             if (guiInfo.sh_video)
             {
-                codecname = guiInfo.sh_video->codec->name;
+                codecname = codec_idx2str(guiInfo.sh_video->codec->name_idx);
 
                 /* we have video, show the video window */
                 if(!IsWindowVisible(mygui->videowindow) || IsIconic(mygui->videowindow))
@@ -822,6 +828,13 @@ int gui(int what, void *data)
           gui(GUI_SET_STATE, (void *) GUI_STOP);
           break;
         }
+#ifdef __WINE__
+        // it's possible to have an X11 video output driver (sending events)
+        case GUI_HANDLE_X_EVENT:
+        {
+          break;
+        }
+#endif
         default:
             mp_msg(MSGT_GPLAYER, MSGL_ERR, "[GUI] GOT UNHANDLED EVENT %i\n", what);
     }

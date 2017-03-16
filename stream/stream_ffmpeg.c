@@ -96,6 +96,7 @@ static int open_f(stream_t *stream, int mode, void *opts, int *file_format)
     int dummy;
 
     init_avformat();
+    avformat_network_init();
     if (mode == STREAM_READ)
         flags = AVIO_FLAG_READ;
     else if (mode == STREAM_WRITE)
@@ -157,7 +158,7 @@ const stream_info_t stream_info_ffmpeg = {
   "",
   "",
   open_f,
-  { "ffmpeg", "rtmp", "rtsp", NULL },
+  { "ffmpeg", "rtmp", "rtsp", "https", NULL },
   NULL,
   1 // Urls are an option string
 };

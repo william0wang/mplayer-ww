@@ -50,7 +50,7 @@ extern char *codecs_file;
 #define GUID_TYPE    1
 #define GUID_DEFINED 1
 typedef struct {
-    unsigned long  f1;
+    unsigned int   f1;
     unsigned short f2;
     unsigned short f3;
     unsigned char  f4[8];
@@ -65,11 +65,11 @@ typedef struct codecs {
     unsigned char outflags[CODECS_MAX_OUTFMT];
     unsigned int infmt[CODECS_MAX_INFMT];
     unsigned char inflags[CODECS_MAX_INFMT];
-    char *name;
-    char *info;
-    char *comment;
-    char *dll;
-    char* drv;
+    unsigned name_idx;
+    unsigned info_idx;
+    unsigned comment_idx;
+    unsigned dll_idx;
+    unsigned drv_idx;
     GUID guid;
 //    short driver;
     short flags;
@@ -86,6 +86,7 @@ codecs_t* find_codec(unsigned int fourcc, unsigned int *fourccmap,
                      codecs_t *start, int audioflag, int force);
 void list_codecs(int audioflag);
 void codecs_uninit_free(void);
+const char *codec_idx2str(unsigned idx);
 
 typedef char ** stringset_t;
 void stringset_init(stringset_t *set);

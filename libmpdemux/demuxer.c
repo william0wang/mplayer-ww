@@ -733,18 +733,25 @@ int ds_fill_buffer(demux_stream_t *ds)
         // This needs to be enough for at least 1 second of packets
         // since libavformat mov demuxer does not try to interleave
         // with more than 1s precision.
-        if (ds->fill_count > 80)
+        if (!force_ni && ds->fill_count > 80) {
+            static int once;
+            if (!once) {
+                mp_msg(MSGT_DEMUXER, MSGL_WARN, "Possibly bad interleaving detected.\n"
+                       "Use -ni option if this causes playback issues and avoid or fix the program that created the file.\n");
+                once = 1;
+            }
             break;
+        }
         // avoid printing the "too many ..." message over and over
         if (ds->eof)
             break;
-        if (apacks >= MAX_PACKS || abytes >= MAX_PACK_BYTES) {
+        if (!force_ni && (apacks >= MAX_PACKS || abytes >= MAX_PACK_BYTES)) {
             mp_msg(MSGT_DEMUXER, MSGL_ERR, MSGTR_TooManyAudioInBuffer,
                    apacks, abytes);
             mp_msg(MSGT_DEMUXER, MSGL_HINT, MSGTR_MaybeNI);
             break;
         }
-        if (vpacks >= MAX_PACKS || vbytes >= MAX_PACK_BYTES) {
+        if (!force_ni && (vpacks >= MAX_PACKS || vbytes >= MAX_PACK_BYTES)) {
             mp_msg(MSGT_DEMUXER, MSGL_ERR, MSGTR_TooManyVideoInBuffer,
                    vpacks, vbytes);
             mp_msg(MSGT_DEMUXER, MSGL_HINT, MSGTR_MaybeNI);
@@ -954,15 +961,15 @@ double ds_get_next_pts(demux_stream_t *ds)
     // if we have not read from the "current" packet, consider it
     // as the next, otherwise we never get the pts for the first packet.
     while (!ds->first && (!ds->current || ds->buffer_pos)) {
-        if (demux->audio->packs >= MAX_PACKS
-            || demux->audio->bytes >= MAX_PACK_BYTES) {
+        if (!force_ni && (demux->audio->packs >= MAX_PACKS
+            || demux->audio->bytes >= MAX_PACK_BYTES)) {
             mp_msg(MSGT_DEMUXER, MSGL_ERR, MSGTR_TooManyAudioInBuffer,
                    demux->audio->packs, demux->audio->bytes);
             mp_msg(MSGT_DEMUXER, MSGL_HINT, MSGTR_MaybeNI);
             return MP_NOPTS_VALUE;
         }
-        if (demux->video->packs >= MAX_PACKS
-            || demux->video->bytes >= MAX_PACK_BYTES) {
+        if (!force_ni && (demux->video->packs >= MAX_PACKS
+            || demux->video->bytes >= MAX_PACK_BYTES)) {
             mp_msg(MSGT_DEMUXER, MSGL_ERR, MSGTR_TooManyVideoInBuffer,
                    demux->video->packs, demux->video->bytes);
             mp_msg(MSGT_DEMUXER, MSGL_HINT, MSGTR_MaybeNI);
@@ -1537,10 +1544,13 @@ double demuxer_get_current_time(demuxer_t *demuxer)
 {
     double get_time_ans = 0;
     sh_video_t *sh_video = demuxer->video->sh;
+    sh_audio_t *sh_audio = demuxer->audio->sh;
     if (demuxer->stream_pts != MP_NOPTS_VALUE)
         get_time_ans = demuxer->stream_pts;
-    else if (sh_video)
+    else if (sh_video && sh_video->pts != MP_NOPTS_VALUE)
         get_time_ans = sh_video->pts;
+    else if (sh_audio && sh_audio->pts != MP_NOPTS_VALUE)
+        get_time_ans = sh_audio->pts;
     return get_time_ans;
 }
 

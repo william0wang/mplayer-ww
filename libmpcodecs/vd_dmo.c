@@ -58,8 +58,8 @@ static int init(sh_video_t *sh){
     unsigned int out_fmt=sh->codec->outfmt[0];
     struct context *ctx;
     void *decoder;
-    if(!(decoder=DMO_VideoDecoder_Open(sh->codec->dll,&sh->codec->guid, sh->bih, 0, 0))){
-        mp_msg(MSGT_DECVIDEO,MSGL_ERR,MSGTR_MissingDLLcodec,sh->codec->dll);
+    if(!(decoder=DMO_VideoDecoder_Open(codec_idx2str(sh->codec->dll_idx),&sh->codec->guid, sh->bih, 0, 0))){
+        mp_msg(MSGT_DECVIDEO,MSGL_ERR,MSGTR_MissingDLLcodec,codec_idx2str(sh->codec->dll_idx));
         mp_msg(MSGT_DECVIDEO,MSGL_HINT,MSGTR_DownloadCodecPackage);
 	return 0;
     }

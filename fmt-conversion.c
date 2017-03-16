@@ -30,6 +30,8 @@ static const struct {
 } conversion_map[] = {
     { IMGFMT_ARGB,       AV_PIX_FMT_ARGB },
     { IMGFMT_BGRA,       AV_PIX_FMT_BGRA },
+    { IMGFMT_BGR48LE,    AV_PIX_FMT_BGR48LE },
+    { IMGFMT_BGR48BE,    AV_PIX_FMT_BGR48BE },
     { IMGFMT_BGR24,      AV_PIX_FMT_BGR24 },
     { IMGFMT_BGR16BE,    AV_PIX_FMT_RGB565BE },
     { IMGFMT_BGR16LE,    AV_PIX_FMT_RGB565LE },
@@ -40,7 +42,7 @@ static const struct {
     { IMGFMT_BGR8,       AV_PIX_FMT_RGB8 },
     { IMGFMT_BGR4,       AV_PIX_FMT_RGB4 },
     { IMGFMT_BGR1,       AV_PIX_FMT_MONOBLACK },
-    { IMGFMT_RGB1,       AV_PIX_FMT_MONOBLACK },
+    { IMGFMT_RGB1,       AV_PIX_FMT_MONOWHITE },
     { IMGFMT_RG4B,       AV_PIX_FMT_BGR4_BYTE },
     { IMGFMT_BG4B,       AV_PIX_FMT_RGB4_BYTE },
     { IMGFMT_RGB48LE,    AV_PIX_FMT_RGB48LE },
@@ -57,19 +59,18 @@ static const struct {
     { IMGFMT_RGB8,       AV_PIX_FMT_BGR8 },
     { IMGFMT_RGB4,       AV_PIX_FMT_BGR4 },
     { IMGFMT_BGR8,       AV_PIX_FMT_PAL8 },
-#if LIBAVUTIL_VERSION_MICRO >= 100
     { IMGFMT_BGR32,      AV_PIX_FMT_0RGB32 },
     { IMGFMT_BGRA,       AV_PIX_FMT_BGR0 },
     { IMGFMT_RGBA,       AV_PIX_FMT_RGB0 },
     { IMGFMT_RGB64LE,    AV_PIX_FMT_RGBA64LE },
     { IMGFMT_RGB64BE,    AV_PIX_FMT_RGBA64BE },
-#endif /* LIBAVUTIL_VERSION_MICRO >= 100 */
     { IMGFMT_XYZ12LE,    AV_PIX_FMT_XYZ12LE },
     { IMGFMT_XYZ12BE,    AV_PIX_FMT_XYZ12BE },
     { IMGFMT_422A,       AV_PIX_FMT_YUVA422P },
     { IMGFMT_444A,       AV_PIX_FMT_YUVA444P },
     { IMGFMT_GBR24P,     AV_PIX_FMT_GBRP },
-#if LIBAVUTIL_VERSION_MICRO >= 100
+    { IMGFMT_GBR10PLE,   AV_PIX_FMT_GBRP10LE },
+    { IMGFMT_GBR10PBE,   AV_PIX_FMT_GBRP10BE },
     { IMGFMT_GBR12PLE,   AV_PIX_FMT_GBRP12LE },
     { IMGFMT_GBR12PBE,   AV_PIX_FMT_GBRP12BE },
     { IMGFMT_GBR14PLE,   AV_PIX_FMT_GBRP14LE },
@@ -78,6 +79,8 @@ static const struct {
     { IMGFMT_420P14_BE,  AV_PIX_FMT_YUV420P14BE },
     { IMGFMT_420P12_LE,  AV_PIX_FMT_YUV420P12LE },
     { IMGFMT_420P12_BE,  AV_PIX_FMT_YUV420P12BE },
+    { IMGFMT_440P12_LE,  AV_PIX_FMT_YUV440P12LE },
+    { IMGFMT_440P12_BE,  AV_PIX_FMT_YUV440P12BE },
     { IMGFMT_422P14_LE,  AV_PIX_FMT_YUV422P14LE },
     { IMGFMT_422P14_BE,  AV_PIX_FMT_YUV422P14BE },
     { IMGFMT_422P12_LE,  AV_PIX_FMT_YUV422P12LE },
@@ -87,7 +90,6 @@ static const struct {
     { IMGFMT_444P12_LE,  AV_PIX_FMT_YUV444P12LE },
     { IMGFMT_444P12_BE,  AV_PIX_FMT_YUV444P12BE },
     { IMGFMT_Y8A,        AV_PIX_FMT_GRAY8A },
-#endif /* LIBAVUTIL_VERSION_MICRO >= 100 */
     { IMGFMT_Y16_LE,     AV_PIX_FMT_GRAY16LE },
     { IMGFMT_Y16_BE,     AV_PIX_FMT_GRAY16BE },
     { IMGFMT_YUY2,       AV_PIX_FMT_YUYV422 },
@@ -114,6 +116,8 @@ static const struct {
     { IMGFMT_420P10_BE,  AV_PIX_FMT_YUV420P10BE },
     { IMGFMT_420P9_LE,   AV_PIX_FMT_YUV420P9LE },
     { IMGFMT_420P9_BE,   AV_PIX_FMT_YUV420P9BE },
+    { IMGFMT_440P10_LE,  AV_PIX_FMT_YUV440P10LE },
+    { IMGFMT_440P10_BE,  AV_PIX_FMT_YUV440P10BE },
     { IMGFMT_422P16_LE,  AV_PIX_FMT_YUV422P16LE },
     { IMGFMT_422P16_BE,  AV_PIX_FMT_YUV422P16BE },
     { IMGFMT_422P10_LE,  AV_PIX_FMT_YUV422P10LE },
@@ -135,12 +139,6 @@ static const struct {
     { IMGFMT_444P,       AV_PIX_FMT_YUVJ444P },
     { IMGFMT_440P,       AV_PIX_FMT_YUVJ440P },
     { IMGFMT_XVMC_IDCT_MPEG2, AV_PIX_FMT_XVMC },
-    { IMGFMT_VDPAU_MPEG1,     AV_PIX_FMT_VDPAU_MPEG1 },
-    { IMGFMT_VDPAU_MPEG2,     AV_PIX_FMT_VDPAU_MPEG2 },
-    { IMGFMT_VDPAU_H264,      AV_PIX_FMT_VDPAU_H264 },
-    { IMGFMT_VDPAU_WMV3,      AV_PIX_FMT_VDPAU_WMV3 },
-    { IMGFMT_VDPAU_VC1,       AV_PIX_FMT_VDPAU_VC1 },
-    { IMGFMT_VDPAU_MPEG4,     AV_PIX_FMT_VDPAU_MPEG4 },
     { 0,                      AV_PIX_FMT_NONE }
 };
 
@@ -153,7 +151,7 @@ enum AVPixelFormat imgfmt2pixfmt(int fmt)
         if (conversion_map[i].fmt == fmt)
             break;
     pix_fmt = conversion_map[i].pix_fmt;
-    if (pix_fmt == PIX_FMT_NONE)
+    if (pix_fmt == AV_PIX_FMT_NONE)
         mp_msg(MSGT_GLOBAL, MSGL_ERR, "Unsupported format %s\n", vo_format_name(fmt));
     return pix_fmt;
 }
@@ -162,7 +160,7 @@ int pixfmt2imgfmt(enum AVPixelFormat pix_fmt)
 {
     int i;
     int fmt;
-    for (i = 0; conversion_map[i].pix_fmt != PIX_FMT_NONE; i++)
+    for (i = 0; conversion_map[i].pix_fmt != AV_PIX_FMT_NONE; i++)
         if (conversion_map[i].pix_fmt == pix_fmt)
             break;
     fmt = conversion_map[i].fmt;

@@ -29,7 +29,7 @@
 #include "mp_image.h"
 #include "vf.h"
 #include "libavutil/attributes.h"
-#include "libavutil/x86/asm.h"
+#include "mpx86asm.h"
 
 typedef void (pack_func_t)(unsigned char *dst, unsigned char *y,
     unsigned char *u, unsigned char *v, int w, int us, int vs);
@@ -78,7 +78,7 @@ static void pack_li_1_C(unsigned char *dst, unsigned char *y,
     }
 }
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
 static void pack_nn_MMX(unsigned char *dst, unsigned char *y,
     unsigned char *u, unsigned char *v, int w,
     int av_unused us, int av_unused vs)
@@ -420,7 +420,7 @@ static int vf_open(vf_instance_t *vf, char *args)
     pack_nn = pack_nn_C;
     pack_li_0 = pack_li_0_C;
     pack_li_1 = pack_li_1_C;
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
     if(gCpuCaps.hasMMX) {
         pack_nn = pack_nn_MMX;
 #if HAVE_EBX_AVAILABLE

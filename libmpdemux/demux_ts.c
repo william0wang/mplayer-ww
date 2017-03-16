@@ -913,7 +913,7 @@ static off_t ts_detect_streams(demuxer_t *demuxer, tsdemux_init_t *param)
 	}
 
 	if(IS_SUB(param->stype))
-		mp_msg(MSGT_DEMUXER, MSGL_INFO, " SUB %s(pid=%d) ", (param->stype==SPU_DVD ? "DVD" : param->stype==SPU_DVB ? "DVB" : "Teletext"), param->spid);
+		mp_msg(MSGT_DEMUXER, MSGL_INFO, " SUB %s(pid=%d) ", (param->stype==SPU_DVD ? "DVD" : param->stype==SPU_DVB ? "DVB" : param->stype==SPU_PGS ? "PGS" : "Teletext"), param->spid);
 	else
 	{
 		param->stype = UNKNOWN;
@@ -1022,10 +1022,7 @@ static demuxer_t *demux_open_ts(demuxer_t * demuxer)
 
 
 	demuxer->priv = priv;
-	if(demuxer->stream->type != STREAMTYPE_FILE)
-		demuxer->seekable = 1;
-	else
-		demuxer->seekable = 1;
+	demuxer->seekable = 1;
 
 
 	params.atype = params.vtype = params.stype = UNKNOWN;
@@ -2563,6 +2560,9 @@ static int parse_pmt(ts_priv_t * priv, uint16_t progid, uint16_t pid, int is_sta
 				break;
 			case 0x13:
 				pmt->es[idx].type = SL_SECTION;
+				break;
+			case 0x24:
+				pmt->es[idx].type = VIDEO_HEVC;
 				break;
 			case 0x80:
 				pmt->es[idx].type = AUDIO_PCM_BR;

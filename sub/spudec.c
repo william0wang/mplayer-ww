@@ -256,7 +256,7 @@ static int spudec_alloc_image(spudec_handle_t *this, int stride, int height)
 static void pal2gray_alpha(const uint16_t *pal,
                            const uint8_t *src, int src_stride,
                            uint8_t *dst, uint8_t *dsta,
-                           int dst_stride, int w, int h)
+                           int dst_stride, int w, int h, int skip_stride)
 {
   int x, y;
   for (y = 0; y < h; y++) {
@@ -265,7 +265,10 @@ static void pal2gray_alpha(const uint16_t *pal,
       *dst++  = pixel;
       *dsta++ = pixel >> 8;
     }
-    for (; x < dst_stride; x++)
+    if (skip_stride) {
+      dst += dst_stride - w;
+      dsta += dst_stride - w;
+    } else for (; x < dst_stride; x++)
       *dsta++ = *dst++ = 0;
     src += src_stride;
   }
@@ -308,7 +311,7 @@ static int apply_palette_crop(spudec_handle_t *this,
   src = this->pal_image + crop_y * this->pal_width + crop_x;
   pal2gray_alpha(pal, src, this->pal_width,
                  this->image, this->aimage, stride,
-                 crop_w, crop_h);
+                 crop_w, crop_h, 0);
   this->width  = crop_w;
   this->height = crop_h;
   this->stride = stride;
@@ -890,7 +893,7 @@ static void sws_spu_image(unsigned char *d1, unsigned char *d2, int dw, int dh,
 		oldvar = spu_gaussvar;
 	}
 
-	ctx=sws_getContext(sw, sh, PIX_FMT_GRAY8, dw, dh, PIX_FMT_GRAY8, SWS_GAUSS, &filter, NULL, NULL);
+	ctx=sws_getContext(sw, sh, AV_PIX_FMT_GRAY8, dw, dh, AV_PIX_FMT_GRAY8, SWS_GAUSS, &filter, NULL, NULL);
 	sws_scale(ctx,&s1,&ss,0,sh,&d1,&ds);
 	for (i=ss*sh-1; i>=0; i--) s2[i] = -s2[i];
 	sws_scale(ctx,&s2,&ss,0,sh,&d2,&ds);
@@ -1424,13 +1427,16 @@ void spudec_packet_fill(packet_t *packet,
       g8a8_pal[i] = (-alpha << 8) | gray;
   }
   pal2gray_alpha(g8a8_pal, pal_img, pal_stride,
-                 img, aimg, packet->stride, w, h);
+                 img, aimg, packet->stride, w, h, 1);
 }
 
 void spudec_packet_send(void *spu, packet_t *packet, double pts, double endpts)
 {
   packet->start_pts = 0;
   packet->end_pts = 0x7fffffff;
+  // Note: valid timestamps from e.g. DVB subtitles can
+  // overflow. Just ignoring the overflow seems to work
+  // best for now, but should be fixed properly at some point.
   if (pts != MP_NOPTS_VALUE)
     packet->start_pts = pts * 90000;
   if (endpts != MP_NOPTS_VALUE)

@@ -109,6 +109,9 @@ const mime_struct_t mime_type_table[] = {
 	// NullSoft Streaming Video
 	{ "video/nsv", DEMUXER_TYPE_NSV},
 	{ "misc/ultravox", DEMUXER_TYPE_NSV},
+	// HLS Streaming/AppleHttp
+	{ "application/vnd.apple.mpegurl", DEMUXER_TYPE_LAVF},
+	{ "application/x-mpegURL", DEMUXER_TYPE_LAVF},
 	{ NULL, DEMUXER_TYPE_UNKNOWN},
 };
 

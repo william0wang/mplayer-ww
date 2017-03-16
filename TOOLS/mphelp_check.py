@@ -20,7 +20,11 @@ def parse(filename):
             while line and line[-1] == '\\':
                 line = it.next().strip()
             continue
-        _, name, value = line.split(None, 2)
+        try:
+            _, name, value = line.split(None, 2)
+        except ValueError:
+            if name in r:
+                continue
         value = value.strip('"')
         while line[-1] == '\\':
             line = it.next().strip()

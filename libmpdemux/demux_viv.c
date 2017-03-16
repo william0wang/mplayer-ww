@@ -255,6 +255,7 @@ static int vivo_check_file(demuxer_t* demuxer){
 	len+=0x80*(c-0x80);
 	if(len>1024) return 0;
     }
+    if(c==-256) return 0;
     len+=c;
     mp_msg(MSGT_DEMUX,MSGL_V,"header block 1 size: %d\n",len);
     //stream_skip(demuxer->stream,len);
@@ -316,8 +317,6 @@ static int demux_vivo_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
   demux->filepos=stream_tell(demux->stream);
 
   c=stream_read_char(demux->stream);
-  if (c == -256) /* EOF */
-    return 0;
 //  printf("c=%x,%02X\n",c,c&0xf0);
   if (c == 0x82)
   {
@@ -328,11 +327,20 @@ static int demux_vivo_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
       mp_msg(MSGT_DEMUX, MSGL_V, "packet 0x82(pos=%u) chunk=%x\n",
         (int)stream_tell(demux->stream), c);
   }
+  if (c == -256) /* EOF */
+    return 0;
   switch(c&0xF0){
   case 0x00: // header - skip it!
   {
       len=stream_read_char(demux->stream);
-      if(len>=0x80) len=0x80*(len-0x80)+stream_read_char(demux->stream);
+      if (len == -256) /* EOF */
+        return 0;
+      if(len>=0x80) {
+          int tmp=stream_read_char(demux->stream);
+          if (tmp == -256) /* EOF */
+            return 0;
+          len=0x80*(len-0x80)+tmp;
+      }
       mp_msg(MSGT_DEMUX, MSGL_V, "vivo extra header: %d bytes\n",len);
 #ifdef TEXTPARSE_ALL
 {
@@ -350,10 +358,14 @@ static int demux_vivo_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
         len = stream_read_char(demux->stream);
       else
         len=128;
+      if (len == -256) /* EOF */
+        return 0;
       ds=demux->video;
       break;
   case 0x20:  // video packet
       len=stream_read_char(demux->stream);
+      if (len == -256) /* EOF */
+        return 0;
       ds=demux->video;
       break;
   case 0x30:  // audio packet
@@ -361,6 +373,8 @@ static int demux_vivo_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
         len = stream_read_char(demux->stream);
       else
         len=40;	/* 40kbps */
+      if (len == -256) /* EOF */
+        return 0;
       ds=demux->audio;
       audio_pos+=len;
       break;
@@ -369,6 +383,8 @@ static int demux_vivo_fill_buffer(demuxer_t *demux, demux_stream_t *dsds){
         len = stream_read_char(demux->stream);
       else
         len=24;	/* 24kbps */
+      if (len == -256) /* EOF */
+        return 0;
       ds=demux->audio;
       audio_pos+=len;
       break;

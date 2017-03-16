@@ -41,7 +41,7 @@
 #include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "libavcodec/avcodec.h"
-#include "libavcodec/dsputil.h"
+#include "libavcodec/pixblockdsp.h"
 #include "libavcodec/idctdsp.h"
 #include "libavcodec/fdctdsp.h"
 
@@ -102,9 +102,9 @@ struct vf_priv_s {
         uint8_t *src;
         int16_t *temp;
         AVCodecContext *avctx;
-        DSPContext dsp;
         IDCTDSPContext idsp;
         FDCTDSPContext fdsp;
+        PixblockDSPContext pdsp;
         char *non_b_qp;
 };
 
@@ -153,7 +153,7 @@ static void softthresh_c(int16_t dst[64], int16_t src[64], int qp, uint8_t *perm
         }
 }
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
 static void hardthresh_mmx(int16_t dst[64], int16_t src[64], int qp, uint8_t *permutation){
         int bias= 0; //FIXME
         unsigned int threshold1;
@@ -334,7 +334,7 @@ static void store_slice_c(uint8_t *dst, int16_t *src, int dst_stride, int src_st
         }
 }
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
 static void store_slice_mmx(uint8_t *dst, int16_t *src, int dst_stride, int src_stride, int width, int height, int log2_scale){
         int y;
 
@@ -418,7 +418,7 @@ static void filter(struct vf_priv_s *p, uint8_t *dst, uint8_t *src, int dst_stri
                                 const int x1= x + offset[i+count-1][0];
                                 const int y1= y + offset[i+count-1][1];
                                 const int index= x1 + y1*stride;
-                                p->dsp.get_pixels(block, p->src + index, stride);
+                                p->pdsp.get_pixels(block, p->src + index, stride);
                                 p->fdsp.fdct(block);
                                 requantize(block2, block, qp, p->idsp.idct_permutation);
                                 p->idsp.idct(block2);
@@ -512,10 +512,10 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
             }
         }
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
         if(gCpuCaps.hasMMX) __asm__ volatile ("emms\n\t");
 #endif
-#if HAVE_MMX2
+#if HAVE_MMXEXT_INLINE
         if(gCpuCaps.hasMMX2) __asm__ volatile ("sfence\n\t");
 #endif
 
@@ -584,7 +584,7 @@ static int vf_open(vf_instance_t *vf, char *args){
     init_avcodec();
 
     vf->priv->avctx= avcodec_alloc_context3(NULL);
-    ff_dsputil_init(&vf->priv->dsp, vf->priv->avctx);
+    ff_pixblockdsp_init(&vf->priv->pdsp, vf->priv->avctx);
     ff_idctdsp_init(&vf->priv->idsp, vf->priv->avctx);
     ff_fdctdsp_init(&vf->priv->fdsp, vf->priv->avctx);
 
@@ -604,7 +604,7 @@ static int vf_open(vf_instance_t *vf, char *args){
         case 1: requantize= softthresh_c; break;
     }
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
     if(gCpuCaps.hasMMX){
         store_slice= store_slice_mmx;
         switch(vf->priv->mode&3){

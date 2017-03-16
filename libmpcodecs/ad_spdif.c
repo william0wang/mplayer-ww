@@ -45,6 +45,7 @@ struct spdifContext {
     int              out_buffer_size;
     uint8_t         *out_buffer;
     uint8_t          pb_buffer[OUTBUF_SIZE];
+    int              header_written;
 };
 
 static int read_packet(void *p, uint8_t *buf, int buf_size)
@@ -78,7 +79,7 @@ static int preinit(sh_audio_t *sh)
 
 static int init(sh_audio_t *sh)
 {
-    int i, x, in_size, srate, bps, *dtshd_rate;
+    int i, x, in_size, srate, bps, *dtshd_rate, res;
     unsigned char *start;
     double pts;
     static const struct {
@@ -124,17 +125,18 @@ static int init(sh_audio_t *sh)
     lavf_ctx->duration   = AV_NOPTS_VALUE;
     lavf_ctx->start_time = AV_NOPTS_VALUE;
     for (i = 0; fmt_id_type[i].name; i++) {
-        if (!strcmp(sh->codec->dll, fmt_id_type[i].name)) {
+        if (!strcmp(codec_idx2str(sh->codec->dll_idx), fmt_id_type[i].name)) {
             lavf_ctx->streams[0]->codec->codec_id = fmt_id_type[i].id;
             break;
         }
     }
-    lavf_ctx->raw_packet_buffer_remaining_size = RAW_PACKET_BUFFER_SIZE;
-    if (AVERROR_PATCHWELCOME == lavf_ctx->oformat->write_header(lavf_ctx)) {
-        mp_msg(MSGT_DECAUDIO,MSGL_INFO,
+    if ((res = avformat_write_header(lavf_ctx, NULL)) < 0) {
+        if (res == AVERROR_PATCHWELCOME)
+            mp_msg(MSGT_DECAUDIO,MSGL_INFO,
                "This codec is not supported by spdifenc.\n");
         goto fail;
     }
+    spdif_ctx->header_written = 1;
 
     // get sample_rate & bitrate from parser
     x = ds_get_packet_pts(sh->ds, &start, &pts);
@@ -293,8 +295,8 @@ static void uninit(sh_audio_t *sh)
     AVFormatContext     *lavf_ctx  = spdif_ctx->lavf_ctx;
 
     if (lavf_ctx) {
-        if (lavf_ctx->oformat)
-            lavf_ctx->oformat->write_trailer(lavf_ctx);
+        if (spdif_ctx->header_written)
+            av_write_trailer(lavf_ctx);
         av_freep(&lavf_ctx->pb);
         if (lavf_ctx->streams) {
             av_freep(&lavf_ctx->streams[0]->codec);

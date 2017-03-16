@@ -67,6 +67,10 @@ int vo_fsmode = 0;
 float vo_panscan = 0.0f;
 float vo_border_pos_x = 0.5;
 float vo_border_pos_y = 0.5;
+int vo_fs_border_l = 0;
+int vo_fs_border_r = 0;
+int vo_fs_border_t = 0;
+int vo_fs_border_b = 0;
 int vo_rotate;
 int vo_ontop = 0;
 int vo_adapter_num=0;
@@ -458,6 +462,8 @@ void calc_src_dst_rects(int src_width, int src_height, struct vo_rect *src, stru
     if (borders) {
       borders->left = apply_border_pos(vo_dwidth,  scaled_width,  vo_border_pos_x);
       borders->top  = apply_border_pos(vo_dheight, scaled_height, vo_border_pos_y);
+      borders->right  = vo_dwidth  - scaled_width  - borders->left;
+      borders->bottom = vo_dheight - scaled_height - borders->top;
     }
     src_dst_split_scaling(src_width, vo_dwidth, scaled_width, vo_border_pos_x,
                           &src->left, &src->right, &dst->left, &dst->right);

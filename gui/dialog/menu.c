@@ -49,6 +49,8 @@
 #include "libavutil/avstring.h"
 
 #include "pixmaps/about.xpm"
+#include "pixmaps/audio.xpm"
+#include "pixmaps/video.xpm"
 #include "pixmaps/half.xpm"
 #include "pixmaps/normal.xpm"
 #include "pixmaps/double.xpm"
@@ -91,11 +93,12 @@
 #include "pixmaps/playdvd.xpm"
 #include "pixmaps/chapter.xpm"
 #include "pixmaps/dolby.xpm"
-#include "pixmaps/audio.xpm"
-#include "pixmaps/video.xpm"
 #endif
 #ifdef CONFIG_TV
 #include "pixmaps/tv.xpm"
+#endif
+#if defined(CONFIG_LIBCDIO) || defined(CONFIG_DVDREAD)
+#include "pixmaps/playimage.xpm"
 #endif
 #include "pixmaps/empty1px.xpm"
 #include "pixmaps/rotate.xpm"
@@ -227,13 +230,12 @@ GtkWidget * AddSeparator( GtkWidget * Menu )
 typedef struct
 {
  int id;
- const char * id2;
+ const char id2[3];
  const char * name;
 } Languages_t;
 
-#ifdef CONFIG_DVDREAD
 #define lng( a,b ) ( (int)(a) * 256 + b )
-static Languages_t Languages[] =
+static const Languages_t Languages[] =
 {
   { lng( 'a','a' ), "aar", "ʿAfár af"                      },
   { lng( 'a','b' ), "abk", "аҧсуа бызшәа"         },
@@ -405,10 +407,12 @@ static Languages_t Languages[] =
   { lng( 'z','u' ), "zul", "isiZulu"                         },
 };
 
+#ifdef CONFIG_DVDREAD
 static char * ChannelTypes[] =
   { "Dolby Digital","","Mpeg1","Mpeg2","PCM","","Digital Theatre System" };
 static char * ChannelNumbers[] =
   { "","Stereo","","","","5.1" };
+#endif
 
 enum
 {
@@ -434,14 +438,15 @@ static const char * GetLanguage( void *language, int type )
     else if ( p[3] != 0) return language;
   }
  for ( i=0;i<sizeof( Languages ) / sizeof( Languages_t );i++ )
-  if ( type == GET_LANG_INT ? Languages[i].id == l : strcasecmp(Languages[i].id2, p) == 0 ) return Languages[i].name;
+  if ( type == GET_LANG_INT ? Languages[i].id == l : strncasecmp(Languages[i].id2, p, sizeof(Languages[i].id2)) == 0 ) return Languages[i].name;
  return MSGTR_GUI_Unknown;
 }
 #undef lng
-#endif
 
 
+#ifdef CONFIG_DVDREAD
 static GtkWidget * DVDSubMenu;
+#endif
 GtkWidget * DVDTitleMenu;
 GtkWidget * DVDChapterMenu;
 GtkWidget * DVDAudioLanguageMenu;
@@ -462,7 +467,7 @@ GtkWidget * CreatePopUpMenu( void )
  GtkWidget * H, * N, * D, * F;
  demuxer_t *demuxer = mpctx_get_demuxer(guiInfo.mpcontext);
  mixer_t *mixer = mpctx_get_mixer(guiInfo.mpcontext);
- int global_sub_size = mpctx_get_global_sub_size(guiInfo.mpcontext);
+ int subs = 0, sub_pos;
 
  Menu=gtk_menu_new();
  gtk_widget_realize (Menu);
@@ -593,6 +598,9 @@ GtkWidget * CreatePopUpMenu( void )
         MenuItem=AddMenuItem( window1, (const char*)empty1px_xpm, DVDSubtitleLanguageMenu,MSGTR_GUI__none_,evNone );
         gtk_widget_set_sensitive( MenuItem,FALSE );
        }
+#endif
+#if defined(CONFIG_LIBCDIO) || defined(CONFIG_DVDREAD)
+    AddMenuItem( window1, (const char*)playimage_xpm, SubMenu,MSGTR_GUI_Image"...    ", evPlayImage );
 #endif
     AddMenuItem( window1, (const char*)url_xpm, SubMenu,MSGTR_GUI_URL"...", evLoadURL );
 #ifdef CONFIG_TV
@@ -733,13 +741,15 @@ GtkWidget * CreatePopUpMenu( void )
    }
 
   /* cheap subtitle switching for non-DVD streams */
-  if ( global_sub_size && guiInfo.StreamType != STREAMTYPE_DVD )
+
+  mpctx_get_global_sub_info(guiInfo.mpcontext, &subs, &sub_pos);
+
+  if ( subs && guiInfo.StreamType != STREAMTYPE_DVD )
    {
-    int pos, i, j, subs0 = guiInfo.mpcontext->sub_counts[SUB_SOURCE_SUBS], subs1 = guiInfo.mpcontext->sub_counts[SUB_SOURCE_VOBSUB];
-    pos = mpctx_get_global_sub_pos(guiInfo.mpcontext);
+    int i, j, subs0 = guiInfo.mpcontext->sub_counts[SUB_SOURCE_SUBS], subs1 = guiInfo.mpcontext->sub_counts[SUB_SOURCE_VOBSUB];
     SubMenu=AddSubMenu( window1, (const char*)subtitle_xpm, Menu, MSGTR_GUI_Subtitles );
-    AddMenuCheckItem( window1, (const char*)empty1px_xpm, SubMenu, MSGTR_GUI__none_, pos == -1, (-1 << 16) + ivSetSubtitle );
-    for ( i=0;i < global_sub_size;i++ )
+    AddMenuCheckItem( window1, (const char*)empty1px_xpm, SubMenu, MSGTR_GUI__none_, sub_pos == -1, (-1 << 16) + ivSetSubtitle );
+    for ( i=0;i < subs;i++ )
      {
       int ret = -1;
       char lng[32], tmp[64], *lang = NULL;
@@ -782,7 +792,7 @@ GtkWidget * CreatePopUpMenu( void )
        }
       if ( ret == 0 ) snprintf( tmp, sizeof(tmp), MSGTR_GUI_TrackN" - %s", i, GetLanguage( lng, GET_LANG_CHR ) );
       else snprintf( tmp, sizeof(tmp), MSGTR_GUI_TrackN, i );
-      AddMenuCheckItem( window1,(const char*)empty1px_xpm,SubMenu,tmp,pos == i,( i << 16 ) + ivSetSubtitle );
+      AddMenuCheckItem( window1,(const char*)empty1px_xpm,SubMenu,tmp,sub_pos == i,( i << 16 ) + ivSetSubtitle );
      }
    }
 

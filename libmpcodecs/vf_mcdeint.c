@@ -58,7 +58,6 @@ Known Issues:
 #include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "libavcodec/avcodec.h"
-#include "libavcodec/dsputil.h"
 
 #undef fprintf
 #undef free
@@ -93,6 +92,8 @@ struct vf_priv_s {
 
 static void filter(struct vf_priv_s *p, uint8_t *dst[3], uint8_t *src[3], int dst_stride[3], int src_stride[3], int width, int height){
     int x, y, i;
+    int got_pkt;
+    AVPacket pkt;
 
     for(i=0; i<3; i++){
         p->frame->data[i]= src[i];
@@ -102,7 +103,10 @@ static void filter(struct vf_priv_s *p, uint8_t *dst[3], uint8_t *src[3], int ds
     p->avctx_enc->me_cmp=
     p->avctx_enc->me_sub_cmp= FF_CMP_SAD /*| (p->parity ? FF_CMP_ODD : FF_CMP_EVEN)*/;
     p->frame->quality= p->qp*FF_QP2LAMBDA;
-    avcodec_encode_video(p->avctx_enc, p->outbuf, p->outbuf_size, p->frame);
+    av_init_packet(&pkt);
+    pkt.data = p->outbuf;
+    pkt.size = p->outbuf_size;
+    avcodec_encode_video2(p->avctx_enc, &pkt, p->frame, &got_pkt);
     p->frame_dec = p->avctx_enc->coded_frame;
 
     for(i=0; i<3; i++){
@@ -226,7 +230,7 @@ static int config(struct vf_instance *vf,
             avctx_enc->time_base= (AVRational){1,25};  // meaningless
             avctx_enc->gop_size = 300;
             avctx_enc->max_b_frames= 0;
-            avctx_enc->pix_fmt = PIX_FMT_YUV420P;
+            avctx_enc->pix_fmt = AV_PIX_FMT_YUV420P;
             avctx_enc->flags = CODEC_FLAG_QSCALE | CODEC_FLAG_LOW_DELAY;
             avctx_enc->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
             avctx_enc->global_quality= 1;
@@ -252,7 +256,7 @@ static int config(struct vf_instance *vf,
             av_dict_free(&opts);
 
         }
-        vf->priv->frame= avcodec_alloc_frame();
+        vf->priv->frame= av_frame_alloc();
 
         vf->priv->outbuf_size= width*height*10;
         vf->priv->outbuf= malloc(vf->priv->outbuf_size);

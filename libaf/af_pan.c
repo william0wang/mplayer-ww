@@ -202,7 +202,7 @@ static int af_open(af_instance_t* af){
 }
 
 // Description of this filter
-af_info_t af_info_pan = {
+const af_info_t af_info_pan = {
     "Panning audio filter",
     "pan",
     "Anders",

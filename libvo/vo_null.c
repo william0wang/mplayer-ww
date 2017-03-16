@@ -64,7 +64,7 @@ query_format(uint32_t format)
 {
     if (IMGFMT_IS_HWACCEL(format))
         return 0;
-    return VFCAP_CSP_SUPPORTED;
+    return VFCAP_CSP_SUPPORTED | VFCAP_ACCEPT_STRIDE;
 }
 
 static int

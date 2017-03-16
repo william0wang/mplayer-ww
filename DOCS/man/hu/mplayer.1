@@ -1,5 +1,5 @@
 .\" Synced with r32066
-.\" MPlayer (C) 2000-2014 MPlayer Team
+.\" MPlayer (C) 2000-2016 MPlayer Team
 .\" Ezt a man oldalt Gabucino, Diego Biurrun és Jonas Jermann készíti/készítette
 .\" Karbantartó: Gabrov
 .
@@ -1693,7 +1693,7 @@ Megadja a bemenet képarányát:
 .IPs arate=<32000\-48000>
 Megadja az audió kódolási rátáját (alapértelmezett: 48000 Hz, használható: 32000, 44100
 és 48000 Hz).
-.IPs alayer=<1\-3>
+.IPs alayer=<1\-5>
 Megadja az MPEG audió réteg kódolását (alapértelmezett: 2).
 .IPs abitrate=<32\-448>
 Megadja az audió kódolási bitrátáját kbps-ben (alapértelmezett: 384).
@@ -2131,7 +2131,7 @@ eredményezve, ha immediatemode=0-t használsz.
 .TP
 .B \-tvscan <opció1:opció2:...> (csak TV és MPlayer)
 A TV csatorna kereső finomhangolására használható opció.
-Az MPlayer kiírja az értékeket a "-tv channels=" opcióhoz,
+Az MPlayer kiírja az értékeket a "\-tv channels=" opcióhoz,
 beleértve a már meglévő és az épp megtalált csatornákat.
 .sp 1
 Az elérhető alopciók:
@@ -2308,7 +2308,7 @@ Lásd még a \-dump*sub és \-vobsubout* opciókat is.
 .B \-embeddedfonts (csak FreeType)
 Engedélyezi a matroska beágyazott betűinek kicsomagolását (alapértelmezett: kikapcsolva).
 Ezek a betűtípusok használhatóak az SSA/ASS feliratok
-rendereléséhez (-ass kapcsoló).
+rendereléséhez (\-ass kapcsoló).
 A betűtípus fájlok a ~/.mplayer/fonts könyvtárban lesznek létrehozva.
 .br
 .I MEGJEGYZÉS:
@@ -2772,7 +2772,7 @@ százalékában (alapértelmezett: 3).
 .B \-volume <-1\-100> (lásd még \-af volume)
 Beállítja a kezdő hangerőt a keverőben, akár hardveres, akár szoftveres (ha a
 \-softvol-lal együtt használod).
-A -1-es érték (alapértelmezett) nem változtat a hangerőn.
+A \-1-es érték (alapértelmezett) nem változtat a hangerőn.
 .
 .
 .
@@ -3230,14 +3230,14 @@ A teljes képernyős váltás javítása OpenBox 1.x-en.
 .PD 1
 .
 .TP
-.B \-geometry x[%][:y[%]] vagy [WxH][+-x+-y]
+.B \-geometry x[%][:y[%]] vagy [WxH][+\-x+\-y]
 Annak beállítása hogy kezdéskor hova lesz kirakva a video.
 Az x és y érték a képernyő bal felső sarkától a megjelenítendő ablak
 bal felső sarkáig mért távolság pixelben, vagy ha egy százalék jelet
 írsz az érték mögé, akkor a képernyő adott irányú méretének százalék
 érték lesz. Támogatja továbbá a szabványos X11 \-geometry opció formátumot
-is, melyben pl. a +10-50 azt jelenti, hogy "tedd 10 pixellel a bal szegély
-mellé és 50 pixellel az alsó szegély fölé", a "--20+-10" pedig azt, hogy
+is, melyben pl. a +10\-50 azt jelenti, hogy "tedd 10 pixellel a bal szegély
+mellé és 50 pixellel az alsó szegély fölé", a "\-\-20+\-10" pedig azt, hogy
 "tedd 20 pixellel a jobb szegélyen túl és 10 pixellel a felső szegély fölé".
 Ha egy külső ablak is meg van adva a \-wid opcióval, akkor az x és y
 koordináták az ablak bal felső sarkához viszonyulnak a képernyő helyett.
@@ -3814,7 +3814,7 @@ Mac OS X CoreVideo kimeneti videó vezérlő
 .PD 0
 .RSs
 .IPs device_id=<szám>
-Teljes képernyős lejátszásnál a használni kívánt képernyő eszköz, vagy -1-re állítva
+Teljes képernyős lejátszásnál a használni kívánt képernyő eszköz, vagy \-1-re állítva
 mindig ugyan azt a képernyőt használja, amelyiken a videó ablak van (alapértelmezett: \-1 \- auto).
 .
 .IPs shared_buffer
@@ -4057,7 +4057,7 @@ A részletekért lásd a lscale-t.
 Beállítja a lscale/cscale szűrők erősségét, ahol ez támogatott.
 .IPs stereo=<érték>
 Kiválaszt egy módszert a sztereó képernyőkhöz.
-Valószínűleg használnod kell a -aspect kapcsolót a képarány javításához.
+Valószínűleg használnod kell a \-aspect kapcsolót a képarány javításához.
 Kísérleti dolog, ne várj tőle túl sokat.
 .RSss
 0: Normális 2D képernyő
@@ -4178,7 +4178,7 @@ Haszos sebességméréshez.
 .B "aa\ \ \ \ \ "
 ASCII art kimeneti videó vezérlő, ami működik szöveges konzolon.
 Az elérhető alopciók listáját és azok leírását megkaphatod egy
-'mplayer \-vo aa:help' paranccsal.
+\&'mplayer \-vo aa:help' paranccsal.
 .br
 .I MEGJEGYZÉS:
 A vezérlő nem kezeli jól a \-aspect opciót.
@@ -4469,7 +4469,7 @@ A formátum ugyan az, mint amit az mjpegtools alkalmaz, így ez akkor
 hasznos, ha a videót az mjpegtools-szal akarod feldolgozni.
 Az YV12 formátumot támogatja.
 Ha a forrás fájlodnak eltérő formátuma van és átlapolt, akkor használd
-a -vf scale=::1 opciót, hogy kényszerítsd az átlapolt módú konvertálást.
+a \-vf scale=::1 opciót, hogy kényszerítsd az átlapolt módú konvertálást.
 Kombinálhatod a \-fixed\-vo opcióval ugyanolyan képméretű és fps
 értékű fájlok összefűzéséhez.
 .PD 0
@@ -7189,7 +7189,7 @@ számol a mezőkhöz a t, b és p alternatívákhoz.
 .B telecine[=start]
 3:2-es 'telecine' eljárást alkalmaz a frameráta 20%-os növelésére.
 Ez valószínűleg nem fog jól működni az MPlayerrel, de használható a
-'mencoder \-fps 30000/1001 \-ofps 30000/1001 \-vf telecine' paranccsal.
+\&'mencoder \-fps 30000/1001 \-ofps 30000/1001 \-vf telecine' paranccsal.
 Mintkét fps opció fontos!
 (A/V szinkron sérül, ha valamelyik rossz.)
 Az opcionális start paraméter megmondja a szűrőnek, hogy hol kezdjen a
@@ -7564,7 +7564,7 @@ Megengedi képernyőmentések készítését a filmből szolga módú
 parancsokkal, melyek billentyű lenyomásokhoz köthetőek.
 Lásd a szolga mód dokumentációját és az INTERAKTÍV VEZÉRLÉS
 fejezetet a részletekért.
-'shotNNNN.png' nevű fájlok fognak létrejönni a munkakönyvtárban,
+\&'shotNNNN.png' nevű fájlok fognak létrejönni a munkakönyvtárban,
 az első szabad szám felhasználásával \- egy fájl sem lesz felülírva.
 A szűrő nem jelent hátrányt, ha nem használod és elfogad minden
 színteret, így nyugodtan beleírható a konfigurációs fájlba.
@@ -7660,7 +7660,7 @@ Az eldobásuk szükséges lehet, hogy a kódolók ne zavarodjanak össze.
 .sp 1
 .RS
 .I MEGJEGYZÉS:
-Ezen szűrő és bármelyik keresési forma (beleértve a -ss -t és az EDL-eket)
+Ezen szűrő és bármelyik keresési forma (beleértve a \-ss -t és az EDL-eket)
 együttes használata kiszabadíthatja a szellemet a palackból.
 .RE
 .
@@ -9846,7 +9846,7 @@ Beállítja a használni kívánt kvantáló típusát.
 Nagyobb bitrátáknál úgy tűnik, hogy az MPEG kvantálás jobban megőrzi a részleteket.
 Alacsony bitrátáknál a H.263 simítása csökkenti a blokk zajt.
 Ha saját matricákat használsz, az MPEG kvantálást
-.b kell
+.B kell
 használni.
 .
 .TP
@@ -11803,7 +11803,7 @@ leírja, hogyan készíthetsz hasznos hibajelentést.
 Az MPlayert eredetileg Gereöffy Árpád írta.
 Lásd az AUTHORS fájlt a többi közreműködő listájához.
 .PP
-MPlayer (C) 2000\-2014 Az MPlayer Csapat
+MPlayer (C) 2000\-2016 Az MPlayer Csapat
 .PP
 Ezt a man oldalt nagyrészt Gabucino, Jonas Jermann és Diego Biurrun írta.
 A karbantartó Diego Biurrun.

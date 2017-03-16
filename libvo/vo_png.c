@@ -134,6 +134,8 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
         avctx = avcodec_alloc_context3(NULL);
         avctx->compression_level = z_compression;
         avctx->pix_fmt = imgfmt2pixfmt(format);
+        avctx->width = width;
+        avctx->height = height;
         if (avcodec_open2(avctx, avcodec_find_encoder(AV_CODEC_ID_PNG), NULL) < 0) {
             uninit();
             return -1;
@@ -145,7 +147,7 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
 
 
 static uint32_t draw_image(mp_image_t* mpi){
-    AVFrame pic;
+    AVFrame *pic;
     int buffersize;
     int res, got_pkt;
     char buf[100];
@@ -162,10 +164,14 @@ static uint32_t draw_image(mp_image_t* mpi){
         return 1;
     }
 
+    pic = av_frame_alloc();
     avctx->width = mpi->w;
     avctx->height = mpi->h;
-    pic.data[0] = mpi->planes[0];
-    pic.linesize[0] = mpi->stride[0];
+    pic->width  = mpi->w;
+    pic->height = mpi->h;
+    pic->format = imgfmt2pixfmt(png_format);
+    pic->data[0] = mpi->planes[0];
+    pic->linesize[0] = mpi->stride[0];
     buffersize = mpi->w * mpi->h * 8;
     if (outbuffer_size < buffersize) {
         av_freep(&outbuffer);
@@ -175,7 +181,8 @@ static uint32_t draw_image(mp_image_t* mpi){
     av_init_packet(&pkt);
     pkt.data = outbuffer;
     pkt.size = outbuffer_size;
-    res = avcodec_encode_video2(avctx, &pkt, &pic, &got_pkt);
+    res = avcodec_encode_video2(avctx, &pkt, pic, &got_pkt);
+    av_frame_free(&pic);
 
     if (res < 0 || !got_pkt) {
  	    mp_msg(MSGT_VO,MSGL_WARN, MSGTR_LIBVO_PNG_ErrorInCreatePng);

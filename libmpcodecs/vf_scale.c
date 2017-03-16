@@ -99,6 +99,10 @@ static const unsigned int outfmt_list[]={
     IMGFMT_420P10_BE,
     IMGFMT_420P9_LE,
     IMGFMT_420P9_BE,
+    IMGFMT_440P12_LE,
+    IMGFMT_440P12_BE,
+    IMGFMT_440P10_LE,
+    IMGFMT_440P10_BE,
     IMGFMT_420A,
     IMGFMT_422A,
     IMGFMT_444A,
@@ -117,6 +121,8 @@ static const unsigned int outfmt_list[]={
     IMGFMT_BGR24,
     IMGFMT_RGB24,
     IMGFMT_GBR24P,
+    IMGFMT_GBR10PLE,
+    IMGFMT_GBR10PBE,
     IMGFMT_GBR12PLE,
     IMGFMT_GBR12PBE,
     IMGFMT_GBR14PLE,
@@ -220,7 +226,7 @@ static int config(struct vf_instance *vf,
         return 0;
     }
     sfmt = imgfmt2pixfmt(outfmt);
-    if (outfmt == IMGFMT_BGR8) sfmt = PIX_FMT_PAL8;
+    if (outfmt == IMGFMT_BGR8) sfmt = AV_PIX_FMT_PAL8;
     dfmt = imgfmt2pixfmt(best);
 
     vo_flags=vf->next->query_format(vf->next,best);
@@ -544,7 +550,7 @@ static int control(struct vf_instance *vf, int request, void* data){
 //  supported Input formats: YV12, I420, IYUV, YUY2, UYVY, BGR32, BGR24, BGR16, BGR15, RGB32, RGB24, Y8, Y800
 
 static int query_format(struct vf_instance *vf, unsigned int fmt){
-    if (!IMGFMT_IS_HWACCEL(fmt) && imgfmt2pixfmt(fmt) != PIX_FMT_NONE) {
+    if (!IMGFMT_IS_HWACCEL(fmt) && imgfmt2pixfmt(fmt) != AV_PIX_FMT_NONE) {
         unsigned int best=find_best_out(vf, fmt);
         int flags;
         if(!best) return 0;         // no matching out-fmt
@@ -599,7 +605,7 @@ void sws_getFlagsAndFilterFromCmdLine(int *flags, SwsFilter **srcFilterParam, Sw
         static int firstTime=1;
         *flags=0;
 
-#if ARCH_X86
+#if ARCH_X86 && HAVE_MMX_INLINE
         if(gCpuCaps.hasMMX)
                 __asm__ volatile("emms\n\t"::: "memory"); //FIXME this should not be required but it IS (even for non-MMX versions)
 #endif
@@ -646,7 +652,7 @@ struct SwsContext *sws_getContextFromCmdLine(int srcW, int srcH, int srcFormat, 
 
         dfmt = imgfmt2pixfmt(dstFormat);
         sfmt = imgfmt2pixfmt(srcFormat);
-        if (srcFormat == IMGFMT_RGB8 || srcFormat == IMGFMT_BGR8) sfmt = PIX_FMT_PAL8;
+        if (srcFormat == IMGFMT_RGB8 || srcFormat == IMGFMT_BGR8) sfmt = AV_PIX_FMT_PAL8;
         sws_getFlagsAndFilterFromCmdLine(&flags, &srcFilterParam, &dstFilterParam);
 
         return sws_getContext(srcW, srcH, sfmt, dstW, dstH, dfmt, flags, srcFilterParam, dstFilterParam, NULL);

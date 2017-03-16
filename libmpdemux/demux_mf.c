@@ -56,14 +56,14 @@ static int demux_mf_fill_buffer(demuxer_t *demuxer, demux_stream_t *ds){
 
   if ( mf->curr_frame >= mf->nr_of_files ) return 0;
 
-  stat( mf->names[mf->curr_frame],&fs );
+  if (stat( mf->names[mf->curr_frame],&fs ) == -1) return 0;
 //  printf( "[demux_mf] frame: %d (%s,%d)\n",mf->curr_frame,mf->names[mf->curr_frame],fs.st_size );
 
   if ( !( f=fopen( mf->names[mf->curr_frame],"rb" ) ) ) return 0;
   {
    sh_video_t     * sh_video = demuxer->video->sh;
    demux_packet_t * dp = new_demux_packet( fs.st_size );
-   if ( !fread( dp->buffer,fs.st_size,1,f ) ) {
+   if ( fread( dp->buffer,1,fs.st_size,f ) != fs.st_size ) {
         fclose(f);
         free_demux_packet(dp);
         return 0;

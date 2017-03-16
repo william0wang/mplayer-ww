@@ -826,6 +826,19 @@ err:
     return 0;
 }
 
+static void fixup_ctrl_state(int *ctrl_state, int state)
+{
+    // Attempt to fix if somehow our state got out of
+    // sync with reality.
+    // This usually happens when a shortcut involving CTRL
+    // was used to switch to a different window/workspace.
+    if (*ctrl_state != !!(state & 4)) {
+        *ctrl_state = !!(state & 4);
+        mplayer_put_key(KEY_CTRL |
+            (*ctrl_state ? MP_KEY_DOWN : 0));
+    }
+}
+
 static int handle_x11_event(Display *mydisplay, XEvent *event)
 {
     int key = 0;
@@ -872,15 +885,7 @@ static int handle_x11_event(Display *mydisplay, XEvent *event)
                     } else if (event->type == KeyRelease) {
                         break;
                     }
-                    // Attempt to fix if somehow our state got out of
-                    // sync with reality.
-                    // This usually happens when a shortcut involving CTRL
-                    // was used to switch to a different window/workspace.
-                    if (ctrl_state != !!(event->xkey.state & 4)) {
-                        ctrl_state = !!(event->xkey.state & 4);
-                        mplayer_put_key(KEY_CTRL |
-                            (ctrl_state ? MP_KEY_DOWN : 0));
-                    }
+                    fixup_ctrl_state(&ctrl_state, event->xkey.state);
                     if (!vo_x11_putkey_ext(keySym)) {
                         if (utf8) mplayer_put_key(utf8);
                         else vo_x11_putkey(key);
@@ -896,6 +901,7 @@ static int handle_x11_event(Display *mydisplay, XEvent *event)
                 key = MP_KEY_DOWN;
                 /* Fallthrough, treat like release otherwise */
             case ButtonRelease:
+                fixup_ctrl_state(&ctrl_state, event->xbutton.state);
 #ifdef CONFIG_GUI
                 // Ignore mouse button 1-3 under GUI.
                 if (use_gui && (event->xbutton.button >= 1)
@@ -961,6 +967,19 @@ int vo_x11_check_events(Display * mydisplay)
         mouse_timer = GetTimerMS();
     }
     return ret;
+}
+
+static void vo_x11_update_fs_borders(void)
+{
+    if (!vo_fs)
+        return;
+    if (vo_dwidth  <= vo_fs_border_l + vo_fs_border_r ||
+        vo_dheight <= vo_fs_border_t + vo_fs_border_b) {
+        mp_msg(MSGT_VO, MSGL_ERR, "[x11] borders too wide, ignored.\n");
+        return;
+    }
+    vo_dwidth  -= vo_fs_border_l + vo_fs_border_r;
+    vo_dheight -= vo_fs_border_t + vo_fs_border_b;
 }
 
 /**
@@ -1145,6 +1164,7 @@ void vo_x11_create_vo_window(XVisualInfo *vis, int x, int y,
     vo_fs = 0;
     vo_dwidth = width;
     vo_dheight = height;
+    vo_x11_update_fs_borders();
     vo_window = vo_x11_create_smooth_window(mDisplay, mRootWin, vis->visual,
                       x, y, width, height, vis->depth, col_map);
     window_state = VOFLAG_HIDDEN;
@@ -1189,6 +1209,7 @@ void vo_x11_create_vo_window(XVisualInfo *vis, int x, int y,
     // set the size values right.
     vo_dwidth  = vo_screenwidth;
     vo_dheight = vo_screenheight;
+    vo_x11_update_fs_borders();
   }
 final:
   if (vo_gc != None)
@@ -1381,7 +1402,11 @@ int vo_x11_update_geometry(void) {
     Window dummy_win;
     XGetGeometry(mDisplay, vo_window, &dummy_win, &dummy_int, &dummy_int,
                  &w, &h, &dummy_int, &depth);
-    if (w <= INT_MAX && h <= INT_MAX) { vo_dwidth = w; vo_dheight = h; }
+    if (w <= INT_MAX && h <= INT_MAX) {
+        vo_dwidth = w;
+        vo_dheight = h;
+        vo_x11_update_fs_borders();
+    }
     XTranslateCoordinates(mDisplay, vo_window, mRootWin, 0, 0, &vo_dx, &vo_dy,
                           &dummy_win);
 

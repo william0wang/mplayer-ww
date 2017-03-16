@@ -148,8 +148,9 @@ static int preinit(const char *arg){
 	}
 	return 0;
     }
+#else
+    if (!arg) arg = "grab.mpg";
 #endif
-    arg = (arg ? arg : "grab.mpg");
     mp_msg(MSGT_VO,MSGL_INFO, "Saving PES stream to %s\n", arg);
     vo_mpegpes_fd=open(arg,O_WRONLY|O_CREAT,0666);
     if(vo_mpegpes_fd<0){

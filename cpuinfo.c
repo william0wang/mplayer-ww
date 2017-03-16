@@ -50,7 +50,7 @@ typedef struct cpuid_regs {
 } cpuid_regs_t;
 
 static cpuid_regs_t
-cpuid(int func) {
+cpuid(int func, int sub) {
     cpuid_regs_t regs;
 #define CPUID   ".byte 0x0f, 0xa2; "
 #ifdef __x86_64__
@@ -65,7 +65,7 @@ cpuid(int func) {
             "xchg %%esi, %%ebx\n\t"
 #endif
             : "=a" (regs.eax), "=S" (regs.ebx), "=c" (regs.ecx), "=d" (regs.edx)
-            : "0" (func));
+            : "0" (func), "2" (sub));
     return regs;
 }
 
@@ -118,11 +118,12 @@ main(void)
     unsigned max_ext_cpuid;
     unsigned int amd_flags;
     unsigned int amd_flags2;
+    unsigned int ext_flags;
     const char *model_name = NULL;
     int i;
     char processor_name[49];
 
-    regs = cpuid(0);
+    regs = cpuid(0, 0);
     max_cpuid = regs.eax;
     /* printf("%d CPUID function codes\n", max_cpuid+1); */
 
@@ -132,16 +133,16 @@ main(void)
     idstr[12] = 0;
     printf("vendor_id\t: %s\n", idstr);
 
-    regs_ext = cpuid((1<<31) + 0);
+    regs_ext = cpuid((1<<31) + 0, 0);
     max_ext_cpuid = regs_ext.eax;
     if (max_ext_cpuid >= (1<<31) + 1) {
-        regs_ext = cpuid((1<<31) + 1);
+        regs_ext = cpuid((1<<31) + 1, 0);
         amd_flags = regs_ext.edx;
         amd_flags2 = regs_ext.ecx;
 
         if (max_ext_cpuid >= (1<<31) + 4) {
             for (i = 2; i <= 4; i++) {
-                regs_ext = cpuid((1<<31) + i);
+                regs_ext = cpuid((1<<31) + i, 0);
                 store32(processor_name + (i-2)*16, regs_ext.eax);
                 store32(processor_name + (i-2)*16 + 4, regs_ext.ebx);
                 store32(processor_name + (i-2)*16 + 8, regs_ext.ecx);
@@ -156,6 +157,13 @@ main(void)
     } else {
         amd_flags = 0;
         amd_flags2 = 0;
+    }
+
+    if (max_cpuid >= 7) {
+        regs_ext = cpuid(7, 0);
+        ext_flags = regs_ext.ebx;
+    } else {
+        ext_flags = 0;
     }
 
     if (max_cpuid >= 1) {
@@ -210,20 +218,26 @@ main(void)
             CPUID_FEATURE_DEF(8, "tm2", "Thermal Monitor 2"),
             CPUID_FEATURE_DEF(9, "ssse3", "Supplemental SSE3"),
             CPUID_FEATURE_DEF(10, "cid", "L1 Context ID"),
+            CPUID_FEATURE_DEF(11, "sdbg", "Silicon Debug"),
             CPUID_FEATURE_DEF(12, "fma", "Fused Multiply Add"),
             CPUID_FEATURE_DEF(13, "cx16", "CMPXCHG16B Available"),
             CPUID_FEATURE_DEF(14, "xtpr", "xTPR Disable"),
             CPUID_FEATURE_DEF(15, "pdcm", "Perf/Debug Capability MSR"),
+            CPUID_FEATURE_DEF(17, "pcid", "Processor-context identifiers"),
             CPUID_FEATURE_DEF(18, "dca", "Direct Cache Access"),
             CPUID_FEATURE_DEF(19, "sse4_1", "SSE4.1 Extensions"),
             CPUID_FEATURE_DEF(20, "sse4_2", "SSE4.2 Extensions"),
             CPUID_FEATURE_DEF(21, "x2apic", "x2APIC Feature"),
             CPUID_FEATURE_DEF(22, "movbe", "MOVBE Instruction"),
             CPUID_FEATURE_DEF(23, "popcnt", "Pop Count Instruction"),
+            CPUID_FEATURE_DEF(24, "tsc_deadline_timer", "TSC Deadline"),
             CPUID_FEATURE_DEF(25, "aes", "AES Instruction"),
             CPUID_FEATURE_DEF(26, "xsave", "XSAVE/XRSTOR Extensions"),
             CPUID_FEATURE_DEF(27, "osxsave", "XSAVE/XRSTOR Enabled in the OS"),
             CPUID_FEATURE_DEF(28, "avx", "Advanced Vector Extension"),
+            CPUID_FEATURE_DEF(29, "f16c", "Float 16 Instructions"),
+            CPUID_FEATURE_DEF(30, "rdrand", "RDRAND Instruction"),
+            CPUID_FEATURE_DEF(31, "hypervisor", "Reserved for Use by Hypervisor"),
             { -1 }
         };
         static struct {
@@ -257,14 +271,60 @@ main(void)
             CPUID_FEATURE_DEF(8, "3dnowprefetch", "3DNow! Prefetch/PrefetchW"),
             CPUID_FEATURE_DEF(9, "osvw", "OS Visible Workaround"),
             CPUID_FEATURE_DEF(10, "ibs", "Instruction Based Sampling"),
-            CPUID_FEATURE_DEF(11, "sse5", "SSE5 Extensions"),
+            CPUID_FEATURE_DEF(11, "xop", "XOP Extensions"),
             CPUID_FEATURE_DEF(12, "skinit", "SKINIT, STGI, and DEV Support"),
             CPUID_FEATURE_DEF(13, "wdt", "Watchdog Timer Support"),
+            CPUID_FEATURE_DEF(15, "lwp", "Lightweight Profiling"),
+            CPUID_FEATURE_DEF(16, "fma4", "Fused Multiple Add with 4 Operands"),
+            CPUID_FEATURE_DEF(17, "tce", "Translation cache extension"),
+            CPUID_FEATURE_DEF(19, "nodeid_msr", "Support for MSRC001_100C"),
+            CPUID_FEATURE_DEF(21, "tbm", "Trailing Bit Manipulation"),
+            CPUID_FEATURE_DEF(22, "topoext", "CPUID Fn 8000001d - 8000001e"),
+            CPUID_FEATURE_DEF(23, "perfctr_core", "Core performance counter"),
+            CPUID_FEATURE_DEF(24, "perfctr_nb", "NB performance counter"),
+            CPUID_FEATURE_DEF(26, "bpext", "Data breakpoint extensions"),
+            CPUID_FEATURE_DEF(27, "perftsc", "Performance TCS"),
+            CPUID_FEATURE_DEF(28, "perfctr_l2", "L2 performance counter"),
+            CPUID_FEATURE_DEF(29, "mwaitx", "MONITORX/MWAITX"),
             { -1 }
         };
+        static struct {
+            int bit;
+            char *desc;
+        } cap_ext[] = {
+            CPUID_FEATURE_DEF(0, "fsgsbase", "{RD/WR}{FS/GS}BASE instructions"),
+            CPUID_FEATURE_DEF(1, "tsc_adjust", "TSC adjustment MSR 0x3b"),
+            CPUID_FEATURE_DEF(2, "sgx", "Software Guard Extensions"),
+            CPUID_FEATURE_DEF(3, "bmi1", "1st group bit manipulation"),
+            CPUID_FEATURE_DEF(4, "hle", "Hardware Lock Elision"),
+            CPUID_FEATURE_DEF(5, "avx2", "AVX2 instructions"),
+            CPUID_FEATURE_DEF(7, "smep", "Supervisor mode execution protection"),
+            CPUID_FEATURE_DEF(8, "bmi2", "2nd group bit manipulation"),
+            CPUID_FEATURE_DEF(9, "erms", "Enhanced REP MOVSB/STOSB"),
+            CPUID_FEATURE_DEF(10, "invpcid", "Invalidate processor context ID"),
+            CPUID_FEATURE_DEF(11, "rtm", "Restricted Transactional Memory"),
+            CPUID_FEATURE_DEF(12, "cqm", "Cache QoS Monitoring"),
+            CPUID_FEATURE_DEF(14, "mpx", "Memory Protection Extension"),
+            CPUID_FEATURE_DEF(16, "avx512f", "AVX-512 Foundation"),
+            CPUID_FEATURE_DEF(17, "avx512dq", "AVX-512 Double/Quad granular"),
+            CPUID_FEATURE_DEF(18, "rdseed", "The RDSEED instruction"),
+            CPUID_FEATURE_DEF(19, "adx", "ADCX and ADOX instructions"),
+            CPUID_FEATURE_DEF(20, "smap", "Supservisor mode access prevention"),
+            CPUID_FEATURE_DEF(22, "pcommit", "PCOMMIT instruction"),
+            CPUID_FEATURE_DEF(23, "clflushopt", "CLFLUSHOPT instruction"),
+            CPUID_FEATURE_DEF(24, "clwb", "CLWB instruction"),
+            CPUID_FEATURE_DEF(26, "avx512pf", "AVX-512 Prefetch"),
+            CPUID_FEATURE_DEF(27, "avx512er", "AVX-512 Exponential and Reciprocal"),
+            CPUID_FEATURE_DEF(28, "avx512cd", "AVX-512 Conflict Detection"),
+            CPUID_FEATURE_DEF(29, "sha_ni", "SHA extensions"),
+            CPUID_FEATURE_DEF(30, "avx512bw", "AVX-512 Byte/Word granular"),
+            CPUID_FEATURE_DEF(31, "avx512vl", "AVX-512 128/256 Vector Length"),
+            { -1 }
+        };
+
         unsigned int family, model, stepping;
 
-        regs = cpuid(1);
+        regs = cpuid(1, 0);
         family = (regs.eax >> 8) & 0xf;
         model = (regs.eax >> 4) & 0xf;
         stepping = regs.eax & 0xf;
@@ -323,6 +383,11 @@ main(void)
         for (i = 0; cap_amd2[i].bit >= 0; i++) {
             if (amd_flags2 & (1 << cap_amd2[i].bit)) {
                 printf(" %s", cap_amd2[i].desc);
+            }
+        }
+        for (i = 0; cap_ext[i].bit >= 0; i++) {
+            if (ext_flags & (1 << cap_ext[i].bit)) {
+                printf(" %s", cap_ext[i].desc);
             }
         }
         printf("\n");

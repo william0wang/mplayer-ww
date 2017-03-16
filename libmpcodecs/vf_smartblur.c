@@ -89,7 +89,7 @@ static int allocStuff(FilterParam *f, int width, int height){
     swsF.lumH= swsF.lumV= vec;
     swsF.chrH= swsF.chrV= NULL;
     f->filterContext= sws_getContext(
-        width, height, PIX_FMT_GRAY8, width, height, PIX_FMT_GRAY8, SWS_BICUBIC, &swsF, NULL, NULL);
+        width, height, AV_PIX_FMT_GRAY8, width, height, AV_PIX_FMT_GRAY8, SWS_BICUBIC, &swsF, NULL, NULL);
 
     sws_freeVec(vec);
 

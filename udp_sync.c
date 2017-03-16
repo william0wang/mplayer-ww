@@ -25,6 +25,7 @@
 
 #if !HAVE_WINSOCK2_H
 #include <errno.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -112,7 +113,11 @@ static int get_udp(int blocking, double *master_position)
         servaddr.sin_family      = AF_INET;
         servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
         servaddr.sin_port        = htons(udp_port);
-        bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+        if (bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) == -1) {
+            closesocket(sockfd);
+            sockfd = -1;
+            return -1;
+        }
 
         setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 

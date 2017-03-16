@@ -115,7 +115,7 @@ static char *load_file(const char *filename, off_t * length)
 
     mp_msg(MSGT_NETWORK, MSGL_V, "Loading cookie file: %s\n", filename);
 
-    fd = open(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY | O_BINARY);
     if (fd < 0) {
 	mp_msg(MSGT_NETWORK, MSGL_V, "Could not open");
 	goto err_out;

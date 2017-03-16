@@ -38,7 +38,9 @@
 #endif
 #include <errno.h>
 
-#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__DragonFly__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#if CONFIG_LIBCDIO
+#include "vcd_read_libcdio.h"
+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__DragonFly__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include "vcd_read_fbsd.h"
 #elif defined(__APPLE__)
 #include "vcd_read_darwin.h"
@@ -52,7 +54,7 @@
 
 #include "libmpdemux/demuxer.h"
 
-static struct stream_priv_s {
+static const struct stream_priv_s {
   int track;
   char* device;
 } stream_priv_dflts = {
@@ -124,6 +126,10 @@ static int control(stream_t *stream, int cmd, void *arg) {
 }
 
 static void close_s(stream_t *stream) {
+#if CONFIG_LIBCDIO
+  mp_vcd_priv_t *vcd = stream->priv;
+  cdio_destroy(vcd->cdio);
+#endif
   free(stream->priv);
 }
 
@@ -131,7 +137,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
   struct stream_priv_s* p = opts;
   int ret,ret2,f,sect,tmp;
   mp_vcd_priv_t* vcd;
-#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+#if (defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && !defined(CONFIG_LIBCDIO)
   int bsize = VCD_SECTOR_SIZE;
 #endif
 #if defined(__MINGW32__) || defined(__CYGWIN__)
@@ -143,6 +149,9 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
   HFILE hcd;
   ULONG ulAction;
   ULONG rc;
+#endif
+#if CONFIG_LIBCDIO
+  CdIo *cdio;
 #endif
 
   if(mode != STREAM_READ
@@ -174,6 +183,9 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
                OPEN_ACCESS_READONLY | OPEN_SHARE_DENYNONE | OPEN_FLAGS_DASD,
                NULL);
   f = rc ? -1 : hcd;
+#elif CONFIG_LIBCDIO
+  cdio = cdio_open(p->device, DRIVER_UNKNOWN);
+  f = cdio ? 0 : -1;
 #else
   f=open(p->device,O_RDONLY);
 #endif
@@ -186,14 +198,26 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
   vcd = vcd_read_toc(f);
   if(!vcd) {
     mp_msg(MSGT_OPEN,MSGL_ERR,"Failed to get cd toc\n");
+#if CONFIG_LIBCDIO
+    cdio_destroy(cdio);
+#else
     close(f);
+#endif
     m_struct_free(&stream_opts,opts);
     return STREAM_ERROR;
   }
+#if CONFIG_LIBCDIO
+  else
+    vcd->cdio = cdio;
+#endif
   ret2=vcd_get_track_end(vcd,p->track);
   if(ret2<0){
     mp_msg(MSGT_OPEN,MSGL_ERR,MSGTR_ErrTrackSelect " (get)\n");
+#if CONFIG_LIBCDIO
+    cdio_destroy(cdio);
+#else
     close(f);
+#endif
     free(vcd);
     m_struct_free(&stream_opts,opts);
     return STREAM_ERROR;
@@ -201,7 +225,11 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
   ret=vcd_seek_to_track(vcd,p->track);
   if(ret<0){
     mp_msg(MSGT_OPEN,MSGL_ERR,MSGTR_ErrTrackSelect " (seek)\n");
+#if CONFIG_LIBCDIO
+    cdio_destroy(cdio);
+#else
     close(f);
+#endif
     free(vcd);
     m_struct_free(&stream_opts,opts);
     return STREAM_ERROR;
@@ -220,7 +248,7 @@ static int open_s(stream_t *stream,int mode, void* opts, int* file_format) {
 
   mp_msg(MSGT_OPEN,MSGL_V,"VCD start byte position: 0x%X  end: 0x%X\n",ret,ret2);
 
-#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+#if (defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && !defined(CONFIG_LIBCDIO)
   if (ioctl (f, CDRIOCSETBLOCKSIZE, &bsize) == -1) {
     mp_msg(MSGT_OPEN,MSGL_WARN,"Error in CDRIOCSETBLOCKSIZE");
   }

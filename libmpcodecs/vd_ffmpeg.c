@@ -51,7 +51,9 @@
 
 #if CONFIG_VDPAU
 #include "libavcodec/vdpau.h"
+#include "vdpau_frame_data.h"
 #endif
+#include "libavutil/pixdesc.h"
 
 static const vd_info_t info = {
     "FFmpeg's libavcodec codec family",
@@ -104,13 +106,16 @@ typedef struct {
     int b_count;
     AVRational last_sample_aspect_ratio;
     int palette_sent;
-    int use_hwaccel;
+    int use_vdpau;
 } vd_ffmpeg_ctx;
 
 #include "m_option.h"
 
-static int get_buffer(AVCodecContext *avctx, AVFrame *pic);
+static int get_buffer(AVCodecContext *avctx, AVFrame *pic, int isreference);
+static int mpcodec_default_get_buffer(AVCodecContext *avctx, AVFrame *frame);
+static int get_buffer2(AVCodecContext *avctx, AVFrame *frame, int flags);
 static void release_buffer(AVCodecContext *avctx, AVFrame *pic);
+static void mpcodec_default_release_buffer(AVCodecContext *s, AVFrame *pic);
 static void draw_slice(struct AVCodecContext *s, const AVFrame *src, int offset[4],
                        int y, int type, int height);
 
@@ -166,7 +171,7 @@ const m_option_t lavc_decode_opts_conf[]={
     {"skiploopfilter", &lavc_param_skip_loop_filter_str , CONF_TYPE_STRING  , 0, 0, 0, NULL},
     {"skipidct"      , &lavc_param_skip_idct_str        , CONF_TYPE_STRING  , 0, 0, 0, NULL},
     {"skipframe"     , &lavc_param_skip_frame_str       , CONF_TYPE_STRING  , 0, 0, 0, NULL},
-    {"threads"       , &lavc_param_threads              , CONF_TYPE_INT     , CONF_RANGE, 1, 16, NULL},
+    {"threads"       , &lavc_param_threads              , CONF_TYPE_INT     , CONF_RANGE, 1, 32, NULL},
     {"bitexact"      , &lavc_param_bitexact             , CONF_TYPE_FLAG    , 0, 0, CODEC_FLAG_BITEXACT, NULL},
     {"o"             , &lavc_avopt                      , CONF_TYPE_STRING  , 0, 0, 0, NULL},
     {NULL, NULL, 0, 0, 0, 0, NULL}
@@ -205,7 +210,7 @@ static int control(sh_video_t *sh, int cmd, void *arg, ...){
 #if CONFIG_XVMC
         case IMGFMT_XVMC_IDCT_MPEG2:
         case IMGFMT_XVMC_MOCO_MPEG2:
-            if(avctx->pix_fmt==PIX_FMT_XVMC_MPEG2_IDCT) return CONTROL_TRUE;
+            if(avctx->pix_fmt == AV_PIX_FMT_XVMC_MPEG2_IDCT) return CONTROL_TRUE;
 #endif
         }
         return CONTROL_FALSE;
@@ -230,7 +235,7 @@ static int vdpau_render_wrapper(AVCodecContext *s, AVFrame *f,
     sh_video_t *sh = s->opaque;
     struct vdpau_frame_data data;
     uint8_t *planes[4] = {(void *)&data};
-    data.render_state = mpi->priv;
+    data.surface = (VdpVideoSurface)mpi->priv;
     data.info = info;
     data.bitstream_buffers_used = count;
     data.bitstream_buffers = buffers;
@@ -249,6 +254,7 @@ static int pixfmt2imgfmt2(enum AVPixelFormat fmt, enum AVCodecID cid)
         case AV_CODEC_ID_MPEG4:      return IMGFMT_VDPAU_MPEG4;
         case AV_CODEC_ID_WMV3:       return IMGFMT_VDPAU_WMV3;
         case AV_CODEC_ID_VC1:        return IMGFMT_VDPAU_VC1;
+        case AV_CODEC_ID_HEVC:       return IMGFMT_VDPAU_HEVC;
         }
     return pixfmt2imgfmt(fmt);
 }
@@ -274,7 +280,7 @@ static void set_dr_slice_settings(struct AVCodecContext *avctx, const AVCodec *l
     ctx->nonref_dr = 0;
     // TODO: fix and enable again. This currently causes issues when using filters
     // and seeking, usually failing with the "Ran out of numbered images" message,
-    // but bugzilla #2118 might be related as well.
+    // but ticket #2118 might be related as well.
     if (0 && lavc_codec->id == AV_CODEC_ID_H264) {
         ctx->do_dr1 = 1;
         ctx->nonref_dr = 1;
@@ -283,15 +289,9 @@ static void set_dr_slice_settings(struct AVCodecContext *avctx, const AVCodec *l
         ctx->do_slices = ctx->do_dr1 = 0;
     }
     if(ctx->do_dr1){
-        avctx->flags |= CODEC_FLAG_EMU_EDGE;
-        avctx->  reget_buffer =
-        avctx->    get_buffer =     get_buffer;
-        avctx->release_buffer = release_buffer;
+        avctx->get_buffer2 = get_buffer2;
     } else if (lavc_codec->capabilities & CODEC_CAP_DR1) {
-        avctx->flags &= ~CODEC_FLAG_EMU_EDGE;
-        avctx->  reget_buffer = avcodec_default_reget_buffer;
-        avctx->    get_buffer = avcodec_default_get_buffer;
-        avctx->release_buffer = avcodec_default_release_buffer;
+        avctx->get_buffer2 = avcodec_default_get_buffer2;
     }
     avctx->slice_flags = 0;
 }
@@ -302,20 +302,28 @@ static void set_format_params(struct AVCodecContext *avctx,
     sh_video_t *sh     = avctx->opaque;
     vd_ffmpeg_ctx *ctx = sh->context;
     int imgfmt;
-    if (fmt == PIX_FMT_NONE)
+    if (fmt == AV_PIX_FMT_NONE)
         return;
-    ctx->use_hwaccel = fmt == AV_PIX_FMT_VDPAU;
+    ctx->use_vdpau = fmt == AV_PIX_FMT_VDPAU;
     imgfmt = pixfmt2imgfmt2(fmt, avctx->codec_id);
+#if CONFIG_VDPAU
+    if (!ctx->use_vdpau) {
+        av_freep(&avctx->hwaccel_context);
+    } else {
+        AVVDPAUContext *vdpc = avctx->hwaccel_context;
+        if (!vdpc)
+            avctx->hwaccel_context = vdpc = av_alloc_vdpaucontext();
+        vdpc->render2 = vdpau_render_wrapper;
+    }
+#endif
     if (IMGFMT_IS_HWACCEL(imgfmt)) {
         ctx->do_dr1    = 1;
         ctx->nonref_dr = 0;
-        avctx->get_buffer      = get_buffer;
-        avctx->release_buffer  = release_buffer;
-        avctx->reget_buffer    = get_buffer;
+        avctx->get_buffer2 = get_buffer2;
         mp_msg(MSGT_DECVIDEO, MSGL_V, IMGFMT_IS_XVMC(imgfmt) ?
                MSGTR_MPCODECS_XVMCAcceleratedMPEG2 :
                "[VD_FFMPEG] VDPAU accelerated decoding\n");
-        if (ctx->use_hwaccel) {
+        if (ctx->use_vdpau) {
             avctx->draw_horiz_band = NULL;
             avctx->slice_flags = 0;
             ctx->do_slices = 0;
@@ -343,9 +351,9 @@ static int init(sh_video_t *sh){
     if (!ctx)
         return 0;
 
-    lavc_codec = avcodec_find_decoder_by_name(sh->codec->dll);
+    lavc_codec = avcodec_find_decoder_by_name(codec_idx2str(sh->codec->dll_idx));
     if(!lavc_codec){
-        mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_MissingLAVCcodec, sh->codec->dll);
+        mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_MissingLAVCcodec, codec_idx2str(sh->codec->dll_idx));
         uninit(sh);
         return 0;
     }
@@ -379,11 +387,11 @@ static int init(sh_video_t *sh){
         }
         lavc_param_threads = numberOfCPUs;
 #endif
-        if(lavc_codec->id == CODEC_ID_H264 || lavc_codec->id == CODEC_ID_MPEG2TS ||
-				lavc_codec->id == CODEC_ID_MPEG2VIDEO_XVMC) {
+        if(lavc_codec->id == AV_CODEC_ID_H264 || lavc_codec->id == AV_CODEC_ID_MPEG2TS ||
+				lavc_codec->id == AV_CODEC_ID_MPEG2VIDEO_XVMC) {
             if (lavc_param_threads > 16) lavc_param_threads = 16;
-            if (lavc_param_threads > 1 && (lavc_codec->id == CODEC_ID_MPEG2VIDEO ||
-              lavc_codec->id == CODEC_ID_MPEG2TS || lavc_codec->id == CODEC_ID_MPEG2VIDEO_XVMC))
+            if (lavc_param_threads > 1 && (lavc_codec->id == AV_CODEC_ID_MPEG2VIDEO ||
+              lavc_codec->id == AV_CODEC_ID_MPEG2TS || lavc_codec->id == AV_CODEC_ID_MPEG2VIDEO_XVMC))
                 vd_use_slices = 0;
             mp_msg(MSGT_DECVIDEO, MSGL_INFO, "Spawning %d decoding thread%s...\n", lavc_param_threads, lavc_param_threads == 1 ? "" : "s");
         } else {
@@ -425,7 +433,6 @@ static int init(sh_video_t *sh){
 #endif
     avctx->flags2|= lavc_param_fast;
     avctx->codec_tag= sh->format;
-    avctx->stream_codec_tag= sh->video.fccHandler;
     avctx->idct_algo= lavc_param_idct_algo;
     avctx->error_concealment= lavc_param_error_concealment;
     avctx->debug= lavc_param_debug;
@@ -579,8 +586,8 @@ static void uninit(sh_video_t *sh){
         av_freep(&avctx->slice_offset);
     }
 
-    av_freep(&avctx);
-    av_freep(&ctx->pic);
+    avcodec_free_context(&avctx);
+    av_frame_free(&ctx->pic);
     free(ctx);
 }
 
@@ -596,17 +603,10 @@ static void draw_slice(struct AVCodecContext *s,
         mp_msg(MSGT_DECVIDEO, MSGL_FATAL, "BUG in FFmpeg, draw_slice called with NULL pointer!\n");
         return;
     }
-    if (mpi && ctx->use_hwaccel) {
+    if (mpi && ctx->use_vdpau) {
         mp_msg(MSGT_DECVIDEO, MSGL_FATAL, "BUG in FFmpeg, draw_slice called for VDPAU!\n");
         return;
     }
-#if CONFIG_VDPAU
-    if (mpi && IMGFMT_IS_VDPAU(mpi->imgfmt)) {
-        struct vdpau_render_state *render = mpi->priv;
-        vdpau_render_wrapper(s, src, &render->info, render->bitstream_buffers_used, render->bitstream_buffers);
-        return;
-    }
-#endif
     if (height < 0)
     {
         int i;
@@ -624,7 +624,12 @@ static void draw_slice(struct AVCodecContext *s,
     }
 }
 
-static void update_configuration(sh_video_t *sh, enum AVPixelFormat pix_fmt) {
+// ignore_aspect is used to not bother with aspect changes during get_buffer.
+// The aspect can be wrong when get_buffer is called before decoding and it
+// should simply not be necessary.
+// In particular this stops spurious get_buffer aspect values from causing
+// a container value to be overwritten.
+static void update_configuration(sh_video_t *sh, enum AVPixelFormat pix_fmt, int ignore_aspect) {
     vd_ffmpeg_ctx *ctx = sh->context;
     AVCodecContext *avctx = ctx->avctx;
     int aspect_change = av_cmp_q(avctx->sample_aspect_ratio, ctx->last_sample_aspect_ratio);
@@ -634,7 +639,7 @@ static void update_configuration(sh_video_t *sh, enum AVPixelFormat pix_fmt) {
     }
      // it is possible another vo buffers to be used after vo config()
      // lavc reset its buffers on width/heigh change but not on aspect change!!!
-    if (aspect_change ||
+    if ((!ignore_aspect && aspect_change) ||
         pix_fmt != ctx->pix_fmt ||
         !ctx->vo_initialized)
     {
@@ -643,35 +648,48 @@ static void update_configuration(sh_video_t *sh, enum AVPixelFormat pix_fmt) {
         // this is a special-case HACK for MPEG-1/2 VDPAU that uses neither get_format nor
         // sets the value correctly in avcodec_open.
         set_format_params(avctx, pix_fmt);
-        mp_msg(MSGT_DECVIDEO, MSGL_V, "[ffmpeg] aspect_ratio: %f\n", aspect);
 
-        // Do not overwrite sh->original_aspect on the first call,
-        // if a container aspect is available (which is preferred then).
-        // But set it even if the sample aspect did not change, since a
-        // resolution change can cause an aspect change even if the
-        // _sample_ aspect is unchanged.
-        if (sh->original_aspect == 0 || (aspect_change && ctx->last_sample_aspect_ratio.den))
-            sh->original_aspect = aspect;
-        ctx->last_sample_aspect_ratio = avctx->sample_aspect_ratio;
+        if (!ignore_aspect) {
+            mp_msg(MSGT_DECVIDEO, MSGL_V, "[ffmpeg] aspect_ratio: %f\n", aspect);
+
+            // Do not overwrite sh->original_aspect on the first call,
+            // if a container aspect is available (which is preferred then).
+            // But set it even if the sample aspect did not change, since a
+            // resolution change can cause an aspect change even if the
+            // _sample_ aspect is unchanged.
+            if (sh->original_aspect == 0 || (aspect_change && ctx->last_sample_aspect_ratio.den))
+                sh->original_aspect = aspect;
+            ctx->last_sample_aspect_ratio = avctx->sample_aspect_ratio;
+        }
         ctx->pix_fmt = pix_fmt;
         ctx->best_csp = pixfmt2imgfmt2(pix_fmt, avctx->codec_id);
     }
 }
 
-static int init_vo(sh_video_t *sh, enum AVPixelFormat pix_fmt)
+static int is_in_format_list(sh_video_t *sh, int imgfmt)
+{
+    int i;
+    for (i = 0; i < CODECS_MAX_OUTFMT; i++)
+        if (sh->codec->outfmt[i] == imgfmt)
+            return 1;
+    return 0;
+}
+
+static int init_vo(sh_video_t *sh, enum AVPixelFormat pix_fmt, int ignore_aspect)
 {
     vd_ffmpeg_ctx *ctx = sh->context;
     const AVCodecContext *avctx = ctx->avctx;
     int width, height;
-    int i;
+    int imgfmt = pixfmt2imgfmt2(pix_fmt, avctx->codec_id);
 
     // avoid initialization for formats not on the supported
     // list in the codecs.conf entry.
-    for (i = 0; i < CODECS_MAX_OUTFMT; i++)
-        if (sh->codec->outfmt[i] == pixfmt2imgfmt2(pix_fmt, avctx->codec_id))
-            break;
-    if (i == CODECS_MAX_OUTFMT)
+    if (!is_in_format_list(sh, imgfmt)) {
+        if (imgfmt)
+            mp_msg(MSGT_DECVIDEO, MSGL_WARN, "Unexpected decoder output format %s\n",
+                   vo_format_name(imgfmt));
         return -1;
+    }
 
     width = avctx->width;
     height = avctx->height;
@@ -686,7 +704,7 @@ static int init_vo(sh_video_t *sh, enum AVPixelFormat pix_fmt)
     if (width != sh->disp_w  || height != sh->disp_h)
         ctx->vo_initialized = 0;
 
-    update_configuration(sh, pix_fmt);
+    update_configuration(sh, pix_fmt, ignore_aspect);
     if (!ctx->vo_initialized)
     {
         sh->disp_w = width;
@@ -698,7 +716,7 @@ static int init_vo(sh_video_t *sh, enum AVPixelFormat pix_fmt)
     return 0;
 }
 
-static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
+static int get_buffer(AVCodecContext *avctx, AVFrame *pic, int isreference){
     sh_video_t *sh = avctx->opaque;
     vd_ffmpeg_ctx *ctx = sh->context;
     mp_image_t *mpi=NULL;
@@ -707,27 +725,12 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
     int width = FFMAX(avctx->width,  -(-avctx->coded_width  >> avctx->lowres));
     int height= FFMAX(avctx->height, -(-avctx->coded_height >> avctx->lowres));
     // special case to handle reget_buffer
-    if (pic->opaque && pic->data[0] && (!pic->buffer_hints || pic->buffer_hints & FF_BUFFER_HINTS_REUSABLE))
+    if (pic->opaque && pic->data[0])
         return 0;
     avcodec_align_dimensions(avctx, &width, &height);
 //printf("get_buffer %d %d %d\n", pic->reference, ctx->ip_count, ctx->b_count);
 
-    if (pic->buffer_hints) {
-        mp_msg(MSGT_DECVIDEO, MSGL_DBG2, "Buffer hints: %u\n", pic->buffer_hints);
-        type = MP_IMGTYPE_TEMP;
-        if (pic->buffer_hints & FF_BUFFER_HINTS_READABLE)
-            flags |= MP_IMGFLAG_READABLE;
-        if (pic->buffer_hints & FF_BUFFER_HINTS_PRESERVE ||
-            pic->buffer_hints & FF_BUFFER_HINTS_REUSABLE) {
-            ctx->ip_count++;
-            type = MP_IMGTYPE_IP;
-            flags |= MP_IMGFLAG_PRESERVE;
-        }
-        flags|=(avctx->skip_idct<=AVDISCARD_DEFAULT && avctx->skip_frame<=AVDISCARD_DEFAULT && ctx->do_slices) ?
-                 MP_IMGFLAG_DRAW_CALLBACK:0;
-        mp_msg(MSGT_DECVIDEO, MSGL_DBG2, type == MP_IMGTYPE_IP ? "using IP\n" : "using TEMP\n");
-    } else {
-        if(!pic->reference){
+        if(!isreference){
             ctx->b_count++;
             flags|=(avctx->skip_idct<=AVDISCARD_DEFAULT && avctx->skip_frame<=AVDISCARD_DEFAULT && ctx->do_slices) ?
                      MP_IMGFLAG_DRAW_CALLBACK:0;
@@ -741,18 +744,16 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
         }else{
             type= MP_IMGTYPE_IP;
         }
-    }
 
     if (ctx->nonref_dr) {
         if (flags & MP_IMGFLAG_PRESERVE)
-            return avcodec_default_get_buffer(avctx, pic);
+            return mpcodec_default_get_buffer(avctx, pic);
         // Use NUMBERED since for e.g. TEMP vos assume there will
         // be no other frames between the get_image and matching put_image.
         type = MP_IMGTYPE_NUMBERED;
     }
 
-    if(init_vo(sh, avctx->pix_fmt) < 0){
-        avctx->release_buffer= avcodec_default_release_buffer;
+    if(init_vo(sh, avctx->pix_fmt, 1) < 0){
         goto disable_dr1;
     }
 
@@ -773,6 +774,12 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
         mp_msg(MSGT_DECVIDEO, MSGL_DBG2, type== MP_IMGTYPE_IPB ? "using IPB\n" : "using IP\n");
     }
 
+    // Make sure to not leak dead pointers.
+    pic->data[0]= NULL;
+    pic->data[1]= NULL;
+    pic->data[2]= NULL;
+    pic->data[3]= NULL;
+
     if (ctx->best_csp == IMGFMT_RGB8 || ctx->best_csp == IMGFMT_BGR8)
         flags |= MP_IMGFLAG_RGB_PALETTE;
     mpi= mpcodecs_get_image(sh, type, flags, width, height);
@@ -785,19 +792,11 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
         avctx->draw_horiz_band= draw_slice;
     } else
         avctx->draw_horiz_band= NULL;
-    if(IMGFMT_IS_HWACCEL(mpi->imgfmt)) {
-        avctx->draw_horiz_band= draw_slice;
-    }
 #if CONFIG_VDPAU
-    if (ctx->use_hwaccel) {
-        struct vdpau_render_state *render = mpi->priv;
-        AVVDPAUContext *vdpc;
+    if (ctx->use_vdpau) {
+        VdpVideoSurface surface = (VdpVideoSurface)mpi->priv;
         avctx->draw_horiz_band= NULL;
-        if (!avctx->hwaccel_context)
-            avctx->hwaccel_context = av_alloc_vdpaucontext();
-        vdpc = avctx->hwaccel_context;
-        vdpc->render2 = vdpau_render_wrapper;
-        mpi->planes[3] = render->surface;
+        mpi->planes[3] = surface;
     }
 #endif
 #if CONFIG_XVMC
@@ -812,6 +811,7 @@ static int get_buffer(AVCodecContext *avctx, AVFrame *pic){
             mp_msg(MSGT_DECVIDEO, MSGL_DBG5, "vd_ffmpeg::get_buffer (xvmc render=%p)\n", render);
         assert(render != 0);
         assert(render->xvmc_id == AV_XVMC_ID);
+        avctx->draw_horiz_band= draw_slice;
     }
 #endif
 
@@ -859,20 +859,17 @@ else if(mpi->flags&MP_IMGFLAG_DRAW_CALLBACK)
 else
     printf(".");
 #endif
-    pic->type= FF_BUFFER_TYPE_USER;
     return 0;
 
 disable_dr1:
     ctx->do_dr1 = 0;
     // For frame-multithreading these contexts aren't
     // the same and must both be updated.
-    ctx->avctx->get_buffer   =
-    avctx->get_buffer        = avcodec_default_get_buffer;
-    ctx->avctx->reget_buffer =
-    avctx->reget_buffer      = avcodec_default_reget_buffer;
+    ctx->avctx->get_buffer2   =
+    avctx->get_buffer2 = avcodec_default_get_buffer2;
     if (pic->data[0])
-        release_buffer(avctx, pic);
-    return avctx->get_buffer(avctx, pic);
+        mpcodec_default_release_buffer(avctx, pic);
+    return avctx->get_buffer2(avctx, pic,0);
 }
 
 static void release_buffer(struct AVCodecContext *avctx, AVFrame *pic){
@@ -880,8 +877,8 @@ static void release_buffer(struct AVCodecContext *avctx, AVFrame *pic){
     sh_video_t *sh = avctx->opaque;
     vd_ffmpeg_ctx *ctx = sh->context;
     int i;
-    if (pic->type != FF_BUFFER_TYPE_USER) {
-        avcodec_default_release_buffer(avctx, pic);
+    if (pic->opaque == NULL) {
+        mpcodec_default_release_buffer(avctx, pic);
         return;
     }
 
@@ -906,15 +903,6 @@ static void release_buffer(struct AVCodecContext *avctx, AVFrame *pic){
     }
 //printf("R%X %X\n", pic->linesize[0], pic->data[0]);
 }
-
-// copypaste from demux_real.c - it should match to get it working!
-//FIXME put into some header
-typedef struct dp_hdr_s {
-    uint32_t chunks;        // number of chunks
-    uint32_t timestamp; // timestamp from packet header
-    uint32_t len;        // length of actual data
-    uint32_t chunktab;        // offset to chunk offset array
-} dp_hdr_t;
 
 static av_unused void swap_palette(void *pal)
 {
@@ -971,6 +959,9 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
     pkt.size = len;
     // Necessary to decode e.g. CorePNG and ZeroCodec correctly
     pkt.flags = (sh->ds->flags & 1) ? AV_PKT_FLAG_KEY : 0;
+    av_packet_split_side_data(&pkt);
+    if (av_packet_get_side_data(&pkt, AV_PKT_DATA_PALETTE, NULL))
+        ctx->palette_sent = 1;
     if (!ctx->palette_sent && sh->bih && sh->bih->biBitCount <= 8) {
         /* Pass palette to codec */
         uint8_t *pal_data = (uint8_t *)(sh->bih+1);
@@ -1000,7 +991,7 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
     // even when we do dr we might actually get a buffer we had
     // FFmpeg allocate - this mostly happens with nonref_dr.
     // Ensure we treat it correctly.
-    dr1= ctx->do_dr1 && pic->type == FF_BUFFER_TYPE_USER;
+    dr1= ctx->do_dr1 && pic->opaque != NULL;
     if(ret<0) mp_msg(MSGT_DECVIDEO, MSGL_WARN, "Error while decoding frame!\n");
 //printf("repeat: %d\n", pic->repeat_pict);
 //-- vstats generation
@@ -1087,7 +1078,7 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
 	    return NULL;    // skipped image
     }
 
-    if(init_vo(sh, avctx->pix_fmt) < 0) return NULL;
+    if(init_vo(sh, avctx->pix_fmt, 0) < 0) return NULL;
 
     if(dr1 && pic->opaque){
         mpi=pic->opaque;
@@ -1158,23 +1149,143 @@ static enum AVPixelFormat get_format(struct AVCodecContext *avctx,
         for (i = 0; fmt[i] != AV_PIX_FMT_NONE; i++)
             if (fmt[i] == ctx->pix_fmt) return ctx->pix_fmt;
 
-    for(i=0;fmt[i]!=PIX_FMT_NONE;i++){
-        // it is incorrect of FFmpeg to even offer these, filter them out
-        if(!(avctx->codec->capabilities & CODEC_CAP_HWACCEL_VDPAU) &&
-           (fmt[i] == AV_PIX_FMT_VDPAU_MPEG1 || fmt[i] == AV_PIX_FMT_VDPAU_MPEG2))
-            continue;
+    for(i=0;fmt[i]!=AV_PIX_FMT_NONE;i++){
         imgfmt = pixfmt2imgfmt2(fmt[i], avctx->codec_id);
-        if(!IMGFMT_IS_HWACCEL(imgfmt)) continue;
+        if(!IMGFMT_IS_HWACCEL(imgfmt) || !is_in_format_list(sh, imgfmt)) continue;
         mp_msg(MSGT_DECVIDEO, MSGL_V, MSGTR_MPCODECS_TryingPixfmt, i);
-        if(init_vo(sh, fmt[i]) >= 0) {
+        if(init_vo(sh, fmt[i], 1) >= 0) {
             break;
         }
     }
     selected_format = fmt[i];
-    if (selected_format == PIX_FMT_NONE) {
+    if (selected_format == AV_PIX_FMT_NONE) {
         selected_format = avcodec_default_get_format(avctx, fmt);
-        update_configuration(sh, selected_format);
+        update_configuration(sh, selected_format, 1);
     }
     set_format_params(avctx, selected_format);
     return selected_format;
+}
+
+
+/*
+ FFWrapper
+*/
+static int mpcodec_default_get_buffer(AVCodecContext *avctx, AVFrame *frame)
+{
+    return avcodec_default_get_buffer2(avctx, frame, 0);
+}
+
+static void mpcodec_default_release_buffer(AVCodecContext *s, AVFrame *pic)
+{
+    av_frame_unref(pic);
+}
+
+typedef struct CompatReleaseBufPriv {
+    AVCodecContext avctx;
+    AVFrame frame;
+    uint8_t avframe_padding[1024]; // hack to allow linking to a avutil with larger AVFrame
+} CompatReleaseBufPriv;
+
+static void compat_free_buffer(void *opaque, uint8_t *data)
+{
+    CompatReleaseBufPriv *priv = opaque;
+    release_buffer(&priv->avctx, &priv->frame);
+    av_freep(&priv);
+}
+
+static void compat_release_buffer(void *opaque, uint8_t *data)
+{
+    AVBufferRef *buf = opaque;
+    av_buffer_unref(&buf);
+}
+
+static int get_buffer2(AVCodecContext *avctx, AVFrame *frame, int flags)
+{
+    /*
+     * Wrap an old get_buffer()-allocated buffer in a bunch of AVBuffers.
+     * We wrap each plane in its own AVBuffer. Each of those has a reference to
+     * a dummy AVBuffer as its private data, unreffing it on free.
+     * When all the planes are freed, the dummy buffer's free callback calls
+     * release_buffer().
+     */
+    CompatReleaseBufPriv *priv = NULL;
+    AVBufferRef *dummy_buf = NULL;
+    int planes, i, ret;
+
+    ret = get_buffer(avctx, frame, flags & AV_GET_BUFFER_FLAG_REF);
+    if (ret < 0)
+        return ret;
+
+    /* return if the buffers are already set up
+     * this would happen e.g. when a custom get_buffer() calls
+     * avcodec_default_get_buffer
+     */
+    if (frame->buf[0])
+        goto end0;
+
+    priv = av_mallocz(sizeof(*priv));
+    if (!priv) {
+        ret = AVERROR(ENOMEM);
+        goto fail;
+    }
+    priv->avctx = *avctx;
+    priv->frame = *frame;
+
+    dummy_buf = av_buffer_create(NULL, 0, compat_free_buffer, priv, 0);
+    if (!dummy_buf) {
+        ret = AVERROR(ENOMEM);
+        goto fail;
+    }
+
+#define WRAP_PLANE(ref_out, data, data_size)                            \
+do {                                                                    \
+    AVBufferRef *dummy_ref = av_buffer_ref(dummy_buf);                  \
+    if (!dummy_ref) {                                                   \
+        ret = AVERROR(ENOMEM);                                          \
+        goto fail;                                                      \
+    }                                                                   \
+    ref_out = av_buffer_create(data, data_size, compat_release_buffer,  \
+                               dummy_ref, 0);                           \
+    if (!ref_out) {                                                     \
+        av_buffer_unref(&dummy_ref);                                    \
+        av_frame_unref(frame);                                          \
+        ret = AVERROR(ENOMEM);                                          \
+        goto fail;                                                      \
+    }                                                                   \
+} while (0)
+
+    {
+        const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(frame->format);
+
+        planes = av_pix_fmt_count_planes(frame->format);
+        /* workaround for AVHWAccel plane count of 0, buf[0] is used as
+           check for allocated buffers: make libavcodec happy */
+        if (desc && desc->flags & AV_PIX_FMT_FLAG_HWACCEL)
+            planes = 1;
+        if (!desc || planes <= 0) {
+            ret = AVERROR(EINVAL);
+            goto fail;
+        }
+
+        for (i = 0; i < planes; i++) {
+            int v_shift    = (i == 1 || i == 2) ? desc->log2_chroma_h : 0;
+            int plane_size = (frame->height >> v_shift) * frame->linesize[i];
+
+            WRAP_PLANE(frame->buf[i], frame->data[i], plane_size);
+        }
+    }
+
+    av_buffer_unref(&dummy_buf);
+
+end0:
+    frame->width  = avctx->width;
+    frame->height = avctx->height;
+
+    return 0;
+
+fail:
+    release_buffer(avctx, frame);
+    av_freep(&priv);
+    av_buffer_unref(&dummy_buf);
+    return ret;
 }

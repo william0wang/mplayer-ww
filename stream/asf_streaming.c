@@ -186,26 +186,27 @@ static int asf_streaming_parse_header(int fd, streaming_ctrl_t* streaming_ctrl) 
 	// So we need to retrieve all the chunk before starting to parse the header.
   do {
 	  if (asf_read_wrapper(fd, &chunk, sizeof(ASF_stream_chunck_t), streaming_ctrl) <= 0)
-	    return -1;
+	    goto read_loop_err_out;
 	  // Endian handling of the stream chunk
 	  le2me_ASF_stream_chunck_t(&chunk);
 	  size = asf_streaming( &chunk, &r) - sizeof(ASF_stream_chunck_t);
 	  if(r) mp_msg(MSGT_NETWORK,MSGL_WARN,MSGTR_MPDEMUX_ASF_WarnDropHeader);
 	  if(size < 0){
 	    mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_ASF_ErrorParsingChunkHeader);
-		return -1;
+	    goto read_loop_err_out;
 	  }
 	  if (chunk.type != ASF_STREAMING_HEADER) {
 	    mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_ASF_NoHeaderAtFirstChunk);
-	    return -1;
+	    goto read_loop_err_out;
 	  }
 
 	  // audit: do not overflow buffer_size
-	  if (size > SIZE_MAX - buffer_size) return -1;
+	  if (size > SIZE_MAX - buffer_size)
+	    goto read_loop_err_out;
 	  buffer = malloc(size+buffer_size);
 	  if(buffer == NULL) {
 	    mp_msg(MSGT_NETWORK,MSGL_FATAL,MSGTR_MPDEMUX_ASF_BufferMallocFailed,size+buffer_size);
-	    return -1;
+	    goto read_loop_err_out;
 	  }
 	  if( chunk_buffer!=NULL ) {
 	  	memcpy( buffer, chunk_buffer, buffer_size );
@@ -216,13 +217,13 @@ static int asf_streaming_parse_header(int fd, streaming_ctrl_t* streaming_ctrl) 
 	  buffer_size += size;
 
 	  if (asf_read_wrapper(fd, buffer, size, streaming_ctrl) <= 0)
-	    return -1;
+	    goto read_loop_err_out;
 
 	  if( chunk_size2read==0 ) {
 		ASF_header_t *asfh = (ASF_header_t *)buffer;
 		if(size < (int)sizeof(ASF_header_t)) {
 		    mp_msg(MSGT_NETWORK,MSGL_ERR,MSGTR_MPDEMUX_ASF_ErrChunk2Small);
-		    return -1;
+		    goto read_loop_err_out;
 		} else mp_msg(MSGT_NETWORK,MSGL_DBG2,"Got chunk\n");
 		chunk_size2read = AV_RL64(&asfh->objh.size);
 		mp_msg(MSGT_NETWORK,MSGL_DBG2,"Size 2 read=%d\n", chunk_size2read);
@@ -328,7 +329,7 @@ static int asf_streaming_parse_header(int fd, streaming_ctrl_t* streaming_ctrl) 
 			}
 		}
   }
-  free(buffer);
+  free(chunk_buffer);
 
   // automatic stream selection based on bandwidth
   if (bw == 0) bw = INT_MAX;
@@ -337,16 +338,13 @@ static int asf_streaming_parse_header(int fd, streaming_ctrl_t* streaming_ctrl) 
   if (asf_ctrl->n_audio) {
     // find lowest-bitrate audio stream
     a_rate = a_rates[0];
-    a_idx = 0;
     for (i = 0; i < asf_ctrl->n_audio; i++) {
       if (a_rates[i] < a_rate) {
         a_rate = a_rates[i];
-        a_idx = i;
       }
     }
     if (max_idx(asf_ctrl->n_video, v_rates, bw - a_rate) < 0) {
       // both audio and video are not possible, try video only next
-      a_idx = -1;
       a_rate = 0;
     }
   }
@@ -390,7 +388,8 @@ static int asf_streaming_parse_header(int fd, streaming_ctrl_t* streaming_ctrl) 
 
 len_err_out:
   mp_msg(MSGT_NETWORK, MSGL_FATAL, MSGTR_MPDEMUX_ASF_InvalidLenInHeader);
-  free(buffer);
+read_loop_err_out:
+  free(chunk_buffer);
   free(v_rates);
   free(a_rates);
   return -1;
@@ -580,7 +579,7 @@ static HTTP_header_t *asf_http_request(streaming_ctrl_t *streaming_ctrl) {
 					if(stream_id == asf_http_ctrl->audio_id) {
 						enable = 0;
 					} else {
-						enable = 2;
+						//enable = 2;
 						continue;
 					}
 					asf_nb_stream++;
@@ -593,7 +592,7 @@ static HTTP_header_t *asf_http_request(streaming_ctrl_t *streaming_ctrl) {
 					if(stream_id == asf_http_ctrl->video_id) {
 						enable = 0;
 					} else {
-						enable = 2;
+						//enable = 2;
 						continue;
 					}
 					asf_nb_stream++;

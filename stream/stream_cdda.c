@@ -21,8 +21,13 @@
 #include <cdda_interface.h>
 #include <cdda_paranoia.h>
 #else
+#if HAVE_CDIO_PARANOIA_H
 #include <cdio/cdda.h>
 #include <cdio/paranoia.h>
+#elif HAVE_CDIO_PARANOIA_PARANOIA_H
+#include <cdio/paranoia/cdda.h>
+#include <cdio/paranoia/paranoia.h>
+#endif
 #endif
 #include <stdio.h>
 #include <stdlib.h>

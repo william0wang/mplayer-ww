@@ -36,7 +36,7 @@
 //===========================================================================//
 
 // commented out 16 and 15 bit output support, because the conversion
-// routines are incorrrect.  they assume the palette to be of the same
+// routines are incorrect.  They assume the palette to be of the same
 // depth as the output, which is incorrect. --Joey
 
 static const unsigned int bgr_list[]={
@@ -77,6 +77,7 @@ static unsigned int find_best(struct vf_instance *vf, unsigned int fmt){
     unsigned int best=0;
     int ret;
     const unsigned int* p;
+    // output RGB vs. BGR must match palette format
     if(fmt==IMGFMT_BGR8) p=bgr_list;
     else if(fmt==IMGFMT_RGB8) p=rgb_list;
     else return 0;
@@ -140,16 +141,10 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
                 palette8torgb16(mpi->planes[0],dmpi->planes[0],mpi->h*mpi->w,mpi->planes[1]);
             break;
         case 24:
-            if (IMGFMT_IS_BGR(dmpi->imgfmt))
-                sws_convertPalette8ToPacked24(mpi->planes[0],dmpi->planes[0],mpi->h*mpi->w,mpi->planes[1]);
-            else
-                sws_convertPalette8ToPacked24(mpi->planes[0],dmpi->planes[0],mpi->h*mpi->w,mpi->planes[1]);
+            sws_convertPalette8ToPacked24(mpi->planes[0],dmpi->planes[0],mpi->h*mpi->w,mpi->planes[1]);
             break;
         case 32:
-            if (IMGFMT_IS_BGR(dmpi->imgfmt))
-                sws_convertPalette8ToPacked32(mpi->planes[0],dmpi->planes[0],mpi->h*mpi->w,mpi->planes[1]);
-            else
-                sws_convertPalette8ToPacked32(mpi->planes[0],dmpi->planes[0],mpi->h*mpi->w,mpi->planes[1]);
+            sws_convertPalette8ToPacked32(mpi->planes[0],dmpi->planes[0],mpi->h*mpi->w,mpi->planes[1]);
             break;
         }
     } else {
@@ -166,16 +161,10 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
                     palette8torgb16(src,dst,mpi->w,mpi->planes[1]);
                 break;
             case 24:
-                if (IMGFMT_IS_BGR(dmpi->imgfmt))
-                    sws_convertPalette8ToPacked24(src,dst,mpi->w,mpi->planes[1]);
-                else
-                    sws_convertPalette8ToPacked24(src,dst,mpi->w,mpi->planes[1]);
+                sws_convertPalette8ToPacked24(src,dst,mpi->w,mpi->planes[1]);
                 break;
             case 32:
-                if (IMGFMT_IS_BGR(dmpi->imgfmt))
-                    sws_convertPalette8ToPacked32(src,dst,mpi->w,mpi->planes[1]);
-                else
-                    sws_convertPalette8ToPacked32(src,dst,mpi->w,mpi->planes[1]);
+                sws_convertPalette8ToPacked32(src,dst,mpi->w,mpi->planes[1]);
                 break;
             }
         }

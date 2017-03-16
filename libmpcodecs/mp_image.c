@@ -33,8 +33,22 @@
 #include "mp_msg.h"
 
 void mp_image_alloc_planes(mp_image_t *mpi) {
+  /* This condition is stricter than needed, but I want to be sure that every
+   * calculation step can fit in int32_t. This assumption is true over most of
+   * the code, so this acts as a safeguard for other image size calulations. */
+  if ((unsigned int)mpi->height + 2 > INT_MAX ||
+      (int64_t)mpi->width*(mpi->height+2) > INT_MAX ||
+      (int64_t)mpi->bpp*mpi->width*(mpi->height+2) > INT_MAX) {
+      mp_msg(MSGT_DECVIDEO,MSGL_WARN,"mp_image: Unreasonable image parameters\n");
+      return;
+  }
   // IF09 - allocate space for 4. plane delta info - unused
   if (mpi->imgfmt == IMGFMT_IF09) {
+    if ((int64_t)mpi->chroma_width*mpi->chroma_height > INT_MAX ||
+        mpi->bpp*mpi->width*(mpi->height+2)/8 > INT_MAX - mpi->chroma_width*mpi->chroma_height) {
+        mp_msg(MSGT_DECVIDEO,MSGL_WARN,"mp_image: Unreasonable image parameters\n");
+        return;
+  }
     mpi->planes[0]=av_malloc(mpi->bpp*mpi->width*(mpi->height+2)/8+
                             mpi->chroma_width*mpi->chroma_height);
   } else
@@ -130,6 +144,10 @@ void mp_image_setfmt(mp_image_t* mpi,unsigned int out_fmt){
         mpi->bpp=24;
         mpi->flags|=MP_IMGFLAG_PLANAR;
         return;
+    } else if (out_fmt == IMGFMT_GBR10P) {
+        mpi->bpp=30;
+        mpi->flags|=MP_IMGFLAG_PLANAR;
+        return;
     } else if (out_fmt == IMGFMT_GBR12P) {
         mpi->bpp=36;
         mpi->flags|=MP_IMGFLAG_PLANAR;
@@ -192,6 +210,10 @@ void mp_image_setfmt(mp_image_t* mpi,unsigned int out_fmt){
     case IMGFMT_420P10_BE:
     case IMGFMT_420P9_LE:
     case IMGFMT_420P9_BE:
+    case IMGFMT_440P12_LE:
+    case IMGFMT_440P12_BE:
+    case IMGFMT_440P10_LE:
+    case IMGFMT_440P10_BE:
         return;
     case IMGFMT_Y16_LE:
     case IMGFMT_Y16_BE:

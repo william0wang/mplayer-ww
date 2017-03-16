@@ -1224,7 +1224,7 @@ int skinRead(char *sname)
         linenumber++;
 
         strswap(line, '\t', ' ');
-        trim(line);
+        despace(line);
         decomment(line);
 
         if (!*line)

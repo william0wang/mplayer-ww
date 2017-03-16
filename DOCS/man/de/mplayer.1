@@ -1,4 +1,4 @@
-.\" MPlayer (C) 2000-2014 MPlayer Team
+.\" MPlayer (C) 2000-2016 MPlayer Team
 .\" Diese Man-Page wurde/wird von Moritz Bunkus, Sebastian Krämer,
 .\" Tobias Diedrich gepflegt.
 .\"
@@ -33,7 +33,7 @@
 .\" Titel
 .\" --------------------------------------------------------------------------
 .
-.TH MPlayer 1 "13.02.2014" "Das MPlayer Projekt"
+.TH MPlayer 1 "13.02.2015" "Das MPlayer Projekt"
 .
 .SH NAME
 mplayer  \- Movie Player
@@ -1759,6 +1759,8 @@ einiger schlechter AVI-Dateien ermöglicht).
 Benutze nicht den durchschnittlichen Bytes/\:Sekunde-Wert für die
 A/\:V-Synchronisation.
 Hilft bei einigen AVI-Dateien mit defektem Header.
+Dies kann den Speicherbedarf beträchtlich erhöhen, weshalb es wohl besser
+wäre, das Interleaving der betroffenen Dateien in Ordnung zu bringen.
 .
 .TP
 .B \-noextbased
@@ -1821,7 +1823,7 @@ Gib den Aspekt der Eingabe an:
 .IPs arate=<32000\-48000>
 Gib die Audio-Rate für die Encodierung an (Standard: 48000 Hz, verfügbar:
 32000, 44100 und 48000 Hz).
-.IPs alayer=<1\-3>
+.IPs alayer=<1\-5>
 Gib die Encodierung des MPEG-Audio-Layers an (Standard: 2).
 .IPs abitrate=<32\-448>
 Gib die Bitrate für die Audioencodierung in kbps an (Standard: 384).
@@ -2271,7 +2273,7 @@ zusammen mit immediatemode=0 zu ruckelndem Video führt.
 .TP
 .B \-tvscan <Option1:Option2:...> (nur bei TV und MPlayer)
 Mache Einstellungen für den TV-Kanal-Scanner.
-MPlayer wird auch Werte für die Option "-tv channels=" ausgeben,
+MPlayer wird auch Werte für die Option "\-tv channels=" ausgeben,
 inklusive der existierenden und der gerade gefundenen Kanäle.
 .sp 1
 Verfügbare Unteroptionen sind:
@@ -2540,6 +2542,7 @@ VOBsub-Untertitel lädt.
 .TP
 .B \-noautosub
 Deaktiviert das automatische Laden von Untertiteln.
+ANMERKUNG: VOBsub-Untertitel sind nicht betroffen.
 .
 .TP
 .B \-osd\-duration <Zeit> (nur bei MPlayer)
@@ -2695,7 +2698,8 @@ Demuxer-ID akzeptiert.
 .
 .TP
 .B \-sub\-fuzziness <Modus>
-Passe die Unschärfe für die Suche nach Untertiteln an:
+Passe die Unschärfe für die Suche nach Untertiteln an (gilt nicht f�r
+VOBsub):
 .PD 0
 .RSs
 .IPs 0
@@ -2740,8 +2744,8 @@ CC-Untertitel wurden bisher auf keinen DVDs für andere Regionen entdeckt.
 .TP
 .B \-subcp <Codepage> (nur bei iconv)
 Wenn dein System iconv(3) unterstützt, kannst du mit dieser Option
-die Codepage für die Untertitel angeben. Sie hat Vorrang sowohl vor -utf8
-wie auch vor -unicode.
+die Codepage für die Untertitel angeben. Sie hat Vorrang sowohl vor \-utf8
+wie auch vor \-unicode.
 .sp 1
 .I BEISPIEL:
 .PD 0
@@ -2758,6 +2762,7 @@ Du kannst eine Sprache im 2-Zeichen-Sprachcode angeben, um ENCA automatisch
 eine Codepage erkennen zu lassen.
 Wenn du nicht sicher bist, gib irgendetwas ein und sieh dir die Ausgaben von
 mplayer \-v an, um die verfügbaren Sprachen zu sehen.
+Benutze __ (zwei Unterstriche), falls deine Sprache nicht unterstützt wird.
 Die alternative Codepage gibt die zu benutzende Codepage an, falls die
 automatische Erkennung versagt.
 .sp 1
@@ -2769,6 +2774,8 @@ Nimm an, die Untertitel seien Tschechisch, und rate die Kodierung.
 Wenn die Erkennung versagt, benutze latin2.
 .IPs "\-subcp enca:pl:cp1250"
 Rate die Kodierung für Polnisch, benutze sonst cp1250.
+.IPs "\-subcp enca:__:latin1"
+Allgemeine Erkennung (meistens Unicode) mit latin1 als Alternative.
 .RE
 .PD 1
 .
@@ -2870,7 +2877,7 @@ bewegen und die Zeile löschen (Standard: ^[[A\\r^[[K).
 .TP
 .B \-unicode
 Weist MPlayer an, die Untertiteldatei als Unicode zu behandeln. (Diese Option
-ist nur wirksam, wenn weder -subcp noch -utf8 verwendet werden.)
+ist nur wirksam, wenn weder \-subcp noch \-utf8 verwendet werden.)
 .
 .TP
 .B \-unrarexec <Pfad zum unrar-Programm> (unter MingW nicht unterstützt)
@@ -2883,8 +2890,8 @@ Der Pfad muss den Dateinamen des Programms beinhalten, z.B.\&
 .TP
 .B "\-utf8 \ \ "
 Weist MPlayer an, die Untertiteldatei als UTF-8 zu behandeln. (Diese Option
-ist nur wirksam, wenn -subcp nicht verwendet wird, und sie hat Vorrang vor
--unicode.)
+ist nur wirksam, wenn \-subcp nicht verwendet wird, und sie hat Vorrang vor
+\-unicode.)
 .
 .TP
 .B \-vobsub <VOBsub-Datei ohne Erweiterung>
@@ -2956,7 +2963,7 @@ Gesamtweite (Standard: 3).
 .B \-volume <-1\-100> (siehe auch \-af volume)
 Setze die Lautstärke im Mixer zum Programmstart, entweder in Hardware oder
 Software (in Verbindung mit \-softvol).
-Ein Wert von -1 (Standard) ändert die Lautstärke nicht.
+Ein Wert von \-1 (Standard) ändert die Lautstärke nicht.
 .
 .
 .
@@ -10729,7 +10736,7 @@ höhere Werte forcieren sanftere Schwankungen.
 .TP
 .B zones=<Zone0>[/<Zone1>[/...]]
 Vom Benutzer festgelegte Qualität für besondere Abschnitte (Ende, Abspann,
-...).
+\&...).
 Jede Zone ist <Start-Frame>,<End-Frame>,<Option>, wobei Option die folgenden
 Werte annehmen kann:
 .PD 0
@@ -12001,7 +12008,7 @@ erstellt.
 MPlayer wurde ursprünglich von Arpad Gereöffy geschrieben.
 Siehe Datei AUTHORS für eine Liste einiger der vielen anderen Beitragenden.
 .PP
-MPlayer is (C) 2000\-2014 The MPlayer Team
+MPlayer is (C) 2000\-2016 The MPlayer Team
 .PP
 Diese Manpage wurde zum größten Teil von Gabucino, Diego Biurrun und
 Jonas Jermann geschrieben und von Moritz Bunkus und Sebastian Krämer

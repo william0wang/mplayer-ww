@@ -38,6 +38,8 @@
 #include "libswscale/swscale.h"
 #include "libavcodec/avcodec.h"
 
+static int compression_level = 0;
+
 struct vf_priv_s {
     int frameno;
     char fname[256];
@@ -76,8 +78,20 @@ static int config(struct vf_instance *vf,
                                  d_width, d_height, IMGFMT_RGB24);
 
     av_fast_malloc(&vf->priv->outbuffer, &vf->priv->outbuffer_size, d_width * d_height * 3 * 2);
-    vf->priv->avctx->width = d_width;
-    vf->priv->avctx->height = d_height;
+    if (!vf->priv->avctx) {
+        vf->priv->avctx = avcodec_alloc_context3(NULL);
+        vf->priv->avctx->pix_fmt = AV_PIX_FMT_RGB24;
+        vf->priv->avctx->width = d_width;
+        vf->priv->avctx->height = d_height;
+        vf->priv->avctx->time_base.num = 1;
+        vf->priv->avctx->time_base.den = 1;
+        vf->priv->avctx->compression_level = compression_level;
+        if (avcodec_open2(vf->priv->avctx, avcodec_find_encoder(AV_CODEC_ID_PNG), NULL)) {
+            mp_msg(MSGT_VFILTER, MSGL_FATAL, "Could not open libavcodec PNG encoder\n");
+            return 0;
+        }
+    }
+
     vf->priv->dw = d_width;
     vf->priv->dh = d_height;
     vf->priv->pic->linesize[0] = (3*vf->priv->dw+15)&~15;
@@ -98,20 +112,28 @@ static void write_png(struct vf_priv_s *priv)
     AVPacket pkt;
     int res, got_pkt;
 
+    av_init_packet(&pkt);
+    pkt.data = priv->outbuffer;
+    pkt.size = priv->outbuffer_size;
+    priv->pic->width = priv->avctx->width;
+    priv->pic->height = priv->avctx->height;
+    priv->pic->format = priv->avctx->pix_fmt;
+    res = avcodec_encode_video2(priv->avctx, &pkt, priv->pic, &got_pkt);
+    if (res < 0 || !got_pkt || pkt.size <= 0) {
+        mp_msg(MSGT_VFILTER,MSGL_ERR,"\nFailed to encode screenshot %s!\n", fname);
+        return;
+    }
+
     fp = fopen (fname, "wb");
     if (fp == NULL) {
         mp_msg(MSGT_VFILTER,MSGL_ERR,"\nPNG Error opening %s for writing!\n", fname);
         return;
     }
 
-    av_init_packet(&pkt);
-    pkt.data = priv->outbuffer;
-    pkt.size = priv->outbuffer_size;
-    res = avcodec_encode_video2(priv->avctx, &pkt, priv->pic, &got_pkt);
-    if (res >= 0 && got_pkt && pkt.size > 0)
-        fwrite(priv->outbuffer, pkt.size, 1, fp);
+    fwrite(priv->outbuffer, pkt.size, 1, fp);
 
     fclose (fp);
+    mp_msg(MSGT_VFILTER,MSGL_INFO,"*** screenshot '%s' ***\n",priv->fname);
 }
 
 static int fexists(char *fname)
@@ -165,9 +187,6 @@ static void gen_fname(struct vf_priv_s* priv)
         priv->fname[0] = '\0';
         return;
     }
-
-    mp_msg(MSGT_VFILTER,MSGL_INFO,"*** screenshot '%s' ***\n",priv->fname);
-
 }
 
 static void scale_image(struct vf_priv_s* priv, mp_image_t *mpi)
@@ -175,7 +194,7 @@ static void scale_image(struct vf_priv_s* priv, mp_image_t *mpi)
     if (!priv->pic->data[0])
         priv->pic->data[0] = av_malloc(priv->pic->linesize[0]*priv->dh);
 
-    sws_scale(priv->ctx, mpi->planes, mpi->stride, 0, priv->dh, priv->pic->data, priv->pic->linesize);
+    sws_scale(priv->ctx, mpi->planes, mpi->stride, 0, mpi->height, priv->pic->data, priv->pic->linesize);
 }
 
 static void start_slice(struct vf_instance *vf, mp_image_t *mpi)
@@ -312,27 +331,25 @@ static int vf_open(vf_instance_t *vf, char *args)
     vf->control=control;
     vf->put_image=put_image;
     vf->query_format=query_format;
-    // vf->start_slice=start_slice;
-    // vf->draw_slice=draw_slice;
-    // vf->get_image=get_image;
+    vf->start_slice=start_slice;
+    vf->draw_slice=draw_slice;
+    vf->get_image=get_image;
     vf->uninit=uninit;
     vf->priv = calloc(1, sizeof(struct vf_priv_s));
     vf->priv->pic = av_frame_alloc();
     vf->priv->prefix = strdup(args ? args : "shot");
-    vf->priv->avctx = avcodec_alloc_context3(NULL);
 
     if (args) {
-        sscanf(args, "%d", &vf->priv->avctx->compression_level);
+        sscanf(args, "%d", &compression_level);
 	    mp_msg(MSGT_VFILTER, MSGL_V, "Screenshot: compression level: %d\n",
-	        vf->priv->avctx->compression_level);
+	        compression_level);
     } else {
-        vf->priv->avctx->compression_level = FF_COMPRESSION_DEFAULT;
+        compression_level = FF_COMPRESSION_DEFAULT;
     }
 
-    vf->priv->avctx->pix_fmt = PIX_FMT_RGB24;
     avcodec_register_all();
-    if (avcodec_open2(vf->priv->avctx, avcodec_find_encoder(AV_CODEC_ID_PNG), NULL)) {
-        mp_msg(MSGT_VFILTER, MSGL_FATAL, "Could not open libavcodec PNG encoder\n");
+    if (!avcodec_find_encoder(AV_CODEC_ID_PNG)) {
+        mp_msg(MSGT_VFILTER, MSGL_FATAL, "Could not find libavcodec PNG encoder\n");
         return 0;
     }
     return 1;

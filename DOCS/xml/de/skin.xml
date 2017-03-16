@@ -736,6 +736,13 @@ end
                     <entry>Dateiname</entry>
                   </row>
                   <row>
+                    <entry>$O</entry>
+                    <entry>
+                      Dateiname (falls kein Titelname verfügbar), ansonsten
+                      der Titel
+                    </entry>
+                  </row>
+                  <row>
                     <entry>$f</entry>
                     <entry>Dateiname in Kleinbuchstaben</entry>
                   </row>
@@ -748,7 +755,8 @@ end
                     <entry>
                       Buchstabe entsprechend dem Streamtyp (Datei: <keycap>f</keycap>,
                       CD: <keycap>a</keycap>, Video-CD: <keycap>v</keycap>, DVD: <keycap>d</keycap>,
-                      URL: <keycap>u</keycap>, TV/DVB: <keycap>b</keycap>)
+                      URL: <keycap>u</keycap>, TV/DVB: <keycap>b</keycap>,
+                      CUE: <keycap>c</keycap>)
                     </entry>
                   </row>
                   <row>
@@ -987,6 +995,7 @@ image = font.png
             <row><entry><keycap>d</keycap></entry><entry>Stream ist eine DVD</entry></row>
             <row><entry><keycap>u</keycap></entry><entry>Stream ist eine URL</entry></row>
             <row><entry><keycap>b</keycap></entry><entry>Stream ist eine TV/DVB-Übertragung</entry></row>
+            <row><entry><keycap>c</keycap></entry><entry>Stream ist ein Cuesheet</entry></row>
           </tbody>
         </tgroup>
       </informaltable>
@@ -1058,8 +1067,8 @@ image = font.png
         <term><emphasis role="bold">evLoad</emphasis></term>
         <listitem>
           <para>
-            Lade eine Datei (durch Öffnen des Datei-Browser-Fensters,
-            in dem du die Datei wählen kannst).
+            Lade eine Datei (durch Öffnen einer Dateiauswahl-Dialogbox,
+            in der die Datei ausgesucht werden kann).
           </para>
         </listitem>
       </varlistentry>
@@ -1078,7 +1087,7 @@ image = font.png
         <term><emphasis role="bold">evLoadAudioFile</emphasis></term>
         <listitem>
           <para>
-            Lädt eine Audio-Datei (mit dem Dateiwähler)
+            Lädt eine Audio-Datei (mit dem Dateiauswahl-Dialog).
           </para>
         </listitem>
       </varlistentry>
@@ -1087,7 +1096,7 @@ image = font.png
         <term><emphasis role="bold">evLoadSubtitle</emphasis></term>
         <listitem>
           <para>
-            Lädt eine Untertiteldatei (mit dem Dateiwähler)
+            Lädt eine Untertiteldatei (mit dem Dateiauswahl-Dialog).
           </para>
         </listitem>
       </varlistentry>
@@ -1133,6 +1142,17 @@ image = font.png
         <listitem>
           <para>
             Versucht die DVD im angegebenen DVD-ROM-Laufwerk zu öffnen.
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><emphasis role="bold">evPlayImage</emphasis></term>
+        <listitem>
+          <para>
+            Lädt ein CD-/(S)VCD-/DVD-Abbild oder DVD-Kopie (mit dem
+            Dateiauswahl-Dialog) und spielt es ab, als ob es eine reelle Disc
+            wäre.
           </para>
         </listitem>
       </varlistentry>

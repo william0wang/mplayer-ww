@@ -251,23 +251,24 @@ static int preinit(sh_audio_t *sh){
   // let's check if the driver is available, return 0 if not.
   // (you should do that if you use external lib(s) which is optional)
   unsigned int result;
+  const char *dll = codec_idx2str(sh->codec->dll_idx);
   char *path;
 
-  path = malloc(strlen(codec_path) + strlen(sh->codec->dll) + 2);
+  path = malloc(strlen(codec_path) + strlen(dll) + 2);
   if (!path) return 0;
-  sprintf(path, "%s/%s", codec_path, sh->codec->dll);
+  sprintf(path, "%s/%s", codec_path, dll);
 
     /* first try to load linux dlls, if failed and we're supporting win32 dlls,
        then try to load the windows ones */
 
 #ifdef HAVE_LIBDL
-    if (strstr(sh->codec->dll,".dll") || !load_syms_linux(path))
+    if (strstr(dll,".dll") || !load_syms_linux(path))
 #endif
 #ifdef CONFIG_WIN32DLL
-	if (!load_syms_windows(sh->codec->dll))
+	if (!load_syms_windows(dll))
 #endif
     {
-	mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_MissingDLLcodec, sh->codec->dll);
+	mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_MissingDLLcodec, dll);
 	mp_msg(MSGT_DECVIDEO, MSGL_HINT, "Read the RealAudio section of the DOCS!\n");
 	free(path);
 	return 0;

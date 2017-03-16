@@ -316,7 +316,7 @@ static int rtsp_get_answers(rtsp_t *s) {
     }
     *answer_ptr=answer;
     answer_ptr++;
-  } while ((strlen(answer)!=0) && (++ans_count < MAX_FIELDS));
+  } while ((strlen(answer)!=0) && (++ans_count < MAX_FIELDS - 1));
 
   s->cseq++;
 

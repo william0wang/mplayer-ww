@@ -1,4 +1,4 @@
-/* 
+/*
  * vo_yuv4mpeg.c, yuv4mpeg (mjpegtools) interface
  *
  * Thrown together by
@@ -17,7 +17,7 @@
  *
  * 2002/04/17 Juergen Hammelmann <juergen.hammelmann@gmx.de>
  *            - added support for output of subtitles
- *              best, if you give option '-osdlevel 0' to mplayer for 
+ *              best, if you give option '-osdlevel 0' to mplayer for
  *              no watching the seek+timer
  */
 
@@ -46,7 +46,7 @@
 #include "libmpcodecs/vf_scale.h"
 #include "libavutil/rational.h"
 
-static vo_info_t info = 
+static vo_info_t info =
 {
 	"yuvpipe",
 	"yuvpipe",
@@ -124,8 +124,8 @@ static void output_frames()
 }
 */
 
-static int config(uint32_t width, uint32_t height, uint32_t d_width, 
-       uint32_t d_height, uint32_t flags, char *title, 
+static int config(uint32_t width, uint32_t height, uint32_t d_width,
+       uint32_t d_height, uint32_t flags, char *title,
        uint32_t format)
 {
 	AVRational pixelaspect = av_div_q((AVRational){d_width, d_height},
@@ -154,30 +154,30 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 				MSGTR_VO_YUV4MPEG_InterlacedHeightDivisibleBy4);
 			return -1;
 		}
-		
+
 		rgb_line_buffer = malloc(image_width * 3);
 		if (!rgb_line_buffer)
 		{
 			mp_msg(MSGT_VO,MSGL_FATAL,
-				MSGTR_VO_YUV4MPEG_InterlacedLineBufAllocFail);
+				"MSGTR_VO_YUV4MPEG_InterlacedLineBufAllocFail");
 			return -1;
 		}
-		
+
 		if (using_format == IMGFMT_YV12)
 			mp_msg(MSGT_VO,MSGL_WARN,
 				"Input not RGB, can't separate chrominance by fields!");
 	}
-				
+
 	if (width % 2)
 	{
 		mp_msg(MSGT_VO,MSGL_FATAL,
 			MSGTR_VO_YUV4MPEG_WidthDivisibleBy2);
 		return -1;
-	}	
-	
+	}
+
 	if(using_format != IMGFMT_YV12)
 	{
-		sws_rgb2rgb_init();
+		ff_sws_rgb2rgb_init();
 		rgb_buffer = malloc(image_width * image_height * 3);
 		if (!rgb_buffer)
 		{
@@ -191,7 +191,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 	//init_buffer(frame_bytes);
 	image = malloc(frame_bytes);
 
-	if (image == 0) 
+	if (image == 0)
 	{
 		return -1;
 	}
@@ -227,7 +227,7 @@ static int config(uint32_t width, uint32_t height, uint32_t d_width,
 static void swap_fields(uint8_t *ptr, const int h, const int stride)
 {
 	int i;
-	
+
 	for (i=0; i<h; i +=2)
 	{
 		memcpy(rgb_line_buffer     , ptr + stride *  i   , stride);
@@ -245,10 +245,10 @@ static void draw_alpha(int x0, int y0, int w, int h, unsigned char *src,
 	case IMGFMT_IYUV :
 	case IMGFMT_YVU9 :
 
-	    	vo_draw_alpha_yv12(w, h, src, srca, stride, 
+	    	vo_draw_alpha_yv12(w, h, src, srca, stride,
 				       image + y0 * image_width + x0, image_width);
 			break;
-		
+
 		case IMGFMT_BGR|24:
 		case IMGFMT_RGB|24:
 			if (config_interlace != Y4M_ILACE_BOTTOM_FIRST)
@@ -260,7 +260,7 @@ static void draw_alpha(int x0, int y0, int w, int h, unsigned char *src,
 
 				vo_draw_alpha_rgb24(w, h, src, srca, stride,
 						rgb_buffer + (y0 * image_width  + x0) * 3, image_width * 3);
-				
+
 				swap_fields (rgb_buffer, image_height, image_width * 3);
 			}
 			break;
@@ -282,7 +282,7 @@ static void deinterleave_fields(uint8_t *ptr, const int stride,
 		line_state[i] = 0;
 
 	line_state[0] = 1;
-	
+
 	while(k_start < modv)
 	{
 		i = j = k_start;
@@ -296,7 +296,7 @@ static void deinterleave_fields(uint8_t *ptr, const int stride,
 			memcpy(ptr + stride * i, ptr + stride * j, stride);
 		}
 		memcpy(ptr + stride * i, rgb_line_buffer, stride);
-		
+
 		while(k_start < modv && line_state[k_start])
 			k_start++;
 	}
@@ -365,32 +365,32 @@ static void flip_page (void)
 	uint8_t *upper_y, *upper_u, *upper_v, *rgb_buffer_lower;
 	int rgb_stride, uv_stride, field_height;
 	unsigned int i, low_ofs;
-	
+
 	if (using_format != IMGFMT_YV12)
 	{
 		rgb_stride = image_width * 3;
 		uv_stride = image_width / 2;
-		
+
 		if (Y4M_IS_INTERLACED)
 		{
-			field_height = image_height / 2;		
+			field_height = image_height / 2;
 
 			upper_y = image;
 			upper_u = upper_y + image_width * field_height;
 			upper_v = upper_u + image_width * field_height / 4;
 			low_ofs = image_width * field_height * 3 / 2;
 			rgb_buffer_lower = rgb_buffer + rgb_stride * field_height;
-		
+
 			deinterleave_fields(rgb_buffer, rgb_stride, image_height);
 
-			rgb24toyv12(rgb_buffer, upper_y, upper_u, upper_v,
+			ff_rgb24toyv12(rgb_buffer, upper_y, upper_u, upper_v,
 						 image_width, field_height,
-						 image_width, uv_stride, rgb_stride);
-			rgb24toyv12(rgb_buffer_lower,  upper_y + low_ofs,
+						 image_width, uv_stride, rgb_stride, NULL);
+			ff_rgb24toyv12(rgb_buffer_lower,  upper_y + low_ofs,
 						 upper_u + low_ofs, upper_v + low_ofs,
 						 image_width, field_height,
-						 image_width, uv_stride, rgb_stride);
-		
+						 image_width, uv_stride, rgb_stride, NULL);
+
 			/* Write Y plane */
 			for(i = 0; i < field_height; i++)
 			{
@@ -412,9 +412,9 @@ static void flip_page (void)
 			return; /* Image written; We have to stop here */
 		}
 
-		rgb24toyv12(rgb_buffer, image_y, image_u, image_v,
+		ff_rgb24toyv12(rgb_buffer, image_y, image_u, image_v,
 					image_width, image_height,
-					image_width, uv_stride, rgb_stride);
+					image_width, uv_stride, rgb_stride, NULL);
 	}
 
 	/* Write progressive frame */
@@ -423,25 +423,25 @@ static void flip_page (void)
 		// first buffer is filled, check for cuda completion
 		output_frames();
 		vo_yuv_write(image, frame_bytes);
-		
+
 	} else if (activeseq[1]== SEQ_FRAMES) {
 		// second buffer is filled, check for cuda completion
 
 	}
 	*/
 	vo_yuv_write(image, frame_bytes);
-	
+
 }
 
 static int draw_slice(uint8_t *srcimg[], int stride[], int w,int h,int x,int y)
 {
 	int i;
 	uint8_t *dst, *src = srcimg[0];
-	
+
 	switch (using_format)
 	{
 		case IMGFMT_YV12:
-		
+
 		// copy Y:
 		dst = image_y + image_width * y + x;
 		for (i = 0; i < h; i++)
@@ -468,7 +468,7 @@ static int draw_slice(uint8_t *srcimg[], int stride[], int w,int h,int x,int y)
 			}
 		}
 		break;
-		
+
 		case IMGFMT_BGR24:
 		case IMGFMT_RGB24:
 			dst = rgb_buffer + (image_width * y + x) * 3;
@@ -506,7 +506,7 @@ static int query_format(uint32_t format)
 		/* When processing interlaced material we want to get the raw RGB
          * data and do the YV12 conversion ourselves to have the chrominance
          * information sampled correct. */
-		
+
 		switch(format)
 		{
 			case IMGFMT_YV12:
@@ -526,7 +526,7 @@ static int query_format(uint32_t format)
     		case IMGFMT_BGR|24:
     		case IMGFMT_RGB|24:
         		return VFCAP_CSP_SUPPORTED|VFCAP_OSD|VFCAP_ACCEPT_STRIDE;
-    	}	
+    	}
 	}
 	return 0;
 }
@@ -543,7 +543,7 @@ static void uninit(void)
 		close(yuv_pipe);
 		yuv_pipe = 0;
 	}
-	
+
 	if(rgb_buffer)
 		free(rgb_buffer);
 	rgb_buffer = NULL;
@@ -575,7 +575,7 @@ static int preinit(const char *arg)
   il = 0;
   il_bf = 0;
   if (subopt_parse(arg, subopts) != 0) {
-    mp_msg(MSGT_VO, MSGL_FATAL, MSGTR_VO_YUV4MPEG_UnknownSubDev, arg); 
+    mp_msg(MSGT_VO, MSGL_FATAL, MSGTR_VO_YUV4MPEG_UnknownSubDev, arg);
     return -1;
   }
 

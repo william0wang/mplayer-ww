@@ -352,7 +352,7 @@ static void outline0(
 }
 
 // gaussian blur
-void blur(
+static void blur(
 	unsigned char *buffer,
 	unsigned short *tmp2,
 	int width,
@@ -941,7 +941,7 @@ int kerning(font_desc_t *desc, int prevc, int c)
     return f266ToInt(kern.x);
 }
 
-font_desc_t* read_font_desc_ft(const char *fname, int face_index, int movie_width, int movie_height, float font_scale_factor)
+static font_desc_t* read_font_desc_ft(const char *fname, int face_index, int movie_width, int movie_height, float font_scale_factor)
 {
     font_desc_t *desc = NULL;
 
@@ -1112,6 +1112,15 @@ int done_freetype(void)
 
 void load_font_ft(int width, int height, font_desc_t** fontp, const char *font_name, float font_scale_factor)
 {
+#ifdef CONFIG_FONTCONFIG
+    FcPattern *fc_pattern;
+    FcPattern *fc_pattern2;
+    FcChar8 *s;
+    int face_index;
+    FcBool scalable;
+    FcResult result = FcResultMatch;
+#endif
+
     font_desc_t *vo_font = *fontp;
     vo_image_width = width;
     vo_image_height = height;
@@ -1121,15 +1130,50 @@ void load_font_ft(int width, int height, font_desc_t** fontp, const char *font_n
 
     if (vo_font) free_font_desc(vo_font);
 
+#ifdef CONFIG_FONTCONFIG
+    if (font_fontconfig > 0)
+    {
+	FcInit();
+	fc_pattern = FcNameParse(font_name ? font_name : "sans-serif");
+	FcConfigSubstitute(0, fc_pattern, FcMatchPattern);
+	FcDefaultSubstitute(fc_pattern);
+	fc_pattern2 = fc_pattern;
+        fc_pattern = FcFontMatch(0, fc_pattern, &result);
+        if (fc_pattern) {
+            FcPatternDestroy(fc_pattern2);
+            if (FcPatternGetBool(fc_pattern, FC_SCALABLE, 0, &scalable) == FcResultMatch &&
+                scalable != FcTrue) {
+                FcPatternDestroy(fc_pattern);
+                fc_pattern = FcNameParse("sans-serif");
+                FcConfigSubstitute(0, fc_pattern, FcMatchPattern);
+                FcDefaultSubstitute(fc_pattern);
+                fc_pattern2 = fc_pattern;
+                fc_pattern = FcFontMatch(0, fc_pattern, &result);
+                FcPatternDestroy(fc_pattern2);
+            }
+            // s doesn't need to be freed according to fontconfig docs
+            if (FcPatternGetString(fc_pattern, FC_FILE, 0, &s) == FcResultMatch &&
+                FcPatternGetInteger(fc_pattern, FC_INDEX, 0, &face_index) == FcResultMatch) {
+                *fontp=read_font_desc_ft(s, face_index, width, height, font_scale_factor);
+                FcPatternDestroy(fc_pattern);
+                return;
+            }
+            FcPatternDestroy(fc_pattern);
+        }
+        // Failed to match any font, try without fontconfig
+        mp_msg(MSGT_OSD, MSGL_ERR, MSGTR_LIBVO_FONT_LOAD_FT_FontconfigNoMatch);
+    }
+#endif
+
     char name[MAX_PATH];
-	if (font_name) {
-		strcpy(name, font_name);
-		if (strchr(name, ',')) *strchr(name, ',') = 0;
-		if (!strchr(name,'\\')) {
-			memcpy(name+strlen(font_path), name, strlen(name)+1);
-			memcpy(name, font_path, strlen(font_path));
-		}
-	} else
-		name[0] = 0;
+    if (font_name) {
+        strcpy(name, font_name);
+        if (strchr(name, ',')) *strchr(name, ',') = 0;
+        if (!strchr(name,'\\')) {
+            memcpy(name+strlen(font_path), name, strlen(name)+1);
+            memcpy(name, font_path, strlen(font_path));
+        }
+    } else
+        name[0] = 0;
     *fontp=read_font_desc_ft(name, 0, width, height, font_scale_factor);
 }

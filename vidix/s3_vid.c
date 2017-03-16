@@ -100,7 +100,7 @@ typedef struct s3_info s3_info;
 
 static s3_info *info;
 
-static vidix_capability_t s3_cap = {
+static const vidix_capability_t s3_cap = {
   "S3 BES",
   "Reza Jelveh, Michael Kostylev",
   TYPE_OUTPUT,
@@ -581,7 +581,6 @@ static int s3_probe (int verbose, int force)
           mp_msg(MSGT_VO, MSGL_STATUS, "[s3_vid] Device is disabled, ignoring\n");
           continue;
         }
-        s3_cap.device_id = lst[i].device;
         err = 0;
         memcpy (&pci_info, &lst[i], sizeof (pciinfo_t));
         break;
@@ -597,6 +596,7 @@ static int s3_init (void)
 {
   unsigned char cr36;
   int mtrr, videoRam;
+  int chip;
   static unsigned char RamTrioVirge[] = { 4, 0, 3, 8, 2, 6, 1, 0 };
   static unsigned char RamSavage3D[] = { 8, 4, 4, 2 };
   static unsigned char RamSavage4[] = { 2, 4, 8, 12, 16, 32, 64, 32 };
@@ -607,7 +607,9 @@ static int s3_init (void)
 
   info = calloc (1, sizeof (s3_info));
 
-  info->chip.arch = s3_card_ids[find_chip (pci_info.device)].arch;
+  chip = find_chip(pci_info.device);
+  if (chip < 0) chip = 0;
+  info->chip.arch = s3_card_ids[chip].arch;
 
   /* Switch to vga registers */
   OUTPORT8 (0x3c3, INPORT8 (0x3c3) | 0x01);
@@ -720,6 +722,7 @@ static void s3_destroy (void)
 static int s3_get_caps (vidix_capability_t * to)
 {
   memcpy (to, &s3_cap, sizeof (vidix_capability_t));
+  to->device_id = pci_info.device;
   return 0;
 }
 
@@ -906,7 +909,7 @@ static int s3_frame_sel (unsigned int frame)
   return 0;
 }
 
-VDXDriver s3_drv = {
+const VDXDriver s3_drv = {
   "s3",
   NULL,
   .probe = s3_probe,

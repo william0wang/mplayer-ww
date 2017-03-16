@@ -134,6 +134,9 @@ static int select_mlti_data(const char *mlti_chunk, int mlti_size, int selection
 
   int numrules, codec, size;
   int i;
+  const char *mlti_end = mlti_chunk + mlti_size;
+
+  if (mlti_size < 4) return 0;
 
   /* MLTI chunk should begin with MLTI */
 
@@ -152,20 +155,25 @@ static int select_mlti_data(const char *mlti_chunk, int mlti_size, int selection
   mlti_chunk+=4;
 
   /* next 16 bits are the number of rules */
+  if (mlti_chunk > mlti_end - 2) return 0;
   numrules=AV_RB16(mlti_chunk);
   if (selection >= numrules) return 0;
 
   /* now <numrules> indices of codecs follows */
   /* we skip to selection                     */
+  if ((selection+1)*2 > mlti_end - mlti_chunk) return 0;
   mlti_chunk+=(selection+1)*2;
 
   /* get our index */
+  if (mlti_chunk > mlti_end - 2) return 0;
   codec=AV_RB16(mlti_chunk);
 
   /* skip to number of codecs */
+  if ((numrules-selection)*2 > mlti_end - mlti_chunk) return 0;
   mlti_chunk+=(numrules-selection)*2;
 
   /* get number of codecs */
+  if (mlti_chunk > mlti_end - 2) return 0;
   numrules=AV_RB16(mlti_chunk);
 
   if (codec >= numrules) {
@@ -178,11 +186,15 @@ static int select_mlti_data(const char *mlti_chunk, int mlti_size, int selection
 
   /* now seek to selected codec */
   for (i=0; i<codec; i++) {
+    if (mlti_chunk > mlti_end - 4) return 0;
     size=AV_RB32(mlti_chunk);
+    if (size + 4 > mlti_end - mlti_chunk) return 0;
     mlti_chunk+=size+4;
   }
 
+  if (mlti_chunk > mlti_end - 4) return 0;
   size=AV_RB32(mlti_chunk);
+  if (size > mlti_end - mlti_chunk - 4) return 0;
 
 #ifdef LOG
   hexdump(mlti_chunk+4, size);

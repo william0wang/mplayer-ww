@@ -278,8 +278,13 @@ static inline void update_ch(af_hrtf_t *s, short *in, const int k)
     }
 
     /* We need to update the bass compensation delay line, too. */
-    s->ba_l[k] = in[0] + in[4] + in[2];
-    s->ba_r[k] = in[4] + in[1] + in[3];
+    // TODO: should this use lf/cf/rf etc. instead?
+    s->ba_l[k] = in[0];
+    s->ba_r[k] = in[1];
+    if (s->decode_mode == HRTF_MIX_51) {
+        s->ba_l[k] += in[4] + in[2];
+        s->ba_r[k] += in[4] + in[3];
+    }
 }
 
 /* Initialization and runtime control */
@@ -661,7 +666,7 @@ static int af_open(af_instance_t* af)
 }
 
 /* Description of this filter */
-af_info_t af_info_hrtf = {
+const af_info_t af_info_hrtf = {
     "HRTF Headphone",
     "hrtf",
     "ylai",

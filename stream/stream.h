@@ -40,7 +40,7 @@
 #define STREAMTYPE_DVDNAV 9    // we cannot safely "seek" in this...
 #define STREAMTYPE_CDDA 10     // raw audio CD reader
 #define STREAMTYPE_SMB 11      // smb:// url, using libsmbclient (samba)
-#define STREAMTYPE_VCDBINCUE 12      // vcd directly from bin/cue files
+#define STREAMTYPE_BINCUE 12   // cd/vcd directly from bin/cue files
 #define STREAMTYPE_DVB 13
 #define STREAMTYPE_VSTREAM 14
 #define STREAMTYPE_SDP 15
@@ -51,7 +51,8 @@
 #define STREAMTYPE_BLURAY 20
 #define STREAMTYPE_BD 21
 
-#define STREAM_BUFFER_SIZE 2048
+#define STREAM_BUFFER_MIN 2048
+#define STREAM_BUFFER_SIZE (2*STREAM_BUFFER_MIN) // must be at least 2*STREAM_BUFFER_MIN
 #define STREAM_MAX_SECTOR_SIZE (8*1024)
 
 #define VCD_SECTOR_SIZE 2352
@@ -326,6 +327,8 @@ static inline int stream_seek(stream_t *s, int64_t pos)
            "Invalid seek to negative position %"PRIx64"!\n", pos);
     pos = 0;
   }
+  if (s->buf_len == 0 && s->pos == pos)
+    return 1;
   if(pos<s->pos){
     int64_t x=pos-(s->pos-s->buf_len);
     if(x>=0){

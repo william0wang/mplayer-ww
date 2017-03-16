@@ -22,7 +22,7 @@ static long pci_config_read_long(
           int func,
           unsigned cmd)
 {
-    unsigned long retval;
+    unsigned retval;
     pciconfig_read(bus, dev<<3, cmd, 4, &retval);
     return retval;
 }

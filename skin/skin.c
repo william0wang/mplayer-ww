@@ -109,12 +109,12 @@ static image_t *pngRead(const char *skindir, const char *fname)
       int src_stride[4] = { 4 * bmp.Width, 0, 0, 0 };
       uint8_t *dst[4] = { NULL, NULL, NULL, NULL };
       int dst_stride[4];
-      enum PixelFormat out_pix_fmt;
+      enum AVPixelFormat out_pix_fmt;
       struct SwsContext *sws;
-      if      (desktopbpp == 16) out_pix_fmt = PIX_FMT_RGB555;
-      else if (desktopbpp == 24) out_pix_fmt = PIX_FMT_RGB24;
+      if      (desktopbpp == 16) out_pix_fmt = AV_PIX_FMT_RGB555;
+      else if (desktopbpp == 24) out_pix_fmt = AV_PIX_FMT_RGB24;
       av_image_fill_linesizes(dst_stride, out_pix_fmt, bmp.Width);
-      sws = sws_getContext(bmp.Width, bmp.Height, PIX_FMT_RGB32,
+      sws = sws_getContext(bmp.Width, bmp.Height, AV_PIX_FMT_RGB32,
                            bmp.Width, bmp.Height, out_pix_fmt,
                            SWS_POINT, NULL, NULL, NULL);
       bf->data = malloc(bf->size);
@@ -213,7 +213,7 @@ int loadskin(skin_t *skin, HWND hWnd)
 	char *skindir = NULL;
 	HINSTANCE hInstance = GetModuleHandle(0);
 
-    if(!show_controlbar || !hWnd) 
+    if(!show_controlbar || !hWnd)
     	return 0;
 
  	skindir = get_path("skin");
@@ -1183,7 +1183,7 @@ BOOL TransparentBlt(HDC dcDest, int nXOriginDest, int nYOriginDest, int nWidthDe
 {
      HDC dc, maskDC, newMaskDC, newImageDC;
      HBITMAP bitmap, oldBitmap, maskBitmap, oldMask, newMask, oldNewMask, newImage, oldNewImage;
-     
+
      if (nWidthDest < 1) return FALSE;
      if (nWidthSrc < 1) return FALSE;
      if (nHeightDest < 1) return FALSE;
@@ -2771,7 +2771,7 @@ int on_lbutton_up(skin_t *skin, HWND hDlg, RECT r, POINT p, HWND hCmd)
 			refresh = 1;
 		}
 	}
-	
+
 	return refresh;
 }
 

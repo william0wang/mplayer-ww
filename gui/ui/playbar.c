@@ -160,12 +160,13 @@ static void uiPlaybarMouse( int Button, int X, int Y, int RX, int RY )
 
         switch( item->type )
          {
-          case itButton:
+          // NOTE TO MYSELF: commented, because the expression can never be true
+          /*case itButton:
                if ( ( SelectedItem > -1 ) &&
                  ( ( ( item->message == evPlaySwitchToPause && item->message == evPauseSwitchToPlay ) ) ||
                  ( ( item->message == evPauseSwitchToPlay && item->message == evPlaySwitchToPause ) ) ) )
                  { item->pressed=btnDisabled; }
-               break;
+               break;*/
           case itRPotmeter:
                prev_point=appRadian( item, X - item->x, Y - item->y ) - item->zeropoint;
                if ( prev_point < 0.0 ) prev_point+=2*M_PI;

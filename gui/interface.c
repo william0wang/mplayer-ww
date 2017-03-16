@@ -32,6 +32,7 @@
 #include "ui/ui.h"
 #include "util/list.h"
 #include "util/mem.h"
+#include "util/misc.h"
 #include "util/string.h"
 #include "wm/ws.h"
 #include "wm/wsxdnd.h"
@@ -53,6 +54,7 @@
 #include "libmpcodecs/dec_video.h"
 #include "libmpcodecs/vd.h"
 #include "libmpcodecs/vf.h"
+#include "libmpdemux/demuxer.h"
 #include "libvo/video_out.h"
 #include "libvo/x11_common.h"
 #include "osdep/timer.h"
@@ -76,6 +78,10 @@ guiInterface_t guiInfo = {
 
 static int guiInitialized;
 static int orig_fontconfig;
+static struct {
+    int changed;
+    char *name;
+} orig_demuxer;
 
 /**
  * @brief Set option 'fontconfig' depending on #font_name.
@@ -92,7 +98,7 @@ static void set_fontconfig(void)
  * @param vf video filter to be added or changed
  * @param argvf pointer to an array of (new) parameter/value pairs
  */
-static void add_vf(const char *vf, const char *const *argvf)
+static void add_vf(const char *vf, const char * const *argvf)
 {
     if (vf_settings) {
         int i = 0;
@@ -440,6 +446,9 @@ int gui(int what, void *data)
         wsMouseAutohide();
         gtkEvents();
 
+        if (guiInfo.Stop && (guiInfo.ElapsedTime >= guiInfo.Stop))
+            guiInfo.MediumChanged = GUI_MEDIUM_NEW;
+
         break;
 
     case GUI_RUN_COMMAND:
@@ -498,6 +507,9 @@ int gui(int what, void *data)
             force_fps = 0;
         }
 
+        if (guiInfo.Filename && (gstrcmp(strrchr(guiInfo.Filename, '.'), ".cue") == 0))
+            guiInfo.StreamType = STREAMTYPE_BINCUE;
+
         switch (guiInfo.StreamType) {
         case STREAMTYPE_FILE:
         case STREAMTYPE_STREAM:
@@ -508,7 +520,7 @@ int gui(int what, void *data)
         {
             char tmp[512];
 
-            sprintf(tmp, "cdda://%d", guiInfo.Track);
+            snprintf(tmp, sizeof(tmp), "cdda://%d%s%s", guiInfo.Track, guiInfo.ImageFilename ? "/" : "", guiInfo.ImageFilename ? guiInfo.ImageFilename : "");
             uiSetFile(NULL, tmp, SAME_STREAMTYPE);
         }
         break;
@@ -517,7 +529,7 @@ int gui(int what, void *data)
         {
             char tmp[512];
 
-            sprintf(tmp, "vcd://%d", guiInfo.Track);
+            snprintf(tmp, sizeof(tmp), "vcd://%d%s%s", guiInfo.Track, guiInfo.ImageFilename ? "/" : "", guiInfo.ImageFilename ? guiInfo.ImageFilename : "");
             uiSetFile(NULL, tmp, SAME_STREAMTYPE);
         }
         break;
@@ -526,7 +538,7 @@ int gui(int what, void *data)
         {
             char tmp[512];
 
-            sprintf(tmp, "dvd://%d", guiInfo.Track);
+            snprintf(tmp, sizeof(tmp), "dvd://%d%s%s", guiInfo.Track, guiInfo.ImageFilename ? "/" : "", guiInfo.ImageFilename ? guiInfo.ImageFilename : "");
             uiSetFile(NULL, tmp, SAME_STREAMTYPE);
         }
 #ifdef CONFIG_DVDREAD
@@ -543,6 +555,54 @@ int gui(int what, void *data)
             sprintf(tmp, "%s://", guiTV[gui_tv_digital].SchemeName);
             uiSetFile(NULL, tmp, SAME_STREAMTYPE);
         }
+        break;
+
+        case STREAMTYPE_BINCUE:
+        {
+            char tmp[512], *fname, *colon;
+
+            fname = guiInfo.Filename;
+
+            if (strncmp(guiInfo.Filename, "cue://", 6) == 0)
+                fname += 6;
+
+            if (fname == guiInfo.Filename) {   // no scheme, so check for playlist
+                plItem **playlist = cue_playlist(guiInfo.Filename);
+
+                if (playlist) {
+                    plItem *curr = listMgr(PLAYLIST_ITEM_GET_CURR, 0);
+
+                    while (*playlist) {
+                        if (*(playlist + 1))
+                            (*playlist)->stop = (*(playlist + 1))->start;
+                        else
+                            (*playlist)->stop = 0;
+
+                        listMgr(PLAYLIST_ITEM_INSERT, *playlist);
+                        playlist++;
+                    }
+
+                    listMgr(PLAYLIST_ITEM_SET_CURR, curr);
+                    listMgr(PLAYLIST_ITEM_DEL_CURR, 0);
+
+                    guiInfo.StreamType = STREAMTYPE_FILE;
+                }
+            }
+
+            if (guiInfo.StreamType == STREAMTYPE_BINCUE) {
+                colon = strrchr(fname, ':');
+
+                if (colon)
+                    *colon = 0;
+
+                snprintf(tmp, sizeof(tmp), "cue://%s:%d", fname, guiInfo.Track);
+                uiSetFile(NULL, tmp, SAME_STREAMTYPE);
+            } else {
+                next = listMgr(PLAYLIST_ITEM_GET_CURR, 0);
+                uiSetFileFromPlaylist(next);
+            }
+        }
+        break;
         }
 
         /* video opts */
@@ -729,6 +789,12 @@ int gui(int what, void *data)
             guiInfo.StreamType = stream->type;
         }
 
+        if (orig_demuxer.changed) {
+            free(demuxer_name);
+            demuxer_name = orig_demuxer.name;
+            orig_demuxer.changed = False;
+        }
+
         switch (guiInfo.StreamType) {
         case STREAMTYPE_FILE:
         case STREAMTYPE_STREAM:
@@ -774,6 +840,22 @@ int gui(int what, void *data)
         case STREAMTYPE_DVB:
             guiInfo.Tracks = guiInfo.Track = 1;
             break;
+
+        case STREAMTYPE_BINCUE:
+
+            guiInfo.Tracks = 0;
+            stream_control(stream, STREAM_CTRL_GET_NUM_TITLES, &guiInfo.Tracks);
+            if (stream_control(stream, STREAM_CTRL_GET_CURRENT_TITLE, &guiInfo.Track) == STREAM_OK)
+                guiInfo.Track++;
+            stream_control(stream, STREAM_CTRL_GET_NUM_ANGLES, &guiInfo.Angles);
+
+            if (guiInfo.Angles == 0) {
+                orig_demuxer.name    = demuxer_name;
+                demuxer_name         = strdup("rawaudio");
+                orig_demuxer.changed = True;
+            }
+
+            break;
         }
 
         break;
@@ -787,7 +869,7 @@ int gui(int what, void *data)
         nfree(guiInfo.CodecName);
 
         if (guiInfo.sh_video)
-            guiInfo.CodecName = strdup(guiInfo.sh_video->codec->name);
+            guiInfo.CodecName = strdup(codec_idx2str(guiInfo.sh_video->codec->name_idx));
 
         state = (isSeekableStreamtype ? btnReleased : btnDisabled);
         btnSet(evForward10sec, state);
@@ -850,6 +932,9 @@ int gui(int what, void *data)
                 }
             }
         }
+
+        if (guiInfo.Start)
+            uiAbsSeek(guiInfo.Start);
 
         // These must be done here (in the last call from MPlayer before
         // playback starts) and not in GUI_SETUP_VIDEO_WINDOW, because...
@@ -926,7 +1011,7 @@ int gui(int what, void *data)
                 break;
             }
 
-            if (guiInfo.StreamType == STREAMTYPE_CDDA && guiInfo.Track < guiInfo.Tracks) {
+            if ((guiInfo.StreamType == STREAMTYPE_CDDA || guiInfo.StreamType == STREAMTYPE_BINCUE) && guiInfo.Track < guiInfo.Tracks) {
                 uiNext();
                 break;
             }
@@ -935,9 +1020,8 @@ int gui(int what, void *data)
         }
 
         if (next) {
-            uiSetFile(next->path, next->name, STREAMTYPE_FILE);
+            uiSetFileFromPlaylist(next);
             guiInfo.MediumChanged = GUI_MEDIUM_NEW;
-            guiInfo.Track = (uintptr_t)listMgr(PLAYLIST_ITEM_GET_POS, next);
         } else {
             if (guiInfo.MediumChanged == GUI_MEDIUM_NEW)
                 break;
@@ -951,11 +1035,25 @@ int gui(int what, void *data)
                     uiUnsetFile();
                 else if ((curr != listMgr(PLAYLIST_GET, 0)) && guiInfo.Playing) {
                     curr = listMgr(PLAYLIST_ITEM_SET_CURR, listMgr(PLAYLIST_GET, 0));
-                    uiSetFile(curr->path, curr->name, STREAMTYPE_FILE);
+                    uiSetFileFromPlaylist(curr);
                     guiInfo.Track = 1;
                 }
             } else if (guiInfo.Playing) {
-                int first = (guiInfo.StreamType == STREAMTYPE_VCD ? 2 : 1);
+                int first;
+
+                switch (guiInfo.StreamType) {
+                case STREAMTYPE_VCD:
+                    first = 2;
+                    break;
+
+                case STREAMTYPE_BINCUE:
+                    first = 1 + guiInfo.Angles;
+                    break;
+
+                default:
+                    first = 1;
+                    break;
+                }
 
                 if (guiInfo.Track != first) {
                     uiUnsetMedia(True);
@@ -1162,9 +1260,9 @@ void mplayer(int what, float value, void *data)
     {
         mp_cmd_t *mp_cmd;
 
-        mp_cmd       = calloc(1, sizeof(*mp_cmd));
-        mp_cmd->id   = MP_CMD_PANSCAN;
-        mp_cmd->name = strdup("panscan");
+        mp_cmd     = calloc(1, sizeof(*mp_cmd));
+        mp_cmd->id = MP_CMD_PANSCAN;
+        ARRAY_STRCPY(mp_cmd->name, "panscan");
         mp_cmd->args[0].v.f = value;
         mp_cmd->args[1].v.i = 1;
         mp_input_queue_cmd(mp_cmd);
